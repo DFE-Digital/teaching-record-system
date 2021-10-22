@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    name: Build & Test
     runs-on: ubuntu-latest
 
     steps:
@@ -19,4 +20,12 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Test
-      run: dotnet test --configuration Release --no-build
+      run: dotnet test --configuration Release --no-build --logger trx
+
+    - name: Test report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with:
+        name: Unit tests
+        path: "**/*.trx"
+        reporter: dotnet-trx
