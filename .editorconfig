@@ -7,5 +7,8 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+[*.{yml,yaml}]
+indent_size=2
+
 [*.cs]
 dotnet_sort_system_directives_first = true
