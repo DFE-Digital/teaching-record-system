@@ -29,3 +29,25 @@ jobs:
         name: Unit tests
         path: "**/*.trx"
         reporter: dotnet-trx
+
+    - name: Publish
+      run: dotnet publish --configuration Release --no-build src/DqtApi/DqtApi.csproj
+
+    - name: Docker image tag
+      id: image
+      run: |
+        echo ::set-output name=tag::ghcr.io/$GITHUB_REPOSITORY:sha-$(echo $GITHUB_SHA | cut -c -7)
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Docker build & push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: ${{ github.ref == 'refs/heads/main' }}
+        tags: ${{ steps.image.outputs.tag }}
