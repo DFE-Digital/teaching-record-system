@@ -29,6 +29,7 @@ namespace DqtApi
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
+                c.EnableAnnotations();
             });
 
             if (Environment.EnvironmentName != "Testing")
