@@ -12,12 +12,15 @@ namespace DqtApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            Environment = env;
         }
 
         public IConfiguration Configuration { get; }
+
+        public IWebHostEnvironment Environment { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -28,7 +31,10 @@ namespace DqtApi
                 c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
             });
 
-            services.AddSingleton<ServiceClient>(GetCrmServiceClient());
+            if (Environment.EnvironmentName != "Testing")
+            {
+                services.AddSingleton<IOrganizationServiceAsync>(GetCrmServiceClient());
+            }
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
