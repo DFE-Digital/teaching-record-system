@@ -39,7 +39,7 @@ jobs:
     - name: Docker image tag
       id: image
       run: |
-        echo ::set-output name=tag::ghcr.io/$GITHUB_REPOSITORY:sha-$(echo $GITHUB_SHA | cut -c -7)
+        echo ::set-output name=tag::ghcr.io/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):sha-$(echo $GITHUB_SHA | cut -c -7)
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v1
