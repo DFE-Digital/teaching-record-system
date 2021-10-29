@@ -25,9 +25,18 @@ $crmClientSecret = Get-UserSecret "CrmClientSecret"
 
 $connectionString = "AuthType=ClientSecret;url=${crmUrl};ClientId=${crmClientId};ClientSecret=${crmClientSecret}"
 
+$coreToolsFolder = (Join-Path $PSScriptRoot tools coretools)
+
+Copy-Item (Join-Path $PSScriptRoot tools DqtApi.CrmSvcUtilFilter filter.xml) (Join-Path $coreToolsFolder filter.xml)
+
 $namespace = "DqtApi.Models"
 $output = Join-Path -Path $PSScriptRoot -ChildPath src DqtApi Models GeneratedCode.cs
 mkdir (Split-Path $output) -Force | Out-Null
 
-$crmSvcUtil = Join-Path -Path $PSScriptRoot -ChildPath tools coretools "CrmSvcUtil.exe"
-& $crmSvcUtil /connectionstring:${connectionString} /out:${output} /namespace:${namespace} /emitfieldsclasses
+$crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"
+& $crmSvcUtil `
+    /connectionstring:${connectionString} `
+    /out:${output} `
+    /namespace:${namespace} `
+    /emitfieldsclasses `
+    /codewriterfilter:DqtApi.CrmSvcUtilFilter.CodeWriterFilter,DqtApi.CrmSvcUtilFilter
