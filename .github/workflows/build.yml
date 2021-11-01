@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      docker_image_tag: ${{ steps.image.outputs.tag }}
+      docker-image: ${{ steps.image.outputs.tag }}
 
     steps:
     - uses: actions/checkout@v1
@@ -47,10 +47,25 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Docker build & push
       uses: docker/build-push-action@v2
       with:
         context: .
         push: ${{ github.ref == 'refs/heads/main' }}
         tags: ${{ steps.image.outputs.tag }}
+
+  deploy_dev:
+    name: Deploy to dev environment
+    runs-on: ubuntu-latest
+    needs: build
+    #if: ${{ github.ref == 'refs/heads/main' }}
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Deploy
+      uses: ./.github/workflows/actions/deploy
+      with:
+        environment-name: dev
+        image: ${{ needs.build.outputs.docker-image }}

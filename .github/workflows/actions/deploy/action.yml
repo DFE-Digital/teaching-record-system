@@ -1,0 +1,25 @@
+name: 'Deploy to GOV.UK PaaS'
+inputs:
+  environment-name:
+    required: true
+    type: 'string'
+  docker-image:
+    required: true
+    type: 'string'
+
+runs:
+  using: 'composite'
+
+  steps:
+    - run: |
+        if [ -z "${{ inputs.environment-name }}" ]; then
+          echo "::error ::environment-name is empty"
+          exit 1
+        fi
+
+        if [ -z "${{ inputs.docker-image }}" ]; then
+          echo "::error ::docker-image is empty"
+          exit 1
+        fi
+      name: Validate inputs
+      shell: bash
