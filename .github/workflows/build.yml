@@ -23,7 +23,7 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Test
-      run: dotnet test --configuration Release --no-build --logger trx
+      run: dotnet test tests/DqtApi.Tests --configuration Release --no-build --logger trx
 
     - name: Test report
       uses: dorny/test-reporter@v1
