@@ -7,6 +7,7 @@ using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace DqtApi.FunctionalTests
 {
@@ -41,6 +42,17 @@ namespace DqtApi.FunctionalTests
             {
                 BaseAddress = new Uri(Configuration["BaseUrl"])
             };
+
+            if (!string.IsNullOrEmpty(Configuration["AdditionalHeadersJson"]))
+            {
+                var additionalHeadersJson = JObject.Parse(Configuration["AdditionalHeadersJson"]);
+
+                foreach (var kvp in additionalHeadersJson)
+                {
+                    httpClient.DefaultRequestHeaders.Add(kvp.Key, kvp.Value.ToString());
+                }
+            }
+
             return httpClient;
         }
 
