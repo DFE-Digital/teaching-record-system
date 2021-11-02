@@ -109,6 +109,9 @@ jobs:
       url: ${{ steps.deploy.outputs.environment_url }}
     concurrency: deploy_dev
 
+    outputs:
+      environment_url: ${{ steps.deploy.outputs.environment_url }}
+
     steps:
     - uses: actions/checkout@v2
 
@@ -120,3 +123,15 @@ jobs:
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
         terraform_vars: dev.tfvars.json
         terraform_backend_vars: dev.backend.tfvars
+
+  zap_scan:
+    name: OWASP ZAP API scan
+    needs: deploy_dev
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: zaproxy/action-api-scan@v0.1.0
+      with:
+        target: ${{ needs.deploy_dev.outputs.environment_url}}swagger/v1/swagger.json
+        format: openapi
+        allow_issue_writing: false
