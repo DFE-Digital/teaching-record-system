@@ -210,4 +210,31 @@ namespace DqtApi.Models
 			}
 		}
 	}
+	
+	/// <summary>
+	/// Represents a source of entities bound to a CRM service. It tracks and manages changes made to the retrieved entities.
+	/// </summary>
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
+	public partial class DqtServiceContext : Microsoft.Xrm.Sdk.Client.OrganizationServiceContext
+	{
+		
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		public DqtServiceContext(Microsoft.Xrm.Sdk.IOrganizationService service) : 
+				base(service)
+		{
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.Models.Contact"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.Models.Contact> ContactSet
+		{
+			get
+			{
+				return this.CreateQuery<DqtApi.Models.Contact>();
+			}
+		}
+	}
 }
