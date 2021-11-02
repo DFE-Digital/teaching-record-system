@@ -32,5 +32,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DqtApi.TestCommon\DqtApi.TestCommon.csproj" />
+  </ItemGroup>
   
 </Project>
