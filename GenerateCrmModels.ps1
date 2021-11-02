@@ -39,4 +39,5 @@ $crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"
     /out:${output} `
     /namespace:${namespace} `
     /emitfieldsclasses `
+    /servicecontextname:DqtServiceContext `
     /codewriterfilter:DqtApi.CrmSvcUtilFilter.CodeWriterFilter,DqtApi.CrmSvcUtilFilter
