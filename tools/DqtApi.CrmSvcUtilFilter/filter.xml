@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <filter>
     <entities>
-        <entity>contact</entity>
+        <entity name="contact">
+            <attributes>
+                <attribute name="fullname"/>
+            </attributes>
+        </entity>
     </entities>
 </filter>
