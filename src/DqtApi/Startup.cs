@@ -1,4 +1,6 @@
 using System;
+using FluentValidation.AspNetCore;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -24,13 +26,24 @@ namespace DqtApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services
+                .AddMvc()
+                .AddFluentValidation(fv =>
+                {
+                    fv.RegisterValidatorsFromAssemblyContaining(typeof(Startup));
+                })
+                .AddHybridModelBinder(options =>
+                {
+                    options.FallbackBindingOrder = new[] { HybridModelBinding.Source.Body };
+                });
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
                 c.EnableAnnotations();
             });
+
+            services.AddMediatR(typeof(Startup));
 
             if (Environment.EnvironmentName != "Testing")
             {
