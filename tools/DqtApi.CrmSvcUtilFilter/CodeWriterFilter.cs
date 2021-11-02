@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using Microsoft.Crm.Services.Utility;
@@ -11,21 +12,22 @@ namespace DqtApi.CrmSvcUtilFilter
     public class CodeWriterFilter : ICodeWriterFilterService
     {
         private readonly ICodeWriterFilterService _defaultService;
-        private readonly HashSet<string> _validEntities;
+        private readonly IDictionary<string, IEnumerable<string>> _validEntities;
 
         public CodeWriterFilter(ICodeWriterFilterService defaultService)
         {
             _defaultService = defaultService;
-            _validEntities = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            _validEntities = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
 
             LoadFilterData();
         }
 
         public bool GenerateAttribute(AttributeMetadata attributeMetadata, IServiceProvider services) =>
-            _defaultService.GenerateAttribute(attributeMetadata, services);
+            _validEntities.ContainsKey(attributeMetadata.EntityLogicalName)
+            && _validEntities[attributeMetadata.EntityLogicalName].Contains(attributeMetadata.LogicalName);
 
         public bool GenerateEntity(EntityMetadata entityMetadata, IServiceProvider services) =>
-            _validEntities.Contains(entityMetadata.LogicalName);
+            _validEntities.ContainsKey(entityMetadata.LogicalName);
 
         public bool GenerateOption(OptionMetadata optionMetadata, IServiceProvider services) =>
             _defaultService.GenerateOption(optionMetadata, services);
@@ -48,7 +50,8 @@ namespace DqtApi.CrmSvcUtilFilter
 
             foreach (XElement entityElement in entitiesElement.Elements("entity"))
             {
-                _validEntities.Add(entityElement.Value.ToLowerInvariant());
+                var attributes = entityElement.Element("attributes");
+                _validEntities.Add(entityElement.Attribute("name").Value.ToLowerInvariant(), attributes.Elements("attribute").Select(attribute => attribute.Attribute("name").Value.ToLowerInvariant()));
             }
         }
     }
