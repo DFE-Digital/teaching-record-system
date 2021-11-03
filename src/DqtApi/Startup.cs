@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using DqtApi.Security;
 using FluentValidation.AspNetCore;
@@ -61,6 +62,28 @@ namespace DqtApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
                 c.EnableAnnotations();
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Scheme = "Bearer",
+                    Type = SecuritySchemeType.Http
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    [
+                        new OpenApiSecurityScheme()
+                        {
+                            Reference = new OpenApiReference()
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        }
+                    ] = new List<string>()
+                });
             });
 
             services.AddMediatR(typeof(Startup));
@@ -101,6 +124,7 @@ namespace DqtApi
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("v1/swagger.json", "DQT API");
+                    c.EnablePersistAuthorization();
                 });
             }
         }
