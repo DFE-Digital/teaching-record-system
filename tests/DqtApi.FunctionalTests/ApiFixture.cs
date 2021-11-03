@@ -20,6 +20,7 @@ namespace DqtApi.FunctionalTests
             EnvironmentName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
 
             Configuration = GetConfiguration();
+            TestData = Configuration.GetSection("TestData");
             HttpClient = CreateHttpClient();
             StartLocalApi();
         }
@@ -29,6 +30,8 @@ namespace DqtApi.FunctionalTests
         public string EnvironmentName { get; }
 
         public HttpClient HttpClient { get; }
+
+        public IConfigurationSection TestData { get; }
 
         public void Dispose()
         {
