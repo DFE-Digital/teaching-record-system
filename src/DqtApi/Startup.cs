@@ -1,4 +1,6 @@
 using System;
+using System.Security.Claims;
+using DqtApi.Security;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +28,20 @@ namespace DqtApi
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(
+                    "Bearer",
+                    policy => policy
+                        .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                        .RequireClaim(ClaimTypes.Name));
+
+                options.DefaultPolicy = options.GetPolicy("Bearer");
+            });
+
             services
                 .AddMvc()
                 .AddFluentValidation(fv =>
@@ -44,6 +60,7 @@ namespace DqtApi
             });
 
             services.AddMediatR(typeof(Startup));
+            services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
 
             if (Environment.EnvironmentName != "Testing")
             {
@@ -59,6 +76,9 @@ namespace DqtApi
             }
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
