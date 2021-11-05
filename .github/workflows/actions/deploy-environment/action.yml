@@ -1,0 +1,74 @@
+name: Deploy PAAS environment
+
+inputs:
+  environment_name:
+    description: 'The name of the environment'
+    required: true
+  docker_image:
+    description: 'The Docker image to deploy to the environment'
+    required: true
+  azure_credentials:
+    description: 'JSON object containing a service principal that can read from Azure Key Vault'
+    required: true
+  terraform_vars:
+    description: 'Path to the tfvars file for the environment'
+    required: true
+  terraform_backend_vars:
+    description: 'Path to the backend tfvars file for the environment'
+    required: true
+
+outputs:
+  environment_url:
+    description: 'The base URL for the deployed environment'
+    value: ${{ steps.terraform.outputs.url }}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Get Key Vault name
+      id: keyvault
+      run: |
+        KEY_VAULT_NAME=$(cat $TFVARS | grep -E '^key_vault_name' | cut -d'=' -f2 | tr -d '"' | tr -d ' ')
+
+        if [ -z "$KEY_VAULT_NAME" ]; then
+          echo "::error ::Failed to extract key_vault_name from $TFVARS"
+          exit 1
+        fi
+
+        echo ::set-output name=name::$KEY_VAULT_NAME
+      shell: bash
+      env:
+        TFVARS: ${{ inputs.terraform_vars }}
+      working-directory: terraform
+
+    - uses: Azure/login@v1
+      with:
+        creds: ${{ inputs.azure_credentials }}
+
+    - uses: Azure/get-keyvault-secrets@v1
+      id: get_secrets
+      with:
+        keyvault: ${{ steps.keyvault.outputs.name }}
+        secrets: 'TFSTATE-CONTAINER-ACCESS-KEY'
+
+    - uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.10
+        terraform_wrapper: false
+
+    - name: Terraform
+      id: terraform
+      run: |
+        terraform init -backend-config=$BACKEND_TFVARS -input=false -no-color
+        terraform apply -var-file=$TFVARS -auto-approve -input=false -no-color
+
+        echo ::set-output name=url::https://$(terraform output -raw api_fqdn)/
+      env:
+        ARM_ACCESS_KEY: ${{ steps.get_secrets.outputs.TFSTATE-CONTAINER-ACCESS-KEY }}
+        TFVARS: ${{ inputs.terraform_vars }}
+        BACKEND_TFVARS: ${{ inputs.terraform_backend_vars }}
+        TF_VAR_azure_sp_credentials_json: ${{ inputs.azure_credentials }}
+        TF_VAR_api_docker_image: ${{ inputs.docker_image }}
+      shell: bash
+      working-directory: terraform

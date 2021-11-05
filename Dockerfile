@@ -3,3 +3,4 @@
   COPY src/DqtApi/bin/Release/net5.0/publish/ App/
   WORKDIR /App
   ENTRYPOINT ["dotnet", "DqtApi.dll"]
+  EXPOSE 80
