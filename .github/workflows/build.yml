@@ -23,11 +23,11 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Test
-    - env:
+      run: dotnet test --configuration Release --no-build --logger trx
+      env:
         IntegrationTests_CrmUrl: ${{ secrets.IntegrationTests_CrmUrl }}
         IntegrationTests_CrmClientId: ${{ secrets.IntegrationTests_CrmClientId }}
         IntegrationTests_CrmClientSecret: ${{ secrets.IntegrationTests_CrmClientSecret }}
-      run: dotnet test --configuration Release --no-build --logger trx
 
     - name: Test report
       uses: dorny/test-reporter@v1
