@@ -5,7 +5,7 @@
 
     <IsPackable>false</IsPackable>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
-    <UserSecretsId>7f5e1670-9172-4191-ae15-62f237715d18</UserSecretsId>
+    <UserSecretsId>DqtApiTests</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.1" />
