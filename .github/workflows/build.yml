@@ -25,9 +25,9 @@ jobs:
     - name: Test
       run: dotnet test tests/DqtApi.Tests --configuration Release --no-build --logger trx
       env:
-        IntegrationTests_CrmUrl: ${{ secrets.IntegrationTests_CrmUrl }}
-        IntegrationTests_CrmClientId: ${{ secrets.IntegrationTests_CrmClientId }}
-        IntegrationTests_CrmClientSecret: ${{ secrets.IntegrationTests_CrmClientSecret }}
+        IntegrationTests_CrmUrl: ${{ secrets.INTEGRATIONTESTS_CRMURL }}
+        IntegrationTests_CrmClientId: ${{ secrets.INTEGRATIONTESTS_CRMCLIENTID }}
+        IntegrationTests_CrmClientSecret: ${{ secrets.INTEGRATIONTESTS_CRMCLIENTSECRET }}
 
     - name: Test report
       uses: dorny/test-reporter@v1
@@ -51,7 +51,7 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Docker build & push
       uses: docker/build-push-action@v2
       with:
