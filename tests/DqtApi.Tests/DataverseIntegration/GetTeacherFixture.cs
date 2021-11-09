@@ -27,7 +27,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var builder = new ConfigurationBuilder()
                 .AddUserSecrets<GetTeacherTests>()
-                .AddEnvironmentVariables("Integration_");
+                .AddEnvironmentVariables("IntegrationTests_");
 
             _configuration = builder.Build();
 
