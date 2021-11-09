@@ -26,7 +26,8 @@ namespace DqtApi.Tests.DataverseIntegration
         public GetTeacherFixture()
         {
             var builder = new ConfigurationBuilder()
-                .AddUserSecrets<GetTeacherTests>();
+                .AddUserSecrets<GetTeacherTests>()
+                .AddEnvironmentVariables("Integration_");
 
             _configuration = builder.Build();
 
@@ -50,9 +51,9 @@ namespace DqtApi.Tests.DataverseIntegration
 
         private ServiceClient GetCrmServiceClient() =>
             new(
-                new Uri(_configuration["CrmUrl"]),
-                _configuration["CrmClientId"],
-                _configuration["CrmClientSecret"],
+                new Uri(_configuration["IntegrationTests_CrmUrl"]),
+                _configuration["IntegrationTests_CrmClientId"],
+                _configuration["IntegrationTests_CrmClientSecret"],
                 useUniqueInstance: true);
 
         private Guid GetFixtureId(string nationalInsuranceNumber)
