@@ -23,7 +23,7 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Test
-      run: dotnet test --configuration Release --no-build --logger trx
+      run: dotnet test tests/DqtApi.Tests --configuration Release --no-build --logger trx
       env:
         IntegrationTests_CrmUrl: ${{ secrets.IntegrationTests_CrmUrl }}
         IntegrationTests_CrmClientId: ${{ secrets.IntegrationTests_CrmClientId }}

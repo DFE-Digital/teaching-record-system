@@ -11,7 +11,9 @@ namespace DqtApi.Tests
         protected ApiTestBase(ApiFixture apiFixture)
         {
             ApiFixture = apiFixture;
+
             HttpClient = apiFixture.CreateClient();
+            HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "tests");
 
             apiFixture.ResetMocks();
         }

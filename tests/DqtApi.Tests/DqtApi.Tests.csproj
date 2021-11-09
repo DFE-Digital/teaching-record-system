@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DqtApi\DqtApi.csproj" />
+    <ProjectReference Include="..\DqtApi.TestCommon\DqtApi.TestCommon.csproj" />
   </ItemGroup>
 
 </Project>
