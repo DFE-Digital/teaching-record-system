@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DqtApi.Models;
 using Xunit;
 
-namespace DqtApi.Tests.UnitTests
+namespace DqtApi.Tests.V1.UnitTests
 {
     public class GetTeacherRequest
     {

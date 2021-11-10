@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using DqtApi.Models;
 
-namespace DqtApi.Responses
+namespace DqtApi.V1.Responses
 {
     public class GetTeacherResponse
     {

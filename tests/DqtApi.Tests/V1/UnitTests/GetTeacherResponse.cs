@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using DqtApi.Models;
 using Microsoft.Xrm.Sdk;
 using Xunit;
 
-namespace DqtApi.Tests.UnitTests
+namespace DqtApi.Tests.V1.UnitTests
 {
     public class GetTeacherResponse
     {
@@ -30,7 +28,7 @@ namespace DqtApi.Tests.UnitTests
 
             contact.FormattedValues.Add(Contact.Fields.StateCode, ContactState.Active.ToString());
 
-            var response = new Responses.GetTeacherResponse(contact);
+            var response = new DqtApi.V1.Responses.GetTeacherResponse(contact);
 
             Assert.True(response.ActiveAlert);
             Assert.Equal(birthDate, response.DateOfBirth);
@@ -66,7 +64,7 @@ namespace DqtApi.Tests.UnitTests
 
             contact.FormattedValues.Add($"{prefix}.{dfeta_qtsregistration.Fields.StateCode}", dfeta_qtsregistrationState.Active.ToString());
 
-            var response = new Responses.GetTeacherResponse(contact);
+            var response = new DqtApi.V1.Responses.GetTeacherResponse(contact);
 
             var qualifiedTeacherStatus = response.QualifiedTeacherStatus;
 
@@ -104,7 +102,7 @@ namespace DqtApi.Tests.UnitTests
             contact.FormattedValues.Add($"{prefix}.{dfeta_induction.Fields.dfeta_InductionStatus}", inductionStatusName);
             contact.FormattedValues.Add($"{prefix}.{dfeta_induction.Fields.StateCode}", dfeta_inductionState.Active.ToString());
 
-            var response = new Responses.GetTeacherResponse(contact);
+            var response = new DqtApi.V1.Responses.GetTeacherResponse(contact);
 
             var induction = response.Induction;
 
@@ -164,7 +162,7 @@ namespace DqtApi.Tests.UnitTests
             contact.FormattedValues.Add($"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_Subject3Id}", subject3);
             contact.FormattedValues.Add($"{prefix}.{dfeta_initialteachertraining.Fields.StateCode}", dfeta_initialteachertrainingState.Active.ToString());
 
-            var response = new Responses.GetTeacherResponse(contact);
+            var response = new DqtApi.V1.Responses.GetTeacherResponse(contact);
 
             var initialTeacherTraining = response.InitialTeacherTraining;
 
@@ -202,7 +200,7 @@ namespace DqtApi.Tests.UnitTests
                 })
             };
 
-            var response = new Responses.GetTeacherResponse(contact);
+            var response = new DqtApi.V1.Responses.GetTeacherResponse(contact);
 
             var qualifications = response.Qualifications;
 

@@ -2,15 +2,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using DqtApi.DAL;
 using DqtApi.Models;
-using DqtApi.Responses;
+using DqtApi.V1.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace DqtApi
+namespace DqtApi.V1.Controllers
 {
     [ApiController]
-    [Route("v1/teachers")]
+    [Route("teachers")]
     public class TeachersController : ControllerBase
     {
         private readonly IDataverseAdaptor _dataverseAdaptor;
@@ -27,7 +27,7 @@ namespace DqtApi
         [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetTeacher([FromRoute]GetTeacherRequest request)           
+        public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)           
         {            
             if (!request.BirthDate.HasValue)
             {

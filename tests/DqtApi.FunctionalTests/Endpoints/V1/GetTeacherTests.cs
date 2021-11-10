@@ -6,7 +6,7 @@ using DqtApi.TestCommon;
 using Xunit;
 using Xunit.Extensions.AssemblyFixture;
 
-namespace DqtApi.FunctionalTests.Endpoints
+namespace DqtApi.FunctionalTests.Endpoints.V1
 {
     public class GetTeacherTests : IAssemblyFixture<ApiFixture>
     {

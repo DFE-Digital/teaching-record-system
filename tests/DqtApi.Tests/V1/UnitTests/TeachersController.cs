@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DqtApi.DAL;
 using DqtApi.Models;
-using DqtApi.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace DqtApi.Tests.UnitTests
+namespace DqtApi.Tests.V1.UnitTests
 {
     public class TeachersController
     {
@@ -26,7 +25,7 @@ namespace DqtApi.Tests.UnitTests
         {
             _adaptor.Setup(a => a.GetMatchingTeachersAsync(It.IsAny<Models.GetTeacherRequest>())).ReturnsAsync(new List<Contact>());
 
-            var result = await new DqtApi.TeachersController(_adaptor.Object).GetTeacher(new Models.GetTeacherRequest{ TRN = trn, BirthDate = birthDate });
+            var result = await new DqtApi.V1.Controllers.TeachersController(_adaptor.Object).GetTeacher(new Models.GetTeacherRequest { TRN = trn, BirthDate = birthDate });
 
             Assert.IsType<NotFoundResult>(result);
         }
@@ -36,7 +35,7 @@ namespace DqtApi.Tests.UnitTests
         {
             _adaptor.Setup(a => a.GetMatchingTeachersAsync(It.IsAny<Models.GetTeacherRequest>())).ReturnsAsync(new[] { new Contact{ dfeta_TRN = trn } });
 
-            var result = await new DqtApi.TeachersController(_adaptor.Object).GetTeacher(new Models.GetTeacherRequest { TRN = trn, BirthDate = birthDate });
+            var result = await new DqtApi.V1.Controllers.TeachersController(_adaptor.Object).GetTeacher(new Models.GetTeacherRequest { TRN = trn, BirthDate = birthDate });
 
             Assert.IsType<OkObjectResult>(result);
         }
