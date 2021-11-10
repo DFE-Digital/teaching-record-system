@@ -4,9 +4,17 @@ on:
   push:
     branches:
     - main
+    paths-ignore:
+    - 'docs/**'
+    - 'README.md'
+    - 'LICENSE'
   pull_request:
     branches:
     - main
+    paths-ignore:
+    - 'docs/**'
+    - 'README.md'
+    - 'LICENSE'
 
 jobs:
   build:
@@ -51,7 +59,7 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Docker build & push
       uses: docker/build-push-action@v2
       with:
