@@ -109,9 +109,9 @@ namespace DqtApi
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
+                endpoints.MapGet("/health", async context =>
                 {
-                    await context.Response.WriteAsync("Hello World!");
+                    await context.Response.WriteAsync("OK");
                 });
 
                 endpoints.MapControllers();
