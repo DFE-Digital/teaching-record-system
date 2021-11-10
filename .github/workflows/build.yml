@@ -24,6 +24,10 @@ jobs:
 
     - name: Test
       run: dotnet test tests/DqtApi.Tests --configuration Release --no-build --logger trx
+      env:
+        IntegrationTests_CrmUrl: ${{ secrets.IntegrationTests_CrmUrl }}
+        IntegrationTests_CrmClientId: ${{ secrets.IntegrationTests_CrmClientId }}
+        IntegrationTests_CrmClientSecret: ${{ secrets.IntegrationTests_CrmClientSecret }}
 
     - name: Test report
       uses: dorny/test-reporter@v1
