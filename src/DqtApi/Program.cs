@@ -1,11 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
+using DqtApi.Security;
+using FluentValidation.AspNetCore;
+using MediatR;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
+using Microsoft.PowerPlatform.Dataverse.Client;
 
 namespace DqtApi
 {
@@ -13,16 +18,126 @@ namespace DqtApi
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
-        }
+            var builder = WebApplication.CreateBuilder(args);
+            var services = builder.Services;
+            var env = builder.Environment;
+            var configuration = builder.Configuration;
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+            services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(
+                    "Bearer",
+                    policy => policy
+                        .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                        .RequireClaim(ClaimTypes.Name));
+
+                options.DefaultPolicy = options.GetPolicy("Bearer");
+            });
+
+            services
+                .AddMvc(options =>
                 {
-                    webBuilder.ConfigureKestrel(options => options.AddServerHeader = false);
-
-                    webBuilder.UseStartup<Startup>();
+                    options.Filters.Add(new AuthorizeFilter());
+                })
+                .AddFluentValidation(fv =>
+                {
+                    fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));
+                })
+                .AddHybridModelBinder(options =>
+                {
+                    options.FallbackBindingOrder = new[] { HybridModelBinding.Source.Body };
                 });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
+                c.EnableAnnotations();
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Scheme = "Bearer",
+                    Type = SecuritySchemeType.Http
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    [
+                        new OpenApiSecurityScheme()
+                        {
+                            Reference = new OpenApiReference()
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        }
+                    ] = new List<string>()
+                });
+            });
+
+            services.AddMediatR(typeof(Program));
+            services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
+
+            if (env.EnvironmentName != "Testing")
+            {
+                services.AddSingleton<IOrganizationServiceAsync>(GetCrmServiceClient());
+            }
+
+            var app = builder.Build();
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.Use((ctx, next) =>
+            {
+                ctx.Response.Headers.Add("X-Frame-Options", "deny");
+                ctx.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                ctx.Response.Headers.Add("X-XSS-Protection", "0");
+
+                return next();
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGet("/health", async context =>
+                {
+                    await context.Response.WriteAsync("OK");
+                });
+
+                endpoints.MapControllers();
+            });
+
+            app.UseSwagger(options =>
+            {
+                options.PreSerializeFilters.Add((_, request) =>
+                {
+                    request.HttpContext.Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+                });
+            });
+
+            if (env.IsDevelopment())
+            {
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("v1/swagger.json", "DQT API");
+                    c.EnablePersistAuthorization();
+                });
+            }
+
+            app.Run();
+
+            ServiceClient GetCrmServiceClient() =>
+                new ServiceClient(
+                    new Uri(configuration["CrmUrl"]),
+                    configuration["CrmClientId"],
+                    configuration["CrmClientSecret"],
+                    useUniqueInstance: true);
+        }
     }
 }

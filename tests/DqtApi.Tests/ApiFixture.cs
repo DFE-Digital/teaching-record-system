@@ -6,7 +6,7 @@ using Moq;
 
 namespace DqtApi.Tests
 {
-    public class ApiFixture : WebApplicationFactory<DqtApi.Startup>
+    public class ApiFixture : WebApplicationFactory<DqtApi.Program>
     {
         public Mock<IOrganizationServiceAsync> OrganizationService { get; } = new Mock<IOrganizationServiceAsync>();
 
