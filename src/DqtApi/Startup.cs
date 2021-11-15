@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,6 +49,7 @@ namespace DqtApi
                 .AddMvc(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter());
+                    options.Filters.Add(new ResponseCacheAttribute() { Duration = 0, Location = ResponseCacheLocation.None });
                 })
                 .AddFluentValidation(fv =>
                 {
@@ -107,6 +109,15 @@ namespace DqtApi
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.Use((ctx, next) =>
+            {
+                ctx.Response.Headers.Add("X-Frame-Options", "deny");
+                ctx.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                ctx.Response.Headers.Add("X-XSS-Protection", "0");
+
+                return next();
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/health", async context =>
@@ -117,7 +128,13 @@ namespace DqtApi
                 endpoints.MapControllers();
             });
 
-            app.UseSwagger();
+            app.UseSwagger(options =>
+            {
+                options.PreSerializeFilters.Add((_, request) =>
+                {
+                    request.HttpContext.Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+                });
+            });
 
             if (env.IsDevelopment())
             {
