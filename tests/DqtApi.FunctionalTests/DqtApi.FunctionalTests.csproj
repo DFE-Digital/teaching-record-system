@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
-    <RunSettingsFilePath>$(MSBuildProjectDirectory)\.runsettings</RunSettingsFilePath>
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)\dev.runsettings</RunSettingsFilePath>
     <UserSecretsId>DqtApiFunctionalTests</UserSecretsId>
   </PropertyGroup>
 
@@ -35,6 +35,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DqtApi.TestCommon\DqtApi.TestCommon.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../../src/DqtApi/Configuration/**/*.cs">
+      <Link>\Configuration\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
   </ItemGroup>
   
 </Project>
