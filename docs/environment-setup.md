@@ -31,7 +31,7 @@ Add a secret named `AZURE_CREDENTIALS`. Use the JSON object from above for the v
 ### Create the resource group
 
 Create a parameters file for the new environment within the `azure` folder e.g. `azuredeploy.dev.parameters.json`.
-Specify values for the `environmentName`, `keyVaultName` and `storageAccountName` parameters.
+Specify values for the `keyVaultName` and `storageAccountName` parameters.
 
 #### Example **`azuredeploy.dev.parameters.json`**
 ```json
@@ -39,9 +39,6 @@ Specify values for the `environmentName`, `keyVaultName` and `storageAccountName
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "environmentName": {
-      "value": "Dev"
-    },
     "keyVaultName": {
       "value": "s165d01-kv"
     },
@@ -81,14 +78,16 @@ storage_account_name = "s165d01tfstate"
 key                  = "dev.tfstate"
 ```
 
-The main `.tfvars` file needs the resource group and Key Vault names from the resource group deployment above as well as the PAAS space and application name where it should be deployed.
+The main `.tfvars.json` file needs the resource group and Key Vault names from the resource group deployment above as well as the PAAS space and application name where it should be deployed.
 
-#### Example **`dev.tfvars`**
+#### Example **`dev.tfvars.json`**
 ```hcl
-key_vault_name      = "s165d01-kv"
-resource_group_name = "s165d01-rg"
-app_name            = "qualified-teachers-api-dev"
-paas_space          = "tra-dev"
+{
+  "key_vault_name": "s165d01-kv",
+  "resource_group_name": "s165d01-rg",
+  "api_app_name": "qualified-teachers-api-dev",
+  "paas_space": "tra-dev"
+}
 ```
 
 ## Secrets
