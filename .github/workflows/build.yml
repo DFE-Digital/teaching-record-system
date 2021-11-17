@@ -31,10 +31,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+
     - name: Build
       run: dotnet build --configuration Release
 
     - name: Test
+      id: test
       run: dotnet test tests/DqtApi.Tests --configuration Release --no-build --logger trx
       env:
         IntegrationTests_CrmUrl: ${{ secrets.IntegrationTests_CrmUrl }}
@@ -43,7 +48,7 @@ jobs:
 
     - name: Test report
       uses: dorny/test-reporter@v1
-      if: success() || failure()
+      if: ${{ steps.test.outcome != 'skipped' }}
       with:
         name: Test results
         path: "**/*.trx"

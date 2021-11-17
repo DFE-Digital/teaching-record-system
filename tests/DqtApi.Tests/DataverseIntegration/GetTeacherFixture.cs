@@ -26,7 +26,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public GetTeacherFixture()
         {
             var builder = new ConfigurationBuilder()
-                .AddUserSecrets<GetTeacherTests>()
+                .AddUserSecrets<GetTeacherTests>(optional: true)
                 .AddEnvironmentVariables("IntegrationTests_");
 
             _configuration = builder.Build();
