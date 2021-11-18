@@ -1,10 +1,6 @@
 locals {
-  # Any Key Vault secret prefixed 'APP--' gets exposed to the app as an environment variable.
-  # The ASP.NET Core configuration system expects keys with '__' separators but Key Vault doesn't support that
-  # so we use '--' instead in the secret name.
   api_app_config = {
-    for k, v in data.azurerm_key_vault_secret.secrets :
-    replace(substr(k, length("APP--"), -1), "--", "__") => v.value if substr(k, 0, length("APP--")) == "APP--"
+    AppConfig = data.azurerm_key_vault_secret.secrets["APP-CONFIG"].value
   }
 }
 

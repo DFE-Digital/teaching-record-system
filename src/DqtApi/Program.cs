@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using DqtApi.Configuration;
 using DqtApi.Security;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -19,6 +20,12 @@ namespace DqtApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            if (builder.Environment.IsProduction())
+            {
+                builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
+            }
+
             var services = builder.Services;
             var env = builder.Environment;
             var configuration = builder.Configuration;

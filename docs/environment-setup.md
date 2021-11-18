@@ -96,10 +96,6 @@ In addition to the `TFSTATE-CONTAINER-ACCESS-KEY` secret, `PAAS-USER` and `PAAS-
 
 ### Application secrets
 
-Any secrets in the Key Vault prefixed with 'APP--' will be passed through to the application via environment variables (with the 'APP--' prefix removed).
-In addition, since Key Vault does not support the '\__' delimiter expected by the .NET Configuration system, '--' should be used as a delimiter.
-Any '--' delimiters will be swapped for '__' by Terraform.
+Application config is stored in a JSON-encoded Key Vault secret named 'APP-CONFIG'.
 
-#### Example
-
-A secret named 'APP--ApiClients--client1--ApiKey' is exposed to the app as an environment variable 'ApiClient__client1__ApiKey' and can be retrieved in the app using `Configuration["ApiClients:client1:ApiKey"]`.
+Our `AddJsonEnvironmentVariable` configuration extension is used to read the environment variable, decode its contents then set configuration keys appropriately.
