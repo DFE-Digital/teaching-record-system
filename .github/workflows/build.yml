@@ -140,3 +140,4 @@ jobs:
         target: ${{ needs.deploy_dev.outputs.environment_url}}swagger/v1/swagger.json
         format: openapi
         allow_issue_writing: false
+        fail_action: true
