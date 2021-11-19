@@ -21,6 +21,9 @@ outputs:
   environment_url:
     description: 'The base URL for the deployed environment'
     value: ${{ steps.terraform.outputs.url }}
+  test_user_api_key:
+    description: 'An API key of a client for running tests'
+    value: ${{ steps.get_secrets.outputs.TEST-API-KEY }}
 
 runs:
   using: composite
@@ -50,7 +53,7 @@ runs:
       id: get_secrets
       with:
         keyvault: ${{ steps.keyvault.outputs.name }}
-        secrets: 'TFSTATE-CONTAINER-ACCESS-KEY'
+        secrets: 'TFSTATE-CONTAINER-ACCESS-KEY,TEST-API-KEY'
 
     - uses: hashicorp/setup-terraform@v1
       with:
