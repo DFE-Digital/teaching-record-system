@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog.Context;
 
 namespace DqtApi.Security
 {
@@ -50,6 +51,8 @@ namespace DqtApi.Security
 
             var principal = CreatePrincipal(client);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
+
+            LogContext.PushProperty("ClientId", client.ClientId);
 
             return Task.FromResult(AuthenticateResult.Success(ticket));
         }
