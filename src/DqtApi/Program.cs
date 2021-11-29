@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Serilog;
+using Serilog.Context;
 
 namespace DqtApi
 {
@@ -20,6 +22,8 @@ namespace DqtApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
 
             if (builder.Environment.IsProduction())
             {
@@ -95,6 +99,14 @@ namespace DqtApi
             }
 
             var app = builder.Build();
+
+            app.Use((ctx, next) =>
+            {
+                LogContext.PushProperty("CorrelationId", ctx.TraceIdentifier);
+                return next();
+            });
+
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 
