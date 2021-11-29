@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using DqtApi.Configuration;
 
 namespace DqtApi.FunctionalTests
 {
@@ -64,7 +65,8 @@ namespace DqtApi.FunctionalTests
             var configurationBuilder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
+                .AddEnvironmentVariables()
+                .AddJsonEnvironmentVariable("FunctionalTestsConfig");
 
             if (EnvironmentName.Equals("Development", StringComparison.OrdinalIgnoreCase))
             {
