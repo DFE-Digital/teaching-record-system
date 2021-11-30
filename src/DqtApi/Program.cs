@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Npgsql;
 using Serilog;
 using Serilog.Context;
 
@@ -33,7 +34,9 @@ namespace DqtApi
 
             if (builder.Environment.IsProduction())
             {
-                builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
+                builder.Configuration
+                    .AddJsonEnvironmentVariable("AppConfig")
+                    .AddJsonEnvironmentVariable("VCAP_SERVICES", configurationKeyPrefix: "VCAP_SERVICES");
             }
 
             var services = builder.Services;
@@ -101,7 +104,27 @@ namespace DqtApi
             services.AddMediatR(typeof(Program));
             services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
 
-            services.AddDbContext<DqtContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<DqtContext>(options =>
+            {
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection") ?? GetConnectionStringForPaasService());
+
+                string GetConnectionStringForPaasService()
+                {
+                    var builder = new NpgsqlConnectionStringBuilder()
+                    {
+                        Host = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:host"),
+                        Database = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:name"),
+                        Username = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:username"),
+                        Password = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:password"),
+                        Port = configuration.GetValue<int>("VCAP_SERVICES:postgres:0:credentials:port"),
+                        SslMode = SslMode.Require,
+                        TrustServerCertificate = true
+                    };
+
+                    return builder.ConnectionString;
+                }
+            });
+
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             if (env.EnvironmentName != "Testing")

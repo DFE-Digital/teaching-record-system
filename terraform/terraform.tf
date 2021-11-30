@@ -13,7 +13,7 @@ terraform {
 
     cloudfoundry = {
       source  = "cloudfoundry-community/cloudfoundry"
-      version = "~> 0.14"
+      version = "~> 0.15"
     }
   }
 }
