@@ -29,17 +29,24 @@ runs:
   using: composite
 
   steps:
-    - name: Get Key Vault name
-      id: keyvault
+    - name: Extract configuration from tfvars
+      id: config
       run: |
         KEY_VAULT_NAME=$(jq -r '.key_vault_name' $TFVARS)
+        PAAS_SPACE=$(jq -r '.paas_space' $TFVARS)
 
         if [ -z "$KEY_VAULT_NAME" ]; then
           echo "::error ::Failed to extract key_vault_name from $TFVARS"
           exit 1
         fi
 
-        echo ::set-output name=name::$KEY_VAULT_NAME
+        if [ -z "$PAAS_SPACE" ]; then
+          echo "::error ::Failed to extract paas_space from $TFVARS"
+          exit 1
+        fi
+
+        echo ::set-output name=key_vault_name::$KEY_VAULT_NAME
+        echo ::set-output name=paas_space::$PAAS_SPACE
       shell: bash
       env:
         TFVARS: ${{ inputs.terraform_vars }}
@@ -52,19 +59,32 @@ runs:
     - uses: Azure/get-keyvault-secrets@v1
       id: get_secrets
       with:
-        keyvault: ${{ steps.keyvault.outputs.name }}
-        secrets: 'TFSTATE-CONTAINER-ACCESS-KEY,TEST-API-KEY,FUNCTIONAL-TESTS-CONFIG'
+        keyvault: ${{ steps.config.outputs.key_vault_name }}
+        secrets: 'TFSTATE-CONTAINER-ACCESS-KEY,TEST-API-KEY,FUNCTIONAL-TESTS-CONFIG,PAAS-USER,PAAS-PASSWORD'
 
     - uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 1.0.10
         terraform_wrapper: false
 
+    - name: Download migrations
+      uses: actions/download-artifact@v2
+      with:
+        name: migrations
+        path: migrations
+
+    - uses: DFE-Digital/github-actions/setup-cf-cli@master
+      with:
+        CF_USERNAME: ${{ steps.get_secrets.outputs.PAAS-USER }}
+        CF_PASSWORD: ${{ steps.get_secrets.outputs.PAAS-PASSWORD }}
+        CF_SPACE_NAME: ${{ steps.config.outputs.paas_space }}
+        INSTALL_CONDUIT: true
+
     - name: Terraform
       id: terraform
       run: |
         terraform init -backend-config=$BACKEND_TFVARS -input=false -no-color
-        terraform apply -var-file=$TFVARS -auto-approve -input=false -no-color
+        terraform apply -var-file=$TFVARS -var="migrations_file=$(realpath ../migrations/script.sql)" -auto-approve -input=false -no-color
 
         echo ::set-output name=url::https://$(terraform output -raw api_fqdn)/
       env:
