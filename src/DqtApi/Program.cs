@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using DqtApi.Configuration;
 using DqtApi.DAL;
+using DqtApi.DataStore.Sql;
 using DqtApi.Filters;
 using DqtApi.Security;
 using DqtApi.Swagger;
@@ -11,6 +12,8 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
@@ -98,6 +101,9 @@ namespace DqtApi
             services.AddMediatR(typeof(Program));
             services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
 
+            services.AddDbContext<DqtContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
             if (env.EnvironmentName != "Testing")
             {
                 services.AddSingleton<IOrganizationServiceAsync>(GetCrmServiceClient());
@@ -153,6 +159,14 @@ namespace DqtApi
                     c.SwaggerEndpoint("v1/swagger.json", "DQT API");
                     c.EnablePersistAuthorization();
                 });
+
+                app.UseMigrationsEndPoint();
+
+                using (var scope = app.Services.CreateScope())
+                {
+                    var context = scope.ServiceProvider.GetRequiredService<DqtContext>();
+                    context.Database.EnsureCreated();
+                }
             }
 
             app.Run();
