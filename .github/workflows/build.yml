@@ -54,6 +54,18 @@ jobs:
         path: "**/*.trx"
         reporter: dotnet-trx
 
+    # TODO Use migration bundles when https://github.com/dotnet/efcore/issues/25555 is fixed
+    - name: Generate migrations script
+      run: |
+        dotnet tool install --global dotnet-ef
+        dotnet ef migrations script --idempotent --output migrations.sql --configuration Release --project src/DqtApi/DqtApi.csproj --no-build
+
+    - name: Publish migrations.sql
+      uses: actions/upload-artifact@v2
+      with:
+        name: migrations
+        path: migrations.sql
+
     - name: Publish
       run: dotnet publish --configuration Release --no-build src/DqtApi/DqtApi.csproj
 
