@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
+using DqtApi.TestCommon;
 using Microsoft.Xrm.Sdk.Query;
 using Moq;
 using Xunit;

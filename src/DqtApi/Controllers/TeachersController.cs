@@ -1,12 +1,14 @@
 using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using DqtApi.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using DqtApi.DAL;
+using DqtApi.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DqtApi
 {
@@ -31,31 +33,39 @@ namespace DqtApi
             if (!Regex.IsMatch(trn, @"^\d{7}$"))
             {
                 return Problem(title: "Invalid TRN", statusCode: 400);
-            }
+            }            
 
             // Validate birthDate
-            if (!DateTime.TryParseExact(birthDate, "yyyy-MM-dd", provider: null, style: DateTimeStyles.None, out _))
+            if (!DateTime.TryParseExact(birthDate, "yyyy-MM-dd", provider: null, style: DateTimeStyles.None, out DateTime parsedBirthdate))
             {
                 return Problem(title: "Invalid birthdate", statusCode: 400);
             }
 
-            try
+            var request = new GetTeacherRequest
             {
-                var teacher = await _dataverseAdaptor.GetTeacherByTRN(trn);
+                BirthDate = parsedBirthdate,
+                TRN = trn,
+                NationalInsuranceNumber = nino
+            };
 
-                if (teacher == null)
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    return Ok(new GetTeacherResponse(teacher));
-                }
+            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
 
+            var teacher = request.SelectMatch(matchingTeachers);
+
+            if (teacher == null)
+            {
+                return NotFound();
             }
-            catch (MoreThanOneMatchingTeacherException)
+            else
             {
-                return Problem(title: $"More than one teacher with TRN {trn}", statusCode: 400);
+                var qualifications = await _dataverseAdaptor.GetQualificationsAsync(teacher.Id);
+
+                if (qualifications.Any())
+                {
+                    teacher.dfeta_contact_dfeta_qualification = qualifications;
+                }
+
+                return Ok(new GetTeacherResponse(teacher));
             }
         }
     }
