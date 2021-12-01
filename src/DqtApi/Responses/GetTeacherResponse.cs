@@ -1,31 +1,61 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
-using DqtApi.Models;
 
 namespace DqtApi.Responses
 {
     public class GetTeacherResponse
     {
-        [JsonPropertyName("trn")]
-        public string Trn { get; set; }
-        [JsonPropertyName("ni_number")]
-        public string NationalInsuranceNumber { get; set; }
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-        [JsonPropertyName("dob")]
-        public string DateOfBirth { get; set; }
-        [JsonPropertyName("active_alert")]
-        public bool ActiveAlert { get; set; }
-        [JsonPropertyName("state")]
-        public int State { get; set; }
-        [JsonPropertyName("state_name")]
-        public string StateName { get; set; }
+        private readonly Contact _teacher;
 
-        public GetTeacherResponse(Teacher teacher)
-        {
-            Trn = teacher.Trn;
-            Name = teacher.Name;
-            NationalInsuranceNumber = teacher.NationalInsuranceNumber;
-            // TODO other fields
+        [JsonPropertyName("trn")]
+        public string Trn => _teacher.dfeta_TRN;
+
+        [JsonPropertyName("ni_number")]
+        public string NationalInsuranceNumber => _teacher.dfeta_NINumber;
+
+        [JsonPropertyName("qualified_teacher_status")]
+        [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]
+        public QualifiedTeacherStatus QualifiedTeacherStatus { get; set; }
+
+        [JsonPropertyName("induction")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Induction Induction { get; set; }
+
+        [JsonPropertyName("initial_teacher_training")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public InitialTeacherTraining InitialTeacherTraining { get; set; }
+
+        [JsonPropertyName("qualifications")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IEnumerable<Qualification> Qualifications { get; set; }
+
+        [JsonPropertyName("name")]
+        public string Name => _teacher.FullName;
+
+        [JsonPropertyName("dob")]
+        public DateTime? DateOfBirth => _teacher.BirthDate;
+
+        [JsonPropertyName("active_alert")]
+        public bool? ActiveAlert => _teacher.dfeta_ActiveSanctions;
+
+        [JsonPropertyName("state")]
+        public ContactState State => _teacher.StateCode.Value;
+
+        [JsonPropertyName("state_name")]
+        public string StateName => _teacher.FormattedValues[Contact.Fields.StateCode];
+
+        public GetTeacherResponse(Contact teacher)
+        {            
+            _teacher = teacher;
+
+            QualifiedTeacherStatus = _teacher.Extract<dfeta_qtsregistration, QualifiedTeacherStatus>();
+            Induction = _teacher.Extract<dfeta_induction, Induction>();
+            // todo check we should return first, or should we return unique active record? see teacherpolicy.xml
+            InitialTeacherTraining = _teacher.Extract<dfeta_initialteachertraining, InitialTeacherTraining>();
+
+            Qualifications = _teacher.dfeta_contact_dfeta_qualification?.Select(qualification => new Qualification(qualification));
         }
     }
 }

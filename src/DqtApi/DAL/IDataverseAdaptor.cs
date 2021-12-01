@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DqtApi.Models;
 
@@ -5,6 +7,8 @@ namespace DqtApi.DAL
 {
     public interface IDataverseAdaptor
     {
-        Task<Teacher> GetTeacherByTRN(string trn);
+        Task<IEnumerable<Contact>> GetMatchingTeachersAsync(GetTeacherRequest request);
+
+        Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId);
     }
 }
