@@ -1,9 +1,10 @@
-﻿using DqtApi.Models;
+using System.Threading.Tasks;
+using DqtApi.Models;
 
 namespace DqtApi.DAL
 {
     public interface IDataverseAdaptor
     {
-        Contact GetTeacher(GetTeacherRequest request);
+        Task<Teacher> GetTeacherByTRN(string trn);
     }
 }

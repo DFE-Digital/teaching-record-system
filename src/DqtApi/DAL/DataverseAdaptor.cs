@@ -1,44 +1,57 @@
-﻿using System.Linq;
-using DqtApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using DqtApi.Models;
+using Microsoft.Xrm.Sdk.Query;
+using System.Threading.Tasks;
 
 namespace DqtApi.DAL
 {
     public class DataverseAdaptor : IDataverseAdaptor
     {
-        private readonly DqtServiceContext _context;
-
-        public DataverseAdaptor(IOrganizationServiceAsync organizationServiceAsync)
+        private readonly IOrganizationServiceAsync _service;
+        public DataverseAdaptor(IOrganizationServiceAsync service)
         {
-            _context = new DqtServiceContext(organizationServiceAsync);
+            _service = service;
         }
 
-        public Contact GetTeacher(GetTeacherRequest request)
+        public async Task<Teacher> GetTeacherByTRN(string trn)
         {
-            if (string.IsNullOrEmpty(request.NationalInsuranceNumber))
+            var query = new QueryExpression()
             {
-                return GetTeacherByTRN(request);
-            }
-            else
+                EntityName = "contact",
+                ColumnSet = new ColumnSet(
+                    "dfeta_trn",
+                    "dfeta_ninumber",
+                    "fullname",
+                    "birthdate",
+                    "dfeta_activesanctions",
+                    "statecode"),
+                Criteria = new FilterExpression()
+                {
+                    Conditions =
+                    {
+                        new ConditionExpression()
+                        {
+                            AttributeName = "dfeta_trn",
+                            Operator = ConditionOperator.Equal,
+                            Values = { trn }
+                        }
+                    }
+                }
+            };
+
+            var results = await _service.RetrieveMultipleAsync(query);
+
+            if (results.Entities.Count == 0)
             {
-                return GetTeacherByTRNOrNationalInsuranceNumber(request);
+                return null;
             }
-        }
 
-        private Contact GetTeacherByTRN(GetTeacherRequest request)
-        { 
-            return (from contact in _context.ContactSet
-                    where contact.dfeta_TRN == request.TRN
-                    && contact.BirthDate == request.BirthDate
-                    select contact).SingleOrDefault();
-        }
+            if (results.Entities.Count > 1)
+            {
+                throw new MoreThanOneMatchingTeacherException();
+            }
 
-        private Contact GetTeacherByTRNOrNationalInsuranceNumber(GetTeacherRequest request)
-        {
-            return (from contact in _context.ContactSet
-                    where (contact.dfeta_NINumber == request.NationalInsuranceNumber || contact.dfeta_TRN == request.TRN)
-                    && contact.BirthDate == request.BirthDate
-                    select contact).SingleOrDefault();
+            return new Teacher(results.Entities[0]);
         }
     }
 }
