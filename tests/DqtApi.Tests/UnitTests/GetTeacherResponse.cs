@@ -186,7 +186,6 @@ namespace DqtApi.Tests.UnitTests
         [Fact]
         public void Given_a_contact_with_qualifications_the_details_are_mapped()
         {
-            var name = "Qualification";
             var qualificationTypes = new[] { dfeta_qualification_dfeta_Type.HigherEducation.ToString(), dfeta_qualification_dfeta_Type.MandatoryQualification.ToString() };
 
             var contact = new Contact()

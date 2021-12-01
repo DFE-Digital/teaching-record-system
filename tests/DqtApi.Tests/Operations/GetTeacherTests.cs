@@ -40,29 +40,29 @@ namespace DqtApi.Tests
             await AssertEx.ResponseIsProblemDetails(response, expectedTitle: "Invalid birthdate");
         }
 
-        [Fact(Skip = "not implemented")]
-        public async Task NinoSpecified_GeneratesQueryWithNino()
-        {
-            throw new System.NotImplementedException();
-        }
+        //[Fact(Skip = "not implemented")]
+        //public async Task NinoSpecified_GeneratesQueryWithNino()
+        //{
+        //    throw new System.NotImplementedException();
+        //}
 
-        [Fact(Skip = "not implemented")]
-        public async Task NinoNotSpecified_GeneratesQueryWithoutNino()
-        {
-            throw new System.NotImplementedException();
-        }
+        //[Fact(Skip = "not implemented")]
+        //public async Task NinoNotSpecified_GeneratesQueryWithoutNino()
+        //{
+        //    throw new System.NotImplementedException();
+        //}
 
-        [Fact(Skip = "not implemented")]
-        public async Task NoContactFound_ReturnsNotFound()
-        {
-            throw new System.NotImplementedException();
-        }
+        //[Fact(Skip = "not implemented")]
+        //public async Task NoContactFound_ReturnsNotFound()
+        //{
+        //    throw new System.NotImplementedException();
+        //}
 
-        [Fact(Skip = "not implemented")]
-        public async Task MultipleContactsFound_ReturnsFirstMatch()
-        {
-            throw new System.NotImplementedException();
-        }
+        //[Fact(Skip = "not implemented")]
+        //public async Task MultipleContactsFound_ReturnsFirstMatch()
+        //{
+        //    throw new System.NotImplementedException();
+        //}
 
         // TODO response validation
     }
