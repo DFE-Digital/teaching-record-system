@@ -8,5 +8,22 @@ namespace DqtApi.DataStore.Sql
             : base(options)
         {
         }
+
+        public DqtContext(string connectionString)
+            : this(CreateOptions(connectionString))
+        {
+        }
+
+        public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
+        {
+            optionsBuilder.UseNpgsql(connectionString);
+        }
+
+        private static DbContextOptions<DqtContext> CreateOptions(string connectionString)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<DqtContext>();
+            ConfigureOptions(optionsBuilder, connectionString);
+            return optionsBuilder.Options;
+        }
     }
 }

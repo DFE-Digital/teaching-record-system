@@ -28,6 +28,6 @@ namespace DqtApi.Tests
 
         public virtual Task DisposeAsync() => Task.CompletedTask;
 
-        public virtual Task InitializeAsync() => Task.CompletedTask;
+        public virtual Task InitializeAsync() => ApiFixture.DbHelper.ClearData();
     }
 }
