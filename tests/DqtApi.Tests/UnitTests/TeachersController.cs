@@ -14,7 +14,7 @@ namespace DqtApi.Tests.UnitTests
     {
         private readonly Mock<IDataverseAdaptor> _adaptor;
         private readonly string trn = "1111111";
-        private readonly string birthDate = new DateTime(2000, 1, 1).ToString("yyyy-MM-dd");
+        private readonly DateTime birthDate = new(2000, 1, 1);
 
         public TeachersController()
         {
@@ -40,8 +40,5 @@ namespace DqtApi.Tests.UnitTests
 
             Assert.IsType<OkObjectResult>(result);
         }
-
-        //public static GetTeacherRequest MatchesFields(string trn, DateTime birthdate, string nationalInsuranceNumber)
-        //    => Match.Create<GetTeacherRequest>(request => request.TRN == trn && request.BirthDate == birthdate && request.NationalInsuranceNumber == nationalInsuranceNumber);
     }
 }

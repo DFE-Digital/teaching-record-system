@@ -8,7 +8,7 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class GetTeacherFixture : IDisposable
+    public class DataverseAdaptorFixture : IDisposable
     {
         public struct Fixture
         {
@@ -21,13 +21,7 @@ namespace DqtApi.Tests.DataverseIntegration
         private readonly ServiceClient _service;
 
         public IOrganizationServiceAsync Service => _service;
-        //private readonly string _matchingNationalInsuranceNumber1;
-        //private readonly string _matchingNationalInsuranceNumber2;
         private readonly string _nonmatchingNationalInsuranceNumber;
-        //private Guid _fixture1Id;
-        //private Guid _fixture2Id;
-        //private readonly string _matchingTRN1;
-        //private readonly string _matchingTRN2;
         private readonly string _nonmatchingTRN;
 
         private readonly Fixture[] _fixtures;
@@ -37,10 +31,10 @@ namespace DqtApi.Tests.DataverseIntegration
 
         private readonly IConfiguration _configuration;
 
-        public GetTeacherFixture()
+        public DataverseAdaptorFixture()
         {
             var builder = new ConfigurationBuilder()
-                .AddUserSecrets<GetTeacherTests>(optional: true)
+                .AddUserSecrets<DataverseAdaptorTests>(optional: true)
                 .AddEnvironmentVariables("IntegrationTests_");
 
             _configuration = builder.Build();
