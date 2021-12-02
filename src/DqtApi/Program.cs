@@ -106,7 +106,9 @@ namespace DqtApi
 
             services.AddDbContext<DqtContext>(options =>
             {
-                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection") ?? GetConnectionStringForPaasService());
+                DqtContext.ConfigureOptions(
+                    options,
+                    configuration.GetConnectionString("DefaultConnection") ?? GetConnectionStringForPaasService());
 
                 string GetConnectionStringForPaasService()
                 {
