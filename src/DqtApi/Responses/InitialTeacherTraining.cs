@@ -61,15 +61,12 @@ namespace DqtApi.Responses
         public string Qualification => FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId);
 
         [JsonPropertyName("subject1_code")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Subject1Code => Subject1?.Code;
 
         [JsonPropertyName("subject2_code")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Subject2Code => Subject2?.Code;
 
         [JsonPropertyName("subject3_code")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Subject3Code => Subject3?.Code;
     }
 }

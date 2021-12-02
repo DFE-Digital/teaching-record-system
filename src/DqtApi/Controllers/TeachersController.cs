@@ -33,9 +33,14 @@ namespace DqtApi
             if (!Regex.IsMatch(trn, @"^\d{7}$"))
             {
                 return Problem(title: "Invalid TRN", statusCode: 400);
-            }            
+            }
 
             // Validate birthDate
+            if (string.IsNullOrEmpty(birthDate))
+            {
+                return NotFound();
+            }
+
             if (!DateTime.TryParseExact(birthDate, "yyyy-MM-dd", provider: null, style: DateTimeStyles.None, out DateTime parsedBirthdate))
             {
                 return Problem(title: "Invalid birthdate", statusCode: 400);

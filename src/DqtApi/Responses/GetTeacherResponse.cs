@@ -16,19 +16,15 @@ namespace DqtApi.Responses
         public string NationalInsuranceNumber => _teacher.dfeta_NINumber;
 
         [JsonPropertyName("qualified_teacher_status")]
-        [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]
         public QualifiedTeacherStatus QualifiedTeacherStatus { get; set; }
 
         [JsonPropertyName("induction")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Induction Induction { get; set; }
 
         [JsonPropertyName("initial_teacher_training")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public InitialTeacherTraining InitialTeacherTraining { get; set; }
 
         [JsonPropertyName("qualifications")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public IEnumerable<Qualification> Qualifications { get; set; }
 
         [JsonPropertyName("name")]
@@ -55,7 +51,8 @@ namespace DqtApi.Responses
             // todo check we should return first, or should we return unique active record? see teacherpolicy.xml
             InitialTeacherTraining = _teacher.Extract<dfeta_initialteachertraining, InitialTeacherTraining>();
 
-            Qualifications = _teacher.dfeta_contact_dfeta_qualification?.Select(qualification => new Qualification(qualification));
+            Qualifications = _teacher.dfeta_contact_dfeta_qualification?.Select(qualification => new Qualification(qualification))
+                ?? new List<Qualification>();
         }
     }
 }
