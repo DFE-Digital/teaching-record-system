@@ -133,6 +133,7 @@ jobs:
     name: OWASP ZAP API scan
     needs: deploy_dev
     runs-on: ubuntu-latest
+    concurrency: deploy_dev
 
     steps:
     - name: Create config file
