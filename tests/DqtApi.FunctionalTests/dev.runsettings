@@ -3,6 +3,7 @@
   <RunConfiguration>
     <EnvironmentVariables>
       <DOTNET_ENVIRONMENT>Development</DOTNET_ENVIRONMENT>
+      <FunctionalTestsConfig>{}</FunctionalTestsConfig>
     </EnvironmentVariables>
   </RunConfiguration>
 </RunSettings>

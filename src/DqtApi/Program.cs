@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using DqtApi.Configuration;
+using DqtApi.DAL;
 using DqtApi.Security;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -96,6 +97,7 @@ namespace DqtApi
             if (env.EnvironmentName != "Testing")
             {
                 services.AddSingleton<IOrganizationServiceAsync>(GetCrmServiceClient());
+                services.AddSingleton<IDataverseAdaptor, DataverseAdaptor>();
             }
 
             var app = builder.Build();

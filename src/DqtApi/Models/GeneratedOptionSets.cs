@@ -1015,6 +1015,19 @@ public enum dfeta_ITTServiceLeaver
 }
 
 [System.Runtime.Serialization.DataContractAttribute()]
+public enum dfeta_ittsubject_StatusCode
+{
+	
+	[System.Runtime.Serialization.EnumMemberAttribute()]
+	[OptionSetMetadataAttribute("Active", 0)]
+	Active = 1,
+	
+	[System.Runtime.Serialization.EnumMemberAttribute()]
+	[OptionSetMetadataAttribute("Inactive", 1)]
+	Inactive = 2,
+}
+
+[System.Runtime.Serialization.DataContractAttribute()]
 public enum dfeta_PersonTitle
 {
 	
