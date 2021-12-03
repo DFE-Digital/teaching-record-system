@@ -206,7 +206,9 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			public const string HasChildrenCode = "haschildrencode";
 			public const string Home2 = "home2";
 			public const string ImportSequenceNumber = "importsequencenumber";
+			public const string IsAutoCreate = "isautocreate";
 			public const string IsBackofficeCustomer = "isbackofficecustomer";
+			public const string IsPrivate = "isprivate";
 			public const string JobTitle = "jobtitle";
 			public const string LastName = "lastname";
 			public const string LastOnHoldTime = "lastonholdtime";
@@ -333,6 +335,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("accountid");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("AccountId");
+				this.SetAttributeValue("accountid", value);
+				this.OnPropertyChanged("AccountId");
+			}
 		}
 	
 		/// <summary>
@@ -425,6 +434,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<string>("address1_composite");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Address1_Composite");
+				this.SetAttributeValue("address1_composite", value);
+				this.OnPropertyChanged("Address1_Composite");
 			}
 		}
 	
@@ -899,6 +915,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<string>("address2_composite");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Address2_Composite");
+				this.SetAttributeValue("address2_composite", value);
+				this.OnPropertyChanged("Address2_Composite");
+			}
 		}
 	
 		/// <summary>
@@ -1372,6 +1395,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<string>("address3_composite");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Address3_Composite");
+				this.SetAttributeValue("address3_composite", value);
+				this.OnPropertyChanged("Address3_Composite");
+			}
 		}
 	
 		/// <summary>
@@ -1785,6 +1815,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging30");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Aging30");
+				this.SetAttributeValue("aging30", value);
+				this.OnPropertyChanged("Aging30");
+			}
 		}
 	
 		/// <summary>
@@ -1797,6 +1834,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging30_base");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Aging30_Base");
+				this.SetAttributeValue("aging30_base", value);
+				this.OnPropertyChanged("Aging30_Base");
 			}
 		}
 	
@@ -1811,6 +1855,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging60");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Aging60");
+				this.SetAttributeValue("aging60", value);
+				this.OnPropertyChanged("Aging60");
+			}
 		}
 	
 		/// <summary>
@@ -1823,6 +1874,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging60_base");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Aging60_Base");
+				this.SetAttributeValue("aging60_base", value);
+				this.OnPropertyChanged("Aging60_Base");
 			}
 		}
 	
@@ -1837,6 +1895,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging90");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Aging90");
+				this.SetAttributeValue("aging90", value);
+				this.OnPropertyChanged("Aging90");
+			}
 		}
 	
 		/// <summary>
@@ -1849,6 +1914,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging90_base");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Aging90_Base");
+				this.SetAttributeValue("aging90_base", value);
+				this.OnPropertyChanged("Aging90_Base");
 			}
 		}
 	
@@ -1902,6 +1974,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("annualincome_base");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("AnnualIncome_Base");
+				this.SetAttributeValue("annualincome_base", value);
+				this.OnPropertyChanged("AnnualIncome_Base");
 			}
 		}
 	
@@ -2139,6 +2218,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
 		}
 	
 		/// <summary>
@@ -2152,6 +2238,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdbyexternalparty");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedByExternalParty");
+				this.SetAttributeValue("createdbyexternalparty", value);
+				this.OnPropertyChanged("CreatedByExternalParty");
+			}
 		}
 	
 		/// <summary>
@@ -2164,6 +2257,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 	
@@ -2217,6 +2317,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("creditlimit_base");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreditLimit_Base");
+				this.SetAttributeValue("creditlimit_base", value);
+				this.OnPropertyChanged("CreditLimit_Base");
 			}
 		}
 	
@@ -3331,6 +3438,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<System.Nullable<long>>("entityimage_timestamp");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("EntityImage_Timestamp");
+				this.SetAttributeValue("entityimage_timestamp", value);
+				this.OnPropertyChanged("EntityImage_Timestamp");
+			}
 		}
 	
 		/// <summary>
@@ -3343,6 +3457,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<string>("entityimage_url");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("EntityImage_URL");
+				this.SetAttributeValue("entityimage_url", value);
+				this.OnPropertyChanged("EntityImage_URL");
 			}
 		}
 	
@@ -3357,6 +3478,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<System.Nullable<System.Guid>>("entityimageid");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("EntityImageId");
+				this.SetAttributeValue("entityimageid", value);
+				this.OnPropertyChanged("EntityImageId");
+			}
 		}
 	
 		/// <summary>
@@ -3369,6 +3497,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<decimal>>("exchangerate");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ExchangeRate");
+				this.SetAttributeValue("exchangerate", value);
+				this.OnPropertyChanged("ExchangeRate");
 			}
 		}
 	
@@ -3503,6 +3638,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<string>("fullname");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("FullName");
+				this.SetAttributeValue("fullname", value);
+				this.OnPropertyChanged("FullName");
+			}
 		}
 	
 		/// <summary>
@@ -3606,6 +3748,26 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 		}
 	
 		/// <summary>
+		/// Information about whether the contact was auto-created when promoting an email or an appointment.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isautocreate")]
+		public System.Nullable<bool> IsAutoCreate
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("isautocreate");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsAutoCreate");
+				this.SetAttributeValue("isautocreate", value);
+				this.OnPropertyChanged("IsAutoCreate");
+			}
+		}
+	
+		/// <summary>
 		/// Information about whether the contact is in an associated Microsoft Great Plains database.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isbackofficecustomer")]
@@ -3622,6 +3784,26 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 				this.OnPropertyChanging("IsBackofficeCustomer");
 				this.SetAttributeValue("isbackofficecustomer", value);
 				this.OnPropertyChanged("IsBackofficeCustomer");
+			}
+		}
+	
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isprivate")]
+		public System.Nullable<bool> IsPrivate
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("isprivate");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsPrivate");
+				this.SetAttributeValue("isprivate", value);
+				this.OnPropertyChanged("IsPrivate");
 			}
 		}
 	
@@ -3796,6 +3978,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("masterid");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("MasterId");
+				this.SetAttributeValue("masterid", value);
+				this.OnPropertyChanged("MasterId");
+			}
 		}
 	
 		/// <summary>
@@ -3808,6 +3997,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<bool>>("merged");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Merged");
+				this.SetAttributeValue("merged", value);
+				this.OnPropertyChanged("Merged");
 			}
 		}
 	
@@ -3862,6 +4058,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
 		}
 	
 		/// <summary>
@@ -3875,6 +4078,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedbyexternalparty");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedByExternalParty");
+				this.SetAttributeValue("modifiedbyexternalparty", value);
+				this.OnPropertyChanged("ModifiedByExternalParty");
+			}
 		}
 	
 		/// <summary>
@@ -3887,6 +4097,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 	
@@ -4001,6 +4218,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<System.Nullable<int>>("onholdtime");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OnHoldTime");
+				this.SetAttributeValue("onholdtime", value);
+				this.OnPropertyChanged("OnHoldTime");
+			}
 		}
 	
 		/// <summary>
@@ -4074,6 +4298,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningbusinessunit");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningBusinessUnit");
+				this.SetAttributeValue("owningbusinessunit", value);
+				this.OnPropertyChanged("OwningBusinessUnit");
+			}
 		}
 	
 		/// <summary>
@@ -4087,6 +4318,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningteam");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningTeam");
+				this.SetAttributeValue("owningteam", value);
+				this.OnPropertyChanged("OwningTeam");
+			}
 		}
 	
 		/// <summary>
@@ -4099,6 +4337,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owninguser");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningUser");
+				this.SetAttributeValue("owninguser", value);
+				this.OnPropertyChanged("OwningUser");
 			}
 		}
 	
@@ -4152,6 +4397,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("parentcontactid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ParentContactId");
+				this.SetAttributeValue("parentcontactid", value);
+				this.OnPropertyChanged("ParentContactId");
 			}
 		}
 	
@@ -4426,6 +4678,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("slainvokedid");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SLAInvokedId");
+				this.SetAttributeValue("slainvokedid", value);
+				this.OnPropertyChanged("SLAInvokedId");
+			}
 		}
 	
 		/// <summary>
@@ -4674,6 +4933,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<string>("timespentbymeonemailandmeetings");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("TimeSpentByMeOnEmailAndMeetings");
+				this.SetAttributeValue("timespentbymeonemailandmeetings", value);
+				this.OnPropertyChanged("TimeSpentByMeOnEmailAndMeetings");
+			}
 		}
 	
 		/// <summary>
@@ -4767,6 +5033,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
+			}
 		}
 	
 		/// <summary>
@@ -4819,6 +5092,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			get
 			{
 				return this.GetAttributeValue<string>("yomifullname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("YomiFullName");
+				this.SetAttributeValue("yomifullname", value);
+				this.OnPropertyChanged("YomiFullName");
 			}
 		}
 	
@@ -5095,6 +5375,13 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 			{
 				return this.GetRelatedEntity<Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing);
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingcontact_master_contact");
+				this.SetRelatedEntity<Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingcontact_master_contact");
+			}
 		}
 	
 		/// <summary>
@@ -5254,6 +5541,13 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
 		}
 	
 		/// <summary>
@@ -5266,6 +5560,13 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 	
@@ -5683,6 +5984,13 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
 		}
 	
 		/// <summary>
@@ -5695,6 +6003,13 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 	
@@ -5769,6 +6084,13 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningbusinessunit");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningBusinessUnit");
+				this.SetAttributeValue("owningbusinessunit", value);
+				this.OnPropertyChanged("OwningBusinessUnit");
+			}
 		}
 	
 		/// <summary>
@@ -5782,6 +6104,13 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningteam");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningTeam");
+				this.SetAttributeValue("owningteam", value);
+				this.OnPropertyChanged("OwningTeam");
+			}
 		}
 	
 		/// <summary>
@@ -5794,6 +6123,13 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owninguser");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningUser");
+				this.SetAttributeValue("owninguser", value);
+				this.OnPropertyChanged("OwningUser");
 			}
 		}
 	
@@ -5902,6 +6238,13 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
 			}
 		}
 	
@@ -6044,6 +6387,9 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 			public const string VersionNumber = "versionnumber";
 			public const string dfeta_contact_dfeta_initialteachertraining = "dfeta_contact_dfeta_initialteachertraining";
 			public const string dfeta_contact_dfeta_initialteachertraining1 = "dfeta_contact_dfeta_initialteachertraining1";
+			public const string dfeta_dfeta_ittsubject1_dfeta_initialteachertra = "dfeta_dfeta_ittsubject1_dfeta_initialteachertra";
+			public const string dfeta_dfeta_ittsubject2_dfeta_initialteachertra = "dfeta_dfeta_ittsubject2_dfeta_initialteachertra";
+			public const string dfeta_dfeta_ittsubject3_dfeta_initialteachertra = "dfeta_dfeta_ittsubject3_dfeta_initialteachertra";
 		}
 	
 	/// <summary>
@@ -6100,6 +6446,13 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
 		}
 	
 		/// <summary>
@@ -6112,6 +6465,13 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 	
@@ -6889,6 +7249,13 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
 		}
 	
 		/// <summary>
@@ -6901,6 +7268,13 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 	
@@ -6975,6 +7349,13 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningbusinessunit");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningBusinessUnit");
+				this.SetAttributeValue("owningbusinessunit", value);
+				this.OnPropertyChanged("OwningBusinessUnit");
+			}
 		}
 	
 		/// <summary>
@@ -6988,6 +7369,13 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningteam");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningTeam");
+				this.SetAttributeValue("owningteam", value);
+				this.OnPropertyChanged("OwningTeam");
+			}
 		}
 	
 		/// <summary>
@@ -7000,6 +7388,13 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owninguser");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningUser");
+				this.SetAttributeValue("owninguser", value);
+				this.OnPropertyChanged("OwningUser");
 			}
 		}
 	
@@ -7109,6 +7504,13 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 			{
 				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
+			}
 		}
 	
 		/// <summary>
@@ -7150,6 +7552,634 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanging("dfeta_contact_dfeta_initialteachertraining1");
 				this.SetRelatedEntity<Contact>("dfeta_contact_dfeta_initialteachertraining1", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining1");
+			}
+		}
+	
+		/// <summary>
+		/// N:1 dfeta_dfeta_ittsubject1_dfeta_initialteachertra
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_subject1id")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject1_dfeta_initialteachertra")]
+		public dfeta_ittsubject dfeta_dfeta_ittsubject1_dfeta_initialteachertra
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_ittsubject1_dfeta_initialteachertra");
+				this.SetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_ittsubject1_dfeta_initialteachertra");
+			}
+		}
+	
+		/// <summary>
+		/// N:1 dfeta_dfeta_ittsubject2_dfeta_initialteachertra
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_subject2id")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject2_dfeta_initialteachertra")]
+		public dfeta_ittsubject dfeta_dfeta_ittsubject2_dfeta_initialteachertra
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_ittsubject2_dfeta_initialteachertra");
+				this.SetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_ittsubject2_dfeta_initialteachertra");
+			}
+		}
+	
+		/// <summary>
+		/// N:1 dfeta_dfeta_ittsubject3_dfeta_initialteachertra
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_subject3id")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject3_dfeta_initialteachertra")]
+		public dfeta_ittsubject dfeta_dfeta_ittsubject3_dfeta_initialteachertra
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
+				this.SetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
+			}
+		}
+}
+
+[System.Runtime.Serialization.DataContractAttribute()]
+public enum dfeta_ittsubjectState
+{
+	
+	[System.Runtime.Serialization.EnumMemberAttribute()]
+	Active = 0,
+	
+	[System.Runtime.Serialization.EnumMemberAttribute()]
+	Inactive = 1,
+}
+
+/// <summary>
+/// 
+/// </summary>
+[System.Runtime.Serialization.DataContractAttribute()]
+[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_ittsubject")]
+public partial class dfeta_ittsubject : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+{
+	
+		public static class Fields
+		{
+			public const string CreatedBy = "createdby";
+			public const string CreatedOn = "createdon";
+			public const string CreatedOnBehalfBy = "createdonbehalfby";
+			public const string dfeta_ittsubjectId = "dfeta_ittsubjectid";
+			public const string Id = "dfeta_ittsubjectid";
+			public const string dfeta_name = "dfeta_name";
+			public const string dfeta_restrictedpostqts = "dfeta_restrictedpostqts";
+			public const string dfeta_Value = "dfeta_value";
+			public const string dfeta_ViewOrder = "dfeta_vieworder";
+			public const string ImportSequenceNumber = "importsequencenumber";
+			public const string ModifiedBy = "modifiedby";
+			public const string ModifiedOn = "modifiedon";
+			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
+			public const string OrganizationId = "organizationid";
+			public const string OverriddenCreatedOn = "overriddencreatedon";
+			public const string StateCode = "statecode";
+			public const string StatusCode = "statuscode";
+			public const string TimeZoneRuleVersionNumber = "timezoneruleversionnumber";
+			public const string UTCConversionTimeZoneCode = "utcconversiontimezonecode";
+			public const string VersionNumber = "versionnumber";
+		}
+	
+	/// <summary>
+	/// Default Constructor.
+	/// </summary>
+	[System.Diagnostics.DebuggerNonUserCode()]
+	public dfeta_ittsubject() : 
+			base(EntityLogicalName)
+	{
+	}
+	
+	public const string EntityLogicalName = "dfeta_ittsubject";
+	
+	public const string EntitySchemaName = "dfeta_ittsubject";
+	
+	public const string PrimaryIdAttribute = "dfeta_ittsubjectid";
+	
+	public const string PrimaryNameAttribute = "dfeta_name";
+	
+	public const string EntityLogicalCollectionName = "dfeta_ittsubjects";
+	
+	public const string EntitySetName = "dfeta_ittsubjects";
+	
+	public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+	
+	public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+	
+	[System.Diagnostics.DebuggerNonUserCode()]
+	private void OnPropertyChanged(string propertyName)
+	{
+		if ((this.PropertyChanged != null))
+		{
+			this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+		}
+	}
+	
+	[System.Diagnostics.DebuggerNonUserCode()]
+	private void OnPropertyChanging(string propertyName)
+	{
+		if ((this.PropertyChanging != null))
+		{
+			this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+		}
+	}
+	
+		/// <summary>
+		/// Unique identifier of the user who created the record.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
+		}
+	
+		/// <summary>
+		/// Date and time when the record was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+	
+		/// <summary>
+		/// Unique identifier of the delegate user who created the record.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOnBehalfBy");
+				this.SetAttributeValue("createdonbehalfby", value);
+				this.OnPropertyChanged("CreatedOnBehalfBy");
+			}
+		}
+	
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ittsubjectid")]
+		public System.Nullable<System.Guid> dfeta_ittsubjectId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_ittsubjectid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_ittsubjectId");
+				this.SetAttributeValue("dfeta_ittsubjectid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_ittsubjectId");
+			}
+		}
+	
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ittsubjectid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_ittsubjectId = value;
+			}
+		}
+	
+		/// <summary>
+		/// The name of the custom entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
+		public string dfeta_name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_name");
+				this.SetAttributeValue("dfeta_name", value);
+				this.OnPropertyChanged("dfeta_name");
+			}
+		}
+	
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_restrictedpostqts")]
+		public System.Nullable<bool> dfeta_restrictedpostqts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_restrictedpostqts");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_restrictedpostqts");
+				this.SetAttributeValue("dfeta_restrictedpostqts", value);
+				this.OnPropertyChanged("dfeta_restrictedpostqts");
+			}
+		}
+	
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
+		public string dfeta_Value
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_value");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Value");
+				this.SetAttributeValue("dfeta_value", value);
+				this.OnPropertyChanged("dfeta_Value");
+			}
+		}
+	
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_vieworder")]
+		public System.Nullable<int> dfeta_ViewOrder
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("dfeta_vieworder");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_ViewOrder");
+				this.SetAttributeValue("dfeta_vieworder", value);
+				this.OnPropertyChanged("dfeta_ViewOrder");
+			}
+		}
+	
+		/// <summary>
+		/// Sequence number of the import that created this record.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("importsequencenumber")]
+		public System.Nullable<int> ImportSequenceNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("importsequencenumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ImportSequenceNumber");
+				this.SetAttributeValue("importsequencenumber", value);
+				this.OnPropertyChanged("ImportSequenceNumber");
+			}
+		}
+	
+		/// <summary>
+		/// Unique identifier of the user who modified the record.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
+		}
+	
+		/// <summary>
+		/// Date and time when the record was modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
+			}
+		}
+	
+		/// <summary>
+		/// Unique identifier of the delegate user who modified the record.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOnBehalfBy");
+				this.SetAttributeValue("modifiedonbehalfby", value);
+				this.OnPropertyChanged("ModifiedOnBehalfBy");
+			}
+		}
+	
+		/// <summary>
+		/// Unique identifier for the organization
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("organizationid")]
+		public Microsoft.Xrm.Sdk.EntityReference OrganizationId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("organizationid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OrganizationId");
+				this.SetAttributeValue("organizationid", value);
+				this.OnPropertyChanged("OrganizationId");
+			}
+		}
+	
+		/// <summary>
+		/// Date and time that the record was migrated.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overriddencreatedon")]
+		public System.Nullable<System.DateTime> OverriddenCreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overriddencreatedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OverriddenCreatedOn");
+				this.SetAttributeValue("overriddencreatedon", value);
+				this.OnPropertyChanged("OverriddenCreatedOn");
+			}
+		}
+	
+		/// <summary>
+		/// Status of the ITT Subject
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<dfeta_ittsubjectState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((dfeta_ittsubjectState)(System.Enum.ToObject(typeof(dfeta_ittsubjectState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+	
+		/// <summary>
+		/// Reason for the status of the ITT Subject
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
+		public virtual dfeta_ittsubject_StatusCode? StatusCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_ittsubject_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StatusCode");
+				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("StatusCode");
+			}
+		}
+	
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("timezoneruleversionnumber")]
+		public System.Nullable<int> TimeZoneRuleVersionNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("timezoneruleversionnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("TimeZoneRuleVersionNumber");
+				this.SetAttributeValue("timezoneruleversionnumber", value);
+				this.OnPropertyChanged("TimeZoneRuleVersionNumber");
+			}
+		}
+	
+		/// <summary>
+		/// Time zone code that was in use when the record was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("utcconversiontimezonecode")]
+		public System.Nullable<int> UTCConversionTimeZoneCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("utcconversiontimezonecode");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("UTCConversionTimeZoneCode");
+				this.SetAttributeValue("utcconversiontimezonecode", value);
+				this.OnPropertyChanged("UTCConversionTimeZoneCode");
+			}
+		}
+	
+		/// <summary>
+		/// Version Number
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
+		public System.Nullable<long> VersionNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
+			}
+		}
+	
+		/// <summary>
+		/// 1:N dfeta_dfeta_ittsubject1_dfeta_initialteachertra
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject1_dfeta_initialteachertra")]
+		public System.Collections.Generic.IEnumerable<dfeta_initialteachertraining> dfeta_dfeta_ittsubject1_dfeta_initialteachertra
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_ittsubject1_dfeta_initialteachertra");
+				this.SetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_ittsubject1_dfeta_initialteachertra");
+			}
+		}
+	
+		/// <summary>
+		/// 1:N dfeta_dfeta_ittsubject2_dfeta_initialteachertra
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject2_dfeta_initialteachertra")]
+		public System.Collections.Generic.IEnumerable<dfeta_initialteachertraining> dfeta_dfeta_ittsubject2_dfeta_initialteachertra
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_ittsubject2_dfeta_initialteachertra");
+				this.SetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_ittsubject2_dfeta_initialteachertra");
+			}
+		}
+	
+		/// <summary>
+		/// 1:N dfeta_dfeta_ittsubject3_dfeta_initialteachertra
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject3_dfeta_initialteachertra")]
+		public System.Collections.Generic.IEnumerable<dfeta_initialteachertraining> dfeta_dfeta_ittsubject3_dfeta_initialteachertra
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
+				this.SetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
 			}
 		}
 }
@@ -7264,6 +8294,13 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
 		}
 	
 		/// <summary>
@@ -7276,6 +8313,13 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 	
@@ -7593,6 +8637,13 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
 		}
 	
 		/// <summary>
@@ -7605,6 +8656,13 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 	
@@ -7679,6 +8737,13 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningbusinessunit");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningBusinessUnit");
+				this.SetAttributeValue("owningbusinessunit", value);
+				this.OnPropertyChanged("OwningBusinessUnit");
+			}
 		}
 	
 		/// <summary>
@@ -7692,6 +8757,13 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningteam");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningTeam");
+				this.SetAttributeValue("owningteam", value);
+				this.OnPropertyChanged("OwningTeam");
+			}
 		}
 	
 		/// <summary>
@@ -7704,6 +8776,13 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owninguser");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningUser");
+				this.SetAttributeValue("owninguser", value);
+				this.OnPropertyChanged("OwningUser");
 			}
 		}
 	
@@ -7812,6 +8891,13 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
 			}
 		}
 	
@@ -8040,6 +9126,13 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
 		}
 	
 		/// <summary>
@@ -8052,6 +9145,13 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 	
@@ -9029,6 +10129,13 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
 		}
 	
 		/// <summary>
@@ -9041,6 +10148,13 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 			get
 			{
 				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 	
@@ -9115,6 +10229,13 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningbusinessunit");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningBusinessUnit");
+				this.SetAttributeValue("owningbusinessunit", value);
+				this.OnPropertyChanged("OwningBusinessUnit");
+			}
 		}
 	
 		/// <summary>
@@ -9128,6 +10249,13 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningteam");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningTeam");
+				this.SetAttributeValue("owningteam", value);
+				this.OnPropertyChanged("OwningTeam");
+			}
 		}
 	
 		/// <summary>
@@ -9140,6 +10268,13 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 			get
 			{
 				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owninguser");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OwningUser");
+				this.SetAttributeValue("owninguser", value);
+				this.OnPropertyChanged("OwningUser");
 			}
 		}
 	
@@ -9249,6 +10384,13 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 			{
 				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
 			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
+			}
 		}
 	
 		/// <summary>
@@ -9321,6 +10463,18 @@ public partial class DqtServiceContext : Microsoft.Xrm.Sdk.Client.OrganizationSe
 			get
 			{
 				return this.CreateQuery<dfeta_initialteachertraining>();
+			}
+		}
+	
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="dfeta_ittsubject"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<dfeta_ittsubject> dfeta_ittsubjectSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<dfeta_ittsubject>();
 			}
 		}
 	

@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<filter>
+    <entities>
+        <entity name="contact">
+            <attributes>
+                <attribute name="dfeta_trn"/>
+                <attribute name="dfeta_ninumber"/>
+                <attribute name="birthdate"/>
+                <attribute name="fullname"/>
+                <attribute name="dfeta_activesanctions" />
+                <attribute name="statecode" />
+            </attributes>
+        </entity>
+        <entity name="dfeta_induction">
+            <attributes>
+                <attribute name="dfeta_startdate" />
+                <attribute name="dfeta_completiondate" />
+                <attribute name="dfeta_inductionstatus" />
+                <attribute name="statecode" />
+            </attributes>
+        </entity>
+        <entity name="dfeta_qtsregistration">
+            <attributes>
+                <attribute name="dfeta_qtsdate" />
+                <attribute name="statecode" />
+                <attribute name="dfeta_name" />
+            </attributes>
+        </entity>
+        <entity name="dfeta_initialteachertraining">
+            <attributes>
+                <attribute name="dfeta_result" />
+                <attribute name="dfeta_programmetype" />
+                <attribute name="dfeta_programmestartdate" />
+                <attribute name="dfeta_programmeenddate" />
+                <attribute name="statecode" />
+                <attribute name="dfeta_subject1id" />
+                <attribute name="dfeta_subject2id" />
+                <attribute name="dfeta_subject3id" />
+                <attribute name="dfeta_ittqualificationid" />
+            </attributes>
+        </entity>
+        <entity name="dfeta_qualification">
+            <attributes>
+                <attribute name="dfeta_type" />
+                <attribute name="dfeta_completionorawarddate" />
+            </attributes>
+        </entity>
+    </entities>
+</filter>
