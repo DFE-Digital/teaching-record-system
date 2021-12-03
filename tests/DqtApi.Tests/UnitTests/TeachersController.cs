@@ -14,7 +14,7 @@ namespace DqtApi.Tests.UnitTests
     {
         private readonly Mock<IDataverseAdaptor> _adaptor;
         private readonly string trn = "1111111";
-        private readonly DateTime birthDate = new(2000, 1, 1);
+        private readonly string birthDate = new DateTime(2000, 1, 1).ToString("yyyy-MM-dd");
 
         public TeachersController()
         {

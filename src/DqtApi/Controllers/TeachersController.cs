@@ -26,7 +26,7 @@ namespace DqtApi
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetTeacher(
             [FromRoute] string trn,
-            [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true)] DateTime? birthDate,  // TODO model binder for yyyy-mm-dd format
+            [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true)] string birthDate,  // TODO model binder for yyyy-mm-dd format
             [FromQuery] string nino)
         {
             // Validate TRN
@@ -36,14 +36,19 @@ namespace DqtApi
             }
 
             // Validate birthDate
-            if (!birthDate.HasValue)
+            if (string.IsNullOrEmpty(birthDate))
             {
                 return NotFound();
             }
-           
+
+            if (!DateTime.TryParseExact(birthDate, "yyyy-MM-dd", provider: null, style: DateTimeStyles.None, out DateTime parsedBirthdate))
+            {
+                return Problem(title: "Invalid birthdate", statusCode: 400);
+            }
+
             var request = new GetTeacherRequest
             {
-                BirthDate = birthDate.Value,
+                BirthDate = parsedBirthdate,
                 TRN = trn,
                 NationalInsuranceNumber = nino
             };
