@@ -1,14 +1,14 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using DqtApi.DAL;
+using DqtApi.Models;
 using DqtApi.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using DqtApi.DAL;
-using DqtApi.Models;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DqtApi
 {
@@ -17,17 +17,23 @@ namespace DqtApi
     public class TeachersController : ControllerBase
     {
         private readonly IDataverseAdaptor _dataverseAdaptor;
-        public TeachersController(IDataverseAdaptor dataverseAdaptor) {
+
+        public TeachersController(IDataverseAdaptor dataverseAdaptor)
+        {
             _dataverseAdaptor = dataverseAdaptor;
         }
 
         [HttpGet("{trn}")]
+        [SwaggerOperation(
+            summary: "Teacher",
+            description: "Get an individual teacher by their TRN")]
+        [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetTeacher(
-            [FromRoute] string trn,
-            [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true)] string birthDate,  // TODO model binder for yyyy-mm-dd format
-            [FromQuery] string nino)
+            [FromRoute, SwaggerParameter("Teacher Reference Number (TRN)", Required = true)] string trn,
+            [FromQuery(Name = "birthdate"), SwaggerParameter("Birthdate in the format: yyyy-mm-dd", Required = true)] string birthDate,  // TODO model binder for yyyy-mm-dd format
+            [FromQuery, SwaggerParameter("National Insurance number - used if TRN does not match e.g. A1A123A12")] string nino)
         {
             // Validate TRN
             if (!Regex.IsMatch(trn, @"^\d{7}$"))
