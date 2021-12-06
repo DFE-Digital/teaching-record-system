@@ -152,3 +152,28 @@ jobs:
         allow_issue_writing: false
         fail_action: true
         cmd_options: '-z "-configFile /zap/wrk/options.prop"'
+
+  deploy_test:
+    name: Deploy to test environment
+    needs: [build, validate_terraform]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: test
+      url: ${{ steps.deploy.outputs.environment_url }}
+    concurrency: deploy_test
+
+    outputs:
+      environment_url: ${{ steps.deploy.outputs.environment_url }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: ./.github/workflows/actions/deploy-environment
+      id: deploy
+      with:
+        environment_name: test
+        docker_image: ${{ needs.build.outputs.docker_image }}
+        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+        terraform_vars: test.tfvars.json
+        terraform_backend_vars: test.backend.tfvars

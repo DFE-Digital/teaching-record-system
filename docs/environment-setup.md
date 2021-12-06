@@ -12,13 +12,13 @@ Using the Azure CLI create a service principal in the appropriate subscription:
 
 ```
 az account set --subscription <subscription name>
-az ad sp create-for-rbac --name <principal name> --skip-assignment
+az ad sp create-for-rbac --name <principal name> --skip-assignment --sdk-auth
 ```
 
 #### Example
 ```
 az account set --subscription s165-teachingqualificationsservice-development
-az ad sp create-for-rbac --name s165d01-keyvault-readonly-access --skip-assignment
+az ad sp create-for-rbac --name s165d01-keyvault-readonly-access --skip-assignment --sdk-auth
 ```
 
 The final command should output a JSON object containing `clientId`, `clientSecret`, `subscriptionId` and `tenantId`.
@@ -59,6 +59,11 @@ Set-ResourceGroup.ps1 -ResourceGroupName <resource group> -EnvironmentName <envi
 ```
 Set-ResourceGroup.ps1 -ResourceGroupName s165d01-rg -EnvironmentName dev -Subscription s165-teachingqualificationsservice-development -ParametersFile azuredeploy.dev.parameters.json -ServicePrincipalName s165d01-keyvault-readonly-access
 ```
+
+
+### Assign Key Vault permissions to Service Principal
+
+Send a 'CIP Request' in ServiceNow to have the 'Key Vault Reader' role assigned to the service principal created above for the Key Vault.
 
 
 ### Add storage account key to Key Vault
