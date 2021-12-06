@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using DqtApi.Configuration;
 using DqtApi.DAL;
+using DqtApi.Filters;
 using DqtApi.Security;
+using DqtApi.Swagger;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -53,6 +55,7 @@ namespace DqtApi
                 .AddMvc(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter());
+                    options.Filters.Add(new ProducesJsonOrProblemAttribute());
                 })
                 .AddFluentValidation(fv =>
                 {
@@ -67,6 +70,7 @@ namespace DqtApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
                 c.EnableAnnotations();
+                c.OperationFilter<ResponseContentTypeOperationFilter>();
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
