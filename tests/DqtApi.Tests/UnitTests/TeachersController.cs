@@ -14,7 +14,7 @@ namespace DqtApi.Tests.UnitTests
     {
         private readonly Mock<IDataverseAdaptor> _adaptor;
         private readonly string trn = "1111111";
-        private readonly string birthDate = new DateTime(2000, 1, 1).ToString("yyyy-MM-dd");
+        private readonly DateTime birthDate = new DateTime(2000, 1, 1);
 
         public TeachersController()
         {
@@ -26,7 +26,7 @@ namespace DqtApi.Tests.UnitTests
         {
             _adaptor.Setup(a => a.GetMatchingTeachersAsync(It.IsAny<Models.GetTeacherRequest>())).ReturnsAsync(new List<Contact>());
 
-            var result = await new DqtApi.TeachersController(_adaptor.Object).GetTeacher(trn, birthDate, null);
+            var result = await new DqtApi.TeachersController(_adaptor.Object).GetTeacher(new Models.GetTeacherRequest{ TRN = trn, BirthDate = birthDate });
 
             Assert.IsType<NotFoundResult>(result);
         }
@@ -36,7 +36,7 @@ namespace DqtApi.Tests.UnitTests
         {
             _adaptor.Setup(a => a.GetMatchingTeachersAsync(It.IsAny<Models.GetTeacherRequest>())).ReturnsAsync(new[] { new Contact{ dfeta_TRN = trn } });
 
-            var result = await new DqtApi.TeachersController(_adaptor.Object).GetTeacher(trn, birthDate, null);
+            var result = await new DqtApi.TeachersController(_adaptor.Object).GetTeacher(new Models.GetTeacherRequest { TRN = trn, BirthDate = birthDate });
 
             Assert.IsType<OkObjectResult>(result);
         }

@@ -59,7 +59,7 @@ namespace DqtApi
                 })
                 .AddFluentValidation(fv =>
                 {
-                    fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));
+                    fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));                    
                 })
                 .AddHybridModelBinder(options =>
                 {
@@ -104,7 +104,7 @@ namespace DqtApi
                 services.AddSingleton<IDataverseAdaptor, DataverseAdaptor>();
             }
 
-            var app = builder.Build();
+            var app = builder.Build();            
 
             app.Use((ctx, next) =>
             {
