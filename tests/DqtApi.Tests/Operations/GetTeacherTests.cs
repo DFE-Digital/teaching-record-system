@@ -1,8 +1,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
+using DqtApi.Properties;
 using DqtApi.TestCommon;
-using Microsoft.Xrm.Sdk.Query;
-using Moq;
 using Xunit;
 
 namespace DqtApi.Tests
@@ -25,7 +24,7 @@ namespace DqtApi.Tests
 
             var response = await HttpClient.SendAsync(request);
 
-            await AssertEx.ResponseIsProblemDetails(response, expectedTitle: "Invalid TRN");
+            await AssertEx.ResponseIsProblemDetails(response, expectedError: StringResources.ErrorMessages_TRNMustBe7Digits, nameof(Models.GetTeacherRequest.TRN));
         }
 
         [Theory]
@@ -37,7 +36,7 @@ namespace DqtApi.Tests
 
             var response = await HttpClient.SendAsync(request);
 
-            await AssertEx.ResponseIsProblemDetails(response, expectedTitle: "Invalid birthdate");
+            await AssertEx.ResponseIsProblemDetails(response, expectedError: StringResources.ErrorMessages_InvalidBirthDate, nameof(Models.GetTeacherRequest.BirthDate));
         }
 
         //[Fact(Skip = "not implemented")]

@@ -103,8 +103,8 @@ namespace DqtApi
                 services.AddSingleton<IOrganizationServiceAsync>(GetCrmServiceClient());
                 services.AddSingleton<IDataverseAdaptor, DataverseAdaptor>();
             }
-
-            var app = builder.Build();
+         
+            var app = builder.Build();            
 
             app.Use((ctx, next) =>
             {
