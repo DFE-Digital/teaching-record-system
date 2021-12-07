@@ -15,7 +15,8 @@
   "variables": {
     "location": "[resourceGroup().location]",
     "tenantId": "9c7d9dd3-840c-4b3f-818e-552865082e16",
-    "tfstateContainerName": ["dqtapi-tfstate", "dqtmonitoring-tfstate"],
+    "tfstateContainerName": "dqtapi-tfstate",
+    "tfstateContainerName2": "dqtmonitoring-tfstate",
     "deliveryTeamGroupId": "ce5793a4-b822-4018-a65d-6c04e96918b2"
   },
   "resources": [
@@ -35,11 +36,15 @@
         {
           "type": "blobServices/containers",
           "apiVersion": "2019-06-01",
-          "name": "[concat('default/', variables('tfstateContainerName')[copyIndex()])]",
-          "copy": {
-            "name": "blobIterator",
-            "count": "[length(variables('tfstateContainerName'))]"
-          },
+          "name": "[concat('default/', variables('tfstateContainerName'))]",
+          "dependsOn": [
+            "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+          ]
+        },
+        {
+          "type": "blobServices/containers",
+          "apiVersion": "2019-06-01",
+          "name": "[concat('default/', variables('tfstateContainerName2'))]",
           "dependsOn": [
             "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
           ]
