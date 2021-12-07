@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
@@ -28,7 +30,7 @@ namespace DqtApi.TestCommon
         public static Task<dynamic> JsonResponse(HttpResponseMessage response, int expectedStatusCode = StatusCodes.Status200OK) =>
             JsonResponse<dynamic>(response, expectedStatusCode);
 
-        public static async Task ResponseIsProblemDetails(HttpResponseMessage response, string expectedTitle, int expectedStatusCode = 400)
+        public static async Task ResponseIsProblemDetails(HttpResponseMessage response, string expectedError, string propertyName, int expectedStatusCode = 400)
         {
             if (response is null)
             {
@@ -40,7 +42,7 @@ namespace DqtApi.TestCommon
 
             var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
             Assert.Equal(expectedStatusCode, problemDetails.Status);
-            Assert.Equal(expectedTitle, problemDetails.Title);
+            Assert.Equal(expectedError, problemDetails.Errors[propertyName].Single());
         }
 
         private class ProblemDetails
@@ -49,6 +51,8 @@ namespace DqtApi.TestCommon
             public string Title { get; set; }
             [JsonPropertyName("status")]
             public int Status { get; set; }
+            [JsonPropertyName("errors")]
+            public Dictionary<string, string[]> Errors { get; set; }
         }
     }
 }

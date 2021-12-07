@@ -30,12 +30,12 @@ namespace DqtApi
         [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetTeacher(GetTeacherRequest request)           
+        public async Task<IActionResult> GetTeacher([FromRoute]GetTeacherRequest request)           
         {
-            if (!ModelState.IsValid)
-            {
-                return Problem(title: "Invalid TRN", statusCode: 400);
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    return Problem(title: "Invalid TRN", statusCode: 400, detail: "TRN must consist of 7 digits");
+            //}
 
             if (!request.BirthDate.HasValue)
             {

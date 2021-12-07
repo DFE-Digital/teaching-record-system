@@ -10,6 +10,7 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -59,7 +60,7 @@ namespace DqtApi
                 })
                 .AddFluentValidation(fv =>
                 {
-                    fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));                    
+                    fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));
                 })
                 .AddHybridModelBinder(options =>
                 {
@@ -103,6 +104,12 @@ namespace DqtApi
                 services.AddSingleton<IOrganizationServiceAsync>(GetCrmServiceClient());
                 services.AddSingleton<IDataverseAdaptor, DataverseAdaptor>();
             }
+
+            //services.Configure<ApiBehaviorOptions>(options =>
+            //{
+            //    options.SuppressModelStateInvalidFilter = true;               
+            //});
+
 
             var app = builder.Build();            
 

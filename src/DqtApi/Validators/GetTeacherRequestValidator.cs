@@ -7,10 +7,7 @@ namespace DqtApi.Validators
     {
         public GetTeacherRequestValidator()
         {
-            RuleFor(x => x.TRN).Matches(@"^\d{7}$").Must(_ =>
-            {
-                return true;
-            });
+            RuleFor(x => x.TRN).Matches(@"^\d{7}$").WithMessage(Properties.StringResources.ErrorMessages_TRNMustBe7Digits);
         }
     }
 }

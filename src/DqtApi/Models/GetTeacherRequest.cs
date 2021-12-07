@@ -8,11 +8,10 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace DqtApi.Models
 {
     public class GetTeacherRequest
-    {
-        [FromRoute]
+    {        
         public string TRN { get; set; }
 
-        [FromQuery, SwaggerParameter(Required = true)]
+        [FromQuery, SwaggerParameter(Required = true),ModelBinder(typeof(ModelBinders.DateTimeReverseOrderBinder))]
         public DateTime? BirthDate { get; set; }
 
         [FromQuery(Name = "nino")]
