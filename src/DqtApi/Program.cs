@@ -19,6 +19,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Npgsql;
+using Prometheus;
 using Serilog;
 using Serilog.Context;
 
@@ -146,6 +147,7 @@ namespace DqtApi
             app.UseSerilogRequestLogging();
 
             app.UseRouting();
+            app.UseHttpMetrics();
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -165,6 +167,8 @@ namespace DqtApi
                 {
                     await context.Response.WriteAsync("OK");
                 });
+
+                endpoints.MapMetrics();
 
                 endpoints.MapControllers();
             });
