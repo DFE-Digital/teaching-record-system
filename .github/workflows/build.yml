@@ -103,6 +103,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         tflint_rulesets: azurerm
         working_directory: terraform
+      continue-on-error: true  # temporary- we're getting sporadic 503 errors here in action setup
 
   deploy_dev:
     name: Deploy to dev environment
