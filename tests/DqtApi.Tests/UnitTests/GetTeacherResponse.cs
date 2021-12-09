@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DqtApi.Models;
 using Microsoft.Xrm.Sdk;
 using Xunit;
 
@@ -90,7 +91,7 @@ namespace DqtApi.Tests.UnitTests
                 Attributes = new AttributeCollection
                 {
                     { $"{prefix}.{dfeta_induction.Fields.dfeta_CompletionDate}",
-                        new AliasedValue(dfeta_induction.EntityLogicalName, dfeta_induction.Fields.dfeta_name, completionDate) },
+                        new AliasedValue(dfeta_induction.EntityLogicalName, dfeta_induction.Fields.dfeta_CompletionDate, completionDate) },
                     { $"{prefix}.{dfeta_induction.Fields.dfeta_StartDate}",
                         new AliasedValue(dfeta_induction.EntityLogicalName, dfeta_induction.Fields.dfeta_StartDate, startDate) },
                     { $"{prefix}.{dfeta_induction.Fields.StateCode}",

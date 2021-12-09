@@ -10,7 +10,7 @@ using Xunit;
 
 namespace DqtApi.Tests
 {
-    public class ApiFixture : WebApplicationFactory<DqtApi.Program>, IAsyncLifetime
+    public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
     {
         public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
 
@@ -34,10 +34,10 @@ namespace DqtApi.Tests
 
             builder.ConfigureServices(services =>
             {
-                services.AddSingleton<IOrganizationServiceAsync>(OrganizationService.Object);
+                services.AddSingleton(OrganizationService.Object);
                 services.AddSingleton<IDataverseAdaptor, DataverseAdaptor>();
 
-                services.AddSingleton<DbHelper>(sp =>
+                services.AddSingleton(sp =>
                 {
                     var configuration = sp.GetRequiredService<IConfiguration>();
                     var connectionString = configuration.GetConnectionString("DefaultConnection");

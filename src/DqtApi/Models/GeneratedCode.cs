@@ -44,6 +44,7 @@ namespace DqtApi.Models
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
 			public const string dfeta_NINumber = "dfeta_ninumber";
 			public const string dfeta_TRN = "dfeta_trn";
+			public const string dfeta_trnrequired = "dfeta_trnrequired";
 			public const string FullName = "fullname";
 			public const string StateCode = "statecode";
 			public const string Referencedcontact_customer_contacts = "Referencedcontact_customer_contacts";
@@ -182,6 +183,26 @@ namespace DqtApi.Models
 				this.OnPropertyChanging("dfeta_TRN");
 				this.SetAttributeValue("dfeta_trn", value);
 				this.OnPropertyChanged("dfeta_TRN");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trnrequired")]
+		public System.Nullable<bool> dfeta_trnrequired
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_trnrequired");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_trnrequired");
+				this.SetAttributeValue("dfeta_trnrequired", value);
+				this.OnPropertyChanged("dfeta_trnrequired");
 			}
 		}
 		
