@@ -75,7 +75,9 @@ namespace DqtApi.DAL
                 dfeta_initialteachertraining.Fields.dfeta_Result,
                 dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
                 dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
-                dfeta_initialteachertraining.Fields.dfeta_Subject3Id
+                dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
+                dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate
             );
 
             initialTeacherTrainingLink.EntityAlias = nameof(dfeta_initialteachertraining);
