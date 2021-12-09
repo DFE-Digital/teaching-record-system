@@ -1,4 +1,6 @@
-﻿namespace DqtApi.Responses
+﻿using DqtApi.Models;
+
+namespace DqtApi.Responses
 {
     public class Subject : LinkedEntity<dfeta_ittsubject>
     {
