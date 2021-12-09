@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using DqtApi.DAL;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,9 @@ namespace DqtApi.Tests
 
             builder.ConfigureServices(services =>
             {
+                // Add controllers defined in this test assembly
+                services.AddMvc().AddApplicationPart(typeof(ApiFixture).Assembly);
+
                 services.AddSingleton(OrganizationService.Object);
                 services.AddSingleton<IDataverseAdaptor, DataverseAdaptor>();
 
