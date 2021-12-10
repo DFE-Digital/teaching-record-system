@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DqtApi.Models;
 using Xunit;
 
 namespace DqtApi.Tests.UnitTests
@@ -9,8 +10,8 @@ namespace DqtApi.Tests.UnitTests
         private readonly string _trn = "1111111";
         private readonly string _nationalInsuranceNumber = "AA123456A";
 
-        private Contact _matchingTrn;
-        private Contact _matchingNationalInsuranceNumber;
+        private readonly Contact _matchingTrn;
+        private readonly Contact _matchingNationalInsuranceNumber;
         private IEnumerable<Contact> _matches;
 
         public GetTeacherRequest()

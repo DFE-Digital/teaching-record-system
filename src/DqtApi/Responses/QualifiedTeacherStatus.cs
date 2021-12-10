@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using DqtApi.Models;
 
 namespace DqtApi.Responses
 {

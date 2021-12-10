@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using DqtApi.DAL;
+using DqtApi.Models;
 using Microsoft.Xrm.Sdk;
 
 namespace DqtApi.Responses
