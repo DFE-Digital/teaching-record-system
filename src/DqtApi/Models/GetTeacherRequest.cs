@@ -11,7 +11,7 @@ namespace DqtApi.Models
     {        
         public string TRN { get; set; }
 
-        [FromQuery, SwaggerParameter(Required = true),ModelBinder(typeof(ModelBinders.DateTimeReverseOrderBinder))]
+        [FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date"), ModelBinder(typeof(ModelBinders.DateTimeReverseOrderBinder))]
         public DateTime? BirthDate { get; set; }
 
         [FromQuery(Name = "nino")]
