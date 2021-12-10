@@ -24,7 +24,7 @@ namespace DqtApi.Tests
 
             var response = await HttpClient.SendAsync(request);
 
-            await AssertEx.ResponseIsProblemDetails(response, expectedError: StringResources.ErrorMessages_TRNMustBe7Digits, nameof(Models.GetTeacherRequest.TRN));
+            await AssertEx.ResponseIsProblemDetails(response, expectedError: StringResources.ErrorMessages_TRNMustBe7Digits, "trn");
         }
 
         [Theory]
@@ -36,7 +36,7 @@ namespace DqtApi.Tests
 
             var response = await HttpClient.SendAsync(request);
 
-            await AssertEx.ResponseIsProblemDetails(response, expectedError: StringResources.ErrorMessages_InvalidBirthDate, nameof(Models.GetTeacherRequest.BirthDate));
+            await AssertEx.ResponseIsProblemDetails(response, expectedError: StringResources.ErrorMessages_InvalidBirthDate, "birthdate");
         }
 
         //[Fact(Skip = "not implemented")]
