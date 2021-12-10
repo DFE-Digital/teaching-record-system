@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
-using DqtApi.DAL;
-using DqtApi.Models;
+using DqtApi.DataStore.Crm;
+using DqtApi.DataStore.Crm.Models;
 
 namespace DqtApi.V1.Responses
 {

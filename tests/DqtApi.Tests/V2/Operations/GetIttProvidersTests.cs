@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using DqtApi.Models;
+using DqtApi.DataStore.Crm.Models;
 using DqtApi.TestCommon;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -30,7 +30,7 @@ namespace DqtApi.Tests.V2.Operations
                 dfeta_UKPRN = "2345678"
             };
 
-            ApiFixture.DataverseAdaptor
+            ApiFixture.DataverseAdapter
                 .Setup(mock => mock.GetIttProviders())
                 .ReturnsAsync(new[] { provider1, provider2 });
 

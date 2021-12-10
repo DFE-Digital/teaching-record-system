@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using DqtApi.DAL;
+using DqtApi.DataStore.Crm;
 using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
@@ -7,11 +7,11 @@ namespace DqtApi.Tests.DataverseIntegration
     [Collection(nameof(DataverseTestCollection))]
     public class GetIttProvidersTests : IClassFixture<CrmClientFixture>
     {
-        private readonly DataverseAdaptor _dataverseAdaptor;
+        private readonly DataverseAdapter _dataverseAdapter;
 
         public GetIttProvidersTests(CrmClientFixture crmClientFixture)
         {
-            _dataverseAdaptor = crmClientFixture.CreateDataverseAdaptor();
+            _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
         }
 
         [Fact]
@@ -20,7 +20,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Arrange
 
             // Act
-            var result = await _dataverseAdaptor.GetIttProviders();
+            var result = await _dataverseAdapter.GetIttProviders();
 
             // Assert
             Assert.NotEmpty(result);

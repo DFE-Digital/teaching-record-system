@@ -1,4 +1,4 @@
-﻿using DqtApi.Models;
+﻿using DqtApi.DataStore.Crm.Models;
 using FluentValidation;
 
 namespace DqtApi.V1.Validators

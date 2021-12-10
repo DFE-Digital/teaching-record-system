@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DqtApi.DAL;
-using DqtApi.Models;
+using DqtApi.DataStore.Crm;
+using DqtApi.DataStore.Crm.Models;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -27,7 +27,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
         public ServiceClient ServiceClient { get; }
 
-        public DataverseAdaptor CreateDataverseAdaptor() => new(ServiceClient);
+        public DataverseAdapter CreateDataverseAdapter() => new(ServiceClient);
 
         public Task InitializeAsync() => Task.CompletedTask;
 

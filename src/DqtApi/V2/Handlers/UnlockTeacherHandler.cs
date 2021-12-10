@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using DqtApi.DAL;
-using DqtApi.Models;
+using DqtApi.DataStore.Crm;
+using DqtApi.DataStore.Crm.Models;
 using DqtApi.V2.Requests;
 using MediatR;
 
@@ -9,16 +9,16 @@ namespace DqtApi.V2.Handlers
 {
     public class UnlockTeacherHandler : IRequestHandler<UnlockTeacherRequest>
     {
-        private readonly IDataverseAdaptor _dataverseAdaptor;
+        private readonly IDataverseAdapter _dataverseAdapter;
 
-        public UnlockTeacherHandler(IDataverseAdaptor dataverseAdaptor)
+        public UnlockTeacherHandler(IDataverseAdapter dataverseAdapter)
         {
-            _dataverseAdaptor = dataverseAdaptor;
+            _dataverseAdapter = dataverseAdapter;
         }
 
         public async Task<Unit> Handle(UnlockTeacherRequest request, CancellationToken cancellationToken)
         {
-            var found = await _dataverseAdaptor.UnlockTeacherRecordAsync(request.TeacherId);
+            var found = await _dataverseAdapter.UnlockTeacherRecordAsync(request.TeacherId);
 
             if (!found)
             {

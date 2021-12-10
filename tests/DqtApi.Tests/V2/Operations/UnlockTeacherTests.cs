@@ -19,7 +19,7 @@ namespace DqtApi.Tests.V2.Operations
             // Arrange
             var teacherId = Guid.NewGuid();
 
-            ApiFixture.DataverseAdaptor
+            ApiFixture.DataverseAdapter
                 .Setup(mock => mock.UnlockTeacherRecordAsync(teacherId))
                 .ReturnsAsync(false);
 
@@ -38,7 +38,7 @@ namespace DqtApi.Tests.V2.Operations
             // Arrange
             var teacherId = Guid.NewGuid();
 
-            ApiFixture.DataverseAdaptor
+            ApiFixture.DataverseAdapter
                 .Setup(mock => mock.UnlockTeacherRecordAsync(teacherId))
                 .ReturnsAsync(true)
                 .Verifiable();
@@ -50,7 +50,7 @@ namespace DqtApi.Tests.V2.Operations
 
             // Assert
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-            ApiFixture.DataverseAdaptor.Verify();
+            ApiFixture.DataverseAdapter.Verify();
         }
     }
 }

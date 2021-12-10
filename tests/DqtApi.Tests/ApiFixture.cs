@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using DqtApi.DAL;
+using DqtApi.DataStore.Crm;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +13,7 @@ namespace DqtApi.Tests
     {
         public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
 
-        public Mock<IDataverseAdaptor> DataverseAdaptor { get; } = new Mock<IDataverseAdaptor>();
+        public Mock<IDataverseAdapter> DataverseAdapter { get; } = new Mock<IDataverseAdapter>();
 
         public async Task InitializeAsync()
         {
@@ -22,7 +22,7 @@ namespace DqtApi.Tests
 
         public void ResetMocks()
         {
-            DataverseAdaptor.Reset();
+            DataverseAdapter.Reset();
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -38,7 +38,7 @@ namespace DqtApi.Tests
                 // Add controllers defined in this test assembly
                 services.AddMvc().AddApplicationPart(typeof(ApiFixture).Assembly);
 
-                services.AddSingleton(DataverseAdaptor.Object);
+                services.AddSingleton(DataverseAdapter.Object);
 
                 services.AddSingleton(sp =>
                 {

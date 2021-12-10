@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using DqtApi.Configuration;
-using DqtApi.DAL;
+using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Sql;
 using DqtApi.Filters;
 using DqtApi.Security;
@@ -159,7 +159,7 @@ namespace DqtApi
                 var crmServiceClient = GetCrmServiceClient();
 
                 services.AddSingleton<IOrganizationServiceAsync>(crmServiceClient);
-                services.AddSingleton<IDataverseAdaptor, DataverseAdaptor>();
+                services.AddSingleton<IDataverseAdapter, DataverseAdapter>();
 
                 healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
             }

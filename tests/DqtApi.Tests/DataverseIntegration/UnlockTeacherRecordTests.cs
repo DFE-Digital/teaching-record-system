@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DqtApi.DAL;
-using DqtApi.Models;
+using DqtApi.DataStore.Crm;
+using DqtApi.DataStore.Crm.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
 using Xunit;
@@ -12,13 +12,13 @@ namespace DqtApi.Tests.DataverseIntegration
     public class UnlockTeacherRecordTests : IClassFixture<CrmClientFixture>
     {
         private readonly CrmClientFixture _crmClientFixture;
-        private readonly DataverseAdaptor _dataverseAdaptor;
+        private readonly DataverseAdapter _dataverseAdapter;
         private readonly ServiceClient _serviceClient;
 
         public UnlockTeacherRecordTests(CrmClientFixture crmClientFixture)
         {
             _crmClientFixture = crmClientFixture;
-            _dataverseAdaptor = crmClientFixture.CreateDataverseAdaptor();
+            _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
             _serviceClient = crmClientFixture.ServiceClient;
         }
 
@@ -29,7 +29,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var teacherId = Guid.NewGuid();
 
             // Act
-            var result = await _dataverseAdaptor.UnlockTeacherRecordAsync(teacherId);
+            var result = await _dataverseAdapter.UnlockTeacherRecordAsync(teacherId);
 
             // Assert
             Assert.False(result);
@@ -48,7 +48,7 @@ namespace DqtApi.Tests.DataverseIntegration
             _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, teacherId);
 
             // Act
-            var result = await _dataverseAdaptor.UnlockTeacherRecordAsync(teacherId);
+            var result = await _dataverseAdapter.UnlockTeacherRecordAsync(teacherId);
 
             // Assert
             Assert.True(result);

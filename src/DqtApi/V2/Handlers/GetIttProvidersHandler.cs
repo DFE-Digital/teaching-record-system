@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DqtApi.DAL;
+using DqtApi.DataStore.Crm;
 using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
 using MediatR;
@@ -10,16 +10,16 @@ namespace DqtApi.V2.Handlers
 {
     public class GetIttProvidersHandler : IRequestHandler<GetIttProvidersRequest, GetIttProvidersResponse>
     {
-        private readonly IDataverseAdaptor _dataverseAdaptor;
+        private readonly IDataverseAdapter _dataverseAdapter;
 
-        public GetIttProvidersHandler(IDataverseAdaptor dataverseAdaptor)
+        public GetIttProvidersHandler(IDataverseAdapter dataverseAdapter)
         {
-            _dataverseAdaptor = dataverseAdaptor;
+            _dataverseAdapter = dataverseAdapter;
         }
 
         public async Task<GetIttProvidersResponse> Handle(GetIttProvidersRequest request, CancellationToken cancellationToken)
         {
-            var ittProviders = await _dataverseAdaptor.GetIttProviders();
+            var ittProviders = await _dataverseAdapter.GetIttProviders();
 
             return new GetIttProvidersResponse()
             {

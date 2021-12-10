@@ -1,4 +1,4 @@
-﻿using DqtApi.DAL;
+﻿using DqtApi.DataStore.Crm;
 using Microsoft.Xrm.Sdk;
 
 namespace DqtApi.V1.Responses

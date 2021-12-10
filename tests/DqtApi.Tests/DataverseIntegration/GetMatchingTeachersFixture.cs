@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using DqtApi.Models;
+using DqtApi.DataStore.Crm.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
 using Xunit;

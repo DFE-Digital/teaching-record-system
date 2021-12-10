@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DqtApi.Models;
+using DqtApi.DataStore.Crm.Models;
 
-namespace DqtApi.DAL
+namespace DqtApi.DataStore.Crm
 {
-    public interface IDataverseAdaptor
+    public interface IDataverseAdapter
     {
         Task<IEnumerable<Account>> GetIttProviders();
 
