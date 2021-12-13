@@ -9,6 +9,7 @@ namespace DqtApi.DataStore.Sql
         {
             var options = new DbContextOptionsBuilder<DqtContext>()
                 .UseNpgsql()
+                .UseSnakeCaseNamingConvention()
                 .Options;
 
             return new DqtContext(options);
