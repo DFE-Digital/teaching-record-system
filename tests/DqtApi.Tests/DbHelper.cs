@@ -27,7 +27,6 @@ namespace DqtApi.Tests
         {
             using var dbContext = new DqtContext(_connectionString);
             await dbContext.Database.EnsureDeletedAsync();
-            await dbContext.Database.EnsureCreatedAsync();
             await dbContext.Database.MigrateAsync();
 
             CreateCheckpoint();
