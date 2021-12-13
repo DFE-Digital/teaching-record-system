@@ -131,6 +131,7 @@ namespace DqtApi
 
             services.AddMediatR(typeof(Program));
             services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
+            services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
 
             services.AddDbContext<DqtContext>(options =>
             {
