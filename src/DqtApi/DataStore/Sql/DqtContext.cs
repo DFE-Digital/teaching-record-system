@@ -19,6 +19,11 @@ namespace DqtApi.DataStore.Sql
             optionsBuilder.UseNpgsql(connectionString);
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(DqtContext).Assembly);
+        }
+
         private static DbContextOptions<DqtContext> CreateOptions(string connectionString)
         {
             var optionsBuilder = new DbContextOptionsBuilder<DqtContext>();
