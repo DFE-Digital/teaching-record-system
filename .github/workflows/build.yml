@@ -24,6 +24,7 @@ jobs:
   build:
     name: Build & test
     runs-on: ubuntu-latest
+    concurrency: build
 
     outputs:
       docker_image: ${{ steps.image.outputs.tag }}
