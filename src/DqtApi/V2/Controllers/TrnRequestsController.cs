@@ -23,7 +23,7 @@ namespace DqtApi.V2.Controllers
         [SwaggerOperation(summary: "Retrieves a TRN request")]
         [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetTrnRequest([FromRoute] GetTrnRequest request)
+        public async Task<IActionResult> GetTrnRequest(GetTrnRequest request)
         {
             var response = await _mediator.Send(request);
             return response != null ? Ok(response) : NotFound();

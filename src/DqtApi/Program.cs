@@ -6,12 +6,14 @@ using DqtApi.Configuration;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Sql;
 using DqtApi.Filters;
+using DqtApi.ModelBinding;
 using DqtApi.Security;
 using DqtApi.Swagger;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -65,6 +67,8 @@ namespace DqtApi
             services
                 .AddMvc(options =>
                 {
+                    options.AddHybridBodyModelBinderProvider();
+
                     options.Filters.Add(new AuthorizeFilter());
                     options.Filters.Add(new ProducesJsonOrProblemAttribute());
                     options.Filters.Add(new CrmServiceProtectionFaultExceptionFilter());
@@ -78,11 +82,9 @@ namespace DqtApi
                 .AddFluentValidation(fv =>
                 {
                     fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));
-                })
-                .AddHybridModelBinder(options =>
-                {
-                    options.FallbackBindingOrder = new[] { HybridModelBinding.Source.Body };
                 });
+
+            services.AddTransient<IApiDescriptionProvider, HybridBodyApiDescriptionProvider>();
 
             services.AddControllers()
                 .AddJsonOptions(options =>

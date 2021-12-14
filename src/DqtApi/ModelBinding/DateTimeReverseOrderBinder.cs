@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace DqtApi.ModelBinders
+namespace DqtApi.ModelBinding
 {
     public class DateTimeReverseOrderBinder : IModelBinder
     {       
