@@ -16,8 +16,16 @@ namespace DqtApi.DataStore.Sql
 
         public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
         {
+            if (connectionString != null)
+            {
+                optionsBuilder.UseNpgsql(connectionString);
+            }
+            else
+            {
+                optionsBuilder.UseNpgsql();
+            }
+
             optionsBuilder
-                .UseNpgsql(connectionString)
                 .UseSnakeCaseNamingConvention();
         }
 

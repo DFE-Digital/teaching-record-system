@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace DqtApi.DataStore.Sql
 {
@@ -7,12 +8,16 @@ namespace DqtApi.DataStore.Sql
     {
         public DqtContext CreateDbContext(string[] args)
         {
-            var options = new DbContextOptionsBuilder<DqtContext>()
-                .UseNpgsql()
-                .UseSnakeCaseNamingConvention()
-                .Options;
+            var configuration = new ConfigurationBuilder()
+                .AddUserSecrets<DqtDesignTimeDbContextFactory>(optional: true)  // Optional for CI
+                .Build();
 
-            return new DqtContext(options);
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+            var optionsBuilder = new DbContextOptionsBuilder<DqtContext>();
+            DqtContext.ConfigureOptions(optionsBuilder, connectionString);
+
+            return new DqtContext(optionsBuilder.Options);
         }
     }
 }
