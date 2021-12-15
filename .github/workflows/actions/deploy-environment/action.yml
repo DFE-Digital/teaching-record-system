@@ -16,6 +16,8 @@ inputs:
   terraform_backend_vars:
     description: 'Path to the backend tfvars file for the environment'
     required: true
+  skip_functional_tests:
+    default: false
 
 outputs:
   environment_url:
@@ -60,7 +62,7 @@ runs:
       id: get_secrets
       with:
         keyvault: ${{ steps.config.outputs.key_vault_name }}
-        secrets: 'TFSTATE-CONTAINER-ACCESS-KEY,TEST-API-KEY,FUNCTIONAL-TESTS-CONFIG,PAAS-USER,PAAS-PASSWORD'
+        secrets: 'TFSTATE-CONTAINER-ACCESS-KEY,TEST-API-KEY,PAAS-USER,PAAS-PASSWORD'
 
     - uses: hashicorp/setup-terraform@v1
       with:
@@ -96,24 +98,10 @@ runs:
       shell: bash
       working-directory: terraform
 
-    - uses: actions/setup-dotnet@v1
+    - uses: ./.github/workflows/actions/functional-tests
+      if: inputs.skip_functional_tests != 'true'
       with:
-        dotnet-version: '6.0.x'
-
-    - name: Functional tests
-      id: functional_tests
-      run: |
-        dotnet test tests/DqtApi.FunctionalTests --configuration Release --logger trx --settings tests/DqtApi.FunctionalTests/ci.runsettings || true
-      env:
-        FunctionalTestsConfig: ${{ steps.get_secrets.outputs.FUNCTIONAL-TESTS-CONFIG }}
-        BaseUrl: ${{ steps.terraform.outputs.url }}
-      shell: bash
-
-    - name: Test report
-      uses: dorny/test-reporter@v1
-      if: steps.functional_tests.outcome != 'skipped'
-      with:
-        name: ${{ inputs.environment_name }} functional test results
-        path: "**/*.trx"
-        reporter: dotnet-trx
-        fail-on-error: false
+        environment_name: ${{ inputs.environment_name }}
+        azure_credentials: ${{ inputs.azure_credentials }}
+        base_url: ${{ steps.terraform.outputs.url }}
+        key_vault_name: ${{ steps.config.outputs.key_vault_name }}
