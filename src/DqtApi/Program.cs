@@ -63,6 +63,7 @@ namespace DqtApi
                 {
                     options.Filters.Add(new AuthorizeFilter());
                     options.Filters.Add(new ProducesJsonOrProblemAttribute());
+                    options.Filters.Add(new CrmServiceProtectionFaultExceptionFilter());
                 })
                 .AddFluentValidation(fv =>
                 {
