@@ -208,9 +208,34 @@ jobs:
         terraform_vars: test.tfvars.json
         terraform_backend_vars: test.backend.tfvars
 
+  deploy_preprod:
+    name: Deploy to pre-production environment
+    needs: [build, deploy_test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: pre-production
+      url: ${{ steps.deploy.outputs.environment_url }}
+    concurrency: deploy_preprod
+
+    outputs:
+      environment_url: ${{ steps.deploy.outputs.environment_url }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: ./.github/workflows/actions/deploy-environment
+      id: deploy
+      with:
+        environment_name: pre-production
+        docker_image: ${{ needs.build.outputs.docker_image }}
+        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+        terraform_vars: preprod.tfvars.json
+        terraform_backend_vars: preprod.backend.tfvars
+
   deploy_prod:
     name: Deploy to production environment
-    needs: [build, deploy_test]
+    needs: [build, deploy_preprod]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     environment:
