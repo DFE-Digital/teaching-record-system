@@ -17,6 +17,30 @@ namespace DqtApi.DAL
             _service = organizationServiceAsync;
         }
 
+        public async Task<IEnumerable<Account>> GetIttProviders()
+        {
+            var filter = new FilterExpression(LogicalOperator.And);
+            filter.AddCondition(Account.Fields.StateCode, ConditionOperator.Equal, (int)AccountState.Active);
+            filter.AddCondition(Account.Fields.dfeta_TrainingProvider, ConditionOperator.Equal, true);
+            filter.AddCondition(Account.Fields.dfeta_UKPRN, ConditionOperator.NotNull);
+
+            var query = new QueryExpression(Account.EntityLogicalName)
+            {
+                ColumnSet = new(
+                    Account.Fields.Name,
+                    Account.Fields.dfeta_UKPRN),
+                Criteria = filter,
+                Orders =
+                {
+                    new OrderExpression(Account.Fields.Name, OrderType.Ascending)
+                }
+            };
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<Account>());
+        }
+
         public async Task<IEnumerable<Contact>> GetMatchingTeachersAsync(GetTeacherRequest request)
         {
             var query = request.GenerateQuery();
