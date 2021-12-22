@@ -97,6 +97,8 @@ namespace DqtApi
                     options.JsonSerializerOptions.Converters.Add(new DateOnlyConverter());
                 });
 
+            services.Decorate<Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory, CamelCaseErrorKeysProblemDetailsFactory>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
