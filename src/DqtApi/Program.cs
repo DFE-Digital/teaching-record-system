@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using DqtApi.Configuration;
 using DqtApi.DAL;
 using DqtApi.DataStore.Sql;
@@ -74,6 +75,12 @@ namespace DqtApi
                 .AddHybridModelBinder(options =>
                 {
                     options.FallbackBindingOrder = new[] { HybridModelBinding.Source.Body };
+                });
+
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
             services.AddSwaggerGen(c =>
