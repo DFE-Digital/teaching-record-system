@@ -10,5 +10,7 @@ namespace DqtApi.DAL
         Task<IEnumerable<Contact>> GetMatchingTeachersAsync(GetTeacherRequest request);
 
         Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId);
+
+        Task<Contact> GetTeacherAsync(Guid teacherId);
     }
 }

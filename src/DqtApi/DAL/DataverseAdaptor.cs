@@ -47,6 +47,22 @@ namespace DqtApi.DAL
             return result.Entities.Select(entity => entity.ToEntity<dfeta_qualification>());
         }
 
+        public async Task<Contact> GetTeacherAsync(Guid teacherId)
+        {
+            var filter = new FilterExpression();
+            filter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, teacherId);
+
+            var query = new QueryExpression(Contact.EntityLogicalName)
+            {
+                ColumnSet = new ColumnSet { AllColumns = true },
+                Criteria = filter
+            };
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.FirstOrDefault()?.ToEntity<Contact>();
+        }
+
         private static void AddQualifiedTeacherStatusLink(QueryExpression query)
         {
             var qualifiedTeacherStatusLink = query.AddLink(dfeta_qtsregistration.EntityLogicalName, Contact.PrimaryIdAttribute,

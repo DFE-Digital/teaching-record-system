@@ -15,12 +15,14 @@ namespace DqtApi.Tests
             ApiFixture = apiFixture;
 
             HttpClient = apiFixture.CreateClient();
-            HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "tests");
+            HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", ClientId);
 
             apiFixture.ResetMocks();
         }
 
         public ApiFixture ApiFixture { get; }
+
+        public string ClientId { get; } = "tests";
 
         public HttpClient HttpClient { get; }
 
