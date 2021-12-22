@@ -23,6 +23,7 @@ using Npgsql;
 using Prometheus;
 using Serilog;
 using Serilog.Context;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace DqtApi
 {
@@ -90,6 +91,7 @@ namespace DqtApi
 
                 c.DocInclusionPredicate((docName, api) => docName.Equals(api.GroupName, StringComparison.OrdinalIgnoreCase));
                 c.EnableAnnotations();
+                c.ExampleFilters();
                 c.OperationFilter<ResponseContentTypeOperationFilter>();
 
                 c.CustomSchemaIds(type =>
@@ -132,6 +134,7 @@ namespace DqtApi
             services.AddMediatR(typeof(Program));
             services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
             services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
+            services.AddSwaggerExamplesFromAssemblyOf<Program>();
 
             services.AddDbContext<DqtContext>(options =>
             {
