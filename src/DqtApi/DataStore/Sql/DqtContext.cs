@@ -1,3 +1,4 @@
+using DqtApi.DataStore.Sql.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DqtApi.DataStore.Sql
@@ -13,6 +14,8 @@ namespace DqtApi.DataStore.Sql
             : this(CreateOptions(connectionString))
         {
         }
+
+        public DbSet<TrnRequest> TrnRequests { get; set; }
 
         public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
         {
