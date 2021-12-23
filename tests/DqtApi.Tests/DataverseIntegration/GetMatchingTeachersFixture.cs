@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Linq;
 using DqtApi.Models;
-using Microsoft.Extensions.Configuration;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
 using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class DataverseAdaptorFixture : IDisposable
+    public class GetMatchingTeachersFixture : CrmClientFixture
     {
         public struct Fixture
         {
@@ -18,9 +17,7 @@ namespace DqtApi.Tests.DataverseIntegration
             public Guid ID { get; set; }
         }
 
-        private readonly ServiceClient _service;
-
-        public IOrganizationServiceAsync Service => _service;
+        public IOrganizationServiceAsync Service => ServiceClient;
         private readonly string _nonmatchingNationalInsuranceNumber;
         private readonly string _nonmatchingTRN;
 
@@ -29,19 +26,9 @@ namespace DqtApi.Tests.DataverseIntegration
         private static DateTime MatchingBirthdate => new(2001, 1, 1);
         private static DateTime NonmatchingBirthdate => new(2002, 2, 2);
 
-        private readonly IConfiguration _configuration;
-
-        public DataverseAdaptorFixture()
+        public GetMatchingTeachersFixture()
         {
-            var builder = new ConfigurationBuilder()
-                .AddUserSecrets<DataverseAdaptorTests>(optional: true)
-                .AddEnvironmentVariables("IntegrationTests_");
-
-            _configuration = builder.Build();
-
-            _service = GetCrmServiceClient();
-
-            var nationalInsuranceNumberGenerator = new NationalInsuranceNumberGenerator(_service);
+            var nationalInsuranceNumberGenerator = new NationalInsuranceNumberGenerator(Service);
 
             var nationalInsuranceNumber1 = nationalInsuranceNumberGenerator.GetNextAvailable();
             var nationalInsuranceNumber2 = nationalInsuranceNumberGenerator.GetNextAvailable(nationalInsuranceNumber1);
@@ -63,27 +50,20 @@ namespace DqtApi.Tests.DataverseIntegration
 
         private string GetTRN(Guid contactId)
         {
-            return _service.Retrieve(Contact.EntityLogicalName, contactId, new ColumnSet(Contact.Fields.dfeta_TRN))
+            return Service.Retrieve(Contact.EntityLogicalName, contactId, new ColumnSet(Contact.Fields.dfeta_TRN))
                 .GetAttributeValue<string>(Contact.Fields.dfeta_TRN);
         }
 
-        private ServiceClient GetCrmServiceClient() =>
-            new(
-                new Uri(_configuration["CrmUrl"]),
-                _configuration["CrmClientId"],
-                _configuration["CrmClientSecret"],
-                useUniqueInstance: true);
-
         private Guid CreateContact(string nationalInsuranceNumber)
         {
-            var id = _service.Create(new Contact
+            var id = Service.Create(new Contact
             {
                 dfeta_NINumber = nationalInsuranceNumber,
                 BirthDate = MatchingBirthdate
             });
 
             // updated TRN Required, so that TRN is generated
-            _service.Update(new Contact
+            Service.Update(new Contact
             {
                 Id = id,
                 dfeta_trnrequired = true
@@ -121,15 +101,15 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(_fixtures[index].ID, teacher.Id);
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             // remove National Insurance Number from each fixture so it can be re-used
             Enumerable.Range(0, 2).ToList().ForEach(i =>
             {
-                _service.Update(new Contact { Id = _fixtures[i].ID, dfeta_NINumber = string.Empty });
+                Service.Update(new Contact { Id = _fixtures[i].ID, dfeta_NINumber = string.Empty });
             });
 
-            _service.Dispose();
+            base.Dispose();
         }
     }
 }

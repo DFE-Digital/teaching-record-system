@@ -1,16 +1,17 @@
 ﻿using System.Linq;
 using DqtApi.DAL;
 using Xunit;
-using static DqtApi.Tests.DataverseIntegration.DataverseAdaptorFixture.MatchFixture;
+using static DqtApi.Tests.DataverseIntegration.GetMatchingTeachersFixture.MatchFixture;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class DataverseAdaptorTests : IClassFixture<DataverseAdaptorFixture>
+    [Collection(nameof(DataverseTestCollection))]
+    public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture>
     {
-        private readonly DataverseAdaptorFixture _fixture;
+        private readonly GetMatchingTeachersFixture _fixture;
         private readonly IDataverseAdaptor _dataverseAdaptor;
 
-        public DataverseAdaptorTests(DataverseAdaptorFixture fixture)
+        public GetMatchingTeachersTests(GetMatchingTeachersFixture fixture)
         {
             _fixture = fixture;
             _dataverseAdaptor = new DataverseAdaptor(_fixture.Service);
