@@ -6,6 +6,7 @@ using DqtApi.Configuration;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Sql;
 using DqtApi.Filters;
+using DqtApi.Json;
 using DqtApi.ModelBinding;
 using DqtApi.Security;
 using DqtApi.Swagger;
@@ -13,6 +14,7 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +22,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Npgsql;
@@ -27,6 +30,7 @@ using Prometheus;
 using Serilog;
 using Serilog.Context;
 using Swashbuckle.AspNetCore.Filters;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace DqtApi
 {
@@ -90,6 +94,7 @@ namespace DqtApi
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    options.JsonSerializerOptions.Converters.Add(new DateOnlyConverter());
                 });
 
             services.AddSwaggerGen(c =>
@@ -148,6 +153,11 @@ namespace DqtApi
             services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
             services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
             services.AddSwaggerExamplesFromAssemblyOf<Program>();
+            services.AddTransient<ISerializerDataContractResolver>(sp =>
+            {
+                var serializerOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions;
+                return new Swagger.JsonSerializerDataContractResolver(serializerOptions);
+            });
 
             services.AddDbContext<DqtContext>(options =>
             {

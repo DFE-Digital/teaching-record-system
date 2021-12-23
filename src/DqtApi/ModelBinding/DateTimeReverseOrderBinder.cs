@@ -31,7 +31,7 @@ namespace DqtApi.ModelBinding
                 return Task.CompletedTask;
             }
 
-            if (!DateTime.TryParseExact(value, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out DateTime result))
+            if (!DateTime.TryParseExact(value, Constants.DateFormat, null, System.Globalization.DateTimeStyles.None, out DateTime result))
             {
                 bindingContext.ModelState.TryAddModelError(modelName, Properties.StringResources.ErrorMessages_InvalidBirthDate);
 
