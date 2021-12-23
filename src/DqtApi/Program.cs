@@ -64,6 +64,8 @@ namespace DqtApi
                     options.Filters.Add(new AuthorizeFilter());
                     options.Filters.Add(new ProducesJsonOrProblemAttribute());
                     options.Filters.Add(new CrmServiceProtectionFaultExceptionFilter());
+
+                    options.Conventions.Add(new ApiVersionConvention());
                 })
                 .AddFluentValidation(fv =>
                 {
@@ -77,6 +79,9 @@ namespace DqtApi
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
+                c.SwaggerDoc("v2", new OpenApiInfo() { Title = "DQT API", Version = "v2" });
+
+                c.DocInclusionPredicate((docName, api) => docName.Equals(api.GroupName, StringComparison.OrdinalIgnoreCase));
                 c.EnableAnnotations();
                 c.OperationFilter<ResponseContentTypeOperationFilter>();
 
@@ -200,7 +205,8 @@ namespace DqtApi
             {
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("v1/swagger.json", "DQT API");
+                    c.SwaggerEndpoint("v1/swagger.json", "DQT API v1");
+                    c.SwaggerEndpoint("v2/swagger.json", "DQT API v2");
                     c.EnablePersistAuthorization();
                 });
 

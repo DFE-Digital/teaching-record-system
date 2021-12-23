@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using DqtApi.Models;
 
-namespace DqtApi.Responses
+namespace DqtApi.V1.Responses
 {
     public class Induction : LinkedEntity<dfeta_induction>
     {

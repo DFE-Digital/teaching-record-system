@@ -16,10 +16,12 @@ namespace DqtApi.FunctionalTests.Endpoints
 
         public HttpClient HttpClient { get; }
 
-        [Fact]
-        public async Task GetSwaggerDoc()
+        [Theory]
+        [InlineData("v1")]
+        [InlineData("v2")]
+        public async Task GetSwaggerDoc(string version)
         {
-            var response = await HttpClient.GetAsync("swagger/v1/swagger.json");
+            var response = await HttpClient.GetAsync($"swagger/{version}/swagger.json");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);

@@ -4,7 +4,7 @@ using DqtApi.DAL;
 using DqtApi.Models;
 using Microsoft.Xrm.Sdk;
 
-namespace DqtApi.Responses
+namespace DqtApi.V1.Responses
 {
     public class InitialTeacherTraining : LinkedEntity<dfeta_initialteachertraining>
     {

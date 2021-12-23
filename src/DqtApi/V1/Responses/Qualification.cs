@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using DqtApi.DAL;
 using DqtApi.Models;
 
-namespace DqtApi.Responses
+namespace DqtApi.V1.Responses
 {
     public class Qualification
     {
