@@ -71,6 +71,10 @@ namespace DqtApi
 
                     options.Conventions.Add(new ApiVersionConvention());
                 })
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.SuppressInferBindingSourcesForParameters = true;
+                })
                 .AddFluentValidation(fv =>
                 {
                     fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));

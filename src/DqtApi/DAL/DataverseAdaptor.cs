@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using DqtApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Microsoft.PowerPlatform.Dataverse.Client.Utils;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 
 namespace DqtApi.DAL
@@ -85,6 +88,23 @@ namespace DqtApi.DAL
             var result = await _service.RetrieveMultipleAsync(query);
 
             return result.Entities.FirstOrDefault()?.ToEntity<Contact>();
+        }
+
+        public async Task<bool> UnlockTeacherRecordAsync(Guid teacherId)
+        {
+            var update = new Entity(Contact.EntityLogicalName, teacherId);
+            update[Contact.Fields.dfeta_loginfailedcounter] = 0;
+
+            try
+            {
+                await _service.UpdateAsync(update);
+                return true;
+            }
+            catch (DataverseOperationException ex)
+                when (ex.InnerException is Microsoft.Rest.HttpOperationException httpException && httpException.Response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return false;
+            }
         }
 
         private static void AddQualifiedTeacherStatusLink(QueryExpression query)
