@@ -13,7 +13,7 @@ resource "cloudfoundry_route" "api_public" {
 }
 
 resource "cloudfoundry_user_provided_service" "logging" {
-  name             = "logit-ssl-drain"
+  name             = var.logging_service_name
   space            = data.cloudfoundry_space.space.id
   syslog_drain_url = "syslog-tls://${local.logstash_endpoint}"
 }
