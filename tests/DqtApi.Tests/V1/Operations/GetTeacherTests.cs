@@ -4,7 +4,7 @@ using DqtApi.Properties;
 using DqtApi.TestCommon;
 using Xunit;
 
-namespace DqtApi.Tests
+namespace DqtApi.Tests.V1.Operations
 {
     public class GetTeacherTests : ApiTestBase
     {

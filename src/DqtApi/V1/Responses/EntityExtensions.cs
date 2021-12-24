@@ -1,7 +1,7 @@
 ﻿using DqtApi.DAL;
 using Microsoft.Xrm.Sdk;
 
-namespace DqtApi.Responses
+namespace DqtApi.V1.Responses
 {
     public static class EntityExtensions
     {

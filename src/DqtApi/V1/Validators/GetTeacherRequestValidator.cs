@@ -1,7 +1,7 @@
 ﻿using DqtApi.Models;
 using FluentValidation;
 
-namespace DqtApi.Validators
+namespace DqtApi.V1.Validators
 {
     public class GetTeacherRequestValidator : AbstractValidator<GetTeacherRequest>
     {
