@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -132,6 +133,11 @@ namespace DqtApi
                 });
             });
 
+            var pgConnectionString = GetPostgresConnectionString();
+
+            var healthCheckBuilder = services.AddHealthChecks()
+                .AddNpgSql(pgConnectionString);
+
             services.AddMediatR(typeof(Program));
             services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
             services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
@@ -139,33 +145,19 @@ namespace DqtApi
 
             services.AddDbContext<DqtContext>(options =>
             {
-                DqtContext.ConfigureOptions(
-                    options,
-                    configuration.GetConnectionString("DefaultConnection") ?? GetConnectionStringForPaasService());
-
-                string GetConnectionStringForPaasService()
-                {
-                    var builder = new NpgsqlConnectionStringBuilder()
-                    {
-                        Host = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:host"),
-                        Database = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:name"),
-                        Username = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:username"),
-                        Password = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:password"),
-                        Port = configuration.GetValue<int>("VCAP_SERVICES:postgres:0:credentials:port"),
-                        SslMode = SslMode.Require,
-                        TrustServerCertificate = true
-                    };
-
-                    return builder.ConnectionString;
-                }
+                DqtContext.ConfigureOptions(options, pgConnectionString);
             });
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             if (env.EnvironmentName != "Testing")
             {
-                services.AddSingleton<IOrganizationServiceAsync>(GetCrmServiceClient());
+                var crmServiceClient = GetCrmServiceClient();
+
+                services.AddSingleton<IOrganizationServiceAsync>(crmServiceClient);
                 services.AddSingleton<IDataverseAdaptor, DataverseAdaptor>();
+
+                healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
             }
 
             MetricLabels.ConfigureLabels(builder.Configuration);
@@ -182,6 +174,8 @@ namespace DqtApi
 
             app.UseRouting();
             app.UseHttpMetrics();
+
+            app.UseHealthChecks("/status");
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -241,6 +235,27 @@ namespace DqtApi
                     configuration["CrmClientId"],
                     configuration["CrmClientSecret"],
                     useUniqueInstance: true);
+
+            string GetPostgresConnectionString()
+            {
+                return configuration.GetConnectionString("DefaultConnection") ?? GetConnectionStringForPaasService();
+
+                string GetConnectionStringForPaasService()
+                {
+                    var builder = new NpgsqlConnectionStringBuilder()
+                    {
+                        Host = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:host"),
+                        Database = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:name"),
+                        Username = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:username"),
+                        Password = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:password"),
+                        Port = configuration.GetValue<int>("VCAP_SERVICES:postgres:0:credentials:port"),
+                        SslMode = SslMode.Require,
+                        TrustServerCertificate = true
+                    };
+
+                    return builder.ConnectionString;
+                }
+            }
         }
     }
 }
