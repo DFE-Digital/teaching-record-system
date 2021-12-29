@@ -39,7 +39,8 @@ namespace DqtApi
             {
                 builder.Configuration
                     .AddJsonEnvironmentVariable("AppConfig")
-                    .AddJsonEnvironmentVariable("VCAP_SERVICES", configurationKeyPrefix: "VCAP_SERVICES");
+                    .AddJsonEnvironmentVariable("VCAP_SERVICES", configurationKeyPrefix: "VCAP_SERVICES")
+                    .AddJsonEnvironmentVariable("VCAP_APPLICATION", configurationKeyPrefix: "VCAP_APPLICATION");
             }
 
             var services = builder.Services;
@@ -166,7 +167,9 @@ namespace DqtApi
                 services.AddSingleton<IOrganizationServiceAsync>(GetCrmServiceClient());
                 services.AddSingleton<IDataverseAdaptor, DataverseAdaptor>();
             }
-         
+
+            MetricLabels.ConfigureLabels(builder.Configuration);
+
             var app = builder.Build();            
 
             app.Use((ctx, next) =>
