@@ -1,11 +1,19 @@
-# Description
+### Context
 
-Please include a summary of the change. 
+Include relevant motivation and context.
 
-Please also include relevant motivation and context. 
+### Changes proposed in this pull request
 
-List any dependencies that are required for this change.
+Include a summary of the change.
 
-## Link to Trello Card
+### Guidance to review
 
-## How should a reviewer approach the PR? (optional)
+Inlude any useful information needed to review this change.
+Inlude any dependencies that are required for this change.
+
+### Checklist
+
+-   [ ] Attach to Trello card
+-   [ ] Rebased master
+-   [ ] Cleaned commit history
+-   [ ] Tested by running locally
