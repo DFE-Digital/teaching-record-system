@@ -10,11 +10,13 @@ namespace DqtApi.Tests.DataverseIntegration
     [Collection(nameof(DataverseTestCollection))]
     public class GetTeacherTests : IClassFixture<CrmClientFixture>
     {
+        private readonly CrmClientFixture _crmClientFixture;
         private readonly DataverseAdaptor _dataverseAdaptor;
         private readonly ServiceClient _serviceClient;
 
         public GetTeacherTests(CrmClientFixture crmClientFixture)
         {
+            _crmClientFixture = crmClientFixture;
             _dataverseAdaptor = crmClientFixture.CreateDataverseAdaptor();
             _serviceClient = crmClientFixture.ServiceClient;
         }
@@ -37,6 +39,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             // Arrange
             var teacherId = await _serviceClient.CreateAsync(new Contact());
+            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, teacherId);
 
             // Act
             var result = await _dataverseAdaptor.GetTeacherAsync(teacherId);

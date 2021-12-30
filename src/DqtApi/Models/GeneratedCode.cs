@@ -382,6 +382,7 @@ namespace DqtApi.Models
 		{
 			public const string BirthDate = "birthdate";
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
+			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
 			public const string dfeta_NINumber = "dfeta_ninumber";
 			public const string dfeta_TRN = "dfeta_trn";
 			public const string dfeta_trnrequired = "dfeta_trnrequired";
@@ -485,6 +486,26 @@ namespace DqtApi.Models
 				this.OnPropertyChanging("dfeta_ActiveSanctions");
 				this.SetAttributeValue("dfeta_activesanctions", value);
 				this.OnPropertyChanged("dfeta_ActiveSanctions");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_loginfailedcounter")]
+		public System.Nullable<int> dfeta_loginfailedcounter
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("dfeta_loginfailedcounter");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_loginfailedcounter");
+				this.SetAttributeValue("dfeta_loginfailedcounter", value);
+				this.OnPropertyChanged("dfeta_loginfailedcounter");
 			}
 		}
 		
