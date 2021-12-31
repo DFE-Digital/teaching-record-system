@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace DqtApi.TestCommon
@@ -28,7 +29,13 @@ namespace DqtApi.TestCommon
         public static Task<dynamic> JsonResponse(HttpResponseMessage response, int expectedStatusCode = StatusCodes.Status200OK) =>
             JsonResponse<dynamic>(response, expectedStatusCode);
 
-        public static async Task ResponseIsProblemDetails(HttpResponseMessage response, string expectedTitle, int expectedStatusCode = 400)
+        public static async Task JsonResponseEquals(HttpResponseMessage response, object expected, int expectedStatusCode = StatusCodes.Status200OK)
+        {
+            var jsonResponse = await JsonResponse<JObject>(response, expectedStatusCode);
+            JsonObjectEquals(JToken.FromObject(expected), jsonResponse);
+        }
+
+        public static async Task ResponseIsProblemDetails(HttpResponseMessage response, string expectedError, string propertyName, int expectedStatusCode = 400)
         {
             if (response is null)
             {
@@ -38,17 +45,17 @@ namespace DqtApi.TestCommon
             Assert.Equal(expectedStatusCode, (int)response.StatusCode);
             Assert.Equal("application/problem+json", response.Content.Headers.ContentType.MediaType);
 
-            var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            var json = await response.Content.ReadAsStringAsync();
+            var problemDetails = JsonConvert.DeserializeObject<ProblemDetails>(json);
             Assert.Equal(expectedStatusCode, problemDetails.Status);
-            Assert.Equal(expectedTitle, problemDetails.Title);
+            Assert.Equal(expectedError, problemDetails.Errors[propertyName].Single());
         }
 
         private class ProblemDetails
         {
-            [JsonPropertyName("title")]
             public string Title { get; set; }
-            [JsonPropertyName("status")]
             public int Status { get; set; }
+            public Dictionary<string, string[]> Errors { get; set; }
         }
     }
 }

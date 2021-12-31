@@ -21,12 +21,38 @@ env:
   CONTAINER_REGISTRY: ghcr.io
 
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Cancel Previous Runs
+      uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        access_token: ${{ github.token }}
+
   build:
     name: Build & test
+    needs: [setup]
     runs-on: ubuntu-latest
+    concurrency: build
 
     outputs:
       docker_image: ${{ steps.image.outputs.tag }}
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: dqt
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
     - uses: actions/checkout@v2
@@ -45,6 +71,7 @@ jobs:
         IntegrationTests_CrmUrl: ${{ secrets.IntegrationTests_CrmUrl }}
         IntegrationTests_CrmClientId: ${{ secrets.IntegrationTests_CrmClientId }}
         IntegrationTests_CrmClientSecret: ${{ secrets.IntegrationTests_CrmClientSecret }}
+        ConnectionStrings__DefaultConnection: "Host=localhost;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }};Database=dqt"
 
     - name: Test report
       uses: dorny/test-reporter@v1
@@ -53,6 +80,19 @@ jobs:
         name: Test results
         path: "**/*.trx"
         reporter: dotnet-trx
+
+    # TODO Use migration bundles when https://github.com/dotnet/efcore/issues/25555 is fixed
+    - name: Generate migrations artifact
+      run: |
+        mkdir migrations
+        dotnet tool install --global dotnet-ef
+        dotnet ef migrations script --idempotent --output migrations/script.sql --configuration Release --project src/DqtApi/DqtApi.csproj --no-build
+
+    - name: Publish migrations
+      uses: actions/upload-artifact@v2
+      with:
+        name: migrations
+        path: migrations
 
     - name: Publish
       run: dotnet publish --configuration Release --no-build src/DqtApi/DqtApi.csproj
@@ -78,6 +118,7 @@ jobs:
 
   validate_terraform:
     name: Validate Terraform
+    needs: [setup]
     runs-on: ubuntu-latest
 
     steps:
@@ -103,6 +144,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         tflint_rulesets: azurerm
         working_directory: terraform
+      continue-on-error: true  # temporary- we're getting sporadic 503 errors here in action setup
 
   deploy_dev:
     name: Deploy to dev environment
@@ -134,6 +176,9 @@ jobs:
     needs: deploy_dev
     runs-on: ubuntu-latest
     concurrency: deploy_dev
+    strategy:
+      matrix:
+        version: [v1, v2]
 
     steps:
     - name: Create config file
@@ -147,7 +192,7 @@ jobs:
 
     - uses: zaproxy/action-api-scan@v0.1.0
       with:
-        target: ${{ needs.deploy_dev.outputs.environment_url }}swagger/v1/swagger.json
+        target: ${{ needs.deploy_dev.outputs.environment_url }}swagger/${{ matrix.version }}/swagger.json
         format: openapi
         allow_issue_writing: false
         fail_action: true
@@ -177,3 +222,54 @@ jobs:
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
         terraform_vars: test.tfvars.json
         terraform_backend_vars: test.backend.tfvars
+
+  deploy_preprod:
+    name: Deploy to pre-production environment
+    needs: [build, deploy_test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: pre-production
+      url: ${{ steps.deploy.outputs.environment_url }}
+    concurrency: deploy_preprod
+
+    outputs:
+      environment_url: ${{ steps.deploy.outputs.environment_url }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: ./.github/workflows/actions/deploy-environment
+      id: deploy
+      with:
+        environment_name: pre-production
+        docker_image: ${{ needs.build.outputs.docker_image }}
+        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+        terraform_vars: preprod.tfvars.json
+        terraform_backend_vars: preprod.backend.tfvars
+
+  deploy_prod:
+    name: Deploy to production environment
+    needs: [build, deploy_preprod]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.environment_url }}
+    concurrency: deploy_prod
+
+    outputs:
+      environment_url: ${{ steps.deploy.outputs.environment_url }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: ./.github/workflows/actions/deploy-environment
+      id: deploy
+      with:
+        environment_name: production
+        docker_image: ${{ needs.build.outputs.docker_image }}
+        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+        terraform_vars: prod.tfvars.json
+        terraform_backend_vars: prod.backend.tfvars
+        skip_functional_tests: true

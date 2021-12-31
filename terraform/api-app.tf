@@ -12,11 +12,30 @@ resource "cloudfoundry_route" "api_public" {
   space    = data.cloudfoundry_space.space.id
 }
 
-
 resource "cloudfoundry_user_provided_service" "logging" {
-  name             = "logit-ssl-drain"
+  name             = var.logging_service_name
   space            = data.cloudfoundry_space.space.id
   syslog_drain_url = "syslog-tls://${local.logstash_endpoint}"
+}
+
+resource "cloudfoundry_service_instance" "postgres" {
+  name         = var.postgres_database_name
+  space        = data.cloudfoundry_space.space.id
+  service_plan = data.cloudfoundry_service.postgres.service_plans[var.postgres_database_service_plan]
+}
+
+resource "null_resource" "migrations" {
+  triggers = {
+    migrations = "${sha1(file(var.migrations_file))}"
+  }
+
+  provisioner "local-exec" {
+    command = "cf target -s ${var.paas_space} && cf conduit ${cloudfoundry_service_instance.postgres.name} -- psql -f ${var.migrations_file}"
+  }
+
+  depends_on = [
+    cloudfoundry_service_instance.postgres
+  ]
 }
 
 resource "cloudfoundry_app" "api" {
@@ -38,4 +57,12 @@ resource "cloudfoundry_app" "api" {
   service_binding {
     service_instance = cloudfoundry_user_provided_service.logging.id
   }
+
+  service_binding {
+    service_instance = cloudfoundry_service_instance.postgres.id
+  }
+
+  depends_on = [
+    null_resource.migrations
+  ]
 }

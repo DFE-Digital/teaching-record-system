@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using DqtApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Microsoft.PowerPlatform.Dataverse.Client.Utils;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 
 namespace DqtApi.DAL
@@ -15,6 +18,30 @@ namespace DqtApi.DAL
         public DataverseAdaptor(IOrganizationServiceAsync organizationServiceAsync)
         {
             _service = organizationServiceAsync;
+        }
+
+        public async Task<IEnumerable<Account>> GetIttProviders()
+        {
+            var filter = new FilterExpression(LogicalOperator.And);
+            filter.AddCondition(Account.Fields.StateCode, ConditionOperator.Equal, (int)AccountState.Active);
+            filter.AddCondition(Account.Fields.dfeta_TrainingProvider, ConditionOperator.Equal, true);
+            filter.AddCondition(Account.Fields.dfeta_UKPRN, ConditionOperator.NotNull);
+
+            var query = new QueryExpression(Account.EntityLogicalName)
+            {
+                ColumnSet = new(
+                    Account.Fields.Name,
+                    Account.Fields.dfeta_UKPRN),
+                Criteria = filter,
+                Orders =
+                {
+                    new OrderExpression(Account.Fields.Name, OrderType.Ascending)
+                }
+            };
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<Account>());
         }
 
         public async Task<IEnumerable<Contact>> GetMatchingTeachersAsync(GetTeacherRequest request)
@@ -47,6 +74,39 @@ namespace DqtApi.DAL
             return result.Entities.Select(entity => entity.ToEntity<dfeta_qualification>());
         }
 
+        public async Task<Contact> GetTeacherAsync(Guid teacherId)
+        {
+            var filter = new FilterExpression();
+            filter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, teacherId);
+
+            var query = new QueryExpression(Contact.EntityLogicalName)
+            {
+                ColumnSet = new ColumnSet { AllColumns = true },
+                Criteria = filter
+            };
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.FirstOrDefault()?.ToEntity<Contact>();
+        }
+
+        public async Task<bool> UnlockTeacherRecordAsync(Guid teacherId)
+        {
+            var update = new Entity(Contact.EntityLogicalName, teacherId);
+            update[Contact.Fields.dfeta_loginfailedcounter] = 0;
+
+            try
+            {
+                await _service.UpdateAsync(update);
+                return true;
+            }
+            catch (DataverseOperationException ex)
+                when (ex.InnerException is Microsoft.Rest.HttpOperationException httpException && httpException.Response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return false;
+            }
+        }
+
         private static void AddQualifiedTeacherStatusLink(QueryExpression query)
         {
             var qualifiedTeacherStatusLink = query.AddLink(dfeta_qtsregistration.EntityLogicalName, Contact.PrimaryIdAttribute,
@@ -75,7 +135,9 @@ namespace DqtApi.DAL
                 dfeta_initialteachertraining.Fields.dfeta_Result,
                 dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
                 dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
-                dfeta_initialteachertraining.Fields.dfeta_Subject3Id
+                dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
+                dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate
             );
 
             initialTeacherTrainingLink.EntityAlias = nameof(dfeta_initialteachertraining);

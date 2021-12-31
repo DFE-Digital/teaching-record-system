@@ -35,9 +35,11 @@ namespace DqtApi.Configuration
 
         private class WrapperSource : JsonStreamConfigurationSource
         {
+            private const string EmptyJson = "{}";
+
             public WrapperSource(EnvironmentVariableJsonConfigurationSource source)
             {
-                var envVar = Environment.GetEnvironmentVariable(source.EnvironmentVariableName) ?? string.Empty;
+                var envVar = Environment.GetEnvironmentVariable(source.EnvironmentVariableName) ?? EmptyJson;
                 var envVarBytes = Encoding.ASCII.GetBytes(envVar);
                 Stream = new MemoryStream(envVarBytes);
 

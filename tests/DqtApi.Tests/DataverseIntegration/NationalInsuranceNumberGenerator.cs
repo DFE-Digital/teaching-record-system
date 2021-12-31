@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using DqtApi.Models;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 

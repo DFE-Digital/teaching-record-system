@@ -10,2020 +10,445 @@
 //------------------------------------------------------------------------------
 
 [assembly: Microsoft.Xrm.Sdk.Client.ProxyTypesAssemblyAttribute()]
-[assembly: System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.93")]
+[assembly: System.CodeDom.Compiler.GeneratedCodeAttribute("CrmSvcUtil", "9.1.0.95")]
 
-
-
-[System.Runtime.Serialization.DataContractAttribute()]
-public enum ContactState
+namespace DqtApi.Models
 {
 	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Active = 0,
 	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Inactive = 1,
-}
-
-/// <summary>
-/// Person with whom a business unit has a relationship, such as customer, supplier, and colleague.
-/// </summary>
-[System.Runtime.Serialization.DataContractAttribute()]
-[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("contact")]
-public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
-{
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum AccountState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
 	
+	/// <summary>
+	/// Business that represents a customer or potential customer. The company that is billed in business transactions.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("account")]
+	public partial class Account : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the account entity
+		/// </summary>
 		public static class Fields
 		{
-			public const string AccountId = "accountid";
-			public const string AccountRoleCode = "accountrolecode";
-			public const string Address1_AddressId = "address1_addressid";
-			public const string Address1_AddressTypeCode = "address1_addresstypecode";
-			public const string Address1_City = "address1_city";
-			public const string Address1_Composite = "address1_composite";
-			public const string Address1_Country = "address1_country";
-			public const string Address1_County = "address1_county";
-			public const string Address1_Fax = "address1_fax";
-			public const string Address1_FreightTermsCode = "address1_freighttermscode";
-			public const string Address1_Latitude = "address1_latitude";
-			public const string Address1_Line1 = "address1_line1";
-			public const string Address1_Line2 = "address1_line2";
-			public const string Address1_Line3 = "address1_line3";
-			public const string Address1_Longitude = "address1_longitude";
-			public const string Address1_Name = "address1_name";
-			public const string Address1_PostalCode = "address1_postalcode";
-			public const string Address1_PostOfficeBox = "address1_postofficebox";
-			public const string Address1_PrimaryContactName = "address1_primarycontactname";
-			public const string Address1_ShippingMethodCode = "address1_shippingmethodcode";
-			public const string Address1_StateOrProvince = "address1_stateorprovince";
-			public const string Address1_Telephone1 = "address1_telephone1";
-			public const string Address1_Telephone2 = "address1_telephone2";
-			public const string Address1_Telephone3 = "address1_telephone3";
-			public const string Address1_UPSZone = "address1_upszone";
-			public const string Address1_UTCOffset = "address1_utcoffset";
-			public const string Address2_AddressId = "address2_addressid";
-			public const string Address2_AddressTypeCode = "address2_addresstypecode";
-			public const string Address2_City = "address2_city";
-			public const string Address2_Composite = "address2_composite";
-			public const string Address2_Country = "address2_country";
-			public const string Address2_County = "address2_county";
-			public const string Address2_Fax = "address2_fax";
-			public const string Address2_FreightTermsCode = "address2_freighttermscode";
-			public const string Address2_Latitude = "address2_latitude";
-			public const string Address2_Line1 = "address2_line1";
-			public const string Address2_Line2 = "address2_line2";
-			public const string Address2_Line3 = "address2_line3";
-			public const string Address2_Longitude = "address2_longitude";
-			public const string Address2_Name = "address2_name";
-			public const string Address2_PostalCode = "address2_postalcode";
-			public const string Address2_PostOfficeBox = "address2_postofficebox";
-			public const string Address2_PrimaryContactName = "address2_primarycontactname";
-			public const string Address2_ShippingMethodCode = "address2_shippingmethodcode";
-			public const string Address2_StateOrProvince = "address2_stateorprovince";
-			public const string Address2_Telephone1 = "address2_telephone1";
-			public const string Address2_Telephone2 = "address2_telephone2";
-			public const string Address2_Telephone3 = "address2_telephone3";
-			public const string Address2_UPSZone = "address2_upszone";
-			public const string Address2_UTCOffset = "address2_utcoffset";
-			public const string Address3_AddressId = "address3_addressid";
-			public const string Address3_AddressTypeCode = "address3_addresstypecode";
-			public const string Address3_City = "address3_city";
-			public const string Address3_Composite = "address3_composite";
-			public const string Address3_Country = "address3_country";
-			public const string Address3_County = "address3_county";
-			public const string Address3_Fax = "address3_fax";
-			public const string Address3_FreightTermsCode = "address3_freighttermscode";
-			public const string Address3_Latitude = "address3_latitude";
-			public const string Address3_Line1 = "address3_line1";
-			public const string Address3_Line2 = "address3_line2";
-			public const string Address3_Line3 = "address3_line3";
-			public const string Address3_Longitude = "address3_longitude";
-			public const string Address3_Name = "address3_name";
-			public const string Address3_PostalCode = "address3_postalcode";
-			public const string Address3_PostOfficeBox = "address3_postofficebox";
-			public const string Address3_PrimaryContactName = "address3_primarycontactname";
-			public const string Address3_ShippingMethodCode = "address3_shippingmethodcode";
-			public const string Address3_StateOrProvince = "address3_stateorprovince";
-			public const string Address3_Telephone1 = "address3_telephone1";
-			public const string Address3_Telephone2 = "address3_telephone2";
-			public const string Address3_Telephone3 = "address3_telephone3";
-			public const string Address3_UPSZone = "address3_upszone";
-			public const string Address3_UTCOffset = "address3_utcoffset";
-			public const string Aging30 = "aging30";
-			public const string Aging30_Base = "aging30_base";
-			public const string Aging60 = "aging60";
-			public const string Aging60_Base = "aging60_base";
-			public const string Aging90 = "aging90";
-			public const string Aging90_Base = "aging90_base";
-			public const string Anniversary = "anniversary";
-			public const string AnnualIncome = "annualincome";
-			public const string AnnualIncome_Base = "annualincome_base";
-			public const string AssistantName = "assistantname";
-			public const string AssistantPhone = "assistantphone";
-			public const string BirthDate = "birthdate";
-			public const string Business2 = "business2";
-			public const string BusinessCard = "businesscard";
-			public const string BusinessCardAttributes = "businesscardattributes";
-			public const string Callback = "callback";
-			public const string ChildrensNames = "childrensnames";
-			public const string Company = "company";
-			public const string ContactId = "contactid";
-			public const string Id = "contactid";
-			public const string CreatedBy = "createdby";
-			public const string CreatedByExternalParty = "createdbyexternalparty";
-			public const string CreatedOn = "createdon";
-			public const string CreatedOnBehalfBy = "createdonbehalfby";
-			public const string CreditLimit = "creditlimit";
-			public const string CreditLimit_Base = "creditlimit_base";
-			public const string CreditOnHold = "creditonhold";
-			public const string CustomerSizeCode = "customersizecode";
-			public const string CustomerTypeCode = "customertypecode";
-			public const string DefaultPriceLevelId = "defaultpricelevelid";
-			public const string Department = "department";
-			public const string Description = "description";
-			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
-			public const string dfeta_AddressConsent = "dfeta_addressconsent";
-			public const string dfeta_AddressLastUpdated = "dfeta_addresslastupdated";
-			public const string dfeta_addressverificationflag = "dfeta_addressverificationflag";
-			public const string dfeta_CapitaDateofBirthChangedOn = "dfeta_capitadateofbirthchangedon";
-			public const string dfeta_CapitaNINumberChangedOn = "dfeta_capitaninumberchangedon";
-			public const string dfeta_CapitaTRNChangedOn = "dfeta_capitatrnchangedon";
-			public const string dfeta_ContactNumberLastUpdated = "dfeta_contactnumberlastupdated";
-			public const string dfeta_DateofDeath = "dfeta_dateofdeath";
-			public const string dfeta_Disability = "dfeta_disability";
-			public const string dfeta_DisabilityId = "dfeta_disabilityid";
-			public const string dfeta_EmailAddressLastUpdated = "dfeta_emailaddresslastupdated";
-			public const string dfeta_EthnicityId = "dfeta_ethnicityid";
-			public const string dfeta_EvolveID = "dfeta_evolveid";
-			public const string dfeta_EYTSDate = "dfeta_eytsdate";
-			public const string dfeta_EYTSDateChangedOn = "dfeta_eytsdatechangedon";
-			public const string dfeta_HLTA_Candidate_Id = "dfeta_hlta_candidate_id";
-			public const string dfeta_HUSID = "dfeta_husid";
-			public const string dfeta_InductionStatus = "dfeta_inductionstatus";
-			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
-			public const string dfeta_MergeInfo = "dfeta_mergeinfo";
-			public const string dfeta_NationalityId = "dfeta_nationalityid";
-			public const string dfeta_NINumber = "dfeta_ninumber";
-			public const string dfeta_PartyID = "dfeta_partyid";
-			public const string dfeta_previousemail = "dfeta_previousemail";
-			public const string dfeta_PreviousLastName = "dfeta_previouslastname";
-			public const string dfeta_QTSDate = "dfeta_qtsdate";
-			public const string dfeta_QTSDateChangedOn = "dfeta_qtsdatechangedon";
-			public const string dfeta_QTSRegistrationId = "dfeta_qtsregistrationid";
-			public const string dfeta_SAUSERID = "dfeta_sauserid";
-			public const string dfeta_suppressionflag = "dfeta_suppressionflag";
-			public const string dfeta_Title = "dfeta_title";
-			public const string dfeta_TRN = "dfeta_trn";
-			public const string dfeta_TRNAllocateRequest = "dfeta_trnallocaterequest";
-			public const string dfeta_trnrequired = "dfeta_trnrequired";
-			public const string dfeta_tssupdate = "dfeta_tssupdate";
-			public const string DoNotBulkEMail = "donotbulkemail";
-			public const string DoNotBulkPostalMail = "donotbulkpostalmail";
-			public const string DoNotEMail = "donotemail";
-			public const string DoNotFax = "donotfax";
-			public const string DoNotPhone = "donotphone";
-			public const string DoNotPostalMail = "donotpostalmail";
-			public const string DoNotSendMM = "donotsendmm";
-			public const string EducationCode = "educationcode";
-			public const string EMailAddress1 = "emailaddress1";
-			public const string EMailAddress2 = "emailaddress2";
-			public const string EMailAddress3 = "emailaddress3";
-			public const string EmployeeId = "employeeid";
-			public const string EntityImage = "entityimage";
-			public const string EntityImage_Timestamp = "entityimage_timestamp";
-			public const string EntityImage_URL = "entityimage_url";
-			public const string EntityImageId = "entityimageid";
-			public const string ExchangeRate = "exchangerate";
-			public const string ExternalUserIdentifier = "externaluseridentifier";
-			public const string FamilyStatusCode = "familystatuscode";
-			public const string Fax = "fax";
-			public const string FirstName = "firstname";
-			public const string FollowEmail = "followemail";
-			public const string FtpSiteUrl = "ftpsiteurl";
-			public const string FullName = "fullname";
-			public const string GenderCode = "gendercode";
-			public const string GovernmentId = "governmentid";
-			public const string HasChildrenCode = "haschildrencode";
-			public const string Home2 = "home2";
-			public const string ImportSequenceNumber = "importsequencenumber";
-			public const string IsAutoCreate = "isautocreate";
-			public const string IsBackofficeCustomer = "isbackofficecustomer";
-			public const string IsPrivate = "isprivate";
-			public const string JobTitle = "jobtitle";
-			public const string LastName = "lastname";
-			public const string LastOnHoldTime = "lastonholdtime";
-			public const string LastUsedInCampaign = "lastusedincampaign";
-			public const string LeadSourceCode = "leadsourcecode";
-			public const string ManagerName = "managername";
-			public const string ManagerPhone = "managerphone";
-			public const string MarketingOnly = "marketingonly";
-			public const string MasterId = "masterid";
-			public const string Merged = "merged";
-			public const string MiddleName = "middlename";
-			public const string MobilePhone = "mobilephone";
-			public const string ModifiedBy = "modifiedby";
-			public const string ModifiedByExternalParty = "modifiedbyexternalparty";
-			public const string ModifiedOn = "modifiedon";
-			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
-			public const string msdyn_gdproptout = "msdyn_gdproptout";
-			public const string msdyn_orgchangestatus = "msdyn_orgchangestatus";
-			public const string NickName = "nickname";
-			public const string NumberOfChildren = "numberofchildren";
-			public const string OnHoldTime = "onholdtime";
-			public const string OriginatingLeadId = "originatingleadid";
-			public const string OverriddenCreatedOn = "overriddencreatedon";
-			public const string OwnerId = "ownerid";
-			public const string OwningBusinessUnit = "owningbusinessunit";
-			public const string OwningTeam = "owningteam";
-			public const string OwningUser = "owninguser";
-			public const string Pager = "pager";
-			public const string parent_contactid = "parent_contactid";
-			public const string ParentContactId = "parentcontactid";
-			public const string ParentCustomerId = "parentcustomerid";
-			public const string ParticipatesInWorkflow = "participatesinworkflow";
-			public const string PaymentTermsCode = "paymenttermscode";
-			public const string PreferredAppointmentDayCode = "preferredappointmentdaycode";
-			public const string PreferredAppointmentTimeCode = "preferredappointmenttimecode";
-			public const string PreferredContactMethodCode = "preferredcontactmethodcode";
-			public const string PreferredEquipmentId = "preferredequipmentid";
-			public const string PreferredServiceId = "preferredserviceid";
-			public const string PreferredSystemUserId = "preferredsystemuserid";
-			public const string ProcessId = "processid";
-			public const string Salutation = "salutation";
-			public const string ShippingMethodCode = "shippingmethodcode";
-			public const string SLAId = "slaid";
-			public const string SLAInvokedId = "slainvokedid";
-			public const string SpousesName = "spousesname";
-			public const string StageId = "stageid";
+			public const string dfeta_TrainingProvider = "dfeta_trainingprovider";
+			public const string dfeta_UKPRN = "dfeta_ukprn";
+			public const string Name = "name";
 			public const string StateCode = "statecode";
-			public const string StatusCode = "statuscode";
-			public const string SubscriptionId = "subscriptionid";
-			public const string Suffix = "suffix";
-			public const string TeamsFollowed = "teamsfollowed";
-			public const string Telephone1 = "telephone1";
-			public const string Telephone2 = "telephone2";
-			public const string Telephone3 = "telephone3";
-			public const string TerritoryCode = "territorycode";
-			public const string TimeSpentByMeOnEmailAndMeetings = "timespentbymeonemailandmeetings";
-			public const string TimeZoneRuleVersionNumber = "timezoneruleversionnumber";
-			public const string TransactionCurrencyId = "transactioncurrencyid";
-			public const string TraversedPath = "traversedpath";
-			public const string UTCConversionTimeZoneCode = "utcconversiontimezonecode";
-			public const string VersionNumber = "versionnumber";
-			public const string WebSiteUrl = "websiteurl";
-			public const string YomiFirstName = "yomifirstname";
-			public const string YomiFullName = "yomifullname";
-			public const string YomiLastName = "yomilastname";
-			public const string YomiMiddleName = "yomimiddlename";
+			public const string Referencedaccount_master_account = "Referencedaccount_master_account";
+			public const string Referencedaccount_parent_account = "Referencedaccount_parent_account";
+			public const string contact_customer_accounts = "contact_customer_accounts";
+			public const string dfeta_account_dfeta_initialteachertraining = "dfeta_account_dfeta_initialteachertraining";
+			public const string dfeta_account_dfeta_qualification_he = "dfeta_account_dfeta_qualification_he";
+			public const string Referencingaccount_master_account = "account_master_account";
+			public const string Referencingaccount_parent_account = "account_parent_account";
+			public const string account_primary_contact = "account_primary_contact";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public Account() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "Account";
+		
+		public const string PrimaryIdAttribute = "accountid";
+		
+		public const string PrimaryNameAttribute = "name";
+		
+		public const string EntityLogicalName = "account";
+		
+		public const string EntityLogicalCollectionName = "accounts";
+		
+		public const string EntitySetName = "accounts";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trainingprovider")]
+		public System.Nullable<bool> dfeta_TrainingProvider
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_trainingprovider");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_TrainingProvider");
+				this.SetAttributeValue("dfeta_trainingprovider", value);
+				this.OnPropertyChanged("dfeta_TrainingProvider");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ukprn")]
+		public string dfeta_UKPRN
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_ukprn");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_UKPRN");
+				this.SetAttributeValue("dfeta_ukprn", value);
+				this.OnPropertyChanged("dfeta_UKPRN");
+			}
+		}
+		
+		/// <summary>
+		/// Name of the account.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("name")]
+		public string Name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Name");
+				this.SetAttributeValue("name", value);
+				this.OnPropertyChanged("Name");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the account.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<DqtApi.Models.AccountState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((DqtApi.Models.AccountState)(System.Enum.ToObject(typeof(DqtApi.Models.AccountState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N account_master_account
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("account_master_account", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.Account> Referencedaccount_master_account
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<DqtApi.Models.Account>("account_master_account", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedaccount_master_account");
+				this.SetRelatedEntities<DqtApi.Models.Account>("account_master_account", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedaccount_master_account");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N account_parent_account
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("account_parent_account", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.Account> Referencedaccount_parent_account
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<DqtApi.Models.Account>("account_parent_account", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedaccount_parent_account");
+				this.SetRelatedEntities<DqtApi.Models.Account>("account_parent_account", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedaccount_parent_account");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N contact_customer_accounts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_customer_accounts")]
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.Contact> contact_customer_accounts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<DqtApi.Models.Contact>("contact_customer_accounts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("contact_customer_accounts");
+				this.SetRelatedEntities<DqtApi.Models.Contact>("contact_customer_accounts", null, value);
+				this.OnPropertyChanged("contact_customer_accounts");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_account_dfeta_initialteachertraining
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_account_dfeta_initialteachertraining")]
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_initialteachertraining> dfeta_account_dfeta_initialteachertraining
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_account_dfeta_initialteachertraining", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_account_dfeta_initialteachertraining");
+				this.SetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_account_dfeta_initialteachertraining", null, value);
+				this.OnPropertyChanged("dfeta_account_dfeta_initialteachertraining");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_account_dfeta_qualification_he
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_account_dfeta_qualification_he")]
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_qualification> dfeta_account_dfeta_qualification_he
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_qualification>("dfeta_account_dfeta_qualification_he", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_account_dfeta_qualification_he");
+				this.SetRelatedEntities<DqtApi.Models.dfeta_qualification>("dfeta_account_dfeta_qualification_he", null, value);
+				this.OnPropertyChanged("dfeta_account_dfeta_qualification_he");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 account_master_account
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("masterid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("account_master_account", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public DqtApi.Models.Account Referencingaccount_master_account
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<DqtApi.Models.Account>("account_master_account", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingaccount_master_account");
+				this.SetRelatedEntity<DqtApi.Models.Account>("account_master_account", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingaccount_master_account");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 account_parent_account
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentaccountid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("account_parent_account", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public DqtApi.Models.Account Referencingaccount_parent_account
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<DqtApi.Models.Account>("account_parent_account", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingaccount_parent_account");
+				this.SetRelatedEntity<DqtApi.Models.Account>("account_parent_account", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingaccount_parent_account");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 account_primary_contact
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("primarycontactid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("account_primary_contact")]
+		public DqtApi.Models.Contact account_primary_contact
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("account_primary_contact", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("account_primary_contact");
+				this.SetRelatedEntity<DqtApi.Models.Contact>("account_primary_contact", null, value);
+				this.OnPropertyChanged("account_primary_contact");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum ContactState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
+	
+	/// <summary>
+	/// Person with whom a business unit has a relationship, such as customer, supplier, and colleague.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("contact")]
+	public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the contact entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string BirthDate = "birthdate";
+			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
+			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
+			public const string dfeta_NINumber = "dfeta_ninumber";
+			public const string dfeta_TRN = "dfeta_trn";
+			public const string dfeta_trnrequired = "dfeta_trnrequired";
+			public const string FullName = "fullname";
+			public const string StateCode = "statecode";
+			public const string account_primary_contact = "account_primary_contact";
+			public const string Referencedcontact_customer_contacts = "Referencedcontact_customer_contacts";
+			public const string Referencedcontact_master_contact = "Referencedcontact_master_contact";
+			public const string Referencedcontact_parent_contact = "Referencedcontact_parent_contact";
+			public const string dfeta_contact_dfeta_induction = "dfeta_contact_dfeta_induction";
+			public const string dfeta_contact_dfeta_induction1 = "dfeta_contact_dfeta_induction1";
+			public const string dfeta_contact_dfeta_initialteachertraining = "dfeta_contact_dfeta_initialteachertraining";
+			public const string dfeta_contact_dfeta_initialteachertraining1 = "dfeta_contact_dfeta_initialteachertraining1";
+			public const string dfeta_contact_dfeta_qtsregistration = "dfeta_contact_dfeta_qtsregistration";
+			public const string dfeta_contact_dfeta_qtsregistration1 = "dfeta_contact_dfeta_qtsregistration1";
+			public const string dfeta_contact_dfeta_qualification = "dfeta_contact_dfeta_qualification";
+			public const string contact_customer_accounts = "contact_customer_accounts";
 			public const string Referencingcontact_customer_contacts = "contact_customer_contacts";
 			public const string Referencingcontact_master_contact = "contact_master_contact";
 			public const string Referencingcontact_parent_contact = "contact_parent_contact";
 			public const string dfeta_dfeta_qtsregistration_contact = "dfeta_dfeta_qtsregistration_contact";
 		}
-	
-	/// <summary>
-	/// Default Constructor.
-	/// </summary>
-	[System.Diagnostics.DebuggerNonUserCode()]
-	public Contact() : 
-			base(EntityLogicalName)
-	{
-	}
-	
-	public const string EntityLogicalName = "contact";
-	
-	public const string EntitySchemaName = "Contact";
-	
-	public const string PrimaryIdAttribute = "contactid";
-	
-	public const string PrimaryNameAttribute = "fullname";
-	
-	public const string EntityLogicalCollectionName = "contacts";
-	
-	public const string EntitySetName = "contacts";
-	
-	public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-	
-	public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanged(string propertyName)
-	{
-		if ((this.PropertyChanged != null))
-		{
-			this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-		}
-	}
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanging(string propertyName)
-	{
-		if ((this.PropertyChanging != null))
-		{
-			this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
-		}
-	}
-	
-		/// <summary>
-		/// Unique identifier of the account with which the contact is associated.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountid")]
-		public Microsoft.Xrm.Sdk.EntityReference AccountId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("accountid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("AccountId");
-				this.SetAttributeValue("accountid", value);
-				this.OnPropertyChanged("AccountId");
-			}
-		}
-	
-		/// <summary>
-		/// Account role of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountrolecode")]
-		public virtual Contact_AccountRoleCode? AccountRoleCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_AccountRoleCode?)(EntityOptionSetEnum.GetEnum(this, "accountrolecode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("AccountRoleCode");
-				this.SetAttributeValue("accountrolecode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("AccountRoleCode");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for address 1.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_addressid")]
-		public System.Nullable<System.Guid> Address1_AddressId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("address1_addressid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_AddressId");
-				this.SetAttributeValue("address1_addressid", value);
-				this.OnPropertyChanged("Address1_AddressId");
-			}
-		}
-	
-		/// <summary>
-		/// Select the primary address type.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_addresstypecode")]
-		public virtual Contact_Address1_AddressTypeCode? Address1_AddressTypeCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_Address1_AddressTypeCode?)(EntityOptionSetEnum.GetEnum(this, "address1_addresstypecode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_AddressTypeCode");
-				this.SetAttributeValue("address1_addresstypecode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("Address1_AddressTypeCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type the city for the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_city")]
-		public string Address1_City
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_city");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_City");
-				this.SetAttributeValue("address1_city", value);
-				this.OnPropertyChanged("Address1_City");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the complete primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_composite")]
-		public string Address1_Composite
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_composite");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Composite");
-				this.SetAttributeValue("address1_composite", value);
-				this.OnPropertyChanged("Address1_Composite");
-			}
-		}
-	
-		/// <summary>
-		/// Type the country or region for the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_country")]
-		public string Address1_Country
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_country");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Country");
-				this.SetAttributeValue("address1_country", value);
-				this.OnPropertyChanged("Address1_Country");
-			}
-		}
-	
-		/// <summary>
-		/// Type the county for the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_county")]
-		public string Address1_County
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_county");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_County");
-				this.SetAttributeValue("address1_county", value);
-				this.OnPropertyChanged("Address1_County");
-			}
-		}
-	
-		/// <summary>
-		/// Type the fax number associated with the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_fax")]
-		public string Address1_Fax
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_fax");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Fax");
-				this.SetAttributeValue("address1_fax", value);
-				this.OnPropertyChanged("Address1_Fax");
-			}
-		}
-	
-		/// <summary>
-		/// Select the freight terms for the primary address to make sure shipping orders are processed correctly.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_freighttermscode")]
-		public virtual Contact_Address1_FreightTermsCode? Address1_FreightTermsCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_Address1_FreightTermsCode?)(EntityOptionSetEnum.GetEnum(this, "address1_freighttermscode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_FreightTermsCode");
-				this.SetAttributeValue("address1_freighttermscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("Address1_FreightTermsCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type the latitude value for the primary address for use in mapping and other applications.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_latitude")]
-		public System.Nullable<double> Address1_Latitude
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<double>>("address1_latitude");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Latitude");
-				this.SetAttributeValue("address1_latitude", value);
-				this.OnPropertyChanged("Address1_Latitude");
-			}
-		}
-	
-		/// <summary>
-		/// Type the first line of the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_line1")]
-		public string Address1_Line1
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_line1");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Line1");
-				this.SetAttributeValue("address1_line1", value);
-				this.OnPropertyChanged("Address1_Line1");
-			}
-		}
-	
-		/// <summary>
-		/// Type the second line of the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_line2")]
-		public string Address1_Line2
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_line2");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Line2");
-				this.SetAttributeValue("address1_line2", value);
-				this.OnPropertyChanged("Address1_Line2");
-			}
-		}
-	
-		/// <summary>
-		/// Type the third line of the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_line3")]
-		public string Address1_Line3
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_line3");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Line3");
-				this.SetAttributeValue("address1_line3", value);
-				this.OnPropertyChanged("Address1_Line3");
-			}
-		}
-	
-		/// <summary>
-		/// Type the longitude value for the primary address for use in mapping and other applications.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_longitude")]
-		public System.Nullable<double> Address1_Longitude
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<double>>("address1_longitude");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Longitude");
-				this.SetAttributeValue("address1_longitude", value);
-				this.OnPropertyChanged("Address1_Longitude");
-			}
-		}
-	
-		/// <summary>
-		/// Type a descriptive name for the primary address, such as Corporate Headquarters.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_name")]
-		public string Address1_Name
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_name");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Name");
-				this.SetAttributeValue("address1_name", value);
-				this.OnPropertyChanged("Address1_Name");
-			}
-		}
-	
-		/// <summary>
-		/// Type the ZIP Code or postal code for the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_postalcode")]
-		public string Address1_PostalCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_postalcode");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_PostalCode");
-				this.SetAttributeValue("address1_postalcode", value);
-				this.OnPropertyChanged("Address1_PostalCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type the post office box number of the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_postofficebox")]
-		public string Address1_PostOfficeBox
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_postofficebox");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_PostOfficeBox");
-				this.SetAttributeValue("address1_postofficebox", value);
-				this.OnPropertyChanged("Address1_PostOfficeBox");
-			}
-		}
-	
-		/// <summary>
-		/// Type the name of the main contact at the account's primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_primarycontactname")]
-		public string Address1_PrimaryContactName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_primarycontactname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_PrimaryContactName");
-				this.SetAttributeValue("address1_primarycontactname", value);
-				this.OnPropertyChanged("Address1_PrimaryContactName");
-			}
-		}
-	
-		/// <summary>
-		/// Select a shipping method for deliveries sent to this address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_shippingmethodcode")]
-		public virtual Contact_Address1_ShippingMethodCode? Address1_ShippingMethodCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_Address1_ShippingMethodCode?)(EntityOptionSetEnum.GetEnum(this, "address1_shippingmethodcode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_ShippingMethodCode");
-				this.SetAttributeValue("address1_shippingmethodcode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("Address1_ShippingMethodCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type the state or province of the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_stateorprovince")]
-		public string Address1_StateOrProvince
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_stateorprovince");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_StateOrProvince");
-				this.SetAttributeValue("address1_stateorprovince", value);
-				this.OnPropertyChanged("Address1_StateOrProvince");
-			}
-		}
-	
-		/// <summary>
-		/// Type the main phone number associated with the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_telephone1")]
-		public string Address1_Telephone1
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_telephone1");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Telephone1");
-				this.SetAttributeValue("address1_telephone1", value);
-				this.OnPropertyChanged("Address1_Telephone1");
-			}
-		}
-	
-		/// <summary>
-		/// Type a second phone number associated with the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_telephone2")]
-		public string Address1_Telephone2
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_telephone2");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Telephone2");
-				this.SetAttributeValue("address1_telephone2", value);
-				this.OnPropertyChanged("Address1_Telephone2");
-			}
-		}
-	
-		/// <summary>
-		/// Type a third phone number associated with the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_telephone3")]
-		public string Address1_Telephone3
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_telephone3");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_Telephone3");
-				this.SetAttributeValue("address1_telephone3", value);
-				this.OnPropertyChanged("Address1_Telephone3");
-			}
-		}
-	
-		/// <summary>
-		/// Type the UPS zone of the primary address to make sure shipping charges are calculated correctly and deliveries are made promptly, if shipped by UPS.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_upszone")]
-		public string Address1_UPSZone
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address1_upszone");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_UPSZone");
-				this.SetAttributeValue("address1_upszone", value);
-				this.OnPropertyChanged("Address1_UPSZone");
-			}
-		}
-	
-		/// <summary>
-		/// Select the time zone, or UTC offset, for this address so that other people can reference it when they contact someone at this address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address1_utcoffset")]
-		public System.Nullable<int> Address1_UTCOffset
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("address1_utcoffset");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address1_UTCOffset");
-				this.SetAttributeValue("address1_utcoffset", value);
-				this.OnPropertyChanged("Address1_UTCOffset");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for address 2.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_addressid")]
-		public System.Nullable<System.Guid> Address2_AddressId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("address2_addressid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_AddressId");
-				this.SetAttributeValue("address2_addressid", value);
-				this.OnPropertyChanged("Address2_AddressId");
-			}
-		}
-	
-		/// <summary>
-		/// Select the secondary address type.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_addresstypecode")]
-		public virtual Contact_Address2_AddressTypeCode? Address2_AddressTypeCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_Address2_AddressTypeCode?)(EntityOptionSetEnum.GetEnum(this, "address2_addresstypecode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_AddressTypeCode");
-				this.SetAttributeValue("address2_addresstypecode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("Address2_AddressTypeCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type the city for the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_city")]
-		public string Address2_City
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_city");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_City");
-				this.SetAttributeValue("address2_city", value);
-				this.OnPropertyChanged("Address2_City");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the complete secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_composite")]
-		public string Address2_Composite
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_composite");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Composite");
-				this.SetAttributeValue("address2_composite", value);
-				this.OnPropertyChanged("Address2_Composite");
-			}
-		}
-	
-		/// <summary>
-		/// Type the country or region for the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_country")]
-		public string Address2_Country
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_country");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Country");
-				this.SetAttributeValue("address2_country", value);
-				this.OnPropertyChanged("Address2_Country");
-			}
-		}
-	
-		/// <summary>
-		/// Type the county for the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_county")]
-		public string Address2_County
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_county");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_County");
-				this.SetAttributeValue("address2_county", value);
-				this.OnPropertyChanged("Address2_County");
-			}
-		}
-	
-		/// <summary>
-		/// Type the fax number associated with the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_fax")]
-		public string Address2_Fax
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_fax");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Fax");
-				this.SetAttributeValue("address2_fax", value);
-				this.OnPropertyChanged("Address2_Fax");
-			}
-		}
-	
-		/// <summary>
-		/// Select the freight terms for the secondary address to make sure shipping orders are processed correctly.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_freighttermscode")]
-		public virtual Contact_Address2_FreightTermsCode? Address2_FreightTermsCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_Address2_FreightTermsCode?)(EntityOptionSetEnum.GetEnum(this, "address2_freighttermscode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_FreightTermsCode");
-				this.SetAttributeValue("address2_freighttermscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("Address2_FreightTermsCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type the latitude value for the secondary address for use in mapping and other applications.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_latitude")]
-		public System.Nullable<double> Address2_Latitude
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<double>>("address2_latitude");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Latitude");
-				this.SetAttributeValue("address2_latitude", value);
-				this.OnPropertyChanged("Address2_Latitude");
-			}
-		}
-	
-		/// <summary>
-		/// Type the first line of the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_line1")]
-		public string Address2_Line1
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_line1");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Line1");
-				this.SetAttributeValue("address2_line1", value);
-				this.OnPropertyChanged("Address2_Line1");
-			}
-		}
-	
-		/// <summary>
-		/// Type the second line of the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_line2")]
-		public string Address2_Line2
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_line2");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Line2");
-				this.SetAttributeValue("address2_line2", value);
-				this.OnPropertyChanged("Address2_Line2");
-			}
-		}
-	
-		/// <summary>
-		/// Type the third line of the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_line3")]
-		public string Address2_Line3
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_line3");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Line3");
-				this.SetAttributeValue("address2_line3", value);
-				this.OnPropertyChanged("Address2_Line3");
-			}
-		}
-	
-		/// <summary>
-		/// Type the longitude value for the secondary address for use in mapping and other applications.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_longitude")]
-		public System.Nullable<double> Address2_Longitude
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<double>>("address2_longitude");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Longitude");
-				this.SetAttributeValue("address2_longitude", value);
-				this.OnPropertyChanged("Address2_Longitude");
-			}
-		}
-	
-		/// <summary>
-		/// Type a descriptive name for the secondary address, such as Corporate Headquarters.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_name")]
-		public string Address2_Name
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_name");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Name");
-				this.SetAttributeValue("address2_name", value);
-				this.OnPropertyChanged("Address2_Name");
-			}
-		}
-	
-		/// <summary>
-		/// Type the ZIP Code or postal code for the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_postalcode")]
-		public string Address2_PostalCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_postalcode");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_PostalCode");
-				this.SetAttributeValue("address2_postalcode", value);
-				this.OnPropertyChanged("Address2_PostalCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type the post office box number of the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_postofficebox")]
-		public string Address2_PostOfficeBox
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_postofficebox");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_PostOfficeBox");
-				this.SetAttributeValue("address2_postofficebox", value);
-				this.OnPropertyChanged("Address2_PostOfficeBox");
-			}
-		}
-	
-		/// <summary>
-		/// Type the name of the main contact at the account's secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_primarycontactname")]
-		public string Address2_PrimaryContactName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_primarycontactname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_PrimaryContactName");
-				this.SetAttributeValue("address2_primarycontactname", value);
-				this.OnPropertyChanged("Address2_PrimaryContactName");
-			}
-		}
-	
-		/// <summary>
-		/// Select a shipping method for deliveries sent to this address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_shippingmethodcode")]
-		public virtual Contact_Address2_ShippingMethodCode? Address2_ShippingMethodCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_Address2_ShippingMethodCode?)(EntityOptionSetEnum.GetEnum(this, "address2_shippingmethodcode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_ShippingMethodCode");
-				this.SetAttributeValue("address2_shippingmethodcode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("Address2_ShippingMethodCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type the state or province of the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_stateorprovince")]
-		public string Address2_StateOrProvince
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_stateorprovince");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_StateOrProvince");
-				this.SetAttributeValue("address2_stateorprovince", value);
-				this.OnPropertyChanged("Address2_StateOrProvince");
-			}
-		}
-	
-		/// <summary>
-		/// Type the main phone number associated with the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_telephone1")]
-		public string Address2_Telephone1
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_telephone1");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Telephone1");
-				this.SetAttributeValue("address2_telephone1", value);
-				this.OnPropertyChanged("Address2_Telephone1");
-			}
-		}
-	
-		/// <summary>
-		/// Type a second phone number associated with the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_telephone2")]
-		public string Address2_Telephone2
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_telephone2");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Telephone2");
-				this.SetAttributeValue("address2_telephone2", value);
-				this.OnPropertyChanged("Address2_Telephone2");
-			}
-		}
-	
-		/// <summary>
-		/// Type a third phone number associated with the secondary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_telephone3")]
-		public string Address2_Telephone3
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_telephone3");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_Telephone3");
-				this.SetAttributeValue("address2_telephone3", value);
-				this.OnPropertyChanged("Address2_Telephone3");
-			}
-		}
-	
-		/// <summary>
-		/// Type the UPS zone of the secondary address to make sure shipping charges are calculated correctly and deliveries are made promptly, if shipped by UPS.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_upszone")]
-		public string Address2_UPSZone
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address2_upszone");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_UPSZone");
-				this.SetAttributeValue("address2_upszone", value);
-				this.OnPropertyChanged("Address2_UPSZone");
-			}
-		}
-	
-		/// <summary>
-		/// Select the time zone, or UTC offset, for this address so that other people can reference it when they contact someone at this address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address2_utcoffset")]
-		public System.Nullable<int> Address2_UTCOffset
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("address2_utcoffset");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address2_UTCOffset");
-				this.SetAttributeValue("address2_utcoffset", value);
-				this.OnPropertyChanged("Address2_UTCOffset");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for address 3.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_addressid")]
-		public System.Nullable<System.Guid> Address3_AddressId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("address3_addressid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_AddressId");
-				this.SetAttributeValue("address3_addressid", value);
-				this.OnPropertyChanged("Address3_AddressId");
-			}
-		}
-	
-		/// <summary>
-		/// Select the third address type.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_addresstypecode")]
-		public virtual Contact_Address3_AddressTypeCode? Address3_AddressTypeCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_Address3_AddressTypeCode?)(EntityOptionSetEnum.GetEnum(this, "address3_addresstypecode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_AddressTypeCode");
-				this.SetAttributeValue("address3_addresstypecode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("Address3_AddressTypeCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type the city for the 3rd address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_city")]
-		public string Address3_City
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_city");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_City");
-				this.SetAttributeValue("address3_city", value);
-				this.OnPropertyChanged("Address3_City");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the complete third address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_composite")]
-		public string Address3_Composite
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_composite");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Composite");
-				this.SetAttributeValue("address3_composite", value);
-				this.OnPropertyChanged("Address3_Composite");
-			}
-		}
-	
-		/// <summary>
-		/// the country or region for the 3rd address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_country")]
-		public string Address3_Country
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_country");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Country");
-				this.SetAttributeValue("address3_country", value);
-				this.OnPropertyChanged("Address3_Country");
-			}
-		}
-	
-		/// <summary>
-		/// Type the county for the third address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_county")]
-		public string Address3_County
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_county");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_County");
-				this.SetAttributeValue("address3_county", value);
-				this.OnPropertyChanged("Address3_County");
-			}
-		}
-	
-		/// <summary>
-		/// Type the fax number associated with the third address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_fax")]
-		public string Address3_Fax
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_fax");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Fax");
-				this.SetAttributeValue("address3_fax", value);
-				this.OnPropertyChanged("Address3_Fax");
-			}
-		}
-	
-		/// <summary>
-		/// Select the freight terms for the third address to make sure shipping orders are processed correctly.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_freighttermscode")]
-		public virtual Contact_Address3_FreightTermsCode? Address3_FreightTermsCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_Address3_FreightTermsCode?)(EntityOptionSetEnum.GetEnum(this, "address3_freighttermscode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_FreightTermsCode");
-				this.SetAttributeValue("address3_freighttermscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("Address3_FreightTermsCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type the latitude value for the third address for use in mapping and other applications.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_latitude")]
-		public System.Nullable<double> Address3_Latitude
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<double>>("address3_latitude");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Latitude");
-				this.SetAttributeValue("address3_latitude", value);
-				this.OnPropertyChanged("Address3_Latitude");
-			}
-		}
-	
-		/// <summary>
-		/// the first line of the 3rd address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_line1")]
-		public string Address3_Line1
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_line1");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Line1");
-				this.SetAttributeValue("address3_line1", value);
-				this.OnPropertyChanged("Address3_Line1");
-			}
-		}
-	
-		/// <summary>
-		/// the second line of the 3rd address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_line2")]
-		public string Address3_Line2
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_line2");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Line2");
-				this.SetAttributeValue("address3_line2", value);
-				this.OnPropertyChanged("Address3_Line2");
-			}
-		}
-	
-		/// <summary>
-		/// the third line of the 3rd address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_line3")]
-		public string Address3_Line3
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_line3");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Line3");
-				this.SetAttributeValue("address3_line3", value);
-				this.OnPropertyChanged("Address3_Line3");
-			}
-		}
-	
-		/// <summary>
-		/// Type the longitude value for the third address for use in mapping and other applications.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_longitude")]
-		public System.Nullable<double> Address3_Longitude
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<double>>("address3_longitude");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Longitude");
-				this.SetAttributeValue("address3_longitude", value);
-				this.OnPropertyChanged("Address3_Longitude");
-			}
-		}
-	
-		/// <summary>
-		/// Type a descriptive name for the third address, such as Corporate Headquarters.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_name")]
-		public string Address3_Name
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_name");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Name");
-				this.SetAttributeValue("address3_name", value);
-				this.OnPropertyChanged("Address3_Name");
-			}
-		}
-	
-		/// <summary>
-		/// the ZIP Code or postal code for the 3rd address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_postalcode")]
-		public string Address3_PostalCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_postalcode");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_PostalCode");
-				this.SetAttributeValue("address3_postalcode", value);
-				this.OnPropertyChanged("Address3_PostalCode");
-			}
-		}
-	
-		/// <summary>
-		/// the post office box number of the 3rd address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_postofficebox")]
-		public string Address3_PostOfficeBox
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_postofficebox");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_PostOfficeBox");
-				this.SetAttributeValue("address3_postofficebox", value);
-				this.OnPropertyChanged("Address3_PostOfficeBox");
-			}
-		}
-	
-		/// <summary>
-		/// Type the name of the main contact at the account's third address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_primarycontactname")]
-		public string Address3_PrimaryContactName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_primarycontactname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_PrimaryContactName");
-				this.SetAttributeValue("address3_primarycontactname", value);
-				this.OnPropertyChanged("Address3_PrimaryContactName");
-			}
-		}
-	
-		/// <summary>
-		/// Select a shipping method for deliveries sent to this address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_shippingmethodcode")]
-		public virtual Contact_Address3_ShippingMethodCode? Address3_ShippingMethodCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_Address3_ShippingMethodCode?)(EntityOptionSetEnum.GetEnum(this, "address3_shippingmethodcode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_ShippingMethodCode");
-				this.SetAttributeValue("address3_shippingmethodcode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("Address3_ShippingMethodCode");
-			}
-		}
-	
-		/// <summary>
-		/// the state or province of the third address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_stateorprovince")]
-		public string Address3_StateOrProvince
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_stateorprovince");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_StateOrProvince");
-				this.SetAttributeValue("address3_stateorprovince", value);
-				this.OnPropertyChanged("Address3_StateOrProvince");
-			}
-		}
-	
-		/// <summary>
-		/// Type the main phone number associated with the third address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_telephone1")]
-		public string Address3_Telephone1
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_telephone1");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Telephone1");
-				this.SetAttributeValue("address3_telephone1", value);
-				this.OnPropertyChanged("Address3_Telephone1");
-			}
-		}
-	
-		/// <summary>
-		/// Type a second phone number associated with the third address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_telephone2")]
-		public string Address3_Telephone2
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_telephone2");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Telephone2");
-				this.SetAttributeValue("address3_telephone2", value);
-				this.OnPropertyChanged("Address3_Telephone2");
-			}
-		}
-	
-		/// <summary>
-		/// Type a third phone number associated with the primary address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_telephone3")]
-		public string Address3_Telephone3
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_telephone3");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_Telephone3");
-				this.SetAttributeValue("address3_telephone3", value);
-				this.OnPropertyChanged("Address3_Telephone3");
-			}
-		}
-	
-		/// <summary>
-		/// Type the UPS zone of the third address to make sure shipping charges are calculated correctly and deliveries are made promptly, if shipped by UPS.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_upszone")]
-		public string Address3_UPSZone
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("address3_upszone");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_UPSZone");
-				this.SetAttributeValue("address3_upszone", value);
-				this.OnPropertyChanged("Address3_UPSZone");
-			}
-		}
-	
-		/// <summary>
-		/// Select the time zone, or UTC offset, for this address so that other people can reference it when they contact someone at this address.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("address3_utcoffset")]
-		public System.Nullable<int> Address3_UTCOffset
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("address3_utcoffset");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Address3_UTCOffset");
-				this.SetAttributeValue("address3_utcoffset", value);
-				this.OnPropertyChanged("Address3_UTCOffset");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("aging30")]
-		public Microsoft.Xrm.Sdk.Money Aging30
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging30");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Aging30");
-				this.SetAttributeValue("aging30", value);
-				this.OnPropertyChanged("Aging30");
-			}
-		}
-	
-		/// <summary>
-		/// Base currency equivalent of the aging 30 for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("aging30_base")]
-		public Microsoft.Xrm.Sdk.Money Aging30_Base
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging30_base");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Aging30_Base");
-				this.SetAttributeValue("aging30_base", value);
-				this.OnPropertyChanged("Aging30_Base");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("aging60")]
-		public Microsoft.Xrm.Sdk.Money Aging60
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging60");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Aging60");
-				this.SetAttributeValue("aging60", value);
-				this.OnPropertyChanged("Aging60");
-			}
-		}
-	
-		/// <summary>
-		/// Base currency equivalent of the aging 60 for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("aging60_base")]
-		public Microsoft.Xrm.Sdk.Money Aging60_Base
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging60_base");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Aging60_Base");
-				this.SetAttributeValue("aging60_base", value);
-				this.OnPropertyChanged("Aging60_Base");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("aging90")]
-		public Microsoft.Xrm.Sdk.Money Aging90
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging90");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Aging90");
-				this.SetAttributeValue("aging90", value);
-				this.OnPropertyChanged("Aging90");
-			}
-		}
-	
-		/// <summary>
-		/// Base currency equivalent of the aging 90 for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("aging90_base")]
-		public Microsoft.Xrm.Sdk.Money Aging90_Base
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("aging90_base");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Aging90_Base");
-				this.SetAttributeValue("aging90_base", value);
-				this.OnPropertyChanged("Aging90_Base");
-			}
-		}
-	
-		/// <summary>
-		/// Wedding anniversary of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("anniversary")]
-		public System.Nullable<System.DateTime> Anniversary
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("anniversary");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Anniversary");
-				this.SetAttributeValue("anniversary", value);
-				this.OnPropertyChanged("Anniversary");
-			}
-		}
-	
-		/// <summary>
-		/// Annual income of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("annualincome")]
-		public Microsoft.Xrm.Sdk.Money AnnualIncome
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("annualincome");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("AnnualIncome");
-				this.SetAttributeValue("annualincome", value);
-				this.OnPropertyChanged("AnnualIncome");
-			}
-		}
-	
+		
 		/// <summary>
-		/// Base currency equivalent of the annual income of the contact.
+		/// Default Constructor.
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("annualincome_base")]
-		public Microsoft.Xrm.Sdk.Money AnnualIncome_Base
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public Contact() : 
+				base(EntityLogicalName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("annualincome_base");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("AnnualIncome_Base");
-				this.SetAttributeValue("annualincome_base", value);
-				this.OnPropertyChanged("AnnualIncome_Base");
-			}
 		}
-	
-		/// <summary>
-		/// Name of the contact's assistant contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("assistantname")]
-		public string AssistantName
+		
+		public const string EntitySchemaName = "Contact";
+		
+		public const string PrimaryIdAttribute = "contactid";
+		
+		public const string PrimaryNameAttribute = "fullname";
+		
+		public const string EntityLogicalName = "contact";
+		
+		public const string EntityLogicalCollectionName = "contacts";
+		
+		public const string EntitySetName = "contacts";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("assistantname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
+			if ((this.PropertyChanged != null))
 			{
-				this.OnPropertyChanging("AssistantName");
-				this.SetAttributeValue("assistantname", value);
-				this.OnPropertyChanged("AssistantName");
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-	
-		/// <summary>
-		/// Phone number for the contact's assistant.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("assistantphone")]
-		public string AssistantPhone
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("assistantphone");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
+			if ((this.PropertyChanging != null))
 			{
-				this.OnPropertyChanging("AssistantPhone");
-				this.SetAttributeValue("assistantphone", value);
-				this.OnPropertyChanged("AssistantPhone");
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-	
+		
 		/// <summary>
 		/// Birth date of the contact.
 		/// </summary>
@@ -2043,410 +468,7 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 				this.OnPropertyChanged("BirthDate");
 			}
 		}
-	
-		/// <summary>
-		/// Type a second business phone number for this contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("business2")]
-		public string Business2
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("business2");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Business2");
-				this.SetAttributeValue("business2", value);
-				this.OnPropertyChanged("Business2");
-			}
-		}
-	
-		/// <summary>
-		/// Stores Image of the Business Card
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("businesscard")]
-		public string BusinessCard
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("businesscard");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("BusinessCard");
-				this.SetAttributeValue("businesscard", value);
-				this.OnPropertyChanged("BusinessCard");
-			}
-		}
-	
-		/// <summary>
-		/// Stores Business Card Control Properties.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("businesscardattributes")]
-		public string BusinessCardAttributes
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("businesscardattributes");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("BusinessCardAttributes");
-				this.SetAttributeValue("businesscardattributes", value);
-				this.OnPropertyChanged("BusinessCardAttributes");
-			}
-		}
-	
-		/// <summary>
-		/// Type a callback phone number for this contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("callback")]
-		public string Callback
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("callback");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Callback");
-				this.SetAttributeValue("callback", value);
-				this.OnPropertyChanged("Callback");
-			}
-		}
-	
-		/// <summary>
-		/// Names of the contact's children.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("childrensnames")]
-		public string ChildrensNames
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("childrensnames");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ChildrensNames");
-				this.SetAttributeValue("childrensnames", value);
-				this.OnPropertyChanged("ChildrensNames");
-			}
-		}
-	
-		/// <summary>
-		/// Type the company phone of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("company")]
-		public string Company
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("company");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Company");
-				this.SetAttributeValue("company", value);
-				this.OnPropertyChanged("Company");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("contactid")]
-		public System.Nullable<System.Guid> ContactId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("contactid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ContactId");
-				this.SetAttributeValue("contactid", value);
-				if (value.HasValue)
-				{
-					base.Id = value.Value;
-				}
-				else
-				{
-					base.Id = System.Guid.Empty;
-				}
-				this.OnPropertyChanged("ContactId");
-			}
-		}
-	
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("contactid")]
-		public override System.Guid Id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return base.Id;
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.ContactId = value;
-			}
-		}
-	
-		/// <summary>
-		/// Shows who created the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedBy");
-				this.SetAttributeValue("createdby", value);
-				this.OnPropertyChanged("CreatedBy");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the external party who created the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdbyexternalparty")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedByExternalParty
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdbyexternalparty");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedByExternalParty");
-				this.SetAttributeValue("createdbyexternalparty", value);
-				this.OnPropertyChanged("CreatedByExternalParty");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time when the contact was created.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
-		public System.Nullable<System.DateTime> CreatedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOn");
-				this.SetAttributeValue("createdon", value);
-				this.OnPropertyChanged("CreatedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Shows who created the record on behalf of another user.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOnBehalfBy");
-				this.SetAttributeValue("createdonbehalfby", value);
-				this.OnPropertyChanged("CreatedOnBehalfBy");
-			}
-		}
-	
-		/// <summary>
-		/// Credit limit for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("creditlimit")]
-		public Microsoft.Xrm.Sdk.Money CreditLimit
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("creditlimit");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreditLimit");
-				this.SetAttributeValue("creditlimit", value);
-				this.OnPropertyChanged("CreditLimit");
-			}
-		}
-	
-		/// <summary>
-		/// Base currency equivalent of the credit limit for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("creditlimit_base")]
-		public Microsoft.Xrm.Sdk.Money CreditLimit_Base
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.Money>("creditlimit_base");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreditLimit_Base");
-				this.SetAttributeValue("creditlimit_base", value);
-				this.OnPropertyChanged("CreditLimit_Base");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether credit for the contact is on hold.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("creditonhold")]
-		public System.Nullable<bool> CreditOnHold
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("creditonhold");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreditOnHold");
-				this.SetAttributeValue("creditonhold", value);
-				this.OnPropertyChanged("CreditOnHold");
-			}
-		}
-	
-		/// <summary>
-		/// Size of the contact's business.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customersizecode")]
-		public virtual Contact_CustomerSizeCode? CustomerSizeCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_CustomerSizeCode?)(EntityOptionSetEnum.GetEnum(this, "customersizecode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CustomerSizeCode");
-				this.SetAttributeValue("customersizecode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("CustomerSizeCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type of business associated with the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customertypecode")]
-		public virtual Contact_CustomerTypeCode? CustomerTypeCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_CustomerTypeCode?)(EntityOptionSetEnum.GetEnum(this, "customertypecode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CustomerTypeCode");
-				this.SetAttributeValue("customertypecode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("CustomerTypeCode");
-			}
-		}
-	
-		/// <summary>
-		/// Choose the default price list associated with the contact to make sure the correct product prices for this customer are applied in sales opportunities, quotes, and orders.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("defaultpricelevelid")]
-		public Microsoft.Xrm.Sdk.EntityReference DefaultPriceLevelId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("defaultpricelevelid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("DefaultPriceLevelId");
-				this.SetAttributeValue("defaultpricelevelid", value);
-				this.OnPropertyChanged("DefaultPriceLevelId");
-			}
-		}
-	
-		/// <summary>
-		/// Department in the business unit or organization associated with the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("department")]
-		public string Department
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("department");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Department");
-				this.SetAttributeValue("department", value);
-				this.OnPropertyChanged("Department");
-			}
-		}
-	
-		/// <summary>
-		/// Description of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("description")]
-		public string Description
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("description");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Description");
-				this.SetAttributeValue("description", value);
-				this.OnPropertyChanged("Description");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -2466,367 +488,7 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 				this.OnPropertyChanged("dfeta_ActiveSanctions");
 			}
 		}
-	
-		/// <summary>
-		/// Consent for Research Purposes
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_addressconsent")]
-		public System.Nullable<bool> dfeta_AddressConsent
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_addressconsent");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_AddressConsent");
-				this.SetAttributeValue("dfeta_addressconsent", value);
-				this.OnPropertyChanged("dfeta_AddressConsent");
-			}
-		}
-	
-		/// <summary>
-		/// Date when the address was last updated.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_addresslastupdated")]
-		public System.Nullable<System.DateTime> dfeta_AddressLastUpdated
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_addresslastupdated");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_AddressLastUpdated");
-				this.SetAttributeValue("dfeta_addresslastupdated", value);
-				this.OnPropertyChanged("dfeta_AddressLastUpdated");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_addressverificationflag")]
-		public virtual Contact_dfeta_addressverificationflag? dfeta_addressverificationflag
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_dfeta_addressverificationflag?)(EntityOptionSetEnum.GetEnum(this, "dfeta_addressverificationflag")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_addressverificationflag");
-				this.SetAttributeValue("dfeta_addressverificationflag", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_addressverificationflag");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_capitadateofbirthchangedon")]
-		public System.Nullable<System.DateTime> dfeta_CapitaDateofBirthChangedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_capitadateofbirthchangedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_CapitaDateofBirthChangedOn");
-				this.SetAttributeValue("dfeta_capitadateofbirthchangedon", value);
-				this.OnPropertyChanged("dfeta_CapitaDateofBirthChangedOn");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_capitaninumberchangedon")]
-		public System.Nullable<System.DateTime> dfeta_CapitaNINumberChangedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_capitaninumberchangedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_CapitaNINumberChangedOn");
-				this.SetAttributeValue("dfeta_capitaninumberchangedon", value);
-				this.OnPropertyChanged("dfeta_CapitaNINumberChangedOn");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_capitatrnchangedon")]
-		public System.Nullable<System.DateTime> dfeta_CapitaTRNChangedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_capitatrnchangedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_CapitaTRNChangedOn");
-				this.SetAttributeValue("dfeta_capitatrnchangedon", value);
-				this.OnPropertyChanged("dfeta_CapitaTRNChangedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Date when the contact numbers were last updated.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_contactnumberlastupdated")]
-		public System.Nullable<System.DateTime> dfeta_ContactNumberLastUpdated
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_contactnumberlastupdated");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_ContactNumberLastUpdated");
-				this.SetAttributeValue("dfeta_contactnumberlastupdated", value);
-				this.OnPropertyChanged("dfeta_ContactNumberLastUpdated");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_dateofdeath")]
-		public System.Nullable<System.DateTime> dfeta_DateofDeath
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_dateofdeath");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_DateofDeath");
-				this.SetAttributeValue("dfeta_dateofdeath", value);
-				this.OnPropertyChanged("dfeta_DateofDeath");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_disability")]
-		public System.Nullable<bool> dfeta_Disability
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_disability");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_Disability");
-				this.SetAttributeValue("dfeta_disability", value);
-				this.OnPropertyChanged("dfeta_Disability");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Disability associated with Person.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_disabilityid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_DisabilityId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_disabilityid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_DisabilityId");
-				this.SetAttributeValue("dfeta_disabilityid", value);
-				this.OnPropertyChanged("dfeta_DisabilityId");
-			}
-		}
-	
-		/// <summary>
-		/// Date when the email address was last updated.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_emailaddresslastupdated")]
-		public System.Nullable<System.DateTime> dfeta_EmailAddressLastUpdated
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_emailaddresslastupdated");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_EmailAddressLastUpdated");
-				this.SetAttributeValue("dfeta_emailaddresslastupdated", value);
-				this.OnPropertyChanged("dfeta_EmailAddressLastUpdated");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Ethnicity associated with Contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ethnicityid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_EthnicityId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_ethnicityid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_EthnicityId");
-				this.SetAttributeValue("dfeta_ethnicityid", value);
-				this.OnPropertyChanged("dfeta_EthnicityId");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_evolveid")]
-		public string dfeta_EvolveID
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_evolveid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_EvolveID");
-				this.SetAttributeValue("dfeta_evolveid", value);
-				this.OnPropertyChanged("dfeta_EvolveID");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eytsdate")]
-		public System.Nullable<System.DateTime> dfeta_EYTSDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_eytsdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_EYTSDate");
-				this.SetAttributeValue("dfeta_eytsdate", value);
-				this.OnPropertyChanged("dfeta_EYTSDate");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eytsdatechangedon")]
-		public System.Nullable<System.DateTime> dfeta_EYTSDateChangedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_eytsdatechangedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_EYTSDateChangedOn");
-				this.SetAttributeValue("dfeta_eytsdatechangedon", value);
-				this.OnPropertyChanged("dfeta_EYTSDateChangedOn");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_candidate_id")]
-		public string dfeta_HLTA_Candidate_Id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_hlta_candidate_id");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_Candidate_Id");
-				this.SetAttributeValue("dfeta_hlta_candidate_id", value);
-				this.OnPropertyChanged("dfeta_HLTA_Candidate_Id");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_husid")]
-		public string dfeta_HUSID
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_husid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HUSID");
-				this.SetAttributeValue("dfeta_husid", value);
-				this.OnPropertyChanged("dfeta_HUSID");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionstatus")]
-		public virtual dfeta_InductionStatus? dfeta_InductionStatus
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_InductionStatus?)(EntityOptionSetEnum.GetEnum(this, "dfeta_inductionstatus")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_InductionStatus");
-				this.SetAttributeValue("dfeta_inductionstatus", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_InductionStatus");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -2846,47 +508,7 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 				this.OnPropertyChanged("dfeta_loginfailedcounter");
 			}
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mergeinfo")]
-		public string dfeta_MergeInfo
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_mergeinfo");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_MergeInfo");
-				this.SetAttributeValue("dfeta_mergeinfo", value);
-				this.OnPropertyChanged("dfeta_MergeInfo");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Country associated with Person.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_nationalityid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_NationalityId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_nationalityid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_NationalityId");
-				this.SetAttributeValue("dfeta_nationalityid", value);
-				this.OnPropertyChanged("dfeta_NationalityId");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -2906,187 +528,7 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 				this.OnPropertyChanged("dfeta_NINumber");
 			}
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_partyid")]
-		public string dfeta_PartyID
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_partyid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_PartyID");
-				this.SetAttributeValue("dfeta_partyid", value);
-				this.OnPropertyChanged("dfeta_PartyID");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_previousemail")]
-		public string dfeta_previousemail
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_previousemail");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_previousemail");
-				this.SetAttributeValue("dfeta_previousemail", value);
-				this.OnPropertyChanged("dfeta_previousemail");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_previouslastname")]
-		public string dfeta_PreviousLastName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_previouslastname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_PreviousLastName");
-				this.SetAttributeValue("dfeta_previouslastname", value);
-				this.OnPropertyChanged("dfeta_PreviousLastName");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsdate")]
-		public System.Nullable<System.DateTime> dfeta_QTSDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_qtsdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_QTSDate");
-				this.SetAttributeValue("dfeta_qtsdate", value);
-				this.OnPropertyChanged("dfeta_QTSDate");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsdatechangedon")]
-		public System.Nullable<System.DateTime> dfeta_QTSDateChangedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_qtsdatechangedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_QTSDateChangedOn");
-				this.SetAttributeValue("dfeta_qtsdatechangedon", value);
-				this.OnPropertyChanged("dfeta_QTSDateChangedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for QTS Registration associated with Person.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsregistrationid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_QTSRegistrationId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_qtsregistrationid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_QTSRegistrationId");
-				this.SetAttributeValue("dfeta_qtsregistrationid", value);
-				this.OnPropertyChanged("dfeta_QTSRegistrationId");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sauserid")]
-		public string dfeta_SAUSERID
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_sauserid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_SAUSERID");
-				this.SetAttributeValue("dfeta_sauserid", value);
-				this.OnPropertyChanged("dfeta_SAUSERID");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_suppressionflag")]
-		public virtual Contact_dfeta_suppressionflag? dfeta_suppressionflag
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_dfeta_suppressionflag?)(EntityOptionSetEnum.GetEnum(this, "dfeta_suppressionflag")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_suppressionflag");
-				this.SetAttributeValue("dfeta_suppressionflag", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_suppressionflag");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_title")]
-		public virtual dfeta_PersonTitle? dfeta_Title
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_PersonTitle?)(EntityOptionSetEnum.GetEnum(this, "dfeta_title")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_Title");
-				this.SetAttributeValue("dfeta_title", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_Title");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -3106,27 +548,7 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 				this.OnPropertyChanged("dfeta_TRN");
 			}
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trnallocaterequest")]
-		public System.Nullable<System.DateTime> dfeta_TRNAllocateRequest
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_trnallocaterequest");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_TRNAllocateRequest");
-				this.SetAttributeValue("dfeta_trnallocaterequest", value);
-				this.OnPropertyChanged("dfeta_TRNAllocateRequest");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -3146,487 +568,7 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 				this.OnPropertyChanged("dfeta_trnrequired");
 			}
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_tssupdate")]
-		public System.Nullable<System.DateTime> dfeta_tssupdate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_tssupdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_tssupdate");
-				this.SetAttributeValue("dfeta_tssupdate", value);
-				this.OnPropertyChanged("dfeta_tssupdate");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether to allow sending direct e-mail to the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("donotbulkemail")]
-		public System.Nullable<bool> DoNotBulkEMail
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("donotbulkemail");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("DoNotBulkEMail");
-				this.SetAttributeValue("donotbulkemail", value);
-				this.OnPropertyChanged("DoNotBulkEMail");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether to allow sending bulk-rate postal mail to the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("donotbulkpostalmail")]
-		public System.Nullable<bool> DoNotBulkPostalMail
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("donotbulkpostalmail");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("DoNotBulkPostalMail");
-				this.SetAttributeValue("donotbulkpostalmail", value);
-				this.OnPropertyChanged("DoNotBulkPostalMail");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether to allow sending e-mail to the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("donotemail")]
-		public System.Nullable<bool> DoNotEMail
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("donotemail");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("DoNotEMail");
-				this.SetAttributeValue("donotemail", value);
-				this.OnPropertyChanged("DoNotEMail");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether to allow sending fax transmittals to the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("donotfax")]
-		public System.Nullable<bool> DoNotFax
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("donotfax");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("DoNotFax");
-				this.SetAttributeValue("donotfax", value);
-				this.OnPropertyChanged("DoNotFax");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether to allow phone calls to the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("donotphone")]
-		public System.Nullable<bool> DoNotPhone
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("donotphone");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("DoNotPhone");
-				this.SetAttributeValue("donotphone", value);
-				this.OnPropertyChanged("DoNotPhone");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether to allow sending postal mail to the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("donotpostalmail")]
-		public System.Nullable<bool> DoNotPostalMail
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("donotpostalmail");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("DoNotPostalMail");
-				this.SetAttributeValue("donotpostalmail", value);
-				this.OnPropertyChanged("DoNotPostalMail");
-			}
-		}
-	
-		/// <summary>
-		/// Information regarding whether to allow sending marketing mail to the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("donotsendmm")]
-		public System.Nullable<bool> DoNotSendMM
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("donotsendmm");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("DoNotSendMM");
-				this.SetAttributeValue("donotsendmm", value);
-				this.OnPropertyChanged("DoNotSendMM");
-			}
-		}
-	
-		/// <summary>
-		/// Formal education level that the contact has attained.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("educationcode")]
-		public virtual Contact_EducationCode? EducationCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_EducationCode?)(EntityOptionSetEnum.GetEnum(this, "educationcode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("EducationCode");
-				this.SetAttributeValue("educationcode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("EducationCode");
-			}
-		}
-	
-		/// <summary>
-		/// First e-mail address for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("emailaddress1")]
-		public string EMailAddress1
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("emailaddress1");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("EMailAddress1");
-				this.SetAttributeValue("emailaddress1", value);
-				this.OnPropertyChanged("EMailAddress1");
-			}
-		}
-	
-		/// <summary>
-		/// Type the secondary email address for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("emailaddress2")]
-		public string EMailAddress2
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("emailaddress2");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("EMailAddress2");
-				this.SetAttributeValue("emailaddress2", value);
-				this.OnPropertyChanged("EMailAddress2");
-			}
-		}
-	
-		/// <summary>
-		/// Type an alternate email address for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("emailaddress3")]
-		public string EMailAddress3
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("emailaddress3");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("EMailAddress3");
-				this.SetAttributeValue("emailaddress3", value);
-				this.OnPropertyChanged("EMailAddress3");
-			}
-		}
-	
-		/// <summary>
-		/// Employee ID for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("employeeid")]
-		public string EmployeeId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("employeeid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("EmployeeId");
-				this.SetAttributeValue("employeeid", value);
-				this.OnPropertyChanged("EmployeeId");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the default image for the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("entityimage")]
-		public byte[] EntityImage
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<byte[]>("entityimage");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("EntityImage");
-				this.SetAttributeValue("entityimage", value);
-				this.OnPropertyChanged("EntityImage");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("entityimage_timestamp")]
-		public System.Nullable<long> EntityImage_Timestamp
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<long>>("entityimage_timestamp");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("EntityImage_Timestamp");
-				this.SetAttributeValue("entityimage_timestamp", value);
-				this.OnPropertyChanged("EntityImage_Timestamp");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("entityimage_url")]
-		public string EntityImage_URL
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("entityimage_url");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("EntityImage_URL");
-				this.SetAttributeValue("entityimage_url", value);
-				this.OnPropertyChanged("EntityImage_URL");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("entityimageid")]
-		public System.Nullable<System.Guid> EntityImageId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("entityimageid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("EntityImageId");
-				this.SetAttributeValue("entityimageid", value);
-				this.OnPropertyChanged("EntityImageId");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the conversion rate of the record's currency. The exchange rate is used to convert all money fields in the record from the local currency to the system's default currency.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("exchangerate")]
-		public System.Nullable<decimal> ExchangeRate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<decimal>>("exchangerate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ExchangeRate");
-				this.SetAttributeValue("exchangerate", value);
-				this.OnPropertyChanged("ExchangeRate");
-			}
-		}
-	
-		/// <summary>
-		/// Identifier for an external user.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("externaluseridentifier")]
-		public string ExternalUserIdentifier
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("externaluseridentifier");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ExternalUserIdentifier");
-				this.SetAttributeValue("externaluseridentifier", value);
-				this.OnPropertyChanged("ExternalUserIdentifier");
-			}
-		}
-	
-		/// <summary>
-		/// Marital status of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("familystatuscode")]
-		public virtual Contact_FamilyStatusCode? FamilyStatusCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_FamilyStatusCode?)(EntityOptionSetEnum.GetEnum(this, "familystatuscode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("FamilyStatusCode");
-				this.SetAttributeValue("familystatuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("FamilyStatusCode");
-			}
-		}
-	
-		/// <summary>
-		/// Fax number for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("fax")]
-		public string Fax
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("fax");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Fax");
-				this.SetAttributeValue("fax", value);
-				this.OnPropertyChanged("Fax");
-			}
-		}
-	
-		/// <summary>
-		/// Type the contact's first name to make sure the contact is addressed correctly in sales calls, email, and marketing campaigns.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("firstname")]
-		public string FirstName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("firstname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("FirstName");
-				this.SetAttributeValue("firstname", value);
-				this.OnPropertyChanged("FirstName");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether to allow following email activity like opens, attachment views and link clicks for emails sent to the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("followemail")]
-		public System.Nullable<bool> FollowEmail
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("followemail");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("FollowEmail");
-				this.SetAttributeValue("followemail", value);
-				this.OnPropertyChanged("FollowEmail");
-			}
-		}
-	
-		/// <summary>
-		/// FTP site URL for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ftpsiteurl")]
-		public string FtpSiteUrl
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("ftpsiteurl");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("FtpSiteUrl");
-				this.SetAttributeValue("ftpsiteurl", value);
-				this.OnPropertyChanged("FtpSiteUrl");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Full name of the contact.
 		/// </summary>
@@ -3646,1092 +588,12 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 				this.OnPropertyChanged("FullName");
 			}
 		}
-	
-		/// <summary>
-		/// Gender of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("gendercode")]
-		public virtual Contact_GenderCode? GenderCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_GenderCode?)(EntityOptionSetEnum.GetEnum(this, "gendercode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("GenderCode");
-				this.SetAttributeValue("gendercode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("GenderCode");
-			}
-		}
-	
-		/// <summary>
-		/// Government ID for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("governmentid")]
-		public string GovernmentId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("governmentid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("GovernmentId");
-				this.SetAttributeValue("governmentid", value);
-				this.OnPropertyChanged("GovernmentId");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether the contact has children.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("haschildrencode")]
-		public virtual Contact_HasChildrenCode? HasChildrenCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_HasChildrenCode?)(EntityOptionSetEnum.GetEnum(this, "haschildrencode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("HasChildrenCode");
-				this.SetAttributeValue("haschildrencode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("HasChildrenCode");
-			}
-		}
-	
-		/// <summary>
-		/// Type a second home phone number for this contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("home2")]
-		public string Home2
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("home2");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Home2");
-				this.SetAttributeValue("home2", value);
-				this.OnPropertyChanged("Home2");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the data import or data migration that created this record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("importsequencenumber")]
-		public System.Nullable<int> ImportSequenceNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("importsequencenumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ImportSequenceNumber");
-				this.SetAttributeValue("importsequencenumber", value);
-				this.OnPropertyChanged("ImportSequenceNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether the contact was auto-created when promoting an email or an appointment.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isautocreate")]
-		public System.Nullable<bool> IsAutoCreate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("isautocreate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("IsAutoCreate");
-				this.SetAttributeValue("isautocreate", value);
-				this.OnPropertyChanged("IsAutoCreate");
-			}
-		}
-	
-		/// <summary>
-		/// Information about whether the contact is in an associated Microsoft Great Plains database.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isbackofficecustomer")]
-		public System.Nullable<bool> IsBackofficeCustomer
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("isbackofficecustomer");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("IsBackofficeCustomer");
-				this.SetAttributeValue("isbackofficecustomer", value);
-				this.OnPropertyChanged("IsBackofficeCustomer");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isprivate")]
-		public System.Nullable<bool> IsPrivate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("isprivate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("IsPrivate");
-				this.SetAttributeValue("isprivate", value);
-				this.OnPropertyChanged("IsPrivate");
-			}
-		}
-	
-		/// <summary>
-		/// Job title of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("jobtitle")]
-		public string JobTitle
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("jobtitle");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("JobTitle");
-				this.SetAttributeValue("jobtitle", value);
-				this.OnPropertyChanged("JobTitle");
-			}
-		}
-	
-		/// <summary>
-		/// Type the contact's last name to make sure the contact is addressed correctly in sales calls, email, and marketing campaigns.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("lastname")]
-		public string LastName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("lastname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("LastName");
-				this.SetAttributeValue("lastname", value);
-				this.OnPropertyChanged("LastName");
-			}
-		}
-	
-		/// <summary>
-		/// Contains the date and time stamp of the last on hold time.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("lastonholdtime")]
-		public System.Nullable<System.DateTime> LastOnHoldTime
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("lastonholdtime");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("LastOnHoldTime");
-				this.SetAttributeValue("lastonholdtime", value);
-				this.OnPropertyChanged("LastOnHoldTime");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time when the contact was last contacted as a part of a marketing campaign.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("lastusedincampaign")]
-		public System.Nullable<System.DateTime> LastUsedInCampaign
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("lastusedincampaign");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("LastUsedInCampaign");
-				this.SetAttributeValue("lastusedincampaign", value);
-				this.OnPropertyChanged("LastUsedInCampaign");
-			}
-		}
-	
-		/// <summary>
-		/// Source of the lead of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("leadsourcecode")]
-		public virtual Contact_LeadSourceCode? LeadSourceCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_LeadSourceCode?)(EntityOptionSetEnum.GetEnum(this, "leadsourcecode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("LeadSourceCode");
-				this.SetAttributeValue("leadsourcecode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("LeadSourceCode");
-			}
-		}
-	
-		/// <summary>
-		/// Name of the contact's manager.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("managername")]
-		public string ManagerName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("managername");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ManagerName");
-				this.SetAttributeValue("managername", value);
-				this.OnPropertyChanged("ManagerName");
-			}
-		}
-	
-		/// <summary>
-		/// Phone number for the contact's manager.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("managerphone")]
-		public string ManagerPhone
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("managerphone");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ManagerPhone");
-				this.SetAttributeValue("managerphone", value);
-				this.OnPropertyChanged("ManagerPhone");
-			}
-		}
-	
-		/// <summary>
-		/// Whether is only for marketing
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("marketingonly")]
-		public System.Nullable<bool> MarketingOnly
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("marketingonly");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("MarketingOnly");
-				this.SetAttributeValue("marketingonly", value);
-				this.OnPropertyChanged("MarketingOnly");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the master contact for merge.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("masterid")]
-		public Microsoft.Xrm.Sdk.EntityReference MasterId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("masterid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("MasterId");
-				this.SetAttributeValue("masterid", value);
-				this.OnPropertyChanged("MasterId");
-			}
-		}
-	
-		/// <summary>
-		/// Shows whether the account has been merged with a master contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("merged")]
-		public System.Nullable<bool> Merged
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("merged");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Merged");
-				this.SetAttributeValue("merged", value);
-				this.OnPropertyChanged("Merged");
-			}
-		}
-	
-		/// <summary>
-		/// Type the contact's middle name or initial to make sure the contact is addressed correctly.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("middlename")]
-		public string MiddleName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("middlename");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("MiddleName");
-				this.SetAttributeValue("middlename", value);
-				this.OnPropertyChanged("MiddleName");
-			}
-		}
-	
-		/// <summary>
-		/// Mobile phone number for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("mobilephone")]
-		public string MobilePhone
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("mobilephone");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("MobilePhone");
-				this.SetAttributeValue("mobilephone", value);
-				this.OnPropertyChanged("MobilePhone");
-			}
-		}
-	
-		/// <summary>
-		/// Shows who last updated the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedBy");
-				this.SetAttributeValue("modifiedby", value);
-				this.OnPropertyChanged("ModifiedBy");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the external party who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedbyexternalparty")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedByExternalParty
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedbyexternalparty");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedByExternalParty");
-				this.SetAttributeValue("modifiedbyexternalparty", value);
-				this.OnPropertyChanged("ModifiedByExternalParty");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time when the contact was last modified.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
-		public System.Nullable<System.DateTime> ModifiedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOn");
-				this.SetAttributeValue("modifiedon", value);
-				this.OnPropertyChanged("ModifiedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Shows who last updated the record on behalf of another user.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOnBehalfBy");
-				this.SetAttributeValue("modifiedonbehalfby", value);
-				this.OnPropertyChanged("ModifiedOnBehalfBy");
-			}
-		}
-	
-		/// <summary>
-		/// Describes whether contact is opted out or not
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("msdyn_gdproptout")]
-		public System.Nullable<bool> msdyn_gdproptout
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("msdyn_gdproptout");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("msdyn_gdproptout");
-				this.SetAttributeValue("msdyn_gdproptout", value);
-				this.OnPropertyChanged("msdyn_gdproptout");
-			}
-		}
-	
-		/// <summary>
-		/// Whether or not the contact belongs to the associated account
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("msdyn_orgchangestatus")]
-		public virtual Contact_msdyn_orgchangestatus? msdyn_orgchangestatus
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_msdyn_orgchangestatus?)(EntityOptionSetEnum.GetEnum(this, "msdyn_orgchangestatus")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("msdyn_orgchangestatus");
-				this.SetAttributeValue("msdyn_orgchangestatus", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("msdyn_orgchangestatus");
-			}
-		}
-	
-		/// <summary>
-		/// Nickname of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("nickname")]
-		public string NickName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("nickname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("NickName");
-				this.SetAttributeValue("nickname", value);
-				this.OnPropertyChanged("NickName");
-			}
-		}
-	
-		/// <summary>
-		/// How many children the contact has.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("numberofchildren")]
-		public System.Nullable<int> NumberOfChildren
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("numberofchildren");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("NumberOfChildren");
-				this.SetAttributeValue("numberofchildren", value);
-				this.OnPropertyChanged("NumberOfChildren");
-			}
-		}
-	
-		/// <summary>
-		/// Shows how long, in minutes, that the record was on hold.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("onholdtime")]
-		public System.Nullable<int> OnHoldTime
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("onholdtime");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OnHoldTime");
-				this.SetAttributeValue("onholdtime", value);
-				this.OnPropertyChanged("OnHoldTime");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the lead that the contact was created if the contact was created by converting a lead in Microsoft Dynamics 365. This is used to relate the contact to the data on the originating lead for use in reporting and analytics.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("originatingleadid")]
-		public Microsoft.Xrm.Sdk.EntityReference OriginatingLeadId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("originatingleadid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OriginatingLeadId");
-				this.SetAttributeValue("originatingleadid", value);
-				this.OnPropertyChanged("OriginatingLeadId");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time that the record was migrated.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overriddencreatedon")]
-		public System.Nullable<System.DateTime> OverriddenCreatedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overriddencreatedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OverriddenCreatedOn");
-				this.SetAttributeValue("overriddencreatedon", value);
-				this.OnPropertyChanged("OverriddenCreatedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Enter the user or team who is assigned to manage the record. This field is updated every time the record is assigned to a different user.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ownerid")]
-		public Microsoft.Xrm.Sdk.EntityReference OwnerId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("ownerid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwnerId");
-				this.SetAttributeValue("ownerid", value);
-				this.OnPropertyChanged("OwnerId");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the business unit that owns the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningbusinessunit")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningBusinessUnit
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningbusinessunit");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningBusinessUnit");
-				this.SetAttributeValue("owningbusinessunit", value);
-				this.OnPropertyChanged("OwningBusinessUnit");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the team who owns the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningteam")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningTeam
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningteam");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningTeam");
-				this.SetAttributeValue("owningteam", value);
-				this.OnPropertyChanged("OwningTeam");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the user who owns the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningUser
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owninguser");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningUser");
-				this.SetAttributeValue("owninguser", value);
-				this.OnPropertyChanged("OwningUser");
-			}
-		}
-	
-		/// <summary>
-		/// Pager number for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("pager")]
-		public string Pager
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("pager");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Pager");
-				this.SetAttributeValue("pager", value);
-				this.OnPropertyChanged("Pager");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parent_contactid")]
-		public Microsoft.Xrm.Sdk.EntityReference parent_contactid
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("parent_contactid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("parent_contactid");
-				this.SetAttributeValue("parent_contactid", value);
-				this.OnPropertyChanged("parent_contactid");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the parent contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentcontactid")]
-		public Microsoft.Xrm.Sdk.EntityReference ParentContactId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("parentcontactid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ParentContactId");
-				this.SetAttributeValue("parentcontactid", value);
-				this.OnPropertyChanged("ParentContactId");
-			}
-		}
-	
-		/// <summary>
-		/// Select the parent account or parent contact for the contact to provide a quick link to additional details, such as financial information, activities, and opportunities.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentcustomerid")]
-		public Microsoft.Xrm.Sdk.EntityReference ParentCustomerId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("parentcustomerid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ParentCustomerId");
-				this.SetAttributeValue("parentcustomerid", value);
-				this.OnPropertyChanged("ParentCustomerId");
-			}
-		}
-	
-		/// <summary>
-		/// Shows whether the contact participates in workflow rules.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("participatesinworkflow")]
-		public System.Nullable<bool> ParticipatesInWorkflow
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("participatesinworkflow");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ParticipatesInWorkflow");
-				this.SetAttributeValue("participatesinworkflow", value);
-				this.OnPropertyChanged("ParticipatesInWorkflow");
-			}
-		}
-	
-		/// <summary>
-		/// Payment terms for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("paymenttermscode")]
-		public virtual Contact_PaymentTermsCode? PaymentTermsCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_PaymentTermsCode?)(EntityOptionSetEnum.GetEnum(this, "paymenttermscode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("PaymentTermsCode");
-				this.SetAttributeValue("paymenttermscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("PaymentTermsCode");
-			}
-		}
-	
-		/// <summary>
-		/// Day of the week that the contact prefers for scheduling service activities.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("preferredappointmentdaycode")]
-		public virtual Contact_PreferredAppointmentDayCode? PreferredAppointmentDayCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_PreferredAppointmentDayCode?)(EntityOptionSetEnum.GetEnum(this, "preferredappointmentdaycode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("PreferredAppointmentDayCode");
-				this.SetAttributeValue("preferredappointmentdaycode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("PreferredAppointmentDayCode");
-			}
-		}
-	
-		/// <summary>
-		/// Time of day that the contact prefers for scheduling service activities.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("preferredappointmenttimecode")]
-		public virtual Contact_PreferredAppointmentTimeCode? PreferredAppointmentTimeCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_PreferredAppointmentTimeCode?)(EntityOptionSetEnum.GetEnum(this, "preferredappointmenttimecode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("PreferredAppointmentTimeCode");
-				this.SetAttributeValue("preferredappointmenttimecode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("PreferredAppointmentTimeCode");
-			}
-		}
-	
-		/// <summary>
-		/// Preferred contact method for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("preferredcontactmethodcode")]
-		public virtual Contact_PreferredContactMethodCode? PreferredContactMethodCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_PreferredContactMethodCode?)(EntityOptionSetEnum.GetEnum(this, "preferredcontactmethodcode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("PreferredContactMethodCode");
-				this.SetAttributeValue("preferredcontactmethodcode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("PreferredContactMethodCode");
-			}
-		}
-	
-		/// <summary>
-		/// Choose the contact's preferred service facility or equipment to make sure services are scheduled correctly for the customer.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("preferredequipmentid")]
-		public Microsoft.Xrm.Sdk.EntityReference PreferredEquipmentId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("preferredequipmentid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("PreferredEquipmentId");
-				this.SetAttributeValue("preferredequipmentid", value);
-				this.OnPropertyChanged("PreferredEquipmentId");
-			}
-		}
-	
-		/// <summary>
-		/// Choose the contact's preferred service to make sure services are scheduled correctly for the customer.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("preferredserviceid")]
-		public Microsoft.Xrm.Sdk.EntityReference PreferredServiceId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("preferredserviceid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("PreferredServiceId");
-				this.SetAttributeValue("preferredserviceid", value);
-				this.OnPropertyChanged("PreferredServiceId");
-			}
-		}
-	
-		/// <summary>
-		/// Choose the regular or preferred customer service representative for reference when scheduling service activities for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("preferredsystemuserid")]
-		public Microsoft.Xrm.Sdk.EntityReference PreferredSystemUserId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("preferredsystemuserid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("PreferredSystemUserId");
-				this.SetAttributeValue("preferredsystemuserid", value);
-				this.OnPropertyChanged("PreferredSystemUserId");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the ID of the process.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("processid")]
-		public System.Nullable<System.Guid> ProcessId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("processid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ProcessId");
-				this.SetAttributeValue("processid", value);
-				this.OnPropertyChanged("ProcessId");
-			}
-		}
-	
-		/// <summary>
-		/// Salutation for correspondence with the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("salutation")]
-		public string Salutation
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("salutation");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Salutation");
-				this.SetAttributeValue("salutation", value);
-				this.OnPropertyChanged("Salutation");
-			}
-		}
-	
-		/// <summary>
-		/// Method of shipping for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("shippingmethodcode")]
-		public virtual Contact_ShippingMethodCode? ShippingMethodCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_ShippingMethodCode?)(EntityOptionSetEnum.GetEnum(this, "shippingmethodcode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ShippingMethodCode");
-				this.SetAttributeValue("shippingmethodcode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("ShippingMethodCode");
-			}
-		}
-	
-		/// <summary>
-		/// Choose the service level agreement (SLA) that you want to apply to the Contact record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("slaid")]
-		public Microsoft.Xrm.Sdk.EntityReference SLAId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("slaid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("SLAId");
-				this.SetAttributeValue("slaid", value);
-				this.OnPropertyChanged("SLAId");
-			}
-		}
-	
-		/// <summary>
-		/// Last SLA that was applied to this case. This field is for internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("slainvokedid")]
-		public Microsoft.Xrm.Sdk.EntityReference SLAInvokedId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("slainvokedid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("SLAInvokedId");
-				this.SetAttributeValue("slainvokedid", value);
-				this.OnPropertyChanged("SLAInvokedId");
-			}
-		}
-	
-		/// <summary>
-		/// Name of the contact's spouse/partner.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("spousesname")]
-		public string SpousesName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("spousesname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("SpousesName");
-				this.SetAttributeValue("spousesname", value);
-				this.OnPropertyChanged("SpousesName");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the ID of the stage.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("stageid")]
-		public System.Nullable<System.Guid> StageId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("stageid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("StageId");
-				this.SetAttributeValue("stageid", value);
-				this.OnPropertyChanged("StageId");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Status of the contact.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
-		public System.Nullable<ContactState> StateCode
+		public System.Nullable<DqtApi.Models.ContactState> StateCode
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
@@ -4739,7 +601,7 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
 				if ((optionSet != null))
 				{
-					return ((ContactState)(System.Enum.ToObject(typeof(ContactState), optionSet.Value)));
+					return ((DqtApi.Models.ContactState)(System.Enum.ToObject(typeof(DqtApi.Models.ContactState), optionSet.Value)));
 				}
 				else
 				{
@@ -4761,895 +623,410 @@ public partial class Contact : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.I
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-	
+		
 		/// <summary>
-		/// Reason for the status of the contact.
+		/// 1:N account_primary_contact
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
-		public virtual Contact_StatusCode? StatusCode
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("account_primary_contact")]
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.Account> account_primary_contact
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return ((Contact_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
+				return this.GetRelatedEntities<DqtApi.Models.Account>("account_primary_contact", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
-				this.OnPropertyChanging("StatusCode");
-				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("StatusCode");
+				this.OnPropertyChanging("account_primary_contact");
+				this.SetRelatedEntities<DqtApi.Models.Account>("account_primary_contact", null, value);
+				this.OnPropertyChanged("account_primary_contact");
 			}
 		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subscriptionid")]
-		public System.Nullable<System.Guid> SubscriptionId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("subscriptionid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("SubscriptionId");
-				this.SetAttributeValue("subscriptionid", value);
-				this.OnPropertyChanged("SubscriptionId");
-			}
-		}
-	
-		/// <summary>
-		/// Suffix for the contact name, such as Jr., Sr., or III.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("suffix")]
-		public string Suffix
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("suffix");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Suffix");
-				this.SetAttributeValue("suffix", value);
-				this.OnPropertyChanged("Suffix");
-			}
-		}
-	
-		/// <summary>
-		/// Number of users or conversations followed the record
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("teamsfollowed")]
-		public System.Nullable<int> TeamsFollowed
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("teamsfollowed");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TeamsFollowed");
-				this.SetAttributeValue("teamsfollowed", value);
-				this.OnPropertyChanged("TeamsFollowed");
-			}
-		}
-	
-		/// <summary>
-		/// First telephone number for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("telephone1")]
-		public string Telephone1
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("telephone1");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Telephone1");
-				this.SetAttributeValue("telephone1", value);
-				this.OnPropertyChanged("Telephone1");
-			}
-		}
-	
-		/// <summary>
-		/// Second telephone number for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("telephone2")]
-		public string Telephone2
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("telephone2");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Telephone2");
-				this.SetAttributeValue("telephone2", value);
-				this.OnPropertyChanged("Telephone2");
-			}
-		}
-	
-		/// <summary>
-		/// Third telephone number for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("telephone3")]
-		public string Telephone3
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("telephone3");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("Telephone3");
-				this.SetAttributeValue("telephone3", value);
-				this.OnPropertyChanged("Telephone3");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the territory to which the contact is assigned.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("territorycode")]
-		public virtual Contact_TerritoryCode? TerritoryCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((Contact_TerritoryCode?)(EntityOptionSetEnum.GetEnum(this, "territorycode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TerritoryCode");
-				this.SetAttributeValue("territorycode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("TerritoryCode");
-			}
-		}
-	
-		/// <summary>
-		/// Total time spent for emails (read and write) and meetings by me in relation to the contact record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("timespentbymeonemailandmeetings")]
-		public string TimeSpentByMeOnEmailAndMeetings
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("timespentbymeonemailandmeetings");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TimeSpentByMeOnEmailAndMeetings");
-				this.SetAttributeValue("timespentbymeonemailandmeetings", value);
-				this.OnPropertyChanged("TimeSpentByMeOnEmailAndMeetings");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("timezoneruleversionnumber")]
-		public System.Nullable<int> TimeZoneRuleVersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("timezoneruleversionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TimeZoneRuleVersionNumber");
-				this.SetAttributeValue("timezoneruleversionnumber", value);
-				this.OnPropertyChanged("TimeZoneRuleVersionNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Choose the local currency for the record to make sure budgets are reported in the correct currency.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("transactioncurrencyid")]
-		public Microsoft.Xrm.Sdk.EntityReference TransactionCurrencyId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("transactioncurrencyid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TransactionCurrencyId");
-				this.SetAttributeValue("transactioncurrencyid", value);
-				this.OnPropertyChanged("TransactionCurrencyId");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("traversedpath")]
-		public string TraversedPath
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("traversedpath");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TraversedPath");
-				this.SetAttributeValue("traversedpath", value);
-				this.OnPropertyChanged("TraversedPath");
-			}
-		}
-	
-		/// <summary>
-		/// Time zone code that was in use when the record was created.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("utcconversiontimezonecode")]
-		public System.Nullable<int> UTCConversionTimeZoneCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("utcconversiontimezonecode");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("UTCConversionTimeZoneCode");
-				this.SetAttributeValue("utcconversiontimezonecode", value);
-				this.OnPropertyChanged("UTCConversionTimeZoneCode");
-			}
-		}
-	
-		/// <summary>
-		/// Version number of the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
-		public System.Nullable<long> VersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("VersionNumber");
-				this.SetAttributeValue("versionnumber", value);
-				this.OnPropertyChanged("VersionNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Web site URL for the contact.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("websiteurl")]
-		public string WebSiteUrl
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("websiteurl");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("WebSiteUrl");
-				this.SetAttributeValue("websiteurl", value);
-				this.OnPropertyChanged("WebSiteUrl");
-			}
-		}
-	
-		/// <summary>
-		/// Hiragana or Katakana phonetic guide for the contact first name, used for Yomi sorting.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("yomifirstname")]
-		public string YomiFirstName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("yomifirstname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("YomiFirstName");
-				this.SetAttributeValue("yomifirstname", value);
-				this.OnPropertyChanged("YomiFirstName");
-			}
-		}
-	
-		/// <summary>
-		/// Shows the combined Yomi first and last names of the contact so that the full phonetic name can be displayed in views and reports.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("yomifullname")]
-		public string YomiFullName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("yomifullname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("YomiFullName");
-				this.SetAttributeValue("yomifullname", value);
-				this.OnPropertyChanged("YomiFullName");
-			}
-		}
-	
-		/// <summary>
-		/// Hiragana or Katakana phonetic guide for the contact last name, used for Yomi sorting.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("yomilastname")]
-		public string YomiLastName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("yomilastname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("YomiLastName");
-				this.SetAttributeValue("yomilastname", value);
-				this.OnPropertyChanged("YomiLastName");
-			}
-		}
-	
-		/// <summary>
-		/// Hiragana or Katakana phonetic guide for the contact middle name, used for Yomi sorting.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("yomimiddlename")]
-		public string YomiMiddleName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("yomimiddlename");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("YomiMiddleName");
-				this.SetAttributeValue("yomimiddlename", value);
-				this.OnPropertyChanged("YomiMiddleName");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 1:N contact_customer_contacts
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
-		public System.Collections.Generic.IEnumerable<Contact> Referencedcontact_customer_contacts
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.Contact> Referencedcontact_customer_contacts
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<Contact>("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+				return this.GetRelatedEntities<DqtApi.Models.Contact>("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referenced);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("Referencedcontact_customer_contacts");
-				this.SetRelatedEntities<Contact>("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.SetRelatedEntities<DqtApi.Models.Contact>("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
 				this.OnPropertyChanged("Referencedcontact_customer_contacts");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N contact_master_contact
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
-		public System.Collections.Generic.IEnumerable<Contact> Referencedcontact_master_contact
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.Contact> Referencedcontact_master_contact
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+				return this.GetRelatedEntities<DqtApi.Models.Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("Referencedcontact_master_contact");
-				this.SetRelatedEntities<Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.SetRelatedEntities<DqtApi.Models.Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
 				this.OnPropertyChanged("Referencedcontact_master_contact");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N contact_parent_contact
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
-		public System.Collections.Generic.IEnumerable<Contact> Referencedcontact_parent_contact
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.Contact> Referencedcontact_parent_contact
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+				return this.GetRelatedEntities<DqtApi.Models.Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("Referencedcontact_parent_contact");
-				this.SetRelatedEntities<Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.SetRelatedEntities<DqtApi.Models.Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
 				this.OnPropertyChanged("Referencedcontact_parent_contact");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_induction
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_induction")]
-		public System.Collections.Generic.IEnumerable<dfeta_induction> dfeta_contact_dfeta_induction
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_induction> dfeta_contact_dfeta_induction
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_induction>("dfeta_contact_dfeta_induction", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_induction>("dfeta_contact_dfeta_induction", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_induction");
-				this.SetRelatedEntities<dfeta_induction>("dfeta_contact_dfeta_induction", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_induction>("dfeta_contact_dfeta_induction", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_induction");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_induction1
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_induction1")]
-		public System.Collections.Generic.IEnumerable<dfeta_induction> dfeta_contact_dfeta_induction1
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_induction> dfeta_contact_dfeta_induction1
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_induction>("dfeta_contact_dfeta_induction1", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_induction>("dfeta_contact_dfeta_induction1", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_induction1");
-				this.SetRelatedEntities<dfeta_induction>("dfeta_contact_dfeta_induction1", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_induction>("dfeta_contact_dfeta_induction1", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_induction1");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_initialteachertraining
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_initialteachertraining")]
-		public System.Collections.Generic.IEnumerable<dfeta_initialteachertraining> dfeta_contact_dfeta_initialteachertraining
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_initialteachertraining> dfeta_contact_dfeta_initialteachertraining
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_initialteachertraining>("dfeta_contact_dfeta_initialteachertraining", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_contact_dfeta_initialteachertraining", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_initialteachertraining");
-				this.SetRelatedEntities<dfeta_initialteachertraining>("dfeta_contact_dfeta_initialteachertraining", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_contact_dfeta_initialteachertraining", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_initialteachertraining1
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_initialteachertraining1")]
-		public System.Collections.Generic.IEnumerable<dfeta_initialteachertraining> dfeta_contact_dfeta_initialteachertraining1
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_initialteachertraining> dfeta_contact_dfeta_initialteachertraining1
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_initialteachertraining>("dfeta_contact_dfeta_initialteachertraining1", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_contact_dfeta_initialteachertraining1", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_initialteachertraining1");
-				this.SetRelatedEntities<dfeta_initialteachertraining>("dfeta_contact_dfeta_initialteachertraining1", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_contact_dfeta_initialteachertraining1", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining1");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_qtsregistration
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_qtsregistration")]
-		public System.Collections.Generic.IEnumerable<dfeta_qtsregistration> dfeta_contact_dfeta_qtsregistration
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_qtsregistration> dfeta_contact_dfeta_qtsregistration
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_qtsregistration>("dfeta_contact_dfeta_qtsregistration", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_qtsregistration>("dfeta_contact_dfeta_qtsregistration", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_qtsregistration");
-				this.SetRelatedEntities<dfeta_qtsregistration>("dfeta_contact_dfeta_qtsregistration", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_qtsregistration>("dfeta_contact_dfeta_qtsregistration", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_qtsregistration");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_qtsregistration1
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_qtsregistration1")]
-		public System.Collections.Generic.IEnumerable<dfeta_qtsregistration> dfeta_contact_dfeta_qtsregistration1
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_qtsregistration> dfeta_contact_dfeta_qtsregistration1
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_qtsregistration>("dfeta_contact_dfeta_qtsregistration1", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_qtsregistration>("dfeta_contact_dfeta_qtsregistration1", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_qtsregistration1");
-				this.SetRelatedEntities<dfeta_qtsregistration>("dfeta_contact_dfeta_qtsregistration1", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_qtsregistration>("dfeta_contact_dfeta_qtsregistration1", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_qtsregistration1");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_contact_dfeta_qualification
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_qualification")]
-		public System.Collections.Generic.IEnumerable<dfeta_qualification> dfeta_contact_dfeta_qualification
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_qualification> dfeta_contact_dfeta_qualification
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_qualification>("dfeta_contact_dfeta_qualification", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_qualification>("dfeta_contact_dfeta_qualification", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_qualification");
-				this.SetRelatedEntities<dfeta_qualification>("dfeta_contact_dfeta_qualification", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_qualification>("dfeta_contact_dfeta_qualification", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_qualification");
 			}
 		}
-	
+		
+		/// <summary>
+		/// N:1 contact_customer_accounts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentcustomerid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_customer_accounts")]
+		public DqtApi.Models.Account contact_customer_accounts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<DqtApi.Models.Account>("contact_customer_accounts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("contact_customer_accounts");
+				this.SetRelatedEntity<DqtApi.Models.Account>("contact_customer_accounts", null, value);
+				this.OnPropertyChanged("contact_customer_accounts");
+			}
+		}
+		
 		/// <summary>
 		/// N:1 contact_customer_contacts
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentcustomerid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
-		public Contact Referencingcontact_customer_contacts
+		public DqtApi.Models.Contact Referencingcontact_customer_contacts
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<Contact>("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referencing);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("Referencingcontact_customer_contacts");
-				this.SetRelatedEntity<Contact>("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.SetRelatedEntity<DqtApi.Models.Contact>("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
 				this.OnPropertyChanged("Referencingcontact_customer_contacts");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 contact_master_contact
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("masterid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
-		public Contact Referencingcontact_master_contact
+		public DqtApi.Models.Contact Referencingcontact_master_contact
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("Referencingcontact_master_contact");
-				this.SetRelatedEntity<Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.SetRelatedEntity<DqtApi.Models.Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
 				this.OnPropertyChanged("Referencingcontact_master_contact");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 contact_parent_contact
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parent_contactid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
-		public Contact Referencingcontact_parent_contact
+		public DqtApi.Models.Contact Referencingcontact_parent_contact
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("Referencingcontact_parent_contact");
-				this.SetRelatedEntity<Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.SetRelatedEntity<DqtApi.Models.Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
 				this.OnPropertyChanged("Referencingcontact_parent_contact");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_dfeta_qtsregistration_contact
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsregistrationid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_qtsregistration_contact")]
-		public dfeta_qtsregistration dfeta_dfeta_qtsregistration_contact
+		public DqtApi.Models.dfeta_qtsregistration dfeta_dfeta_qtsregistration_contact
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<dfeta_qtsregistration>("dfeta_dfeta_qtsregistration_contact", null);
+				return this.GetRelatedEntity<DqtApi.Models.dfeta_qtsregistration>("dfeta_dfeta_qtsregistration_contact", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_dfeta_qtsregistration_contact");
-				this.SetRelatedEntity<dfeta_qtsregistration>("dfeta_dfeta_qtsregistration_contact", null, value);
+				this.SetRelatedEntity<DqtApi.Models.dfeta_qtsregistration>("dfeta_dfeta_qtsregistration_contact", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_contact");
 			}
 		}
-}
-
-[System.Runtime.Serialization.DataContractAttribute()]
-public enum dfeta_inductionState
-{
+	}
 	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Active = 0,
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_inductionState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
 	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Inactive = 1,
-}
-
-/// <summary>
-/// 
-/// </summary>
-[System.Runtime.Serialization.DataContractAttribute()]
-[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_induction")]
-public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
-{
-	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_induction")]
+	public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_induction entity
+		/// </summary>
 		public static class Fields
 		{
-			public const string CreatedBy = "createdby";
-			public const string CreatedOn = "createdon";
-			public const string CreatedOnBehalfBy = "createdonbehalfby";
-			public const string dfeta_AppealReceived = "dfeta_appealreceived";
-			public const string dfeta_AppealReceivedOn = "dfeta_appealreceivedon";
-			public const string dfeta_CertificateNumber = "dfeta_certificatenumber";
 			public const string dfeta_CompletionDate = "dfeta_completiondate";
-			public const string dfeta_ExtensionLength = "dfeta_extensionlength";
-			public const string dfeta_ExtensionLengthUnit = "dfeta_extensionlengthunit";
-			public const string dfeta_InductionExemptionReason = "dfeta_inductionexemptionreason";
-			public const string dfeta_inductionId = "dfeta_inductionid";
-			public const string Id = "dfeta_inductionid";
 			public const string dfeta_InductionStatus = "dfeta_inductionstatus";
-			public const string dfeta_name = "dfeta_name";
-			public const string dfeta_NumeracyPassDate = "dfeta_numeracypassdate";
-			public const string dfeta_Outcome = "dfeta_outcome";
-			public const string dfeta_OutcomeDate = "dfeta_outcomedate";
 			public const string dfeta_PersonId = "dfeta_personid";
-			public const string dfeta_RequestedById = "dfeta_requestedbyid";
 			public const string dfeta_StartDate = "dfeta_startdate";
-			public const string dfeta_TransitionArrangementsEligible = "dfeta_transitionarrangementseligible";
-			public const string ImportSequenceNumber = "importsequencenumber";
-			public const string ModifiedBy = "modifiedby";
-			public const string ModifiedOn = "modifiedon";
-			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
-			public const string OverriddenCreatedOn = "overriddencreatedon";
-			public const string OwnerId = "ownerid";
-			public const string OwningBusinessUnit = "owningbusinessunit";
-			public const string OwningTeam = "owningteam";
-			public const string OwningUser = "owninguser";
 			public const string StateCode = "statecode";
-			public const string StatusCode = "statuscode";
-			public const string TimeZoneRuleVersionNumber = "timezoneruleversionnumber";
-			public const string UTCConversionTimeZoneCode = "utcconversiontimezonecode";
-			public const string VersionNumber = "versionnumber";
+			public const string dfeta_dfeta_induction_dfeta_qtsregistration = "dfeta_dfeta_induction_dfeta_qtsregistration";
 			public const string dfeta_contact_dfeta_induction = "dfeta_contact_dfeta_induction";
 			public const string dfeta_contact_dfeta_induction1 = "dfeta_contact_dfeta_induction1";
 		}
-	
-	/// <summary>
-	/// Default Constructor.
-	/// </summary>
-	[System.Diagnostics.DebuggerNonUserCode()]
-	public dfeta_induction() : 
-			base(EntityLogicalName)
-	{
-	}
-	
-	public const string EntityLogicalName = "dfeta_induction";
-	
-	public const string EntitySchemaName = "dfeta_induction";
-	
-	public const string PrimaryIdAttribute = "dfeta_inductionid";
-	
-	public const string PrimaryNameAttribute = "dfeta_name";
-	
-	public const string EntityLogicalCollectionName = "dfeta_inductions";
-	
-	public const string EntitySetName = "dfeta_inductions";
-	
-	public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-	
-	public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanged(string propertyName)
-	{
-		if ((this.PropertyChanged != null))
-		{
-			this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-		}
-	}
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanging(string propertyName)
-	{
-		if ((this.PropertyChanging != null))
-		{
-			this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
-		}
-	}
-	
+		
 		/// <summary>
-		/// Unique identifier of the user who created the record.
+		/// Default Constructor.
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_induction() : 
+				base(EntityLogicalName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
+		}
+		
+		public const string EntitySchemaName = "dfeta_induction";
+		
+		public const string PrimaryIdAttribute = "dfeta_inductionid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_induction";
+		
+		public const string EntityLogicalCollectionName = "dfeta_inductions";
+		
+		public const string EntitySetName = "dfeta_inductions";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
 			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedBy");
-				this.SetAttributeValue("createdby", value);
-				this.OnPropertyChanged("CreatedBy");
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-	
-		/// <summary>
-		/// Date and time when the record was created.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
-		public System.Nullable<System.DateTime> CreatedOn
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
+			if ((this.PropertyChanging != null))
 			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOn");
-				this.SetAttributeValue("createdon", value);
-				this.OnPropertyChanged("CreatedOn");
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier of the delegate user who created the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOnBehalfBy");
-				this.SetAttributeValue("createdonbehalfby", value);
-				this.OnPropertyChanged("CreatedOnBehalfBy");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_appealreceived")]
-		public System.Nullable<bool> dfeta_AppealReceived
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_appealreceived");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_AppealReceived");
-				this.SetAttributeValue("dfeta_appealreceived", value);
-				this.OnPropertyChanged("dfeta_AppealReceived");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_appealreceivedon")]
-		public System.Nullable<System.DateTime> dfeta_AppealReceivedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_appealreceivedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_AppealReceivedOn");
-				this.SetAttributeValue("dfeta_appealreceivedon", value);
-				this.OnPropertyChanged("dfeta_AppealReceivedOn");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_certificatenumber")]
-		public string dfeta_CertificateNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_certificatenumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_CertificateNumber");
-				this.SetAttributeValue("dfeta_certificatenumber", value);
-				this.OnPropertyChanged("dfeta_CertificateNumber");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -5669,110 +1046,7 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 				this.OnPropertyChanged("dfeta_CompletionDate");
 			}
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_extensionlength")]
-		public string dfeta_ExtensionLength
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_extensionlength");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_ExtensionLength");
-				this.SetAttributeValue("dfeta_extensionlength", value);
-				this.OnPropertyChanged("dfeta_ExtensionLength");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_extensionlengthunit")]
-		public virtual dfeta_CourseUnit? dfeta_ExtensionLengthUnit
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_CourseUnit?)(EntityOptionSetEnum.GetEnum(this, "dfeta_extensionlengthunit")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_ExtensionLengthUnit");
-				this.SetAttributeValue("dfeta_extensionlengthunit", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_ExtensionLengthUnit");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionexemptionreason")]
-		public virtual dfeta_InductionExemptionReason? dfeta_InductionExemptionReason
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_InductionExemptionReason?)(EntityOptionSetEnum.GetEnum(this, "dfeta_inductionexemptionreason")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_InductionExemptionReason");
-				this.SetAttributeValue("dfeta_inductionexemptionreason", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_InductionExemptionReason");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for entity instances
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionid")]
-		public System.Nullable<System.Guid> dfeta_inductionId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_inductionid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_inductionId");
-				this.SetAttributeValue("dfeta_inductionid", value);
-				if (value.HasValue)
-				{
-					base.Id = value.Value;
-				}
-				else
-				{
-					base.Id = System.Guid.Empty;
-				}
-				this.OnPropertyChanged("dfeta_inductionId");
-			}
-		}
-	
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionid")]
-		public override System.Guid Id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return base.Id;
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.dfeta_inductionId = value;
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -5792,87 +1066,7 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 				this.OnPropertyChanged("dfeta_InductionStatus");
 			}
 		}
-	
-		/// <summary>
-		/// The name of the custom entity.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
-		public string dfeta_name
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_name");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_name");
-				this.SetAttributeValue("dfeta_name", value);
-				this.OnPropertyChanged("dfeta_name");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_numeracypassdate")]
-		public System.Nullable<System.DateTime> dfeta_NumeracyPassDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_numeracypassdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_NumeracyPassDate");
-				this.SetAttributeValue("dfeta_numeracypassdate", value);
-				this.OnPropertyChanged("dfeta_NumeracyPassDate");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_outcome")]
-		public virtual dfeta_AppealOutcome? dfeta_Outcome
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_AppealOutcome?)(EntityOptionSetEnum.GetEnum(this, "dfeta_outcome")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_Outcome");
-				this.SetAttributeValue("dfeta_outcome", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_Outcome");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_outcomedate")]
-		public System.Nullable<System.DateTime> dfeta_OutcomeDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_outcomedate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_OutcomeDate");
-				this.SetAttributeValue("dfeta_outcomedate", value);
-				this.OnPropertyChanged("dfeta_OutcomeDate");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Unique identifier for Person associated with Induction.
 		/// </summary>
@@ -5892,27 +1086,7 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier for Person associated with Induction.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_requestedbyid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_RequestedById
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_requestedbyid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_RequestedById");
-				this.SetAttributeValue("dfeta_requestedbyid", value);
-				this.OnPropertyChanged("dfeta_RequestedById");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -5932,212 +1106,12 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 				this.OnPropertyChanged("dfeta_StartDate");
 			}
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_transitionarrangementseligible")]
-		public System.Nullable<bool> dfeta_TransitionArrangementsEligible
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_transitionarrangementseligible");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_TransitionArrangementsEligible");
-				this.SetAttributeValue("dfeta_transitionarrangementseligible", value);
-				this.OnPropertyChanged("dfeta_TransitionArrangementsEligible");
-			}
-		}
-	
-		/// <summary>
-		/// Sequence number of the import that created this record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("importsequencenumber")]
-		public System.Nullable<int> ImportSequenceNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("importsequencenumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ImportSequenceNumber");
-				this.SetAttributeValue("importsequencenumber", value);
-				this.OnPropertyChanged("ImportSequenceNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the user who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedBy");
-				this.SetAttributeValue("modifiedby", value);
-				this.OnPropertyChanged("ModifiedBy");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time when the record was modified.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
-		public System.Nullable<System.DateTime> ModifiedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOn");
-				this.SetAttributeValue("modifiedon", value);
-				this.OnPropertyChanged("ModifiedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the delegate user who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOnBehalfBy");
-				this.SetAttributeValue("modifiedonbehalfby", value);
-				this.OnPropertyChanged("ModifiedOnBehalfBy");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time that the record was migrated.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overriddencreatedon")]
-		public System.Nullable<System.DateTime> OverriddenCreatedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overriddencreatedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OverriddenCreatedOn");
-				this.SetAttributeValue("overriddencreatedon", value);
-				this.OnPropertyChanged("OverriddenCreatedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Owner Id
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ownerid")]
-		public Microsoft.Xrm.Sdk.EntityReference OwnerId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("ownerid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwnerId");
-				this.SetAttributeValue("ownerid", value);
-				this.OnPropertyChanged("OwnerId");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the business unit that owns the record
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningbusinessunit")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningBusinessUnit
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningbusinessunit");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningBusinessUnit");
-				this.SetAttributeValue("owningbusinessunit", value);
-				this.OnPropertyChanged("OwningBusinessUnit");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the team that owns the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningteam")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningTeam
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningteam");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningTeam");
-				this.SetAttributeValue("owningteam", value);
-				this.OnPropertyChanged("OwningTeam");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the user that owns the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningUser
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owninguser");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningUser");
-				this.SetAttributeValue("owninguser", value);
-				this.OnPropertyChanged("OwningUser");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Status of the Induction
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
-		public System.Nullable<dfeta_inductionState> StateCode
+		public System.Nullable<DqtApi.Models.dfeta_inductionState> StateCode
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
@@ -6145,7 +1119,7 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
 				if ((optionSet != null))
 				{
-					return ((dfeta_inductionState)(System.Enum.ToObject(typeof(dfeta_inductionState), optionSet.Value)));
+					return ((DqtApi.Models.dfeta_inductionState)(System.Enum.ToObject(typeof(DqtApi.Models.dfeta_inductionState), optionSet.Value)));
 				}
 				else
 				{
@@ -6167,617 +1141,155 @@ public partial class dfeta_induction : Microsoft.Xrm.Sdk.Entity, System.Componen
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-	
-		/// <summary>
-		/// Reason for the status of the Induction
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
-		public virtual dfeta_induction_StatusCode? StatusCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_induction_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("StatusCode");
-				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("StatusCode");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("timezoneruleversionnumber")]
-		public System.Nullable<int> TimeZoneRuleVersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("timezoneruleversionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TimeZoneRuleVersionNumber");
-				this.SetAttributeValue("timezoneruleversionnumber", value);
-				this.OnPropertyChanged("TimeZoneRuleVersionNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Time zone code that was in use when the record was created.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("utcconversiontimezonecode")]
-		public System.Nullable<int> UTCConversionTimeZoneCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("utcconversiontimezonecode");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("UTCConversionTimeZoneCode");
-				this.SetAttributeValue("utcconversiontimezonecode", value);
-				this.OnPropertyChanged("UTCConversionTimeZoneCode");
-			}
-		}
-	
-		/// <summary>
-		/// Version Number
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
-		public System.Nullable<long> VersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("VersionNumber");
-				this.SetAttributeValue("versionnumber", value);
-				this.OnPropertyChanged("VersionNumber");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_dfeta_induction_dfeta_qtsregistration
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_induction_dfeta_qtsregistration")]
-		public System.Collections.Generic.IEnumerable<dfeta_qtsregistration> dfeta_dfeta_induction_dfeta_qtsregistration
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_qtsregistration> dfeta_dfeta_induction_dfeta_qtsregistration
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_qtsregistration>("dfeta_dfeta_induction_dfeta_qtsregistration", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_qtsregistration>("dfeta_dfeta_induction_dfeta_qtsregistration", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_dfeta_induction_dfeta_qtsregistration");
-				this.SetRelatedEntities<dfeta_qtsregistration>("dfeta_dfeta_induction_dfeta_qtsregistration", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_qtsregistration>("dfeta_dfeta_induction_dfeta_qtsregistration", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_induction_dfeta_qtsregistration");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_induction
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_induction")]
-		public Contact dfeta_contact_dfeta_induction
+		public DqtApi.Models.Contact dfeta_contact_dfeta_induction
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<Contact>("dfeta_contact_dfeta_induction", null);
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_induction", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_induction");
-				this.SetRelatedEntity<Contact>("dfeta_contact_dfeta_induction", null, value);
+				this.SetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_induction", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_induction");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_induction1
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_requestedbyid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_induction1")]
-		public Contact dfeta_contact_dfeta_induction1
+		public DqtApi.Models.Contact dfeta_contact_dfeta_induction1
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<Contact>("dfeta_contact_dfeta_induction1", null);
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_induction1", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_induction1");
-				this.SetRelatedEntity<Contact>("dfeta_contact_dfeta_induction1", null, value);
+				this.SetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_induction1", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_induction1");
 			}
 		}
-}
-
-[System.Runtime.Serialization.DataContractAttribute()]
-public enum dfeta_initialteachertrainingState
-{
+	}
 	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Active = 0,
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_initialteachertrainingState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
 	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Inactive = 1,
-}
-
-/// <summary>
-/// 
-/// </summary>
-[System.Runtime.Serialization.DataContractAttribute()]
-[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_initialteachertraining")]
-public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
-{
-	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_initialteachertraining")]
+	public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_initialteachertraining entity
+		/// </summary>
 		public static class Fields
 		{
-			public const string CreatedBy = "createdby";
-			public const string CreatedOn = "createdon";
-			public const string CreatedOnBehalfBy = "createdonbehalfby";
-			public const string dfeta_AgeRangeFrom = "dfeta_agerangefrom";
-			public const string dfeta_AgeRangeTo = "dfeta_agerangeto";
-			public const string dfeta_ClassDivision = "dfeta_classdivision";
-			public const string dfeta_CohortYear = "dfeta_cohortyear";
-			public const string dfeta_CountryId = "dfeta_countryid";
-			public const string dfeta_CourseLength = "dfeta_courselength";
-			public const string dfeta_CourseLengthUnit = "dfeta_courselengthunit";
-			public const string dfeta_EstablishmentId = "dfeta_establishmentid";
-			public const string dfeta_initialteachertrainingId = "dfeta_initialteachertrainingid";
-			public const string Id = "dfeta_initialteachertrainingid";
-			public const string dfeta_initiativecode2id = "dfeta_initiativecode2id";
-			public const string dfeta_initiativecodeid = "dfeta_initiativecodeid";
-			public const string dfeta_InstitutionsOwnIdentifier = "dfeta_institutionsownidentifier";
-			public const string dfeta_ittqualificationaim = "dfeta_ittqualificationaim";
 			public const string dfeta_ITTQualificationId = "dfeta_ittqualificationid";
-			public const string dfeta_mrtraining = "dfeta_mrtraining";
-			public const string dfeta_name = "dfeta_name";
 			public const string dfeta_PersonId = "dfeta_personid";
-			public const string dfeta_PostgraduateApprenticeshipStartDate = "dfeta_postgraduateapprenticeshipstartdate";
 			public const string dfeta_ProgrammeEndDate = "dfeta_programmeenddate";
 			public const string dfeta_ProgrammeStartDate = "dfeta_programmestartdate";
 			public const string dfeta_ProgrammeType = "dfeta_programmetype";
-			public const string dfeta_RequestedById = "dfeta_requestedbyid";
 			public const string dfeta_Result = "dfeta_result";
-			public const string dfeta_SchoolDirectId = "dfeta_schooldirectid";
-			public const string dfeta_ServiceLeaver = "dfeta_serviceleaver";
-			public const string dfeta_SpecialisedAgeRangeFrom = "dfeta_specialisedagerangefrom";
-			public const string dfeta_SpecialisedAgeRangeTo = "dfeta_specialisedagerangeto";
 			public const string dfeta_Subject1Id = "dfeta_subject1id";
 			public const string dfeta_Subject2Id = "dfeta_subject2id";
 			public const string dfeta_Subject3Id = "dfeta_subject3id";
-			public const string dfeta_TraineeID = "dfeta_traineeid";
-			public const string dfeta_TransactionId = "dfeta_transactionid";
-			public const string dfeta_TroopstoTeach = "dfeta_troopstoteach";
-			public const string dfeta_TSSTCohort = "dfeta_tsstcohort";
-			public const string dfeta_TSSTSubject = "dfeta_tsstsubject";
-			public const string ImportSequenceNumber = "importsequencenumber";
-			public const string ModifiedBy = "modifiedby";
-			public const string ModifiedOn = "modifiedon";
-			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
-			public const string OverriddenCreatedOn = "overriddencreatedon";
-			public const string OwnerId = "ownerid";
-			public const string OwningBusinessUnit = "owningbusinessunit";
-			public const string OwningTeam = "owningteam";
-			public const string OwningUser = "owninguser";
 			public const string StateCode = "statecode";
-			public const string StatusCode = "statuscode";
-			public const string TimeZoneRuleVersionNumber = "timezoneruleversionnumber";
-			public const string UTCConversionTimeZoneCode = "utcconversiontimezonecode";
-			public const string VersionNumber = "versionnumber";
+			public const string dfeta_account_dfeta_initialteachertraining = "dfeta_account_dfeta_initialteachertraining";
 			public const string dfeta_contact_dfeta_initialteachertraining = "dfeta_contact_dfeta_initialteachertraining";
 			public const string dfeta_contact_dfeta_initialteachertraining1 = "dfeta_contact_dfeta_initialteachertraining1";
 			public const string dfeta_dfeta_ittsubject1_dfeta_initialteachertra = "dfeta_dfeta_ittsubject1_dfeta_initialteachertra";
 			public const string dfeta_dfeta_ittsubject2_dfeta_initialteachertra = "dfeta_dfeta_ittsubject2_dfeta_initialteachertra";
 			public const string dfeta_dfeta_ittsubject3_dfeta_initialteachertra = "dfeta_dfeta_ittsubject3_dfeta_initialteachertra";
 		}
-	
-	/// <summary>
-	/// Default Constructor.
-	/// </summary>
-	[System.Diagnostics.DebuggerNonUserCode()]
-	public dfeta_initialteachertraining() : 
-			base(EntityLogicalName)
-	{
-	}
-	
-	public const string EntityLogicalName = "dfeta_initialteachertraining";
-	
-	public const string EntitySchemaName = "dfeta_initialteachertraining";
-	
-	public const string PrimaryIdAttribute = "dfeta_initialteachertrainingid";
-	
-	public const string PrimaryNameAttribute = "dfeta_name";
-	
-	public const string EntityLogicalCollectionName = "dfeta_initialteachertrainings";
-	
-	public const string EntitySetName = "dfeta_initialteachertrainings";
-	
-	public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-	
-	public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanged(string propertyName)
-	{
-		if ((this.PropertyChanged != null))
-		{
-			this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-		}
-	}
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanging(string propertyName)
-	{
-		if ((this.PropertyChanging != null))
-		{
-			this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
-		}
-	}
-	
+		
 		/// <summary>
-		/// Unique identifier of the user who created the record.
+		/// Default Constructor.
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_initialteachertraining() : 
+				base(EntityLogicalName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
+		}
+		
+		public const string EntitySchemaName = "dfeta_initialteachertraining";
+		
+		public const string PrimaryIdAttribute = "dfeta_initialteachertrainingid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_initialteachertraining";
+		
+		public const string EntityLogicalCollectionName = "dfeta_initialteachertrainings";
+		
+		public const string EntitySetName = "dfeta_initialteachertrainings";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
 			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedBy");
-				this.SetAttributeValue("createdby", value);
-				this.OnPropertyChanged("CreatedBy");
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-	
-		/// <summary>
-		/// Date and time when the record was created.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
-		public System.Nullable<System.DateTime> CreatedOn
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
+			if ((this.PropertyChanging != null))
 			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOn");
-				this.SetAttributeValue("createdon", value);
-				this.OnPropertyChanged("CreatedOn");
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier of the delegate user who created the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOnBehalfBy");
-				this.SetAttributeValue("createdonbehalfby", value);
-				this.OnPropertyChanged("CreatedOnBehalfBy");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_agerangefrom")]
-		public virtual dfeta_AgeRange? dfeta_AgeRangeFrom
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_AgeRange?)(EntityOptionSetEnum.GetEnum(this, "dfeta_agerangefrom")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_AgeRangeFrom");
-				this.SetAttributeValue("dfeta_agerangefrom", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_AgeRangeFrom");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_agerangeto")]
-		public virtual dfeta_AgeRange? dfeta_AgeRangeTo
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_AgeRange?)(EntityOptionSetEnum.GetEnum(this, "dfeta_agerangeto")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_AgeRangeTo");
-				this.SetAttributeValue("dfeta_agerangeto", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_AgeRangeTo");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_classdivision")]
-		public virtual dfeta_classdivision? dfeta_ClassDivision
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_classdivision?)(EntityOptionSetEnum.GetEnum(this, "dfeta_classdivision")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_ClassDivision");
-				this.SetAttributeValue("dfeta_classdivision", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_ClassDivision");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_cohortyear")]
-		public string dfeta_CohortYear
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_cohortyear");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_CohortYear");
-				this.SetAttributeValue("dfeta_cohortyear", value);
-				this.OnPropertyChanged("dfeta_CohortYear");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for *Country associated with Initial Teacher Training.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_countryid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_CountryId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_countryid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_CountryId");
-				this.SetAttributeValue("dfeta_countryid", value);
-				this.OnPropertyChanged("dfeta_CountryId");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_courselength")]
-		public System.Nullable<int> dfeta_CourseLength
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("dfeta_courselength");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_CourseLength");
-				this.SetAttributeValue("dfeta_courselength", value);
-				this.OnPropertyChanged("dfeta_CourseLength");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_courselengthunit")]
-		public virtual dfeta_CourseUnit? dfeta_CourseLengthUnit
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_CourseUnit?)(EntityOptionSetEnum.GetEnum(this, "dfeta_courselengthunit")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_CourseLengthUnit");
-				this.SetAttributeValue("dfeta_courselengthunit", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_CourseLengthUnit");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Organisation associated with Initial Teacher Training.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_establishmentid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_EstablishmentId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_establishmentid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_EstablishmentId");
-				this.SetAttributeValue("dfeta_establishmentid", value);
-				this.OnPropertyChanged("dfeta_EstablishmentId");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for entity instances
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_initialteachertrainingid")]
-		public System.Nullable<System.Guid> dfeta_initialteachertrainingId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_initialteachertrainingid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_initialteachertrainingId");
-				this.SetAttributeValue("dfeta_initialteachertrainingid", value);
-				if (value.HasValue)
-				{
-					base.Id = value.Value;
-				}
-				else
-				{
-					base.Id = System.Guid.Empty;
-				}
-				this.OnPropertyChanged("dfeta_initialteachertrainingId");
-			}
-		}
-	
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_initialteachertrainingid")]
-		public override System.Guid Id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return base.Id;
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.dfeta_initialteachertrainingId = value;
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Initiative Code associated with Initial Teacher Training.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_initiativecode2id")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_initiativecode2id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_initiativecode2id");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_initiativecode2id");
-				this.SetAttributeValue("dfeta_initiativecode2id", value);
-				this.OnPropertyChanged("dfeta_initiativecode2id");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Initiative Code associated with Initial Teacher Training.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_initiativecodeid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_initiativecodeid
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_initiativecodeid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_initiativecodeid");
-				this.SetAttributeValue("dfeta_initiativecodeid", value);
-				this.OnPropertyChanged("dfeta_initiativecodeid");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_institutionsownidentifier")]
-		public string dfeta_InstitutionsOwnIdentifier
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_institutionsownidentifier");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_InstitutionsOwnIdentifier");
-				this.SetAttributeValue("dfeta_institutionsownidentifier", value);
-				this.OnPropertyChanged("dfeta_InstitutionsOwnIdentifier");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ittqualificationaim")]
-		public virtual dfeta_ITTQualificationAim? dfeta_ittqualificationaim
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_ITTQualificationAim?)(EntityOptionSetEnum.GetEnum(this, "dfeta_ittqualificationaim")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_ittqualificationaim");
-				this.SetAttributeValue("dfeta_ittqualificationaim", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_ittqualificationaim");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Unique identifier for Qualification - ITT associated with Initial Teacher Training.
 		/// </summary>
@@ -6797,47 +1309,7 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanged("dfeta_ITTQualificationId");
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier for MR Training associated with Initial Teacher Training.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mrtraining")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_mrtraining
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_mrtraining");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_mrtraining");
-				this.SetAttributeValue("dfeta_mrtraining", value);
-				this.OnPropertyChanged("dfeta_mrtraining");
-			}
-		}
-	
-		/// <summary>
-		/// The name of the custom entity.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
-		public string dfeta_name
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_name");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_name");
-				this.SetAttributeValue("dfeta_name", value);
-				this.OnPropertyChanged("dfeta_name");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Unique identifier for Person associated with Initial Teacher Training.
 		/// </summary>
@@ -6857,27 +1329,7 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_postgraduateapprenticeshipstartdate")]
-		public System.Nullable<System.DateTime> dfeta_PostgraduateApprenticeshipStartDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_postgraduateapprenticeshipstartdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_PostgraduateApprenticeshipStartDate");
-				this.SetAttributeValue("dfeta_postgraduateapprenticeshipstartdate", value);
-				this.OnPropertyChanged("dfeta_PostgraduateApprenticeshipStartDate");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -6897,7 +1349,7 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanged("dfeta_ProgrammeEndDate");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -6917,7 +1369,7 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanged("dfeta_ProgrammeStartDate");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -6937,27 +1389,7 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanged("dfeta_ProgrammeType");
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier for Person associated with Initial Teacher Training.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_requestedbyid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_RequestedById
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_requestedbyid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_RequestedById");
-				this.SetAttributeValue("dfeta_requestedbyid", value);
-				this.OnPropertyChanged("dfeta_RequestedById");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -6977,87 +1409,7 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanged("dfeta_Result");
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier for School Direct Initiative associated with Initial Teacher Training.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_schooldirectid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_SchoolDirectId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_schooldirectid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_SchoolDirectId");
-				this.SetAttributeValue("dfeta_schooldirectid", value);
-				this.OnPropertyChanged("dfeta_SchoolDirectId");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_serviceleaver")]
-		public virtual dfeta_ITTServiceLeaver? dfeta_ServiceLeaver
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_ITTServiceLeaver?)(EntityOptionSetEnum.GetEnum(this, "dfeta_serviceleaver")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_ServiceLeaver");
-				this.SetAttributeValue("dfeta_serviceleaver", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_ServiceLeaver");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_specialisedagerangefrom")]
-		public virtual dfeta_AgeRange? dfeta_SpecialisedAgeRangeFrom
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_AgeRange?)(EntityOptionSetEnum.GetEnum(this, "dfeta_specialisedagerangefrom")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_SpecialisedAgeRangeFrom");
-				this.SetAttributeValue("dfeta_specialisedagerangefrom", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_SpecialisedAgeRangeFrom");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_specialisedagerangeto")]
-		public virtual dfeta_AgeRange? dfeta_SpecialisedAgeRangeTo
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_AgeRange?)(EntityOptionSetEnum.GetEnum(this, "dfeta_specialisedagerangeto")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_SpecialisedAgeRangeTo");
-				this.SetAttributeValue("dfeta_specialisedagerangeto", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_SpecialisedAgeRangeTo");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Unique identifier for Subject - ITT associated with Initial Teacher Training.
 		/// </summary>
@@ -7077,7 +1429,7 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanged("dfeta_Subject1Id");
 			}
 		}
-	
+		
 		/// <summary>
 		/// Unique identifier for Subject - ITT associated with Initial Teacher Training.
 		/// </summary>
@@ -7097,7 +1449,7 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanged("dfeta_Subject2Id");
 			}
 		}
-	
+		
 		/// <summary>
 		/// Unique identifier for Subject - ITT associated with Initial Teacher Training.
 		/// </summary>
@@ -7117,292 +1469,12 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanged("dfeta_Subject3Id");
 			}
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_traineeid")]
-		public string dfeta_TraineeID
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_traineeid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_TraineeID");
-				this.SetAttributeValue("dfeta_traineeid", value);
-				this.OnPropertyChanged("dfeta_TraineeID");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_transactionid")]
-		public string dfeta_TransactionId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_transactionid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_TransactionId");
-				this.SetAttributeValue("dfeta_transactionid", value);
-				this.OnPropertyChanged("dfeta_TransactionId");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_troopstoteach")]
-		public System.Nullable<bool> dfeta_TroopstoTeach
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_troopstoteach");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_TroopstoTeach");
-				this.SetAttributeValue("dfeta_troopstoteach", value);
-				this.OnPropertyChanged("dfeta_TroopstoTeach");
-			}
-		}
-	
-		/// <summary>
-		/// Teacher subject specialism training cohort year
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_tsstcohort")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_TSSTCohort
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_tsstcohort");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_TSSTCohort");
-				this.SetAttributeValue("dfeta_tsstcohort", value);
-				this.OnPropertyChanged("dfeta_TSSTCohort");
-			}
-		}
-	
-		/// <summary>
-		/// Teacher subject specialism training subject
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_tsstsubject")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_TSSTSubject
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_tsstsubject");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_TSSTSubject");
-				this.SetAttributeValue("dfeta_tsstsubject", value);
-				this.OnPropertyChanged("dfeta_TSSTSubject");
-			}
-		}
-	
-		/// <summary>
-		/// Sequence number of the import that created this record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("importsequencenumber")]
-		public System.Nullable<int> ImportSequenceNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("importsequencenumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ImportSequenceNumber");
-				this.SetAttributeValue("importsequencenumber", value);
-				this.OnPropertyChanged("ImportSequenceNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the user who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedBy");
-				this.SetAttributeValue("modifiedby", value);
-				this.OnPropertyChanged("ModifiedBy");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time when the record was modified.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
-		public System.Nullable<System.DateTime> ModifiedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOn");
-				this.SetAttributeValue("modifiedon", value);
-				this.OnPropertyChanged("ModifiedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the delegate user who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOnBehalfBy");
-				this.SetAttributeValue("modifiedonbehalfby", value);
-				this.OnPropertyChanged("ModifiedOnBehalfBy");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time that the record was migrated.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overriddencreatedon")]
-		public System.Nullable<System.DateTime> OverriddenCreatedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overriddencreatedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OverriddenCreatedOn");
-				this.SetAttributeValue("overriddencreatedon", value);
-				this.OnPropertyChanged("OverriddenCreatedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Owner Id
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ownerid")]
-		public Microsoft.Xrm.Sdk.EntityReference OwnerId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("ownerid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwnerId");
-				this.SetAttributeValue("ownerid", value);
-				this.OnPropertyChanged("OwnerId");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the business unit that owns the record
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningbusinessunit")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningBusinessUnit
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningbusinessunit");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningBusinessUnit");
-				this.SetAttributeValue("owningbusinessunit", value);
-				this.OnPropertyChanged("OwningBusinessUnit");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the team that owns the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningteam")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningTeam
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningteam");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningTeam");
-				this.SetAttributeValue("owningteam", value);
-				this.OnPropertyChanged("OwningTeam");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the user that owns the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningUser
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owninguser");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningUser");
-				this.SetAttributeValue("owninguser", value);
-				this.OnPropertyChanged("OwningUser");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Status of the Initial Teacher Training
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
-		public System.Nullable<dfeta_initialteachertrainingState> StateCode
+		public System.Nullable<DqtApi.Models.dfeta_initialteachertrainingState> StateCode
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
@@ -7410,7 +1482,7 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
 				if ((optionSet != null))
 				{
-					return ((dfeta_initialteachertrainingState)(System.Enum.ToObject(typeof(dfeta_initialteachertrainingState), optionSet.Value)));
+					return ((DqtApi.Models.dfeta_initialteachertrainingState)(System.Enum.ToObject(typeof(DqtApi.Models.dfeta_initialteachertrainingState), optionSet.Value)));
 				}
 				else
 				{
@@ -7432,422 +1504,208 @@ public partial class dfeta_initialteachertraining : Microsoft.Xrm.Sdk.Entity, Sy
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-	
+		
 		/// <summary>
-		/// Reason for the status of the Initial Teacher Training
+		/// N:1 dfeta_account_dfeta_initialteachertraining
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
-		public virtual dfeta_initialteachertraining_StatusCode? StatusCode
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_establishmentid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_account_dfeta_initialteachertraining")]
+		public DqtApi.Models.Account dfeta_account_dfeta_initialteachertraining
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return ((dfeta_initialteachertraining_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
+				return this.GetRelatedEntity<DqtApi.Models.Account>("dfeta_account_dfeta_initialteachertraining", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
-				this.OnPropertyChanging("StatusCode");
-				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("StatusCode");
+				this.OnPropertyChanging("dfeta_account_dfeta_initialteachertraining");
+				this.SetRelatedEntity<DqtApi.Models.Account>("dfeta_account_dfeta_initialteachertraining", null, value);
+				this.OnPropertyChanged("dfeta_account_dfeta_initialteachertraining");
 			}
 		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("timezoneruleversionnumber")]
-		public System.Nullable<int> TimeZoneRuleVersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("timezoneruleversionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TimeZoneRuleVersionNumber");
-				this.SetAttributeValue("timezoneruleversionnumber", value);
-				this.OnPropertyChanged("TimeZoneRuleVersionNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Time zone code that was in use when the record was created.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("utcconversiontimezonecode")]
-		public System.Nullable<int> UTCConversionTimeZoneCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("utcconversiontimezonecode");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("UTCConversionTimeZoneCode");
-				this.SetAttributeValue("utcconversiontimezonecode", value);
-				this.OnPropertyChanged("UTCConversionTimeZoneCode");
-			}
-		}
-	
-		/// <summary>
-		/// Version Number
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
-		public System.Nullable<long> VersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("VersionNumber");
-				this.SetAttributeValue("versionnumber", value);
-				this.OnPropertyChanged("VersionNumber");
-			}
-		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_initialteachertraining
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_initialteachertraining")]
-		public Contact dfeta_contact_dfeta_initialteachertraining
+		public DqtApi.Models.Contact dfeta_contact_dfeta_initialteachertraining
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<Contact>("dfeta_contact_dfeta_initialteachertraining", null);
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_initialteachertraining", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_initialteachertraining");
-				this.SetRelatedEntity<Contact>("dfeta_contact_dfeta_initialteachertraining", null, value);
+				this.SetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_initialteachertraining", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_initialteachertraining1
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_requestedbyid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_initialteachertraining1")]
-		public Contact dfeta_contact_dfeta_initialteachertraining1
+		public DqtApi.Models.Contact dfeta_contact_dfeta_initialteachertraining1
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<Contact>("dfeta_contact_dfeta_initialteachertraining1", null);
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_initialteachertraining1", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_initialteachertraining1");
-				this.SetRelatedEntity<Contact>("dfeta_contact_dfeta_initialteachertraining1", null, value);
+				this.SetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_initialteachertraining1", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining1");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_dfeta_ittsubject1_dfeta_initialteachertra
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_subject1id")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject1_dfeta_initialteachertra")]
-		public dfeta_ittsubject dfeta_dfeta_ittsubject1_dfeta_initialteachertra
+		public DqtApi.Models.dfeta_ittsubject dfeta_dfeta_ittsubject1_dfeta_initialteachertra
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null);
+				return this.GetRelatedEntity<DqtApi.Models.dfeta_ittsubject>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_dfeta_ittsubject1_dfeta_initialteachertra");
-				this.SetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null, value);
+				this.SetRelatedEntity<DqtApi.Models.dfeta_ittsubject>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject1_dfeta_initialteachertra");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_dfeta_ittsubject2_dfeta_initialteachertra
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_subject2id")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject2_dfeta_initialteachertra")]
-		public dfeta_ittsubject dfeta_dfeta_ittsubject2_dfeta_initialteachertra
+		public DqtApi.Models.dfeta_ittsubject dfeta_dfeta_ittsubject2_dfeta_initialteachertra
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null);
+				return this.GetRelatedEntity<DqtApi.Models.dfeta_ittsubject>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_dfeta_ittsubject2_dfeta_initialteachertra");
-				this.SetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null, value);
+				this.SetRelatedEntity<DqtApi.Models.dfeta_ittsubject>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject2_dfeta_initialteachertra");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_dfeta_ittsubject3_dfeta_initialteachertra
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_subject3id")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject3_dfeta_initialteachertra")]
-		public dfeta_ittsubject dfeta_dfeta_ittsubject3_dfeta_initialteachertra
+		public DqtApi.Models.dfeta_ittsubject dfeta_dfeta_ittsubject3_dfeta_initialteachertra
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null);
+				return this.GetRelatedEntity<DqtApi.Models.dfeta_ittsubject>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
-				this.SetRelatedEntity<dfeta_ittsubject>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null, value);
+				this.SetRelatedEntity<DqtApi.Models.dfeta_ittsubject>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
 			}
 		}
-}
-
-[System.Runtime.Serialization.DataContractAttribute()]
-public enum dfeta_ittsubjectState
-{
+	}
 	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Active = 0,
-	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Inactive = 1,
-}
-
-/// <summary>
-/// 
-/// </summary>
-[System.Runtime.Serialization.DataContractAttribute()]
-[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_ittsubject")]
-public partial class dfeta_ittsubject : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
-{
-	
-		public static class Fields
-		{
-			public const string CreatedBy = "createdby";
-			public const string CreatedOn = "createdon";
-			public const string CreatedOnBehalfBy = "createdonbehalfby";
-			public const string dfeta_ittsubjectId = "dfeta_ittsubjectid";
-			public const string Id = "dfeta_ittsubjectid";
-			public const string dfeta_name = "dfeta_name";
-			public const string dfeta_restrictedpostqts = "dfeta_restrictedpostqts";
-			public const string dfeta_Value = "dfeta_value";
-			public const string dfeta_ViewOrder = "dfeta_vieworder";
-			public const string ImportSequenceNumber = "importsequencenumber";
-			public const string ModifiedBy = "modifiedby";
-			public const string ModifiedOn = "modifiedon";
-			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
-			public const string OrganizationId = "organizationid";
-			public const string OverriddenCreatedOn = "overriddencreatedon";
-			public const string StateCode = "statecode";
-			public const string StatusCode = "statuscode";
-			public const string TimeZoneRuleVersionNumber = "timezoneruleversionnumber";
-			public const string UTCConversionTimeZoneCode = "utcconversiontimezonecode";
-			public const string VersionNumber = "versionnumber";
-		}
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_ittsubjectState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
 	
 	/// <summary>
-	/// Default Constructor.
+	/// 
 	/// </summary>
-	[System.Diagnostics.DebuggerNonUserCode()]
-	public dfeta_ittsubject() : 
-			base(EntityLogicalName)
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_ittsubject")]
+	public partial class dfeta_ittsubject : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-	}
-	
-	public const string EntityLogicalName = "dfeta_ittsubject";
-	
-	public const string EntitySchemaName = "dfeta_ittsubject";
-	
-	public const string PrimaryIdAttribute = "dfeta_ittsubjectid";
-	
-	public const string PrimaryNameAttribute = "dfeta_name";
-	
-	public const string EntityLogicalCollectionName = "dfeta_ittsubjects";
-	
-	public const string EntitySetName = "dfeta_ittsubjects";
-	
-	public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-	
-	public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanged(string propertyName)
-	{
-		if ((this.PropertyChanged != null))
-		{
-			this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-		}
-	}
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanging(string propertyName)
-	{
-		if ((this.PropertyChanging != null))
-		{
-			this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
-		}
-	}
-	
+		
 		/// <summary>
-		/// Unique identifier of the user who created the record.
+		/// Available fields, a the time of codegen, for the dfeta_ittsubject entity
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		public static class Fields
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedBy");
-				this.SetAttributeValue("createdby", value);
-				this.OnPropertyChanged("CreatedBy");
-			}
+			public const string dfeta_Value = "dfeta_value";
+			public const string StateCode = "statecode";
+			public const string dfeta_dfeta_ittsubject1_dfeta_initialteachertra = "dfeta_dfeta_ittsubject1_dfeta_initialteachertra";
+			public const string dfeta_dfeta_ittsubject2_dfeta_initialteachertra = "dfeta_dfeta_ittsubject2_dfeta_initialteachertra";
+			public const string dfeta_dfeta_ittsubject3_dfeta_initialteachertra = "dfeta_dfeta_ittsubject3_dfeta_initialteachertra";
 		}
-	
+		
 		/// <summary>
-		/// Date and time when the record was created.
+		/// Default Constructor.
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
-		public System.Nullable<System.DateTime> CreatedOn
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_ittsubject() : 
+				base(EntityLogicalName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
+		}
+		
+		public const string EntitySchemaName = "dfeta_ittsubject";
+		
+		public const string PrimaryIdAttribute = "dfeta_ittsubjectid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_ittsubject";
+		
+		public const string EntityLogicalCollectionName = "dfeta_ittsubjects";
+		
+		public const string EntitySetName = "dfeta_ittsubjects";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
 			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOn");
-				this.SetAttributeValue("createdon", value);
-				this.OnPropertyChanged("CreatedOn");
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier of the delegate user who created the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
+			if ((this.PropertyChanging != null))
 			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOnBehalfBy");
-				this.SetAttributeValue("createdonbehalfby", value);
-				this.OnPropertyChanged("CreatedOnBehalfBy");
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier for entity instances
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ittsubjectid")]
-		public System.Nullable<System.Guid> dfeta_ittsubjectId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_ittsubjectid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_ittsubjectId");
-				this.SetAttributeValue("dfeta_ittsubjectid", value);
-				if (value.HasValue)
-				{
-					base.Id = value.Value;
-				}
-				else
-				{
-					base.Id = System.Guid.Empty;
-				}
-				this.OnPropertyChanged("dfeta_ittsubjectId");
-			}
-		}
-	
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ittsubjectid")]
-		public override System.Guid Id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return base.Id;
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.dfeta_ittsubjectId = value;
-			}
-		}
-	
-		/// <summary>
-		/// The name of the custom entity.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
-		public string dfeta_name
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_name");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_name");
-				this.SetAttributeValue("dfeta_name", value);
-				this.OnPropertyChanged("dfeta_name");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_restrictedpostqts")]
-		public System.Nullable<bool> dfeta_restrictedpostqts
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_restrictedpostqts");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_restrictedpostqts");
-				this.SetAttributeValue("dfeta_restrictedpostqts", value);
-				this.OnPropertyChanged("dfeta_restrictedpostqts");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -7867,152 +1725,12 @@ public partial class dfeta_ittsubject : Microsoft.Xrm.Sdk.Entity, System.Compone
 				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_vieworder")]
-		public System.Nullable<int> dfeta_ViewOrder
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("dfeta_vieworder");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_ViewOrder");
-				this.SetAttributeValue("dfeta_vieworder", value);
-				this.OnPropertyChanged("dfeta_ViewOrder");
-			}
-		}
-	
-		/// <summary>
-		/// Sequence number of the import that created this record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("importsequencenumber")]
-		public System.Nullable<int> ImportSequenceNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("importsequencenumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ImportSequenceNumber");
-				this.SetAttributeValue("importsequencenumber", value);
-				this.OnPropertyChanged("ImportSequenceNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the user who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedBy");
-				this.SetAttributeValue("modifiedby", value);
-				this.OnPropertyChanged("ModifiedBy");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time when the record was modified.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
-		public System.Nullable<System.DateTime> ModifiedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOn");
-				this.SetAttributeValue("modifiedon", value);
-				this.OnPropertyChanged("ModifiedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the delegate user who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOnBehalfBy");
-				this.SetAttributeValue("modifiedonbehalfby", value);
-				this.OnPropertyChanged("ModifiedOnBehalfBy");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the organization
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("organizationid")]
-		public Microsoft.Xrm.Sdk.EntityReference OrganizationId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("organizationid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OrganizationId");
-				this.SetAttributeValue("organizationid", value);
-				this.OnPropertyChanged("OrganizationId");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time that the record was migrated.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overriddencreatedon")]
-		public System.Nullable<System.DateTime> OverriddenCreatedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overriddencreatedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OverriddenCreatedOn");
-				this.SetAttributeValue("overriddencreatedon", value);
-				this.OnPropertyChanged("OverriddenCreatedOn");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Status of the ITT Subject
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
-		public System.Nullable<dfeta_ittsubjectState> StateCode
+		public System.Nullable<DqtApi.Models.dfeta_ittsubjectState> StateCode
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
@@ -8020,7 +1738,7 @@ public partial class dfeta_ittsubject : Microsoft.Xrm.Sdk.Entity, System.Compone
 				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
 				if ((optionSet != null))
 				{
-					return ((dfeta_ittsubjectState)(System.Enum.ToObject(typeof(dfeta_ittsubjectState), optionSet.Value)));
+					return ((DqtApi.Models.dfeta_ittsubjectState)(System.Enum.ToObject(typeof(DqtApi.Models.dfeta_ittsubjectState), optionSet.Value)));
 				}
 				else
 				{
@@ -8042,407 +1760,145 @@ public partial class dfeta_ittsubject : Microsoft.Xrm.Sdk.Entity, System.Compone
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-	
-		/// <summary>
-		/// Reason for the status of the ITT Subject
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
-		public virtual dfeta_ittsubject_StatusCode? StatusCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_ittsubject_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("StatusCode");
-				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("StatusCode");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("timezoneruleversionnumber")]
-		public System.Nullable<int> TimeZoneRuleVersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("timezoneruleversionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TimeZoneRuleVersionNumber");
-				this.SetAttributeValue("timezoneruleversionnumber", value);
-				this.OnPropertyChanged("TimeZoneRuleVersionNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Time zone code that was in use when the record was created.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("utcconversiontimezonecode")]
-		public System.Nullable<int> UTCConversionTimeZoneCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("utcconversiontimezonecode");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("UTCConversionTimeZoneCode");
-				this.SetAttributeValue("utcconversiontimezonecode", value);
-				this.OnPropertyChanged("UTCConversionTimeZoneCode");
-			}
-		}
-	
-		/// <summary>
-		/// Version Number
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
-		public System.Nullable<long> VersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("VersionNumber");
-				this.SetAttributeValue("versionnumber", value);
-				this.OnPropertyChanged("VersionNumber");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_dfeta_ittsubject1_dfeta_initialteachertra
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject1_dfeta_initialteachertra")]
-		public System.Collections.Generic.IEnumerable<dfeta_initialteachertraining> dfeta_dfeta_ittsubject1_dfeta_initialteachertra
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_initialteachertraining> dfeta_dfeta_ittsubject1_dfeta_initialteachertra
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_dfeta_ittsubject1_dfeta_initialteachertra");
-				this.SetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_dfeta_ittsubject1_dfeta_initialteachertra", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject1_dfeta_initialteachertra");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_dfeta_ittsubject2_dfeta_initialteachertra
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject2_dfeta_initialteachertra")]
-		public System.Collections.Generic.IEnumerable<dfeta_initialteachertraining> dfeta_dfeta_ittsubject2_dfeta_initialteachertra
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_initialteachertraining> dfeta_dfeta_ittsubject2_dfeta_initialteachertra
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_dfeta_ittsubject2_dfeta_initialteachertra");
-				this.SetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_dfeta_ittsubject2_dfeta_initialteachertra", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject2_dfeta_initialteachertra");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_dfeta_ittsubject3_dfeta_initialteachertra
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittsubject3_dfeta_initialteachertra")]
-		public System.Collections.Generic.IEnumerable<dfeta_initialteachertraining> dfeta_dfeta_ittsubject3_dfeta_initialteachertra
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.dfeta_initialteachertraining> dfeta_dfeta_ittsubject3_dfeta_initialteachertra
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null);
+				return this.GetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
-				this.SetRelatedEntities<dfeta_initialteachertraining>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null, value);
+				this.SetRelatedEntities<DqtApi.Models.dfeta_initialteachertraining>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
 			}
 		}
-}
-
-[System.Runtime.Serialization.DataContractAttribute()]
-public enum dfeta_qtsregistrationState
-{
+	}
 	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Active = 0,
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_qtsregistrationState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
 	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Inactive = 1,
-}
-
-/// <summary>
-/// 
-/// </summary>
-[System.Runtime.Serialization.DataContractAttribute()]
-[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_qtsregistration")]
-public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
-{
-	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_qtsregistration")]
+	public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_qtsregistration entity
+		/// </summary>
 		public static class Fields
 		{
-			public const string CreatedBy = "createdby";
-			public const string CreatedOn = "createdon";
-			public const string CreatedOnBehalfBy = "createdonbehalfby";
-			public const string dfeta_CertificateNumber = "dfeta_certificatenumber";
-			public const string dfeta_DateofRecognition = "dfeta_dateofrecognition";
-			public const string dfeta_EarlyYearsStatusId = "dfeta_earlyyearsstatusid";
-			public const string dfeta_EYTSDate = "dfeta_eytsdate";
-			public const string dfeta_InductionId = "dfeta_inductionid";
 			public const string dfeta_name = "dfeta_name";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_QTSDate = "dfeta_qtsdate";
-			public const string dfeta_qtsregistrationId = "dfeta_qtsregistrationid";
-			public const string Id = "dfeta_qtsregistrationid";
-			public const string dfeta_RequestedById = "dfeta_requestedbyid";
-			public const string dfeta_SkillsTestPassDate = "dfeta_skillstestpassdate";
-			public const string dfeta_TeacherStatusId = "dfeta_teacherstatusid";
-			public const string ImportSequenceNumber = "importsequencenumber";
-			public const string ModifiedBy = "modifiedby";
-			public const string ModifiedOn = "modifiedon";
-			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
-			public const string OverriddenCreatedOn = "overriddencreatedon";
-			public const string OwnerId = "ownerid";
-			public const string OwningBusinessUnit = "owningbusinessunit";
-			public const string OwningTeam = "owningteam";
-			public const string OwningUser = "owninguser";
 			public const string StateCode = "statecode";
-			public const string StatusCode = "statuscode";
-			public const string TimeZoneRuleVersionNumber = "timezoneruleversionnumber";
-			public const string UTCConversionTimeZoneCode = "utcconversiontimezonecode";
-			public const string VersionNumber = "versionnumber";
+			public const string dfeta_dfeta_qtsregistration_contact = "dfeta_dfeta_qtsregistration_contact";
 			public const string dfeta_contact_dfeta_qtsregistration = "dfeta_contact_dfeta_qtsregistration";
 			public const string dfeta_contact_dfeta_qtsregistration1 = "dfeta_contact_dfeta_qtsregistration1";
 			public const string dfeta_dfeta_induction_dfeta_qtsregistration = "dfeta_dfeta_induction_dfeta_qtsregistration";
 		}
-	
-	/// <summary>
-	/// Default Constructor.
-	/// </summary>
-	[System.Diagnostics.DebuggerNonUserCode()]
-	public dfeta_qtsregistration() : 
-			base(EntityLogicalName)
-	{
-	}
-	
-	public const string EntityLogicalName = "dfeta_qtsregistration";
-	
-	public const string EntitySchemaName = "dfeta_qtsregistration";
-	
-	public const string PrimaryIdAttribute = "dfeta_qtsregistrationid";
-	
-	public const string PrimaryNameAttribute = "dfeta_name";
-	
-	public const string EntityLogicalCollectionName = "dfeta_qtsregistrations";
-	
-	public const string EntitySetName = "dfeta_qtsregistrations";
-	
-	public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-	
-	public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanged(string propertyName)
-	{
-		if ((this.PropertyChanged != null))
-		{
-			this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-		}
-	}
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanging(string propertyName)
-	{
-		if ((this.PropertyChanging != null))
-		{
-			this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
-		}
-	}
-	
+		
 		/// <summary>
-		/// Unique identifier of the user who created the record.
+		/// Default Constructor.
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_qtsregistration() : 
+				base(EntityLogicalName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
+		}
+		
+		public const string EntitySchemaName = "dfeta_qtsregistration";
+		
+		public const string PrimaryIdAttribute = "dfeta_qtsregistrationid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_qtsregistration";
+		
+		public const string EntityLogicalCollectionName = "dfeta_qtsregistrations";
+		
+		public const string EntitySetName = "dfeta_qtsregistrations";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
 			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedBy");
-				this.SetAttributeValue("createdby", value);
-				this.OnPropertyChanged("CreatedBy");
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-	
-		/// <summary>
-		/// Date and time when the record was created.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
-		public System.Nullable<System.DateTime> CreatedOn
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
+			if ((this.PropertyChanging != null))
 			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOn");
-				this.SetAttributeValue("createdon", value);
-				this.OnPropertyChanged("CreatedOn");
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier of the delegate user who created the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOnBehalfBy");
-				this.SetAttributeValue("createdonbehalfby", value);
-				this.OnPropertyChanged("CreatedOnBehalfBy");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_certificatenumber")]
-		public string dfeta_CertificateNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_certificatenumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_CertificateNumber");
-				this.SetAttributeValue("dfeta_certificatenumber", value);
-				this.OnPropertyChanged("dfeta_CertificateNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Date field for EEA teachers to teach SEN children
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_dateofrecognition")]
-		public System.Nullable<System.DateTime> dfeta_DateofRecognition
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_dateofrecognition");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_DateofRecognition");
-				this.SetAttributeValue("dfeta_dateofrecognition", value);
-				this.OnPropertyChanged("dfeta_DateofRecognition");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Early Years Status associated with QTS Registration.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_earlyyearsstatusid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_EarlyYearsStatusId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_earlyyearsstatusid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_EarlyYearsStatusId");
-				this.SetAttributeValue("dfeta_earlyyearsstatusid", value);
-				this.OnPropertyChanged("dfeta_EarlyYearsStatusId");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eytsdate")]
-		public System.Nullable<System.DateTime> dfeta_EYTSDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_eytsdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_EYTSDate");
-				this.SetAttributeValue("dfeta_eytsdate", value);
-				this.OnPropertyChanged("dfeta_EYTSDate");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Induction associated with QTS.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_InductionId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_inductionid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_InductionId");
-				this.SetAttributeValue("dfeta_inductionid", value);
-				this.OnPropertyChanged("dfeta_InductionId");
-			}
-		}
-	
+		
 		/// <summary>
 		/// The name of the custom entity.
 		/// </summary>
@@ -8462,7 +1918,7 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 				this.OnPropertyChanged("dfeta_name");
 			}
 		}
-	
+		
 		/// <summary>
 		/// Unique identifier for Person associated with QTS Registration.
 		/// </summary>
@@ -8482,7 +1938,7 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -8502,295 +1958,12 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 				this.OnPropertyChanged("dfeta_QTSDate");
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier for entity instances
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsregistrationid")]
-		public System.Nullable<System.Guid> dfeta_qtsregistrationId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_qtsregistrationid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_qtsregistrationId");
-				this.SetAttributeValue("dfeta_qtsregistrationid", value);
-				if (value.HasValue)
-				{
-					base.Id = value.Value;
-				}
-				else
-				{
-					base.Id = System.Guid.Empty;
-				}
-				this.OnPropertyChanged("dfeta_qtsregistrationId");
-			}
-		}
-	
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsregistrationid")]
-		public override System.Guid Id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return base.Id;
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.dfeta_qtsregistrationId = value;
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Person associated with QTS.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_requestedbyid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_RequestedById
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_requestedbyid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_RequestedById");
-				this.SetAttributeValue("dfeta_requestedbyid", value);
-				this.OnPropertyChanged("dfeta_RequestedById");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_skillstestpassdate")]
-		public System.Nullable<System.DateTime> dfeta_SkillsTestPassDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_skillstestpassdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_SkillsTestPassDate");
-				this.SetAttributeValue("dfeta_skillstestpassdate", value);
-				this.OnPropertyChanged("dfeta_SkillsTestPassDate");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Teacher Status associated with QTS Registration.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_teacherstatusid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_TeacherStatusId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_teacherstatusid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_TeacherStatusId");
-				this.SetAttributeValue("dfeta_teacherstatusid", value);
-				this.OnPropertyChanged("dfeta_TeacherStatusId");
-			}
-		}
-	
-		/// <summary>
-		/// Sequence number of the import that created this record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("importsequencenumber")]
-		public System.Nullable<int> ImportSequenceNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("importsequencenumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ImportSequenceNumber");
-				this.SetAttributeValue("importsequencenumber", value);
-				this.OnPropertyChanged("ImportSequenceNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the user who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedBy");
-				this.SetAttributeValue("modifiedby", value);
-				this.OnPropertyChanged("ModifiedBy");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time when the record was modified.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
-		public System.Nullable<System.DateTime> ModifiedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOn");
-				this.SetAttributeValue("modifiedon", value);
-				this.OnPropertyChanged("ModifiedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the delegate user who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOnBehalfBy");
-				this.SetAttributeValue("modifiedonbehalfby", value);
-				this.OnPropertyChanged("ModifiedOnBehalfBy");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time that the record was migrated.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overriddencreatedon")]
-		public System.Nullable<System.DateTime> OverriddenCreatedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overriddencreatedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OverriddenCreatedOn");
-				this.SetAttributeValue("overriddencreatedon", value);
-				this.OnPropertyChanged("OverriddenCreatedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Owner Id
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ownerid")]
-		public Microsoft.Xrm.Sdk.EntityReference OwnerId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("ownerid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwnerId");
-				this.SetAttributeValue("ownerid", value);
-				this.OnPropertyChanged("OwnerId");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the business unit that owns the record
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningbusinessunit")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningBusinessUnit
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningbusinessunit");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningBusinessUnit");
-				this.SetAttributeValue("owningbusinessunit", value);
-				this.OnPropertyChanged("OwningBusinessUnit");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the team that owns the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningteam")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningTeam
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningteam");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningTeam");
-				this.SetAttributeValue("owningteam", value);
-				this.OnPropertyChanged("OwningTeam");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the user that owns the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningUser
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owninguser");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningUser");
-				this.SetAttributeValue("owninguser", value);
-				this.OnPropertyChanged("OwningUser");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Status of the QTS Registration
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
-		public System.Nullable<dfeta_qtsregistrationState> StateCode
+		public System.Nullable<DqtApi.Models.dfeta_qtsregistrationState> StateCode
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
@@ -8798,7 +1971,7 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
 				if ((optionSet != null))
 				{
-					return ((dfeta_qtsregistrationState)(System.Enum.ToObject(typeof(dfeta_qtsregistrationState), optionSet.Value)));
+					return ((DqtApi.Models.dfeta_qtsregistrationState)(System.Enum.ToObject(typeof(DqtApi.Models.dfeta_qtsregistrationState), optionSet.Value)));
 				}
 				else
 				{
@@ -8820,361 +1993,165 @@ public partial class dfeta_qtsregistration : Microsoft.Xrm.Sdk.Entity, System.Co
 				this.OnPropertyChanged("StateCode");
 			}
 		}
-	
-		/// <summary>
-		/// Reason for the status of the QTS Registration
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
-		public virtual dfeta_qtsregistration_StatusCode? StatusCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_qtsregistration_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("StatusCode");
-				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("StatusCode");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("timezoneruleversionnumber")]
-		public System.Nullable<int> TimeZoneRuleVersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("timezoneruleversionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TimeZoneRuleVersionNumber");
-				this.SetAttributeValue("timezoneruleversionnumber", value);
-				this.OnPropertyChanged("TimeZoneRuleVersionNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Time zone code that was in use when the record was created.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("utcconversiontimezonecode")]
-		public System.Nullable<int> UTCConversionTimeZoneCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("utcconversiontimezonecode");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("UTCConversionTimeZoneCode");
-				this.SetAttributeValue("utcconversiontimezonecode", value);
-				this.OnPropertyChanged("UTCConversionTimeZoneCode");
-			}
-		}
-	
-		/// <summary>
-		/// Version Number
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
-		public System.Nullable<long> VersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("VersionNumber");
-				this.SetAttributeValue("versionnumber", value);
-				this.OnPropertyChanged("VersionNumber");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 1:N dfeta_dfeta_qtsregistration_contact
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_qtsregistration_contact")]
-		public System.Collections.Generic.IEnumerable<Contact> dfeta_dfeta_qtsregistration_contact
+		public System.Collections.Generic.IEnumerable<DqtApi.Models.Contact> dfeta_dfeta_qtsregistration_contact
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntities<Contact>("dfeta_dfeta_qtsregistration_contact", null);
+				return this.GetRelatedEntities<DqtApi.Models.Contact>("dfeta_dfeta_qtsregistration_contact", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_dfeta_qtsregistration_contact");
-				this.SetRelatedEntities<Contact>("dfeta_dfeta_qtsregistration_contact", null, value);
+				this.SetRelatedEntities<DqtApi.Models.Contact>("dfeta_dfeta_qtsregistration_contact", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_contact");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_qtsregistration
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_qtsregistration")]
-		public Contact dfeta_contact_dfeta_qtsregistration
+		public DqtApi.Models.Contact dfeta_contact_dfeta_qtsregistration
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<Contact>("dfeta_contact_dfeta_qtsregistration", null);
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_qtsregistration", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_qtsregistration");
-				this.SetRelatedEntity<Contact>("dfeta_contact_dfeta_qtsregistration", null, value);
+				this.SetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_qtsregistration", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_qtsregistration");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_qtsregistration1
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_requestedbyid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_qtsregistration1")]
-		public Contact dfeta_contact_dfeta_qtsregistration1
+		public DqtApi.Models.Contact dfeta_contact_dfeta_qtsregistration1
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<Contact>("dfeta_contact_dfeta_qtsregistration1", null);
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_qtsregistration1", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_qtsregistration1");
-				this.SetRelatedEntity<Contact>("dfeta_contact_dfeta_qtsregistration1", null, value);
+				this.SetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_qtsregistration1", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_qtsregistration1");
 			}
 		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_dfeta_induction_dfeta_qtsregistration
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_induction_dfeta_qtsregistration")]
-		public dfeta_induction dfeta_dfeta_induction_dfeta_qtsregistration
+		public DqtApi.Models.dfeta_induction dfeta_dfeta_induction_dfeta_qtsregistration
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<dfeta_induction>("dfeta_dfeta_induction_dfeta_qtsregistration", null);
+				return this.GetRelatedEntity<DqtApi.Models.dfeta_induction>("dfeta_dfeta_induction_dfeta_qtsregistration", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_dfeta_induction_dfeta_qtsregistration");
-				this.SetRelatedEntity<dfeta_induction>("dfeta_dfeta_induction_dfeta_qtsregistration", null, value);
+				this.SetRelatedEntity<DqtApi.Models.dfeta_induction>("dfeta_dfeta_induction_dfeta_qtsregistration", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_induction_dfeta_qtsregistration");
 			}
 		}
-}
-
-[System.Runtime.Serialization.DataContractAttribute()]
-public enum dfeta_qualificationState
-{
+	}
 	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Active = 0,
-	
-	[System.Runtime.Serialization.EnumMemberAttribute()]
-	Inactive = 1,
-}
-
-/// <summary>
-/// 
-/// </summary>
-[System.Runtime.Serialization.DataContractAttribute()]
-[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_qualification")]
-public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
-{
-	
-		public static class Fields
-		{
-			public const string CreatedBy = "createdby";
-			public const string CreatedOn = "createdon";
-			public const string CreatedOnBehalfBy = "createdonbehalfby";
-			public const string dfeta_CompletionorAwardDate = "dfeta_completionorawarddate";
-			public const string dfeta_HE_ClassDivision = "dfeta_he_classdivision";
-			public const string dfeta_HE_CompletionDate = "dfeta_he_completiondate";
-			public const string dfeta_HE_CountryId = "dfeta_he_countryid";
-			public const string dfeta_HE_CourseLength = "dfeta_he_courselength";
-			public const string dfeta_HE_EstablishmentId = "dfeta_he_establishmentid";
-			public const string dfeta_HE_EstablishmentLegacy = "dfeta_he_establishmentlegacy";
-			public const string dfeta_HE_FirstDegreeFlag = "dfeta_he_firstdegreeflag";
-			public const string dfeta_HE_HEQualificationId = "dfeta_he_hequalificationid";
-			public const string dfeta_HE_HESubject1Id = "dfeta_he_hesubject1id";
-			public const string dfeta_HE_HESubject2Id = "dfeta_he_hesubject2id";
-			public const string dfeta_HE_HESubject3Id = "dfeta_he_hesubject3id";
-			public const string dfeta_HE_StartDate = "dfeta_he_startdate";
-			public const string dfeta_HLTA_AssessmentDate = "dfeta_hlta_assessmentdate";
-			public const string dfeta_HLTA_AwardLetterSentDate = "dfeta_hlta_awardlettersentdate";
-			public const string dfeta_HLTA_ModerationDate = "dfeta_hlta_moderationdate";
-			public const string dfeta_HLTA_ModerationOutcome = "dfeta_hlta_moderationoutcome";
-			public const string dfeta_HLTA_ModerationOutcomeText = "dfeta_hlta_moderationoutcometext";
-			public const string dfeta_HLTA_PreparationDate = "dfeta_hlta_preparationdate";
-			public const string dfeta_HLTA_ProviderofPreparation = "dfeta_hlta_providerofpreparation";
-			public const string dfeta_HLTA_RPA = "dfeta_hlta_rpa";
-			public const string dfeta_HLTA_SchoolName = "dfeta_hlta_schoolname";
-			public const string dfeta_HLTA_SchoolURN = "dfeta_hlta_schoolurn";
-			public const string dfeta_HLTA_Specialism1Description = "dfeta_hlta_specialism1description";
-			public const string dfeta_HLTA_Specialism1Text = "dfeta_hlta_specialism1text";
-			public const string dfeta_HLTA_Specialism2Description = "dfeta_hlta_specialism2description";
-			public const string dfeta_HLTA_Specialism2Text = "dfeta_hlta_specialism2text";
-			public const string dfeta_MQ_Date = "dfeta_mq_date";
-			public const string dfeta_MQ_MQEstablishmentId = "dfeta_mq_mqestablishmentid";
-			public const string dfeta_MQ_SpecialismId = "dfeta_mq_specialismid";
-			public const string dfeta_MQStartDate = "dfeta_mqstartdate";
-			public const string dfeta_mrcourseid = "dfeta_mrcourseid";
-			public const string dfeta_name = "dfeta_name";
-			public const string dfeta_NPQEL_Awarded = "dfeta_npqel_awarded";
-			public const string dfeta_NPQEL_Date = "dfeta_npqel_date";
-			public const string dfeta_NPQH_Awarded = "dfeta_npqh_awarded";
-			public const string dfeta_NPQH_Date = "dfeta_npqh_date";
-			public const string dfeta_npqml_awarded = "dfeta_npqml_awarded";
-			public const string dfeta_npqml_date = "dfeta_npqml_date";
-			public const string dfeta_npqsl_awarded = "dfeta_npqsl_awarded";
-			public const string dfeta_npqsl_date = "dfeta_npqsl_date";
-			public const string dfeta_PersonId = "dfeta_personid";
-			public const string dfeta_qualificationId = "dfeta_qualificationid";
-			public const string Id = "dfeta_qualificationid";
-			public const string dfeta_TransactionId = "dfeta_transactionid";
-			public const string dfeta_Type = "dfeta_type";
-			public const string ImportSequenceNumber = "importsequencenumber";
-			public const string ModifiedBy = "modifiedby";
-			public const string ModifiedOn = "modifiedon";
-			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
-			public const string OverriddenCreatedOn = "overriddencreatedon";
-			public const string OwnerId = "ownerid";
-			public const string OwningBusinessUnit = "owningbusinessunit";
-			public const string OwningTeam = "owningteam";
-			public const string OwningUser = "owninguser";
-			public const string StateCode = "statecode";
-			public const string StatusCode = "statuscode";
-			public const string TimeZoneRuleVersionNumber = "timezoneruleversionnumber";
-			public const string UTCConversionTimeZoneCode = "utcconversiontimezonecode";
-			public const string VersionNumber = "versionnumber";
-			public const string dfeta_contact_dfeta_qualification = "dfeta_contact_dfeta_qualification";
-		}
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_qualificationState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
 	
 	/// <summary>
-	/// Default Constructor.
+	/// 
 	/// </summary>
-	[System.Diagnostics.DebuggerNonUserCode()]
-	public dfeta_qualification() : 
-			base(EntityLogicalName)
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_qualification")]
+	public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 	{
-	}
-	
-	public const string EntityLogicalName = "dfeta_qualification";
-	
-	public const string EntitySchemaName = "dfeta_qualification";
-	
-	public const string PrimaryIdAttribute = "dfeta_qualificationid";
-	
-	public const string PrimaryNameAttribute = "dfeta_name";
-	
-	public const string EntityLogicalCollectionName = "dfeta_qualifications";
-	
-	public const string EntitySetName = "dfeta_qualifications";
-	
-	public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-	
-	public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanged(string propertyName)
-	{
-		if ((this.PropertyChanged != null))
-		{
-			this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-		}
-	}
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	private void OnPropertyChanging(string propertyName)
-	{
-		if ((this.PropertyChanging != null))
-		{
-			this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
-		}
-	}
-	
+		
 		/// <summary>
-		/// Unique identifier of the user who created the record.
+		/// Available fields, a the time of codegen, for the dfeta_qualification entity
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		public static class Fields
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedBy");
-				this.SetAttributeValue("createdby", value);
-				this.OnPropertyChanged("CreatedBy");
-			}
+			public const string dfeta_CompletionorAwardDate = "dfeta_completionorawarddate";
+			public const string dfeta_PersonId = "dfeta_personid";
+			public const string dfeta_Type = "dfeta_type";
+			public const string dfeta_account_dfeta_qualification_he = "dfeta_account_dfeta_qualification_he";
+			public const string dfeta_contact_dfeta_qualification = "dfeta_contact_dfeta_qualification";
 		}
-	
+		
 		/// <summary>
-		/// Date and time when the record was created.
+		/// Default Constructor.
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
-		public System.Nullable<System.DateTime> CreatedOn
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_qualification() : 
+				base(EntityLogicalName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
+		}
+		
+		public const string EntitySchemaName = "dfeta_qualification";
+		
+		public const string PrimaryIdAttribute = "dfeta_qualificationid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_qualification";
+		
+		public const string EntityLogicalCollectionName = "dfeta_qualifications";
+		
+		public const string EntitySetName = "dfeta_qualifications";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
 			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOn");
-				this.SetAttributeValue("createdon", value);
-				this.OnPropertyChanged("CreatedOn");
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier of the delegate user who created the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
 		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
+			if ((this.PropertyChanging != null))
 			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("CreatedOnBehalfBy");
-				this.SetAttributeValue("createdonbehalfby", value);
-				this.OnPropertyChanged("CreatedOnBehalfBy");
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 			}
 		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -9194,807 +2171,7 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 				this.OnPropertyChanged("dfeta_CompletionorAwardDate");
 			}
 		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_classdivision")]
-		public virtual dfeta_classdivision? dfeta_HE_ClassDivision
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_classdivision?)(EntityOptionSetEnum.GetEnum(this, "dfeta_he_classdivision")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_ClassDivision");
-				this.SetAttributeValue("dfeta_he_classdivision", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_HE_ClassDivision");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_completiondate")]
-		public System.Nullable<System.DateTime> dfeta_HE_CompletionDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_he_completiondate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_CompletionDate");
-				this.SetAttributeValue("dfeta_he_completiondate", value);
-				this.OnPropertyChanged("dfeta_HE_CompletionDate");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Country associated with Qualification.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_countryid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_HE_CountryId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_he_countryid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_CountryId");
-				this.SetAttributeValue("dfeta_he_countryid", value);
-				this.OnPropertyChanged("dfeta_HE_CountryId");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_courselength")]
-		public string dfeta_HE_CourseLength
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_he_courselength");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_CourseLength");
-				this.SetAttributeValue("dfeta_he_courselength", value);
-				this.OnPropertyChanged("dfeta_HE_CourseLength");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Organisation associated with Qualification.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_establishmentid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_HE_EstablishmentId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_he_establishmentid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_EstablishmentId");
-				this.SetAttributeValue("dfeta_he_establishmentid", value);
-				this.OnPropertyChanged("dfeta_HE_EstablishmentId");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_establishmentlegacy")]
-		public string dfeta_HE_EstablishmentLegacy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_he_establishmentlegacy");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_EstablishmentLegacy");
-				this.SetAttributeValue("dfeta_he_establishmentlegacy", value);
-				this.OnPropertyChanged("dfeta_HE_EstablishmentLegacy");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_firstdegreeflag")]
-		public virtual dfeta_he_firstdegreeflag? dfeta_HE_FirstDegreeFlag
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_he_firstdegreeflag?)(EntityOptionSetEnum.GetEnum(this, "dfeta_he_firstdegreeflag")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_FirstDegreeFlag");
-				this.SetAttributeValue("dfeta_he_firstdegreeflag", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_HE_FirstDegreeFlag");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for HE Qualification associated with Qualification.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_hequalificationid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_HE_HEQualificationId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_he_hequalificationid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_HEQualificationId");
-				this.SetAttributeValue("dfeta_he_hequalificationid", value);
-				this.OnPropertyChanged("dfeta_HE_HEQualificationId");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for HE Subject associated with Qualification.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_hesubject1id")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_HE_HESubject1Id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_he_hesubject1id");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_HESubject1Id");
-				this.SetAttributeValue("dfeta_he_hesubject1id", value);
-				this.OnPropertyChanged("dfeta_HE_HESubject1Id");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for HE Subject associated with Qualification.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_hesubject2id")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_HE_HESubject2Id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_he_hesubject2id");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_HESubject2Id");
-				this.SetAttributeValue("dfeta_he_hesubject2id", value);
-				this.OnPropertyChanged("dfeta_HE_HESubject2Id");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for HE Subject associated with Qualification.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_hesubject3id")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_HE_HESubject3Id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_he_hesubject3id");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_HESubject3Id");
-				this.SetAttributeValue("dfeta_he_hesubject3id", value);
-				this.OnPropertyChanged("dfeta_HE_HESubject3Id");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_startdate")]
-		public System.Nullable<System.DateTime> dfeta_HE_StartDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_he_startdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HE_StartDate");
-				this.SetAttributeValue("dfeta_he_startdate", value);
-				this.OnPropertyChanged("dfeta_HE_StartDate");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_assessmentdate")]
-		public System.Nullable<System.DateTime> dfeta_HLTA_AssessmentDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_hlta_assessmentdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_AssessmentDate");
-				this.SetAttributeValue("dfeta_hlta_assessmentdate", value);
-				this.OnPropertyChanged("dfeta_HLTA_AssessmentDate");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_awardlettersentdate")]
-		public System.Nullable<System.DateTime> dfeta_HLTA_AwardLetterSentDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_hlta_awardlettersentdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_AwardLetterSentDate");
-				this.SetAttributeValue("dfeta_hlta_awardlettersentdate", value);
-				this.OnPropertyChanged("dfeta_HLTA_AwardLetterSentDate");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_moderationdate")]
-		public System.Nullable<System.DateTime> dfeta_HLTA_ModerationDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_hlta_moderationdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_ModerationDate");
-				this.SetAttributeValue("dfeta_hlta_moderationdate", value);
-				this.OnPropertyChanged("dfeta_HLTA_ModerationDate");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_moderationoutcome")]
-		public virtual dfeta_qualification_dfeta_HLTA_ModerationOutcome? dfeta_HLTA_ModerationOutcome
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_qualification_dfeta_HLTA_ModerationOutcome?)(EntityOptionSetEnum.GetEnum(this, "dfeta_hlta_moderationoutcome")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_ModerationOutcome");
-				this.SetAttributeValue("dfeta_hlta_moderationoutcome", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("dfeta_HLTA_ModerationOutcome");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_moderationoutcometext")]
-		public string dfeta_HLTA_ModerationOutcomeText
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_hlta_moderationoutcometext");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_ModerationOutcomeText");
-				this.SetAttributeValue("dfeta_hlta_moderationoutcometext", value);
-				this.OnPropertyChanged("dfeta_HLTA_ModerationOutcomeText");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_preparationdate")]
-		public System.Nullable<System.DateTime> dfeta_HLTA_PreparationDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_hlta_preparationdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_PreparationDate");
-				this.SetAttributeValue("dfeta_hlta_preparationdate", value);
-				this.OnPropertyChanged("dfeta_HLTA_PreparationDate");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_providerofpreparation")]
-		public string dfeta_HLTA_ProviderofPreparation
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_hlta_providerofpreparation");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_ProviderofPreparation");
-				this.SetAttributeValue("dfeta_hlta_providerofpreparation", value);
-				this.OnPropertyChanged("dfeta_HLTA_ProviderofPreparation");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_rpa")]
-		public string dfeta_HLTA_RPA
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_hlta_rpa");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_RPA");
-				this.SetAttributeValue("dfeta_hlta_rpa", value);
-				this.OnPropertyChanged("dfeta_HLTA_RPA");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_schoolname")]
-		public string dfeta_HLTA_SchoolName
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_hlta_schoolname");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_SchoolName");
-				this.SetAttributeValue("dfeta_hlta_schoolname", value);
-				this.OnPropertyChanged("dfeta_HLTA_SchoolName");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_schoolurn")]
-		public string dfeta_HLTA_SchoolURN
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_hlta_schoolurn");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_SchoolURN");
-				this.SetAttributeValue("dfeta_hlta_schoolurn", value);
-				this.OnPropertyChanged("dfeta_HLTA_SchoolURN");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_specialism1description")]
-		public string dfeta_HLTA_Specialism1Description
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_hlta_specialism1description");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_Specialism1Description");
-				this.SetAttributeValue("dfeta_hlta_specialism1description", value);
-				this.OnPropertyChanged("dfeta_HLTA_Specialism1Description");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_specialism1text")]
-		public string dfeta_HLTA_Specialism1Text
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_hlta_specialism1text");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_Specialism1Text");
-				this.SetAttributeValue("dfeta_hlta_specialism1text", value);
-				this.OnPropertyChanged("dfeta_HLTA_Specialism1Text");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_specialism2description")]
-		public string dfeta_HLTA_Specialism2Description
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_hlta_specialism2description");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_Specialism2Description");
-				this.SetAttributeValue("dfeta_hlta_specialism2description", value);
-				this.OnPropertyChanged("dfeta_HLTA_Specialism2Description");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hlta_specialism2text")]
-		public string dfeta_HLTA_Specialism2Text
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_hlta_specialism2text");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_HLTA_Specialism2Text");
-				this.SetAttributeValue("dfeta_hlta_specialism2text", value);
-				this.OnPropertyChanged("dfeta_HLTA_Specialism2Text");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mq_date")]
-		public System.Nullable<System.DateTime> dfeta_MQ_Date
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_mq_date");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_MQ_Date");
-				this.SetAttributeValue("dfeta_mq_date", value);
-				this.OnPropertyChanged("dfeta_MQ_Date");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for MQ Establishment associated with Qualification.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mq_mqestablishmentid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_MQ_MQEstablishmentId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_mq_mqestablishmentid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_MQ_MQEstablishmentId");
-				this.SetAttributeValue("dfeta_mq_mqestablishmentid", value);
-				this.OnPropertyChanged("dfeta_MQ_MQEstablishmentId");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for Specialism associated with Qualification.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mq_specialismid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_MQ_SpecialismId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_mq_specialismid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_MQ_SpecialismId");
-				this.SetAttributeValue("dfeta_mq_specialismid", value);
-				this.OnPropertyChanged("dfeta_MQ_SpecialismId");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mqstartdate")]
-		public System.Nullable<System.DateTime> dfeta_MQStartDate
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_mqstartdate");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_MQStartDate");
-				this.SetAttributeValue("dfeta_mqstartdate", value);
-				this.OnPropertyChanged("dfeta_MQStartDate");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for MR Course associated with Qualification.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mrcourseid")]
-		public Microsoft.Xrm.Sdk.EntityReference dfeta_mrcourseid
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_mrcourseid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_mrcourseid");
-				this.SetAttributeValue("dfeta_mrcourseid", value);
-				this.OnPropertyChanged("dfeta_mrcourseid");
-			}
-		}
-	
-		/// <summary>
-		/// The name of the custom entity.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
-		public string dfeta_name
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_name");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_name");
-				this.SetAttributeValue("dfeta_name", value);
-				this.OnPropertyChanged("dfeta_name");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqel_awarded")]
-		public System.Nullable<bool> dfeta_NPQEL_Awarded
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqel_awarded");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_NPQEL_Awarded");
-				this.SetAttributeValue("dfeta_npqel_awarded", value);
-				this.OnPropertyChanged("dfeta_NPQEL_Awarded");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqel_date")]
-		public System.Nullable<System.DateTime> dfeta_NPQEL_Date
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqel_date");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_NPQEL_Date");
-				this.SetAttributeValue("dfeta_npqel_date", value);
-				this.OnPropertyChanged("dfeta_NPQEL_Date");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqh_awarded")]
-		public System.Nullable<bool> dfeta_NPQH_Awarded
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqh_awarded");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_NPQH_Awarded");
-				this.SetAttributeValue("dfeta_npqh_awarded", value);
-				this.OnPropertyChanged("dfeta_NPQH_Awarded");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqh_date")]
-		public System.Nullable<System.DateTime> dfeta_NPQH_Date
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqh_date");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_NPQH_Date");
-				this.SetAttributeValue("dfeta_npqh_date", value);
-				this.OnPropertyChanged("dfeta_NPQH_Date");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqml_awarded")]
-		public System.Nullable<bool> dfeta_npqml_awarded
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqml_awarded");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_npqml_awarded");
-				this.SetAttributeValue("dfeta_npqml_awarded", value);
-				this.OnPropertyChanged("dfeta_npqml_awarded");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqml_date")]
-		public System.Nullable<System.DateTime> dfeta_npqml_date
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqml_date");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_npqml_date");
-				this.SetAttributeValue("dfeta_npqml_date", value);
-				this.OnPropertyChanged("dfeta_npqml_date");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqsl_awarded")]
-		public System.Nullable<bool> dfeta_npqsl_awarded
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqsl_awarded");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_npqsl_awarded");
-				this.SetAttributeValue("dfeta_npqsl_awarded", value);
-				this.OnPropertyChanged("dfeta_npqsl_awarded");
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqsl_date")]
-		public System.Nullable<System.DateTime> dfeta_npqsl_date
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqsl_date");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_npqsl_date");
-				this.SetAttributeValue("dfeta_npqsl_date", value);
-				this.OnPropertyChanged("dfeta_npqsl_date");
-			}
-		}
-	
+		
 		/// <summary>
 		/// Unique identifier for Person associated with Qualification.
 		/// </summary>
@@ -10014,70 +2191,7 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 				this.OnPropertyChanged("dfeta_PersonId");
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier for entity instances
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qualificationid")]
-		public System.Nullable<System.Guid> dfeta_qualificationId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_qualificationid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_qualificationId");
-				this.SetAttributeValue("dfeta_qualificationid", value);
-				if (value.HasValue)
-				{
-					base.Id = value.Value;
-				}
-				else
-				{
-					base.Id = System.Guid.Empty;
-				}
-				this.OnPropertyChanged("dfeta_qualificationId");
-			}
-		}
-	
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qualificationid")]
-		public override System.Guid Id
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return base.Id;
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.dfeta_qualificationId = value;
-			}
-		}
-	
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_transactionid")]
-		public string dfeta_TransactionId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_transactionid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_TransactionId");
-				this.SetAttributeValue("dfeta_transactionid", value);
-				this.OnPropertyChanged("dfeta_TransactionId");
-			}
-		}
-	
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -10097,511 +2211,150 @@ public partial class dfeta_qualification : Microsoft.Xrm.Sdk.Entity, System.Comp
 				this.OnPropertyChanged("dfeta_Type");
 			}
 		}
-	
+		
 		/// <summary>
-		/// Sequence number of the import that created this record.
+		/// N:1 dfeta_account_dfeta_qualification_he
 		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("importsequencenumber")]
-		public System.Nullable<int> ImportSequenceNumber
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_establishmentid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_account_dfeta_qualification_he")]
+		public DqtApi.Models.Account dfeta_account_dfeta_qualification_he
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetAttributeValue<System.Nullable<int>>("importsequencenumber");
+				return this.GetRelatedEntity<DqtApi.Models.Account>("dfeta_account_dfeta_qualification_he", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
-				this.OnPropertyChanging("ImportSequenceNumber");
-				this.SetAttributeValue("importsequencenumber", value);
-				this.OnPropertyChanged("ImportSequenceNumber");
+				this.OnPropertyChanging("dfeta_account_dfeta_qualification_he");
+				this.SetRelatedEntity<DqtApi.Models.Account>("dfeta_account_dfeta_qualification_he", null, value);
+				this.OnPropertyChanged("dfeta_account_dfeta_qualification_he");
 			}
 		}
-	
-		/// <summary>
-		/// Unique identifier of the user who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedBy");
-				this.SetAttributeValue("modifiedby", value);
-				this.OnPropertyChanged("ModifiedBy");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time when the record was modified.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
-		public System.Nullable<System.DateTime> ModifiedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOn");
-				this.SetAttributeValue("modifiedon", value);
-				this.OnPropertyChanged("ModifiedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier of the delegate user who modified the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
-		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("ModifiedOnBehalfBy");
-				this.SetAttributeValue("modifiedonbehalfby", value);
-				this.OnPropertyChanged("ModifiedOnBehalfBy");
-			}
-		}
-	
-		/// <summary>
-		/// Date and time that the record was migrated.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overriddencreatedon")]
-		public System.Nullable<System.DateTime> OverriddenCreatedOn
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overriddencreatedon");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OverriddenCreatedOn");
-				this.SetAttributeValue("overriddencreatedon", value);
-				this.OnPropertyChanged("OverriddenCreatedOn");
-			}
-		}
-	
-		/// <summary>
-		/// Owner Id
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ownerid")]
-		public Microsoft.Xrm.Sdk.EntityReference OwnerId
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("ownerid");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwnerId");
-				this.SetAttributeValue("ownerid", value);
-				this.OnPropertyChanged("OwnerId");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the business unit that owns the record
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningbusinessunit")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningBusinessUnit
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningbusinessunit");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningBusinessUnit");
-				this.SetAttributeValue("owningbusinessunit", value);
-				this.OnPropertyChanged("OwningBusinessUnit");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the team that owns the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningteam")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningTeam
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owningteam");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningTeam");
-				this.SetAttributeValue("owningteam", value);
-				this.OnPropertyChanged("OwningTeam");
-			}
-		}
-	
-		/// <summary>
-		/// Unique identifier for the user that owns the record.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
-		public Microsoft.Xrm.Sdk.EntityReference OwningUser
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("owninguser");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("OwningUser");
-				this.SetAttributeValue("owninguser", value);
-				this.OnPropertyChanged("OwningUser");
-			}
-		}
-	
-		/// <summary>
-		/// Status of the Qualification
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
-		public System.Nullable<dfeta_qualificationState> StateCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
-				if ((optionSet != null))
-				{
-					return ((dfeta_qualificationState)(System.Enum.ToObject(typeof(dfeta_qualificationState), optionSet.Value)));
-				}
-				else
-				{
-					return null;
-				}
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("StateCode");
-				if ((value == null))
-				{
-					this.SetAttributeValue("statecode", null);
-				}
-				else
-				{
-					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
-				}
-				this.OnPropertyChanged("StateCode");
-			}
-		}
-	
-		/// <summary>
-		/// Reason for the status of the Qualification
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
-		public virtual dfeta_qualification_StatusCode? StatusCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return ((dfeta_qualification_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("StatusCode");
-				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
-				this.OnPropertyChanged("StatusCode");
-			}
-		}
-	
-		/// <summary>
-		/// For internal use only.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("timezoneruleversionnumber")]
-		public System.Nullable<int> TimeZoneRuleVersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("timezoneruleversionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("TimeZoneRuleVersionNumber");
-				this.SetAttributeValue("timezoneruleversionnumber", value);
-				this.OnPropertyChanged("TimeZoneRuleVersionNumber");
-			}
-		}
-	
-		/// <summary>
-		/// Time zone code that was in use when the record was created.
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("utcconversiontimezonecode")]
-		public System.Nullable<int> UTCConversionTimeZoneCode
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<int>>("utcconversiontimezonecode");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("UTCConversionTimeZoneCode");
-				this.SetAttributeValue("utcconversiontimezonecode", value);
-				this.OnPropertyChanged("UTCConversionTimeZoneCode");
-			}
-		}
-	
-		/// <summary>
-		/// Version Number
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
-		public System.Nullable<long> VersionNumber
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("VersionNumber");
-				this.SetAttributeValue("versionnumber", value);
-				this.OnPropertyChanged("VersionNumber");
-			}
-		}
-	
+		
 		/// <summary>
 		/// N:1 dfeta_contact_dfeta_qualification
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_qualification")]
-		public Contact dfeta_contact_dfeta_qualification
+		public DqtApi.Models.Contact dfeta_contact_dfeta_qualification
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.GetRelatedEntity<Contact>("dfeta_contact_dfeta_qualification", null);
+				return this.GetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_qualification", null);
 			}
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
 				this.OnPropertyChanging("dfeta_contact_dfeta_qualification");
-				this.SetRelatedEntity<Contact>("dfeta_contact_dfeta_qualification", null, value);
+				this.SetRelatedEntity<DqtApi.Models.Contact>("dfeta_contact_dfeta_qualification", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_qualification");
 			}
 		}
-}
-
-/// <summary>
-/// Represents a source of entities bound to a CRM service. It tracks and manages changes made to the retrieved entities.
-/// </summary>
-public partial class DqtServiceContext : Microsoft.Xrm.Sdk.Client.OrganizationServiceContext
-{
-	
-	/// <summary>
-	/// Constructor.
-	/// </summary>
-	[System.Diagnostics.DebuggerNonUserCode()]
-	public DqtServiceContext(Microsoft.Xrm.Sdk.IOrganizationService service) : 
-			base(service)
-	{
 	}
 	
-		/// <summary>
-		/// Gets a binding to the set of all <see cref="Contact"/> entities.
-		/// </summary>
-		public System.Linq.IQueryable<Contact> ContactSet
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.CreateQuery<Contact>();
-			}
-		}
-	
-		/// <summary>
-		/// Gets a binding to the set of all <see cref="dfeta_induction"/> entities.
-		/// </summary>
-		public System.Linq.IQueryable<dfeta_induction> dfeta_inductionSet
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.CreateQuery<dfeta_induction>();
-			}
-		}
-	
-		/// <summary>
-		/// Gets a binding to the set of all <see cref="dfeta_initialteachertraining"/> entities.
-		/// </summary>
-		public System.Linq.IQueryable<dfeta_initialteachertraining> dfeta_initialteachertrainingSet
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.CreateQuery<dfeta_initialteachertraining>();
-			}
-		}
-	
-		/// <summary>
-		/// Gets a binding to the set of all <see cref="dfeta_ittsubject"/> entities.
-		/// </summary>
-		public System.Linq.IQueryable<dfeta_ittsubject> dfeta_ittsubjectSet
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.CreateQuery<dfeta_ittsubject>();
-			}
-		}
-	
-		/// <summary>
-		/// Gets a binding to the set of all <see cref="dfeta_qtsregistration"/> entities.
-		/// </summary>
-		public System.Linq.IQueryable<dfeta_qtsregistration> dfeta_qtsregistrationSet
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.CreateQuery<dfeta_qtsregistration>();
-			}
-		}
-	
-		/// <summary>
-		/// Gets a binding to the set of all <see cref="dfeta_qualification"/> entities.
-		/// </summary>
-		public System.Linq.IQueryable<dfeta_qualification> dfeta_qualificationSet
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.CreateQuery<dfeta_qualification>();
-			}
-		}
-}
-
-internal sealed class EntityOptionSetEnum
-{
-	
-	[System.Diagnostics.DebuggerNonUserCode()]
-	public static System.Nullable<int> GetEnum(Microsoft.Xrm.Sdk.Entity entity, string attributeLogicalName)
+	internal sealed class EntityOptionSetEnum
 	{
-		if (entity.Attributes.ContainsKey(attributeLogicalName))
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public static System.Nullable<int> GetEnum(Microsoft.Xrm.Sdk.Entity entity, string attributeLogicalName)
 		{
-			Microsoft.Xrm.Sdk.OptionSetValue value = entity.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>(attributeLogicalName);
-			if (value != null)
+			if (entity.Attributes.ContainsKey(attributeLogicalName))
 			{
-				return value.Value;
+				Microsoft.Xrm.Sdk.OptionSetValue value = entity.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>(attributeLogicalName);
+				if (value != null)
+				{
+					return value.Value;
+				}
 			}
+			return null;
 		}
-		return null;
 	}
-}
-
-/// <summary>
-/// Attribute to handle storing the OptionSet's Metadata.
-/// </summary>
-[System.AttributeUsageAttribute(System.AttributeTargets.Field)]
-public sealed class OptionSetMetadataAttribute : System.Attribute
-{
 	
 	/// <summary>
-	/// Color of the OptionSetValue.
+	/// Attribute to handle storing the OptionSet's Metadata.
 	/// </summary>
+	[System.AttributeUsageAttribute(System.AttributeTargets.Field)]
+	public sealed class OptionSetMetadataAttribute : System.Attribute
+	{
+		
+		/// <summary>
+		/// Color of the OptionSetValue.
+		/// </summary>
 		public string Color { get; set; }
-	
-	/// <summary>
-	/// Description of the OptionSetValue.
-	/// </summary>
+		
+		/// <summary>
+		/// Description of the OptionSetValue.
+		/// </summary>
 		public string Description { get; set; }
-	
-	/// <summary>
-	/// Display order index of the OptionSetValue.
-	/// </summary>
+		
+		/// <summary>
+		/// Display order index of the OptionSetValue.
+		/// </summary>
 		public int DisplayIndex { get; set; }
-	
-	/// <summary>
-	/// External value of the OptionSetValue.
-	/// </summary>
+		
+		/// <summary>
+		/// External value of the OptionSetValue.
+		/// </summary>
 		public string ExternalValue { get; set; }
-	
-	/// <summary>
-	/// Name of the OptionSetValue.
-	/// </summary>
+		
+		/// <summary>
+		/// Name of the OptionSetValue.
+		/// </summary>
 		public string Name { get; set; }
-	
-	/// <summary>
-	/// Initializes a new instance of the <see cref="OptionSetMetadataAttribute"/> class.
-	/// </summary>
-	/// <param name="name">Name of the value.</param>
-	/// <param name="displayIndex">Display order index of the value.</param>
-	/// <param name="color">Color of the value.</param>
-	/// <param name="description">Description of the value.</param>
-	/// <param name="externalValue">External value of the value.</param>
-	[System.Diagnostics.DebuggerNonUserCode()]
-	public OptionSetMetadataAttribute(string name, int displayIndex, string color = null, string description = null, string externalValue = null)
-	{
-		this.Color = color;
-		this.Description = description;
-		this.ExternalValue = externalValue;
-		this.DisplayIndex = displayIndex;
-		this.Name = name;
+		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="OptionSetMetadataAttribute"/> class.
+		/// </summary>
+		/// <param name="name">Name of the value.</param>
+		/// <param name="displayIndex">Display order index of the value.</param>
+		/// <param name="color">Color of the value.</param>
+		/// <param name="description">Description of the value.</param>
+		/// <param name="externalValue">External value of the value.</param>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public OptionSetMetadataAttribute(string name, int displayIndex, string color = null, string description = null, string externalValue = null)
+		{
+			this.Color = color;
+			this.Description = description;
+			this.ExternalValue = externalValue;
+			this.DisplayIndex = displayIndex;
+			this.Name = name;
+		}
 	}
-}
-
-/// <summary>
-/// Extension class to handle retrieving of OptionSetMetadataAttribute.
-/// </summary>
-public static class OptionSetExtension
-{
 	
 	/// <summary>
-	/// Returns the OptionSetMetadataAttribute for the given enum value
+	/// Extension class to handle retrieving of OptionSetMetadataAttribute.
 	/// </summary>
-	/// <typeparam name="T">OptionSet Enum Type</typeparam>
-	/// <param name="value">Enum Value with OptionSetMetadataAttribute</param>
-	[System.Diagnostics.DebuggerNonUserCode()]
-	public static OptionSetMetadataAttribute GetMetadata<T>(this T value)
-		where T :  struct, System.IConvertible
+	public static class OptionSetExtension
 	{
-		System.Type enumType = typeof(T);
-		if (!enumType.IsEnum)
+		
+		/// <summary>
+		/// Returns the OptionSetMetadataAttribute for the given enum value
+		/// </summary>
+		/// <typeparam name="T">OptionSet Enum Type</typeparam>
+		/// <param name="value">Enum Value with OptionSetMetadataAttribute</param>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public static OptionSetMetadataAttribute GetMetadata<T>(this T value)
+			where T :  struct, System.IConvertible
 		{
-			throw new System.ArgumentException("T must be an enum!");
-		}
-		System.Reflection.MemberInfo[] members = enumType.GetMember(value.ToString());
-		for (int i = 0; (i < members.Length); i++
-		)
-		{
-			System.Attribute attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(members[i], typeof(OptionSetMetadataAttribute));
-			if (attribute != null)
+			System.Type enumType = typeof(T);
+			if (!enumType.IsEnum)
 			{
-				return ((OptionSetMetadataAttribute)(attribute));
+				throw new System.ArgumentException("T must be an enum!");
 			}
+			System.Reflection.MemberInfo[] members = enumType.GetMember(value.ToString());
+			for (int i = 0; (i < members.Length); i++
+			)
+			{
+				System.Attribute attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(members[i], typeof(OptionSetMetadataAttribute));
+				if (attribute != null)
+				{
+					return ((OptionSetMetadataAttribute)(attribute));
+				}
+			}
+			throw new System.ArgumentException("T must be an enum adorned with an OptionSetMetadataAttribute!");
 		}
-		throw new System.ArgumentException("T must be an enum adorned with an OptionSetMetadataAttribute!");
 	}
 }

@@ -42,3 +42,20 @@ variable "api_memory" {
 variable "api_disk_quota" {
   default = "1024"
 }
+
+variable "logging_service_name" {
+  type = string
+}
+
+variable "postgres_database_name" {
+  type = string
+}
+
+variable "postgres_database_service_plan" {
+  type    = string
+  default = "small-13"
+}
+
+variable "migrations_file" {
+  type = string
+}

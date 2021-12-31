@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Xrm.Sdk.Query;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace DqtApi.Models
 {
     public class GetTeacherRequest
     {
+        [FromRoute(Name = "trn")]
         public string TRN { get; set; }
-        public DateTime BirthDate { get; set; }
+
+        [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true), SwaggerSchema(Format = "date"), ModelBinder(typeof(ModelBinders.DateTimeReverseOrderBinder))]
+        public DateTime? BirthDate { get; set; }
+
+        [FromQuery(Name = "nino")]
         public string NationalInsuranceNumber { get; set; }
 
         public QueryExpression GenerateQuery()

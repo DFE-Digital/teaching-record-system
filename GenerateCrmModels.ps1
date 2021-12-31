@@ -27,17 +27,34 @@ $connectionString = "AuthType=ClientSecret;url=${crmUrl};ClientId=${crmClientId}
 
 $coreToolsFolder = (Join-Path $PSScriptRoot tools coretools)
 
-Copy-Item (Join-Path $PSScriptRoot tools DqtApi.CrmSvcUtilFilter filter.xml) (Join-Path $coreToolsFolder filter.xml)
-
 $namespace = "DqtApi.Models"
-$output = Join-Path -Path $PSScriptRoot -ChildPath src DqtApi Models GeneratedCode.cs
-mkdir (Split-Path $output) -Force | Out-Null
+$entitiesOutput = Join-Path -Path $PSScriptRoot -ChildPath src DqtApi Models GeneratedCode.cs
+mkdir (Split-Path $entitiesOutput) -Force | Out-Null
 
+# entities
 $crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"
 & $crmSvcUtil `
     /connectionstring:${connectionString} `
-    /out:${output} `
+    /out:${entitiesOutput} `
     /namespace:${namespace} `
     /emitfieldsclasses `
-    /servicecontextname:DqtServiceContext `
-    /codewriterfilter:DqtApi.CrmSvcUtilFilter.CodeWriterFilter,DqtApi.CrmSvcUtilFilter
+    /SuppressGeneratedCodeAttribute `
+    /codecustomization:"DLaB.CrmSvcUtilExtensions.Entity.CustomizeCodeDomService,DLaB.CrmSvcUtilExtensions" `
+    /codegenerationservice:"DLaB.CrmSvcUtilExtensions.Entity.CustomCodeGenerationService,DLaB.CrmSvcUtilExtensions" `
+    /codewriterfilter:"DLaB.CrmSvcUtilExtensions.Entity.CodeWriterFilterService,DLaB.CrmSvcUtilExtensions" `
+    /namingservice:"DLaB.CrmSvcUtilExtensions.NamingService,DLaB.CrmSvcUtilExtensions" `
+    /metadataproviderservice:"DLaB.CrmSvcUtilExtensions.Entity.MetadataProviderService,DLaB.CrmSvcUtilExtensions"
+
+# option sets
+$optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath src DqtApi Models GeneratedOptionSets.cs
+$crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"
+& $crmSvcUtil `
+    /connectionstring:${connectionString} `
+    /out:${optionSetsOutput} `
+    /namespace:${namespace} `
+    /SuppressGeneratedCodeAttribute `
+    /codecustomization:"DLaB.CrmSvcUtilExtensions.OptionSet.CustomizeCodeDomService,DLaB.CrmSvcUtilExtensions" `
+    /codegenerationservice:"DLaB.CrmSvcUtilExtensions.OptionSet.CustomCodeGenerationService,DLaB.CrmSvcUtilExtensions" `
+    /codewriterfilter:"DLaB.CrmSvcUtilExtensions.OptionSet.CodeWriterFilterService,DLaB.CrmSvcUtilExtensions" `
+    /namingservice:"DLaB.CrmSvcUtilExtensions.NamingService,DLaB.CrmSvcUtilExtensions" `
+    /metadataproviderservice:"DLaB.CrmSvcUtilExtensions.BaseMetadataProviderService,DLaB.CrmSvcUtilExtensions" 
