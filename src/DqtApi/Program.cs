@@ -160,6 +160,7 @@ namespace DqtApi
                 var serializerOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions;
                 return new Swagger.JsonSerializerDataContractResolver(serializerOptions);
             });
+            services.AddSingleton<IClock, Clock>();
 
             services.AddDbContext<DqtContext>(options =>
             {
