@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.ServiceModel;
 using System.Threading.Tasks;
 using DqtApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -74,20 +75,33 @@ namespace DqtApi.DAL
             return result.Entities.Select(entity => entity.ToEntity<dfeta_qualification>());
         }
 
-        public async Task<Contact> GetTeacherAsync(Guid teacherId)
+        public async Task<Contact> GetTeacherAsync(Guid teacherId, bool resolveMerges = true, params string[] columnNames)
         {
-            var filter = new FilterExpression();
-            filter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, teacherId);
+            var columnSet = new ColumnSet(
+                columnNames
+                    .Append(Contact.Fields.Merged)
+                    .Append(Contact.Fields.MasterId)
+                    .Distinct()
+                    .ToArray());
 
-            var query = new QueryExpression(Contact.EntityLogicalName)
+            Contact teacher;
+
+            try
             {
-                ColumnSet = new ColumnSet { AllColumns = true },
-                Criteria = filter
-            };
+                teacher = (await _service.RetrieveAsync(Contact.EntityLogicalName, teacherId, columnSet)).ToEntity<Contact>();
+            }
+            catch (FaultException<OrganizationServiceFault> fault) when (fault.Message.Contains($"{teacherId} Does Not Exist"))
+            {
+                return null;
+            }
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            while (resolveMerges && teacher.Merged == true)
+            {
+                var masterReference = teacher.MasterId;
+                return await GetTeacherAsync(masterReference.Id, resolveMerges);
+            }
 
-            return result.Entities.FirstOrDefault()?.ToEntity<Contact>();
+            return teacher;
         }
 
         public async Task<bool> UnlockTeacherRecordAsync(Guid teacherId)

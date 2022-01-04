@@ -13,7 +13,7 @@ namespace DqtApi.DAL
 
         Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId);
 
-        Task<Contact> GetTeacherAsync(Guid teacherId);
+        Task<Contact> GetTeacherAsync(Guid teacherId, bool resolveMerges = true, params string[] columnNames);
 
         Task<bool> UnlockTeacherRecordAsync(Guid teacherId);
     }
