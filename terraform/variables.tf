@@ -59,3 +59,7 @@ variable "postgres_database_service_plan" {
 variable "migrations_file" {
   type = string
 }
+
+variable "statuscake_alerts" {
+  type = map(any)
+}
