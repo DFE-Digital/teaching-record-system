@@ -3,4 +3,8 @@
     <LangVersion>10.0</LangVersion>
     <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="System.Threading.Tasks.Task" Alias="Task" />
+  </ItemGroup>
 </Project>
