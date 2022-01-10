@@ -16,7 +16,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="0.5.10" />
+    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="0.5.17" />
     <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" Version="0.5.17" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.2" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="5.0.2" />
