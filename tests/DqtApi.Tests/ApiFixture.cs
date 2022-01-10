@@ -29,7 +29,9 @@ namespace DqtApi.Tests
         {
             builder.UseEnvironment("Testing");
 
-            builder.ConfigureAppConfiguration(config => config.AddUserSecrets<ApiFixture>(optional: true));
+            // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
+            // i.e. Program.cs and that has a dependency on IConfiguration
+            builder.UseConfiguration(GetTestConfiguration());
 
             builder.ConfigureServices(services =>
             {
@@ -48,5 +50,8 @@ namespace DqtApi.Tests
         }
 
         Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+
+        private static IConfiguration GetTestConfiguration() =>
+            new ConfigurationBuilder().AddUserSecrets<ApiFixture>(optional: true).Build();
     }
 }
