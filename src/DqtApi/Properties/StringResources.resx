@@ -120,6 +120,12 @@
   <data name="ErrorMessages.InvalidBirthDate" xml:space="preserve">
     <value>Birth date must be in format yyyy-MM-dd</value>
   </data>
+  <data name="ErrorMessages.RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes" xml:space="preserve">
+    <value>requestId can only contain characters a-z, digits, underscores and dashes.</value>
+  </data>
+  <data name="ErrorMessages.RequestIdMustBe100CharactersOrFewer" xml:space="preserve">
+    <value>requestId must be 100 characters or fewer</value>
+  </data>
   <data name="ErrorMessages.TRNMustBe7Digits" xml:space="preserve">
     <value>TRN must consist of 7 digits</value>
   </data>

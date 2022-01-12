@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using DqtApi.DataStore.Crm;
+﻿using DqtApi.DataStore.Crm;
 using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration

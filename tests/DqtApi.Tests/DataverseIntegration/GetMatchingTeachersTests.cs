@@ -14,7 +14,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public GetMatchingTeachersTests(GetMatchingTeachersFixture fixture)
         {
             _fixture = fixture;
-            _dataverseAdapter = new DataverseAdapter(_fixture.Service);
+            _dataverseAdapter = new DataverseAdapter(_fixture.Service, new TestableClock());
         }
 
         [Fact]

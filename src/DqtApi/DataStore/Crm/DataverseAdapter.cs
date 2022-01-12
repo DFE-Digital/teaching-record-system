@@ -12,13 +12,59 @@ using Microsoft.Xrm.Sdk.Query;
 
 namespace DqtApi.DataStore.Crm
 {
-    public class DataverseAdapter : IDataverseAdapter
+    public partial class DataverseAdapter : IDataverseAdapter
     {
         private readonly IOrganizationServiceAsync _service;
+        private readonly IClock _clock;
 
-        public DataverseAdapter(IOrganizationServiceAsync organizationServiceAsync)
+        public DataverseAdapter(
+            IOrganizationServiceAsync organizationServiceAsync,
+            IClock clock)
         {
             _service = organizationServiceAsync;
+            _clock = clock;
+        }
+
+        public async Task<dfeta_country> GetCountry(string value)
+        {
+            var query = new QueryByAttribute(dfeta_country.EntityLogicalName)
+            {
+                ColumnSet = new() { AllColumns = true }
+            };
+
+            query.AddAttributeValue(dfeta_country.Fields.dfeta_Value, value);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<dfeta_country>()).FirstOrDefault();
+        }
+
+        public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value)
+        {
+            var query = new QueryByAttribute(dfeta_earlyyearsstatus.EntityLogicalName)
+            {
+                ColumnSet = new() { AllColumns = true }
+            };
+
+            query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.dfeta_Value, value);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<dfeta_earlyyearsstatus>()).FirstOrDefault();
+        }
+
+        public async Task<dfeta_hesubject> GetHeSubjectByName(string name)
+        {
+            var query = new QueryByAttribute(dfeta_hesubject.EntityLogicalName)
+            {
+                ColumnSet = new() { AllColumns = true }
+            };
+
+            query.AddAttributeValue(dfeta_hesubject.Fields.dfeta_name, name);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<dfeta_hesubject>()).FirstOrDefault();
         }
 
         public async Task<IEnumerable<Account>> GetIttProviders()
@@ -45,6 +91,20 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(entity => entity.ToEntity<Account>());
         }
 
+        public async Task<dfeta_ittsubject> GetIttSubjectByName(string name)
+        {
+            var query = new QueryByAttribute(dfeta_ittsubject.EntityLogicalName)
+            {
+                ColumnSet = new() { AllColumns = true }
+            };
+
+            query.AddAttributeValue(dfeta_ittsubject.Fields.dfeta_name, name);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<dfeta_ittsubject>()).FirstOrDefault();
+        }
+
         public async Task<IEnumerable<Contact>> GetMatchingTeachersAsync(GetTeacherRequest request)
         {
             var query = request.GenerateQuery();
@@ -56,6 +116,20 @@ namespace DqtApi.DataStore.Crm
             var result = await _service.RetrieveMultipleAsync(query);
 
             return result.Entities.Select(entity => entity.ToEntity<Contact>());
+        }
+
+        public async Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames)
+        {
+            var query = new QueryByAttribute(Account.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames)
+            };
+
+            query.AddAttributeValue(Account.Fields.dfeta_UKPRN, ukprn);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
         }
 
         public async Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId)
@@ -102,6 +176,20 @@ namespace DqtApi.DataStore.Crm
             }
 
             return teacher;
+        }
+
+        public async Task<dfeta_teacherstatus> GetTeacherStatus(string value)
+        {
+            var query = new QueryByAttribute(dfeta_teacherstatus.EntityLogicalName)
+            {
+                ColumnSet = new() { AllColumns = true }
+            };
+
+            query.AddAttributeValue(dfeta_teacherstatus.Fields.dfeta_Value, value);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<dfeta_teacherstatus>()).FirstOrDefault();
         }
 
         public async Task<bool> UnlockTeacherRecordAsync(Guid teacherId)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.Crm.Sdk.Messages;
@@ -19,15 +18,35 @@ namespace DqtApi.Tests.DataverseIntegration
         public CrmClientFixture()
         {
             _createdEntities = new();
+            Clock = new();
             Configuration = GetConfiguration();
             ServiceClient = GetCrmServiceClient();
         }
+
+        public TestableClock Clock { get; }
 
         public IConfiguration Configuration { get; }
 
         public ServiceClient ServiceClient { get; }
 
-        public DataverseAdapter CreateDataverseAdapter() => new(ServiceClient);
+        public async Task CleanupEntities()
+        {
+            await Task.WhenAll(_createdEntities.Select(e =>
+            {
+                var deactivateRequest = new SetStateRequest()
+                {
+                    EntityMoniker = new EntityReference(e.EntityName, e.EntityId),
+                    State = new OptionSetValue((int)ContactState.Inactive),
+                    Status = new OptionSetValue(2)
+                };
+
+                return ServiceClient.ExecuteAsync(deactivateRequest);
+            }));
+
+            _createdEntities.Clear();
+        }
+
+        public DataverseAdapter CreateDataverseAdapter() => new(ServiceClient, Clock);
 
         public Task InitializeAsync() => Task.CompletedTask;
 
@@ -36,30 +55,20 @@ namespace DqtApi.Tests.DataverseIntegration
             ServiceClient.Dispose();
         }
 
-        public Task DisposeAsync() => Task.WhenAll(_createdEntities.Select(e =>
-        {
-            var deactivateRequest = new SetStateRequest()
-            {
-                EntityMoniker = new EntityReference(e.EntityName, e.EntityId),
-                State = new OptionSetValue((int)ContactState.Inactive),
-                Status = new OptionSetValue(2)
-            };
-
-            return ServiceClient.ExecuteAsync(deactivateRequest);
-        }));
+        public Task DisposeAsync() => CleanupEntities();
 
         public void RegisterForCleanup(Entity entity)
         {
-            if (entity.Id == Guid.Empty)
-            {
-                throw new ArgumentException("Entity ID is not set.", nameof(entity));
-            }
-
             _createdEntities.Add((entity.LogicalName, entity.Id));
         }
 
         public void RegisterForCleanup(string entityName, Guid entityId)
         {
+            if (entityId == Guid.Empty)
+            {
+                return;
+            }
+
             _createdEntities.Add((entityName, entityId));
         }
 

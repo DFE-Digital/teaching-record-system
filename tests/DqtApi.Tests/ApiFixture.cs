@@ -39,6 +39,7 @@ namespace DqtApi.Tests
                 services.AddMvc().AddApplicationPart(typeof(ApiFixture).Assembly);
 
                 services.AddSingleton(DataverseAdapter.Object);
+                services.AddSingleton<IClock, TestableClock>();
 
                 services.AddSingleton(sp =>
                 {

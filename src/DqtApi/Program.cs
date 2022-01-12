@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
 using DqtApi.Configuration;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Sql;
@@ -93,8 +92,7 @@ namespace DqtApi
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                    options.JsonSerializerOptions.Converters.Add(new DateOnlyConverter());
+                    options.JsonSerializerOptions.AddConverters();
                 });
 
             services.Decorate<Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory, CamelCaseErrorKeysProblemDetailsFactory>();
@@ -160,6 +158,7 @@ namespace DqtApi
                 var serializerOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions;
                 return new Swagger.JsonSerializerDataContractResolver(serializerOptions);
             });
+            services.AddSingleton<IClock, Clock>();
 
             services.AddDbContext<DqtContext>(options =>
             {

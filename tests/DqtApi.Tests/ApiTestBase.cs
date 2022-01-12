@@ -24,7 +24,15 @@ namespace DqtApi.Tests
 
         public string ClientId { get; } = "tests";
 
+        public TestableClock Clock => (TestableClock)ApiFixture.Services.GetRequiredService<IClock>();
+
         public HttpClient HttpClient { get; }
+
+        public DateTime UtcNow
+        {
+            get => Clock.UtcNow;
+            set => Clock.UtcNow = value;
+        }
 
         public virtual void Dispose()
         {

@@ -70,6 +70,24 @@ namespace DqtApi.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to requestId can only contain characters a-z, digits, underscores and dashes..
+        /// </summary>
+        public static string ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes {
+            get {
+                return ResourceManager.GetString("ErrorMessages.RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to requestId must be 100 characters or fewer.
+        /// </summary>
+        public static string ErrorMessages_RequestIdMustBe100CharactersOrFewer {
+            get {
+                return ResourceManager.GetString("ErrorMessages.RequestIdMustBe100CharactersOrFewer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to TRN must consist of 7 digits.
         /// </summary>
         public static string ErrorMessages_TRNMustBe7Digits {
