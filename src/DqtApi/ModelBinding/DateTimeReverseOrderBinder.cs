@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace DqtApi.ModelBinders
+namespace DqtApi.ModelBinding
 {
     public class DateTimeReverseOrderBinder : IModelBinder
     {       
@@ -31,7 +31,7 @@ namespace DqtApi.ModelBinders
                 return Task.CompletedTask;
             }
 
-            if (!DateTime.TryParseExact(value, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out DateTime result))
+            if (!DateTime.TryParseExact(value, Constants.DateFormat, null, System.Globalization.DateTimeStyles.None, out DateTime result))
             {
                 bindingContext.ModelState.TryAddModelError(modelName, Properties.StringResources.ErrorMessages_InvalidBirthDate);
 
