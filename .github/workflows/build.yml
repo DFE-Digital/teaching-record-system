@@ -171,6 +171,31 @@ jobs:
         terraform_vars: dev.tfvars.json
         terraform_backend_vars: dev.backend.tfvars
 
+  sync_api_specs:
+    name: Sync API specs
+    needs: deploy_dev
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Checkout PR
+      run: gh pr checkout ${{ github.event.pull_request.number }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - uses: fregante/setup-git-user@v1
+
+    - name: Generate specs
+      shell: pwsh
+      run: ./Sync-ApiSpecs.ps1 ${{ needs.deploy_dev.outputs.environment_url }}
+
+    - name: Commit specs
+      run: |
+        git add docs/api-specs
+        git diff --cached --quiet docs/api-specs || (git commit -m "Sync API specs" && git push)
+
   zap_scan:
     name: OWASP ZAP API scan
     needs: deploy_dev

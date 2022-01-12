@@ -6,6 +6,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+$BaseUrl = $BaseUrl.TrimEnd("/")
+
 $versions = @("v1", "v2")
 $output = Join-Path $PSScriptRoot "docs" "api-specs"
 
