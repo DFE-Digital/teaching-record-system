@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using DqtApi.DAL;
 using DqtApi.DataStore.Sql;
+using DqtApi.Models;
 using DqtApi.Security;
 using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
@@ -42,7 +43,7 @@ namespace DqtApi.V2.Handlers
 
             if (trnRequest.TeacherId.HasValue)
             {
-                var teacher = await _dataverseAdaptor.GetTeacherAsync(trnRequest.TeacherId.Value);
+                var teacher = await _dataverseAdaptor.GetTeacherAsync(trnRequest.TeacherId.Value, columnNames: Contact.Fields.dfeta_TRN);
                 trn = teacher.dfeta_TRN;
             }
 

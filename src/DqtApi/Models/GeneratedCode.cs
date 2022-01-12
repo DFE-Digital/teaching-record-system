@@ -387,6 +387,8 @@ namespace DqtApi.Models
 			public const string dfeta_TRN = "dfeta_trn";
 			public const string dfeta_trnrequired = "dfeta_trnrequired";
 			public const string FullName = "fullname";
+			public const string MasterId = "masterid";
+			public const string Merged = "merged";
 			public const string StateCode = "statecode";
 			public const string account_primary_contact = "account_primary_contact";
 			public const string Referencedcontact_customer_contacts = "Referencedcontact_customer_contacts";
@@ -586,6 +588,46 @@ namespace DqtApi.Models
 				this.OnPropertyChanging("FullName");
 				this.SetAttributeValue("fullname", value);
 				this.OnPropertyChanged("FullName");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the master contact for merge.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("masterid")]
+		public Microsoft.Xrm.Sdk.EntityReference MasterId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("masterid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("MasterId");
+				this.SetAttributeValue("masterid", value);
+				this.OnPropertyChanged("MasterId");
+			}
+		}
+		
+		/// <summary>
+		/// Shows whether the account has been merged with a master contact.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("merged")]
+		public System.Nullable<bool> Merged
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("merged");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Merged");
+				this.SetAttributeValue("merged", value);
+				this.OnPropertyChanged("Merged");
 			}
 		}
 		
