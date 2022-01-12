@@ -32,4 +32,8 @@
     <ProjectReference Include="..\DqtApi.TestCommon\DqtApi.TestCommon.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="DqtApi.DataStore.Crm.Models.Task" Alias="CrmTask" />
+  </ItemGroup>
+
 </Project>

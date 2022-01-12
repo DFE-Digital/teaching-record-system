@@ -1,4 +1,5 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
+﻿using System.Text.Json.Serialization;
+using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace DqtApi.V2.Responses
@@ -11,6 +12,9 @@ namespace DqtApi.V2.Responses
         public TrnRequestStatus Status { get; set; }
 
         public string Trn { get; set; }
+
+        [JsonIgnore]
+        public bool WasCreated { get; set; }
     }
 
     public class TrnRequestInfoExample : IExamplesProvider<TrnRequestInfo>

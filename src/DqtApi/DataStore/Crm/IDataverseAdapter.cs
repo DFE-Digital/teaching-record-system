@@ -7,6 +7,8 @@ namespace DqtApi.DataStore.Crm
 {
     public interface IDataverseAdapter
     {
+        Task<CreateTeacherResult> CreateTeacher(CreateTeacherCommand command);
+
         Task<IEnumerable<Account>> GetIttProviders();
 
         Task<IEnumerable<Contact>> GetMatchingTeachersAsync(GetTeacherRequest request);

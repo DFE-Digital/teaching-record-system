@@ -28,5 +28,17 @@ namespace DqtApi.V2.Controllers
             var response = await _mediator.Send(request);
             return response != null ? Ok(response) : NotFound();
         }
+
+        [HttpPut("{requestId}")]
+        [SwaggerOperation(summary: "Creates a request for a TRN")]
+        [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetOrCreateTrnRequest([FromBody] GetOrCreateTrnRequest request)
+        {
+            var response = await _mediator.Send(request);
+            var statusCode = response.WasCreated ? StatusCodes.Status201Created : StatusCodes.Status200OK;
+            return StatusCode(statusCode, response);
+        }
     }
 }
