@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql.Models;
 using DqtApi.TestCommon;
 using Microsoft.AspNetCore.Http;
@@ -96,9 +97,9 @@ namespace DqtApi.Tests.V2.Operations
             var teacherId = Guid.NewGuid();
             var trn = "1234567";
 
-            ApiFixture.DataverseAdaptor
+            ApiFixture.DataverseAdapter
                 .Setup(mock => mock.GetTeacherAsync(teacherId, /* resolveMerges: */ true, It.IsAny<string[]>()))
-                .ReturnsAsync(new Models.Contact()
+                .ReturnsAsync(new Contact()
                 {
                     Id = teacherId,
                     dfeta_TRN = trn

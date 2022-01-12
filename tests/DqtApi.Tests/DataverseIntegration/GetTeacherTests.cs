@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DqtApi.DAL;
-using DqtApi.Models;
+using DqtApi.DataStore.Crm;
+using DqtApi.DataStore.Crm.Models;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
@@ -13,13 +13,13 @@ namespace DqtApi.Tests.DataverseIntegration
     public class GetTeacherTests : IClassFixture<CrmClientFixture>
     {
         private readonly CrmClientFixture _crmClientFixture;
-        private readonly DataverseAdaptor _dataverseAdaptor;
+        private readonly DataverseAdapter _dataverseAdapter;
         private readonly ServiceClient _serviceClient;
 
         public GetTeacherTests(CrmClientFixture crmClientFixture)
         {
             _crmClientFixture = crmClientFixture;
-            _dataverseAdaptor = crmClientFixture.CreateDataverseAdaptor();
+            _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
             _serviceClient = crmClientFixture.ServiceClient;
         }
 
@@ -30,7 +30,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var teacherId = Guid.NewGuid();
 
             // Act
-            var result = await _dataverseAdaptor.GetTeacherAsync(teacherId, resolveMerges: false, Contact.Fields.StateCode);
+            var result = await _dataverseAdapter.GetTeacherAsync(teacherId, resolveMerges: false, Contact.Fields.StateCode);
 
             // Assert
             Assert.Null(result);
@@ -44,7 +44,7 @@ namespace DqtApi.Tests.DataverseIntegration
             _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, teacherId);
 
             // Act
-            var result = await _dataverseAdaptor.GetTeacherAsync(teacherId, resolveMerges: false, Contact.Fields.StateCode);
+            var result = await _dataverseAdapter.GetTeacherAsync(teacherId, resolveMerges: false, Contact.Fields.StateCode);
 
             // Assert
             Assert.NotNull(result);
@@ -70,7 +70,7 @@ namespace DqtApi.Tests.DataverseIntegration
             _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, teacherId);
 
             // Act
-            var result = await _dataverseAdaptor.GetTeacherAsync(teacherId, resolveMerges: true, Contact.Fields.StateCode);
+            var result = await _dataverseAdapter.GetTeacherAsync(teacherId, resolveMerges: true, Contact.Fields.StateCode);
 
             // Assert
             Assert.NotNull(result);
@@ -96,7 +96,7 @@ namespace DqtApi.Tests.DataverseIntegration
             _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, teacherId);
 
             // Act
-            var result = await _dataverseAdaptor.GetTeacherAsync(teacherId, resolveMerges: false, Contact.Fields.StateCode);
+            var result = await _dataverseAdapter.GetTeacherAsync(teacherId, resolveMerges: false, Contact.Fields.StateCode);
 
             // Assert
             Assert.NotNull(result);

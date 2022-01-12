@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Xrm.Sdk.Query;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace DqtApi.Models
+namespace DqtApi.DataStore.Crm.Models
 {
     public class GetTeacherRequest
     {

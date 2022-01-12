@@ -4,19 +4,19 @@ using System.Linq;
 using System.Net;
 using System.ServiceModel;
 using System.Threading.Tasks;
-using DqtApi.Models;
+using DqtApi.DataStore.Crm.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.PowerPlatform.Dataverse.Client.Utils;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace DqtApi.DAL
+namespace DqtApi.DataStore.Crm
 {
-    public class DataverseAdaptor : IDataverseAdaptor
+    public class DataverseAdapter : IDataverseAdapter
     {
         private readonly IOrganizationServiceAsync _service;
 
-        public DataverseAdaptor(IOrganizationServiceAsync organizationServiceAsync)
+        public DataverseAdapter(IOrganizationServiceAsync organizationServiceAsync)
         {
             _service = organizationServiceAsync;
         }

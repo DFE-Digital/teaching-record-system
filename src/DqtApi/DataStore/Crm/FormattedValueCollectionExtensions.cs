@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 
-namespace DqtApi.DAL
+namespace DqtApi.DataStore.Crm
 {
     internal static class FormattedValueCollectionExtensions
     {

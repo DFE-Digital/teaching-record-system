@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
-using DqtApi.DAL;
-using DqtApi.Models;
+using DqtApi.DataStore.Crm;
+using DqtApi.DataStore.Crm.Models;
 using DqtApi.V1.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +13,11 @@ namespace DqtApi.V1.Controllers
     [Route("teachers")]
     public class TeachersController : ControllerBase
     {
-        private readonly IDataverseAdaptor _dataverseAdaptor;
+        private readonly IDataverseAdapter _dataverseAdapter;
 
-        public TeachersController(IDataverseAdaptor dataverseAdaptor)
+        public TeachersController(IDataverseAdapter dataverseAdapter)
         {
-            _dataverseAdaptor = dataverseAdaptor;
+            _dataverseAdapter = dataverseAdapter;
         }
 
         [HttpGet("{trn}")]
@@ -34,7 +34,7 @@ namespace DqtApi.V1.Controllers
                 return NotFound();
             }
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             var teacher = request.SelectMatch(matchingTeachers);
 
@@ -44,7 +44,7 @@ namespace DqtApi.V1.Controllers
             }
             else
             {
-                var qualifications = await _dataverseAdaptor.GetQualificationsAsync(teacher.Id);
+                var qualifications = await _dataverseAdapter.GetQualificationsAsync(teacher.Id);
 
                 if (qualifications.Any())
                 {

@@ -9,7 +9,7 @@
 
 //------------------------------------------------------------------------------
 
-namespace DqtApi.Models
+namespace DqtApi.DataStore.Crm.Models
 {
 	
 	

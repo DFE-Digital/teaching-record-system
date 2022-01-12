@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using DqtApi.DAL;
+using DqtApi.DataStore.Crm;
 using Xunit;
 using static DqtApi.Tests.DataverseIntegration.GetMatchingTeachersFixture.MatchFixture;
 
@@ -9,12 +9,12 @@ namespace DqtApi.Tests.DataverseIntegration
     public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture>
     {
         private readonly GetMatchingTeachersFixture _fixture;
-        private readonly IDataverseAdaptor _dataverseAdaptor;
+        private readonly IDataverseAdapter _dataverseAdapter;
 
         public GetMatchingTeachersTests(GetMatchingTeachersFixture fixture)
         {
             _fixture = fixture;
-            _dataverseAdaptor = new DataverseAdaptor(_fixture.Service);
+            _dataverseAdapter = new DataverseAdapter(_fixture.Service);
         }
 
         [Fact]
@@ -22,7 +22,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(One, true);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Single(matchingTeachers);
 
@@ -34,7 +34,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(None, true);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Empty(matchingTeachers);
         }
@@ -44,7 +44,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(One, false);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Empty(matchingTeachers);
         }
@@ -54,7 +54,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(None, false);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Empty(matchingTeachers);
         }
@@ -64,7 +64,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(One, true, One);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Single(matchingTeachers);
 
@@ -76,7 +76,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(One, true, Two);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Collection(matchingTeachers,
                 firstTeacher => _fixture.AssertMatchesFixture(firstTeacher, 0),
@@ -89,7 +89,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(None, true, One);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Single(matchingTeachers);
 
@@ -101,7 +101,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(One, true, None);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Single(matchingTeachers);
 
@@ -113,7 +113,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(None, false, One);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Empty(matchingTeachers);
         }
@@ -123,7 +123,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(One, false, None);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Empty(matchingTeachers);
         }
@@ -133,7 +133,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var request = _fixture.GetRequest(One, false, One);
 
-            var matchingTeachers = await _dataverseAdaptor.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
 
             Assert.Empty(matchingTeachers);
         }
