@@ -159,6 +159,7 @@ namespace DqtApi
                 return new Swagger.JsonSerializerDataContractResolver(serializerOptions);
             });
             services.AddSingleton<IClock, Clock>();
+            services.AddMemoryCache();
 
             services.AddDbContext<DqtContext>(options =>
             {
