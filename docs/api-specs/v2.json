@@ -1,0 +1,465 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "DQT API",
+    "version": "v2"
+  },
+  "paths": {
+    "/v2/itt-providers": {
+      "get": {
+        "tags": [
+          "IttProviders"
+        ],
+        "summary": "Gets a list of all ITT Providers",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetIttProvidersResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/trn-requests/{requestId}": {
+      "get": {
+        "tags": [
+          "TrnRequests"
+        ],
+        "summary": "Retrieves a TRN request",
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "description": "The unique ID the TRN request was created with.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrnRequestInfo"
+                },
+                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567"}
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "TrnRequests"
+        ],
+        "summary": "Creates a request for a TRN",
+        "parameters": [
+          {
+            "name": "requestId",
+            "in": "path",
+            "description": "A unique ID that represents this request. If a request has already been created with this ID then that existing record's result is returned.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetOrCreateTrnRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetOrCreateTrnRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetOrCreateTrnRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrnRequestInfo"
+                },
+                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567"}
+              }
+            }
+          },
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrnRequestInfo"
+                },
+                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567"}
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/unlock-teacher/{teacherId}": {
+      "put": {
+        "tags": [
+          "UnlockTeacher"
+        ],
+        "description": "Unlocks the teacher record allowing the teacher to sign in to the portals",
+        "parameters": [
+          {
+            "name": "teacherId",
+            "in": "path",
+            "description": "The ID of the teacher record to unlock",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ClassDivision": {
+        "enum": [
+          "FirstClassHonours",
+          "UpperSecondClassHonours",
+          "LowerSecondClassHonours",
+          "UndividedSecondClassHonours",
+          "ThirdClassHonours",
+          "FourthClassHonours",
+          "UnclassifiedHonours",
+          "Aegrotat",
+          "PassFollowingAnHonoursCourse",
+          "Ordinary",
+          "GeneralDegree",
+          "Distinction",
+          "Merit",
+          "Pass",
+          "Notapplicable",
+          "NotKnown",
+          "HigherDegree"
+        ],
+        "type": "string"
+      },
+      "Gender": {
+        "enum": [
+          "Male",
+          "Female",
+          "Other"
+        ],
+        "type": "string"
+      },
+      "GetIttProvidersResponse": {
+        "type": "object",
+        "properties": {
+          "ittProviders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IttProviderInfo"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetOrCreateTrnRequest": {
+        "required": [
+          "birthDate",
+          "emailAddress",
+          "firstName",
+          "genderCode",
+          "initialTeacherTraining",
+          "lastName",
+          "middleName",
+          "qualification"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "middleName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "emailAddress": {
+            "type": "string"
+          },
+          "address": {
+            "$ref": "#/components/schemas/GetOrCreateTrnRequestAddress"
+          },
+          "genderCode": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "initialTeacherTraining": {
+            "$ref": "#/components/schemas/GetOrCreateTrnRequestInitialTeacherTraining"
+          },
+          "qualification": {
+            "$ref": "#/components/schemas/GetOrCreateTrnRequestQualification"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetOrCreateTrnRequestAddress": {
+        "type": "object",
+        "properties": {
+          "addressLine1": {
+            "type": "string",
+            "nullable": true
+          },
+          "addressLine2": {
+            "type": "string",
+            "nullable": true
+          },
+          "addressLine3": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "postalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetOrCreateTrnRequestInitialTeacherTraining": {
+        "required": [
+          "programmeEndDate",
+          "programmeStartDate",
+          "programmeType",
+          "providerUkprn",
+          "result",
+          "subject1",
+          "subject2"
+        ],
+        "type": "object",
+        "properties": {
+          "providerUkprn": {
+            "type": "string"
+          },
+          "programmeStartDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "programmeEndDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "programmeType": {
+            "$ref": "#/components/schemas/IttProgrammeType"
+          },
+          "subject1": {
+            "type": "string"
+          },
+          "subject2": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/IttResult"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetOrCreateTrnRequestQualification": {
+        "required": [
+          "class",
+          "countryCode",
+          "date",
+          "providerUkprn",
+          "subject"
+        ],
+        "type": "object",
+        "properties": {
+          "providerUkprn": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "class": {
+            "$ref": "#/components/schemas/ClassDivision"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IttProgrammeType": {
+        "enum": [
+          "Core",
+          "HEI",
+          "SchoolDirectTrainingProgrammeSelfFunded",
+          "SchoolDirectTrainingProgrammeSalaried",
+          "SchoolDirectTrainingProgramme",
+          "TeachFirstProgrammeCC",
+          "TeachFirstProgramme",
+          "OverseasTrainedTeacherProgramme",
+          "RegisteredTeacherProgramme",
+          "GraduateTeacherProgramme",
+          "AssessmentOnlyRoute",
+          "CoreFlexible",
+          "LicensedTeacherProgramme",
+          "UndergraduateOptIn",
+          "EYITTAssessmentOnly",
+          "EYITTGraduateEntry",
+          "EYITTGraduateEmploymentBased",
+          "EYITTUndergraduate",
+          "EYITTSchoolDirectEarlyYears",
+          "Apprenticeship",
+          "FutureTeachingScholars"
+        ],
+        "type": "string"
+      },
+      "IttProviderInfo": {
+        "type": "object",
+        "properties": {
+          "ukprn": {
+            "type": "string"
+          },
+          "providerName": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "IttResult": {
+        "enum": [
+          "Pass",
+          "Fail",
+          "Withdrawn",
+          "InTraining",
+          "Approved",
+          "Deferred",
+          "DeferredforSkillsTests",
+          "UnderAssessment",
+          "ApplicationReceived",
+          "ApplicationUnsuccessful",
+          "Info",
+          "NoResultSubmitted"
+        ],
+        "type": "string"
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "TrnRequestInfo": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TrnRequestStatus"
+          },
+          "trn": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TrnRequestStatus": {
+        "enum": [
+          "Pending",
+          "Completed"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "Bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}

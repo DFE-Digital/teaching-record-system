@@ -1,0 +1,339 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "DQT API",
+    "version": "v1"
+  },
+  "paths": {
+    "/v1/teachers/{trn}": {
+      "get": {
+        "tags": [
+          "Teachers"
+        ],
+        "summary": "Teacher",
+        "description": "Get an individual teacher by their TRN",
+        "parameters": [
+          {
+            "name": "trn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "birthdate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "nino",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTeacherResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ContactState": {
+        "enum": [
+          "Active",
+          "Inactive"
+        ],
+        "type": "string"
+      },
+      "GetTeacherResponse": {
+        "type": "object",
+        "properties": {
+          "trn": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "ni_number": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "qualified_teacher_status": {
+            "$ref": "#/components/schemas/QualifiedTeacherStatus"
+          },
+          "induction": {
+            "$ref": "#/components/schemas/Induction"
+          },
+          "initial_teacher_training": {
+            "$ref": "#/components/schemas/InitialTeacherTraining"
+          },
+          "qualifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Qualification"
+            },
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "dob": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          },
+          "active_alert": {
+            "type": "boolean",
+            "nullable": true,
+            "readOnly": true
+          },
+          "state": {
+            "$ref": "#/components/schemas/ContactState"
+          },
+          "state_name": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Induction": {
+        "type": "object",
+        "properties": {
+          "start_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          },
+          "completion_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "state": {
+            "$ref": "#/components/schemas/InductionState"
+          },
+          "state_name": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "InductionState": {
+        "enum": [
+          "Active",
+          "Inactive"
+        ],
+        "type": "string"
+      },
+      "InitialTeacherTraining": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/InitialteachertrainingState"
+          },
+          "state_code": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "programme_start_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          },
+          "programme_end_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          },
+          "programme_type": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "result": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "subject1": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "subject2": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "subject3": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "qualification": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "subject1_code": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "subject2_code": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "subject3_code": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "InitialteachertrainingState": {
+        "enum": [
+          "Active",
+          "Inactive"
+        ],
+        "type": "string"
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "QtsregistrationState": {
+        "enum": [
+          "Active",
+          "Inactive"
+        ],
+        "type": "string"
+      },
+      "Qualification": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "date_awarded": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "QualifiedTeacherStatus": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "state": {
+            "$ref": "#/components/schemas/QtsregistrationState"
+          },
+          "state_name": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "qts_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "Bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
