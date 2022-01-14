@@ -4,7 +4,9 @@ using System.Linq;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Xunit;
@@ -46,7 +48,7 @@ namespace DqtApi.Tests.DataverseIntegration
             _createdEntities.Clear();
         }
 
-        public DataverseAdapter CreateDataverseAdapter() => new(ServiceClient, Clock);
+        public DataverseAdapter CreateDataverseAdapter() => new(ServiceClient, Clock, new MemoryCache(Options.Create<MemoryCacheOptions>(new())));
 
         public Task InitializeAsync() => Task.CompletedTask;
 

@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using DqtApi.DataStore.Crm;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Xunit;
 using static DqtApi.Tests.DataverseIntegration.GetMatchingTeachersFixture.MatchFixture;
 
@@ -14,7 +16,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public GetMatchingTeachersTests(GetMatchingTeachersFixture fixture)
         {
             _fixture = fixture;
-            _dataverseAdapter = new DataverseAdapter(_fixture.Service, new TestableClock());
+            _dataverseAdapter = new DataverseAdapter(_fixture.Service, new TestableClock(), new MemoryCache(Options.Create<MemoryCacheOptions>(new())));
         }
 
         [Fact]

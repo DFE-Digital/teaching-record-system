@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm.Models;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
@@ -356,23 +357,64 @@ namespace DqtApi.DataStore.Crm
                 Debug.Assert(!string.IsNullOrEmpty(_command.Qualification.CountryCode));
                 Debug.Assert(!string.IsNullOrEmpty(_command.Qualification.Subject));
 
-                var getIttProviderTask = _dataverseAdapter.GetOrganizationByUkprn(_command.InitialTeacherTraining.ProviderUkprn);
-                var getIttCountryTask = _dataverseAdapter.GetCountry("XK");  // XK == 'United Kingdom'
-                var getSubject1Task = _dataverseAdapter.GetIttSubjectByName(_command.InitialTeacherTraining.Subject1);
-                var getSubject2Task = _dataverseAdapter.GetIttSubjectByName(_command.InitialTeacherTraining.Subject2);
-                var getQualificationProviderTask = _dataverseAdapter.GetOrganizationByUkprn(_command.Qualification.ProviderUkprn);
-                var getQualificationCountryTask = _dataverseAdapter.GetCountry(_command.Qualification.CountryCode);
-                var getQualificationSubjectTask = _dataverseAdapter.GetHeSubjectByName(_command.Qualification.Subject);
+                static TResult Let<T, TResult>(T value, Func<T, TResult> getResult) => getResult(value);
+
+                var getIttProviderTask = Let(
+                    _command.InitialTeacherTraining.ProviderUkprn,
+                    ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
+                        CacheKeys.GetOrganizationByUkprnKey(ukprn),
+                        _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn)));
+
+                var getIttCountryTask = Let(
+                    "XK",  // XK == 'United Kingdom'
+                    country => _dataverseAdapter._cache.GetOrCreateAsync(
+                        CacheKeys.GetCountryKey(country),
+                        _ => _dataverseAdapter.GetCountry(country)));
+
+                var getSubject1Task = Let(
+                    _command.InitialTeacherTraining.Subject1,
+                    subject => _dataverseAdapter._cache.GetOrCreateAsync(
+                        CacheKeys.GetIttSubjectKey(subject),
+                        _ => _dataverseAdapter.GetIttSubjectByName(subject)));
+
+                var getSubject2Task = Let(
+                    _command.InitialTeacherTraining.Subject2,
+                    subject => _dataverseAdapter._cache.GetOrCreateAsync(
+                        CacheKeys.GetIttSubjectKey(subject),
+                        _ => _dataverseAdapter.GetIttSubjectByName(subject)));
+
+                var getQualificationProviderTask = Let(
+                    _command.Qualification.ProviderUkprn,
+                    ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
+                        CacheKeys.GetOrganizationByUkprnKey(ukprn),
+                        _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn)));
+
+                var getQualificationCountryTask = Let(
+                    _command.Qualification.CountryCode,
+                    country => _dataverseAdapter._cache.GetOrCreateAsync(
+                        CacheKeys.GetCountryKey(country),
+                        _ => _dataverseAdapter.GetCountry(country)));
+
+                var getQualificationSubjectTask = Let(
+                    _command.Qualification.Subject,
+                    subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
+                        CacheKeys.GetHeSubjectKey(subjectName),
+                        _ => _dataverseAdapter.GetHeSubjectByName(subjectName)));
 
                 var getEarlyYearsStatusTask = IsEarlyYears ?
-                    _dataverseAdapter.GetEarlyYearsStatus("220") :  // 220 == 'Early Years Trainee'
+                    Let(
+                        "220", // 220 == 'Early Years Trainee'
+                        earlyYearsStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetEarlyYearsStatusKey(earlyYearsStatusId),
+                            _ => _dataverseAdapter.GetEarlyYearsStatus(earlyYearsStatusId))) :
                     Task.FromResult<dfeta_earlyyearsstatus>(null);
 
                 var getTeacherStatusTask = !IsEarlyYears ?
-                    _dataverseAdapter.GetTeacherStatus(
+                    Let(
                         _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
                             "212" :  // 212 == 'AOR Candidate'
-                            "211") :  // 211 == 'Trainee Teacher:DMS'
+                            "211",   // 211 == 'Trainee Teacher:DMS'
+                        teacherStatusId => _dataverseAdapter.GetTeacherStatus(teacherStatusId)) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
                 await Task.WhenAll(getIttProviderTask,

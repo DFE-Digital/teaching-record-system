@@ -5,6 +5,7 @@ using System.Net;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.PowerPlatform.Dataverse.Client.Utils;
 using Microsoft.Xrm.Sdk;
@@ -16,13 +17,16 @@ namespace DqtApi.DataStore.Crm
     {
         private readonly IOrganizationServiceAsync _service;
         private readonly IClock _clock;
+        private readonly IMemoryCache _cache;
 
         public DataverseAdapter(
             IOrganizationServiceAsync organizationServiceAsync,
-            IClock clock)
+            IClock clock,
+            IMemoryCache cache)
         {
             _service = organizationServiceAsync;
             _clock = clock;
+            _cache = cache;
         }
 
         public async Task<dfeta_country> GetCountry(string value)
