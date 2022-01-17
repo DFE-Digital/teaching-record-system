@@ -4,11 +4,11 @@ using Xunit;
 namespace DqtApi.Tests.DataverseIntegration
 {
     [Collection(nameof(DataverseTestCollection))]
-    public class GetIttHeSubjectByNameTests : IClassFixture<CrmClientFixture>
+    public class GetHeSubjectByNameTests : IClassFixture<CrmClientFixture>
     {
         private readonly DataverseAdapter _dataverseAdapter;
 
-        public GetIttHeSubjectByNameTests(CrmClientFixture crmClientFixture)
+        public GetHeSubjectByNameTests(CrmClientFixture crmClientFixture)
         {
             _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
         }

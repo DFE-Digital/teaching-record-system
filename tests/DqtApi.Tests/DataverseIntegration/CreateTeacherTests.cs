@@ -191,6 +191,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             var referenceData = new DataverseAdapter.CreateTeacherReferenceLookupResult()
             {
+                QualificationId = Guid.NewGuid(),
                 QualificationCountryId = Guid.NewGuid(),
                 QualificationSubjectId = Guid.NewGuid(),
                 QualificationProviderId = Guid.NewGuid()

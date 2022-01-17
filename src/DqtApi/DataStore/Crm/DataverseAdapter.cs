@@ -57,6 +57,20 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(entity => entity.ToEntity<dfeta_earlyyearsstatus>()).FirstOrDefault();
         }
 
+        public async Task<dfeta_hequalification> GetHeQualificationByName(string name)
+        {
+            var query = new QueryByAttribute(dfeta_hequalification.EntityLogicalName)
+            {
+                ColumnSet = new() { AllColumns = true }
+            };
+
+            query.AddAttributeValue(dfeta_hequalification.Fields.dfeta_name, name);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<dfeta_hequalification>()).FirstOrDefault();
+        }
+
         public async Task<dfeta_hesubject> GetHeSubjectByName(string name)
         {
             var query = new QueryByAttribute(dfeta_hesubject.EntityLogicalName)
