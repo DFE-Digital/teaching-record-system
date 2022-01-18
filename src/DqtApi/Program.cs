@@ -28,6 +28,7 @@ using Npgsql;
 using Prometheus;
 using Serilog;
 using Serilog.Context;
+using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -178,6 +179,11 @@ namespace DqtApi
                 healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
             }
 
+            if (env.IsProduction())
+            {
+                ConfigureRedisServices();
+            }
+
             MetricLabels.ConfigureLabels(builder.Configuration);
 
             var app = builder.Build();            
@@ -253,6 +259,34 @@ namespace DqtApi
                     configuration["CrmClientId"],
                     configuration["CrmClientSecret"],
                     useUniqueInstance: true);
+
+            void ConfigureRedisServices()
+            {
+                var connectionString = configuration.GetConnectionString("Redis") ?? GetConnectionStringForPaasService();
+
+                services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(connectionString));
+                services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);
+
+                healthCheckBuilder.AddRedis(connectionString);
+
+                string GetConnectionStringForPaasService()
+                {
+                    var options = new ConfigurationOptions()
+                    {
+                        EndPoints =
+                        {
+                            {
+                                configuration.GetValue<string>("VCAP_SERVICES:redis:0:credentials:host"),
+                                configuration.GetValue<int>("VCAP_SERVICES:redis:0:credentials:port")
+                            }
+                        },
+                        Password = configuration.GetValue<string>("VCAP_SERVICES:redis:0:credentials:password"),
+                        Ssl = configuration.GetValue<bool>("VCAP_SERVICES:redis:0:credentials:tls_enabled")
+                    };
+
+                    return options.ToString();
+                }
+            }
 
             string GetPostgresConnectionString()
             {
