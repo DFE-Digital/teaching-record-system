@@ -56,6 +56,15 @@ variable "postgres_database_service_plan" {
   default = "small-13"
 }
 
+variable "redis_name" {
+  type = string
+}
+
+variable "redis_service_plan" {
+  type    = string
+  default = "tiny-6_x"
+}
+
 variable "migrations_file" {
   type = string
 }
