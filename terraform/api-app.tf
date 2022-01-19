@@ -38,6 +38,12 @@ resource "null_resource" "migrations" {
   ]
 }
 
+resource "cloudfoundry_service_instance" "redis" {
+  name         = var.redis_name
+  space        = data.cloudfoundry_space.space.id
+  service_plan = data.cloudfoundry_service.redis.service_plans[var.redis_service_plan]
+}
+
 resource "cloudfoundry_app" "api" {
   name                       = var.api_app_name
   space                      = data.cloudfoundry_space.space.id
@@ -60,6 +66,10 @@ resource "cloudfoundry_app" "api" {
 
   service_binding {
     service_instance = cloudfoundry_service_instance.postgres.id
+  }
+
+  service_binding {
+    service_instance = cloudfoundry_service_instance.redis.id
   }
 
   depends_on = [

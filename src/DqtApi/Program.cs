@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using AspNetCoreRateLimit;
+using AspNetCoreRateLimit.Redis;
 using DqtApi.Configuration;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Sql;
@@ -28,6 +30,7 @@ using Npgsql;
 using Prometheus;
 using Serilog;
 using Serilog.Context;
+using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -106,6 +109,7 @@ namespace DqtApi
                 c.EnableAnnotations();
                 c.ExampleFilters();
                 c.OperationFilter<ResponseContentTypeOperationFilter>();
+                c.OperationFilter<RateLimitOperationFilter>();
 
                 c.CustomSchemaIds(type =>
                 {
@@ -178,6 +182,12 @@ namespace DqtApi
                 healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
             }
 
+            if (env.IsProduction())
+            {
+                ConfigureRateLimitServices();
+                ConfigureRedisServices();
+            }
+
             MetricLabels.ConfigureLabels(builder.Configuration);
 
             var app = builder.Build();            
@@ -197,6 +207,11 @@ namespace DqtApi
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            if (env.IsProduction())
+            {
+                app.UseMiddleware<RateLimitMiddleware>();
+            }
 
             app.Use((ctx, next) =>
             {
@@ -253,6 +268,47 @@ namespace DqtApi
                     configuration["CrmClientId"],
                     configuration["CrmClientSecret"],
                     useUniqueInstance: true);
+
+            void ConfigureRateLimitServices()
+            {
+                services.Configure<ClientRateLimitOptions>(configuration.GetSection("ClientRateLimiting"));
+
+                services.AddDistributedRateLimiting<AsyncKeyLockProcessingStrategy>();
+                services.AddDistributedRateLimiting<RedisProcessingStrategy>();
+                services.AddRedisRateLimiting();
+
+                services.AddSingleton<IClientPolicyStore, DistributedCacheClientPolicyStore>();
+                services.AddSingleton<IRateLimitCounterStore, DistributedCacheRateLimitCounterStore>();
+                services.AddSingleton<IRateLimitConfiguration, Security.RateLimitConfiguration>();
+            }
+
+            void ConfigureRedisServices()
+            {
+                var connectionString = configuration.GetConnectionString("Redis") ?? GetConnectionStringForPaasService();
+
+                services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(connectionString));
+                services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);
+
+                healthCheckBuilder.AddRedis(connectionString);
+
+                string GetConnectionStringForPaasService()
+                {
+                    var options = new ConfigurationOptions()
+                    {
+                        EndPoints =
+                        {
+                            {
+                                configuration.GetValue<string>("VCAP_SERVICES:redis:0:credentials:host"),
+                                configuration.GetValue<int>("VCAP_SERVICES:redis:0:credentials:port")
+                            }
+                        },
+                        Password = configuration.GetValue<string>("VCAP_SERVICES:redis:0:credentials:password"),
+                        Ssl = configuration.GetValue<bool>("VCAP_SERVICES:redis:0:credentials:tls_enabled")
+                    };
+
+                    return options.ToString();
+                }
+            }
 
             string GetPostgresConnectionString()
             {

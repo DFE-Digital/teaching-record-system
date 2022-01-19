@@ -12,11 +12,16 @@ namespace DqtApi.Security
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public static string GetCurrentClientIdFromHttpContext(HttpContext httpContext)
+        {
+            var principal = httpContext?.User;
+            return principal?.FindFirst(ClaimTypes.Name)?.Value;
+        }
+
         public string GetCurrentClientId()
         {
             var httpContext = _httpContextAccessor.HttpContext;
-            var principal = httpContext?.User;
-            return principal?.FindFirst(ClaimTypes.Name)?.Value;
+            return GetCurrentClientIdFromHttpContext(httpContext);
         }
     }
 }
