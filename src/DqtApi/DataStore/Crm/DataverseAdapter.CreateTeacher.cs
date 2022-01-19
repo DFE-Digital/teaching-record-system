@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace DqtApi.DataStore.Crm
 {
     public partial class DataverseAdapter
     {
-        internal delegate Task<(Guid TeacherId, string[] MatchedFields)?> FindExistingTeacher();
+        internal delegate Task<CreateTeacherDuplicateTeacherResult> FindExistingTeacher();
 
         public async Task<CreateTeacherResult> CreateTeacher(CreateTeacherCommand command)
         {
@@ -52,7 +53,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             var findExistingTeacherResult = await (findExistingTeacher ?? helper.FindExistingTeacher)();
-            var allocateTrn = !findExistingTeacherResult.HasValue;
+            var allocateTrn = findExistingTeacherResult == null;
 
             if (allocateTrn)
             {
@@ -77,11 +78,11 @@ namespace DqtApi.DataStore.Crm
             else
             {
                 // Create a Task to review the potential duplicate
-                Debug.Assert(findExistingTeacherResult.HasValue);
+                Debug.Assert(findExistingTeacherResult != null);
 
                 txnRequest.Requests.Add(new CreateRequest()
                 {
-                    Target = helper.CreateDuplicateReviewTaskEntity(findExistingTeacherResult.Value)
+                    Target = helper.CreateDuplicateReviewTaskEntity(findExistingTeacherResult)
                 });
             }
 
@@ -122,7 +123,7 @@ namespace DqtApi.DataStore.Crm
                 _ => false
             };
 
-            public CrmTask CreateDuplicateReviewTaskEntity((Guid TeacherId, string[] MatchedAttributes) duplicate)
+            public CrmTask CreateDuplicateReviewTaskEntity(CreateTeacherDuplicateTeacherResult duplicate)
             {
                 var description = GetDescription();
 
@@ -152,6 +153,29 @@ namespace DqtApi.DataStore.Crm
                             Contact.Fields.BirthDate => $"\t- Date of birth: '{_command.BirthDate:dd/MM/yyyy}'",
                             _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
                         });
+                    }
+
+                    Debug.Assert(!duplicate.HasEytsDate || !duplicate.HasQtsDate);
+
+                    var additionalFlags = new List<string>();
+
+                    if (duplicate.HasActiveSanctions)
+                    {
+                        additionalFlags.Add("active sanctions");
+                    }
+
+                    if (duplicate.HasQtsDate)
+                    {
+                        additionalFlags.Add("QTS date");
+                    }
+                    else if (duplicate.HasEytsDate)
+                    {
+                        additionalFlags.Add("EYTS date");
+                    }
+
+                    if (additionalFlags.Count > 0)
+                    {
+                        sb.AppendLine($"Matched record has {string.Join(" & ", additionalFlags)}");
                     }
 
                     return sb.ToString();
@@ -250,7 +274,7 @@ namespace DqtApi.DataStore.Crm
                 };
             }
 
-            public async Task<(Guid TeacherId, string[] MatchedAttributes)?> FindExistingTeacher()
+            public async Task<CreateTeacherDuplicateTeacherResult> FindExistingTeacher()
             {
                 var filter = new FilterExpression(LogicalOperator.And);
                 filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
@@ -267,7 +291,15 @@ namespace DqtApi.DataStore.Crm
 
                 var query = new QueryExpression(Contact.EntityLogicalName)
                 {
-                    ColumnSet = new(),
+                    ColumnSet = new()
+                    {
+                        Columns =
+                        {
+                            Contact.Fields.dfeta_ActiveSanctions,
+                            Contact.Fields.dfeta_QTSDate,
+                            Contact.Fields.dfeta_EYTSDate
+                        }
+                    },
                     Criteria = filter
                 };
 
@@ -303,7 +335,14 @@ namespace DqtApi.DataStore.Crm
 
                 var matchedAttributeNames = attributeMatches.Where(m => m.Matches).Select(m => m.Attribute).ToArray();
 
-                return (match.Id, matchedAttributeNames);
+                return new CreateTeacherDuplicateTeacherResult()
+                {
+                    TeacherId = match.Id,
+                    MatchedAttributes = matchedAttributeNames,
+                    HasActiveSanctions = match.dfeta_ActiveSanctions == true,
+                    HasQtsDate = match.dfeta_QTSDate.HasValue,
+                    HasEytsDate = match.dfeta_EYTSDate.HasValue
+                };
 
                 bool TryGetMatchCombinationsFilter(out FilterExpression filter)
                 {
@@ -506,6 +545,15 @@ namespace DqtApi.DataStore.Crm
             public Guid? QualificationSubjectId { get; set; }
             public Guid? TeacherStatusId { get; set; }
             public Guid? EarlyYearsStatusId { get; set; }
+        }
+
+        internal class CreateTeacherDuplicateTeacherResult
+        {
+            public Guid TeacherId { get; set; }
+            public string[] MatchedAttributes { get; set; }
+            public bool HasActiveSanctions { get; set; }
+            public bool HasQtsDate { get; set; }
+            public bool HasEytsDate { get; set; }
         }
     }
 }

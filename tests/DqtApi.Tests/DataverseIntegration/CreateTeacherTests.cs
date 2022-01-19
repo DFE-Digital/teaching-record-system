@@ -47,7 +47,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             // Arrange
             DataverseAdapter.FindExistingTeacher findExistingTeacher = () =>
-                Task.FromResult<(Guid TeacherId, string[] MatchedFields)?>(null);
+                Task.FromResult<DataverseAdapter.CreateTeacherDuplicateTeacherResult>(null);
 
             var command = CreateCommand();
 
@@ -62,27 +62,47 @@ namespace DqtApi.Tests.DataverseIntegration
             transactionRequest.AssertDoesNotContainCreateRequest<CrmTask>();
         }
 
-        [Fact]
-        public async Task Given_details_that_does_match_existing_record_does_not_allocate_trn_and_creates_QTS_task()
+        [Theory]
+        [InlineData(false, false, false, "")]
+        [InlineData(true, false, false, "Matched record has active sanctions\n")]
+        [InlineData(false, true, false, "Matched record has QTS date\n")]
+        [InlineData(false, false, true, "Matched record has EYTS date\n")]
+        [InlineData(true, true, false, "Matched record has active sanctions & QTS date\n")]
+        [InlineData(true, false, true, "Matched record has active sanctions & EYTS date\n")]
+        public async Task Given_details_that_does_match_existing_record_does_not_allocate_trn_and_creates_QTS_task(
+            bool hasActiveSanctions,
+            bool hasQts,
+            bool hasEyts,
+            string expectedDescriptionSupplement)
         {
             // Arrange
             var firstName = "Joe";
+            var middleName = "X";
             var lastName = "Bloggs";
             var birthDate = new DateTime(1990, 5, 23);
 
             var existingTeacherId = await _serviceClient.CreateAsync(new Contact()
             {
                 FirstName = firstName,
+                MiddleName = middleName,
                 LastName = lastName,
                 BirthDate = birthDate
             });
 
             DataverseAdapter.FindExistingTeacher findExistingTeacher = () =>
-                Task.FromResult<(Guid TeacherId, string[] MatchedFields)?>((existingTeacherId, new[] { Contact.Fields.FirstName, Contact.Fields.LastName, Contact.Fields.BirthDate }));
+                Task.FromResult(new DataverseAdapter.CreateTeacherDuplicateTeacherResult()
+                {
+                    TeacherId = existingTeacherId,
+                    MatchedAttributes = new[] { Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName, Contact.Fields.BirthDate },
+                    HasActiveSanctions = hasActiveSanctions,
+                    HasQtsDate = hasQts,
+                    HasEytsDate = hasEyts
+                });
 
             var command = CreateCommand(command =>
             {
                 command.FirstName = firstName;
+                command.MiddleName = middleName;
                 command.LastName = lastName;
                 command.BirthDate = birthDate;
             });
@@ -105,8 +125,11 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal("Notification for QTS Unit Team", crmTask.Subject);
             Assert.Equal(_crmClientFixture.Clock.UtcNow, crmTask.ScheduledEnd);
 
+            var expectedDescription = $"Potential duplicate\nMatched on\n\t- First name: '{firstName}'\n\t- Middle name: '{middleName}'\n\t- Last name: '{lastName}'\n\t- Date of birth: '{birthDate:dd/MM/yyyy}'\n" +
+                expectedDescriptionSupplement;
+
             Assert.Equal(
-                $"Potential duplicate\nMatched on\n\t- First name: '{firstName}'\n\t- Last name: '{lastName}'\n\t- Date of birth: '{birthDate:dd/MM/yyyy}'\n",
+                expectedDescription,
                 crmTask.Description,
                 ignoreLineEndingDifferences: true);
         }
