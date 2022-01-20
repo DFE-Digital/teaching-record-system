@@ -218,9 +218,7 @@ namespace DqtApi.DataStore.Crm
 
             public dfeta_qualification CreateQualificationEntity(CreateTeacherReferenceLookupResult referenceData)
             {
-                // PO REVIEW: Fields we're no longer populating:
-                // dfeta_HE_HEQualificationId (looked up from QualentCode historically)
-
+                Debug.Assert(referenceData.QualificationId.HasValue);
                 Debug.Assert(referenceData.QualificationProviderId.HasValue);
                 Debug.Assert(referenceData.QualificationCountryId.HasValue);
                 Debug.Assert(referenceData.QualificationSubjectId.HasValue);
@@ -233,7 +231,8 @@ namespace DqtApi.DataStore.Crm
                     dfeta_HE_HESubject1Id = new EntityReference(dfeta_hesubject.EntityLogicalName, referenceData.QualificationSubjectId.Value),
                     dfeta_HE_ClassDivision = _command.Qualification.Class,
                     dfeta_HE_EstablishmentId = new EntityReference(Account.EntityLogicalName, referenceData.QualificationProviderId.Value),
-                    dfeta_HE_CompletionDate = _command.Qualification.Date
+                    dfeta_HE_CompletionDate = _command.Qualification.Date,
+                    dfeta_HE_HEQualificationId = new EntityReference(dfeta_hequalification.EntityLogicalName, referenceData.QualificationId.Value)
                 };
             }
 
@@ -383,6 +382,12 @@ namespace DqtApi.DataStore.Crm
                         CacheKeys.GetIttSubjectKey(subject),
                         _ => _dataverseAdapter.GetIttSubjectByName(subject)));
 
+                var getQualificationTask = Let(
+                    "First Degree",
+                    qualificationName => _dataverseAdapter._cache.GetOrCreateAsync(
+                        CacheKeys.GetHeQualificationKey(qualificationName),
+                        _ => _dataverseAdapter.GetHeQualificationByName(qualificationName)));
+
                 var getQualificationProviderTask = Let(
                     _command.Qualification.ProviderUkprn,
                     ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
@@ -421,6 +426,7 @@ namespace DqtApi.DataStore.Crm
                     getIttCountryTask,
                     getSubject1Task,
                     getSubject2Task,
+                    getQualificationTask,
                     getQualificationProviderTask,
                     getQualificationCountryTask,
                     getQualificationSubjectTask,
@@ -436,6 +442,7 @@ namespace DqtApi.DataStore.Crm
                     IttCountryId = getIttCountryTask.Result?.Id,
                     IttSubject1Id = getSubject1Task.Result?.Id,
                     IttSubject2Id = getSubject2Task.Result?.Id,
+                    QualificationId = getQualificationTask.Result?.Id,
                     QualificationProviderId = getQualificationProviderTask.Result?.Id,
                     QualificationCountryId = getQualificationCountryTask.Result?.Id,
                     QualificationSubjectId = getQualificationSubjectTask.Result?.Id,
@@ -463,6 +470,11 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= CreateTeacherFailedReasons.Subject2NotFound;
                 }
 
+                if (referenceData.QualificationId == null)
+                {
+                    failedReasons |= CreateTeacherFailedReasons.QualificationNotFound;
+                }
+
                 if (referenceData.QualificationProviderId == null)
                 {
                     failedReasons |= CreateTeacherFailedReasons.QualificationProviderNotFound;
@@ -488,6 +500,7 @@ namespace DqtApi.DataStore.Crm
             public Guid? IttCountryId { get; set; }
             public Guid? IttSubject1Id { get; set; }
             public Guid? IttSubject2Id { get; set; }
+            public Guid? QualificationId { get; set; }
             public Guid? QualificationProviderId { get; set; }
             public Guid? QualificationCountryId { get; set; }
             public Guid? QualificationSubjectId { get; set; }

@@ -6,6 +6,8 @@
 
         public static object GetEarlyYearsStatusKey(string code) => $"early_years_status:{code}";
 
+        public static object GetHeQualificationKey(string name) => $"he_qualification:{name}";
+
         public static object GetHeSubjectKey(string name) => $"he_subject:{name}";
 
         public static object GetIttSubjectKey(string name) => $"itt_subject:{name}";

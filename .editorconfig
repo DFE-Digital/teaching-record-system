@@ -19,5 +19,8 @@ indent_size = 2
 [*.{tf,tfvars}]
 indent_size = 2
 
+[*.tsv]
+indent_style = tab
+
 [*.cs]
 dotnet_sort_system_directives_first = true

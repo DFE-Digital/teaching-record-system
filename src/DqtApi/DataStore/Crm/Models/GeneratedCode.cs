@@ -1733,6 +1733,9 @@ namespace DqtApi.DataStore.Crm.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string dfeta_name = "dfeta_name";
+			public const string dfeta_Value = "dfeta_value";
+			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_hequalification_dfeta_qualification = "dfeta_dfeta_hequalification_dfeta_qualification";
 		}
 		
@@ -1776,6 +1779,81 @@ namespace DqtApi.DataStore.Crm.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// The name of the custom entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
+		public string dfeta_name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_name");
+				this.SetAttributeValue("dfeta_name", value);
+				this.OnPropertyChanged("dfeta_name");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
+		public string dfeta_Value
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_value");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Value");
+				this.SetAttributeValue("dfeta_value", value);
+				this.OnPropertyChanged("dfeta_Value");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the Qualification - HE
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<DqtApi.DataStore.Crm.Models.dfeta_hequalificationState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((DqtApi.DataStore.Crm.Models.dfeta_hequalificationState)(System.Enum.ToObject(typeof(DqtApi.DataStore.Crm.Models.dfeta_hequalificationState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
 			}
 		}
 		
