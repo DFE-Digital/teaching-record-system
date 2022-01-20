@@ -34,7 +34,6 @@ namespace DqtApi.DataStore.Crm
         public dfeta_ITTProgrammeType ProgrammeType { get; set; }
         public string Subject1 { get; set; }
         public string Subject2 { get; set; }
-        public dfeta_ITTResult Result { get; set; }
     }
 
     public class CreateTeacherCommandQualification

@@ -80,8 +80,7 @@ namespace DqtApi.V2.Handlers
                         ProgrammeEndDate = request.InitialTeacherTraining.ProgrammeEndDate,
                         ProgrammeType = request.InitialTeacherTraining.ProgrammeType.ConvertToIttProgrammeType(),
                         Subject1 = request.InitialTeacherTraining.Subject1,
-                        Subject2 = request.InitialTeacherTraining.Subject2,
-                        Result = request.InitialTeacherTraining.Result.ConvertToITTResult()
+                        Subject2 = request.InitialTeacherTraining.Subject2
                     },
                     Qualification = new CreateTeacherCommandQualification()
                     {

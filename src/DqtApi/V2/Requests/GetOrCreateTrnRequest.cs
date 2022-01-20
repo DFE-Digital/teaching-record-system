@@ -61,8 +61,6 @@ namespace DqtApi.V2.Requests
         public string Subject1 { get; set; }
         [Required]
         public string Subject2 { get; set; }
-        [Required]
-        public IttResult Result { get; set; }
     }
 
     public class GetOrCreateTrnRequestQualification

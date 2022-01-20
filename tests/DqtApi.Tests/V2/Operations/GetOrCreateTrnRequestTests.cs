@@ -181,8 +181,7 @@ namespace DqtApi.Tests.V2.Operations
                     ProgrammeEndDate = new(2020, 10, 10),
                     ProgrammeType = IttProgrammeType.GraduateTeacherProgramme,
                     Subject1 = "Computer Science",
-                    Subject2 = "Mathematics",
-                    Result = IttResult.Approved
+                    Subject2 = "Mathematics"
                 },
                 Qualification = new()
                 {

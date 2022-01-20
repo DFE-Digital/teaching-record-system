@@ -215,6 +215,10 @@ namespace DqtApi.DataStore.Crm
 
                 var cohortYear = _command.InitialTeacherTraining.ProgrammeEndDate.Year.ToString();
 
+                var result = _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
+                    dfeta_ITTResult.UnderAssessment :
+                    dfeta_ITTResult.InTraining;
+
                 return new dfeta_initialteachertraining()
                 {
                     dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, TeacherId),
@@ -226,7 +230,7 @@ namespace DqtApi.DataStore.Crm
                     dfeta_CohortYear = cohortYear,
                     dfeta_Subject1Id = new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject1Id.Value),
                     dfeta_Subject2Id = new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject2Id.Value),
-                    dfeta_Result = _command.InitialTeacherTraining.Result
+                    dfeta_Result = result
                 };
             }
 

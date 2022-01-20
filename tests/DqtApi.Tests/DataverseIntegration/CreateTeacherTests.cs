@@ -162,11 +162,34 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(command.GenderCode, entity.GenderCode);
         }
 
-        [Fact]
-        public void CreateInitialTeacherTrainingEntity_maps_entity_from_command_correctly()
+        [Theory]
+        [InlineData(dfeta_ITTProgrammeType.Apprenticeship, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.AssessmentOnlyRoute, dfeta_ITTResult.UnderAssessment)]
+        [InlineData(dfeta_ITTProgrammeType.Core, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.CoreFlexible, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTAssessmentOnly, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTGraduateEntry, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTSchoolDirect_EarlyYears, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTUndergraduate, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.FutureTeachingScholars, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.GraduateTeacherProgramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.HEI, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.LicensedTeacherProgramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.OverseasTrainedTeacherProgramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.RegisteredTeacherProgramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Salaried, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Selffunded, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme_CC, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.UndergraduateOptIn, dfeta_ITTResult.InTraining)]
+        public void CreateInitialTeacherTrainingEntity_maps_entity_from_command_correctly(
+            dfeta_ITTProgrammeType programmeType,
+            dfeta_ITTResult expectedResult)
         {
             // Arrange
-            var command = CreateCommand();
+            var command = CreateCommand(c => c.InitialTeacherTraining.ProgrammeType = programmeType);
 
             var referenceData = new DataverseAdapter.CreateTeacherReferenceLookupResult()
             {
@@ -196,7 +219,7 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(referenceData.IttSubject1Id, result.dfeta_Subject1Id?.Id);
             Assert.Equal(dfeta_ittsubject.EntityLogicalName, result.dfeta_Subject2Id?.LogicalName);
             Assert.Equal(referenceData.IttSubject2Id, result.dfeta_Subject2Id?.Id);
-            Assert.Equal(command.InitialTeacherTraining.Result, result.dfeta_Result);
+            Assert.Equal(expectedResult, result.dfeta_Result);
         }
 
         [Fact]
@@ -315,8 +338,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeEndDate = new(2020, 10, 10),
                     ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
                     Subject1 = "Computer Science",
-                    Subject2 = "Mathematics",
-                    Result = dfeta_ITTResult.Approved
+                    Subject2 = "Mathematics"
                 },
                 Qualification = new()
                 {
