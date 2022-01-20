@@ -206,6 +206,8 @@ jobs:
         version: [v1, v2]
 
     steps:
+    - uses: actions/checkout@v2
+
     - name: Create config file
       run: |
         echo "replacer.full_list(0).description=auth1" >> options.prop
@@ -221,6 +223,7 @@ jobs:
         format: openapi
         allow_issue_writing: false
         fail_action: true
+        rules_file_name: '.zap/rules.tsv'
         cmd_options: '-z "-configFile /zap/wrk/options.prop"'
 
   deploy_test:
