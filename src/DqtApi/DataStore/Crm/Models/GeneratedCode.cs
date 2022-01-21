@@ -409,8 +409,10 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string Address1_PostalCode = "address1_postalcode";
 			public const string BirthDate = "birthdate";
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
+			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
 			public const string dfeta_NINumber = "dfeta_ninumber";
+			public const string dfeta_QTSDate = "dfeta_qtsdate";
 			public const string dfeta_TRN = "dfeta_trn";
 			public const string dfeta_TRNAllocateRequest = "dfeta_trnallocaterequest";
 			public const string dfeta_trnrequired = "dfeta_trnrequired";
@@ -650,6 +652,26 @@ namespace DqtApi.DataStore.Crm.Models
 		/// <summary>
 		/// 
 		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eytsdate")]
+		public System.Nullable<System.DateTime> dfeta_EYTSDate
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_eytsdate");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_EYTSDate");
+				this.SetAttributeValue("dfeta_eytsdate", value);
+				this.OnPropertyChanged("dfeta_EYTSDate");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_loginfailedcounter")]
 		public System.Nullable<int> dfeta_loginfailedcounter
 		{
@@ -684,6 +706,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_NINumber");
 				this.SetAttributeValue("dfeta_ninumber", value);
 				this.OnPropertyChanged("dfeta_NINumber");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsdate")]
+		public System.Nullable<System.DateTime> dfeta_QTSDate
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_qtsdate");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_QTSDate");
+				this.SetAttributeValue("dfeta_qtsdate", value);
+				this.OnPropertyChanged("dfeta_QTSDate");
 			}
 		}
 		
