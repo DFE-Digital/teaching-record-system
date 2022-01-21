@@ -33,6 +33,27 @@ $connectionString = "AuthType=ClientSecret;url=${crmUrl};ClientId=${crmClientId}
 
 $coreToolsFolder = (Join-Path $PSScriptRoot tools coretools)
 
+function Set-Configuration {
+    $entitiesConfiguration = Get-Content (Join-Path $PSScriptRoot "crm_attributes.json") | ConvertFrom-Json -AsHashtable
+
+    $entitiesWhitelist = ($entitiesConfiguration.Keys | Sort-Object) -join "|"
+
+    $attributesWhitelist = ($entitiesConfiguration.Keys | Sort-Object | ForEach-Object {
+        $attrs = ($entitiesConfiguration[$_] | Sort-Object) -join ","
+        "$($_):$attrs"
+    }) -join "|"
+
+    $configPath = Join-Path $coreToolsFolder "CrmSvcUtil.exe.config"
+    $config = [xml](Get-Content $configPath)
+
+    $config.SelectSingleNode("/configuration/appSettings/add[@key='EntitiesWhitelist']").value = $entitiesWhitelist
+    $config.SelectSingleNode("/configuration/appSettings/add[@key='AttributesWhitelist']").value = $attributesWhitelist
+
+    $config.Save($configPath)
+}
+
+Set-Configuration
+
 $namespace = "DqtApi.DataStore.Crm.Models"
 $entitiesOutput = Join-Path -Path $PSScriptRoot -ChildPath src DqtApi DataStore Crm Models GeneratedCode.cs
 $optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath src DqtApi DataStore Crm Models GeneratedOptionSets.cs

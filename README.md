@@ -35,9 +35,9 @@ Ask a developer on the team for the user secrets to connect to this environment.
 
 A tool is used to generated proxy classes for the entities defined within the DQT CRM.
 The tool generates the `DqtApi.DataStore.Crm.Models.GeneratedCode.cs` and `DqtApi.DataStore.Crm.Models.GeneratedOptionSets.cs` files.
-A configuration file at `tools/coretools/CrmSvcUtil.exe.config` whitelists the entities and their attributes which are included on the generated types. See the `EntitiesWhitelist` and `AttributesWhitelist` configuration keys.
+A configuration file at `crm_attributes.json` whitelists the entities and their attributes which are included on the generated types.
 
-The Powershell script `GenerateCrmModels.ps1` will re-run the code generator against the `build` environment using the configuration file above.
+The Powershell script `Generate-CrmModels.ps1` will re-run the code generator against the `build` environment using the configuration file above.
 The CRM user secrets described within [Developer setup](#crm-connection) must be correctly set for the tool to run successfully.
 The tool is a .NET Framework application and requires .NET 4.6.
 
