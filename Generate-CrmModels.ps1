@@ -1,3 +1,9 @@
+[CmdletBinding()]
+param (
+    [switch]
+    $IncludeOptionSets = $false
+)
+
 $ErrorActionPreference = "Stop"
 
 $userSecretsId = "DqtApi"
@@ -29,10 +35,12 @@ $coreToolsFolder = (Join-Path $PSScriptRoot tools coretools)
 
 $namespace = "DqtApi.DataStore.Crm.Models"
 $entitiesOutput = Join-Path -Path $PSScriptRoot -ChildPath src DqtApi DataStore Crm Models GeneratedCode.cs
+$optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath src DqtApi DataStore Crm Models GeneratedOptionSets.cs
 mkdir (Split-Path $entitiesOutput) -Force | Out-Null
 
-# entities
 $crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"
+
+# entities
 & $crmSvcUtil `
     /connectionstring:${connectionString} `
     /out:${entitiesOutput} `
@@ -46,14 +54,15 @@ $crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"
     /metadataproviderservice:"DLaB.CrmSvcUtilExtensions.Entity.MetadataProviderService,DLaB.CrmSvcUtilExtensions"
 
 # option sets
-$optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath src DqtApi DataStore Crm Models GeneratedOptionSets.cs
-& $crmSvcUtil `
-    /connectionstring:${connectionString} `
-    /out:${optionSetsOutput} `
-    /namespace:${namespace} `
-    /SuppressGeneratedCodeAttribute `
-    /codecustomization:"DLaB.CrmSvcUtilExtensions.OptionSet.CustomizeCodeDomService,DLaB.CrmSvcUtilExtensions" `
-    /codegenerationservice:"DLaB.CrmSvcUtilExtensions.OptionSet.CustomCodeGenerationService,DLaB.CrmSvcUtilExtensions" `
-    /codewriterfilter:"DLaB.CrmSvcUtilExtensions.OptionSet.CodeWriterFilterService,DLaB.CrmSvcUtilExtensions" `
-    /namingservice:"DLaB.CrmSvcUtilExtensions.NamingService,DLaB.CrmSvcUtilExtensions" `
-    /metadataproviderservice:"DLaB.CrmSvcUtilExtensions.BaseMetadataProviderService,DLaB.CrmSvcUtilExtensions"
+if ($IncludeOptionSets -eq $true) {
+    & $crmSvcUtil `
+        /connectionstring:${connectionString} `
+        /out:${optionSetsOutput} `
+        /namespace:${namespace} `
+        /SuppressGeneratedCodeAttribute `
+        /codecustomization:"DLaB.CrmSvcUtilExtensions.OptionSet.CustomizeCodeDomService,DLaB.CrmSvcUtilExtensions" `
+        /codegenerationservice:"DLaB.CrmSvcUtilExtensions.OptionSet.CustomCodeGenerationService,DLaB.CrmSvcUtilExtensions" `
+        /codewriterfilter:"DLaB.CrmSvcUtilExtensions.OptionSet.CodeWriterFilterService,DLaB.CrmSvcUtilExtensions" `
+        /namingservice:"DLaB.CrmSvcUtilExtensions.NamingService,DLaB.CrmSvcUtilExtensions" `
+        /metadataproviderservice:"DLaB.CrmSvcUtilExtensions.BaseMetadataProviderService,DLaB.CrmSvcUtilExtensions"
+}
