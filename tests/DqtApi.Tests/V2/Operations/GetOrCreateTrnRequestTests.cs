@@ -105,10 +105,10 @@ namespace DqtApi.Tests.V2.Operations
             var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
 
             // Assert
-            await AssertEx.ResponseIsProblemDetails(
+            await AssertEx.ResponseIsValidationErrorForProperty(
                 response,
-                expectedError: Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes,
-                propertyName: "requestId");
+                propertyName: nameof(TrnRequest.RequestId),
+                expectedError: Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
         }
 
         [Fact]
@@ -121,10 +121,10 @@ namespace DqtApi.Tests.V2.Operations
             var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
 
             // Assert
-            await AssertEx.ResponseIsProblemDetails(
+            await AssertEx.ResponseIsValidationErrorForProperty(
                 response,
-                expectedError: Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer,
-                propertyName: "requestId");
+                propertyName: nameof(TrnRequest.RequestId),
+                expectedError: Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
         }
 
         [Theory]

@@ -35,7 +35,11 @@ namespace DqtApi.TestCommon
             JsonObjectEquals(JToken.FromObject(expected), jsonResponse);
         }
 
-        public static async Task ResponseIsProblemDetails(HttpResponseMessage response, string expectedError, string propertyName, int expectedStatusCode = 400)
+        public static async Task ResponseIsValidationErrorForProperty(
+            HttpResponseMessage response,
+            string propertyName,
+            string expectedError,
+            int expectedStatusCode = 400)
         {
             if (response is null)
             {
@@ -55,7 +59,31 @@ namespace DqtApi.TestCommon
         {
             public string Title { get; set; }
             public int Status { get; set; }
+            [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<string[]>))]
             public Dictionary<string, string[]> Errors { get; set; }
+        }
+
+        private class CaseInsensitiveDictionaryConverter<T> : JsonConverter
+        {
+            public override bool CanConvert(Type objectType) =>
+                objectType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<string, T>));
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                if (reader.TokenType == JsonToken.Null)
+                {
+                    return null;
+                }
+
+                var dictionary = new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
+                serializer.Populate(reader, dictionary);
+                return dictionary;
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                throw new NotSupportedException();
+            }
         }
     }
 }

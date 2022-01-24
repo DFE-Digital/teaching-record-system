@@ -24,7 +24,7 @@ namespace DqtApi.Tests.V1.Operations
 
             var response = await HttpClient.SendAsync(request);
 
-            await AssertEx.ResponseIsProblemDetails(response, expectedError: StringResources.ErrorMessages_TRNMustBe7Digits, "trn");
+            await AssertEx.ResponseIsValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
         }
 
         [Theory]
@@ -36,7 +36,7 @@ namespace DqtApi.Tests.V1.Operations
 
             var response = await HttpClient.SendAsync(request);
 
-            await AssertEx.ResponseIsProblemDetails(response, expectedError: StringResources.ErrorMessages_InvalidBirthDate, "birthdate");
+            await AssertEx.ResponseIsValidationErrorForProperty(response, "birthdate", expectedError: StringResources.ErrorMessages_InvalidBirthDate);
         }
 
         //[Fact(Skip = "not implemented")]
