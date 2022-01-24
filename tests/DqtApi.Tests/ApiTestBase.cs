@@ -1,7 +1,9 @@
 using System;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Sql;
+using DqtApi.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -33,6 +35,9 @@ namespace DqtApi.Tests
             get => Clock.UtcNow;
             set => Clock.UtcNow = value;
         }
+
+        public JsonContent CreateJsonContent(object requestBody) =>
+            JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().AddConverters());
 
         public virtual void Dispose()
         {
