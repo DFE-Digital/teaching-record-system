@@ -35,11 +35,26 @@ namespace DqtApi.TestCommon
             JsonObjectEquals(JToken.FromObject(expected), jsonResponse);
         }
 
+        public static async Task ResponseIsError(HttpResponseMessage response, int errorCode, int expectedStatusCode)
+        {
+            var problemDetails = await ResponseIsProblemDetails(response, expectedStatusCode);
+
+            Assert.Contains(problemDetails.Extensions, kvp => kvp.Key == "errorCode");
+            Assert.Equal(errorCode, problemDetails.Extensions["errorCode"].ToObject<int>());
+        }
+
         public static async Task ResponseIsValidationErrorForProperty(
             HttpResponseMessage response,
             string propertyName,
             string expectedError,
             int expectedStatusCode = 400)
+        {
+            var problemDetails = await ResponseIsProblemDetails(response, expectedStatusCode);
+
+            Assert.Equal(expectedError, problemDetails.Errors[propertyName].Single());
+        }
+
+        private static async Task<ProblemDetails> ResponseIsProblemDetails(HttpResponseMessage response, int expectedStatusCode)
         {
             if (response is null)
             {
@@ -52,7 +67,8 @@ namespace DqtApi.TestCommon
             var json = await response.Content.ReadAsStringAsync();
             var problemDetails = JsonConvert.DeserializeObject<ProblemDetails>(json);
             Assert.Equal(expectedStatusCode, problemDetails.Status);
-            Assert.Equal(expectedError, problemDetails.Errors[propertyName].Single());
+
+            return problemDetails;
         }
 
         private class ProblemDetails
@@ -61,6 +77,8 @@ namespace DqtApi.TestCommon
             public int Status { get; set; }
             [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<string[]>))]
             public Dictionary<string, string[]> Errors { get; set; }
+            [JsonExtensionData]
+            public IDictionary<string, JToken> Extensions { get; set; }
         }
 
         private class CaseInsensitiveDictionaryConverter<T> : JsonConverter
