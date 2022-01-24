@@ -97,6 +97,7 @@ namespace DqtApi
                 .AddFluentValidation(fv =>
                 {
                     fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));
+                    fv.DisableDataAnnotationsValidation = true;
                 });
 
             services.AddTransient<IApiDescriptionProvider, HybridBodyApiDescriptionProvider>();
