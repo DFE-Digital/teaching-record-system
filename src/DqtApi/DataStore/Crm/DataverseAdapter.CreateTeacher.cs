@@ -445,12 +445,14 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetEarlyYearsStatus(earlyYearsStatusId))) :
                     Task.FromResult<dfeta_earlyyearsstatus>(null);
 
-                var getTeacherStatusTask = !IsEarlyYears ?
+                var getTeacherStatusTask = !isEarlyYears ?
                     Let(
                         _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
                             "212" :  // 212 == 'AOR Candidate'
                             "211",   // 211 == 'Trainee Teacher:DMS'
-                        teacherStatusId => _dataverseAdapter.GetTeacherStatus(teacherStatusId)) :
+                        teacherStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetTeacherStatusKey(teacherStatusId),
+                            _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
                 await Task.WhenAll(getIttProviderTask,
