@@ -28,10 +28,16 @@ namespace DqtApi.Tests.DataverseIntegration
 
         public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
-        [Fact]
-        public async Task Given_valid_request_creates_required_entities()
+        [Theory]
+        [InlineData(dfeta_ITTProgrammeType.AssessmentOnlyRoute)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTAssessmentOnly)]
+        [InlineData(dfeta_ITTProgrammeType.LicensedTeacherProgramme)]
+        public async Task Given_valid_request_creates_required_entities(dfeta_ITTProgrammeType programmeType)
         {
-            var command = CreateCommand();
+            var command = CreateCommand(cmd =>
+            {
+                cmd.InitialTeacherTraining.ProgrammeType = programmeType;
+            });
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
