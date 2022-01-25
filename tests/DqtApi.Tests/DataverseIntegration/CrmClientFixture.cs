@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
@@ -33,17 +34,26 @@ namespace DqtApi.Tests.DataverseIntegration
 
         public async Task CleanupEntities()
         {
-            await Task.WhenAll(_createdEntities.Select(e =>
+            var multiRequest = new ExecuteMultipleRequest()
             {
-                var deactivateRequest = new SetStateRequest()
+                Requests = new(),
+                Settings = new ExecuteMultipleSettings()
                 {
-                    EntityMoniker = new EntityReference(e.EntityName, e.EntityId),
+                    ContinueOnError = true
+                }
+            };
+
+            foreach (var (entityName, entityId) in _createdEntities)
+            {
+                multiRequest.Requests.Add(new SetStateRequest()
+                {
+                    EntityMoniker = new EntityReference(entityName, entityId),
                     State = new OptionSetValue((int)ContactState.Inactive),
                     Status = new OptionSetValue(2)
-                };
+                });
+            }
 
-                return ServiceClient.ExecuteAsync(deactivateRequest);
-            }));
+            await ServiceClient.ExecuteAsync(multiRequest);
 
             _createdEntities.Clear();
         }
