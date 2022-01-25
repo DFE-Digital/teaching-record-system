@@ -37,6 +37,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_country.Fields.dfeta_Value, value);
+            query.AddAttributeValue(dfeta_country.Fields.StateCode, (int)dfeta_countryState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
@@ -51,6 +52,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.dfeta_Value, value);
+            query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.StateCode, (int)dfeta_earlyyearsStatusState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
@@ -65,6 +67,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_hequalification.Fields.dfeta_name, name);
+            query.AddAttributeValue(dfeta_hequalification.Fields.StateCode, (int)dfeta_hequalificationState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
@@ -79,6 +82,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_hesubject.Fields.dfeta_name, name);
+            query.AddAttributeValue(dfeta_hesubject.Fields.StateCode, (int)dfeta_hesubjectState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
@@ -117,6 +121,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_ittsubject.Fields.dfeta_name, name);
+            query.AddAttributeValue(dfeta_ittsubject.Fields.StateCode, (int)dfeta_ittsubjectState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
@@ -144,6 +149,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(Account.Fields.dfeta_UKPRN, ukprn);
+            query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
@@ -204,6 +210,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_teacherstatus.Fields.dfeta_Value, value);
+            query.AddAttributeValue(dfeta_teacherstatus.Fields.StateCode, (int)dfeta_teacherStatusState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
