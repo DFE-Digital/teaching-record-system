@@ -7,7 +7,7 @@ using static DqtApi.Tests.DataverseIntegration.GetMatchingTeachersFixture.MatchF
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    [Collection(nameof(DataverseTestCollection))]
+    [Collection(nameof(ExclusiveCrmTestCollection))]
     public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture>
     {
         private readonly GetMatchingTeachersFixture _fixture;

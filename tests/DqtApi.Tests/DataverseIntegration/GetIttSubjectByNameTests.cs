@@ -3,7 +3,6 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    [Collection(nameof(DataverseTestCollection))]
     public class GetIttSubjectByNameTests
     {
         private readonly DataverseAdapter _dataverseAdapter;

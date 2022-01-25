@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -7,13 +6,14 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    [Collection(nameof(DataverseTestCollection))]
+    [Collection(nameof(ExclusiveCrmTestCollection))]
     public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLifetime
     {
         private readonly CreateTeacherFixture _createTeacherFixture;
         private readonly CrmClientFixture _crmClientFixture;
         private readonly DataverseAdapter _dataverseAdapter;
         private readonly ServiceClient _serviceClient;
+        private readonly EntityCleanupHelper _entityCleanupHelper;
 
         public CreateTeacherTests(CreateTeacherFixture createTeacherFixture, CrmClientFixture crmClientFixture)
         {
@@ -21,11 +21,12 @@ namespace DqtApi.Tests.DataverseIntegration
             _crmClientFixture = crmClientFixture;
             _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
             _serviceClient = crmClientFixture.ServiceClient;
+            _entityCleanupHelper = crmClientFixture.CreateEntityCleanupHelper();
         }
 
         public Task InitializeAsync() => Task.CompletedTask;
 
-        public Task DisposeAsync() => _crmClientFixture.CleanupEntities();
+        public Task DisposeAsync() => _entityCleanupHelper.CleanupEntities();
 
         [Fact]
         public async Task Given_valid_request_creates_required_entities()
@@ -34,7 +35,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
+            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
 
             // Assert
             Assert.True(result.Succeeded);
@@ -56,7 +57,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command, findExistingTeacher);
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
+            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
 
             // Assert
             Assert.True(result.Succeeded);
@@ -105,8 +106,8 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command, findExistingTeacher);
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, existingTeacherId);
+            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
+            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, existingTeacherId);
 
             // Assert
             Assert.True(result.Succeeded);
@@ -282,7 +283,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 LastName = matchOnSurname ? command.LastName : "Oli",
                 BirthDate = matchOnDateOfBirth ? command.BirthDate : new(1945, 2, 3)
             });
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, existingTeacherId);
+            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, existingTeacherId);
 
             var helper = new DataverseAdapter.CreateTeacherHelper(_dataverseAdapter, command);
 

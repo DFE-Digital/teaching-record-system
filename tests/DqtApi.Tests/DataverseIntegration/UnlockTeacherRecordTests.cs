@@ -8,7 +8,6 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    [Collection(nameof(DataverseTestCollection))]
     public class UnlockTeacherRecordTests
     {
         private readonly CrmClientFixture _crmClientFixture;

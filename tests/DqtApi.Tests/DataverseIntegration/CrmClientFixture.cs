@@ -1,29 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
-using DqtApi.DataStore.Crm.Models;
-using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
     public sealed class CrmClientFixture : IAsyncDisposable
     {
-        private readonly List<(string EntityName, Guid EntityId)> _createdEntities;
+        private readonly EntityCleanupHelper _createdEntityTracker;
 
         public CrmClientFixture()
         {
-            _createdEntities = new();
             Clock = new();
             Configuration = GetConfiguration();
             ServiceClient = GetCrmServiceClient();
+            _createdEntityTracker = CreateEntityCleanupHelper();
         }
 
         public TestableClock Clock { get; }
@@ -32,56 +27,23 @@ namespace DqtApi.Tests.DataverseIntegration
 
         public ServiceClient ServiceClient { get; }
 
-        public async Task CleanupEntities()
-        {
-            var multiRequest = new ExecuteMultipleRequest()
-            {
-                Requests = new(),
-                Settings = new ExecuteMultipleSettings()
-                {
-                    ContinueOnError = true
-                }
-            };
-
-            foreach (var (entityName, entityId) in _createdEntities)
-            {
-                multiRequest.Requests.Add(new SetStateRequest()
-                {
-                    EntityMoniker = new EntityReference(entityName, entityId),
-                    State = new OptionSetValue((int)ContactState.Inactive),
-                    Status = new OptionSetValue(2)
-                });
-            }
-
-            await ServiceClient.ExecuteAsync(multiRequest);
-
-            _createdEntities.Clear();
-        }
-
         public DataverseAdapter CreateDataverseAdapter() => new(ServiceClient, Clock, new MemoryCache(Options.Create<MemoryCacheOptions>(new())));
+
+        public EntityCleanupHelper CreateEntityCleanupHelper() => new(ServiceClient);
 
         public Task InitializeAsync() => Task.CompletedTask;
 
         public async ValueTask DisposeAsync()
         {
-            await CleanupEntities();
+            await _createdEntityTracker.CleanupEntities();
             ServiceClient.Dispose();
         }
 
-        public void RegisterForCleanup(Entity entity)
-        {
-            _createdEntities.Add((entity.LogicalName, entity.Id));
-        }
+        public void RegisterForCleanup(Entity entity) =>
+            _createdEntityTracker.RegisterForCleanup(entity);
 
-        public void RegisterForCleanup(string entityName, Guid entityId)
-        {
-            if (entityId == Guid.Empty)
-            {
-                return;
-            }
-
-            _createdEntities.Add((entityName, entityId));
-        }
+        public void RegisterForCleanup(string entityName, Guid entityId) =>
+            _createdEntityTracker.RegisterForCleanup(entityName, entityId);
 
         private static IConfiguration GetConfiguration() =>
             new ConfigurationBuilder()
@@ -89,11 +51,13 @@ namespace DqtApi.Tests.DataverseIntegration
                 .AddEnvironmentVariables("IntegrationTests_")
                 .Build();
 
-        private ServiceClient GetCrmServiceClient() =>
-            new(
+        // This is wrapped up in Task.Run because the ServiceClient constructor can deadlock in some environments (e.g. CI).
+        // InitServiceAsync().Result within Microsoft.PowerPlatform.Dataverse.Client.ConnectionService.GetCachedService() looks to be the culprit
+        private ServiceClient GetCrmServiceClient() => Task.Run(() =>
+            new ServiceClient(
                 new Uri(Configuration["CrmUrl"]),
                 Configuration["CrmClientId"],
                 Configuration["CrmClientSecret"],
-                useUniqueInstance: true);
+                useUniqueInstance: true)).Result;
     }
 }
