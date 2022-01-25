@@ -89,6 +89,23 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(entity => entity.ToEntity<dfeta_hesubject>()).FirstOrDefault();
         }
 
+        public async Task<IEnumerable<dfeta_initialteachertraining>> GetInitialTeacherTrainingByTeacher(
+            Guid teacherId,
+            params string[] columnNames)
+        {
+            var query = new QueryByAttribute(dfeta_initialteachertraining.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames)
+            };
+
+            query.AddAttributeValue(dfeta_initialteachertraining.Fields.dfeta_PersonId, teacherId);
+            query.AddAttributeValue(dfeta_initialteachertraining.Fields.StateCode, (int)dfeta_initialteachertrainingState.Active);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>());
+        }
+
         public async Task<IEnumerable<Account>> GetIttProviders()
         {
             var filter = new FilterExpression(LogicalOperator.And);
@@ -156,6 +173,23 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
         }
 
+        public async Task<IEnumerable<dfeta_qtsregistration>> GetQtsRegistrationsByTeacher(
+            Guid teacherId,
+            params string[] columnNames)
+        {
+            var query = new QueryByAttribute(dfeta_qtsregistration.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames)
+            };
+
+            query.AddAttributeValue(dfeta_qtsregistration.Fields.dfeta_PersonId, teacherId);
+            query.AddAttributeValue(dfeta_qtsregistration.Fields.StateCode, (int)dfeta_qtsregistrationState.Active);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<dfeta_qtsregistration>());
+        }
+
         public async Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId)
         {
             var query = new QueryByAttribute(dfeta_qualification.EntityLogicalName)
@@ -200,6 +234,27 @@ namespace DqtApi.DataStore.Crm
             }
 
             return teacher;
+        }
+
+        public async Task<IEnumerable<Contact>> GetTeachersByTrn(string trn, bool activeOnly = true, params string[] columnNames)
+        {
+            var filter = new FilterExpression(LogicalOperator.And);
+            filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
+
+            if (activeOnly)
+            {
+                filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+            }
+
+            var query = new QueryExpression(Contact.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames),
+                Criteria = filter
+            };
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(e => e.ToEntity<Contact>());
         }
 
         public async Task<dfeta_teacherstatus> GetTeacherStatus(

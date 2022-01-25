@@ -95,5 +95,68 @@ namespace DqtApi.Properties {
                 return ResourceManager.GetString("ErrorMessages.TRNMustBe7Digits", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teacher with specified TRN not found.
+        /// </summary>
+        public static string Errors_10001_Title {
+            get {
+                return ResourceManager.GetString("Errors.10001.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple teachers found with specified TRN.
+        /// </summary>
+        public static string Errors_10002_Title {
+            get {
+                return ResourceManager.GetString("Errors.10002.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teacher already has QTS/EYTS date.
+        /// </summary>
+        public static string Errors_10003_Title {
+            get {
+                return ResourceManager.GetString("Errors.10003.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teacher has multiple incomplete ITT records.
+        /// </summary>
+        public static string Errors_10004_Title {
+            get {
+                return ResourceManager.GetString("Errors.10004.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teacher has no incomplete ITT record.
+        /// </summary>
+        public static string Errors_10005_Title {
+            get {
+                return ResourceManager.GetString("Errors.10005.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teacher has no QTS record.
+        /// </summary>
+        public static string Errors_10006_Title {
+            get {
+                return ResourceManager.GetString("Errors.10006.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teacher has multiple QTS records.
+        /// </summary>
+        public static string Errors_10007_Title {
+            get {
+                return ResourceManager.GetString("Errors.10007.Title", resourceCulture);
+            }
+        }
     }
 }

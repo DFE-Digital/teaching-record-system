@@ -129,4 +129,25 @@
   <data name="ErrorMessages.TRNMustBe7Digits" xml:space="preserve">
     <value>TRN must consist of 7 digits</value>
   </data>
+  <data name="Errors.10001.Title" xml:space="preserve">
+    <value>Teacher with specified TRN not found</value>
+  </data>
+  <data name="Errors.10002.Title" xml:space="preserve">
+    <value>Multiple teachers found with specified TRN</value>
+  </data>
+  <data name="Errors.10003.Title" xml:space="preserve">
+    <value>Teacher already has QTS/EYTS date</value>
+  </data>
+  <data name="Errors.10004.Title" xml:space="preserve">
+    <value>Teacher has multiple incomplete ITT records</value>
+  </data>
+  <data name="Errors.10005.Title" xml:space="preserve">
+    <value>Teacher has no incomplete ITT record</value>
+  </data>
+  <data name="Errors.10006.Title" xml:space="preserve">
+    <value>Teacher has no QTS record</value>
+  </data>
+  <data name="Errors.10007.Title" xml:space="preserve">
+    <value>Teacher has multiple QTS records</value>
+  </data>
 </root>

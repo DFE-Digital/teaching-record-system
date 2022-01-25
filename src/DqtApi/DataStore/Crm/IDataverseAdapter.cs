@@ -17,6 +17,14 @@ namespace DqtApi.DataStore.Crm
 
         Task<Contact> GetTeacherAsync(Guid teacherId, bool resolveMerges = true, params string[] columnNames);
 
+        Task<IEnumerable<Contact>> GetTeachersByTrn(string trn, bool activeOnly = true, params string[] columnNames);
+
+        Task<SetIttResultForTeacherResult> SetIttResultForTeacher(
+            Guid teacherId,
+            string ittProviderUkprn,
+            dfeta_ITTResult result,
+            DateOnly? assessmentDate);
+
         Task<bool> UnlockTeacherRecordAsync(Guid teacherId);
     }
 }
