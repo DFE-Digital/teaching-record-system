@@ -3910,6 +3910,7 @@ namespace DqtApi.DataStore.Crm.Models
 		public static class Fields
 		{
 			public const string dfeta_name = "dfeta_name";
+			public const string dfeta_QTSDateRequired = "dfeta_qtsdaterequired";
 			public const string dfeta_Value = "dfeta_value";
 			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_teacherstatus_dfeta_qtsregistration = "dfeta_dfeta_teacherstatus_dfeta_qtsregistration";
@@ -3975,6 +3976,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_name");
 				this.SetAttributeValue("dfeta_name", value);
 				this.OnPropertyChanged("dfeta_name");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsdaterequired")]
+		public System.Nullable<bool> dfeta_QTSDateRequired
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_qtsdaterequired");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_QTSDateRequired");
+				this.SetAttributeValue("dfeta_qtsdaterequired", value);
+				this.OnPropertyChanged("dfeta_QTSDateRequired");
 			}
 		}
 		

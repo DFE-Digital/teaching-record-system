@@ -452,7 +452,7 @@ namespace DqtApi.DataStore.Crm
                             "211",   // 211 == 'Trainee Teacher:DMS'
                         teacherStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetTeacherStatusKey(teacherStatusId),
-                            _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId))) :
+                            _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
                 await Task.WhenAll(getIttProviderTask,

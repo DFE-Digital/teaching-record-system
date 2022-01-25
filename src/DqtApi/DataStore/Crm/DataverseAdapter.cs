@@ -202,8 +202,15 @@ namespace DqtApi.DataStore.Crm
             return teacher;
         }
 
-        public async Task<dfeta_teacherstatus> GetTeacherStatus(string value)
+        public async Task<dfeta_teacherstatus> GetTeacherStatus(
+            string value,
+            bool qtsDateRequired)
         {
+            // TECH DEBT Some junk reference data in the build environment means we have teacher statuses duplicated.
+            // In some cases the duplicate records vary by 'dfeta_qtsdaterequired' - we need to ensure we get the correct
+            // one as a workflow will prevent us allocating a qtsregistration for a status where dfeta_qtsdaterequired is true
+            // without a QTS Date.
+
             var query = new QueryByAttribute(dfeta_teacherstatus.EntityLogicalName)
             {
                 ColumnSet = new() { AllColumns = true }
@@ -211,6 +218,7 @@ namespace DqtApi.DataStore.Crm
 
             query.AddAttributeValue(dfeta_teacherstatus.Fields.dfeta_Value, value);
             query.AddAttributeValue(dfeta_teacherstatus.Fields.StateCode, (int)dfeta_teacherStatusState.Active);
+            query.AddAttributeValue(dfeta_teacherstatus.Fields.dfeta_QTSDateRequired, qtsDateRequired);
 
             var result = await _service.RetrieveMultipleAsync(query);
 

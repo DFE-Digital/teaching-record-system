@@ -19,7 +19,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var value = "211";
 
             // Act
-            var result = await _dataverseAdapter.GetTeacherStatus(value);
+            var result = await _dataverseAdapter.GetTeacherStatus(value, qtsDateRequired: false);
 
             // Assert
             Assert.NotNull(result);
@@ -30,10 +30,10 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_invalid_value_returns_null()
         {
             // Arrange
-            var countryCode = "XXXX";
+            var value = "XXXX";
 
             // Act
-            var result = await _dataverseAdapter.GetTeacherStatus(countryCode);
+            var result = await _dataverseAdapter.GetTeacherStatus(value, qtsDateRequired: false);
 
             // Assert
             Assert.Null(result);
