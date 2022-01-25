@@ -4,7 +4,7 @@ using Xunit;
 namespace DqtApi.Tests.DataverseIntegration
 {
     [Collection(nameof(DataverseTestCollection))]
-    public class GetCountryTests : IClassFixture<CrmClientFixture>
+    public class GetCountryTests
     {
         private readonly DataverseAdapter _dataverseAdapter;
 

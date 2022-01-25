@@ -4,7 +4,7 @@ using Xunit;
 namespace DqtApi.Tests.DataverseIntegration
 {
     [Collection(nameof(DataverseTestCollection))]
-    public class GetIttProvidersTests : IClassFixture<CrmClientFixture>
+    public class GetIttProvidersTests
     {
         private readonly DataverseAdapter _dataverseAdapter;
 

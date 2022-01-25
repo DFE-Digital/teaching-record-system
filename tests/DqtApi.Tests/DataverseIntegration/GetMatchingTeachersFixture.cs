@@ -7,7 +7,7 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class GetMatchingTeachersFixture : CrmClientFixture
+    public class GetMatchingTeachersFixture : IDisposable
     {
         public struct Fixture
         {
@@ -17,7 +17,7 @@ namespace DqtApi.Tests.DataverseIntegration
             public Guid ID { get; set; }
         }
 
-        public IOrganizationServiceAsync Service => ServiceClient;
+        public IOrganizationServiceAsync Service { get; }
         private readonly string _nonmatchingNationalInsuranceNumber;
         private readonly string _nonmatchingTRN;
 
@@ -26,8 +26,10 @@ namespace DqtApi.Tests.DataverseIntegration
         private static DateTime MatchingBirthdate => new(2001, 1, 1);
         private static DateTime NonmatchingBirthdate => new(2002, 2, 2);
 
-        public GetMatchingTeachersFixture()
+        public GetMatchingTeachersFixture(CrmClientFixture crmClientFixture)
         {
+            Service = crmClientFixture.ServiceClient;
+
             var nationalInsuranceNumberGenerator = new NationalInsuranceNumberGenerator(Service);
 
             var nationalInsuranceNumber1 = nationalInsuranceNumberGenerator.GetNextAvailable();
@@ -101,15 +103,13 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(_fixtures[index].ID, teacher.Id);
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             // remove National Insurance Number from each fixture so it can be re-used
             Enumerable.Range(0, 2).ToList().ForEach(i =>
             {
                 Service.Update(new Contact { Id = _fixtures[i].ID, dfeta_NINumber = string.Empty });
             });
-
-            base.Dispose();
         }
     }
 }

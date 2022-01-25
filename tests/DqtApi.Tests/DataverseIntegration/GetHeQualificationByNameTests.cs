@@ -5,7 +5,7 @@ using Xunit;
 namespace DqtApi.Tests.DataverseIntegration
 {
     [Collection(nameof(DataverseTestCollection))]
-    public class GetHeQualificationByNameTests : IClassFixture<CrmClientFixture>
+    public class GetHeQualificationByNameTests
     {
         private readonly DataverseAdapter _dataverseAdapter;
         private readonly ServiceClient _serviceClient;

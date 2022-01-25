@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.Crm.Sdk.Messages;
@@ -9,11 +10,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
-using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class CrmClientFixture : IDisposable, IAsyncLifetime
+    public sealed class CrmClientFixture : IAsyncDisposable
     {
         private readonly List<(string EntityName, Guid EntityId)> _createdEntities;
 
@@ -52,12 +52,11 @@ namespace DqtApi.Tests.DataverseIntegration
 
         public Task InitializeAsync() => Task.CompletedTask;
 
-        public virtual void Dispose()
+        public async ValueTask DisposeAsync()
         {
+            await CleanupEntities();
             ServiceClient.Dispose();
         }
-
-        public Task DisposeAsync() => CleanupEntities();
 
         public void RegisterForCleanup(Entity entity)
         {
