@@ -5,6 +5,100 @@
     "version": "v2"
   },
   "paths": {
+    "/v2/teachers/{trn}/itt-outcome": {
+      "put": {
+        "tags": [
+          "IttOutcome"
+        ],
+        "summary": "Sets ITT outcome for a teacher",
+        "parameters": [
+          {
+            "name": "trn",
+            "in": "path",
+            "description": "The TRN of the teacher to set ITT outcome for.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetIttOutcomeRequest"
+              },
+              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22"}
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetIttOutcomeRequest"
+              },
+              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22"}
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetIttOutcomeRequest"
+              },
+              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetIttOutcomeResponse"
+                },
+                "example": {"trn":"1234567","qtsDate":"2021-12-23"}
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/itt-providers": {
       "get": {
         "tags": [
@@ -384,6 +478,16 @@
         },
         "additionalProperties": false
       },
+      "IttOutcome": {
+        "enum": [
+          "Pass",
+          "Fail",
+          "Withdrawn",
+          "Deferred",
+          "DeferredForSkillsTests"
+        ],
+        "type": "string"
+      },
       "IttProgrammeType": {
         "enum": [
           "Core",
@@ -465,6 +569,41 @@
           }
         },
         "additionalProperties": { }
+      },
+      "SetIttOutcomeRequest": {
+        "required": [
+          "ittProviderUkprn",
+          "outcome"
+        ],
+        "type": "object",
+        "properties": {
+          "ittProviderUkprn": {
+            "type": "string"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/IttOutcome"
+          },
+          "assessmentDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SetIttOutcomeResponse": {
+        "type": "object",
+        "properties": {
+          "trn": {
+            "type": "string"
+          },
+          "qtsDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "TrnRequestInfo": {
         "type": "object",
