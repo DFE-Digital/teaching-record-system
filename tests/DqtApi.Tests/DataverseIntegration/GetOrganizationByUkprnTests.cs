@@ -4,8 +4,7 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    [Collection(nameof(DataverseTestCollection))]
-    public class GetOrganizationByUkprnTests : IClassFixture<CrmClientFixture>
+    public class GetOrganizationByUkprnTests
     {
         private readonly DataverseAdapter _dataverseAdapter;
 

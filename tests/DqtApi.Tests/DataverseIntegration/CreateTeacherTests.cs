@@ -6,23 +6,27 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    [Collection(nameof(DataverseTestCollection))]
-    public class CreateTeacherTests : IClassFixture<CrmClientFixture>, IAsyncLifetime
+    [Collection(nameof(ExclusiveCrmTestCollection))]
+    public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLifetime
     {
+        private readonly CreateTeacherFixture _createTeacherFixture;
         private readonly CrmClientFixture _crmClientFixture;
         private readonly DataverseAdapter _dataverseAdapter;
         private readonly ServiceClient _serviceClient;
+        private readonly EntityCleanupHelper _entityCleanupHelper;
 
-        public CreateTeacherTests(CrmClientFixture crmClientFixture)
+        public CreateTeacherTests(CreateTeacherFixture createTeacherFixture, CrmClientFixture crmClientFixture)
         {
+            _createTeacherFixture = createTeacherFixture;
             _crmClientFixture = crmClientFixture;
             _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
             _serviceClient = crmClientFixture.ServiceClient;
+            _entityCleanupHelper = crmClientFixture.CreateEntityCleanupHelper();
         }
 
         public Task InitializeAsync() => Task.CompletedTask;
 
-        public Task DisposeAsync() => _crmClientFixture.CleanupEntities();
+        public Task DisposeAsync() => _entityCleanupHelper.CleanupEntities();
 
         [Fact]
         public async Task Given_valid_request_creates_required_entities()
@@ -31,7 +35,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
+            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
 
             // Assert
             Assert.True(result.Succeeded);
@@ -53,7 +57,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command, findExistingTeacher);
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
+            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
 
             // Assert
             Assert.True(result.Succeeded);
@@ -76,18 +80,11 @@ namespace DqtApi.Tests.DataverseIntegration
             string expectedDescriptionSupplement)
         {
             // Arrange
-            var firstName = "Joe";
-            var middleName = "X";
-            var lastName = "Bloggs";
-            var birthDate = new DateTime(1990, 5, 23);
-
-            var existingTeacherId = await _serviceClient.CreateAsync(new Contact()
-            {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                BirthDate = birthDate
-            });
+            var firstName = _createTeacherFixture.ExistingTeacherFirstName;
+            var middleName = _createTeacherFixture.ExistingTeacherFirstNameMiddleName;
+            var lastName = _createTeacherFixture.ExistingTeacherFirstNameLastName;
+            var birthDate = _createTeacherFixture.ExistingTeacherFirstNameBirthDate;
+            var existingTeacherId = _createTeacherFixture.ExistingTeacherId;
 
             DataverseAdapter.FindExistingTeacher findExistingTeacher = () =>
                 Task.FromResult(new DataverseAdapter.CreateTeacherDuplicateTeacherResult()
@@ -109,8 +106,8 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command, findExistingTeacher);
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, existingTeacherId);
+            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
+            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, existingTeacherId);
 
             // Assert
             Assert.True(result.Succeeded);
@@ -286,7 +283,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 LastName = matchOnSurname ? command.LastName : "Oli",
                 BirthDate = matchOnDateOfBirth ? command.BirthDate : new(1945, 2, 3)
             });
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, existingTeacherId);
+            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, existingTeacherId);
 
             var helper = new DataverseAdapter.CreateTeacherHelper(_dataverseAdapter, command);
 
@@ -375,6 +372,36 @@ namespace DqtApi.Tests.DataverseIntegration
             configureCommand?.Invoke(command);
 
             return command;
+        }
+    }
+
+    public class CreateTeacherFixture : IAsyncLifetime
+    {
+        private readonly CrmClientFixture _crmClientFixture;
+
+        public CreateTeacherFixture(CrmClientFixture crmClientFixture)
+        {
+            _crmClientFixture = crmClientFixture;
+        }
+
+        public Guid ExistingTeacherId { get; private set; }
+        public string ExistingTeacherFirstName => "Joe";
+        public string ExistingTeacherFirstNameMiddleName => "X";
+        public string ExistingTeacherFirstNameLastName => "Bloggs";
+        public DateTime ExistingTeacherFirstNameBirthDate => new DateTime(1990, 5, 23);
+
+        public Task DisposeAsync() => Task.CompletedTask;
+
+        public async Task InitializeAsync()
+        {
+            ExistingTeacherId = await _crmClientFixture.ServiceClient.CreateAsync(new Contact()
+            {
+                FirstName = ExistingTeacherFirstName,
+                MiddleName = ExistingTeacherFirstNameMiddleName,
+                LastName = ExistingTeacherFirstNameLastName,
+                BirthDate = ExistingTeacherFirstNameBirthDate
+            });
+            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, ExistingTeacherId);
         }
     }
 }

@@ -3,8 +3,7 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    [Collection(nameof(DataverseTestCollection))]
-    public class GetEarlyYearsStatusTests : IClassFixture<CrmClientFixture>
+    public class GetEarlyYearsStatusTests
     {
         private readonly DataverseAdapter _dataverseAdapter;
 
