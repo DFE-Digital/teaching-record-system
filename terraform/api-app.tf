@@ -1,6 +1,8 @@
 locals {
   api_app_config = {
-    AppConfig = data.azurerm_key_vault_secret.secrets["APP-CONFIG"].value
+    AppConfig       = data.azurerm_key_vault_secret.secrets["APP-CONFIG"].value,
+    AppVersion      = var.api_app_version,
+    PaasEnvironment = var.environment_name
   }
 
   logstash_endpoint = data.azurerm_key_vault_secret.secrets["LOGSTASH-ENDPOINT"].value

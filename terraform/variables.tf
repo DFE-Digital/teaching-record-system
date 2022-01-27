@@ -1,3 +1,7 @@
+variable "environment_name" {
+  type = string
+}
+
 variable "azure_sp_credentials_json" {
   type = string
 }
@@ -28,6 +32,10 @@ variable "api_app_name" {
 }
 
 variable "api_docker_image" {
+  type = string
+}
+
+variable "api_app_version" {
   type = string
 }
 
