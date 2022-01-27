@@ -14,6 +14,7 @@ using DqtApi.Swagger;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -28,6 +29,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Npgsql;
 using Prometheus;
+using Sentry.AspNetCore;
 using Serilog;
 using Serilog.Context;
 using StackExchange.Redis;
@@ -42,7 +44,16 @@ namespace DqtApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var services = builder.Services;
+            var env = builder.Environment;
+            var configuration = builder.Configuration;
+
             builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
+
+            if (env.IsProduction())
+            {
+                builder.WebHost.UseSentry();
+            }
 
             if (builder.Environment.IsProduction())
             {
@@ -51,10 +62,6 @@ namespace DqtApi
                     .AddJsonEnvironmentVariable("VCAP_SERVICES", configurationKeyPrefix: "VCAP_SERVICES")
                     .AddJsonEnvironmentVariable("VCAP_APPLICATION", configurationKeyPrefix: "VCAP_APPLICATION");
             }
-
-            var services = builder.Services;
-            var env = builder.Environment;
-            var configuration = builder.Configuration;
 
             services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
                 .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { });
@@ -148,6 +155,21 @@ namespace DqtApi
                 });
             });
 
+            services.Configure<SentryAspNetCoreOptions>(options =>
+            {
+                var paasEnvironmentName = configuration["PaasEnvironment"];
+                if (!string.IsNullOrEmpty(paasEnvironmentName))
+                {
+                    options.Environment = paasEnvironmentName;
+                }
+
+                var gitSha = configuration["GitSha"];
+                if (!string.IsNullOrEmpty(gitSha))
+                {
+                    options.Release = gitSha;
+                }
+            });
+
             var pgConnectionString = GetPostgresConnectionString();
 
             var healthCheckBuilder = services.AddHealthChecks()
@@ -201,6 +223,12 @@ namespace DqtApi
             app.UseSerilogRequestLogging();
 
             app.UseRouting();
+
+            if (env.IsProduction())
+            {
+                app.UseSentryTracing();
+            }
+
             app.UseHttpMetrics();
 
             app.UseHealthChecks("/status");
