@@ -54,6 +54,15 @@ runs:
         TFVARS: ${{ inputs.terraform_vars }}
       working-directory: terraform
 
+    - name: Extract version
+      id: get_version
+      run: |
+        API_VERSION=${DOCKER_IMAGE##*:}
+        echo ::set-output name=api_version::$API_VERSION
+      env:
+        DOCKER_IMAGE: ${{ inputs.docker_image }}
+      shell: bash
+
     - uses: Azure/login@v1
       with:
         creds: ${{ inputs.azure_credentials }}
@@ -95,6 +104,7 @@ runs:
         BACKEND_TFVARS: ${{ inputs.terraform_backend_vars }}
         TF_VAR_azure_sp_credentials_json: ${{ inputs.azure_credentials }}
         TF_VAR_api_docker_image: ${{ inputs.docker_image }}
+        TF_VAR_api_app_version: ${{ steps.get_version.outputs.api_version }}
       shell: bash
       working-directory: terraform
 
