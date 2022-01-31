@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
+using DqtApi.Logging;
 using DqtApi.V1.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,7 @@ namespace DqtApi.V1.Controllers
         [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+        [RedactQueryParam("birthdate")]
         public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)           
         {            
             if (!request.BirthDate.HasValue)

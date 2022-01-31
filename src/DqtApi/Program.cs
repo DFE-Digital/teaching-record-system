@@ -8,6 +8,7 @@ using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Sql;
 using DqtApi.Filters;
 using DqtApi.Json;
+using DqtApi.Logging;
 using DqtApi.ModelBinding;
 using DqtApi.Security;
 using DqtApi.Swagger;
@@ -19,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,8 +32,8 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using Npgsql;
 using Prometheus;
 using Sentry.AspNetCore;
+using Sentry.Extensibility;
 using Serilog;
-using Serilog.Context;
 using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -186,6 +188,7 @@ namespace DqtApi
             });
             services.AddSingleton<IClock, Clock>();
             services.AddMemoryCache();
+            services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
 
             services.AddDbContext<DqtContext>(options =>
             {
@@ -212,15 +215,9 @@ namespace DqtApi
 
             MetricLabels.ConfigureLabels(builder.Configuration);
 
-            var app = builder.Build();            
+            var app = builder.Build();
 
-            app.Use((ctx, next) =>
-            {
-                LogContext.PushProperty("CorrelationId", ctx.TraceIdentifier);
-                return next();
-            });
-
-            app.UseSerilogRequestLogging();
+            app.UseRequestLogging();
 
             app.UseRouting();
 
