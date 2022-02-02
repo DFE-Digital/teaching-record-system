@@ -296,42 +296,6 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(expectedMatchedAttributes, result?.MatchedAttributes);
         }
 
-        [Theory]
-        [InlineData(dfeta_ITTProgrammeType.EYITTAssessmentOnly, true)]
-        [InlineData(dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased, true)]
-        [InlineData(dfeta_ITTProgrammeType.EYITTGraduateEntry, true)]
-        [InlineData(dfeta_ITTProgrammeType.EYITTSchoolDirect_EarlyYears, true)]
-        [InlineData(dfeta_ITTProgrammeType.EYITTUndergraduate, true)]
-        [InlineData(dfeta_ITTProgrammeType.Apprenticeship, false)]
-        [InlineData(dfeta_ITTProgrammeType.AssessmentOnlyRoute, false)]
-        [InlineData(dfeta_ITTProgrammeType.Core, false)]
-        [InlineData(dfeta_ITTProgrammeType.CoreFlexible, false)]
-        [InlineData(dfeta_ITTProgrammeType.FutureTeachingScholars, false)]
-        [InlineData(dfeta_ITTProgrammeType.GraduateTeacherProgramme, false)]
-        [InlineData(dfeta_ITTProgrammeType.HEI, false)]
-        [InlineData(dfeta_ITTProgrammeType.LicensedTeacherProgramme, false)]
-        [InlineData(dfeta_ITTProgrammeType.OverseasTrainedTeacherProgramme, false)]
-        [InlineData(dfeta_ITTProgrammeType.RegisteredTeacherProgramme, false)]
-        [InlineData(dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme, false)]
-        [InlineData(dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Salaried, false)]
-        [InlineData(dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Selffunded, false)]
-        [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme, false)]
-        [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme_CC, false)]
-        [InlineData(dfeta_ITTProgrammeType.UndergraduateOptIn, false)]
-        public void IsEarlyYears_returns_correct_value(dfeta_ITTProgrammeType programmeType, bool expectedResult)
-        {
-            // Arrange
-            var command = CreateCommand(c => c.InitialTeacherTraining.ProgrammeType = programmeType);
-
-            var helper = new DataverseAdapter.CreateTeacherHelper(_dataverseAdapter, command);
-
-            // Act
-            var result = helper.IsEarlyYears;
-
-            // Assert
-            Assert.Equal(expectedResult, result);
-        }
-
         private static CreateTeacherCommand CreateCommand(Action<CreateTeacherCommand> configureCommand = null)
         {
             var command = new CreateTeacherCommand()

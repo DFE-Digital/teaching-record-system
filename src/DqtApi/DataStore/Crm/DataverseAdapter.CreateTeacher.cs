@@ -113,16 +113,6 @@ namespace DqtApi.DataStore.Crm
 
             public Guid TeacherId { get; }
 
-            internal bool IsEarlyYears => _command.InitialTeacherTraining.ProgrammeType switch
-            {
-                dfeta_ITTProgrammeType.EYITTAssessmentOnly => true,
-                dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased => true,
-                dfeta_ITTProgrammeType.EYITTGraduateEntry => true,
-                dfeta_ITTProgrammeType.EYITTSchoolDirect_EarlyYears => true,
-                dfeta_ITTProgrammeType.EYITTUndergraduate => true,
-                _ => false
-            };
-
             public CrmTask CreateDuplicateReviewTaskEntity(CreateTeacherDuplicateTeacherResult duplicate)
             {
                 var description = GetDescription();
@@ -395,6 +385,8 @@ namespace DqtApi.DataStore.Crm
                 Debug.Assert(!string.IsNullOrEmpty(_command.Qualification.CountryCode));
                 Debug.Assert(!string.IsNullOrEmpty(_command.Qualification.Subject));
 
+                var isEarlyYears = _command.InitialTeacherTraining.ProgrammeType.IsEarlyYears();
+
                 static TResult Let<T, TResult>(T value, Func<T, TResult> getResult) => getResult(value);
 
                 var getIttProviderTask = Let(
@@ -445,7 +437,7 @@ namespace DqtApi.DataStore.Crm
                         CacheKeys.GetHeSubjectKey(subjectName),
                         _ => _dataverseAdapter.GetHeSubjectByName(subjectName)));
 
-                var getEarlyYearsStatusTask = IsEarlyYears ?
+                var getEarlyYearsStatusTask = isEarlyYears ?
                     Let(
                         "220", // 220 == 'Early Years Trainee'
                         earlyYearsStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
@@ -453,12 +445,14 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetEarlyYearsStatus(earlyYearsStatusId))) :
                     Task.FromResult<dfeta_earlyyearsstatus>(null);
 
-                var getTeacherStatusTask = !IsEarlyYears ?
+                var getTeacherStatusTask = !isEarlyYears ?
                     Let(
                         _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
                             "212" :  // 212 == 'AOR Candidate'
                             "211",   // 211 == 'Trainee Teacher:DMS'
-                        teacherStatusId => _dataverseAdapter.GetTeacherStatus(teacherStatusId)) :
+                        teacherStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetTeacherStatusKey(teacherStatusId),
+                            _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
                 await Task.WhenAll(getIttProviderTask,
@@ -472,8 +466,8 @@ namespace DqtApi.DataStore.Crm
                     getEarlyYearsStatusTask,
                     getTeacherStatusTask);
 
-                Debug.Assert(!IsEarlyYears || getEarlyYearsStatusTask.Result != null, "Early years status lookup failed.");
-                Debug.Assert(IsEarlyYears || getTeacherStatusTask.Result != null, "Teacher status lookup failed.");
+                Debug.Assert(!isEarlyYears || getEarlyYearsStatusTask.Result != null, "Early years status lookup failed.");
+                Debug.Assert(isEarlyYears || getTeacherStatusTask.Result != null, "Teacher status lookup failed.");
 
                 return new()
                 {

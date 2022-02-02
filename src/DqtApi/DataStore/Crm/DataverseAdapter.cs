@@ -37,6 +37,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_country.Fields.dfeta_Value, value);
+            query.AddAttributeValue(dfeta_country.Fields.StateCode, (int)dfeta_countryState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
@@ -51,6 +52,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.dfeta_Value, value);
+            query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.StateCode, (int)dfeta_earlyyearsStatusState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
@@ -65,6 +67,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_hequalification.Fields.dfeta_name, name);
+            query.AddAttributeValue(dfeta_hequalification.Fields.StateCode, (int)dfeta_hequalificationState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
@@ -79,10 +82,28 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_hesubject.Fields.dfeta_name, name);
+            query.AddAttributeValue(dfeta_hesubject.Fields.StateCode, (int)dfeta_hesubjectState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
             return result.Entities.Select(entity => entity.ToEntity<dfeta_hesubject>()).FirstOrDefault();
+        }
+
+        public async Task<IEnumerable<dfeta_initialteachertraining>> GetInitialTeacherTrainingByTeacher(
+            Guid teacherId,
+            params string[] columnNames)
+        {
+            var query = new QueryByAttribute(dfeta_initialteachertraining.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames)
+            };
+
+            query.AddAttributeValue(dfeta_initialteachertraining.Fields.dfeta_PersonId, teacherId);
+            query.AddAttributeValue(dfeta_initialteachertraining.Fields.StateCode, (int)dfeta_initialteachertrainingState.Active);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>());
         }
 
         public async Task<IEnumerable<Account>> GetIttProviders()
@@ -117,6 +138,7 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(dfeta_ittsubject.Fields.dfeta_name, name);
+            query.AddAttributeValue(dfeta_ittsubject.Fields.StateCode, (int)dfeta_ittsubjectState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
@@ -144,10 +166,28 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(Account.Fields.dfeta_UKPRN, ukprn);
+            query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
             return result.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
+        }
+
+        public async Task<IEnumerable<dfeta_qtsregistration>> GetQtsRegistrationsByTeacher(
+            Guid teacherId,
+            params string[] columnNames)
+        {
+            var query = new QueryByAttribute(dfeta_qtsregistration.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames)
+            };
+
+            query.AddAttributeValue(dfeta_qtsregistration.Fields.dfeta_PersonId, teacherId);
+            query.AddAttributeValue(dfeta_qtsregistration.Fields.StateCode, (int)dfeta_qtsregistrationState.Active);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<dfeta_qtsregistration>());
         }
 
         public async Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId)
@@ -196,14 +236,44 @@ namespace DqtApi.DataStore.Crm
             return teacher;
         }
 
-        public async Task<dfeta_teacherstatus> GetTeacherStatus(string value)
+        public async Task<IEnumerable<Contact>> GetTeachersByTrn(string trn, bool activeOnly = true, params string[] columnNames)
         {
+            var filter = new FilterExpression(LogicalOperator.And);
+            filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
+
+            if (activeOnly)
+            {
+                filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+            }
+
+            var query = new QueryExpression(Contact.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames),
+                Criteria = filter
+            };
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(e => e.ToEntity<Contact>());
+        }
+
+        public async Task<dfeta_teacherstatus> GetTeacherStatus(
+            string value,
+            bool qtsDateRequired)
+        {
+            // TECH DEBT Some junk reference data in the build environment means we have teacher statuses duplicated.
+            // In some cases the duplicate records vary by 'dfeta_qtsdaterequired' - we need to ensure we get the correct
+            // one as a workflow will prevent us allocating a qtsregistration for a status where dfeta_qtsdaterequired is true
+            // without a QTS Date.
+
             var query = new QueryByAttribute(dfeta_teacherstatus.EntityLogicalName)
             {
                 ColumnSet = new() { AllColumns = true }
             };
 
             query.AddAttributeValue(dfeta_teacherstatus.Fields.dfeta_Value, value);
+            query.AddAttributeValue(dfeta_teacherstatus.Fields.StateCode, (int)dfeta_teacherStatusState.Active);
+            query.AddAttributeValue(dfeta_teacherstatus.Fields.dfeta_QTSDateRequired, qtsDateRequired);
 
             var result = await _service.RetrieveMultipleAsync(query);
 

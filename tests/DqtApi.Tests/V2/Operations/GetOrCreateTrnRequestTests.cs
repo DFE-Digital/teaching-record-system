@@ -4,7 +4,6 @@ using System.Net.Http.Json;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql.Models;
-using DqtApi.Json;
 using DqtApi.TestCommon;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
@@ -105,10 +104,10 @@ namespace DqtApi.Tests.V2.Operations
             var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
 
             // Assert
-            await AssertEx.ResponseIsProblemDetails(
+            await AssertEx.ResponseIsValidationErrorForProperty(
                 response,
-                expectedError: Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes,
-                propertyName: "requestId");
+                propertyName: nameof(TrnRequest.RequestId),
+                expectedError: Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
         }
 
         [Fact]
@@ -121,10 +120,10 @@ namespace DqtApi.Tests.V2.Operations
             var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
 
             // Assert
-            await AssertEx.ResponseIsProblemDetails(
+            await AssertEx.ResponseIsValidationErrorForProperty(
                 response,
-                expectedError: Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer,
-                propertyName: "requestId");
+                propertyName: nameof(TrnRequest.RequestId),
+                expectedError: Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
         }
 
         [Theory]
@@ -158,7 +157,7 @@ namespace DqtApi.Tests.V2.Operations
                 expectedStatusCode: 201);
         }
 
-        private static JsonContent CreateRequest(Action<GetOrCreateTrnRequest> configureRequest = null)
+        private JsonContent CreateRequest(Action<GetOrCreateTrnRequest> configureRequest = null)
         {
             var request = new GetOrCreateTrnRequest()
             {
@@ -197,7 +196,7 @@ namespace DqtApi.Tests.V2.Operations
 
             configureRequest?.Invoke(request);
 
-            return JsonContent.Create(request, options: new System.Text.Json.JsonSerializerOptions().AddConverters());
+            return CreateJsonContent(request);
         }
     }
 }

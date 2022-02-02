@@ -35,7 +35,26 @@ namespace DqtApi.TestCommon
             JsonObjectEquals(JToken.FromObject(expected), jsonResponse);
         }
 
-        public static async Task ResponseIsProblemDetails(HttpResponseMessage response, string expectedError, string propertyName, int expectedStatusCode = 400)
+        public static async Task ResponseIsError(HttpResponseMessage response, int errorCode, int expectedStatusCode)
+        {
+            var problemDetails = await ResponseIsProblemDetails(response, expectedStatusCode);
+
+            Assert.Contains(problemDetails.Extensions, kvp => kvp.Key == "errorCode");
+            Assert.Equal(errorCode, problemDetails.Extensions["errorCode"].ToObject<int>());
+        }
+
+        public static async Task ResponseIsValidationErrorForProperty(
+            HttpResponseMessage response,
+            string propertyName,
+            string expectedError,
+            int expectedStatusCode = 400)
+        {
+            var problemDetails = await ResponseIsProblemDetails(response, expectedStatusCode);
+
+            Assert.Equal(expectedError, problemDetails.Errors[propertyName].Single());
+        }
+
+        private static async Task<ProblemDetails> ResponseIsProblemDetails(HttpResponseMessage response, int expectedStatusCode)
         {
             if (response is null)
             {
@@ -48,14 +67,41 @@ namespace DqtApi.TestCommon
             var json = await response.Content.ReadAsStringAsync();
             var problemDetails = JsonConvert.DeserializeObject<ProblemDetails>(json);
             Assert.Equal(expectedStatusCode, problemDetails.Status);
-            Assert.Equal(expectedError, problemDetails.Errors[propertyName].Single());
+
+            return problemDetails;
         }
 
         private class ProblemDetails
         {
             public string Title { get; set; }
             public int Status { get; set; }
+            [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<string[]>))]
             public Dictionary<string, string[]> Errors { get; set; }
+            [JsonExtensionData]
+            public IDictionary<string, JToken> Extensions { get; set; }
+        }
+
+        private class CaseInsensitiveDictionaryConverter<T> : JsonConverter
+        {
+            public override bool CanConvert(Type objectType) =>
+                objectType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<string, T>));
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                if (reader.TokenType == JsonToken.Null)
+                {
+                    return null;
+                }
+
+                var dictionary = new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
+                serializer.Populate(reader, dictionary);
+                return dictionary;
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                throw new NotSupportedException();
+            }
         }
     }
 }

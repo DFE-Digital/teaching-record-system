@@ -36,5 +36,23 @@ namespace DqtApi.Tests
                 request.Requests,
                 request => request is CreateRequest createRequest && createRequest.Target is TEntity);
         }
+
+        public static TEntity AssertSingleUpdateRequest<TEntity>(this ExecuteTransactionRequest request)
+            where TEntity : Entity
+        {
+            var updateRequest = (UpdateRequest)Assert.Single(
+                request.Requests,
+                request => request is UpdateRequest updateRequest && updateRequest.Target is TEntity);
+
+            return (TEntity)updateRequest.Target;
+        }
+
+        public static void AssertDoesNotContainUpdateRequest<TEntity>(this ExecuteTransactionRequest request)
+            where TEntity : Entity
+        {
+            Assert.DoesNotContain(
+                request.Requests,
+                request => request is UpdateRequest updateRequest && updateRequest.Target is TEntity);
+        }
     }
 }

@@ -87,6 +87,7 @@ namespace DqtApi
                     options.Filters.Add(new AuthorizeFilter());
                     options.Filters.Add(new ProducesJsonOrProblemAttribute());
                     options.Filters.Add(new CrmServiceProtectionFaultExceptionFilter());
+                    options.Filters.Add(new DefaultErrorExceptionFilter(statusCode: StatusCodes.Status400BadRequest));
 
                     options.Conventions.Add(new ApiVersionConvention());
                 })
@@ -97,6 +98,7 @@ namespace DqtApi
                 .AddFluentValidation(fv =>
                 {
                     fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));
+                    fv.DisableDataAnnotationsValidation = true;
                 });
 
             services.AddTransient<IApiDescriptionProvider, HybridBodyApiDescriptionProvider>();

@@ -13,5 +13,7 @@
         public static object GetIttSubjectKey(string name) => $"itt_subject:{name}";
 
         public static object GetOrganizationByUkprnKey(string ukprn) => $"organization:{ukprn}";
+
+        public static object GetTeacherStatusKey(string code) => $"teacher_status:{code}";
     }
 }
