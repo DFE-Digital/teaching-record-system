@@ -1,0 +1,9 @@
+{
+  "name": "dqt-api-load-tests",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "dependencies": {
+    "k6": "^0.0.0"
+  }
+}
