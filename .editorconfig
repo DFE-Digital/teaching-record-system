@@ -22,5 +22,8 @@ indent_size = 2
 [*.tsv]
 indent_style = tab
 
+[*.js]
+indent_size = 2
+
 [*.cs]
 dotnet_sort_system_directives_first = true
