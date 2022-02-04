@@ -180,21 +180,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Checkout PR
-      run: gh pr checkout ${{ github.event.pull_request.number }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - uses: fregante/setup-git-user@v1
-
     - name: Generate specs
       shell: pwsh
       run: ./Sync-ApiSpecs.ps1 ${{ needs.deploy_dev.outputs.environment_url }}
 
-    - name: Commit specs
+    - name: Verify specs
       run: |
         git add docs/api-specs
-        git diff --cached --quiet docs/api-specs || (git commit -m "Sync API specs" && git push)
+        git diff --cached --quiet docs/api-specs || (
+          echo "::error ::API specs are stale; run Sync-ApiSpecs.ps1"
+          exit 1
+        )
 
   zap_scan:
     name: OWASP ZAP API scan
