@@ -4,18 +4,10 @@ on:
   push:
     branches:
     - main
-    paths-ignore:
-    - 'docs/**'
-    - 'README.md'
-    - 'LICENSE'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
     - main
-    paths-ignore:
-    - 'docs/**'
-    - 'README.md'
-    - 'LICENSE'
 
 env:
   CONTAINER_REGISTRY: ghcr.io
