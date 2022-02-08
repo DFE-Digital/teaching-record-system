@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Specialized;
 using DqtApi.DataStore.Crm;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +17,8 @@ namespace DqtApi.Tests.DataverseIntegration
     public sealed class CrmClientFixture : IAsyncDisposable
     {
         private readonly EntityCleanupHelper _createdEntityTracker;
+        private readonly CancellationTokenSource _completedCts;
+        private readonly EnvironmentLockManager _lockManager;
 
         public CrmClientFixture()
         {
@@ -19,6 +26,10 @@ namespace DqtApi.Tests.DataverseIntegration
             Configuration = GetConfiguration();
             ServiceClient = GetCrmServiceClient();
             _createdEntityTracker = CreateEntityCleanupHelper();
+
+            _completedCts = new CancellationTokenSource();
+            _lockManager = new EnvironmentLockManager(Configuration);
+            _lockManager.AcquireLock(_completedCts.Token);
         }
 
         public TestableClock Clock { get; }
@@ -31,12 +42,11 @@ namespace DqtApi.Tests.DataverseIntegration
 
         public EntityCleanupHelper CreateEntityCleanupHelper() => new(ServiceClient);
 
-        public Task InitializeAsync() => Task.CompletedTask;
-
         public async ValueTask DisposeAsync()
         {
             await _createdEntityTracker.CleanupEntities();
             ServiceClient.Dispose();
+            _completedCts.Cancel();
         }
 
         public void RegisterForCleanup(Entity entity) =>
@@ -59,5 +69,61 @@ namespace DqtApi.Tests.DataverseIntegration
                 Configuration["CrmClientId"],
                 Configuration["CrmClientSecret"],
                 useUniqueInstance: true)).Result;
+
+        private class EnvironmentLockManager
+        {
+            private static readonly TimeSpan _lockAcquireWaitTime = TimeSpan.FromMinutes(2);
+            private static readonly TimeSpan _lockAcquireRetryDelay = TimeSpan.FromSeconds(5);
+            private static readonly TimeSpan _lockRenewalInterval = TimeSpan.FromSeconds(60);
+            private static readonly TimeSpan _lockRenewalBuffer = TimeSpan.FromSeconds(10);
+
+            private readonly BlobClient _blobClient;
+
+            public EnvironmentLockManager(IConfiguration configuration)
+            {
+                var blobUri = new Uri(configuration["BuildEnvLockBlobUri"]);
+                var sasToken = configuration["BuildEnvLockBlobSasToken"];
+
+                _blobClient = new BlobClient(blobUri, new AzureSasCredential(sasToken));
+            }
+
+            public void AcquireLock(CancellationToken cancellationToken)
+            {
+                Debug.Assert(_lockRenewalBuffer < _lockRenewalInterval);
+
+                var leaseClient = _blobClient.GetBlobLeaseClient();
+
+                var acquireSw = Stopwatch.StartNew();
+
+                while (true)
+                {
+                    try
+                    {
+                        leaseClient.Acquire(_lockRenewalInterval, cancellationToken: cancellationToken);
+                        break;
+                    }
+                    catch (RequestFailedException ex) when (ex.ErrorCode == "LeaseAlreadyPresent" && acquireSw.Elapsed < _lockAcquireWaitTime)
+                    {
+                        Thread.Sleep(_lockAcquireRetryDelay);
+                    }
+                }
+
+                cancellationToken.Register(() => leaseClient.Release());
+
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(_lockRenewalInterval - _lockRenewalBuffer, cancellationToken);
+                    await RenewLock();
+
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        await Task.Delay(_lockRenewalInterval, cancellationToken);
+                        await RenewLock();
+                    }
+
+                    Task RenewLock() => leaseClient.RenewAsync();
+                }, cancellationToken);
+            }
+        }
     }
 }
