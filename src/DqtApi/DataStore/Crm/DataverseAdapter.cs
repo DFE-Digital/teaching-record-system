@@ -312,6 +312,80 @@ namespace DqtApi.DataStore.Crm
             qualifiedTeacherStatusLink.EntityAlias = nameof(dfeta_qtsregistration);
         }
 
+        public async Task<Account> GetOrganizationByProviderName(string providerName, params string[] columnNames)
+        {
+            var query = new QueryByAttribute(Account.EntityLogicalName)
+            {
+                ColumnSet = new ColumnSet(columnNames)
+            };
+
+            query.AddAttributeValue(Account.Fields.Name, providerName);
+            query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
+        }
+
+        public async Task<IReadOnlyCollection<Contact>> FindTeachers(FindTeachersQuery filter)
+        {
+            var fields = new[]
+            {
+                (FieldName: Contact.Fields.FirstName, Value: filter.FirstName),
+                (FieldName: Contact.Fields.MiddleName, Value: filter.MiddleName),
+                (FieldName: Contact.Fields.LastName, Value: filter.LastName),
+                (FieldName: Contact.Fields.BirthDate, Value: (object)filter.DateOfBirth),
+                (FieldName: Contact.Fields.dfeta_NINumber, Value: filter.NationalInsuranceNumber),
+                (FieldName: Contact.Fields.EMailAddress1, Value: filter.EmailAddress),
+                (FieldName: Contact.Fields.FirstName, Value: filter.PreviousFirstName),
+                (FieldName: Contact.Fields.LastName, Value: filter.PreviousLastName),
+            }.ToList();
+
+            // If fields are null in the input then don't try to match them (typically MiddleName)
+            fields.RemoveAll(f => f.Value == null);
+
+            var combinations = fields.GetCombinations(length: 2).ToArray();
+
+            if (combinations.Length == 0)
+            {
+                return null;
+            }
+            var combinationsFilter = new FilterExpression(LogicalOperator.Or);
+
+            foreach (var combination in combinations)
+            {
+                var innerFilter = new FilterExpression(LogicalOperator.And);
+
+                foreach (var (fieldName, value) in combination)
+                {
+                    innerFilter.AddCondition(fieldName, ConditionOperator.Equal, value);
+                }
+
+                combinationsFilter.AddFilter(innerFilter);
+            }
+
+            var query = new QueryExpression(Contact.EntityLogicalName)
+            {
+                ColumnSet = new ColumnSet(true),
+                Criteria = combinationsFilter,
+                Orders =
+                {
+                    new OrderExpression(Contact.Fields.LastName, OrderType.Ascending)
+                }
+            };
+
+            // filter by IttProviderOrganisationId if provided
+            if (filter.IttProviderOrganizationId.HasValue)
+            {
+                var le1 = new LinkEntity(Contact.EntityLogicalName, dfeta_initialteachertraining.EntityLogicalName, Contact.PrimaryIdAttribute, dfeta_initialteachertraining.Fields.dfeta_PersonId, JoinOperator.LeftOuter);
+                le1.Columns = new ColumnSet(dfeta_initialteachertraining.Fields.dfeta_EstablishmentId);
+                le1.LinkCriteria.AddCondition(dfeta_initialteachertraining.Fields.dfeta_EstablishmentId, ConditionOperator.Equal, filter.IttProviderOrganizationId);
+                query.LinkEntities.Add(le1);
+            }
+            var result = await _service.RetrieveMultipleAsync(query);
+            return result.Entities.Select(entity => entity.ToEntity<Contact>()).ToList(); ;
+        }
+
         private static void AddInitialTeacherTrainingLink(QueryExpression query)
         {
             var initialTeacherTrainingLink = query.AddLink(dfeta_initialteachertraining.EntityLogicalName, Contact.PrimaryIdAttribute,
@@ -341,7 +415,7 @@ namespace DqtApi.DataStore.Crm
 
             AddSubjectLink(initialTeacherTrainingLink, dfeta_initialteachertraining.Fields.dfeta_Subject1Id, aliasPrefix + 1);
             AddSubjectLink(initialTeacherTrainingLink, dfeta_initialteachertraining.Fields.dfeta_Subject2Id, aliasPrefix + 2);
-            AddSubjectLink(initialTeacherTrainingLink, dfeta_initialteachertraining.Fields.dfeta_Subject3Id, aliasPrefix + 3);            
+            AddSubjectLink(initialTeacherTrainingLink, dfeta_initialteachertraining.Fields.dfeta_Subject3Id, aliasPrefix + 3);
         }
 
         private static void AddSubjectLink(LinkEntity initialTeacherTrainingLink, string subjectIdField, string alias)

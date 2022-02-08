@@ -129,6 +129,119 @@
         }
       }
     },
+    "/v2/teachers/find": {
+      "get": {
+        "tags": [
+          "Teachers"
+        ],
+        "summary": "Returns teachers matching the specified criteria",
+        "parameters": [
+          {
+            "name": "emailAddress",
+            "in": "query",
+            "description": "Email Address",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "firstName",
+            "in": "query",
+            "description": "First name of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "middleName",
+            "in": "query",
+            "description": "Middle name of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lastName",
+            "in": "query",
+            "description": "Last name of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "previousFirstName",
+            "in": "query",
+            "description": "Previous first name of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "previousLastName",
+            "in": "query",
+            "description": "Previous last name of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateOfBirth",
+            "in": "query",
+            "description": "Date of birth of person",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "nationalInsuranceNumber",
+            "in": "query",
+            "description": "National insurance number of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ittProviderName",
+            "in": "query",
+            "description": "Name of teacher training provider",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ittProviderUkprn",
+            "in": "query",
+            "description": "UKPRN of teacher training provider",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindTeachersResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/trn-requests/{requestId}": {
       "get": {
         "tags": [
@@ -316,6 +429,56 @@
           "HigherDegree"
         ],
         "type": "string"
+      },
+      "FindTeacherResult": {
+        "type": "object",
+        "properties": {
+          "trn": {
+            "type": "string",
+            "nullable": true
+          },
+          "emailAddresses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "nationalInsuranceNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "uid": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FindTeachersResponse": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FindTeacherResult"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "Gender": {
         "enum": [

@@ -14,6 +14,7 @@ namespace DqtApi.Validation
             ErrorDescriptor.Create(10005),  // Teacher has no incomplete ITT record
             ErrorDescriptor.Create(10006),  // Teacher has no QTS record
             ErrorDescriptor.Create(10007),  // Teacher has multiple QTS records
+            ErrorDescriptor.Create(10008)   // Organisation not found
         }.ToDictionary(d => d.ErrorCode, d => d);
 
         public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);
@@ -29,6 +30,8 @@ namespace DqtApi.Validation
         public static Error TeacherHasNoQtsRecord() => CreateError(10006);
 
         public static Error TeacherHasMultipleQtsRecords() => CreateError(10007);
+
+        public static Error OrganisationNotFound() => CreateError(10008);
 
         private static Error CreateError(int errorCode)
         {
