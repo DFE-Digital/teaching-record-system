@@ -12,7 +12,7 @@ namespace DqtApi.DataStore.Crm.Models
         [FromRoute(Name = "trn")]
         public string TRN { get; set; }
 
-        [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true), SwaggerSchema(Format = "date"), ModelBinder(typeof(ModelBinding.DateTimeReverseOrderBinder))]
+        [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true), SwaggerSchema(Format = "date"), ModelBinder(typeof(ModelBinding.DateModelBinder))]
         public DateTime? BirthDate { get; set; }
 
         [FromQuery(Name = "nino")]

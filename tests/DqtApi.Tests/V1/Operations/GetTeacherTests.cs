@@ -36,7 +36,7 @@ namespace DqtApi.Tests.V1.Operations
 
             var response = await HttpClient.SendAsync(request);
 
-            await AssertEx.ResponseIsValidationErrorForProperty(response, "birthdate", expectedError: StringResources.ErrorMessages_InvalidBirthDate);
+            await AssertEx.ResponseIsValidationErrorForProperty(response, "birthdate", expectedError: $"The value '{birthDate}' is not valid for BirthDate.");
         }
 
         //[Fact(Skip = "not implemented")]
