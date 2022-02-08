@@ -19,6 +19,10 @@ namespace DqtApi.DataStore.Crm
 
         Task<IEnumerable<Contact>> GetTeachersByTrn(string trn, bool activeOnly = true, params string[] columnNames);
 
+        Task<IReadOnlyCollection<Contact>> FindTeachers(FindTeachersQuery query);
+        Task<Account> GetOrganizationByProviderName(string providerName, params string[] columnNames);
+        Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames);
+
         Task<SetIttResultForTeacherResult> SetIttResultForTeacher(
             Guid teacherId,
             string ittProviderUkprn,
