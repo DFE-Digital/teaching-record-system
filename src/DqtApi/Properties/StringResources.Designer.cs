@@ -61,6 +61,15 @@ namespace DqtApi.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Request must contain IttProviderUkprn or IttProviderName or neither..
+        /// </summary>
+        public static string ErrorMessage_EitherIttProviderNameOrIttProviderUkprn {
+            get {
+                return ResourceManager.GetString("ErrorMessage.EitherIttProviderNameOrIttProviderUkprn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Birth date must be in format yyyy-MM-dd.
         /// </summary>
         public static string ErrorMessages_InvalidBirthDate {
@@ -156,6 +165,15 @@ namespace DqtApi.Properties {
         public static string Errors_10007_Title {
             get {
                 return ResourceManager.GetString("Errors.10007.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Organisation not found..
+        /// </summary>
+        public static string Errors_10008_Title {
+            get {
+                return ResourceManager.GetString("Errors.10008.Title", resourceCulture);
             }
         }
     }

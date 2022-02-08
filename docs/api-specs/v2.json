@@ -129,6 +129,111 @@
         }
       }
     },
+    "/v2/trn-details/trn-details-match": {
+      "get": {
+        "tags": [
+          "TrnDetails"
+        ],
+        "summary": "Returns trn details given an email",
+        "parameters": [
+          {
+            "name": "EmailAddress",
+            "in": "query",
+            "description": "Email Address",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "FirstName",
+            "in": "query",
+            "description": "First name of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "MiddleName",
+            "in": "query",
+            "description": "Middle name of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "LastName",
+            "in": "query",
+            "description": "Last name of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "PreviousFirstName",
+            "in": "query",
+            "description": "Previous first name of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "PreviousLastName",
+            "in": "query",
+            "description": "Previous last name of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "DateOfBirth",
+            "in": "query",
+            "description": "dob of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Nino",
+            "in": "query",
+            "description": "Nino of person",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "IttProviderName",
+            "in": "query",
+            "description": "Name of teacher training provider",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "IttProviderUkprn",
+            "in": "query",
+            "description": "Ukprn of itt provider",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/trn-requests/{requestId}": {
       "get": {
         "tags": [
