@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Crm.Sdk.Messages;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
@@ -38,11 +37,9 @@ namespace DqtApi.Tests.DataverseIntegration
 
             foreach (var (entityName, entityId) in toBeCleared)
             {
-                multiRequest.Requests.Add(new SetStateRequest()
+                multiRequest.Requests.Add(new DeleteRequest()
                 {
-                    EntityMoniker = new EntityReference(entityName, entityId),
-                    State = new OptionSetValue(1),  // Inactive
-                    Status = new OptionSetValue(2)
+                    Target = new EntityReference(entityName, entityId)
                 });
             }
 
