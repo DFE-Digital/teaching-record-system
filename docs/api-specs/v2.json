@@ -185,50 +185,12 @@
             }
           },
           {
-            "name": "dateOfBirth.Year",
+            "name": "dateOfBirth",
             "in": "query",
+            "description": "Date of birth of person",
             "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "dateOfBirth.Month",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "dateOfBirth.Day",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "dateOfBirth.DayOfWeek",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/DayOfWeek"
-            }
-          },
-          {
-            "name": "dateOfBirth.DayOfYear",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "dateOfBirth.DayNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "date"
             }
           },
           {
@@ -465,18 +427,6 @@
           "Notapplicable",
           "NotKnown",
           "HigherDegree"
-        ],
-        "type": "string"
-      },
-      "DayOfWeek": {
-        "enum": [
-          "Sunday",
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday"
         ],
         "type": "string"
       },
