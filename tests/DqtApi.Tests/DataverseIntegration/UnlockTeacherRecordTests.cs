@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -8,18 +7,22 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class UnlockTeacherRecordTests
+    public class UnlockTeacherRecordTests : IAsyncLifetime
     {
-        private readonly CrmClientFixture _crmClientFixture;
+        private readonly CrmClientFixture.TestDataScope _dataScope;
         private readonly DataverseAdapter _dataverseAdapter;
-        private readonly ServiceClient _serviceClient;
+        private readonly IOrganizationServiceAsync _organizationService;
 
         public UnlockTeacherRecordTests(CrmClientFixture crmClientFixture)
         {
-            _crmClientFixture = crmClientFixture;
-            _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
-            _serviceClient = crmClientFixture.ServiceClient;
+            _dataScope = crmClientFixture.CreateTestDataScope();
+            _dataverseAdapter = _dataScope.CreateDataverseAdapter();
+            _organizationService = _dataScope.OrganizationService;
         }
+
+        public Task InitializeAsync() => Task.CompletedTask;
+
+        public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
         [Fact]
         public async Task Given_an_id_that_does_not_exist_returns_false()
@@ -40,11 +43,10 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_a_valid_id_sets_loginfailedcounter_to_0_and_returns_true(int? initialLoginFailedCounter)
         {
             // Arrange
-            var teacherId = await _serviceClient.CreateAsync(new Contact()
+            var teacherId = await _organizationService.CreateAsync(new Contact()
             {
                 dfeta_loginfailedcounter = initialLoginFailedCounter
             });
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, teacherId);
 
             // Act
             var result = await _dataverseAdapter.UnlockTeacherRecordAsync(teacherId);
@@ -52,7 +54,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Assert
             Assert.True(result);
 
-            var teacher = (await _serviceClient.RetrieveAsync(Contact.EntityLogicalName, teacherId, new ColumnSet() { AllColumns = true })).ToEntity<Contact>();
+            var teacher = (await _organizationService.RetrieveAsync(Contact.EntityLogicalName, teacherId, new ColumnSet() { AllColumns = true })).ToEntity<Contact>();
             Assert.Equal(0, teacher.dfeta_loginfailedcounter);
         }
     }

@@ -9,18 +9,24 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class SetIttOutcomeForTeacherTests
+    public class SetIttOutcomeForTeacherTests : IAsyncLifetime
     {
-        private readonly CrmClientFixture _crmClientFixture;
+        private readonly CrmClientFixture.TestDataScope _dataScope;
         private readonly DataverseAdapter _dataverseAdapter;
-        private readonly ServiceClient _serviceClient;
+        private readonly IOrganizationServiceAsync _organizationService;
+        private readonly TestableClock _clock;
 
         public SetIttOutcomeForTeacherTests(CrmClientFixture crmClientFixture)
         {
-            _crmClientFixture = crmClientFixture;
-            _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
-            _serviceClient = crmClientFixture.ServiceClient;
+            _dataScope = crmClientFixture.CreateTestDataScope();
+            _dataverseAdapter = _dataScope.CreateDataverseAdapter();
+            _organizationService = _dataScope.OrganizationService;
+            _clock = crmClientFixture.Clock;
         }
+
+        public Task InitializeAsync() => Task.CompletedTask;
+
+        public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
         [Fact]
         public async Task Given_valid_request_with_Pass_result_for_early_years_updates_qts_and_does_not_create_induction()
@@ -29,7 +35,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var (teacherId, ittId, qtsId, ittProviderUkprn) = await CreatePerson(earlyYears: true);
 
             var ittResult = dfeta_ITTResult.Pass;
-            var assessmentDate = _crmClientFixture.Clock.Today;
+            var assessmentDate = _clock.Today;
 
             var earlyYearsTeacherStatusId = (await _dataverseAdapter.GetEarlyYearsStatus("221")).Id;
 
@@ -71,7 +77,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var (teacherId, ittId, qtsId, ittProviderUkprn) = await CreatePerson(earlyYears: false, assessmentOnly);
 
             var ittResult = dfeta_ITTResult.Pass;
-            var assessmentDate = _crmClientFixture.Clock.Today;
+            var assessmentDate = _clock.Today;
 
             var teacherStatusId = (await _dataverseAdapter.GetTeacherStatus(expectedTeacherStatus, qtsDateRequired: true)).Id;
 
@@ -338,7 +344,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 (await _dataverseAdapter.GetTeacherStatus(assessmentOnly ? "212" : "211", qtsDateRequired: false)).Id :  // 212 == 'AOR Candidate', 211 == 'Trainee Teacher:DMS'
                 (Guid?)null;
 
-            var txnResponse = (ExecuteTransactionResponse)await _serviceClient.ExecuteAsync(new ExecuteTransactionRequest()
+            var txnResponse = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
             {
                 Requests = new()
                 {
@@ -383,10 +389,6 @@ namespace DqtApi.Tests.DataverseIntegration
 
             var ittId = ((CreateResponse)txnResponse.Responses[2]).id;
             var qtsId = ((CreateResponse)txnResponse.Responses[3]).id;
-
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, teacherId);
-            _crmClientFixture.RegisterForCleanup(dfeta_initialteachertraining.EntityLogicalName, ittId);
-            _crmClientFixture.RegisterForCleanup(dfeta_qtsregistration.EntityLogicalName, qtsId);
 
             return (teacherId, ittId, qtsId, ittProviderUkprn);
         }

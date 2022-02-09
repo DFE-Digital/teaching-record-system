@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
@@ -7,7 +6,7 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class GetMatchingTeachersFixture : IDisposable
+    public class GetMatchingTeachersFixture : IAsyncLifetime
     {
         public struct Fixture
         {
@@ -16,6 +15,8 @@ namespace DqtApi.Tests.DataverseIntegration
 
             public Guid ID { get; set; }
         }
+
+        private readonly CrmClientFixture.TestDataScope _dataScope;
 
         public IOrganizationServiceAsync Service { get; }
         private readonly string _nonmatchingNationalInsuranceNumber;
@@ -28,7 +29,8 @@ namespace DqtApi.Tests.DataverseIntegration
 
         public GetMatchingTeachersFixture(CrmClientFixture crmClientFixture)
         {
-            Service = crmClientFixture.ServiceClient;
+            _dataScope = crmClientFixture.CreateTestDataScope();
+            Service = _dataScope.OrganizationService;
 
             var nationalInsuranceNumberGenerator = new NationalInsuranceNumberGenerator(Service);
 
@@ -103,13 +105,8 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(_fixtures[index].ID, teacher.Id);
         }
 
-        public void Dispose()
-        {
-            // remove National Insurance Number from each fixture so it can be re-used
-            Enumerable.Range(0, 2).ToList().ForEach(i =>
-            {
-                Service.Update(new Contact { Id = _fixtures[i].ID, dfeta_NINumber = string.Empty });
-            });
-        }
+        public Task InitializeAsync() => Task.CompletedTask;
+
+        public async Task DisposeAsync() => await _dataScope.DisposeAsync();
     }
 }

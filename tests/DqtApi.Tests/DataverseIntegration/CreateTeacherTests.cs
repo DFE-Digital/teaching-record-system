@@ -10,23 +10,23 @@ namespace DqtApi.Tests.DataverseIntegration
     public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLifetime
     {
         private readonly CreateTeacherFixture _createTeacherFixture;
-        private readonly CrmClientFixture _crmClientFixture;
+        private readonly TestableClock _clock;
+        private readonly CrmClientFixture.TestDataScope _dataScope;
         private readonly DataverseAdapter _dataverseAdapter;
-        private readonly ServiceClient _serviceClient;
-        private readonly EntityCleanupHelper _entityCleanupHelper;
+        private readonly IOrganizationServiceAsync _organizationService;
 
         public CreateTeacherTests(CreateTeacherFixture createTeacherFixture, CrmClientFixture crmClientFixture)
         {
             _createTeacherFixture = createTeacherFixture;
-            _crmClientFixture = crmClientFixture;
-            _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
-            _serviceClient = crmClientFixture.ServiceClient;
-            _entityCleanupHelper = crmClientFixture.CreateEntityCleanupHelper();
+            _clock = crmClientFixture.Clock;
+            _dataScope = crmClientFixture.CreateTestDataScope();
+            _dataverseAdapter = _dataScope.CreateDataverseAdapter();
+            _organizationService = _dataScope.OrganizationService;
         }
 
         public Task InitializeAsync() => Task.CompletedTask;
 
-        public Task DisposeAsync() => _entityCleanupHelper.CleanupEntities();
+        public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
         [Fact]
         public async Task Given_valid_request_creates_required_entities()
@@ -35,7 +35,6 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
-            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
 
             // Assert
             Assert.True(result.Succeeded);
@@ -57,7 +56,6 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command, findExistingTeacher);
-            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
 
             // Assert
             Assert.True(result.Succeeded);
@@ -106,8 +104,6 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command, findExistingTeacher);
-            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, result.TeacherId);
-            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, existingTeacherId);
 
             // Assert
             Assert.True(result.Succeeded);
@@ -120,7 +116,7 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(existingTeacherId, crmTask.dfeta_potentialduplicateid?.Id);
             Assert.Equal("DMSImportTrn", crmTask.Category);
             Assert.Equal("Notification for QTS Unit Team", crmTask.Subject);
-            Assert.Equal(_crmClientFixture.Clock.UtcNow, crmTask.ScheduledEnd);
+            Assert.Equal(_clock.UtcNow, crmTask.ScheduledEnd);
 
             var expectedDescription = $"Potential duplicate\nMatched on\n\t- First name: '{firstName}'\n\t- Middle name: '{middleName}'\n\t- Last name: '{lastName}'\n\t- Date of birth: '{birthDate:dd/MM/yyyy}'\n" +
                 expectedDescriptionSupplement;
@@ -276,14 +272,13 @@ namespace DqtApi.Tests.DataverseIntegration
             // Arrange
             var command = CreateCommand();
 
-            var existingTeacherId = await _serviceClient.CreateAsync(new Contact()
+            var existingTeacherId = await _organizationService.CreateAsync(new Contact()
             {
                 FirstName = matchOnForename ? command.FirstName : "Glad",
                 MiddleName = matchOnMiddlename ? command.MiddleName : "I.",
                 LastName = matchOnSurname ? command.LastName : "Oli",
                 BirthDate = matchOnDateOfBirth ? command.BirthDate : new(1945, 2, 3)
             });
-            _entityCleanupHelper.RegisterForCleanup(Contact.EntityLogicalName, existingTeacherId);
 
             var helper = new DataverseAdapter.CreateTeacherHelper(_dataverseAdapter, command);
 
@@ -341,11 +336,11 @@ namespace DqtApi.Tests.DataverseIntegration
 
     public class CreateTeacherFixture : IAsyncLifetime
     {
-        private readonly CrmClientFixture _crmClientFixture;
+        private readonly CrmClientFixture.TestDataScope _dataScope;
 
         public CreateTeacherFixture(CrmClientFixture crmClientFixture)
         {
-            _crmClientFixture = crmClientFixture;
+            _dataScope = crmClientFixture.CreateTestDataScope();
         }
 
         public Guid ExistingTeacherId { get; private set; }
@@ -354,18 +349,17 @@ namespace DqtApi.Tests.DataverseIntegration
         public string ExistingTeacherFirstNameLastName => "Bloggs";
         public DateTime ExistingTeacherFirstNameBirthDate => new DateTime(1990, 5, 23);
 
-        public Task DisposeAsync() => Task.CompletedTask;
+        public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
         public async Task InitializeAsync()
         {
-            ExistingTeacherId = await _crmClientFixture.ServiceClient.CreateAsync(new Contact()
+            ExistingTeacherId = await _dataScope.OrganizationService.CreateAsync(new Contact()
             {
                 FirstName = ExistingTeacherFirstName,
                 MiddleName = ExistingTeacherFirstNameMiddleName,
                 LastName = ExistingTeacherFirstNameLastName,
                 BirthDate = ExistingTeacherFirstNameBirthDate
             });
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, ExistingTeacherId);
         }
     }
 }

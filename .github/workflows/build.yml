@@ -60,9 +60,11 @@ jobs:
       id: test
       run: dotnet test tests/DqtApi.Tests --configuration Release --no-build --logger trx
       env:
-        IntegrationTests_CrmUrl: ${{ secrets.IntegrationTests_CrmUrl }}
-        IntegrationTests_CrmClientId: ${{ secrets.IntegrationTests_CrmClientId }}
-        IntegrationTests_CrmClientSecret: ${{ secrets.IntegrationTests_CrmClientSecret }}
+        IntegrationTests_CrmUrl: ${{ secrets.INTEGRATIONTESTS_CRMURL }}
+        IntegrationTests_CrmClientId: ${{ secrets.INTEGRATIONTESTS_CRMCLIENTID }}
+        IntegrationTests_CrmClientSecret: ${{ secrets.INTEGRATIONTESTS_CRMCLIENTSECRET }}
+        IntegrationTests_BuildEnvLockBlobUri: ${{ secrets.INTEGRATIONTESTS_BUILDENVLOCKBLOBURI }}
+        IntegrationTests_BuildEnvLockBlobSasToken: ${{ secrets.INTEGRATIONTESTS_BUILDENVLOCKBLOBSASTOKEN }}
         ConnectionStrings__DefaultConnection: "Host=localhost;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }};Database=dqt"
 
     - name: Test report
