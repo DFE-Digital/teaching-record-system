@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.Crm.Sdk.Messages;
@@ -9,18 +8,22 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class GetTeacherTests
+    public class GetTeacherTests : IAsyncLifetime
     {
-        private readonly CrmClientFixture _crmClientFixture;
+        private readonly CrmClientFixture.TestDataScope _dataScope;
         private readonly DataverseAdapter _dataverseAdapter;
-        private readonly ServiceClient _serviceClient;
+        private readonly IOrganizationServiceAsync _organizationService;
 
         public GetTeacherTests(CrmClientFixture crmClientFixture)
         {
-            _crmClientFixture = crmClientFixture;
-            _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
-            _serviceClient = crmClientFixture.ServiceClient;
+            _dataScope = crmClientFixture.CreateTestDataScope();
+            _dataverseAdapter = _dataScope.CreateDataverseAdapter();
+            _organizationService = _dataScope.OrganizationService;
         }
+
+        public Task InitializeAsync() => Task.CompletedTask;
+
+        public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
         [Fact]
         public async Task Given_teacher_that_does_not_exist_returns_null()
@@ -39,8 +42,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_teacher_that_exists_returns_teacher()
         {
             // Arrange
-            var teacherId = await _serviceClient.CreateAsync(new Contact());
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, teacherId);
+            var teacherId = await _organizationService.CreateAsync(new Contact());
 
             // Act
             var result = await _dataverseAdapter.GetTeacherAsync(teacherId, resolveMerges: false, Contact.Fields.StateCode);
@@ -54,19 +56,16 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_merged_teacher_and_resolveMerges_true_return_master()
         {
             // Arrange
-            var masterTeacherId = await _serviceClient.CreateAsync(new Contact());
-            var teacherId = await _serviceClient.CreateAsync(new Contact());
+            var masterTeacherId = await _organizationService.CreateAsync(new Contact());
+            var teacherId = await _organizationService.CreateAsync(new Contact());
 
-            await _serviceClient.ExecuteAsync(new MergeRequest()
+            await _organizationService.ExecuteAsync(new MergeRequest()
             {
                 Target = new EntityReference(Contact.EntityLogicalName, masterTeacherId),
                 SubordinateId = teacherId,
                 PerformParentingChecks = false,
                 UpdateContent = new Entity(Contact.EntityLogicalName)
             });
-
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, masterTeacherId);
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, teacherId);
 
             // Act
             var result = await _dataverseAdapter.GetTeacherAsync(teacherId, resolveMerges: true, Contact.Fields.StateCode);
@@ -80,19 +79,16 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_merged_teacher_and_resolveMerges_false_return_merged_record()
         {
             // Arrange
-            var masterTeacherId = await _serviceClient.CreateAsync(new Contact());
-            var teacherId = await _serviceClient.CreateAsync(new Contact());
+            var masterTeacherId = await _organizationService.CreateAsync(new Contact());
+            var teacherId = await _organizationService.CreateAsync(new Contact());
 
-            await _serviceClient.ExecuteAsync(new MergeRequest()
+            await _organizationService.ExecuteAsync(new MergeRequest()
             {
                 Target = new EntityReference(Contact.EntityLogicalName, masterTeacherId),
                 SubordinateId = teacherId,
                 PerformParentingChecks = false,
                 UpdateContent = new Entity(Contact.EntityLogicalName)
             });
-
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, masterTeacherId);
-            _crmClientFixture.RegisterForCleanup(Contact.EntityLogicalName, teacherId);
 
             // Act
             var result = await _dataverseAdapter.GetTeacherAsync(teacherId, resolveMerges: false, Contact.Fields.StateCode);

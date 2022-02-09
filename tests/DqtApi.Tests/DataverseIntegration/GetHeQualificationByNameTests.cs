@@ -1,19 +1,22 @@
 ﻿using DqtApi.DataStore.Crm;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class GetHeQualificationByNameTests
+    public class GetHeQualificationByNameTests : IAsyncLifetime
     {
+        private readonly CrmClientFixture.TestDataScope _dataScope;
         private readonly DataverseAdapter _dataverseAdapter;
-        private readonly ServiceClient _serviceClient;
 
         public GetHeQualificationByNameTests(CrmClientFixture crmClientFixture)
         {
-            _dataverseAdapter = crmClientFixture.CreateDataverseAdapter();
-            _serviceClient = crmClientFixture.ServiceClient;
+            _dataScope = crmClientFixture.CreateTestDataScope();
+            _dataverseAdapter = _dataScope.CreateDataverseAdapter();
         }
+
+        public Task InitializeAsync() => Task.CompletedTask;
+
+        public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
         [Fact]
         public async Task Given_valid_qualification_name_returns_country()
