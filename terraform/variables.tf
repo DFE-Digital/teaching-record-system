@@ -80,3 +80,15 @@ variable "migrations_file" {
 variable "statuscake_alerts" {
   type = map(any)
 }
+
+variable "hostnames" {
+  default = []
+  type    = list(any)
+}
+
+locals {
+  api_routes = flatten([
+    cloudfoundry_route.api_public,
+    values(cloudfoundry_route.api_education)
+  ])
+}

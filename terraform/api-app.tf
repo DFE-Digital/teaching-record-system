@@ -14,6 +14,13 @@ resource "cloudfoundry_route" "api_public" {
   space    = data.cloudfoundry_space.space.id
 }
 
+resource "cloudfoundry_route" "api_education" {
+  for_each = toset(var.hostnames)
+  domain   = data.cloudfoundry_domain.education_gov_uk.id
+  space    = data.cloudfoundry_space.space.id
+  hostname = each.value
+}
+
 resource "cloudfoundry_user_provided_service" "logging" {
   name             = var.logging_service_name
   space            = data.cloudfoundry_space.space.id
@@ -57,9 +64,11 @@ resource "cloudfoundry_app" "api" {
   environment                = local.api_app_config
   health_check_type          = "http"
   health_check_http_endpoint = "/health"
-
-  routes {
-    route = cloudfoundry_route.api_public.id
+  dynamic "routes" {
+    for_each = local.api_routes
+    content {
+      route = routes.value.id
+    }
   }
 
   service_binding {
