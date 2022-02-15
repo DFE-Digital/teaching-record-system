@@ -1,0 +1,116 @@
+{
+  "account": [
+    "dfeta_trainingprovider",
+    "dfeta_ukprn",
+    "name",
+    "statecode"
+  ],
+  "contact": [
+    "address1_city",
+    "address1_country",
+    "address1_line1",
+    "address1_line2",
+    "address1_line3",
+    "address1_postalcode",
+    "birthdate",
+    "dfeta_activesanctions",
+    "dfeta_eytsdate",
+    "dfeta_loginfailedcounter",
+    "dfeta_ninumber",
+    "dfeta_qtsdate",
+    "dfeta_trn",
+    "dfeta_trnallocaterequest",
+    "dfeta_trnrequired",
+    "emailaddress1",
+    "firstname",
+    "fullname",
+    "gendercode",
+    "lastname",
+    "masterid",
+    "merged",
+    "middlename",
+    "statecode"
+  ],
+  "dfeta_country": [
+    "dfeta_name",
+    "dfeta_value",
+    "statecode"
+  ],
+  "dfeta_earlyyearsstatus": [
+    "dfeta_name",
+    "dfeta_value",
+    "statecode"
+  ],
+  "dfeta_hequalification": [
+    "dfeta_name",
+    "dfeta_value",
+    "statecode",
+  ],
+  "dfeta_hesubject": [
+    "dfeta_name",
+    "dfeta_value",
+    "statecode"
+  ],
+  "dfeta_induction": [
+    "dfeta_completiondate",
+    "dfeta_inductionstatus",
+    "dfeta_personid",
+    "dfeta_startdate",
+    "statecode"
+  ],
+  "dfeta_initialteachertraining": [
+    "dfeta_cohortyear",
+    "dfeta_countryid",
+    "dfeta_establishmentid",
+    "dfeta_ittqualificationid",
+    "dfeta_personid",
+    "dfeta_programmeenddate",
+    "dfeta_programmestartdate",
+    "dfeta_programmetype",
+    "dfeta_result",
+    "dfeta_subject1id",
+    "dfeta_subject2id",
+    "dfeta_subject3id",
+    "statecode"
+  ],
+  "dfeta_ittsubject": [
+    "dfeta_name",
+    "dfeta_value",
+    "statecode"
+  ],
+  "dfeta_qtsregistration": [
+    "dfeta_earlyyearsstatusid",
+    "dfeta_eytsdate",
+    "dfeta_name",
+    "dfeta_personid",
+    "dfeta_qtsdate",
+    "dfeta_teacherstatusid",
+    "statecode"
+  ],
+  "dfeta_qualification": [
+    "dfeta_completionorawarddate",
+    "dfeta_he_classdivision",
+    "dfeta_he_completiondate",
+    "dfeta_he_countryid",
+    "dfeta_he_establishmentid",
+    "dfeta_he_hequalificationid",
+    "dfeta_he_hesubject1id",
+    "dfeta_personid",
+    "dfeta_type"
+  ],
+  "dfeta_teacherstatus": [
+    "dfeta_name",
+    "dfeta_qtsdaterequired",
+    "dfeta_value",
+    "statecode"
+  ],
+  "task": [
+    "category",
+    "description",
+    "dfeta_potentialduplicateid",
+    "regardingobjectid",
+    "scheduledend",
+    "statecode",
+    "subject"
+  ]
+}
