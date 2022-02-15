@@ -61,7 +61,7 @@ namespace DqtApi.V2.Handlers
                     FirstName = request.FirstName,
                     MiddleName = request.MiddleName,
                     LastName = request.LastName,
-                    BirthDate = request.BirthDate.ToDateTime(new()),
+                    BirthDate = request.BirthDate.ToDateTime(),
                     EmailAddress = request.EmailAddress,
                     Address = new CreateTeacherCommandAddress()
                     {

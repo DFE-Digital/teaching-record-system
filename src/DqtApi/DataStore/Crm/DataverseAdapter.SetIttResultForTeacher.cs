@@ -137,7 +137,7 @@ namespace DqtApi.DataStore.Crm
                     Debug.Assert(earlyYearsStatus != null);
 
                     qtsUpdate.dfeta_EarlyYearsStatusId = new EntityReference(dfeta_earlyyearsstatus.EntityLogicalName, earlyYearsStatus.Id);
-                    qtsUpdate.dfeta_EYTSDate = qtsDate.Value.ToDateTime(new());
+                    qtsUpdate.dfeta_EYTSDate = qtsDate.Value.ToDateTime();
                 }
                 else
                 {
@@ -148,7 +148,7 @@ namespace DqtApi.DataStore.Crm
                     Debug.Assert(teacherStatus != null);
 
                     qtsUpdate.dfeta_TeacherStatusId = new EntityReference(dfeta_teacherstatus.EntityLogicalName, teacherStatus.Id);
-                    qtsUpdate.dfeta_QTSDate = qtsDate.Value.ToDateTime(new());
+                    qtsUpdate.dfeta_QTSDate = qtsDate.Value.ToDateTime();
 
                     txnRequest.Requests.Add(new CreateRequest()
                     {
