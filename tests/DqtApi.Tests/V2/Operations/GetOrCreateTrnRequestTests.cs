@@ -106,7 +106,7 @@ namespace DqtApi.Tests.V2.Operations
             // Assert
             await AssertEx.ResponseIsValidationErrorForProperty(
                 response,
-                propertyName: nameof(TrnRequest.RequestId),
+                propertyName: nameof(GetOrCreateTrnRequest.RequestId),
                 expectedError: Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
         }
 
@@ -122,7 +122,7 @@ namespace DqtApi.Tests.V2.Operations
             // Assert
             await AssertEx.ResponseIsValidationErrorForProperty(
                 response,
-                propertyName: nameof(TrnRequest.RequestId),
+                propertyName: nameof(GetOrCreateTrnRequest.RequestId),
                 expectedError: Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
         }
 
@@ -155,6 +155,144 @@ namespace DqtApi.Tests.V2.Operations
                     status = expectedStatus
                 },
                 expectedStatusCode: 201);
+        }
+
+        [Fact]
+        public async Task Given_invalid_itt_provider_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var ukprn = "xxx";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.IttProviderNotFound));
+
+            // Act
+            var response = await HttpClient.PutAsync(
+                $"v2/trn-requests/{requestId}",
+                CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.ProviderUkprn)}",
+                expectedError: Properties.StringResources.Errors_10008_Title);
+        }
+
+        [Fact]
+        public async Task Given_invalid_itt_subject1_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var subject = "xxx";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.Subject1NotFound));
+
+            // Act
+            var response = await HttpClient.PutAsync(
+                $"v2/trn-requests/{requestId}",
+                CreateRequest(req => req.InitialTeacherTraining.Subject1 = subject));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject1)}",
+                expectedError: Properties.StringResources.Errors_10009_Title);
+        }
+
+        [Fact]
+        public async Task Given_invalid_itt_subject2_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var subject = "xxx";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.Subject2NotFound));
+
+            // Act
+            var response = await HttpClient.PutAsync(
+                $"v2/trn-requests/{requestId}",
+                CreateRequest(req => req.InitialTeacherTraining.Subject2 = subject));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject2)}",
+                expectedError: Properties.StringResources.Errors_10009_Title);
+        }
+
+        [Fact]
+        public async Task Given_invalid_qualification_country_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var country = "xxx";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationCountryNotFound));
+
+            // Act
+            var response = await HttpClient.PutAsync(
+                $"v2/trn-requests/{requestId}",
+                CreateRequest(req => req.Qualification.CountryCode = country));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.CountryCode)}",
+                expectedError: Properties.StringResources.Errors_10010_Title);
+        }
+
+        [Fact]
+        public async Task Given_invalid_qualification_subject_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var subject = "xxx";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubjectNotFound));
+
+            // Act
+            var response = await HttpClient.PutAsync(
+                $"v2/trn-requests/{requestId}",
+                CreateRequest(req => req.Qualification.Subject = subject));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.Subject)}",
+                expectedError: Properties.StringResources.Errors_10009_Title);
+        }
+
+        [Fact]
+        public async Task Given_invalid_qualification_provider_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var ukprn = "xxx";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationProviderNotFound));
+
+            // Act
+            var response = await HttpClient.PutAsync(
+                $"v2/trn-requests/{requestId}",
+                CreateRequest(req => req.Qualification.ProviderUkprn = ukprn));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.ProviderUkprn)}",
+                expectedError: Properties.StringResources.Errors_10008_Title);
         }
 
         private JsonContent CreateRequest(Action<GetOrCreateTrnRequest> configureRequest = null)

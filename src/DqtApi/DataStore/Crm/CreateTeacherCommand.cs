@@ -29,8 +29,8 @@ namespace DqtApi.DataStore.Crm
     public class CreateTeacherCommandInitialTeacherTraining
     {
         public string ProviderUkprn { get; set; }
-        public DateTime ProgrammeStartDate { get; set; }
-        public DateTime ProgrammeEndDate { get; set; }
+        public DateOnly ProgrammeStartDate { get; set; }
+        public DateOnly ProgrammeEndDate { get; set; }
         public dfeta_ITTProgrammeType ProgrammeType { get; set; }
         public string Subject1 { get; set; }
         public string Subject2 { get; set; }
@@ -41,7 +41,7 @@ namespace DqtApi.DataStore.Crm
         public string ProviderUkprn { get; set; }
         public string CountryCode { get; set; }
         public string Subject { get; set; }
-        public dfeta_classdivision Class { get; set; }
-        public DateTime Date { get; set; }
+        public dfeta_classdivision? Class { get; set; }
+        public DateOnly? Date { get; set; }
     }
 }

@@ -34,6 +34,7 @@ namespace DqtApi.Tests.DataverseIntegration
         [InlineData(dfeta_ITTProgrammeType.LicensedTeacherProgramme)]
         public async Task Given_valid_request_creates_required_entities(dfeta_ITTProgrammeType programmeType)
         {
+            // Arrange
             var command = CreateCommand(cmd =>
             {
                 cmd.InitialTeacherTraining.ProgrammeType = programmeType;
@@ -49,6 +50,36 @@ namespace DqtApi.Tests.DataverseIntegration
             transactionRequest.AssertSingleCreateRequest<dfeta_initialteachertraining>();
             transactionRequest.AssertSingleCreateRequest<dfeta_qualification>();
             transactionRequest.AssertSingleCreateRequest<dfeta_qtsregistration>();
+        }
+
+        [Fact]
+        public async Task Given_minimal_details_request_succeeds()
+        {
+            // Arrange
+            var command = new CreateTeacherCommand()
+            {
+                FirstName = "Minnie",
+                LastName = "Ryder",
+                BirthDate = new(1990, 5, 23),
+                GenderCode = Contact_GenderCode.Female,
+                InitialTeacherTraining = new()
+                {
+                    ProviderUkprn = "10044534",  // ARK Teacher Training
+                    ProgrammeStartDate = new(2020, 4, 1),
+                    ProgrammeEndDate = new(2020, 10, 10),
+                    ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                },
+                Qualification = new()
+                {
+                    ProviderUkprn = "10044534"
+                }
+            };
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+
+            // Assert
+            Assert.True(result.Succeeded);
         }
 
         [Fact]
@@ -217,8 +248,8 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(referenceData.IttCountryId, result.dfeta_CountryId?.Id);
             Assert.Equal(Account.EntityLogicalName, result.dfeta_EstablishmentId?.LogicalName);
             Assert.Equal(referenceData.IttProviderId, result.dfeta_EstablishmentId?.Id);
-            Assert.Equal(command.InitialTeacherTraining.ProgrammeStartDate, result.dfeta_ProgrammeStartDate);
-            Assert.Equal(command.InitialTeacherTraining.ProgrammeEndDate, result.dfeta_ProgrammeEndDate);
+            Assert.Equal(command.InitialTeacherTraining.ProgrammeStartDate, DateOnly.FromDateTime(result.dfeta_ProgrammeStartDate.Value));
+            Assert.Equal(command.InitialTeacherTraining.ProgrammeEndDate, DateOnly.FromDateTime(result.dfeta_ProgrammeEndDate.Value));
             Assert.Equal(command.InitialTeacherTraining.ProgrammeType, result.dfeta_ProgrammeType);
             Assert.Equal(command.InitialTeacherTraining.ProgrammeEndDate.Year.ToString(), result.dfeta_CohortYear);
             Assert.Equal(dfeta_ittsubject.EntityLogicalName, result.dfeta_Subject1Id?.LogicalName);
@@ -258,7 +289,7 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(command.Qualification.Class, result.dfeta_HE_ClassDivision);
             Assert.Equal(Account.EntityLogicalName, result.dfeta_HE_EstablishmentId?.LogicalName);
             Assert.Equal(referenceData.QualificationProviderId, result.dfeta_HE_EstablishmentId?.Id);
-            Assert.Equal(command.Qualification.Date, result.dfeta_HE_CompletionDate);
+            Assert.Equal(command.Qualification.Date, DateOnly.FromDateTime(result.dfeta_HE_CompletionDate.Value));
         }
 
         [Fact]

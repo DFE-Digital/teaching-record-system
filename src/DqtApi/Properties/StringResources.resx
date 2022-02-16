@@ -154,6 +154,12 @@
     <value>Teacher has multiple QTS records</value>
   </data>
   <data name="Errors.10008.Title" xml:space="preserve">
-    <value>Organisation not found.</value>
+    <value>Organisation not found</value>
+  </data>
+  <data name="Errors.10009.Title" xml:space="preserve">
+    <value>Subject not found</value>
+  </data>
+  <data name="Errors.10010.Title" xml:space="preserve">
+    <value>Country not found</value>
   </data>
 </root>

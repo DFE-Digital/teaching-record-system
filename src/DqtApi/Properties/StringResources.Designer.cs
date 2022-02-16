@@ -169,11 +169,29 @@ namespace DqtApi.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Organisation not found..
+        ///   Looks up a localized string similar to Organisation not found.
         /// </summary>
         public static string Errors_10008_Title {
             get {
                 return ResourceManager.GetString("Errors.10008.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subject not found.
+        /// </summary>
+        public static string Errors_10009_Title {
+            get {
+                return ResourceManager.GetString("Errors.10009.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Country not found.
+        /// </summary>
+        public static string Errors_10010_Title {
+            get {
+                return ResourceManager.GetString("Errors.10010.Title", resourceCulture);
             }
         }
     }
