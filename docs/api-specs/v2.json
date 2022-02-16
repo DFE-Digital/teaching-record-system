@@ -503,12 +503,10 @@
       "GetOrCreateTrnRequest": {
         "required": [
           "birthDate",
-          "emailAddress",
           "firstName",
           "genderCode",
           "initialTeacherTraining",
           "lastName",
-          "middleName",
           "qualification"
         ],
         "type": "object",
@@ -517,7 +515,8 @@
             "type": "string"
           },
           "middleName": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "lastName": {
             "type": "string"
@@ -527,7 +526,8 @@
             "format": "date"
           },
           "emailAddress": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "address": {
             "$ref": "#/components/schemas/GetOrCreateTrnRequestAddress"
@@ -579,10 +579,7 @@
           "programmeEndDate",
           "programmeStartDate",
           "programmeType",
-          "providerUkprn",
-          "result",
-          "subject1",
-          "subject2"
+          "providerUkprn"
         ],
         "type": "object",
         "properties": {
@@ -591,34 +588,39 @@
           },
           "programmeStartDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "programmeEndDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date"
           },
           "programmeType": {
             "$ref": "#/components/schemas/IttProgrammeType"
           },
           "subject1": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "subject2": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
-          "result": {
-            "$ref": "#/components/schemas/IttResult"
+          "ageRangeFrom": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ageRangeTo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "GetOrCreateTrnRequestQualification": {
         "required": [
-          "class",
-          "countryCode",
-          "date",
-          "providerUkprn",
-          "subject"
+          "providerUkprn"
         ],
         "type": "object",
         "properties": {
@@ -626,17 +628,20 @@
             "type": "string"
           },
           "countryCode": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "subject": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "class": {
             "$ref": "#/components/schemas/ClassDivision"
           },
           "date": {
             "type": "string",
-            "format": "date-time"
+            "format": "date",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -688,23 +693,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "IttResult": {
-        "enum": [
-          "Pass",
-          "Fail",
-          "Withdrawn",
-          "InTraining",
-          "Approved",
-          "Deferred",
-          "DeferredforSkillsTests",
-          "UnderAssessment",
-          "ApplicationReceived",
-          "ApplicationUnsuccessful",
-          "Info",
-          "NoResultSubmitted"
-        ],
-        "type": "string"
       },
       "ProblemDetails": {
         "type": "object",
