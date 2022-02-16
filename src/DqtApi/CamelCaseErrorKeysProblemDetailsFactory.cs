@@ -44,7 +44,8 @@ namespace DqtApi
                 var errors = problemDetails.Errors[errorKey];
                 problemDetails.Errors.Remove(errorKey);
 
-                var camelCasedKey = System.Text.Json.JsonNamingPolicy.CamelCase.ConvertName(errorKey);
+                var camelCasedKey = string.Join(".", errorKey.Split(".").Select(System.Text.Json.JsonNamingPolicy.CamelCase.ConvertName));
+
                 problemDetails.Errors.Add(camelCasedKey, errors);
             }
 
