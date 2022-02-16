@@ -91,6 +91,7 @@ namespace DqtApi
                     options.Filters.Add(new ProducesJsonOrProblemAttribute());
                     options.Filters.Add(new CrmServiceProtectionFaultExceptionFilter());
                     options.Filters.Add(new DefaultErrorExceptionFilter(statusCode: StatusCodes.Status400BadRequest));
+                    options.Filters.Add(new ValidationExceptionFilter());
 
                     options.Conventions.Add(new ApiVersionConvention());
                 })
