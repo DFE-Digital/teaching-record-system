@@ -46,7 +46,8 @@ namespace DqtApi.V1.Controllers
             }
             else
             {
-                var qualifications = await _dataverseAdapter.GetQualificationsAsync(teacher.Id);
+                var qualifications = await _dataverseAdapter.GetQualificationsAsync(teacher.Id,
+                    new [] { dfeta_qualification.Fields.dfeta_CompletionorAwardDate, dfeta_qualification.Fields.dfeta_Type});
 
                 if (qualifications.Any())
                 {

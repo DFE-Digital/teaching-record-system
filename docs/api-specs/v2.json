@@ -242,6 +242,66 @@
         }
       }
     },
+    "/v2/teachers/update/{trn}": {
+      "patch": {
+        "tags": [
+          "Teachers"
+        ],
+        "summary": "Updates a Teacher record",
+        "parameters": [
+          {
+            "name": "trn",
+            "in": "path",
+            "description": "The TRN of the teacher to update",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTeacherRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTeacherRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTeacherRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindTeachersResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/trn-requests/{requestId}": {
       "get": {
         "tags": [
@@ -776,6 +836,96 @@
           "Completed"
         ],
         "type": "string"
+      },
+      "UpdateTeacherRequest": {
+        "required": [
+          "initialTeacherTraining",
+          "qualification"
+        ],
+        "type": "object",
+        "properties": {
+          "trn": {
+            "type": "string",
+            "nullable": true
+          },
+          "initialTeacherTraining": {
+            "$ref": "#/components/schemas/UpdateTeacherRequestInitialTeacherTraining"
+          },
+          "qualification": {
+            "$ref": "#/components/schemas/UpdateTeacherRequestRequestQualification"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateTeacherRequestInitialTeacherTraining": {
+        "required": [
+          "programmeEndDate",
+          "programmeStartDate",
+          "programmeType"
+        ],
+        "type": "object",
+        "properties": {
+          "providerUkprn": {
+            "type": "string",
+            "nullable": true
+          },
+          "programmeStartDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "programmeEndDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "programmeType": {
+            "$ref": "#/components/schemas/IttProgrammeType"
+          },
+          "subject1": {
+            "type": "string",
+            "nullable": true
+          },
+          "subject2": {
+            "type": "string",
+            "nullable": true
+          },
+          "ageRangeFrom": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ageRangeTo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateTeacherRequestRequestQualification": {
+        "type": "object",
+        "properties": {
+          "providerUkprn": {
+            "type": "string",
+            "nullable": true
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "subject": {
+            "type": "string",
+            "nullable": true
+          },
+          "class": {
+            "$ref": "#/components/schemas/ClassDivision"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {

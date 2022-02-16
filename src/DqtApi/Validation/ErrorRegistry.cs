@@ -16,7 +16,8 @@ namespace DqtApi.Validation
             ErrorDescriptor.Create(10007),  // Teacher has multiple QTS records
             ErrorDescriptor.Create(10008),  // Organisation not found
             ErrorDescriptor.Create(10009),  // Subject not found
-            ErrorDescriptor.Create(10010),  // County not found
+            ErrorDescriptor.Create(10010),  // County not found,
+            ErrorDescriptor.Create(10011)   // Cannot change Programme Type 
         }.ToDictionary(d => d.ErrorCode, d => d);
 
         public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);
@@ -38,6 +39,8 @@ namespace DqtApi.Validation
         public static Error SubjectNotFound() => CreateError(10009);
 
         public static Error CountryNotFound() => CreateError(10010);
+
+        public static Error CannotChangeProgrammeType() => CreateError(10011);
 
         private static Error CreateError(int errorCode)
         {

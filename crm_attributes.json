@@ -106,6 +106,16 @@
     "dfeta_value",
     "statecode"
   ],
+  "dfeta_sanctioncode" : [
+    "dfeta_sanctioncodeid",
+    "statecode"
+  ], 
+  "dfeta_sanction":
+  [
+    "dfeta_personid",
+    "dfeta_sanctionid",
+    "statecode"
+  ],
   "task": [
     "category",
     "description",

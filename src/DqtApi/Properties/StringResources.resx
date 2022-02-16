@@ -168,4 +168,7 @@
   <data name="Errors.10010.Title" xml:space="preserve">
     <value>Country not found</value>
   </data>
+  <data name="Errors.10011.Title" xml:space="preserve">
+    <value>ProgrammeType cannot be change</value>
+  </data>
 </root>
