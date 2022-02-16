@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
+using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql;
 using DqtApi.DataStore.Sql.Models;
 using DqtApi.Security;
@@ -84,7 +85,9 @@ namespace DqtApi.V2.Handlers
                         ProgrammeEndDate = request.InitialTeacherTraining.ProgrammeEndDate.Value,
                         ProgrammeType = request.InitialTeacherTraining.ProgrammeType.Value.ConvertToIttProgrammeType(),
                         Subject1 = request.InitialTeacherTraining.Subject1,
-                        Subject2 = request.InitialTeacherTraining.Subject2
+                        Subject2 = request.InitialTeacherTraining.Subject2,
+                        AgeRangeFrom = request.InitialTeacherTraining.AgeRangeFrom.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeFrom.Value) : null,
+                        AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null
                     },
                     Qualification = new CreateTeacherCommandQualification()
                     {

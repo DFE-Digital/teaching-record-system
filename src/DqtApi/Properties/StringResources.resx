@@ -120,6 +120,12 @@
   <data name="ErrorMessage.EitherIttProviderNameOrIttProviderUkprn" xml:space="preserve">
     <value>Request must contain IttProviderUkprn or IttProviderName or neither.</value>
   </data>
+  <data name="ErrorMessages.AgeMustBe0To19Inclusive" xml:space="preserve">
+    <value>Age must be 0-19 inclusive.</value>
+  </data>
+  <data name="ErrorMessages.AgeToCannotBeLessThanAgeFrom" xml:space="preserve">
+    <value>'Age to' cannot be less than 'age from'.</value>
+  </data>
   <data name="ErrorMessages.InvalidBirthDate" xml:space="preserve">
     <value>Birth date must be in format yyyy-MM-dd</value>
   </data>

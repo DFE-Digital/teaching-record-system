@@ -57,6 +57,8 @@ namespace DqtApi.V2.Requests
         public IttProgrammeType? ProgrammeType { get; set; }
         public string Subject1 { get; set; }
         public string Subject2 { get; set; }
+        public int? AgeRangeFrom { get; set; }
+        public int? AgeRangeTo { get; set; }
     }
 
     public class GetOrCreateTrnRequestQualification

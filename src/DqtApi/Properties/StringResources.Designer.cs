@@ -70,6 +70,24 @@ namespace DqtApi.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Age must be 0-19 inclusive..
+        /// </summary>
+        public static string ErrorMessages_AgeMustBe0To19Inclusive {
+            get {
+                return ResourceManager.GetString("ErrorMessages.AgeMustBe0To19Inclusive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;Age to&apos; cannot be less than &apos;age from&apos;..
+        /// </summary>
+        public static string ErrorMessages_AgeToCannotBeLessThanAgeFrom {
+            get {
+                return ResourceManager.GetString("ErrorMessages.AgeToCannotBeLessThanAgeFrom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Birth date must be in format yyyy-MM-dd.
         /// </summary>
         public static string ErrorMessages_InvalidBirthDate {

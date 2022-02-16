@@ -224,7 +224,9 @@ namespace DqtApi.DataStore.Crm
                     dfeta_CohortYear = cohortYear,
                     dfeta_Subject1Id = referenceData.IttSubject1Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject1Id.Value) : null,
                     dfeta_Subject2Id = referenceData.IttSubject2Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject2Id.Value) : null,
-                    dfeta_Result = result
+                    dfeta_Result = result,
+                    dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
+                    dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
                 };
             }
 

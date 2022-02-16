@@ -257,6 +257,8 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(dfeta_ittsubject.EntityLogicalName, result.dfeta_Subject2Id?.LogicalName);
             Assert.Equal(referenceData.IttSubject2Id, result.dfeta_Subject2Id?.Id);
             Assert.Equal(expectedResult, result.dfeta_Result);
+            Assert.Equal(command.InitialTeacherTraining.AgeRangeFrom, result.dfeta_AgeRangeFrom);
+            Assert.Equal(command.InitialTeacherTraining.AgeRangeTo, result.dfeta_AgeRangeTo);
         }
 
         [Fact]
@@ -375,7 +377,9 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeEndDate = new(2020, 10, 10),
                     ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
                     Subject1 = "Computer Science",
-                    Subject2 = "Mathematics"
+                    Subject2 = "Mathematics",
+                    AgeRangeFrom = dfeta_AgeRange._05,
+                    AgeRangeTo = dfeta_AgeRange._11
                 },
                 Qualification = new()
                 {
