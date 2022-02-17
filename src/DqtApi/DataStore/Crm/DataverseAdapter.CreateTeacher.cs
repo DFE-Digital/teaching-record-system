@@ -194,7 +194,7 @@ namespace DqtApi.DataStore.Crm
                 // We get a NullReferenceException back from CRM if City is null or empty
                 // (likely from a broken plugin).
                 // Removing the attribute if it's empty solves the problem.
-                if (contact.Address1_City == null)
+                if (string.IsNullOrEmpty(contact.Address1_City))
                 {
                     contact.Attributes.Remove(Contact.Fields.Address1_City);
                 }
