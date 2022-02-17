@@ -174,14 +174,7 @@ namespace DqtApi.DataStore.Crm
 
             public Contact CreateContactEntity()
             {
-                // PO REVIEW: Fields we're no longer populating:
-                // Title
-                // Telephone1
-                // NINumber
-                // PreviousSurname
-                // HUSID
-
-                return new Contact()
+                var contact = new Contact()
                 {
                     Id = TeacherId,
                     FirstName = _command.FirstName,
@@ -197,36 +190,43 @@ namespace DqtApi.DataStore.Crm
                     Address1_Country = _command.Address?.Country,
                     GenderCode = _command.GenderCode,
                 };
+
+                // We get a NullReferenceException back from CRM if City is null or empty
+                // (likely from a broken plugin).
+                // Removing the attribute if it's empty solves the problem.
+                if (contact.Address1_City == null)
+                {
+                    contact.Attributes.Remove(Contact.Fields.Address1_City);
+                }
+
+                return contact;
             }
 
             public dfeta_initialteachertraining CreateInitialTeacherTrainingEntity(CreateTeacherReferenceLookupResult referenceData)
             {
-                // PO REVIEW: Fields we're no longer populating:
-                // HUSID - not in inputs
-                // ITTQualificationId (looked up from QualAimCode historically)
-                // AgerangeFrom
-                // AgeRangeTo
-                // TroopsToTeach
-
                 Debug.Assert(referenceData.IttCountryId.HasValue);
                 Debug.Assert(referenceData.IttProviderId.HasValue);
-                Debug.Assert(referenceData.IttSubject1Id.HasValue);
-                Debug.Assert(referenceData.IttSubject2Id.HasValue);
 
                 var cohortYear = _command.InitialTeacherTraining.ProgrammeEndDate.Year.ToString();
+
+                var result = _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
+                    dfeta_ITTResult.UnderAssessment :
+                    dfeta_ITTResult.InTraining;
 
                 return new dfeta_initialteachertraining()
                 {
                     dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, TeacherId),
                     dfeta_CountryId = new EntityReference(dfeta_country.EntityLogicalName, referenceData.IttCountryId.Value),
                     dfeta_EstablishmentId = new EntityReference(Account.EntityLogicalName, referenceData.IttProviderId.Value),
-                    dfeta_ProgrammeStartDate = _command.InitialTeacherTraining.ProgrammeStartDate,
-                    dfeta_ProgrammeEndDate = _command.InitialTeacherTraining.ProgrammeEndDate,
+                    dfeta_ProgrammeStartDate = _command.InitialTeacherTraining.ProgrammeStartDate.ToDateTime(),
+                    dfeta_ProgrammeEndDate = _command.InitialTeacherTraining.ProgrammeEndDate.ToDateTime(),
                     dfeta_ProgrammeType = _command.InitialTeacherTraining.ProgrammeType,
                     dfeta_CohortYear = cohortYear,
-                    dfeta_Subject1Id = new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject1Id.Value),
-                    dfeta_Subject2Id = new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject2Id.Value),
-                    dfeta_Result = _command.InitialTeacherTraining.Result
+                    dfeta_Subject1Id = referenceData.IttSubject1Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject1Id.Value) : null,
+                    dfeta_Subject2Id = referenceData.IttSubject2Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject2Id.Value) : null,
+                    dfeta_Result = result,
+                    dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
+                    dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
                 };
             }
 
@@ -234,18 +234,16 @@ namespace DqtApi.DataStore.Crm
             {
                 Debug.Assert(referenceData.QualificationId.HasValue);
                 Debug.Assert(referenceData.QualificationProviderId.HasValue);
-                Debug.Assert(referenceData.QualificationCountryId.HasValue);
-                Debug.Assert(referenceData.QualificationSubjectId.HasValue);
 
                 return new dfeta_qualification()
                 {
                     dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, TeacherId),
                     dfeta_Type = dfeta_qualification_dfeta_Type.HigherEducation,
-                    dfeta_HE_CountryId = new EntityReference(dfeta_country.EntityLogicalName, referenceData.QualificationCountryId.Value),
-                    dfeta_HE_HESubject1Id = new EntityReference(dfeta_hesubject.EntityLogicalName, referenceData.QualificationSubjectId.Value),
+                    dfeta_HE_CountryId = referenceData.QualificationCountryId.HasValue ? new EntityReference(dfeta_country.EntityLogicalName, referenceData.QualificationCountryId.Value) : null,
+                    dfeta_HE_HESubject1Id = referenceData.QualificationSubjectId.HasValue ? new EntityReference(dfeta_hesubject.EntityLogicalName, referenceData.QualificationSubjectId.Value) : null,
                     dfeta_HE_ClassDivision = _command.Qualification.Class,
                     dfeta_HE_EstablishmentId = new EntityReference(Account.EntityLogicalName, referenceData.QualificationProviderId.Value),
-                    dfeta_HE_CompletionDate = _command.Qualification.Date,
+                    dfeta_HE_CompletionDate = _command.Qualification.Date?.ToDateTime(),
                     dfeta_HE_HEQualificationId = new EntityReference(dfeta_hequalification.EntityLogicalName, referenceData.QualificationId.Value)
                 };
             }
@@ -379,11 +377,7 @@ namespace DqtApi.DataStore.Crm
             public async Task<CreateTeacherReferenceLookupResult> LookupReferenceData()
             {
                 Debug.Assert(!string.IsNullOrEmpty(_command.InitialTeacherTraining.ProviderUkprn));
-                Debug.Assert(!string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject1));
-                Debug.Assert(!string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject2));
                 Debug.Assert(!string.IsNullOrEmpty(_command.Qualification.ProviderUkprn));
-                Debug.Assert(!string.IsNullOrEmpty(_command.Qualification.CountryCode));
-                Debug.Assert(!string.IsNullOrEmpty(_command.Qualification.Subject));
 
                 var isEarlyYears = _command.InitialTeacherTraining.ProgrammeType.IsEarlyYears();
 
@@ -401,17 +395,21 @@ namespace DqtApi.DataStore.Crm
                         CacheKeys.GetCountryKey(country),
                         _ => _dataverseAdapter.GetCountry(country)));
 
-                var getSubject1Task = Let(
-                    _command.InitialTeacherTraining.Subject1,
-                    subject => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetIttSubjectKey(subject),
-                        _ => _dataverseAdapter.GetIttSubjectByName(subject)));
+                var getSubject1Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject1) ?
+                    Let(
+                        _command.InitialTeacherTraining.Subject1,
+                        subject => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetIttSubjectKey(subject),
+                            _ => _dataverseAdapter.GetIttSubjectByName(subject))) :
+                    null;
 
-                var getSubject2Task = Let(
-                    _command.InitialTeacherTraining.Subject2,
-                    subject => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetIttSubjectKey(subject),
-                        _ => _dataverseAdapter.GetIttSubjectByName(subject)));
+                var getSubject2Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject2) ?
+                    Let(
+                        _command.InitialTeacherTraining.Subject2,
+                        subject => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetIttSubjectKey(subject),
+                            _ => _dataverseAdapter.GetIttSubjectByName(subject))) :
+                    null;
 
                 var getQualificationTask = Let(
                     "First Degree",
@@ -425,17 +423,21 @@ namespace DqtApi.DataStore.Crm
                         CacheKeys.GetOrganizationByUkprnKey(ukprn),
                         _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn)));
 
-                var getQualificationCountryTask = Let(
-                    _command.Qualification.CountryCode,
-                    country => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetCountryKey(country),
-                        _ => _dataverseAdapter.GetCountry(country)));
+                var getQualificationCountryTask = !string.IsNullOrEmpty(_command.Qualification.CountryCode) ?
+                    Let(
+                        _command.Qualification.CountryCode,
+                        country => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetCountryKey(country),
+                            _ => _dataverseAdapter.GetCountry(country))) :
+                    null;
 
-                var getQualificationSubjectTask = Let(
-                    _command.Qualification.Subject,
-                    subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetHeSubjectKey(subjectName),
-                        _ => _dataverseAdapter.GetHeSubjectByName(subjectName)));
+                var getQualificationSubjectTask = !string.IsNullOrEmpty(_command.Qualification.Subject) ?
+                    Let(
+                        _command.Qualification.Subject,
+                        subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetHeSubjectKey(subjectName),
+                            _ => _dataverseAdapter.GetHeSubjectByName(subjectName))) :
+                    null;
 
                 var getEarlyYearsStatusTask = isEarlyYears ?
                     Let(
@@ -455,7 +457,9 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
-                await Task.WhenAll(getIttProviderTask,
+                var lookupTasks = new Task[]
+                {
+                    getIttProviderTask,
                     getIttCountryTask,
                     getSubject1Task,
                     getSubject2Task,
@@ -464,23 +468,28 @@ namespace DqtApi.DataStore.Crm
                     getQualificationCountryTask,
                     getQualificationSubjectTask,
                     getEarlyYearsStatusTask,
-                    getTeacherStatusTask);
+                    getTeacherStatusTask
+                }
+                .Where(t => t != null);
+
+                await Task.WhenAll(lookupTasks);
 
                 Debug.Assert(!isEarlyYears || getEarlyYearsStatusTask.Result != null, "Early years status lookup failed.");
                 Debug.Assert(isEarlyYears || getTeacherStatusTask.Result != null, "Teacher status lookup failed.");
+                Debug.Assert(getQualificationTask.Result != null);
 
                 return new()
                 {
-                    IttProviderId = getIttProviderTask.Result?.Id,
-                    IttCountryId = getIttCountryTask.Result?.Id,
-                    IttSubject1Id = getSubject1Task.Result?.Id,
-                    IttSubject2Id = getSubject2Task.Result?.Id,
-                    QualificationId = getQualificationTask.Result?.Id,
-                    QualificationProviderId = getQualificationProviderTask.Result?.Id,
-                    QualificationCountryId = getQualificationCountryTask.Result?.Id,
-                    QualificationSubjectId = getQualificationSubjectTask.Result?.Id,
-                    EarlyYearsStatusId = getEarlyYearsStatusTask.Result?.Id,
-                    TeacherStatusId = getTeacherStatusTask.Result?.Id
+                    IttProviderId = getIttProviderTask?.Result?.Id,
+                    IttCountryId = getIttCountryTask?.Result?.Id,
+                    IttSubject1Id = getSubject1Task?.Result?.Id,
+                    IttSubject2Id = getSubject2Task?.Result?.Id,
+                    QualificationId = getQualificationTask?.Result?.Id,
+                    QualificationProviderId = getQualificationProviderTask?.Result?.Id,
+                    QualificationCountryId = getQualificationCountryTask?.Result?.Id,
+                    QualificationSubjectId = getQualificationSubjectTask?.Result?.Id,
+                    EarlyYearsStatusId = getEarlyYearsStatusTask?.Result?.Id,
+                    TeacherStatusId = getTeacherStatusTask?.Result?.Id
                 };
             }
 
@@ -493,19 +502,14 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= CreateTeacherFailedReasons.IttProviderNotFound;
                 }
 
-                if (referenceData.IttSubject1Id == null)
+                if (referenceData.IttSubject1Id == null && !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject1))
                 {
                     failedReasons |= CreateTeacherFailedReasons.Subject1NotFound;
                 }
 
-                if (referenceData.IttSubject2Id == null)
+                if (referenceData.IttSubject2Id == null && !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject2))
                 {
                     failedReasons |= CreateTeacherFailedReasons.Subject2NotFound;
-                }
-
-                if (referenceData.QualificationId == null)
-                {
-                    failedReasons |= CreateTeacherFailedReasons.QualificationNotFound;
                 }
 
                 if (referenceData.QualificationProviderId == null)
@@ -513,12 +517,12 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= CreateTeacherFailedReasons.QualificationProviderNotFound;
                 }
 
-                if (referenceData.QualificationCountryId == null)
+                if (referenceData.QualificationCountryId == null && !string.IsNullOrEmpty(_command.Qualification.CountryCode))
                 {
                     failedReasons |= CreateTeacherFailedReasons.QualificationCountryNotFound;
                 }
 
-                if (referenceData.QualificationSubjectId == null)
+                if (referenceData.QualificationSubjectId == null && !string.IsNullOrEmpty(_command.Qualification.Subject))
                 {
                     failedReasons |= CreateTeacherFailedReasons.QualificationSubjectNotFound;
                 }

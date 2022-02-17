@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
+using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql;
 using DqtApi.DataStore.Sql.Models;
 using DqtApi.Security;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
+using DqtApi.Validation;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,7 +66,7 @@ namespace DqtApi.V2.Handlers
                     FirstName = request.FirstName,
                     MiddleName = request.MiddleName,
                     LastName = request.LastName,
-                    BirthDate = request.BirthDate.ToDateTime(new()),
+                    BirthDate = request.BirthDate.ToDateTime(),
                     EmailAddress = request.EmailAddress,
                     Address = new CreateTeacherCommandAddress()
                     {
@@ -76,26 +81,27 @@ namespace DqtApi.V2.Handlers
                     InitialTeacherTraining = new CreateTeacherCommandInitialTeacherTraining()
                     {
                         ProviderUkprn = request.InitialTeacherTraining.ProviderUkprn,
-                        ProgrammeStartDate = request.InitialTeacherTraining.ProgrammeStartDate,
-                        ProgrammeEndDate = request.InitialTeacherTraining.ProgrammeEndDate,
-                        ProgrammeType = request.InitialTeacherTraining.ProgrammeType.ConvertToIttProgrammeType(),
+                        ProgrammeStartDate = request.InitialTeacherTraining.ProgrammeStartDate.Value,
+                        ProgrammeEndDate = request.InitialTeacherTraining.ProgrammeEndDate.Value,
+                        ProgrammeType = request.InitialTeacherTraining.ProgrammeType.Value.ConvertToIttProgrammeType(),
                         Subject1 = request.InitialTeacherTraining.Subject1,
                         Subject2 = request.InitialTeacherTraining.Subject2,
-                        Result = request.InitialTeacherTraining.Result.ConvertToITTResult()
+                        AgeRangeFrom = request.InitialTeacherTraining.AgeRangeFrom.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeFrom.Value) : null,
+                        AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null
                     },
                     Qualification = new CreateTeacherCommandQualification()
                     {
                         ProviderUkprn = request.Qualification.ProviderUkprn,
                         CountryCode = request.Qualification.CountryCode,
                         Subject = request.Qualification.Subject,
-                        Class = request.Qualification.Class.ConvertToClassDivision(),
-                        Date = request.Qualification.Date
+                        Class = request.Qualification.Class.Value.ConvertToClassDivision(),
+                        Date = request.Qualification.Date.Value
                     }
                 });
 
                 if (!createTeacherResult.Succeeded)
                 {
-                    throw new NotImplementedException();
+                    throw CreateValidationExceptionFromFailedReasons(createTeacherResult.FailedReasons);
                 }
 
                 _dqtContext.TrnRequests.Add(new TrnRequest()
@@ -122,6 +128,57 @@ namespace DqtApi.V2.Handlers
                 Trn = trn,
                 Status = status
             };
+        }
+
+        private ValidationException CreateValidationExceptionFromFailedReasons(CreateTeacherFailedReasons failedReasons)
+        {
+            var failures = new List<ValidationFailure>();
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.IttProviderNotFound,
+                $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.ProviderUkprn)}",
+                ErrorRegistry.OrganisationNotFound().Title);
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.Subject1NotFound,
+                $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject1)}",
+                ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.Subject2NotFound,
+                $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject2)}",
+                ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.QualificationCountryNotFound,
+                $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.CountryCode)}",
+                ErrorRegistry.CountryNotFound().Title);
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.QualificationSubjectNotFound,
+                $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.Subject)}",
+                ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.QualificationProviderNotFound,
+                $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.ProviderUkprn)}",
+                ErrorRegistry.OrganisationNotFound().Title);
+
+            if (failedReasons != CreateTeacherFailedReasons.None)
+            {
+                throw new NotImplementedException($"Unknown {nameof(CreateTeacherFailedReasons)}: '{failedReasons}.");
+            }
+
+            return new ValidationException(failures);
+
+            void ConsumeReason(CreateTeacherFailedReasons reason, string propertyName, string message)
+            {
+                if (failedReasons.HasFlag(reason))
+                {
+                    failures.Add(new ValidationFailure(propertyName, message));
+                    failedReasons = failedReasons & ~reason;
+                }
+            }
         }
     }
 }

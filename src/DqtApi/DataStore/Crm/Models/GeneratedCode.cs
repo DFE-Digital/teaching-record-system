@@ -2410,6 +2410,8 @@ namespace DqtApi.DataStore.Crm.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string dfeta_AgeRangeFrom = "dfeta_agerangefrom";
+			public const string dfeta_AgeRangeTo = "dfeta_agerangeto";
 			public const string dfeta_CohortYear = "dfeta_cohortyear";
 			public const string dfeta_CountryId = "dfeta_countryid";
 			public const string dfeta_EstablishmentId = "dfeta_establishmentid";
@@ -2472,6 +2474,46 @@ namespace DqtApi.DataStore.Crm.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_agerangefrom")]
+		public virtual dfeta_AgeRange? dfeta_AgeRangeFrom
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_AgeRange?)(EntityOptionSetEnum.GetEnum(this, "dfeta_agerangefrom")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_AgeRangeFrom");
+				this.SetAttributeValue("dfeta_agerangefrom", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("dfeta_AgeRangeFrom");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_agerangeto")]
+		public virtual dfeta_AgeRange? dfeta_AgeRangeTo
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_AgeRange?)(EntityOptionSetEnum.GetEnum(this, "dfeta_agerangeto")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_AgeRangeTo");
+				this.SetAttributeValue("dfeta_agerangeto", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("dfeta_AgeRangeTo");
 			}
 		}
 		

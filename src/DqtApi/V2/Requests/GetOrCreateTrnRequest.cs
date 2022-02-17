@@ -20,13 +20,11 @@ namespace DqtApi.V2.Requests
 
         [Required]
         public string FirstName { get; set; }
-        [Required]
         public string MiddleName { get; set; }
         [Required]
         public string LastName { get; set; }
         [Required]
         public DateOnly BirthDate { get; set; }
-        [Required]
         public string EmailAddress { get; set; }
         public GetOrCreateTrnRequestAddress Address { get; set; }
         [Required]
@@ -52,30 +50,24 @@ namespace DqtApi.V2.Requests
         [Required]
         public string ProviderUkprn { get; set; }
         [Required]
-        public DateTime ProgrammeStartDate { get; set; }
+        public DateOnly? ProgrammeStartDate { get; set; }
         [Required]
-        public DateTime ProgrammeEndDate { get; set; }
+        public DateOnly? ProgrammeEndDate { get; set; }
         [Required]
-        public IttProgrammeType ProgrammeType { get; set; }
-        [Required]
+        public IttProgrammeType? ProgrammeType { get; set; }
         public string Subject1 { get; set; }
-        [Required]
         public string Subject2 { get; set; }
-        [Required]
-        public IttResult Result { get; set; }
+        public int? AgeRangeFrom { get; set; }
+        public int? AgeRangeTo { get; set; }
     }
 
     public class GetOrCreateTrnRequestQualification
     {
         [Required]
         public string ProviderUkprn { get; set; }
-        [Required]
         public string CountryCode { get; set; }
-        [Required]
         public string Subject { get; set; }
-        [Required]
-        public ClassDivision Class { get; set; }
-        [Required]
-        public DateTime Date { get; set; }
+        public ClassDivision? Class { get; set; }
+        public DateOnly? Date { get; set; }
     }
 }

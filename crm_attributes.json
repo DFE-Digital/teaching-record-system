@@ -59,6 +59,8 @@
     "statecode"
   ],
   "dfeta_initialteachertraining": [
+    "dfeta_agerangefrom",
+    "dfeta_agerangeto",
     "dfeta_cohortyear",
     "dfeta_countryid",
     "dfeta_establishmentid",
