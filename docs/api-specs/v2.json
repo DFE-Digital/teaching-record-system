@@ -619,13 +619,11 @@
         "additionalProperties": false
       },
       "GetOrCreateTrnRequestQualification": {
-        "required": [
-          "providerUkprn"
-        ],
         "type": "object",
         "properties": {
           "providerUkprn": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "countryCode": {
             "type": "string",

@@ -63,7 +63,6 @@ namespace DqtApi.V2.Requests
 
     public class GetOrCreateTrnRequestQualification
     {
-        [Required]
         public string ProviderUkprn { get; set; }
         public string CountryCode { get; set; }
         public string Subject { get; set; }

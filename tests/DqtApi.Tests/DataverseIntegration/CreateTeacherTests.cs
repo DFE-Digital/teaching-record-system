@@ -68,10 +68,6 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeStartDate = new(2020, 4, 1),
                     ProgrammeEndDate = new(2020, 10, 10),
                     ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
-                },
-                Qualification = new()
-                {
-                    ProviderUkprn = "10044534"
                 }
             };
 
