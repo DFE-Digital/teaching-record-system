@@ -13,15 +13,17 @@ namespace DqtApi.DataStore.Crm
 
         Task<IEnumerable<Contact>> GetMatchingTeachersAsync(GetTeacherRequest request);
 
-        Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId);
+        Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId, params string[] columnNames);
 
         Task<Contact> GetTeacherAsync(Guid teacherId, bool resolveMerges = true, params string[] columnNames);
 
         Task<IEnumerable<Contact>> GetTeachersByTrn(string trn, bool activeOnly = true, params string[] columnNames);
 
         Task<IReadOnlyCollection<Contact>> FindTeachers(FindTeachersQuery query);
+        Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);
         Task<Account> GetOrganizationByProviderName(string providerName, params string[] columnNames);
         Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames);
+        Task<IEnumerable<CrmTask>> GetCrmTasks(Guid teacherId, params string[] columnNames);
 
         Task<SetIttResultForTeacherResult> SetIttResultForTeacher(
             Guid teacherId,

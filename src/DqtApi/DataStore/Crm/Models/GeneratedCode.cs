@@ -437,6 +437,7 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string dfeta_contact_dfeta_qtsregistration = "dfeta_contact_dfeta_qtsregistration";
 			public const string dfeta_contact_dfeta_qtsregistration1 = "dfeta_contact_dfeta_qtsregistration1";
 			public const string dfeta_contact_dfeta_qualification = "dfeta_contact_dfeta_qualification";
+			public const string dfeta_contact_dfeta_sanction = "dfeta_contact_dfeta_sanction";
 			public const string dfeta_contact_task_potentialduplicateid = "dfeta_contact_task_potentialduplicateid";
 			public const string contact_customer_accounts = "contact_customer_accounts";
 			public const string Referencingcontact_customer_contacts = "contact_customer_contacts";
@@ -1221,6 +1222,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_contact_dfeta_qualification");
 				this.SetRelatedEntities<DqtApi.DataStore.Crm.Models.dfeta_qualification>("dfeta_contact_dfeta_qualification", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_qualification");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_contact_dfeta_sanction
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_sanction")]
+		public System.Collections.Generic.IEnumerable<DqtApi.DataStore.Crm.Models.dfeta_sanction> dfeta_contact_dfeta_sanction
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<DqtApi.DataStore.Crm.Models.dfeta_sanction>("dfeta_contact_dfeta_sanction", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_contact_dfeta_sanction");
+				this.SetRelatedEntities<DqtApi.DataStore.Crm.Models.dfeta_sanction>("dfeta_contact_dfeta_sanction", null, value);
+				this.OnPropertyChanged("dfeta_contact_dfeta_sanction");
 			}
 		}
 		
@@ -3923,6 +3944,394 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_dfeta_hesubject_dfeta_qualification3");
 				this.SetRelatedEntity<DqtApi.DataStore.Crm.Models.dfeta_hesubject>("dfeta_dfeta_hesubject_dfeta_qualification3", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_hesubject_dfeta_qualification3");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_sanctionState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_sanction")]
+	public partial class dfeta_sanction : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_sanction entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string dfeta_PersonId = "dfeta_personid";
+			public const string dfeta_sanctionId = "dfeta_sanctionid";
+			public const string Id = "dfeta_sanctionid";
+			public const string StateCode = "statecode";
+			public const string dfeta_contact_dfeta_sanction = "dfeta_contact_dfeta_sanction";
+			public const string dfeta_dfeta_sanctioncode_dfeta_sanction = "dfeta_dfeta_sanctioncode_dfeta_sanction";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_sanction() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "dfeta_sanction";
+		
+		public const string PrimaryIdAttribute = "dfeta_sanctionid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_sanction";
+		
+		public const string EntityLogicalCollectionName = "dfeta_sanctions";
+		
+		public const string EntitySetName = "dfeta_sanctions";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for Person associated with Sanction.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_PersonId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_personid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_PersonId");
+				this.SetAttributeValue("dfeta_personid", value);
+				this.OnPropertyChanged("dfeta_PersonId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sanctionid")]
+		public System.Nullable<System.Guid> dfeta_sanctionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_sanctionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_sanctionId");
+				this.SetAttributeValue("dfeta_sanctionid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_sanctionId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sanctionid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_sanctionId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Status of the Sanction
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<DqtApi.DataStore.Crm.Models.dfeta_sanctionState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((DqtApi.DataStore.Crm.Models.dfeta_sanctionState)(System.Enum.ToObject(typeof(DqtApi.DataStore.Crm.Models.dfeta_sanctionState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_contact_dfeta_sanction
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_sanction")]
+		public DqtApi.DataStore.Crm.Models.Contact dfeta_contact_dfeta_sanction
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<DqtApi.DataStore.Crm.Models.Contact>("dfeta_contact_dfeta_sanction", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_contact_dfeta_sanction");
+				this.SetRelatedEntity<DqtApi.DataStore.Crm.Models.Contact>("dfeta_contact_dfeta_sanction", null, value);
+				this.OnPropertyChanged("dfeta_contact_dfeta_sanction");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_dfeta_sanctioncode_dfeta_sanction
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sanctioncodeid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_sanctioncode_dfeta_sanction")]
+		public DqtApi.DataStore.Crm.Models.dfeta_sanctioncode dfeta_dfeta_sanctioncode_dfeta_sanction
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<DqtApi.DataStore.Crm.Models.dfeta_sanctioncode>("dfeta_dfeta_sanctioncode_dfeta_sanction", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_sanctioncode_dfeta_sanction");
+				this.SetRelatedEntity<DqtApi.DataStore.Crm.Models.dfeta_sanctioncode>("dfeta_dfeta_sanctioncode_dfeta_sanction", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_sanctioncode_dfeta_sanction");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_sanctioncodeState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_sanctioncode")]
+	public partial class dfeta_sanctioncode : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_sanctioncode entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string dfeta_sanctioncodeId = "dfeta_sanctioncodeid";
+			public const string Id = "dfeta_sanctioncodeid";
+			public const string StateCode = "statecode";
+			public const string dfeta_dfeta_sanctioncode_dfeta_sanction = "dfeta_dfeta_sanctioncode_dfeta_sanction";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_sanctioncode() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "dfeta_sanctioncode";
+		
+		public const string PrimaryIdAttribute = "dfeta_sanctioncodeid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_sanctioncode";
+		
+		public const string EntityLogicalCollectionName = "dfeta_sanctioncodes";
+		
+		public const string EntitySetName = "dfeta_sanctioncodes";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sanctioncodeid")]
+		public System.Nullable<System.Guid> dfeta_sanctioncodeId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_sanctioncodeid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_sanctioncodeId");
+				this.SetAttributeValue("dfeta_sanctioncodeid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_sanctioncodeId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sanctioncodeid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_sanctioncodeId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Status of the Sanction Code
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<DqtApi.DataStore.Crm.Models.dfeta_sanctioncodeState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((DqtApi.DataStore.Crm.Models.dfeta_sanctioncodeState)(System.Enum.ToObject(typeof(DqtApi.DataStore.Crm.Models.dfeta_sanctioncodeState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_dfeta_sanctioncode_dfeta_sanction
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_sanctioncode_dfeta_sanction")]
+		public System.Collections.Generic.IEnumerable<DqtApi.DataStore.Crm.Models.dfeta_sanction> dfeta_dfeta_sanctioncode_dfeta_sanction
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<DqtApi.DataStore.Crm.Models.dfeta_sanction>("dfeta_dfeta_sanctioncode_dfeta_sanction", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_sanctioncode_dfeta_sanction");
+				this.SetRelatedEntities<DqtApi.DataStore.Crm.Models.dfeta_sanction>("dfeta_dfeta_sanctioncode_dfeta_sanction", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_sanctioncode_dfeta_sanction");
 			}
 		}
 	}

@@ -190,14 +190,11 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(entity => entity.ToEntity<dfeta_qtsregistration>());
         }
 
-        public async Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId)
+        public async Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId, params string[] columnNames)
         {
             var query = new QueryByAttribute(dfeta_qualification.EntityLogicalName)
             {
-                ColumnSet = new ColumnSet(
-                    dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
-                    dfeta_qualification.Fields.dfeta_Type
-                )
+                ColumnSet = new ColumnSet(columnNames)
             };
 
             query.AddAttributeValue(dfeta_qualification.Fields.dfeta_PersonId, teacherId);
@@ -255,6 +252,17 @@ namespace DqtApi.DataStore.Crm
             var result = await _service.RetrieveMultipleAsync(query);
 
             return result.Entities.Select(e => e.ToEntity<Contact>());
+        }
+
+        public async Task<IEnumerable<CrmTask>> GetCrmTasks(Guid teacherId, params string[] columnNames)
+        {
+            var query = new QueryByAttribute(CrmTask.EntityLogicalName)
+            {
+                ColumnSet = new ColumnSet(columnNames)
+            };
+            query.AddAttributeValue(CrmTask.Fields.RegardingObjectId, teacherId);
+            var result = await _service.RetrieveMultipleAsync(query);
+            return result.Entities.Select(entity => entity.ToEntity<CrmTask>());
         }
 
         public async Task<dfeta_teacherstatus> GetTeacherStatus(

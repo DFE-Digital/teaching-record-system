@@ -212,5 +212,14 @@ namespace DqtApi.Properties {
                 return ResourceManager.GetString("Errors.10010.Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ProgrammeType cannot be change.
+        /// </summary>
+        public static string Errors_10011_Title {
+            get {
+                return ResourceManager.GetString("Errors.10011.Title", resourceCulture);
+            }
+        }
     }
 }
