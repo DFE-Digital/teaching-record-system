@@ -2,6 +2,7 @@
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Microsoft.Xrm.Sdk.Messages;
 using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
@@ -347,6 +348,37 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.NotNull(result);
             Assert.Equal(existingTeacherId, result?.TeacherId);
             Assert.Equal(expectedMatchedAttributes, result?.MatchedAttributes);
+        }
+
+        [Theory]
+        [InlineData("Joe3", "X", "Bloggs", "First name contains a digit")]
+        [InlineData("Joe", "X3", "Bloggs", "Middle name contains a digit")]
+        [InlineData("Joe", "X", "Bloggs3", "Last name contains a digit")]
+        [InlineData("Jo3e", "3X", "Bloggs", "First name and middle name contain a digit")]
+        [InlineData("Joe", "X3", "Blog3gs", "Middle name and last name contain a digit")]
+        [InlineData("Joe3", "X", "Bloggs3", "First name and last name contain a digit")]
+        [InlineData("Joe3", "X3", "Bloggs3", "First name, middle name and last name contain a digit")]
+        public async Task Given_name_containing_digits_creates_review_task(
+            string firstName,
+            string middleName,
+            string lastName,
+            string expectedDescription)
+        {
+            // Arrange
+            var command = CreateCommand(cmd =>
+            {
+                cmd.FirstName = firstName;
+                cmd.MiddleName = middleName;
+                cmd.LastName = lastName;
+            });
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+
+            // Assert
+            transactionRequest.AssertContainsCreateRequest<CrmTask>(t =>
+                t.RegardingObjectId?.Id == result.TeacherId &&
+                t.Description == expectedDescription);
         }
 
         private static CreateTeacherCommand CreateCommand(Action<CreateTeacherCommand> configureCommand = null)
