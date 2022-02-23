@@ -227,11 +227,6 @@ namespace DqtApi
 
             app.UseRouting();
 
-            if (env.IsProduction())
-            {
-                app.UseSentryTracing();
-            }
-
             app.UseHttpMetrics();
 
             app.UseHealthChecks("/status");
