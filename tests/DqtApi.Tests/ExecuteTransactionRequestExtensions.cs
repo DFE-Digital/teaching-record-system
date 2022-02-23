@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Xunit;
-using System.Linq;
 
 namespace DqtApi.Tests
 {
@@ -55,6 +54,17 @@ namespace DqtApi.Tests
             Assert.DoesNotContain(
                 request.Requests,
                 request => request is UpdateRequest updateRequest && updateRequest.Target is TEntity);
+        }
+
+        public static void AssertContainsRequest<TRequest>(this ExecuteTransactionRequest request, Predicate<TRequest> filter)
+        {
+            var requests = request.Requests.OfType<TRequest>();
+            Assert.Contains(requests, filter);
+        }
+
+        public static void AssertContainsCreateRequest<TEntity>(this ExecuteTransactionRequest request, Predicate<TEntity> filter)
+        {
+            AssertContainsRequest<CreateRequest>(request, request => request.Target is TEntity entity && filter(entity));
         }
     }
 }

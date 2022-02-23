@@ -52,6 +52,8 @@ namespace DqtApi.DataStore.Crm
                 }
             };
 
+            helper.FlagBadData(txnRequest);
+
             var findExistingTeacherResult = await (findExistingTeacher ?? helper.FindExistingTeacher)();
             var allocateTrn = findExistingTeacherResult == null;
 
@@ -169,6 +171,52 @@ namespace DqtApi.DataStore.Crm
                     }
 
                     return sb.ToString();
+                }
+            }
+
+            public CrmTask CreateNameWithDigitsReviewTaskEntity(
+                bool firstNameContainsDigit,
+                bool middleNameContainsDigit,
+                bool lastNameContainsDigit)
+            {
+                var description = GetDescription();
+
+                return new CrmTask()
+                {
+                    RegardingObjectId = new EntityReference(Contact.EntityLogicalName, TeacherId),
+                    Category = "DMSImportTrn",
+                    Subject = "Notification for QTS Unit Team",
+                    Description = description,
+                    ScheduledEnd = _dataverseAdapter._clock.UtcNow
+                };
+
+                string GetDescription()
+                {
+                    var badFields = new List<string>();
+
+                    if (firstNameContainsDigit)
+                    {
+                        badFields.Add("first name");
+                    }
+
+                    if (middleNameContainsDigit)
+                    {
+                        badFields.Add("middle name");
+                    }
+
+                    if (lastNameContainsDigit)
+                    {
+                        badFields.Add("last name");
+                    }
+
+                    Debug.Assert(badFields.Count > 0);
+
+                    var description = badFields.ToCommaSeparatedString(finalValuesConjunction: "and")
+                        + $" contain{(badFields.Count == 1 ? "s" : "")} a digit";
+
+                    description = description[0..1].ToUpper() + description[1..];
+
+                    return description;
                 }
             }
 
@@ -370,6 +418,21 @@ namespace DqtApi.DataStore.Crm
 
                     filter = combinationsFilter;
                     return true;
+                }
+            }
+
+            public void FlagBadData(ExecuteTransactionRequest txnRequest)
+            {
+                var firstNameContainsDigit = _command.FirstName.Any(Char.IsDigit);
+                var middleNameContainsDigit = _command.MiddleName?.Any(Char.IsDigit) ?? false;
+                var lastNameContainsDigit = _command.LastName.Any(Char.IsDigit);
+
+                if (firstNameContainsDigit || middleNameContainsDigit || lastNameContainsDigit)
+                {
+                    txnRequest.Requests.Add(new CreateRequest()
+                    {
+                        Target = CreateNameWithDigitsReviewTaskEntity(firstNameContainsDigit, middleNameContainsDigit, lastNameContainsDigit)
+                    });
                 }
             }
 
