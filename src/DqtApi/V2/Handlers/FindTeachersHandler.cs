@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,18 +12,17 @@ using MediatR;
 
 namespace DqtApi.V2.Handlers
 {
-    public class GetTrnDetailsHandler : IRequestHandler<FindTeachersRequest, FindTeachersResponse>
+    public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeachersResponse>
     {
         private readonly IDataverseAdapter _dataverseAdapter;
 
-        public GetTrnDetailsHandler(IDataverseAdapter dataverseAdapter)
+        public FindTeachersHandler(IDataverseAdapter dataverseAdapter)
         {
             _dataverseAdapter = dataverseAdapter;
         }
 
         public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
         {
-            Debug.Assert(request != null);
             var ittProvider = default(Account);
             if (!string.IsNullOrEmpty(request.IttProviderUkprn))
             {
@@ -53,21 +51,20 @@ namespace DqtApi.V2.Handlers
             };
 
             var result = await _dataverseAdapter.FindTeachers(query);
-            if (result?.Count > 0)
-                return new FindTeachersResponse()
+
+            return new FindTeachersResponse()
+            {
+                Results = result.Select(a => new FindTeacherResult()
                 {
-                    Results = result?.Select(a => new FindTeacherResult()
-                    {
-                        Trn = a.dfeta_TRN,
-                        EmailAddresses = !string.IsNullOrEmpty(a.EMailAddress1) ? new List<string> { a.EMailAddress1 } : null,
-                        FirstName = a.FirstName,
-                        LastName = a.LastName,
-                        DateOfBirth =  a.BirthDate.HasValue ? DateOnly.FromDateTime(a.BirthDate.Value) : null,
-                        NationalInsuranceNumber = a.dfeta_NINumber,
-                        Uid = a.Id.ToString()
-                    })
-                };
-            return null;
+                    Trn = a.dfeta_TRN,
+                    EmailAddresses = !string.IsNullOrEmpty(a.EMailAddress1) ? new List<string> { a.EMailAddress1 } : null,
+                    FirstName = a.FirstName,
+                    LastName = a.LastName,
+                    DateOfBirth = a.BirthDate.HasValue ? DateOnly.FromDateTime(a.BirthDate.Value) : null,
+                    NationalInsuranceNumber = a.dfeta_NINumber,
+                    Uid = a.Id.ToString()
+                })
+            };
         }
     }
 }
