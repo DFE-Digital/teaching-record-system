@@ -10,41 +10,51 @@ using Xunit;
 
 namespace DqtApi.Tests.V2.Operations
 {
-    public class GetTrnDetailsTests : ApiTestBase
+    public class FindTeachersTests : ApiTestBase
     {
-        public GetTrnDetailsTests(ApiFixture apiFixture) : base(apiFixture)
+        public FindTeachersTests(ApiFixture apiFixture) : base(apiFixture)
         {
         }
 
         [Fact]
-        public async Task When_no_results_found_then_response_is_nocontent()
+        public async Task Given_no_results_returns_ok()
         {
             // Arrange
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+                .ReturnsAsync(Array.Empty<Contact>());
+
             var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find");
 
             // Act
             var response = await HttpClient.SendAsync(request);
 
             // Assert
-            Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode);
+            await AssertEx.JsonResponseEquals(
+                response,
+                expected: new
+                {
+                    results = Array.Empty<object>()
+                },
+                expectedStatusCode: StatusCodes.Status200OK);
         }
 
         [Fact]
-        public async Task Given_SearchParameters_SearchResults_Match()
+        public async Task Given_search_returns_a_result_returns_expected_response()
         {
             // Arrange
             var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference" };
-            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
+
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
-                .ReturnsAsync(new List<Contact> { contact1 })
-                .Verifiable();
+                .ReturnsAsync(new List<Contact> { contact1 });
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
 
             // Act
             var response = await HttpClient.SendAsync(request);
 
             // Assert
-            ApiFixture.DataverseAdapter.Verify();
             await AssertEx.JsonResponseEquals(
                 response,
                 expected: new
@@ -69,15 +79,16 @@ namespace DqtApi.Tests.V2.Operations
         [Theory]
         [InlineData("someProvider", "")]
         [InlineData(null, "1005811506")]
-        public async Task Given_NonExistent_ProviderNameOrUkprnProvider_ReturnError(string providerName, string providerUkprn)
+        public async Task Given_provider_does_not_exist_returns_error(string providerName, string providerUkprn)
         {
             // Arrange
             var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 1, 1), dfeta_TRN = "someReference" };
-            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn={providerUkprn}&IttProviderName={providerName}");
+
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
-                .ReturnsAsync(new List<Contact> { contact1 })
-                .Verifiable();
+                .ReturnsAsync(new List<Contact> { contact1 });
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn={providerUkprn}&IttProviderName={providerName}");
 
             // Act
             var response = await HttpClient.SendAsync(request);
@@ -89,28 +100,31 @@ namespace DqtApi.Tests.V2.Operations
         [Theory]
         [InlineData("someProvider", "")]
         [InlineData(null, "1005811506")]
-        public async Task Given_SearchParametersContainValidProvider_SearchResultsAreReturned(string providerName, string providerUkprn)
+        public async Task Given_search_with_valid_provider_returns_results(string providerName, string providerUkprn)
         {
             // Arrange
             var account = new Account() { Name = "someProvider" };
+
             var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 1, 1), dfeta_TRN = "someReference" };
-            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn={providerUkprn}&IttProviderName={providerName}");
+
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.GetOrganizationByProviderName(It.IsAny<string>()))
                 .ReturnsAsync(account);
+
             ApiFixture.DataverseAdapter
                  .Setup(mock => mock.GetOrganizationByUkprn(It.IsAny<string>()))
                  .ReturnsAsync(account);
+
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
-                .ReturnsAsync(new List<Contact> { contact1 })
-                .Verifiable();
+                .ReturnsAsync(new List<Contact> { contact1 });
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn={providerUkprn}&IttProviderName={providerName}");
 
             // Act
             var response = await HttpClient.SendAsync(request);
 
             // Assert
-            ApiFixture.DataverseAdapter.Verify();
             await AssertEx.JsonResponseEquals(
                 response,
                 expected: new
@@ -133,15 +147,16 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Fact]
-        public async Task Given_BothUkPrnAndProviderNameAreProvided_ReturnError()
+        public async Task Given_both_ukprn_and_provider_name_are_specified_returns_error()
         {
             // Arrange
             var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 1, 1), dfeta_TRN = "someReference" };
-            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn=12345678910&IttProviderName=provider");
+
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
-                .ReturnsAsync(new List<Contact> { contact1 })
-                .Verifiable();
+                .ReturnsAsync(new List<Contact> { contact1 });
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn=12345678910&IttProviderName=provider");
 
             // Act
             var response = await HttpClient.SendAsync(request);
