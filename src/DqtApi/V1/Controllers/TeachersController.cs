@@ -36,7 +36,7 @@ namespace DqtApi.V1.Controllers
                 return NotFound();
             }
 
-            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachersAsync(request);
+            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachers(request);
 
             var teacher = request.SelectMatch(matchingTeachers);
 
@@ -46,7 +46,7 @@ namespace DqtApi.V1.Controllers
             }
             else
             {
-                var qualifications = await _dataverseAdapter.GetQualificationsAsync(teacher.Id,
+                var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(teacher.Id,
                     new [] { dfeta_qualification.Fields.dfeta_CompletionorAwardDate, dfeta_qualification.Fields.dfeta_Type});
 
                 if (qualifications.Any())

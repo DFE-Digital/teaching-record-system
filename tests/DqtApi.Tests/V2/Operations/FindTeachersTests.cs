@@ -47,7 +47,7 @@ namespace DqtApi.Tests.V2.Operations
 
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
-                .ReturnsAsync(new List<Contact> { contact1 });
+                .ReturnsAsync(new[] { contact1 });
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
 
@@ -86,7 +86,7 @@ namespace DqtApi.Tests.V2.Operations
 
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
-                .ReturnsAsync(new List<Contact> { contact1 });
+                .ReturnsAsync(new[] { contact1 });
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn={providerUkprn}&IttProviderName={providerName}");
 
@@ -117,7 +117,7 @@ namespace DqtApi.Tests.V2.Operations
 
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
-                .ReturnsAsync(new List<Contact> { contact1 });
+                .ReturnsAsync(new[] { contact1 });
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn={providerUkprn}&IttProviderName={providerName}");
 
@@ -154,7 +154,7 @@ namespace DqtApi.Tests.V2.Operations
 
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
-                .ReturnsAsync(new List<Contact> { contact1 });
+                .ReturnsAsync(new[] { contact1 });
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn=12345678910&IttProviderName=provider");
 

@@ -43,7 +43,7 @@ namespace DqtApi.V2.Handlers
 
             if (trnRequest.TeacherId.HasValue)
             {
-                var teacher = await _dataverseAdapter.GetTeacherAsync(trnRequest.TeacherId.Value, columnNames: Contact.Fields.dfeta_TRN);
+                var teacher = await _dataverseAdapter.GetTeacher(trnRequest.TeacherId.Value, columnNames: Contact.Fields.dfeta_TRN);
                 trn = teacher.dfeta_TRN;
             }
 

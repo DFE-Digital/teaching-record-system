@@ -20,7 +20,7 @@ namespace DqtApi.Tests.V2.Operations
             var teacherId = Guid.NewGuid();
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.UnlockTeacherRecordAsync(teacherId))
+                .Setup(mock => mock.UnlockTeacherRecord(teacherId))
                 .ReturnsAsync(false);
 
             var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
@@ -39,7 +39,7 @@ namespace DqtApi.Tests.V2.Operations
             var teacherId = Guid.NewGuid();
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.UnlockTeacherRecordAsync(teacherId))
+                .Setup(mock => mock.UnlockTeacherRecord(teacherId))
                 .ReturnsAsync(true)
                 .Verifiable();
 

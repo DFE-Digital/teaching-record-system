@@ -28,7 +28,8 @@ namespace DqtApi.Tests.V2.Operations
             // Arrange
             var ukprn = "xxx";
             var contact = new Contact() { Id = Guid.NewGuid() };
-            var contactList = new List<Contact>() { contact };
+            var contactList = new[] { contact };
+
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingIttRecord));
@@ -53,7 +54,8 @@ namespace DqtApi.Tests.V2.Operations
             var ukprn = "xxx";
             var subject = "xxx";
             var contact = new Contact() { Id = Guid.NewGuid() };
-            var contactList = new List<Contact>() { contact };
+            var contactList = new[] { contact };
+
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                     .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject1NotFound));
@@ -78,7 +80,8 @@ namespace DqtApi.Tests.V2.Operations
             var ukprn = "xxx";
             var subject = "xxx";
             var contact = new Contact() { Id = Guid.NewGuid() };
-            var contactList = new List<Contact>() { contact };
+            var contactList = new[] { contact };
+
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                     .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject2NotFound));
@@ -103,7 +106,7 @@ namespace DqtApi.Tests.V2.Operations
             var ukprn = "xxx";
             var country = "some non existent country country";
             var contact = new Contact() { Id = Guid.NewGuid() };
-            var contactList = new List<Contact>() { contact };
+            var contactList = new[] { contact };
 
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.GetTeachersByTrn(ukprn, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
@@ -129,7 +132,7 @@ namespace DqtApi.Tests.V2.Operations
             var ukprn = "xxx";
             var subject = "xxx";
             var contact = new Contact() { Id = Guid.NewGuid() };
-            var contactList = new List<Contact>() { contact };
+            var contactList = new[] { contact };
 
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.GetTeachersByTrn(ukprn, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
@@ -155,8 +158,9 @@ namespace DqtApi.Tests.V2.Operations
             var ukprn = "xxx";
             var subject = "xxx";
             var contact = new Contact() { Id = Guid.NewGuid() };
-            var contactList = new List<Contact>() { contact };
+            var contactList = new[] { contact };
             var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
+
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.GetTeachersByTrn(ukprn, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                     .ReturnsAsync(contactList);
@@ -210,7 +214,8 @@ namespace DqtApi.Tests.V2.Operations
 
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.GetTeachersByTrn(trn, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
-                .ReturnsAsync(Enumerable.Empty<Contact>());
+                .ReturnsAsync(Array.Empty<Contact>());
+
             var requestBody = new UpdateTeacherRequest()
             {
                 InitialTeacherTraining = new UpdateTeacherRequestInitialTeacherTraining()
@@ -252,7 +257,8 @@ namespace DqtApi.Tests.V2.Operations
 
             var contact1 = new Contact();
             var contact2 = new Contact();
-            var contactList = new List<Contact>() { contact1, contact2 };
+            var contactList = new[] { contact1, contact2 };
+
             var requestBody = new UpdateTeacherRequest()
             {
                 InitialTeacherTraining = new UpdateTeacherRequestInitialTeacherTraining()

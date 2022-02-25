@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm.Models;
 
@@ -9,21 +8,25 @@ namespace DqtApi.DataStore.Crm
     {
         Task<CreateTeacherResult> CreateTeacher(CreateTeacherCommand command);
 
-        Task<IEnumerable<Account>> GetIttProviders();
+        Task<Account[]> GetIttProviders();
 
-        Task<IEnumerable<Contact>> GetMatchingTeachersAsync(GetTeacherRequest request);
+        Task<Contact[]> GetMatchingTeachers(GetTeacherRequest request);
 
-        Task<IEnumerable<dfeta_qualification>> GetQualificationsAsync(Guid teacherId, params string[] columnNames);
+        Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, params string[] columnNames);
 
-        Task<Contact> GetTeacherAsync(Guid teacherId, bool resolveMerges = true, params string[] columnNames);
+        Task<Contact> GetTeacher(Guid teacherId, bool resolveMerges = true, params string[] columnNames);
 
-        Task<IEnumerable<Contact>> GetTeachersByTrn(string trn, bool activeOnly = true, params string[] columnNames);
+        Task<Contact[]> GetTeachersByTrn(string trn, bool activeOnly = true, params string[] columnNames);
 
-        Task<IReadOnlyCollection<Contact>> FindTeachers(FindTeachersQuery query);
+        Task<Contact[]> FindTeachers(FindTeachersQuery query);
+
         Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);
+
         Task<Account> GetOrganizationByProviderName(string providerName, params string[] columnNames);
+
         Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames);
-        Task<IEnumerable<CrmTask>> GetCrmTasks(Guid teacherId, params string[] columnNames);
+
+        Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, params string[] columnNames);
 
         Task<SetIttResultForTeacherResult> SetIttResultForTeacher(
             Guid teacherId,
@@ -31,6 +34,6 @@ namespace DqtApi.DataStore.Crm
             dfeta_ITTResult result,
             DateOnly? assessmentDate);
 
-        Task<bool> UnlockTeacherRecordAsync(Guid teacherId);
+        Task<bool> UnlockTeacherRecord(Guid teacherId);
     }
 }

@@ -53,7 +53,7 @@ namespace DqtApi.V2.Handlers
             if (trnRequest != null)
             {
                 var teacher = trnRequest.TeacherId.HasValue ?
-                    await _dataverseAdapter.GetTeacherAsync(trnRequest.TeacherId.Value) :
+                    await _dataverseAdapter.GetTeacher(trnRequest.TeacherId.Value) :
                     null;
 
                 wasCreated = false;
