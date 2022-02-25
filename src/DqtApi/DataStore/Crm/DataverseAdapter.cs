@@ -156,6 +156,95 @@ namespace DqtApi.DataStore.Crm
             var result = await _service.RetrieveMultipleAsync(query);
 
             return result.Entities.Select(entity => entity.ToEntity<Contact>());
+
+            static void AddInitialTeacherTrainingLink(QueryExpression query)
+            {
+                var initialTeacherTrainingLink = query.AddLink(
+                    dfeta_initialteachertraining.EntityLogicalName,
+                    Contact.PrimaryIdAttribute,
+                    dfeta_initialteachertraining.Fields.dfeta_PersonId,
+                    JoinOperator.LeftOuter);
+
+                initialTeacherTrainingLink.Columns = new ColumnSet(
+                    dfeta_initialteachertraining.PrimaryIdAttribute,
+                    dfeta_initialteachertraining.Fields.StateCode,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
+                    dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate
+                );
+
+                initialTeacherTrainingLink.EntityAlias = nameof(dfeta_initialteachertraining);
+
+                AddSubjectLinks(initialTeacherTrainingLink);
+            }
+
+            static void AddSubjectLinks(LinkEntity initialTeacherTrainingLink)
+            {
+                var aliasPrefix = nameof(dfeta_initialteachertraining) + "." + nameof(dfeta_ittsubject);
+
+                AddSubjectLink(initialTeacherTrainingLink, dfeta_initialteachertraining.Fields.dfeta_Subject1Id, aliasPrefix + 1);
+                AddSubjectLink(initialTeacherTrainingLink, dfeta_initialteachertraining.Fields.dfeta_Subject2Id, aliasPrefix + 2);
+                AddSubjectLink(initialTeacherTrainingLink, dfeta_initialteachertraining.Fields.dfeta_Subject3Id, aliasPrefix + 3);
+            }
+
+            static void AddSubjectLink(LinkEntity initialTeacherTrainingLink, string subjectIdField, string alias)
+            {
+                var subjectLink = initialTeacherTrainingLink.AddLink(
+                    dfeta_ittsubject.EntityLogicalName,
+                    subjectIdField,
+                    dfeta_ittsubject.PrimaryIdAttribute,
+                    JoinOperator.LeftOuter);
+
+                subjectLink.Columns = new ColumnSet(dfeta_ittsubject.Fields.dfeta_Value);
+
+                subjectLink.EntityAlias = alias;
+            }
+
+            static void AddInductionLink(QueryExpression query)
+            {
+                var inductionLink = query.AddLink(
+                    dfeta_induction.EntityLogicalName,
+                    Contact.PrimaryIdAttribute,
+                    dfeta_induction.Fields.dfeta_PersonId,
+                    JoinOperator.LeftOuter);
+
+                inductionLink.Columns = new ColumnSet(
+                    dfeta_induction.PrimaryIdAttribute,
+                    dfeta_induction.Fields.dfeta_InductionStatus,
+                    dfeta_induction.Fields.StateCode,
+                    dfeta_induction.Fields.dfeta_StartDate,
+                    dfeta_induction.Fields.dfeta_CompletionDate
+                );
+
+                inductionLink.EntityAlias = nameof(dfeta_induction);
+            }
+
+            static void AddQualifiedTeacherStatusLink(QueryExpression query)
+            {
+                var qualifiedTeacherStatusLink = query.AddLink(
+                    dfeta_qtsregistration.EntityLogicalName,
+                    Contact.PrimaryIdAttribute,
+                    dfeta_qtsregistration.Fields.dfeta_PersonId,
+                    JoinOperator.LeftOuter);
+
+                qualifiedTeacherStatusLink.Columns = new ColumnSet(
+                    dfeta_qtsregistration.PrimaryIdAttribute,
+                    dfeta_qtsregistration.Fields.dfeta_name,
+                    dfeta_qtsregistration.Fields.StateCode,
+                    dfeta_qtsregistration.Fields.dfeta_QTSDate
+                );
+
+                qualifiedTeacherStatusLink.EntityAlias = nameof(dfeta_qtsregistration);
+
+                var filter = new FilterExpression();
+                filter.AddCondition(dfeta_initialteachertraining.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_initialteachertrainingState.Active);
+                qualifiedTeacherStatusLink.LinkCriteria = filter;
+            }
         }
 
         public async Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames)
@@ -305,21 +394,6 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
-        private static void AddQualifiedTeacherStatusLink(QueryExpression query)
-        {
-            var qualifiedTeacherStatusLink = query.AddLink(dfeta_qtsregistration.EntityLogicalName, Contact.PrimaryIdAttribute,
-                            dfeta_qtsregistration.Fields.dfeta_PersonId, JoinOperator.LeftOuter);
-
-            qualifiedTeacherStatusLink.Columns = new ColumnSet(
-                dfeta_qtsregistration.PrimaryIdAttribute,
-                dfeta_qtsregistration.Fields.dfeta_name,
-                dfeta_qtsregistration.Fields.StateCode,
-                dfeta_qtsregistration.Fields.dfeta_QTSDate
-            );
-
-            qualifiedTeacherStatusLink.EntityAlias = nameof(dfeta_qtsregistration);
-        }
-
         public async Task<Account> GetOrganizationByProviderName(string providerName, params string[] columnNames)
         {
             var query = new QueryByAttribute(Account.EntityLogicalName)
@@ -392,64 +466,6 @@ namespace DqtApi.DataStore.Crm
             }
             var result = await _service.RetrieveMultipleAsync(query);
             return result.Entities.Select(entity => entity.ToEntity<Contact>()).ToList(); ;
-        }
-
-        private static void AddInitialTeacherTrainingLink(QueryExpression query)
-        {
-            var initialTeacherTrainingLink = query.AddLink(dfeta_initialteachertraining.EntityLogicalName, Contact.PrimaryIdAttribute,
-                            dfeta_initialteachertraining.Fields.dfeta_PersonId, JoinOperator.LeftOuter);
-
-            initialTeacherTrainingLink.Columns = new ColumnSet(
-                dfeta_initialteachertraining.PrimaryIdAttribute,
-                dfeta_initialteachertraining.Fields.StateCode,
-                dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
-                dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId,
-                dfeta_initialteachertraining.Fields.dfeta_Result,
-                dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
-                dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
-                dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
-                dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
-                dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate
-            );
-
-            initialTeacherTrainingLink.EntityAlias = nameof(dfeta_initialteachertraining);
-
-            AddSubjectLinks(initialTeacherTrainingLink);
-        }
-
-        private static void AddSubjectLinks(LinkEntity initialTeacherTrainingLink)
-        {
-            var aliasPrefix = nameof(dfeta_initialteachertraining) + "." + nameof(dfeta_ittsubject);
-
-            AddSubjectLink(initialTeacherTrainingLink, dfeta_initialteachertraining.Fields.dfeta_Subject1Id, aliasPrefix + 1);
-            AddSubjectLink(initialTeacherTrainingLink, dfeta_initialteachertraining.Fields.dfeta_Subject2Id, aliasPrefix + 2);
-            AddSubjectLink(initialTeacherTrainingLink, dfeta_initialteachertraining.Fields.dfeta_Subject3Id, aliasPrefix + 3);
-        }
-
-        private static void AddSubjectLink(LinkEntity initialTeacherTrainingLink, string subjectIdField, string alias)
-        {
-            var subjectLink = initialTeacherTrainingLink.AddLink(dfeta_ittsubject.EntityLogicalName, subjectIdField,
-                    dfeta_ittsubject.PrimaryIdAttribute, JoinOperator.LeftOuter);
-
-            subjectLink.Columns = new ColumnSet(dfeta_ittsubject.Fields.dfeta_Value);
-
-            subjectLink.EntityAlias = alias;
-        }
-
-        private static void AddInductionLink(QueryExpression query)
-        {
-            var inductionLink = query.AddLink(dfeta_induction.EntityLogicalName, Contact.PrimaryIdAttribute,
-                            dfeta_induction.Fields.dfeta_PersonId, JoinOperator.LeftOuter);
-
-            inductionLink.Columns = new ColumnSet(
-                dfeta_induction.PrimaryIdAttribute,
-                dfeta_induction.Fields.dfeta_InductionStatus,
-                dfeta_induction.Fields.StateCode,
-                dfeta_induction.Fields.dfeta_StartDate,
-                dfeta_induction.Fields.dfeta_CompletionDate
-            );
-
-            inductionLink.EntityAlias = nameof(dfeta_induction);
         }
     }
 }
