@@ -131,7 +131,7 @@ namespace DqtApi.DataStore.Crm
 
             public async Task<SetIttResultForUpdateTeacherLookupResult> LookupData()
             {
-                var getTeacherTask = _dataverseAdapter.GetTeacherAsync(
+                var getTeacherTask = _dataverseAdapter.GetTeacher(
                     TeacherId,
                     columnNames: new[]
                     {
@@ -173,7 +173,7 @@ namespace DqtApi.DataStore.Crm
                     CacheKeys.GetTeacherStatusKey("211"),  // 211 == 'Trainee Teacher:DMS'
                     _ => _dataverseAdapter.GetTeacherStatus("211", qtsDateRequired: false));
 
-                var getQualifications = _dataverseAdapter.GetQualificationsAsync(TeacherId,
+                var getQualifications = _dataverseAdapter.GetQualificationsForTeacher(TeacherId,
                     columnNames: new[]
                     {
                         dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
@@ -435,7 +435,7 @@ namespace DqtApi.DataStore.Crm
 
             public async Task<UpdateTeacherFindResult> FindExistingTeacherToUpdate()
             {
-                var match = await _dataverseAdapter.GetTeacherAsync(TeacherId, columnNames: new[] {Contact.Fields.dfeta_ActiveSanctions,
+                var match = await _dataverseAdapter.GetTeacher(TeacherId, columnNames: new[] {Contact.Fields.dfeta_ActiveSanctions,
                             Contact.Fields.dfeta_QTSDate,
                             Contact.Fields.dfeta_EYTSDate,
                             Contact.Fields.BirthDate

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
@@ -26,7 +25,7 @@ namespace DqtApi.Tests.V2.Operations
 
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.GetTeachersByTrn(trn, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
-                .ReturnsAsync(Enumerable.Empty<Contact>());
+                .ReturnsAsync(Array.Empty<Contact>());
 
             var requestBody = new SetIttOutcomeRequest()
             {

@@ -208,7 +208,7 @@ namespace DqtApi.DataStore.Crm
 
             public async Task<SetIttResultForTeacherLookupResult> LookupData()
             {
-                var getTeacherTask = _dataverseAdapter.GetTeacherAsync(
+                var getTeacherTask = _dataverseAdapter.GetTeacher(
                     _teacherId,
                     columnNames: new[]
                     {

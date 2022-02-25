@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +15,13 @@ namespace DqtApi.Tests.V1.UnitTests
 
         public TeachersController()
         {
-            _adapter = new Mock<IDataverseAdapter>();            
+            _adapter = new Mock<IDataverseAdapter>();
         }
 
         [Fact]
         public async Task Given_there_is_no_match_return_not_found()
         {
-            _adapter.Setup(a => a.GetMatchingTeachersAsync(It.IsAny<GetTeacherRequest>())).ReturnsAsync(new List<Contact>());
+            _adapter.Setup(a => a.GetMatchingTeachers(It.IsAny<GetTeacherRequest>())).ReturnsAsync(Array.Empty<Contact>());
 
             var result = await new DqtApi.V1.Controllers.TeachersController(_adapter.Object).GetTeacher(new GetTeacherRequest { TRN = trn, BirthDate = birthDate });
 
@@ -33,7 +31,7 @@ namespace DqtApi.Tests.V1.UnitTests
         [Fact]
         public async Task Given_there_is_a_match_return_ok()
         {
-            _adapter.Setup(a => a.GetMatchingTeachersAsync(It.IsAny<GetTeacherRequest>())).ReturnsAsync(new[] { new Contact{ dfeta_TRN = trn } });
+            _adapter.Setup(a => a.GetMatchingTeachers(It.IsAny<GetTeacherRequest>())).ReturnsAsync(new[] { new Contact{ dfeta_TRN = trn } });
 
             var result = await new DqtApi.V1.Controllers.TeachersController(_adapter.Object).GetTeacher(new GetTeacherRequest { TRN = trn, BirthDate = birthDate });
 

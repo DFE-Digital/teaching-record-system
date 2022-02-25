@@ -67,7 +67,7 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
-            var qualifications = await _dataverseAdapter.GetQualificationsAsync(
+            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
                 columnNames: new[]
                 {
@@ -230,7 +230,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 ReturnResponses = true
             });
 
-            await _dataverseAdapter.GetQualificationsAsync(
+            await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
                 columnNames: new[]
                 {
@@ -268,7 +268,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 }
             });
 
-            var qualifications = await _dataverseAdapter.GetQualificationsAsync(
+            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
                 columnNames: new[]
                 {
@@ -521,7 +521,7 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
-            var qualifications = await _dataverseAdapter.GetQualificationsAsync(
+            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
                 columnNames: new[]
                 {
@@ -702,7 +702,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
             var newProviderProvider = (await _dataverseAdapter.GetOrganizationByUkprn(newIttProviderUkprn)).Id;
-            var qualifications = await _dataverseAdapter.GetQualificationsAsync(
+            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
                 columnNames: new[]
                 {

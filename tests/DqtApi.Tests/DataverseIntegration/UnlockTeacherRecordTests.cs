@@ -31,7 +31,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var teacherId = Guid.NewGuid();
 
             // Act
-            var result = await _dataverseAdapter.UnlockTeacherRecordAsync(teacherId);
+            var result = await _dataverseAdapter.UnlockTeacherRecord(teacherId);
 
             // Assert
             Assert.False(result);
@@ -49,7 +49,7 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             // Act
-            var result = await _dataverseAdapter.UnlockTeacherRecordAsync(teacherId);
+            var result = await _dataverseAdapter.UnlockTeacherRecord(teacherId);
 
             // Assert
             Assert.True(result);

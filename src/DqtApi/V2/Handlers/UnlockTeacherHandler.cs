@@ -18,7 +18,7 @@ namespace DqtApi.V2.Handlers
 
         public async Task<Unit> Handle(UnlockTeacherRequest request, CancellationToken cancellationToken)
         {
-            var found = await _dataverseAdapter.UnlockTeacherRecordAsync(request.TeacherId);
+            var found = await _dataverseAdapter.UnlockTeacherRecord(request.TeacherId);
 
             if (!found)
             {
