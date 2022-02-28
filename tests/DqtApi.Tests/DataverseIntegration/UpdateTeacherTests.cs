@@ -29,6 +29,137 @@ namespace DqtApi.Tests.DataverseIntegration
 
         public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
+
+        [Fact]
+        public async Task Given_existing_itt_update_programmetype_from_qts_to_another_qts_programmetype_succeeds()
+        {
+            // Arrange
+            var (teacherId, _,
+                ittProviderUkprn, _, _,
+                _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+
+            var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByName("Computer Science");
+            var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
+            var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByName("Mathematics");
+            var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByName("Computer Science");
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            {
+                TeacherId = teacherId.ToString(),
+                InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+                {
+                    ProviderUkprn = ittProviderUkprn,
+                    ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                    ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                    ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                    Subject1 = "Mathematics",
+                    Subject2 = "Computer Science",
+                    AgeRangeFrom = dfeta_AgeRange._11,
+                    AgeRangeTo = dfeta_AgeRange._12
+                },
+                Qualification = new UpdateTeacherCommandQualification()
+                {
+                    CountryCode = "XK",
+                    Subject = "Computer Science",
+                    Class = dfeta_classdivision.Firstclasshonours,
+                    Date = new DateOnly(2022, 01, 28)
+                }
+            });
+
+            var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
+            var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+                teacherId,
+                columnNames: new[]
+                {
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                    dfeta_initialteachertraining.Fields.StateCode,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+                });
+
+            // Assert
+            Assert.True(result.Succeeded);
+            Assert.Collection(itt,
+                item1 =>
+                {
+                    Assert.Equal(dfeta_ITTProgrammeType.RegisteredTeacherProgramme, item1.dfeta_ProgrammeType);
+                }
+            );
+        }
+
+        [Fact]
+        public async Task Given_existing_itt_update_programmetype_from_eyts_to_another_eyts_programmetype_succeeds()
+        {
+            // Arrange
+            var (teacherId, _,
+                ittProviderUkprn, _, _,
+                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+
+            var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByName("Computer Science");
+            var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
+            var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByName("Mathematics");
+            var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByName("Computer Science");
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            {
+                TeacherId = teacherId.ToString(),
+                InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+                {
+                    ProviderUkprn = ittProviderUkprn,
+                    ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                    ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                    ProgrammeType = dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased,
+                    Subject1 = "Mathematics",
+                    Subject2 = "Computer Science",
+                    AgeRangeFrom = dfeta_AgeRange._11,
+                    AgeRangeTo = dfeta_AgeRange._12
+                },
+                Qualification = new UpdateTeacherCommandQualification()
+                {
+                    CountryCode = "XK",
+                    Subject = "Computer Science",
+                    Class = dfeta_classdivision.Firstclasshonours,
+                    Date = new DateOnly(2022, 01, 28)
+                }
+            });
+
+            var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
+            var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+                teacherId,
+                columnNames: new[]
+                {
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                    dfeta_initialteachertraining.Fields.StateCode,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+                });
+
+            // Assert
+            Assert.True(result.Succeeded);
+            Assert.Collection(itt,
+                item1 =>
+                {
+                    Assert.Equal(dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased, item1.dfeta_ProgrammeType);
+                }
+            );
+        }
+
         [Fact]
         public async Task Given_existing_contact_update_itt_and_qualification_returns_success()
         {
@@ -160,7 +291,44 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Fact]
-        public async Task Given_earlyyears_itt_cannot_change_programmetype()
+        public async Task Given_qts_itt_cannot_change_qts_programmetype_to_eyts_programmetype()
+        {
+            // Arrange
+            var (teacherId, _,
+                ittProviderUkprn, _, _,
+                _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+
+            // Act
+            var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            {
+                TeacherId = teacherId.ToString(),
+                InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+                {
+                    ProviderUkprn = ittProviderUkprn,
+                    ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                    ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                    ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
+                    Subject1 = "Mathematics",
+                    Subject2 = "Computer Science",
+                    AgeRangeFrom = dfeta_AgeRange._11,
+                    AgeRangeTo = dfeta_AgeRange._12
+                },
+                Qualification = new UpdateTeacherCommandQualification()
+                {
+                    CountryCode = "XK",
+                    Subject = "Computer Science",
+                    Class = dfeta_classdivision.Firstclasshonours,
+                    Date = new DateOnly(2022, 01, 28)
+                }
+            });
+
+            // Assert
+            Assert.False(result.Succeeded);
+            Assert.Equal(UpdateTeacherFailedReasons.CannotChangeProgrammeType, result.FailedReasons);
+        }
+
+        [Fact]
+        public async Task Given_earlyyears_itt_cannot_change_eyts_programmetype_to_qts()
         {
             // Arrange
             var (teacherId, _,
@@ -193,6 +361,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.False(result.Succeeded);
+            Assert.Equal(UpdateTeacherFailedReasons.CannotChangeProgrammeType, result.FailedReasons);
         }
 
         [Fact]
@@ -672,7 +841,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             var newIttProviderUkprn = "10045988";
             var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByName("Computer Science");
-            var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
+            var updatedHeCountryId = await _dataverseAdapter.GetCountry("XQ");
             var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByName("Mathematics");
             var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByName("Computer Science");
 
@@ -693,7 +862,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 },
                 Qualification = new UpdateTeacherCommandQualification()
                 {
-                    CountryCode = "XK",
+                    CountryCode = "XQ", //Africa
                     Subject = "Computer Science",
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28)
