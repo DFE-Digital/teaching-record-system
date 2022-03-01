@@ -53,6 +53,8 @@ namespace DqtApi
             var env = builder.Environment;
             var configuration = builder.Configuration;
 
+            var paasEnvironmentName = configuration["PaasEnvironment"];
+
             builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
 
             if (env.IsProduction())
@@ -165,7 +167,6 @@ namespace DqtApi
 
             services.Configure<SentryAspNetCoreOptions>(options =>
             {
-                var paasEnvironmentName = configuration["PaasEnvironment"];
                 if (!string.IsNullOrEmpty(paasEnvironmentName))
                 {
                     options.Environment = paasEnvironmentName;
@@ -223,7 +224,7 @@ namespace DqtApi
 
             var app = builder.Build();
 
-            app.UseRequestLogging();
+            app.UseRequestLogging(logRequestBody: paasEnvironmentName != "prod");
 
             app.UseRouting();
 
