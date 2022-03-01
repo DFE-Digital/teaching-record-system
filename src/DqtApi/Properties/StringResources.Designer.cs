@@ -88,6 +88,15 @@ namespace DqtApi.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Birth date is out of expected range..
+        /// </summary>
+        public static string ErrorMessages_BirthDateIsOutOfRange {
+            get {
+                return ResourceManager.GetString("ErrorMessages.BirthDateIsOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Birth date must be in format yyyy-MM-dd.
         /// </summary>
         public static string ErrorMessages_InvalidBirthDate {

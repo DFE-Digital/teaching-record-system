@@ -126,6 +126,9 @@
   <data name="ErrorMessages.AgeToCannotBeLessThanAgeFrom" xml:space="preserve">
     <value>'Age to' cannot be less than 'age from'.</value>
   </data>
+  <data name="ErrorMessages.BirthDateIsOutOfRange" xml:space="preserve">
+    <value>Birth date is out of expected range.</value>
+  </data>
   <data name="ErrorMessages.InvalidBirthDate" xml:space="preserve">
     <value>Birth date must be in format yyyy-MM-dd</value>
   </data>
