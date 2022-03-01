@@ -79,8 +79,16 @@ jobs:
     - name: Generate migrations artifact
       run: |
         mkdir migrations
+        migrations_file=migrations/script.sql
+
         dotnet tool install --global dotnet-ef
-        dotnet ef migrations script --idempotent --output migrations/script.sql --configuration Release --project src/DqtApi/DqtApi.csproj --no-build
+        dotnet ef migrations script --idempotent --output $migrations_file --configuration Release --project src/DqtApi/DqtApi.csproj --no-build
+
+        # Remove the BOM
+        sed -i $'1s/^\uFEFF//' $migrations_file
+
+        # Ensure any errors return a non-zero exit code when migrations are applied
+        echo "$(echo "\set ON_ERROR_STOP true"; echo ""; cat $migrations_file)" > $migrations_file
 
     - name: Publish migrations
       uses: actions/upload-artifact@v2
