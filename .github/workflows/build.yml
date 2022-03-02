@@ -47,7 +47,7 @@ jobs:
           - 5432:5432
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - uses: actions/setup-dotnet@v1
       with:
@@ -124,7 +124,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - uses: hashicorp/setup-terraform@v1
       with:
@@ -162,7 +162,7 @@ jobs:
       environment_url: ${{ steps.deploy.outputs.environment_url }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - uses: ./.github/workflows/actions/deploy-environment
       id: deploy
@@ -180,7 +180,7 @@ jobs:
     if: github.event_name == 'pull_request'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Generate specs
       shell: pwsh
@@ -204,7 +204,7 @@ jobs:
         version: [v1, v2]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Create config file
       run: |
@@ -238,7 +238,7 @@ jobs:
       environment_url: ${{ steps.deploy.outputs.environment_url }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - uses: ./.github/workflows/actions/deploy-environment
       id: deploy
@@ -263,7 +263,7 @@ jobs:
       environment_url: ${{ steps.deploy.outputs.environment_url }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - uses: ./.github/workflows/actions/deploy-environment
       id: deploy
@@ -288,7 +288,7 @@ jobs:
       environment_url: ${{ steps.deploy.outputs.environment_url }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - uses: ./.github/workflows/actions/deploy-environment
       id: deploy
