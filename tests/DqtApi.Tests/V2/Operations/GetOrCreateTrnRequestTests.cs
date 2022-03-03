@@ -296,6 +296,55 @@ namespace DqtApi.Tests.V2.Operations
                 expectedError: Properties.StringResources.Errors_10008_Title);
         }
 
+
+        [Theory]
+        [InlineData(1900,1,1)]
+        public async Task Given_dob_before_1_1_1940_returns_error(int year, int month, int day)
+        {
+            // Arrange
+            var dob = new DateOnly(year, month, day);
+            var requestId = Guid.NewGuid().ToString();
+            Clock.UtcNow = new DateTime(2022, 1, 1);
+
+            var request = CreateRequest(cmd =>
+            {
+                cmd.BirthDate = dob;
+            });
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                "Birthdate",
+                StringResources.ErrorMessages_BirthDateIsOutOfRange);
+        }
+
+        [Theory]
+        [InlineData(2022, 1, 1)]
+        [InlineData(2023, 1, 1)]
+        public async Task Given_dob_equal_or_after_today_returns_error(int year, int month, int day)
+        {
+            // Arrange
+            var dob = new DateOnly(year, month, day);
+            var requestId = Guid.NewGuid().ToString();
+            Clock.UtcNow = new DateTime(2022, 1, 1);
+            var request = CreateRequest(cmd =>
+            {
+                cmd.BirthDate = dob;
+            });
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                "Birthdate",
+                StringResources.ErrorMessages_BirthDateIsOutOfRange);
+        }
+
         [Theory]
         [MemberData(nameof(InvalidAgeCombinationsData))]
         public async Task Given_invalid_age_combination_returns_error(

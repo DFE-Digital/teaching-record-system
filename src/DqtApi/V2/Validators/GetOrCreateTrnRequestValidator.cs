@@ -1,4 +1,5 @@
-﻿using DqtApi.DataStore.Crm.Models;
+﻿using System;
+using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql.Models;
 using DqtApi.Properties;
 using DqtApi.V2.Requests;
@@ -8,7 +9,7 @@ namespace DqtApi.V2.Validators
 {
     public class GetOrCreateTrnRequestValidator : AbstractValidator<GetOrCreateTrnRequest>
     {
-        public GetOrCreateTrnRequestValidator()
+        public GetOrCreateTrnRequestValidator(IClock clock)
         {
             RuleFor(r => r.RequestId)
                 .Matches(TrnRequest.ValidRequestIdPattern)
@@ -28,7 +29,14 @@ namespace DqtApi.V2.Validators
                 .MaximumLength(AttributeConstraints.Contact.LastNameMaxLength);
 
             RuleFor(r => r.BirthDate)
-                .NotEmpty();
+                .NotEmpty()
+                .Custom((value, ctx) =>
+                {
+                    if (value >= DateOnly.FromDateTime(clock.UtcNow) || value < new DateOnly(1940, 1, 1))
+                    {
+                        ctx.AddFailure(ctx.PropertyName, StringResources.ErrorMessages_BirthDateIsOutOfRange);
+                    }
+                });
 
             RuleFor(r => r.EmailAddress)
                 .EmailAddress()
