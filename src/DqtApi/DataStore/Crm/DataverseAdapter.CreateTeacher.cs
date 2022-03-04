@@ -442,26 +442,28 @@ namespace DqtApi.DataStore.Crm
 
                 var isEarlyYears = _command.InitialTeacherTraining.ProgrammeType.IsEarlyYears();
 
+                var requestBuilder = _dataverseAdapter.CreateMultipleRequestBuilder();
+
                 static TResult Let<T, TResult>(T value, Func<T, TResult> getResult) => getResult(value);
 
                 var getIttProviderTask = Let(
                     _command.InitialTeacherTraining.ProviderUkprn,
                     ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetOrganizationByUkprnKey(ukprn),
-                        _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn)));
+                        _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn, columnNames: Array.Empty<string>(), requestBuilder)));
 
                 var getIttCountryTask = Let(
                     "XK",  // XK == 'United Kingdom'
                     country => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetCountryKey(country),
-                        _ => _dataverseAdapter.GetCountry(country)));
+                        _ => _dataverseAdapter.GetCountry(country, requestBuilder)));
 
                 var getSubject1Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject1) ?
                     Let(
                         _command.InitialTeacherTraining.Subject1,
                         subject => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetIttSubjectKey(subject),
-                            _ => _dataverseAdapter.GetIttSubjectByName(subject))) :
+                            _ => _dataverseAdapter.GetIttSubjectByName(subject, requestBuilder))) :
                     null;
 
                 var getSubject2Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject2) ?
@@ -469,21 +471,21 @@ namespace DqtApi.DataStore.Crm
                         _command.InitialTeacherTraining.Subject2,
                         subject => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetIttSubjectKey(subject),
-                            _ => _dataverseAdapter.GetIttSubjectByName(subject))) :
+                            _ => _dataverseAdapter.GetIttSubjectByName(subject, requestBuilder))) :
                     null;
 
                 var getQualificationTask = Let(
                     "First Degree",
                     qualificationName => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetHeQualificationKey(qualificationName),
-                        _ => _dataverseAdapter.GetHeQualificationByName(qualificationName)));
+                        _ => _dataverseAdapter.GetHeQualificationByName(qualificationName, requestBuilder)));
 
                 var getQualificationProviderTask = !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn) ?
                     Let(
                         _command.Qualification.ProviderUkprn,
                         ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetOrganizationByUkprnKey(ukprn),
-                            _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn))) :
+                            _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn, columnNames: Array.Empty<string>(), requestBuilder))) :
                     null;
 
                 var getQualificationCountryTask = !string.IsNullOrEmpty(_command.Qualification?.CountryCode) ?
@@ -491,7 +493,7 @@ namespace DqtApi.DataStore.Crm
                         _command.Qualification.CountryCode,
                         country => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetCountryKey(country),
-                            _ => _dataverseAdapter.GetCountry(country))) :
+                            _ => _dataverseAdapter.GetCountry(country, requestBuilder))) :
                     null;
 
                 var getQualificationSubjectTask = !string.IsNullOrEmpty(_command.Qualification?.Subject) ?
@@ -499,7 +501,7 @@ namespace DqtApi.DataStore.Crm
                         _command.Qualification.Subject,
                         subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetHeSubjectKey(subjectName),
-                            _ => _dataverseAdapter.GetHeSubjectByName(subjectName))) :
+                            _ => _dataverseAdapter.GetHeSubjectByName(subjectName, requestBuilder))) :
                     null;
 
                 var getEarlyYearsStatusTask = isEarlyYears ?
@@ -507,7 +509,7 @@ namespace DqtApi.DataStore.Crm
                         "220", // 220 == 'Early Years Trainee'
                         earlyYearsStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetEarlyYearsStatusKey(earlyYearsStatusId),
-                            _ => _dataverseAdapter.GetEarlyYearsStatus(earlyYearsStatusId))) :
+                            _ => _dataverseAdapter.GetEarlyYearsStatus(earlyYearsStatusId, requestBuilder))) :
                     Task.FromResult<dfeta_earlyyearsstatus>(null);
 
                 var getTeacherStatusTask = !isEarlyYears ?
@@ -517,7 +519,7 @@ namespace DqtApi.DataStore.Crm
                             "211",   // 211 == 'Trainee Teacher:DMS'
                         teacherStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetTeacherStatusKey(teacherStatusId),
-                            _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false))) :
+                            _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false, requestBuilder))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
                 var lookupTasks = new Task[]
@@ -535,6 +537,7 @@ namespace DqtApi.DataStore.Crm
                 }
                 .Where(t => t != null);
 
+                await requestBuilder.Execute();
                 await Task.WhenAll(lookupTasks);
 
                 Debug.Assert(!isEarlyYears || getEarlyYearsStatusTask.Result != null, "Early years status lookup failed.");
