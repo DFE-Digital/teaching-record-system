@@ -32,7 +32,7 @@ namespace DqtApi.V2.Handlers
             }
             else if (!string.IsNullOrEmpty(request.IttProviderName))
             {
-                ittProvider = await _dataverseAdapter.GetOrganizationByProviderName(request.IttProviderName);
+                ittProvider = await _dataverseAdapter.GetOrganizationByName(request.IttProviderName);
                 if (ittProvider == null)
                     throw new ErrorException(ErrorRegistry.OrganisationNotFound());
             }
