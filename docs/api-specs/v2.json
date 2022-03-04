@@ -28,19 +28,19 @@
               "schema": {
                 "$ref": "#/components/schemas/SetIttOutcomeRequest"
               },
-              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22"}
+              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22","birthDate":"1950-01-01"}
             },
             "text/json": {
               "schema": {
                 "$ref": "#/components/schemas/SetIttOutcomeRequest"
               },
-              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22"}
+              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22","birthDate":"1950-01-01"}
             },
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/SetIttOutcomeRequest"
               },
-              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22"}
+              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22","birthDate":"1950-01-01"}
             }
           }
         },
@@ -781,6 +781,7 @@
       },
       "SetIttOutcomeRequest": {
         "required": [
+          "birthDate",
           "ittProviderUkprn",
           "outcome"
         ],
@@ -796,6 +797,10 @@
             "type": "string",
             "format": "date",
             "nullable": true
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date"
           }
         },
         "additionalProperties": false
@@ -839,6 +844,7 @@
       },
       "UpdateTeacherRequest": {
         "required": [
+          "birthDate",
           "initialTeacherTraining",
           "qualification"
         ],
@@ -853,6 +859,10 @@
           },
           "qualification": {
             "$ref": "#/components/schemas/UpdateTeacherRequestRequestQualification"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date"
           }
         },
         "additionalProperties": false

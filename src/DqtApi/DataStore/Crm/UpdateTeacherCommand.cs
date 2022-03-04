@@ -8,6 +8,7 @@ namespace DqtApi.DataStore.Crm
         public string TeacherId { get; set; }
         public UpdateTeacherCommandInitialTeacherTraining InitialTeacherTraining { get; set; }
         public UpdateTeacherCommandQualification Qualification { get; set; }
+        public DateOnly BirthDate { get; set; }
     }
 
     public class UpdateTeacherCommandInitialTeacherTraining

@@ -18,6 +18,8 @@ namespace DqtApi.DataStore.Crm
 
         Task<Contact[]> GetTeachersByTrn(string trn, bool activeOnly = true, params string[] columnNames);
 
+        Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, bool activeOnly = true, params string[] columnNames);
+
         Task<Contact[]> FindTeachers(FindTeachersQuery query);
 
         Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);

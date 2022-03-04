@@ -18,6 +18,10 @@ namespace DqtApi.V2.Requests
         public UpdateTeacherRequestInitialTeacherTraining InitialTeacherTraining { get; set; }
         [Required]
         public UpdateTeacherRequestRequestQualification Qualification { get; set; }
+
+        [Required]
+        [SwaggerParameter(description: "DoB of teacher")]
+        public DateOnly BirthDate { get; set; }
     }
 
     public class UpdateTeacherRequestInitialTeacherTraining

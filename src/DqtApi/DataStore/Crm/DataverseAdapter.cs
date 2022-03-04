@@ -408,7 +408,27 @@ namespace DqtApi.DataStore.Crm
         {
             var filter = new FilterExpression(LogicalOperator.And);
             filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
+            if (activeOnly)
+            {
+                filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+            }
 
+            var query = new QueryExpression(Contact.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames),
+                Criteria = filter
+            };
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
+        }
+
+        public async Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, bool activeOnly = true, params string[] columnNames)
+        {
+            var filter = new FilterExpression(LogicalOperator.And);
+            filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
+            filter.AddCondition(Contact.Fields.BirthDate, ConditionOperator.Equal, birthDate);
             if (activeOnly)
             {
                 filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
