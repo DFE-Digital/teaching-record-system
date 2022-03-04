@@ -22,13 +22,15 @@ namespace DqtApi.Tests.V2.Operations
         {
             // Arrange
             var trn = "1234567";
+            var dob = new DateOnly(1987, 1, 1);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrn(trn, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                 .ReturnsAsync(Array.Empty<Contact>());
 
             var requestBody = new SetIttOutcomeRequest()
             {
+                BirthDate = dob,
                 IttProviderUkprn = "1001234",
                 Outcome = IttOutcome.Pass,
                 AssessmentDate = Clock.Today
@@ -51,16 +53,18 @@ namespace DqtApi.Tests.V2.Operations
         {
             // Arrange
             var trn = "1234567";
+            var dob = new DateOnly(1987, 1, 1);
 
             var teacher1 = new Contact() { dfeta_TRN = trn };
             var teacher2 = new Contact() { dfeta_TRN = trn };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrn(trn, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                 .ReturnsAsync(new[] { teacher1, teacher2 });
 
             var requestBody = new SetIttOutcomeRequest()
             {
+                BirthDate = dob,
                 IttProviderUkprn = "1001234",
                 Outcome = IttOutcome.Pass,
                 AssessmentDate = Clock.Today
@@ -83,9 +87,11 @@ namespace DqtApi.Tests.V2.Operations
         {
             // Arrange
             var trn = "1234567";
+            var dob = new DateOnly(1987, 1, 1);
 
             var requestBody = new SetIttOutcomeRequest()
             {
+                BirthDate = dob,
                 IttProviderUkprn = null,
                 Outcome = IttOutcome.Pass,
                 AssessmentDate = Clock.Today
@@ -111,9 +117,11 @@ namespace DqtApi.Tests.V2.Operations
         {
             // Arrange
             var trn = "1234567";
+            var dob = new DateOnly(1987, 1, 1);
 
             var requestBody = new SetIttOutcomeRequest()
             {
+                BirthDate = dob,
                 IttProviderUkprn = "1001234",
                 Outcome = IttOutcome.Pass,
                 AssessmentDate = null
@@ -143,9 +151,11 @@ namespace DqtApi.Tests.V2.Operations
         {
             // Arrange
             var trn = "1234567";
+            var dob = new DateOnly(1987, 1, 1);
 
             var requestBody = new SetIttOutcomeRequest()
             {
+                BirthDate = dob,
                 IttProviderUkprn = "1001234",
                 Outcome = outcome,
                 AssessmentDate = Clock.Today
@@ -171,9 +181,11 @@ namespace DqtApi.Tests.V2.Operations
         {
             // Arrange
             var trn = "1234567";
+            var dob = new DateOnly(1987, 1, 1);
 
             var requestBody = new SetIttOutcomeRequest()
             {
+                BirthDate = dob,
                 IttProviderUkprn = "1001234",
                 Outcome = IttOutcome.Pass,
                 AssessmentDate = Clock.Today.AddDays(1)
@@ -202,11 +214,12 @@ namespace DqtApi.Tests.V2.Operations
             var ittProviderUkprn = "1001234";
             var outcome = IttOutcome.Pass;
             var assessmentDate = Clock.Today;
+            var dob = new DateOnly(1987, 1, 1);
 
             var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrn(trn, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                 .ReturnsAsync(new[] { contact });
 
             ApiFixture.DataverseAdapter
@@ -215,6 +228,7 @@ namespace DqtApi.Tests.V2.Operations
 
             var requestBody = new SetIttOutcomeRequest()
             {
+                BirthDate = dob,
                 IttProviderUkprn = ittProviderUkprn,
                 Outcome = outcome,
                 AssessmentDate = assessmentDate
@@ -248,11 +262,12 @@ namespace DqtApi.Tests.V2.Operations
             var ittProviderUkprn = "1001234";
             var outcome = IttOutcome.Pass;
             var assessmentDate = Clock.Today;
+            var dob = new DateOnly(1987, 1, 1);
 
             var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrn(trn, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                 .ReturnsAsync(new[] { contact });
 
             ApiFixture.DataverseAdapter
@@ -261,6 +276,7 @@ namespace DqtApi.Tests.V2.Operations
 
             var requestBody = new SetIttOutcomeRequest()
             {
+                BirthDate = dob,
                 IttProviderUkprn = ittProviderUkprn,
                 Outcome = outcome,
                 AssessmentDate = assessmentDate

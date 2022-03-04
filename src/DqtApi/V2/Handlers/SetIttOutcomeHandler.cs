@@ -22,7 +22,7 @@ namespace DqtApi.V2.Handlers
 
         public async Task<SetIttOutcomeResponse> Handle(SetIttOutcomeRequest request, CancellationToken cancellationToken)
         {
-            var teachers = (await _dataverseAdapter.GetTeachersByTrn(request.Trn, activeOnly: true)).ToArray();
+            var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate, activeOnly: true)).ToArray();
 
             if (teachers.Length == 0)
             {

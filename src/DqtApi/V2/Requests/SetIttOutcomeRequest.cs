@@ -26,6 +26,11 @@ namespace DqtApi.V2.Requests
 
         [SwaggerParameter(description: $"The assessment date for a {nameof(IttOutcome.Pass)} outcome.")]
         public DateOnly? AssessmentDate { get; set; }
+
+
+        [Required]
+        [SwaggerParameter(description: "DoB of teacher")]
+        public DateOnly BirthDate { get; set; }
     }
 
     public class SetQtsRequestExample : IExamplesProvider<SetIttOutcomeRequest>
@@ -35,7 +40,8 @@ namespace DqtApi.V2.Requests
             Trn = "1234567",
             IttProviderUkprn = "1001234",
             Outcome = IttOutcome.Pass,
-            AssessmentDate = new DateOnly(2021, 12, 22)
+            AssessmentDate = new DateOnly(2021, 12, 22),
+            BirthDate = new DateOnly(1950,1,1)
         };
     }
 }
