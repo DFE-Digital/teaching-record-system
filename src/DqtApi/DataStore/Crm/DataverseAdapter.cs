@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.ServiceModel;
@@ -392,16 +391,59 @@ namespace DqtApi.DataStore.Crm
 
         public async Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, params string[] columnNames)
         {
-            var query = new QueryByAttribute(dfeta_qualification.EntityLogicalName)
+            var filter = new FilterExpression();
+            filter.AddCondition(dfeta_qualification.Fields.dfeta_PersonId, ConditionOperator.Equal, teacherId);
+
+            var query = new QueryExpression(dfeta_qualification.EntityLogicalName)
             {
-                ColumnSet = new ColumnSet(columnNames)
+                ColumnSet = new ColumnSet(columnNames),
+                Criteria = filter
             };
 
-            query.AddAttributeValue(dfeta_qualification.Fields.dfeta_PersonId, teacherId);
+            AddHeQualificationLink(query);
+            AddSubjectLinks(query);
 
             var result = await _service.RetrieveMultipleAsync(query);
 
             return result.Entities.Select(entity => entity.ToEntity<dfeta_qualification>()).ToArray();
+
+            static void AddHeQualificationLink(QueryExpression query)
+            {
+                var heSubjectLink = query.AddLink(
+                    dfeta_hequalification.EntityLogicalName,
+                    dfeta_qualification.Fields.dfeta_HE_HEQualificationId,
+                    dfeta_hequalification.Fields.Id,
+                    JoinOperator.LeftOuter);
+
+                heSubjectLink.Columns = new ColumnSet(dfeta_hequalification.PrimaryIdAttribute, dfeta_hequalification.Fields.dfeta_name);
+
+                heSubjectLink.EntityAlias = dfeta_hequalification.EntityLogicalName;
+            }
+
+            static void AddSubjectLinks(QueryExpression query)
+            {
+                var aliasPrefix = dfeta_hesubject.EntityLogicalName;
+
+                AddSubjectLink(query, dfeta_qualification.Fields.dfeta_HE_HESubject1Id, aliasPrefix + 1);
+                AddSubjectLink(query, dfeta_qualification.Fields.dfeta_HE_HESubject2Id, aliasPrefix + 2);
+                AddSubjectLink(query, dfeta_qualification.Fields.dfeta_HE_HESubject3Id, aliasPrefix + 3);
+            }
+
+            static void AddSubjectLink(QueryExpression query, string subjectIdField, string alias)
+            {
+                var subjectLink = query.AddLink(
+                    dfeta_hesubject.EntityLogicalName,
+                    subjectIdField,
+                    dfeta_hesubject.PrimaryIdAttribute,
+                    JoinOperator.LeftOuter);
+
+                subjectLink.Columns = new ColumnSet(
+                    dfeta_hesubject.PrimaryIdAttribute,
+                    dfeta_hesubject.Fields.dfeta_name,
+                    dfeta_hesubject.Fields.dfeta_Value);
+
+                subjectLink.EntityAlias = alias;
+            }
         }
 
         public async Task<Contact> GetTeacher(Guid teacherId, bool resolveMerges = true, params string[] columnNames)

@@ -42,9 +42,10 @@
     "statecode"
   ],
   "dfeta_hequalification": [
+    "dfeta_hequalificationid",
     "dfeta_name",
     "dfeta_value",
-    "statecode",
+    "statecode"
   ],
   "dfeta_hesubject": [
     "dfeta_name",
@@ -97,6 +98,8 @@
     "dfeta_he_establishmentid",
     "dfeta_he_hequalificationid",
     "dfeta_he_hesubject1id",
+    "dfeta_he_hesubject2id",
+    "dfeta_he_hesubject3id",
     "dfeta_personid",
     "dfeta_type"
   ],
@@ -109,7 +112,7 @@
   "dfeta_sanctioncode" : [
     "dfeta_sanctioncodeid",
     "statecode"
-  ], 
+  ],
   "dfeta_sanction":
   [
     "dfeta_personid",

@@ -1796,6 +1796,8 @@ namespace DqtApi.DataStore.Crm.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string dfeta_hequalificationId = "dfeta_hequalificationid";
+			public const string Id = "dfeta_hequalificationid";
 			public const string dfeta_name = "dfeta_name";
 			public const string dfeta_Value = "dfeta_value";
 			public const string StateCode = "statecode";
@@ -1842,6 +1844,49 @@ namespace DqtApi.DataStore.Crm.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hequalificationid")]
+		public System.Nullable<System.Guid> dfeta_hequalificationId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_hequalificationid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_hequalificationId");
+				this.SetAttributeValue("dfeta_hequalificationid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_hequalificationId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_hequalificationid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_hequalificationId = value;
 			}
 		}
 		
@@ -3566,6 +3611,8 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string dfeta_HE_EstablishmentId = "dfeta_he_establishmentid";
 			public const string dfeta_HE_HEQualificationId = "dfeta_he_hequalificationid";
 			public const string dfeta_HE_HESubject1Id = "dfeta_he_hesubject1id";
+			public const string dfeta_HE_HESubject2Id = "dfeta_he_hesubject2id";
+			public const string dfeta_HE_HESubject3Id = "dfeta_he_hesubject3id";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_Type = "dfeta_type";
 			public const string dfeta_account_dfeta_qualification_he = "dfeta_account_dfeta_qualification_he";
@@ -3757,6 +3804,46 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_HE_HESubject1Id");
 				this.SetAttributeValue("dfeta_he_hesubject1id", value);
 				this.OnPropertyChanged("dfeta_HE_HESubject1Id");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for HE Subject associated with Qualification.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_hesubject2id")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_HE_HESubject2Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_he_hesubject2id");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_HE_HESubject2Id");
+				this.SetAttributeValue("dfeta_he_hesubject2id", value);
+				this.OnPropertyChanged("dfeta_HE_HESubject2Id");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for HE Subject associated with Qualification.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_he_hesubject3id")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_HE_HESubject3Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_he_hesubject3id");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_HE_HESubject3Id");
+				this.SetAttributeValue("dfeta_he_hesubject3id", value);
+				this.OnPropertyChanged("dfeta_HE_HESubject3Id");
 			}
 		}
 		

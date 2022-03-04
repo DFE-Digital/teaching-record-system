@@ -78,6 +78,28 @@
   },
   "components": {
     "schemas": {
+      "ClassDivision": {
+        "enum": [
+          "FirstClassHonours",
+          "UpperSecondClassHonours",
+          "LowerSecondClassHonours",
+          "UndividedSecondClassHonours",
+          "ThirdClassHonours",
+          "FourthClassHonours",
+          "UnclassifiedHonours",
+          "Aegrotat",
+          "PassFollowingAnHonoursCourse",
+          "Ordinary",
+          "GeneralDegree",
+          "Distinction",
+          "Merit",
+          "Pass",
+          "Notapplicable",
+          "NotKnown",
+          "HigherDegree"
+        ],
+        "type": "string"
+      },
       "ContactState": {
         "enum": [
           "Active",
@@ -280,6 +302,37 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "he_qualification_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "he_subject1": {
+            "type": "string",
+            "nullable": true
+          },
+          "he_subject2": {
+            "type": "string",
+            "nullable": true
+          },
+          "he_subject3": {
+            "type": "string",
+            "nullable": true
+          },
+          "he_subject1_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "he_subject2_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "he_subject3_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "class": {
+            "$ref": "#/components/schemas/ClassDivision"
           }
         },
         "additionalProperties": false
