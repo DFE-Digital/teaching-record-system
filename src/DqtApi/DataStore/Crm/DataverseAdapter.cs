@@ -9,6 +9,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.PowerPlatform.Dataverse.Client.Utils;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 
 namespace DqtApi.DataStore.Crm
@@ -29,8 +30,12 @@ namespace DqtApi.DataStore.Crm
             _cache = cache;
         }
 
-        public async Task<dfeta_country> GetCountry(string value)
+        public Task<dfeta_country> GetCountry(string value) => GetCountry(value, requestBuilder: null);
+
+        private async Task<dfeta_country> GetCountry(string value, RequestBuilder requestBuilder)
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var query = new QueryByAttribute(dfeta_country.EntityLogicalName)
             {
                 ColumnSet = new() { AllColumns = true }
@@ -39,13 +44,22 @@ namespace DqtApi.DataStore.Crm
             query.AddAttributeValue(dfeta_country.Fields.dfeta_Value, value);
             query.AddAttributeValue(dfeta_country.Fields.StateCode, (int)dfeta_countryState.Active);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<dfeta_country>()).FirstOrDefault();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_country>()).FirstOrDefault();
         }
 
-        public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value)
+        public Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value) => GetEarlyYearsStatus(value, requestBuilder: null);
+
+        private async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value, RequestBuilder requestBuilder)
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var query = new QueryByAttribute(dfeta_earlyyearsstatus.EntityLogicalName)
             {
                 ColumnSet = new() { AllColumns = true }
@@ -54,13 +68,22 @@ namespace DqtApi.DataStore.Crm
             query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.dfeta_Value, value);
             query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.StateCode, (int)dfeta_earlyyearsStatusState.Active);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<dfeta_earlyyearsstatus>()).FirstOrDefault();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_earlyyearsstatus>()).FirstOrDefault();
         }
 
-        public async Task<dfeta_hequalification> GetHeQualificationByName(string name)
+        public Task<dfeta_hequalification> GetHeQualificationByName(string name) => GetHeQualificationByName(name, requestBuilder: null);
+
+        private async Task<dfeta_hequalification> GetHeQualificationByName(string name, RequestBuilder requestBuilder)
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var query = new QueryByAttribute(dfeta_hequalification.EntityLogicalName)
             {
                 ColumnSet = new() { AllColumns = true }
@@ -69,13 +92,22 @@ namespace DqtApi.DataStore.Crm
             query.AddAttributeValue(dfeta_hequalification.Fields.dfeta_name, name);
             query.AddAttributeValue(dfeta_hequalification.Fields.StateCode, (int)dfeta_hequalificationState.Active);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<dfeta_hequalification>()).FirstOrDefault();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_hequalification>()).FirstOrDefault();
         }
 
-        public async Task<dfeta_hesubject> GetHeSubjectByName(string name)
+        public Task<dfeta_hesubject> GetHeSubjectByName(string name) => GetHeSubjectByName(name, requestBuilder: null);
+
+        private async Task<dfeta_hesubject> GetHeSubjectByName(string name, RequestBuilder requestBuilder)
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var query = new QueryByAttribute(dfeta_hesubject.EntityLogicalName)
             {
                 ColumnSet = new() { AllColumns = true }
@@ -84,15 +116,28 @@ namespace DqtApi.DataStore.Crm
             query.AddAttributeValue(dfeta_hesubject.Fields.dfeta_name, name);
             query.AddAttributeValue(dfeta_hesubject.Fields.StateCode, (int)dfeta_hesubjectState.Active);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<dfeta_hesubject>()).FirstOrDefault();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_hesubject>()).FirstOrDefault();
         }
 
-        public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
+        public Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
             Guid teacherId,
-            params string[] columnNames)
+            params string[] columnNames) =>
+                GetInitialTeacherTrainingByTeacher(teacherId, columnNames, requestBuilder: null);
+
+        private async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
+            Guid teacherId,
+            string[] columnNames,
+            RequestBuilder requestBuilder)
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var query = new QueryByAttribute(dfeta_initialteachertraining.EntityLogicalName)
             {
                 ColumnSet = new(columnNames)
@@ -101,9 +146,14 @@ namespace DqtApi.DataStore.Crm
             query.AddAttributeValue(dfeta_initialteachertraining.Fields.dfeta_PersonId, teacherId);
             query.AddAttributeValue(dfeta_initialteachertraining.Fields.StateCode, (int)dfeta_initialteachertrainingState.Active);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>()).ToArray();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>()).ToArray();
         }
 
         public async Task<Account[]> GetIttProviders()
@@ -130,8 +180,12 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
         }
 
-        public async Task<dfeta_ittsubject> GetIttSubjectByName(string name)
+        public Task<dfeta_ittsubject> GetIttSubjectByName(string name) => GetIttSubjectByName(name, requestBuilder: null);
+
+        private async Task<dfeta_ittsubject> GetIttSubjectByName(string name, RequestBuilder requestBuilder)
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var query = new QueryByAttribute(dfeta_ittsubject.EntityLogicalName)
             {
                 ColumnSet = new() { AllColumns = true }
@@ -140,9 +194,14 @@ namespace DqtApi.DataStore.Crm
             query.AddAttributeValue(dfeta_ittsubject.Fields.dfeta_name, name);
             query.AddAttributeValue(dfeta_ittsubject.Fields.StateCode, (int)dfeta_ittsubjectState.Active);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<dfeta_ittsubject>()).FirstOrDefault();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_ittsubject>()).FirstOrDefault();
         }
 
         public async Task<Contact[]> GetMatchingTeachers(GetTeacherRequest request)
@@ -247,8 +306,13 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
-        public async Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames)
+        public Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames) =>
+            GetOrganizationByUkprn(ukprn, columnNames, requestBuilder: null);
+
+        private async Task<Account> GetOrganizationByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var query = new QueryByAttribute(Account.EntityLogicalName)
             {
                 ColumnSet = new(columnNames)
@@ -257,15 +321,28 @@ namespace DqtApi.DataStore.Crm
             query.AddAttributeValue(Account.Fields.dfeta_UKPRN, ukprn);
             query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
         }
 
-        public async Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(
+        public Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(
             Guid teacherId,
-            params string[] columnNames)
+            params string[] columnNames) =>
+                GetQtsRegistrationsByTeacher(teacherId, columnNames, requestBuilder: null);
+
+        private async Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(
+            Guid teacherId,
+            string[] columnNames,
+            RequestBuilder requestBuilder)
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var query = new QueryByAttribute(dfeta_qtsregistration.EntityLogicalName)
             {
                 ColumnSet = new(columnNames)
@@ -274,9 +351,14 @@ namespace DqtApi.DataStore.Crm
             query.AddAttributeValue(dfeta_qtsregistration.Fields.dfeta_PersonId, teacherId);
             query.AddAttributeValue(dfeta_qtsregistration.Fields.StateCode, (int)dfeta_qtsregistrationState.Active);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<dfeta_qtsregistration>()).ToArray();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_qtsregistration>()).ToArray();
         }
 
         public async Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, params string[] columnNames)
@@ -343,27 +425,45 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
         }
 
-        public async Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, params string[] columnNames)
+        public Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, params string[] columnNames) =>
+            GetCrmTasksForTeacher(teacherId, columnNames, requestBuilder: null);
+
+        private async Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames, RequestBuilder requestBuilder)
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var query = new QueryByAttribute(CrmTask.EntityLogicalName)
             {
                 ColumnSet = new ColumnSet(columnNames)
             };
             query.AddAttributeValue(CrmTask.Fields.RegardingObjectId, teacherId);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<CrmTask>()).ToArray();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<CrmTask>()).ToArray();
         }
 
-        public async Task<dfeta_teacherstatus> GetTeacherStatus(
+        public Task<dfeta_teacherstatus> GetTeacherStatus(
             string value,
-            bool qtsDateRequired)
+            bool qtsDateRequired) =>
+                GetTeacherStatus(value, qtsDateRequired, requestBuilder: null);
+
+        private async Task<dfeta_teacherstatus> GetTeacherStatus(
+            string value,
+            bool qtsDateRequired,
+            RequestBuilder requestBuilder)
         {
             // TECH DEBT Some junk reference data in the build environment means we have teacher statuses duplicated.
             // In some cases the duplicate records vary by 'dfeta_qtsdaterequired' - we need to ensure we get the correct
             // one as a workflow will prevent us allocating a qtsregistration for a status where dfeta_qtsdaterequired is true
             // without a QTS Date.
+
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
             var query = new QueryByAttribute(dfeta_teacherstatus.EntityLogicalName)
             {
@@ -374,9 +474,14 @@ namespace DqtApi.DataStore.Crm
             query.AddAttributeValue(dfeta_teacherstatus.Fields.StateCode, (int)dfeta_teacherStatusState.Active);
             query.AddAttributeValue(dfeta_teacherstatus.Fields.dfeta_QTSDateRequired, qtsDateRequired);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<dfeta_teacherstatus>()).FirstOrDefault();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_teacherstatus>()).FirstOrDefault();
         }
 
         public async Task<bool> UnlockTeacherRecord(Guid teacherId)
@@ -396,19 +501,29 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
-        public async Task<Account> GetOrganizationByProviderName(string providerName, params string[] columnNames)
+        public Task<Account> GetOrganizationByName(string name, params string[] columnNames) =>
+            GetOrganizationByName(name, columnNames, requestBuilder: null);
+
+        private async Task<Account> GetOrganizationByName(string name, string[] columnNames, RequestBuilder requestBuilder)
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var query = new QueryByAttribute(Account.EntityLogicalName)
             {
                 ColumnSet = new ColumnSet(columnNames)
             };
 
-            query.AddAttributeValue(Account.Fields.Name, providerName);
+            query.AddAttributeValue(Account.Fields.Name, name);
             query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
         }
 
         public async Task<Contact[]> FindTeachers(FindTeachersQuery filter)
@@ -471,5 +586,11 @@ namespace DqtApi.DataStore.Crm
 
             return result.Entities.Select(entity => entity.ToEntity<Contact>()).ToArray();
         }
+
+        private RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);
+
+        private RequestBuilder CreateSingleRequestBuilder() => RequestBuilder.CreateSingle(_service);
+
+        private RequestBuilder CreateTransactionRequestBuilder() => RequestBuilder.CreateTransaction(_service);
     }
 }
