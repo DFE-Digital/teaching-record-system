@@ -4,20 +4,18 @@ using DqtApi.DataStore.Crm.Models;
 
 namespace DqtApi.V1.Responses
 {
-    public class QualifiedTeacherStatus : LinkedEntity<dfeta_qtsregistration>
+    public class QualifiedTeacherStatus
     {
         [JsonPropertyName("name")]
-        public string Name => Entity.dfeta_name;
+        public string Name { get; set; }
 
         [JsonPropertyName("state")]
-        public dfeta_qtsregistrationState State => Entity.StateCode.Value;
+        public dfeta_qtsregistrationState State { get; set; }
 
         [JsonPropertyName("state_name")]
-        public string StateName => FormattedValues[dfeta_qtsregistration.Fields.StateCode];
+        public string StateName { get; set; }
 
         [JsonPropertyName("qts_date")]
-        public DateTime? QTSDate => Entity.dfeta_QTSDate;                
-
-        public QualifiedTeacherStatus() { }        
+        public DateTime? QtsDate { get; set; }
     }
 }

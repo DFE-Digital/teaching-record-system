@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
 using DqtApi.DataStore.Crm.Models;
 
@@ -8,13 +6,11 @@ namespace DqtApi.V1.Responses
 {
     public class GetTeacherResponse
     {
-        private readonly Contact _teacher;
-
         [JsonPropertyName("trn")]
-        public string Trn => _teacher.dfeta_TRN;
+        public string Trn { get; set; }
 
         [JsonPropertyName("ni_number")]
-        public string NationalInsuranceNumber => _teacher.dfeta_NINumber;
+        public string NationalInsuranceNumber { get; set; }
 
         [JsonPropertyName("qualified_teacher_status")]
         public QualifiedTeacherStatus QualifiedTeacherStatus { get; set; }
@@ -26,34 +22,21 @@ namespace DqtApi.V1.Responses
         public InitialTeacherTraining InitialTeacherTraining { get; set; }
 
         [JsonPropertyName("qualifications")]
-        public IEnumerable<Qualification> Qualifications { get; set; }
+        public Qualification[] Qualifications { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name => _teacher.FullName;
+        public string Name { get; set; }
 
         [JsonPropertyName("dob")]
-        public DateTime? DateOfBirth => _teacher.BirthDate;
+        public DateTime? DateOfBirth { get; set; }
 
         [JsonPropertyName("active_alert")]
-        public bool? ActiveAlert => _teacher.dfeta_ActiveSanctions;
+        public bool? ActiveAlert { get; set; }
 
         [JsonPropertyName("state")]
-        public ContactState State => _teacher.StateCode.Value;
+        public ContactState State { get; set; }
 
         [JsonPropertyName("state_name")]
-        public string StateName => _teacher.FormattedValues[Contact.Fields.StateCode];
-
-        public GetTeacherResponse(Contact teacher)
-        {            
-            _teacher = teacher;
-
-            QualifiedTeacherStatus = _teacher.Extract<dfeta_qtsregistration, QualifiedTeacherStatus>();
-            Induction = _teacher.Extract<dfeta_induction, Induction>();
-            // todo check we should return first, or should we return unique active record? see teacherpolicy.xml
-            InitialTeacherTraining = _teacher.Extract<dfeta_initialteachertraining, InitialTeacherTraining>();
-
-            Qualifications = _teacher.dfeta_contact_dfeta_qualification?.Select(qualification => new Qualification(qualification))
-                ?? new List<Qualification>();
-        }
+        public string StateName { get; set; }
     }
 }

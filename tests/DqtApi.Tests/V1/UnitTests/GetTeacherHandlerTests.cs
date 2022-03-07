@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
 using DqtApi.DataStore.Crm.Models;
+using DqtApi.V1.Handlers;
 using Microsoft.Xrm.Sdk;
 using Xunit;
 
 namespace DqtApi.Tests.V1.UnitTests
 {
-    public class GetTeacherResponse
+    public class GetTeacherHandlerTests
     {
         [Fact]
         public void Given_a_contact_the_details_are_mapped()
@@ -23,12 +24,14 @@ namespace DqtApi.Tests.V1.UnitTests
                 FullName = fullName,
                 dfeta_NINumber = nationalInsuranceNumber,
                 StateCode = ContactState.Active,
-                dfeta_TRN = trn                
+                dfeta_TRN = trn,
+                FormattedValues =
+                {
+                    { Contact.Fields.StateCode, ContactState.Active.ToString() }
+                }
             };
 
-            contact.FormattedValues.Add(Contact.Fields.StateCode, ContactState.Active.ToString());
-
-            var response = new DqtApi.V1.Responses.GetTeacherResponse(contact);
+            var response = GetTeacherHandler.MapContactToResponse(contact);
 
             Assert.True(response.ActiveAlert);
             Assert.Equal(birthDate, response.DateOfBirth);
@@ -49,7 +52,9 @@ namespace DqtApi.Tests.V1.UnitTests
 
             var contact = new Contact
             {
-                Attributes = new AttributeCollection
+                dfeta_ActiveSanctions = false,
+                StateCode = ContactState.Active,
+                Attributes =
                 {
                     { $"{prefix}.{dfeta_qtsregistration.Fields.dfeta_name}",
                         new AliasedValue(dfeta_qtsregistration.EntityLogicalName, dfeta_qtsregistration.Fields.dfeta_name, qualifiedTeacherStatusName) },
@@ -59,18 +64,21 @@ namespace DqtApi.Tests.V1.UnitTests
                         new AliasedValue(dfeta_qtsregistration.EntityLogicalName, dfeta_qtsregistration.Fields.StateCode, new OptionSetValue((int)dfeta_qtsregistrationState.Active)) },
                     { $"{prefix}.{dfeta_qtsregistration.PrimaryIdAttribute}",
                         new AliasedValue(dfeta_qtsregistration.EntityLogicalName, dfeta_qtsregistration.PrimaryIdAttribute, Guid.NewGuid())}
+                },
+                FormattedValues =
+                {
+                    { Contact.Fields.StateCode, ContactState.Active.ToString() },
+                    { $"{prefix}.{dfeta_qtsregistration.Fields.StateCode}", dfeta_qtsregistrationState.Active.ToString() }
                 }
             };
 
-            contact.FormattedValues.Add($"{prefix}.{dfeta_qtsregistration.Fields.StateCode}", dfeta_qtsregistrationState.Active.ToString());
-
-            var response = new DqtApi.V1.Responses.GetTeacherResponse(contact);
+            var response = GetTeacherHandler.MapContactToResponse(contact);
 
             var qualifiedTeacherStatus = response.QualifiedTeacherStatus;
 
             Assert.NotNull(qualifiedTeacherStatus);
             Assert.Equal(qualifiedTeacherStatusName, qualifiedTeacherStatus.Name);
-            Assert.Equal(qtsDate, qualifiedTeacherStatus.QTSDate);
+            Assert.Equal(qtsDate, qualifiedTeacherStatus.QtsDate);
             Assert.Equal(dfeta_qtsregistrationState.Active, qualifiedTeacherStatus.State);
             Assert.Equal(dfeta_qtsregistrationState.Active.ToString(), qualifiedTeacherStatus.StateName);
         }
@@ -86,7 +94,9 @@ namespace DqtApi.Tests.V1.UnitTests
 
             var contact = new Contact
             {
-                Attributes = new AttributeCollection
+                dfeta_ActiveSanctions = false,
+                StateCode = ContactState.Active,
+                Attributes =
                 {
                     { $"{prefix}.{dfeta_induction.Fields.dfeta_CompletionDate}",
                         new AliasedValue(dfeta_induction.EntityLogicalName, dfeta_induction.Fields.dfeta_CompletionDate, completionDate) },
@@ -96,13 +106,16 @@ namespace DqtApi.Tests.V1.UnitTests
                         new AliasedValue(dfeta_induction.EntityLogicalName, dfeta_induction.Fields.StateCode, new OptionSetValue((int)dfeta_inductionState.Active)) },
                     { $"{prefix}.{dfeta_induction.PrimaryIdAttribute}",
                         new AliasedValue(dfeta_induction.EntityLogicalName, dfeta_induction.PrimaryIdAttribute, Guid.NewGuid())}
+                },
+                FormattedValues =
+                {
+                    { Contact.Fields.StateCode, ContactState.Active.ToString() },
+                    { $"{prefix}.{dfeta_induction.Fields.dfeta_InductionStatus}", inductionStatusName },
+                    { $"{prefix}.{dfeta_induction.Fields.StateCode}", dfeta_inductionState.Active.ToString() }
                 }
             };
 
-            contact.FormattedValues.Add($"{prefix}.{dfeta_induction.Fields.dfeta_InductionStatus}", inductionStatusName);
-            contact.FormattedValues.Add($"{prefix}.{dfeta_induction.Fields.StateCode}", dfeta_inductionState.Active.ToString());
-
-            var response = new DqtApi.V1.Responses.GetTeacherResponse(contact);
+            var response = GetTeacherHandler.MapContactToResponse(contact);
 
             var induction = response.Induction;
 
@@ -135,7 +148,9 @@ namespace DqtApi.Tests.V1.UnitTests
 
             var contact = new Contact
             {
-                Attributes = new AttributeCollection
+                dfeta_ActiveSanctions = false,
+                StateCode = ContactState.Active,
+                Attributes =
                 {
                     { $"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate}",
                         new AliasedValue(dfeta_initialteachertraining.EntityLogicalName, dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate, programmeEndDate) },
@@ -151,18 +166,21 @@ namespace DqtApi.Tests.V1.UnitTests
                         new AliasedValue(dfeta_ittsubject.EntityLogicalName, dfeta_ittsubject.Fields.dfeta_Value, subject2Code) },
                     { $"{prefix}.{subjectPrefix}3.{dfeta_ittsubject.Fields.dfeta_Value}",
                         new AliasedValue(dfeta_ittsubject.EntityLogicalName, dfeta_ittsubject.Fields.dfeta_Value, subject3Code) }
+                },
+                FormattedValues =
+                {
+                    { Contact.Fields.StateCode, ContactState.Active.ToString() },
+                    { $"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_ProgrammeType}", programmeType },
+                    { $"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId}", qualification },
+                    { $"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_Result}", result },
+                    { $"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_Subject1Id}", subject1 },
+                    { $"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_Subject2Id}", subject2 },
+                    { $"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_Subject3Id}", subject3 },
+                    { $"{prefix}.{dfeta_initialteachertraining.Fields.StateCode}", dfeta_initialteachertrainingState.Active.ToString() }
                 }
             };
 
-            contact.FormattedValues.Add($"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_ProgrammeType}", programmeType);
-            contact.FormattedValues.Add($"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId}", qualification);
-            contact.FormattedValues.Add($"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_Result}", result);
-            contact.FormattedValues.Add($"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_Subject1Id}", subject1);
-            contact.FormattedValues.Add($"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_Subject2Id}", subject2);
-            contact.FormattedValues.Add($"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_Subject3Id}", subject3);
-            contact.FormattedValues.Add($"{prefix}.{dfeta_initialteachertraining.Fields.StateCode}", dfeta_initialteachertrainingState.Active.ToString());
-
-            var response = new DqtApi.V1.Responses.GetTeacherResponse(contact);
+            var response = GetTeacherHandler.MapContactToResponse(contact);
 
             var initialTeacherTraining = response.InitialTeacherTraining;
 
@@ -189,6 +207,8 @@ namespace DqtApi.Tests.V1.UnitTests
 
             var contact = new Contact()
             {
+                dfeta_ActiveSanctions = false,
+                StateCode = ContactState.Active,
                 dfeta_contact_dfeta_qualification = Enumerable.Range(1, 2).Select(i =>
                 {
                     var qualification = new dfeta_qualification
@@ -197,10 +217,14 @@ namespace DqtApi.Tests.V1.UnitTests
                     };
                     qualification.FormattedValues.Add(dfeta_qualification.Fields.dfeta_Type, qualificationTypes[i - 1]);
                     return qualification;
-                })
+                }),
+                FormattedValues =
+                {
+                    { Contact.Fields.StateCode, ContactState.Active.ToString() }
+                }
             };
 
-            var response = new DqtApi.V1.Responses.GetTeacherResponse(contact);
+            var response = GetTeacherHandler.MapContactToResponse(contact);
 
             var qualifications = response.Qualifications;
 

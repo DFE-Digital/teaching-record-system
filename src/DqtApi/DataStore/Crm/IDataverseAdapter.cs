@@ -10,7 +10,7 @@ namespace DqtApi.DataStore.Crm
 
         Task<Account[]> GetIttProviders();
 
-        Task<Contact[]> GetMatchingTeachers(GetTeacherRequest request);
+        Task<Contact[]> FindTeachers(FindTeachersByTrnBirthDateAndNinoQuery query);
 
         Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, params string[] columnNames);
 

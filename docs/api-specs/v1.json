@@ -90,13 +90,11 @@
         "properties": {
           "trn": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "ni_number": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "qualified_teacher_status": {
             "$ref": "#/components/schemas/QualifiedTeacherStatus"
@@ -116,27 +114,23 @@
           },
           "name": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "dob": {
             "type": "string",
             "format": "date-time",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "active_alert": {
             "type": "boolean",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "state": {
             "$ref": "#/components/schemas/ContactState"
           },
           "state_name": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -147,27 +141,23 @@
           "start_date": {
             "type": "string",
             "format": "date-time",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "completion_date": {
             "type": "string",
             "format": "date-time",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "status": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "state": {
             "$ref": "#/components/schemas/InductionState"
           },
           "state_name": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -187,65 +177,53 @@
           },
           "state_code": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "programme_start_date": {
             "type": "string",
             "format": "date-time",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "programme_end_date": {
             "type": "string",
             "format": "date-time",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "programme_type": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "result": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "subject1": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "subject2": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "subject3": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "qualification": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "subject1_code": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "subject2_code": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "subject3_code": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -296,14 +274,12 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "date_awarded": {
             "type": "string",
             "format": "date-time",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -313,22 +289,19 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "state": {
             "$ref": "#/components/schemas/QtsregistrationState"
           },
           "state_name": {
             "type": "string",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           },
           "qts_date": {
             "type": "string",
             "format": "date-time",
-            "nullable": true,
-            "readOnly": true
+            "nullable": true
           }
         },
         "additionalProperties": false

@@ -1,9 +1,8 @@
-using System.Linq;
 using System.Threading.Tasks;
-using DqtApi.DataStore.Crm;
-using DqtApi.DataStore.Crm.Models;
 using DqtApi.Logging;
+using DqtApi.V1.Requests;
 using DqtApi.V1.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -14,11 +13,11 @@ namespace DqtApi.V1.Controllers
     [Route("teachers")]
     public class TeachersController : ControllerBase
     {
-        private readonly IDataverseAdapter _dataverseAdapter;
+        private readonly IMediator _mediator;
 
-        public TeachersController(IDataverseAdapter dataverseAdapter)
+        public TeachersController(IMediator mediator)
         {
-            _dataverseAdapter = dataverseAdapter;
+            _mediator = mediator;
         }
 
         [HttpGet("{trn}")]
@@ -30,32 +29,9 @@ namespace DqtApi.V1.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         [RedactQueryParam("birthdate")]
         public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)           
-        {            
-            if (!request.BirthDate.HasValue)
-            {
-                return NotFound();
-            }
-
-            var matchingTeachers = await _dataverseAdapter.GetMatchingTeachers(request);
-
-            var teacher = request.SelectMatch(matchingTeachers);
-
-            if (teacher == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(teacher.Id,
-                    new [] { dfeta_qualification.Fields.dfeta_CompletionorAwardDate, dfeta_qualification.Fields.dfeta_Type});
-
-                if (qualifications.Any())
-                {
-                    teacher.dfeta_contact_dfeta_qualification = qualifications;
-                }
-
-                return Ok(new GetTeacherResponse(teacher));
-            }
+        {
+            var response = await _mediator.Send(request);
+            return response != null ? Ok(response) : NotFound();
         }
     }
 }
