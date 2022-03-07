@@ -1,11 +1,7 @@
-﻿using DqtApi.DataStore.Crm.Models;
-
-namespace DqtApi.V1.Responses
+﻿namespace DqtApi.V1.Responses
 {
-    public class Subject : LinkedEntity<dfeta_ittsubject>
+    public class Subject
     {
-        public Subject() { }
-
-        public string Code => Entity.dfeta_Value;
+        public string Code { get; set; }
     }
 }

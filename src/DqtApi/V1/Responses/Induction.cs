@@ -4,23 +4,21 @@ using DqtApi.DataStore.Crm.Models;
 
 namespace DqtApi.V1.Responses
 {
-    public class Induction : LinkedEntity<dfeta_induction>
+    public class Induction
     {
-        public Induction() { }
-
         [JsonPropertyName("start_date")]
-        public DateTime? StartDate => Entity.dfeta_StartDate;
+        public DateTime? StartDate { get; set; }
 
         [JsonPropertyName("completion_date")]
-        public DateTime? CompletionDate => Entity.dfeta_CompletionDate;
+        public DateTime? CompletionDate { get; set; }
 
         [JsonPropertyName("status")]
-        public string InductionStatusName => FormattedValues[dfeta_induction.Fields.dfeta_InductionStatus];
+        public string InductionStatusName { get; set; }
 
         [JsonPropertyName("state")]
-        public dfeta_inductionState State => Entity.StateCode.Value;
+        public dfeta_inductionState State { get; set; }
 
         [JsonPropertyName("state_name")]
-        public string StateName => FormattedValues[dfeta_induction.Fields.StateCode];
+        public string StateName { get; set; }
     }
 }

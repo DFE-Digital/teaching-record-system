@@ -1,73 +1,48 @@
 ﻿using System;
 using System.Text.Json.Serialization;
-using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
-using Microsoft.Xrm.Sdk;
 
 namespace DqtApi.V1.Responses
 {
-    public class InitialTeacherTraining : LinkedEntity<dfeta_initialteachertraining>
+    public class InitialTeacherTraining
     {
-        public InitialTeacherTraining() { }
-
-        [JsonIgnore]
-        public Subject Subject1 => GetSubject(1);
-
-        [JsonIgnore]
-        public Subject Subject2 => GetSubject(2);
-
-        [JsonIgnore]
-        public Subject Subject3 => GetSubject(3);
-
-
-        private Subject GetSubject(int subjectIndex)
-        {
-            var prefix = nameof(dfeta_ittsubject) + subjectIndex;
-            var attributes = Entity.Attributes.MapCollection<object, AttributeCollection>(attribute => attribute.Value, prefix);
-
-            return new Subject
-            {
-                Entity = new dfeta_ittsubject { Attributes = attributes }
-            };
-        }
-        
         [JsonPropertyName("state")]
-        public dfeta_initialteachertrainingState State => Entity.StateCode.Value;
+        public dfeta_initialteachertrainingState State { get; set; }
 
         [JsonPropertyName("state_code")]
-        public string StateName => FormattedValues[dfeta_qtsregistration.Fields.StateCode];
+        public string StateName { get; set; }
 
         [JsonPropertyName("programme_start_date")]
-        public DateTime? ProgrammeStartDate => Entity.dfeta_ProgrammeStartDate;
+        public DateTime? ProgrammeStartDate { get; set; }
 
         [JsonPropertyName("programme_end_date")]
-        public DateTime? ProgrammeEndDate => Entity.dfeta_ProgrammeEndDate;
+        public DateTime? ProgrammeEndDate { get; set; }
 
         [JsonPropertyName("programme_type")]
-        public string ProgrammeType => FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_ProgrammeType);
+        public string ProgrammeType { get; set; }
 
         [JsonPropertyName("result")]
-        public string Result => FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_Result);
+        public string Result { get; set; }
 
         [JsonPropertyName("subject1")]
-        public string Subject1Id => FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_Subject1Id);
+        public string Subject1Id { get; set; }
 
         [JsonPropertyName("subject2")]
-        public string Subject2Id => FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_Subject2Id);
+        public string Subject2Id { get; set; }
 
         [JsonPropertyName("subject3")]
-        public string Subject3Id => FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_Subject3Id);
+        public string Subject3Id { get; set; }
 
         [JsonPropertyName("qualification")]
-        public string Qualification => FormattedValues.ValueOrNull(dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId);
+        public string Qualification { get; set; }
 
         [JsonPropertyName("subject1_code")]
-        public string Subject1Code => Subject1?.Code;
+        public string Subject1Code { get; set; }
 
         [JsonPropertyName("subject2_code")]
-        public string Subject2Code => Subject2?.Code;
+        public string Subject2Code { get; set; }
 
         [JsonPropertyName("subject3_code")]
-        public string Subject3Code => Subject3?.Code;
+        public string Subject3Code { get; set; }
     }
 }

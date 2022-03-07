@@ -204,9 +204,38 @@ namespace DqtApi.DataStore.Crm
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_ittsubject>()).FirstOrDefault();
         }
 
-        public async Task<Contact[]> GetMatchingTeachers(GetTeacherRequest request)
+        public async Task<Contact[]> FindTeachers(FindTeachersByTrnBirthDateAndNinoQuery request)
         {
-            var query = request.GenerateQuery();
+            var filter = new FilterExpression(LogicalOperator.And);
+
+            if (string.IsNullOrEmpty(request.NationalInsuranceNumber))
+            {
+                filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, request.Trn);
+            }
+            else
+            {
+                var childFilter = new FilterExpression(LogicalOperator.Or);
+
+                childFilter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, request.Trn);
+                childFilter.AddCondition(Contact.Fields.dfeta_NINumber, ConditionOperator.Equal, request.NationalInsuranceNumber);
+
+                filter.AddFilter(childFilter);
+            }
+
+            filter.AddCondition(Contact.Fields.BirthDate, ConditionOperator.Equal, request.BirthDate);
+
+            var query = new QueryExpression(Contact.EntityLogicalName)
+            {
+                ColumnSet = new ColumnSet(
+                    Contact.Fields.FullName,
+                    Contact.Fields.StateCode,
+                    Contact.Fields.dfeta_TRN,
+                    Contact.Fields.dfeta_NINumber,
+                    Contact.Fields.BirthDate,
+                    Contact.Fields.dfeta_ActiveSanctions
+                ),
+                Criteria = filter
+            };
 
             AddInductionLink(query);
             AddInitialTeacherTrainingLink(query);

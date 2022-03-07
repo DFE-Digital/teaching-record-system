@@ -1,4 +1,5 @@
 ﻿using System;
+using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
@@ -83,9 +84,9 @@ namespace DqtApi.Tests.DataverseIntegration
             None
         }
 
-        public GetTeacherRequest GetRequest(MatchFixture matchingTRN, bool matchingBirthdate, MatchFixture? matchingNationalInsuranceNumber = null) => new()
+        public FindTeachersByTrnBirthDateAndNinoQuery GetQuery(MatchFixture matchingTRN, bool matchingBirthdate, MatchFixture? matchingNationalInsuranceNumber = null) => new()
         {
-            TRN = matchingTRN switch
+            Trn = matchingTRN switch
             {
                 MatchFixture.One => _fixtures[0].TRN,
                 MatchFixture.Two => _fixtures[1].TRN,
