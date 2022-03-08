@@ -381,6 +381,46 @@ namespace DqtApi.Tests.DataverseIntegration
                 t.Description == expectedDescription);
         }
 
+        [Fact]
+        public async Task Given_record_successfully_created_itt_programmestartdate_and_programmeenddate_matches_request()
+        {
+            // Arrange
+            var startDate = new DateOnly(2020, 01, 13);
+            var endDate = new DateOnly(2021, 01, 07);
+            var birthDate = new DateOnly(1970, 06, 06);
+            var command = new CreateTeacherCommand()
+            {
+                FirstName = "Minnie",
+                LastName = "Ryder",
+                BirthDate = birthDate.ToDateTime(),
+                GenderCode = Contact_GenderCode.Female,
+                InitialTeacherTraining = new()
+                {
+                    ProviderUkprn = "10044534",  // ARK Teacher Training
+                    ProgrammeStartDate = startDate,
+                    ProgrammeEndDate = endDate,
+                    ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                }
+            };
+
+            // Act
+            var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
+            var getIttRecords = await  _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+                result.TeacherId,
+                columnNames: new[]
+                {
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
+                });
+            var savedProgrammeStartDate = DateOnly.FromDateTime(getIttRecords[0].dfeta_ProgrammeStartDate.Value);
+            var savedProgrammeEndDate = DateOnly.FromDateTime(getIttRecords[0].dfeta_ProgrammeEndDate.Value);
+
+            // Assert
+            Assert.True(result.Succeeded);
+            Assert.Equal(startDate, savedProgrammeStartDate);
+            Assert.Equal(endDate, savedProgrammeEndDate);
+        }
+
         private static CreateTeacherCommand CreateCommand(Action<CreateTeacherCommand> configureCommand = null)
         {
             var command = new CreateTeacherCommand()
