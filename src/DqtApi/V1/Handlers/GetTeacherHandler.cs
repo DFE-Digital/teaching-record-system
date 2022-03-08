@@ -6,6 +6,7 @@ using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using DqtApi.V1.Requests;
 using DqtApi.V1.Responses;
+using DqtApi.V2.ApiModels;
 using MediatR;
 using Microsoft.Xrm.Sdk;
 
@@ -49,7 +50,8 @@ namespace DqtApi.V1.Handlers
                 new[]
                 {
                     dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
-                    dfeta_qualification.Fields.dfeta_Type
+                    dfeta_qualification.Fields.dfeta_Type,
+                    dfeta_qualification.Fields.dfeta_HE_ClassDivision
                 });
 
             if (qualifications.Any())
@@ -149,14 +151,31 @@ namespace DqtApi.V1.Handlers
                 }
             }
 
-            Qualification[] MapQualifications()
+            Qualification[] MapQualifications() =>
+                teacher.dfeta_contact_dfeta_qualification?.Select(MapQualification)?.ToArray() ??
+                    Array.Empty<Qualification>();
+
+            Qualification MapQualification(dfeta_qualification qualification)
             {
-                return teacher.dfeta_contact_dfeta_qualification?
-                    .Select(qualification => new Qualification()
-                    {
-                        Name = qualification.FormattedValues.ValueOrNull(dfeta_qualification.Fields.dfeta_Type),
-                        DateAwarded = qualification.dfeta_CompletionorAwardDate
-                    })?.ToArray() ?? Array.Empty<Qualification>();
+                var heQualification = qualification.Extract<dfeta_hequalification>();
+
+                var subject1 = qualification.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}1", dfeta_hesubject.PrimaryIdAttribute);
+                var subject2 = qualification.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}2", dfeta_hesubject.PrimaryIdAttribute);
+                var subject3 = qualification.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}3", dfeta_hesubject.PrimaryIdAttribute);
+
+                return new Qualification()
+                {
+                    Name = qualification.FormattedValues.ValueOrNull(dfeta_qualification.Fields.dfeta_Type),
+                    DateAwarded = qualification.dfeta_CompletionorAwardDate,
+                    Subject1 = subject1?.dfeta_name,
+                    Subject2 = subject2?.dfeta_name,
+                    Subject3 = subject3?.dfeta_name,
+                    Subject1Code = subject1?.dfeta_Value,
+                    Subject2Code = subject2?.dfeta_Value,
+                    Subject3Code = subject3?.dfeta_Value,
+                    HeQualificationName = heQualification?.dfeta_name,
+                    ClassDivision = qualification.dfeta_HE_ClassDivision?.ConvertToEnum<dfeta_classdivision, ClassDivision>()
+                };
             }
         }
     }

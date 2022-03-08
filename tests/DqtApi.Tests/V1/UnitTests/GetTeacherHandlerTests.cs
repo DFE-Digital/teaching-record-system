@@ -203,21 +203,53 @@ namespace DqtApi.Tests.V1.UnitTests
         [Fact]
         public void Given_a_contact_with_qualifications_the_details_are_mapped()
         {
-            var qualificationTypes = new[] { dfeta_qualification_dfeta_Type.HigherEducation.ToString(), dfeta_qualification_dfeta_Type.MandatoryQualification.ToString() };
+            var qualification1Subject1 = "Subject 1";
+            var qualification1Subject1Code = "X101";
+            var qualification1Subject2 = "Subject 2";
+            var qualification1Subject2Code = "X102";
+            var qualification1Subject3 = "Subject 3";
+            var qualification1Subject3Code = "X103";
+            var qualification1HeName = "HE Name";
+            var qualification1Class = dfeta_classdivision.Merit;
+
+            var qualification1 = new dfeta_qualification()
+            {
+                dfeta_CompletionorAwardDate = new DateTime(2021, 12, 1),
+                dfeta_HE_ClassDivision = qualification1Class,
+                Attributes =
+                {
+                    { $"{nameof(dfeta_hequalification)}.{dfeta_hequalification.PrimaryIdAttribute}", new AliasedValue(dfeta_hequalification.EntityLogicalName, dfeta_hequalification.PrimaryIdAttribute, Guid.NewGuid()) },
+                    { $"{nameof(dfeta_hequalification)}.{dfeta_hequalification.Fields.dfeta_name}", new AliasedValue(dfeta_hequalification.EntityLogicalName, dfeta_hequalification.Fields.dfeta_name, qualification1HeName) },
+                    { $"{nameof(dfeta_hesubject)}1.{dfeta_hesubject.PrimaryIdAttribute}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.PrimaryIdAttribute, Guid.NewGuid()) },
+                    { $"{nameof(dfeta_hesubject)}1.{dfeta_hesubject.Fields.dfeta_name}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_name, qualification1Subject1) },
+                    { $"{nameof(dfeta_hesubject)}1.{dfeta_hesubject.Fields.dfeta_Value}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_Value, qualification1Subject1Code) },
+                    { $"{nameof(dfeta_hesubject)}2.{dfeta_hesubject.PrimaryIdAttribute}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.PrimaryIdAttribute, Guid.NewGuid()) },
+                    { $"{nameof(dfeta_hesubject)}2.{dfeta_hesubject.Fields.dfeta_name}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_name, qualification1Subject2) },
+                    { $"{nameof(dfeta_hesubject)}2.{dfeta_hesubject.Fields.dfeta_Value}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_Value, qualification1Subject2Code) },
+                    { $"{nameof(dfeta_hesubject)}3.{dfeta_hesubject.PrimaryIdAttribute}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.PrimaryIdAttribute, Guid.NewGuid()) },
+                    { $"{nameof(dfeta_hesubject)}3.{dfeta_hesubject.Fields.dfeta_name}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_name, qualification1Subject3) },
+                    { $"{nameof(dfeta_hesubject)}3.{dfeta_hesubject.Fields.dfeta_Value}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_Value, qualification1Subject3Code) },
+                },
+                FormattedValues =
+                {
+                    { dfeta_qualification.Fields.dfeta_Type, dfeta_qualification_dfeta_Type.HigherEducation.ToString() }
+                }
+            };
+
+            var qualification2 = new dfeta_qualification()
+            {
+                dfeta_CompletionorAwardDate = new DateTime(2021, 12, 2),
+                FormattedValues =
+                {
+                    { dfeta_qualification.Fields.dfeta_Type, dfeta_qualification_dfeta_Type.MandatoryQualification.ToString() }
+                }
+            };
 
             var contact = new Contact()
             {
                 dfeta_ActiveSanctions = false,
                 StateCode = ContactState.Active,
-                dfeta_contact_dfeta_qualification = Enumerable.Range(1, 2).Select(i =>
-                {
-                    var qualification = new dfeta_qualification
-                    {
-                        dfeta_CompletionorAwardDate = new DateTime(2021, 12, i)
-                    };
-                    qualification.FormattedValues.Add(dfeta_qualification.Fields.dfeta_Type, qualificationTypes[i - 1]);
-                    return qualification;
-                }),
+                dfeta_contact_dfeta_qualification = new[] { qualification1, qualification2 },
                 FormattedValues =
                 {
                     { Contact.Fields.StateCode, ContactState.Active.ToString() }
@@ -228,14 +260,26 @@ namespace DqtApi.Tests.V1.UnitTests
 
             var qualifications = response.Qualifications;
 
-            Assert.Equal(2, qualifications.Count());
-
-            for(var i = 1; i <= 2; i++)
-            {
-                var qualification = qualifications.ElementAt(i - 1);
-                Assert.Equal(qualificationTypes[i - 1], qualification.Name);
-                Assert.Equal(new DateTime(2021, 12, i), qualification.DateAwarded);                
-            }
+            Assert.Collection(
+                qualifications,
+                qualification =>
+                {
+                    Assert.Equal("HigherEducation", qualification.Name);
+                    Assert.Equal(new DateTime(2021, 12, 1), qualification.DateAwarded);
+                    Assert.Equal(qualification1Subject1, qualification.Subject1);
+                    Assert.Equal(qualification1Subject1Code, qualification.Subject1Code);
+                    Assert.Equal(qualification1Subject2, qualification.Subject2);
+                    Assert.Equal(qualification1Subject2Code, qualification.Subject2Code);
+                    Assert.Equal(qualification1Subject3, qualification.Subject3);
+                    Assert.Equal(qualification1Subject3Code, qualification.Subject3Code);
+                    Assert.Equal("Merit", qualification.ClassDivision?.ToString());
+                    Assert.Equal(qualification1HeName, qualification.HeQualificationName);
+                },
+                qualification =>
+                {
+                    Assert.Equal("MandatoryQualification", qualification.Name);
+                    Assert.Equal(new DateTime(2021, 12, 2), qualification.DateAwarded);
+                });
         }
     }
 }

@@ -7,24 +7,24 @@ namespace DqtApi.DataStore.Crm
         public static T Extract<T>(this Entity source)
             where T : Entity, new()
         {
-            string entityAlias = typeof(T).Name;
+            string prefix = typeof(T).Name;
 
-            return Extract<T>(source, entityAlias);
+            return Extract<T>(source, prefix, idAttribute: prefix + "id");
         }
 
-        public static T Extract<T>(this Entity source, string entityAlias)
+        public static T Extract<T>(this Entity source, string prefix, string idAttribute)
             where T : Entity, new()
         {
             var attributes = source.Attributes
-                .MapCollection<object, AttributeCollection>(attribute => source.GetAttributeValue<AliasedValue>(attribute.Key).Value, entityAlias);
+                .MapCollection<object, AttributeCollection>(attribute => source.GetAttributeValue<AliasedValue>(attribute.Key).Value, prefix);
 
-            if (!attributes.ContainsKey($"{entityAlias}id"))
+            if (!attributes.ContainsKey(idAttribute))
             {
                 return null;
             }
 
             var formattedValues = source.FormattedValues
-                .MapCollection<string, FormattedValueCollection>(formattedValue => formattedValue.Value, entityAlias);
+                .MapCollection<string, FormattedValueCollection>(formattedValue => formattedValue.Value, prefix);
 
             var entity = new T()
             {
