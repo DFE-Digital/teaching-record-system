@@ -14,7 +14,7 @@ namespace DqtApi.Configuration
                     { "app", configuration["VCAP_APPLICATION:application_name"] },
                     { "organisation", configuration["VCAP_APPLICATION:organization_name"] },
                     { "space", configuration["VCAP_APPLICATION:space_name"] },
-                    { "instance", configuration["CF_INSTANCE_INDEX"] }
+                    { "app_instance", configuration["CF_INSTANCE_INDEX"] }
                 });
             }
         }
