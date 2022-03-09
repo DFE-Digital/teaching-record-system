@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
+using Microsoft.Xrm.Sdk.Messages;
 using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
@@ -9,11 +12,15 @@ namespace DqtApi.Tests.DataverseIntegration
     {
         private readonly CrmClientFixture.TestDataScope _dataScope;
         private readonly DataverseAdapter _dataverseAdapter;
+        private readonly ITrackedEntityOrganizationService _organizationService;
+        private readonly TestableClock _clock;
 
         public GetTeachersByTrnAndDobTests(CrmClientFixture crmClientFixture)
         {
             _dataScope = crmClientFixture.CreateTestDataScope();
             _dataverseAdapter = _dataScope.CreateDataverseAdapter();
+            _organizationService = _dataScope.OrganizationService;
+            _clock = crmClientFixture.Clock;
         }
 
         public Task InitializeAsync() => Task.CompletedTask;
@@ -25,41 +32,14 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             // Arrange
             var dob = new DateOnly(1980, 01, 01);
-            var command = new CreateTeacherCommand()
-            {
-                FirstName = "Someone",
-                LastName = "Ryder",
-                BirthDate = dob.ToDateTime(),
-                GenderCode = Contact_GenderCode.Female,
-                InitialTeacherTraining = new()
-                {
-                    ProviderUkprn = "10044534",  // ARK Teacher Training
-                    ProgrammeStartDate = new(2020, 4, 1),
-                    ProgrammeEndDate = new(2020, 10, 10),
-                    ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
-                    Subject1 = "Computer Science",
-                    Subject2 = "Mathematics",
-                    AgeRangeFrom = dfeta_AgeRange._05,
-                    AgeRangeTo = dfeta_AgeRange._11
-                },
-                Qualification = new()
-                {
-                    ProviderUkprn = "10044534",
-                    CountryCode = "XK",
-                    Subject = "Computing",
-                    Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new(2021, 5, 3)
-                }
-            };
+            var (_, trn) = await CreateTeacher(dob);
 
             // Act
-            var (teacherResult, _) = await _dataverseAdapter.CreateTeacherImpl(command);
-            var result = await _dataverseAdapter.GetTeachersByTrnAndDoB(teacherResult.Trn, dob, columnNames: Contact.Fields.BirthDate);
-
+            var result = await _dataverseAdapter.GetTeachersByTrnAndDoB(trn, dob, columnNames: Contact.Fields.BirthDate);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(dob, DateOnly.FromDateTime(result[0].BirthDate.Value)) ;
+            Assert.Equal(dob, DateOnly.FromDateTime(result[0].BirthDate.Value));
         }
 
         [Fact]
@@ -67,39 +47,51 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             // Arrange
             var dob = new DateOnly(1988, 01, 01);
-            var command = new CreateTeacherCommand()
-            {
-                FirstName = "Someone",
-                LastName = "Ryder",
-                BirthDate = dob.ToDateTime(),
-                GenderCode = Contact_GenderCode.Female,
-                InitialTeacherTraining = new()
-                {
-                    ProviderUkprn = "10044534",  // ARK Teacher Training
-                    ProgrammeStartDate = new(2020, 4, 1),
-                    ProgrammeEndDate = new(2020, 10, 10),
-                    ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
-                    Subject1 = "Computer Science",
-                    Subject2 = "Mathematics",
-                    AgeRangeFrom = dfeta_AgeRange._05,
-                    AgeRangeTo = dfeta_AgeRange._11
-                },
-                Qualification = new()
-                {
-                    ProviderUkprn = "10044534",
-                    CountryCode = "XK",
-                    Subject = "Computing",
-                    Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new(2021, 5, 3)
-                }
-            };
+            var (_, trn) = await CreateTeacher(dob);
 
             // Act
-            var (teacherResult, _) = await _dataverseAdapter.CreateTeacherImpl(command);
-            var result = await _dataverseAdapter.GetTeachersByTrnAndDoB(teacherResult.Trn, new DateOnly(2022,1,1), columnNames: Contact.Fields.BirthDate);
+            var result = await _dataverseAdapter.GetTeachersByTrnAndDoB(trn, new DateOnly(2022, 1, 1), columnNames: Contact.Fields.BirthDate);
 
             // Assert
             Assert.Empty(result);
+        }
+
+        private async Task<(Guid TeacherId, string Trn)> CreateTeacher(DateOnly birthDate)
+        {
+            var teacherId = Guid.NewGuid();
+
+            var request = new ExecuteTransactionRequest()
+            {
+                Requests = new Microsoft.Xrm.Sdk.OrganizationRequestCollection()
+                {
+                    new CreateRequest()
+                    {
+                        Target = new Contact()
+                        {
+                            Id = teacherId,
+                            BirthDate = birthDate.ToDateTime()
+                        }
+                    },
+                    new UpdateRequest()
+                    {
+                        Target = new Contact()
+                        {
+                            Id = teacherId,
+                            dfeta_TRNAllocateRequest = _clock.UtcNow
+                        }
+                    },
+                    new RetrieveRequest()
+                    {
+                        Target = new Microsoft.Xrm.Sdk.EntityReference(Contact.EntityLogicalName, teacherId),
+                        ColumnSet = new(Contact.Fields.dfeta_TRN)
+                    }
+                }
+            };
+
+            var response = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(request);
+            var retrieveResponse = (RetrieveResponse)response.Responses.Last();
+
+            return (teacherId, retrieveResponse.Entity.ToEntity<Contact>().dfeta_TRN);
         }
     }
 }
