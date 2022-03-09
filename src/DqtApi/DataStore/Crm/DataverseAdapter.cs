@@ -499,7 +499,7 @@ namespace DqtApi.DataStore.Crm
         {
             var filter = new FilterExpression(LogicalOperator.And);
             filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
-            filter.AddCondition(Contact.Fields.BirthDate, ConditionOperator.Equal, birthDate);
+            filter.AddCondition(Contact.Fields.BirthDate, ConditionOperator.Equal, birthDate.ToDateTime());
             if (activeOnly)
             {
                 filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
