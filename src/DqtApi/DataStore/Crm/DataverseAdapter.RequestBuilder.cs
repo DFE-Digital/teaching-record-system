@@ -107,6 +107,7 @@ namespace DqtApi.DataStore.Crm
                     {
                         _responses = Array.Empty<OrganizationResponse>();
                         _completedTcs.SetResult();
+                        return;
                     }
 
                     var request = new ExecuteMultipleRequest()
@@ -140,6 +141,7 @@ namespace DqtApi.DataStore.Crm
                     {
                         _responses = Array.Empty<OrganizationResponse>();
                         _completedTcs.SetResult();
+                        return;
                     }
 
                     var request = new ExecuteTransactionRequest()
