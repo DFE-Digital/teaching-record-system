@@ -21,10 +21,30 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Fact]
+        public async Task Given_missing_birthdate_returns_error()
+        {
+            // Arrange
+            var trn = "1234567";
+            var ukprn = "123456";
+
+            // Act
+            var response = await HttpClient.PatchAsync(
+                $"v2/teachers/update/{trn}",
+                CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: "Birthdate",
+                expectedError: "Birthdate is required.");
+        }
+
+        [Fact]
         public async Task Given_invalid_itt_provider_returns_error()
         {
             // Arrange
             var ukprn = "xxx";
+            var trn = "12345";
             var contact = new Contact() { Id = Guid.NewGuid() };
             var contactList = new[] { contact };
             var dob = new DateOnly(1987, 01, 01);
@@ -34,12 +54,12 @@ namespace DqtApi.Tests.V2.Operations
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingIttRecord));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(ukprn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                 .ReturnsAsync(contactList);
 
             // Act
             var response = await HttpClient.PatchAsync(
-                $"v2/teachers/update/{ukprn}",
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
                 CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
 
             // Assert
@@ -50,8 +70,8 @@ namespace DqtApi.Tests.V2.Operations
         public async Task Given_invalid_itt_subject1_returns_error()
         {
             // Arrange
-            var ukprn = "xxx";
             var subject = "xxx";
+            var trn = "123456";
             var contact = new Contact() { Id = Guid.NewGuid() };
             var contactList = new[] { contact };
             var dob = new DateOnly(1987, 01, 01);
@@ -61,12 +81,12 @@ namespace DqtApi.Tests.V2.Operations
                     .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject1NotFound));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(ukprn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                     .ReturnsAsync(contactList);
 
             // Act
             var response = await HttpClient.PatchAsync(
-                $"v2/teachers/update/{ukprn}",
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
                 CreateRequest(req => req.InitialTeacherTraining.Subject1 = subject));
 
             // Assert
@@ -77,8 +97,8 @@ namespace DqtApi.Tests.V2.Operations
         public async Task Given_invalid_itt_subject2_returns_error()
         {
             // Arrange
-            var ukprn = "xxx";
             var subject = "xxx";
+            var trn = "12345";
             var contact = new Contact() { Id = Guid.NewGuid() };
             var contactList = new[] { contact };
             var dob = new DateOnly(1987, 01, 01);
@@ -88,12 +108,12 @@ namespace DqtApi.Tests.V2.Operations
                     .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject2NotFound));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(ukprn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                     .ReturnsAsync(contactList);
 
             // Act
             var response = await HttpClient.PatchAsync(
-                $"v2/teachers/update/{ukprn}",
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
                 CreateRequest(req => req.InitialTeacherTraining.Subject2 = subject));
 
             // Assert
@@ -104,14 +124,14 @@ namespace DqtApi.Tests.V2.Operations
         public async Task Given_invalid_qualification_country_returns_error()
         {
             // Arrange
-            var ukprn = "xxx";
+            var trn = "123456";
             var country = "some non existent country country";
             var contact = new Contact() { Id = Guid.NewGuid() };
             var contactList = new[] { contact };
             var dob = new DateOnly(1987, 01, 01);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(ukprn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                     .ReturnsAsync(contactList);
 
             ApiFixture.DataverseAdapter
@@ -120,7 +140,7 @@ namespace DqtApi.Tests.V2.Operations
 
             // Act
             var response = await HttpClient.PatchAsync(
-                $"v2/teachers/update/{ukprn}",
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
                 CreateRequest(req => req.Qualification.CountryCode = country));
 
             // Assert
@@ -131,14 +151,14 @@ namespace DqtApi.Tests.V2.Operations
         public async Task Given_invalid_qualification_subject_returns_error()
         {
             // Arrange
-            var ukprn = "xxx";
             var subject = "xxx";
             var contact = new Contact() { Id = Guid.NewGuid() };
             var contactList = new[] { contact };
             var dob = new DateOnly(1987, 01, 01);
+            var trn = "xxx";
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(ukprn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                     .ReturnsAsync(contactList);
 
             ApiFixture.DataverseAdapter
@@ -147,7 +167,7 @@ namespace DqtApi.Tests.V2.Operations
 
             // Act
             var response = await HttpClient.PatchAsync(
-                $"v2/teachers/update/{ukprn}",
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
                 CreateRequest(req => req.Qualification.Subject = subject));
 
             // Assert
@@ -158,15 +178,15 @@ namespace DqtApi.Tests.V2.Operations
         public async Task Given_valid_update_succeeds_return_nocontent()
         {
             // Arrange
-            var ukprn = "xxx";
             var subject = "xxx";
+            var trn = "123456";
             var contact = new Contact() { Id = Guid.NewGuid() };
             var contactList = new[] { contact };
             var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
             var dob = new DateOnly(1987, 01, 01);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(ukprn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                     .ReturnsAsync(contactList);
 
             ApiFixture.DataverseAdapter
@@ -175,7 +195,7 @@ namespace DqtApi.Tests.V2.Operations
 
             // Act
             var response = await HttpClient.PatchAsync(
-                $"v2/teachers/update/{ukprn}",
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
                 CreateRequest(req => req.Qualification.Subject = subject));
 
             // Assert
@@ -191,7 +211,8 @@ namespace DqtApi.Tests.V2.Operations
             string expectedErrorMessage)
         {
             // Arrange
-            var ukprn = "xxx";
+            var trn = "123456";
+            var dob = new DateOnly(1980, 01, 01);
             var request = CreateRequest(cmd =>
             {
                 cmd.InitialTeacherTraining.AgeRangeFrom = ageRangeFrom;
@@ -200,7 +221,7 @@ namespace DqtApi.Tests.V2.Operations
 
             // Act
             var response = await HttpClient.PatchAsync(
-                $"v2/teachers/update/{ukprn}", request);
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}", request);
 
             // Assert
             await AssertEx.ResponseIsValidationErrorForProperty(
@@ -223,7 +244,6 @@ namespace DqtApi.Tests.V2.Operations
 
             var requestBody = new UpdateTeacherRequest()
             {
-                BirthDate = dob,
                 InitialTeacherTraining = new UpdateTeacherRequestInitialTeacherTraining()
                 {
                     ProviderUkprn = "123456",
@@ -242,7 +262,7 @@ namespace DqtApi.Tests.V2.Operations
                 }
             };
 
-            var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}")
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}")
             {
                 Content = CreateJsonContent(requestBody)
             };
@@ -268,7 +288,6 @@ namespace DqtApi.Tests.V2.Operations
 
             var requestBody = new UpdateTeacherRequest()
             {
-                BirthDate = dob,
                 InitialTeacherTraining = new UpdateTeacherRequestInitialTeacherTraining()
                 {
                     ProviderUkprn = "123456",
@@ -294,7 +313,7 @@ namespace DqtApi.Tests.V2.Operations
                 .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
                 .ReturnsAsync(contactList);
 
-            var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}")
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}")
             {
                 Content = CreateJsonContent(requestBody)
             };
@@ -310,7 +329,6 @@ namespace DqtApi.Tests.V2.Operations
         {
             var request = new UpdateTeacherRequest()
             {
-                BirthDate = new DateOnly(1987, 01, 01),
                 InitialTeacherTraining = new()
                 {
                     ProviderUkprn = "10044534",

@@ -51,6 +51,10 @@ namespace DqtApi.V2.Validators
 
             RuleFor(r => r.Qualification.Class)
                 .IsInEnum();
+
+            RuleFor(x => x.BirthDate)
+                .NotEmpty()
+                .WithMessage("Birthdate is required.");
         }
     }
 }

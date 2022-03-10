@@ -36,7 +36,7 @@ namespace DqtApi.Tests.V2.Operations
                 AssessmentDate = Clock.Today
             };
 
-            var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome")
+            var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome?birthdate={dob.ToString("yyyy-MM-dd")}")
             {
                 Content = CreateJsonContent(requestBody)
             };
@@ -64,7 +64,31 @@ namespace DqtApi.Tests.V2.Operations
 
             var requestBody = new SetIttOutcomeRequest()
             {
-                BirthDate = dob,
+                IttProviderUkprn = "1001234",
+                Outcome = IttOutcome.Pass,
+                AssessmentDate = Clock.Today
+            };
+
+            var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome?birthdate={dob.ToString("yyyy-MM-dd")}")
+            {
+                Content = CreateJsonContent(requestBody)
+            };
+
+            // Act
+            var response = await HttpClient.SendAsync(request);
+
+            // Assert
+            await AssertEx.ResponseIsError(response, errorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
+        }
+
+        [Fact]
+        public async Task Given_missing_birthdate_returns_error()
+        {
+            // Arrange
+            var trn = "1234567";
+
+            var requestBody = new SetIttOutcomeRequest()
+            {
                 IttProviderUkprn = "1001234",
                 Outcome = IttOutcome.Pass,
                 AssessmentDate = Clock.Today
@@ -79,7 +103,10 @@ namespace DqtApi.Tests.V2.Operations
             var response = await HttpClient.SendAsync(request);
 
             // Assert
-            await AssertEx.ResponseIsError(response, errorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: nameof(requestBody.BirthDate),
+                expectedError: "Birthdate is required.");
         }
 
         [Fact]
@@ -234,7 +261,7 @@ namespace DqtApi.Tests.V2.Operations
                 AssessmentDate = assessmentDate
             };
 
-            var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome")
+            var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome?birthdate={dob.ToString("yyyy-MM-dd")}")
             {
                 Content = CreateJsonContent(requestBody)
             };
@@ -276,13 +303,12 @@ namespace DqtApi.Tests.V2.Operations
 
             var requestBody = new SetIttOutcomeRequest()
             {
-                BirthDate = dob,
                 IttProviderUkprn = ittProviderUkprn,
                 Outcome = outcome,
                 AssessmentDate = assessmentDate
             };
 
-            var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome")
+            var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome?birthdate={dob.ToString("yyyy-MM-dd")}")
             {
                 Content = CreateJsonContent(requestBody)
             };

@@ -27,10 +27,9 @@ namespace DqtApi.V2.Requests
         [SwaggerParameter(description: $"The assessment date for a {nameof(IttOutcome.Pass)} outcome.")]
         public DateOnly? AssessmentDate { get; set; }
 
-
         [Required]
-        [SwaggerParameter(description: "DoB of teacher")]
-        public DateOnly BirthDate { get; set; }
+        [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true, Description = "DoB of teacher"), SwaggerSchema(Format = "date"), ModelBinder(typeof(ModelBinding.DateModelBinder))]
+        public DateOnly? BirthDate { get; set; }
     }
 
     public class SetQtsRequestExample : IExamplesProvider<SetIttOutcomeRequest>
