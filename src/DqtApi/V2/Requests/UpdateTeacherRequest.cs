@@ -20,8 +20,8 @@ namespace DqtApi.V2.Requests
         public UpdateTeacherRequestRequestQualification Qualification { get; set; }
 
         [Required]
-        [SwaggerParameter(description: "DoB of teacher")]
-        public DateOnly BirthDate { get; set; }
+        [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true, Description = "DoB of teacher"), SwaggerSchema(Format = "date"), ModelBinder(typeof(ModelBinding.DateModelBinder))]
+        public DateOnly? BirthDate { get; set; }
     }
 
     public class UpdateTeacherRequestInitialTeacherTraining

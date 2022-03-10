@@ -20,6 +20,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "birthdate",
+            "in": "query",
+            "description": "DoB of teacher",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
           }
         ],
         "requestBody": {
@@ -256,6 +266,16 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "birthdate",
+            "in": "query",
+            "description": "DoB of teacher",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
             }
           }
         ],

@@ -7,6 +7,10 @@ namespace DqtApi.V2.Validators
     {
         public SetIttOutcomeValidator(IClock clock)
         {
+            RuleFor(x => x.BirthDate)
+                .NotEmpty()
+                .WithMessage("Birthdate is required.");
+
             RuleFor(c => c.IttProviderUkprn)
                 .NotEmpty()
                 .WithMessage("ITT provider UKPRN is required.");
