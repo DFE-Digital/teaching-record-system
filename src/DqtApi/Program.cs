@@ -13,6 +13,7 @@ using DqtApi.Logging;
 using DqtApi.ModelBinding;
 using DqtApi.Security;
 using DqtApi.Swagger;
+using DqtApi.Validation;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -106,6 +107,8 @@ namespace DqtApi
                     fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));
                     fv.DisableDataAnnotationsValidation = true;
                 });
+
+            services.AddTransient<IValidatorInterceptor, PreferModelBindingErrorsValidationInterceptor>();
 
             services.AddTransient<IApiDescriptionProvider, HybridBodyApiDescriptionProvider>();
 
