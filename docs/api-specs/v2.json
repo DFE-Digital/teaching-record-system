@@ -685,6 +685,10 @@
             "type": "string",
             "nullable": true
           },
+          "subject3": {
+            "type": "string",
+            "nullable": true
+          },
           "ageRangeFrom": {
             "type": "integer",
             "format": "int32",
@@ -915,6 +919,10 @@
             "nullable": true
           },
           "subject2": {
+            "type": "string",
+            "nullable": true
+          },
+          "subject3": {
             "type": "string",
             "nullable": true
           },

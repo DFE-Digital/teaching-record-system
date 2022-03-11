@@ -342,8 +342,6 @@ namespace DqtApi.DataStore.Crm
                 }
             }
 
-
-
             public dfeta_initialteachertraining CreateInitialTeacherTrainingEntity(UpdateTeacherReferenceLookupResult referenceData, Guid? id)
             {
                 Debug.Assert(referenceData.IttCountryId.HasValue);
@@ -365,6 +363,7 @@ namespace DqtApi.DataStore.Crm
                     dfeta_CohortYear = cohortYear,
                     dfeta_Subject1Id = referenceData.IttSubject1Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject1Id.Value) : null,
                     dfeta_Subject2Id = referenceData.IttSubject2Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject2Id.Value) : null,
+                    dfeta_Subject3Id = referenceData.IttSubject3Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject3Id.Value) : null,
                     dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
                     dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
                 };
@@ -405,14 +404,19 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= UpdateTeacherFailedReasons.NoMatchingIttRecord;
                 }
 
-                if (referenceData.IttSubject1Id == null)
+                if (referenceData.IttSubject1Id == null && !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject1))
                 {
                     failedReasons |= UpdateTeacherFailedReasons.Subject1NotFound;
                 }
 
-                if (referenceData.IttSubject2Id == null)
+                if (referenceData.IttSubject2Id == null && !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject2))
                 {
                     failedReasons |= UpdateTeacherFailedReasons.Subject2NotFound;
+                }
+
+                if (referenceData.IttSubject3Id == null && !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject3))
+                {
+                    failedReasons |= UpdateTeacherFailedReasons.Subject3NotFound;
                 }
 
                 if (referenceData.QualificationId == null)
@@ -487,6 +491,12 @@ namespace DqtApi.DataStore.Crm
                         CacheKeys.GetIttSubjectKey(subject),
                         _ => _dataverseAdapter.GetIttSubjectByName(subject)));
 
+                var getSubject3Task = Let(
+                    _command.InitialTeacherTraining.Subject3,
+                    subject => _dataverseAdapter._cache.GetOrCreateAsync(
+                        CacheKeys.GetIttSubjectKey(subject),
+                        _ => _dataverseAdapter.GetIttSubjectByName(subject)));
+
                 var getQualificationTask = Let(
                     "First Degree",
                     qualificationName => _dataverseAdapter._cache.GetOrCreateAsync(
@@ -527,6 +537,7 @@ namespace DqtApi.DataStore.Crm
                     getIttCountryTask,
                     getSubject1Task,
                     getSubject2Task,
+                    getSubject3Task,
                     getQualificationTask,
                     getQualificationCountryTask,
                     getQualificationSubjectTask,
@@ -542,6 +553,7 @@ namespace DqtApi.DataStore.Crm
                     IttCountryId = getIttCountryTask.Result?.Id,
                     IttSubject1Id = getSubject1Task.Result?.Id,
                     IttSubject2Id = getSubject2Task.Result?.Id,
+                    IttSubject3Id = getSubject3Task.Result?.Id,
                     QualificationId = getQualificationTask.Result?.Id,
                     QualificationCountryId = getQualificationCountryTask.Result?.Id,
                     QualificationSubjectId = getQualificationSubjectTask.Result?.Id,
@@ -580,6 +592,7 @@ namespace DqtApi.DataStore.Crm
             public Guid? IttCountryId { get; set; }
             public Guid? IttSubject1Id { get; set; }
             public Guid? IttSubject2Id { get; set; }
+            public Guid? IttSubject3Id { get; set; }
             public Guid? QualificationId { get; set; }
             public Guid? QualificationProviderId { get; set; }
             public Guid? QualificationCountryId { get; set; }

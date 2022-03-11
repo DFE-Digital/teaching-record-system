@@ -231,6 +231,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 IttProviderId = Guid.NewGuid(),
                 IttSubject1Id = Guid.NewGuid(),
                 IttSubject2Id = Guid.NewGuid(),
+                IttSubject3Id = Guid.NewGuid(),
             };
 
             var helper = new DataverseAdapter.CreateTeacherHelper(_dataverseAdapter, command);
@@ -256,6 +257,8 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(expectedResult, result.dfeta_Result);
             Assert.Equal(command.InitialTeacherTraining.AgeRangeFrom, result.dfeta_AgeRangeFrom);
             Assert.Equal(command.InitialTeacherTraining.AgeRangeTo, result.dfeta_AgeRangeTo);
+            Assert.Equal(dfeta_ittsubject.EntityLogicalName, result.dfeta_Subject3Id?.LogicalName);
+            Assert.Equal(referenceData.IttSubject3Id, result.dfeta_Subject3Id?.Id);
         }
 
         [Fact]
@@ -446,6 +449,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
                     Subject1 = "Computer Science",
                     Subject2 = "Mathematics",
+                    Subject3 = "Geography",
                     AgeRangeFrom = dfeta_AgeRange._05,
                     AgeRangeTo = dfeta_AgeRange._11
                 },

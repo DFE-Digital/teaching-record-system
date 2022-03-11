@@ -272,6 +272,7 @@ namespace DqtApi.DataStore.Crm
                     dfeta_CohortYear = cohortYear,
                     dfeta_Subject1Id = referenceData.IttSubject1Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject1Id.Value) : null,
                     dfeta_Subject2Id = referenceData.IttSubject2Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject2Id.Value) : null,
+                    dfeta_Subject3Id = referenceData.IttSubject3Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject3Id.Value) : null,
                     dfeta_Result = result,
                     dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
                     dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
@@ -474,6 +475,14 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetIttSubjectByName(subject, requestBuilder))) :
                     null;
 
+                var getSubject3Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject3) ?
+                    Let(
+                        _command.InitialTeacherTraining.Subject3,
+                        subject => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetIttSubjectKey(subject),
+                            _ => _dataverseAdapter.GetIttSubjectByName(subject, requestBuilder))) :
+                    null;
+
                 var getQualificationTask = Let(
                     "First Degree",
                     qualificationName => _dataverseAdapter._cache.GetOrCreateAsync(
@@ -528,6 +537,7 @@ namespace DqtApi.DataStore.Crm
                     getIttCountryTask,
                     getSubject1Task,
                     getSubject2Task,
+                    getSubject3Task,
                     getQualificationTask,
                     getQualificationProviderTask,
                     getQualificationCountryTask,
@@ -550,6 +560,7 @@ namespace DqtApi.DataStore.Crm
                     IttCountryId = getIttCountryTask?.Result?.Id,
                     IttSubject1Id = getSubject1Task?.Result?.Id,
                     IttSubject2Id = getSubject2Task?.Result?.Id,
+                    IttSubject3Id = getSubject3Task?.Result?.Id,
                     QualificationId = getQualificationTask?.Result?.Id,
                     QualificationProviderId = getQualificationProviderTask?.Result?.Id,
                     QualificationCountryId = getQualificationCountryTask?.Result?.Id,
@@ -578,6 +589,11 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= CreateTeacherFailedReasons.Subject2NotFound;
                 }
 
+                if (referenceData.IttSubject3Id == null && !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject3))
+                {
+                    failedReasons |= CreateTeacherFailedReasons.Subject3NotFound;
+                }
+
                 if (referenceData.QualificationProviderId == null && !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn))
                 {
                     failedReasons |= CreateTeacherFailedReasons.QualificationProviderNotFound;
@@ -603,6 +619,7 @@ namespace DqtApi.DataStore.Crm
             public Guid? IttCountryId { get; set; }
             public Guid? IttSubject1Id { get; set; }
             public Guid? IttSubject2Id { get; set; }
+            public Guid? IttSubject3Id { get; set; }
             public Guid? QualificationId { get; set; }
             public Guid? QualificationProviderId { get; set; }
             public Guid? QualificationCountryId { get; set; }

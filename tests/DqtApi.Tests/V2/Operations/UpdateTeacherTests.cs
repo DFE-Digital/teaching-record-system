@@ -121,6 +121,34 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Fact]
+        public async Task Given_invalid_itt_subject3_returns_error()
+        {
+            // Arrange
+            var subject = "xxx";
+            var trn = "12345";
+            var contact = new Contact() { Id = Guid.NewGuid() };
+            var contactList = new[] { contact };
+            var dob = new DateOnly(1987, 01, 01);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                    .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject3NotFound));
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                    .ReturnsAsync(contactList);
+
+            // Act
+            var response = await HttpClient.PatchAsync(
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+                CreateRequest(req => req.InitialTeacherTraining.Subject3 = subject));
+
+            // Assert
+            await AssertEx.ResponseIsError(response, errorCode: 10009, expectedStatusCode: StatusCodes.Status400BadRequest);
+        }
+
+
+        [Fact]
         public async Task Given_invalid_qualification_country_returns_error()
         {
             // Arrange
@@ -337,6 +365,7 @@ namespace DqtApi.Tests.V2.Operations
                     ProgrammeType = IttProgrammeType.GraduateTeacherProgramme,
                     Subject1 = "Computer Science",
                     Subject2 = "Mathematics",
+                    Subject3 = "Computer Science",
                     AgeRangeFrom = 5,
                     AgeRangeTo = 11
                 },
