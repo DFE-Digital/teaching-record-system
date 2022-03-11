@@ -48,6 +48,7 @@ namespace DqtApi.V2.Handlers
                     ProgrammeType = request.InitialTeacherTraining.ProgrammeType.Value.ConvertToIttProgrammeType(),
                     Subject1 = request.InitialTeacherTraining.Subject1,
                     Subject2 = request.InitialTeacherTraining.Subject2,
+                    Subject3 = request.InitialTeacherTraining.Subject3,
                     AgeRangeFrom = request.InitialTeacherTraining.AgeRangeFrom.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeFrom.Value) : null,
                     AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null,
                 },
@@ -77,6 +78,7 @@ namespace DqtApi.V2.Handlers
                     case UpdateTeacherFailedReasons.Subject1NotFound:
                     case UpdateTeacherFailedReasons.QualificationSubjectNotFound:
                     case UpdateTeacherFailedReasons.Subject2NotFound:
+                    case UpdateTeacherFailedReasons.Subject3NotFound:
                         throw new ErrorException(ErrorRegistry.SubjectNotFound());
                     default:
                         throw new NotImplementedException($"Unknown {nameof(UpdateTeacherFailedReasons)}: '{updateTeacherResult.FailedReasons}.");

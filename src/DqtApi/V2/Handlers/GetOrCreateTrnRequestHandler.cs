@@ -86,6 +86,7 @@ namespace DqtApi.V2.Handlers
                         ProgrammeType = request.InitialTeacherTraining.ProgrammeType.Value.ConvertToIttProgrammeType(),
                         Subject1 = request.InitialTeacherTraining.Subject1,
                         Subject2 = request.InitialTeacherTraining.Subject2,
+                        Subject3 = request.InitialTeacherTraining.Subject3,
                         AgeRangeFrom = request.InitialTeacherTraining.AgeRangeFrom.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeFrom.Value) : null,
                         AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null
                     },
@@ -147,6 +148,11 @@ namespace DqtApi.V2.Handlers
             ConsumeReason(
                 CreateTeacherFailedReasons.Subject2NotFound,
                 $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject2)}",
+                ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.Subject3NotFound,
+                $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject3)}",
                 ErrorRegistry.SubjectNotFound().Title);
 
             ConsumeReason(

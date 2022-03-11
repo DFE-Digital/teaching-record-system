@@ -55,6 +55,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
                     Subject1 = "Mathematics",
                     Subject2 = "Computer Science",
+                    Subject3 = "History",
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -120,6 +121,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased,
                     Subject1 = "Mathematics",
                     Subject2 = "Computer Science",
+                    Subject3 = "History",
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -161,7 +163,7 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Fact]
-        public async Task Given_existing_contact_update_itt_and_qualification_returns_success()
+        public async Task Given_updating_existing_contact_update_without_subject3_returns_success()
         {
             // Arrange
             var (teacherId, _,
@@ -172,7 +174,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
             var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByName("Mathematics");
             var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByName("Computer Science");
-
+            
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
@@ -226,6 +228,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_initialteachertraining.Fields.dfeta_Result,
                     dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
                     dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id
                 });
 
             // Assert
@@ -240,6 +243,95 @@ namespace DqtApi.Tests.DataverseIntegration
                     Assert.Equal(dfeta_ITTResult.InTraining, item1.dfeta_Result);
                     Assert.Equal(updateIttSubject1Id.Id, item1.dfeta_Subject1Id.Id);
                     Assert.Equal(updateIttSubject2Id.Id, item1.dfeta_Subject2Id.Id);
+                    Assert.Null(item1.dfeta_Subject3Id);
+                }
+            );
+        }
+
+        [Fact]
+        public async Task Given_existing_contact_update_itt_and_qualification_returns_success()
+        {
+            // Arrange
+            var (teacherId, _,
+                ittProviderUkprn, _, _,
+                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+
+            var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByName("Computer Science");
+            var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
+            var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByName("Mathematics");
+            var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByName("Computer Science");
+            var updateIttSubject3Id = await _dataverseAdapter.GetIttSubjectByName("History");
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            {
+                TeacherId = teacherId.ToString(),
+                InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+                {
+                    ProviderUkprn = ittProviderUkprn,
+                    ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                    ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                    ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
+                    Subject1 = "Mathematics",
+                    Subject2 = "Computer Science",
+                    Subject3 = "History",
+                    AgeRangeFrom = dfeta_AgeRange._11,
+                    AgeRangeTo = dfeta_AgeRange._12
+                },
+                Qualification = new UpdateTeacherCommandQualification()
+                {
+                    CountryCode = "XK",
+                    Subject = "Computer Science",
+                    Class = dfeta_classdivision.Firstclasshonours,
+                    Date = new DateOnly(2022, 01, 28)
+                }
+            });
+
+            var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
+            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+                teacherId,
+                columnNames: new[]
+                {
+                    dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
+                    dfeta_qualification.Fields.dfeta_Type,
+                    dfeta_qualification.Fields.dfeta_HE_EstablishmentId,
+                    dfeta_qualification.Fields.dfeta_PersonId,
+                    dfeta_qualification.Fields.dfeta_HE_ClassDivision,
+                    dfeta_qualification.Fields.dfeta_HE_CompletionDate,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
+                    dfeta_qualification.Fields.dfeta_HE_CountryId,
+                });
+            var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+                teacherId,
+                columnNames: new[]
+                {
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                    dfeta_initialteachertraining.Fields.StateCode,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id
+                });
+
+            // Assert
+            Assert.True(result.Succeeded);
+            Assert.Collection(itt,
+                item1 =>
+                {
+                    Assert.Equal(oldProvider, item1.dfeta_EstablishmentId.Id);
+                    Assert.Equal(dfeta_ITTProgrammeType.EYITTAssessmentOnly, item1.dfeta_ProgrammeType);
+                    Assert.Equal(dfeta_AgeRange._11, item1.dfeta_AgeRangeFrom);
+                    Assert.Equal(dfeta_AgeRange._12, item1.dfeta_AgeRangeTo);
+                    Assert.Equal(dfeta_ITTResult.InTraining, item1.dfeta_Result);
+                    Assert.Equal(updateIttSubject1Id.Id, item1.dfeta_Subject1Id.Id);
+                    Assert.Equal(updateIttSubject2Id.Id, item1.dfeta_Subject2Id.Id);
+                    Assert.Equal(updateIttSubject3Id.Id, item1.dfeta_Subject3Id.Id);
                 }
             );
             Assert.Collection(qualifications,
@@ -273,6 +365,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
                     Subject1 = "Mathematics",
                     Subject2 = "Computer Science",
+                    Subject3 = "History",
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -310,6 +403,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
                     Subject1 = "Mathematics",
                     Subject2 = "Computer Science",
+                    Subject3 = "History",
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -347,6 +441,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
                     Subject1 = "Mathematics",
                     Subject2 = "Computer Science",
+                    Subject3 = "History",
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -425,6 +520,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
                     Subject1 = "Mathematics",
                     Subject2 = "Computer Science",
+                    Subject3 = "History",
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -504,6 +600,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_initialteachertraining.Fields.dfeta_Result,
                     dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
                     dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
                 });
             var entity = existingItt.FirstOrDefault();
             await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
@@ -532,6 +629,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
                     Subject1 = "Mathematics",
                     Subject2 = "Computer Science",
+                    Subject3 = "History",
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -560,6 +658,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_initialteachertraining.Fields.dfeta_Result,
                     dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
                     dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
                 });
 
             // Assert
@@ -615,6 +714,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
                     Subject1 = "Mathematics",
                     Subject2 = "Computer Science",
+                    Subject3 = "History",
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -677,6 +777,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
                     Subject1 = "Mathematics",
                     Subject2 = "Computer Science",
+                    Subject3 = "History",
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -790,11 +891,12 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Theory]
-        [InlineData("Invalid Subject1", "Computer Science", "XK", "Computer Science")]
-        [InlineData("Mathematics", "Invalid subject2", "XK", "Computer Science")]
-        [InlineData("Mathematics", "Computer Science", "INVALID COUNTRY CODE", "Computer Science")]
-        [InlineData("Mathematics", "Computer Science", "XK", "Invalid Qualification subject")]
-        public async Task Given_Invalid_reference_data_request_fails(string ittSubject1, string ittSubject2, string qualificationCountryCode, string qualificationSubject)
+        [InlineData("Invalid Subject1", "Computer Science", "Geography", "XK", "Computer Science")]
+        [InlineData("Mathematics", "Invalid subject2", "History", "XK", "Computer Science")]
+        [InlineData("Mathematics", "Computer Science", "Geography", "INVALID COUNTRY CODE", "Computer Science")]
+        [InlineData("Mathematics", "Computer Science", "Geography", "XK", "Invalid Qualification subject")]
+        [InlineData("Mathematics", "Computer Science", "Invalid subject3", "XK", "Computer Science")]
+        public async Task Given_Invalid_reference_data_request_fails(string ittSubject1, string ittSubject2, string ittSubject3, string qualificationCountryCode, string qualificationSubject)
         {
             // Arrange
             var (teacherId, _,
@@ -815,6 +917,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
                     Subject1 = ittSubject1,
                     Subject2 = ittSubject2,
+                    Subject3 = ittSubject3,
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -844,6 +947,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var updatedHeCountryId = await _dataverseAdapter.GetCountry("XQ");
             var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByName("Mathematics");
             var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByName("Computer Science");
+            var updateIttSubject3Id = await _dataverseAdapter.GetIttSubjectByName("History");
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -857,6 +961,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
                     Subject1 = "Mathematics",
                     Subject2 = "Computer Science",
+                    Subject3 = "History",
                     AgeRangeFrom = dfeta_AgeRange._11,
                     AgeRangeTo = dfeta_AgeRange._12
                 },
@@ -899,6 +1004,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_initialteachertraining.Fields.dfeta_Result,
                     dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
                     dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
                 });
 
             // Assert
@@ -916,6 +1022,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     Assert.Equal(dfeta_AgeRange._12, item2.dfeta_AgeRangeTo);
                     Assert.Equal(updateIttSubject1Id.Id, item2.dfeta_Subject1Id.Id);
                     Assert.Equal(updateIttSubject2Id.Id, item2.dfeta_Subject2Id.Id);
+                    Assert.Equal(updateIttSubject3Id.Id, item2.dfeta_Subject3Id.Id);
                 }
             );
             Assert.Collection(qualifications,
