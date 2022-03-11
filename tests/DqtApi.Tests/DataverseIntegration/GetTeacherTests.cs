@@ -56,8 +56,9 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_merged_teacher_and_resolveMerges_true_return_master()
         {
             // Arrange
-            var masterTeacherId = await _organizationService.CreateAsync(new Contact());
-            var teacherId = await _organizationService.CreateAsync(new Contact());
+            var firstName = "Joe";
+            var masterTeacherId = await _organizationService.CreateAsync(new Contact() { FirstName = firstName });
+            var teacherId = await _organizationService.CreateAsync(new Contact() { FirstName = firstName });
 
             await _organizationService.ExecuteAsync(new MergeRequest()
             {
@@ -68,11 +69,12 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             // Act
-            var result = await _dataverseAdapter.GetTeacher(teacherId, resolveMerges: true, Contact.Fields.StateCode);
+            var result = await _dataverseAdapter.GetTeacher(teacherId, resolveMerges: true, Contact.Fields.StateCode, Contact.Fields.FirstName);
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(masterTeacherId, result.Id);
+            Assert.Equal(firstName, result.FirstName);
         }
 
         [Fact]
