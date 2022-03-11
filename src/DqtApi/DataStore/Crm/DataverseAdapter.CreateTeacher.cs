@@ -139,10 +139,10 @@ namespace DqtApi.DataStore.Crm
                     {
                         sb.AppendLine(matchedAttribute switch
                         {
-                            Contact.Fields.FirstName => $"\t- First name: '{_command.FirstName}'",
-                            Contact.Fields.MiddleName => $"\t- Middle name: '{_command.MiddleName}'",
-                            Contact.Fields.LastName => $"\t- Last name: '{_command.LastName}'",
-                            Contact.Fields.BirthDate => $"\t- Date of birth: '{_command.BirthDate:dd/MM/yyyy}'",
+                            Contact.Fields.FirstName => $"  - First name: '{_command.FirstName}'",
+                            Contact.Fields.MiddleName => $"  - Middle name: '{_command.MiddleName}'",
+                            Contact.Fields.LastName => $"  - Last name: '{_command.LastName}'",
+                            Contact.Fields.BirthDate => $"  - Date of birth: '{_command.BirthDate:dd/MM/yyyy}'",
                             _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
                         });
                     }
