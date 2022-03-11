@@ -469,7 +469,7 @@ namespace DqtApi.DataStore.Crm
             while (resolveMerges && teacher.Merged == true)
             {
                 var masterReference = teacher.MasterId;
-                return await GetTeacher(masterReference.Id, resolveMerges);
+                return await GetTeacher(masterReference.Id, resolveMerges, columnNames);
             }
 
             return teacher;

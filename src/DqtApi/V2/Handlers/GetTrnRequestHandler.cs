@@ -47,7 +47,7 @@ namespace DqtApi.V2.Handlers
                 trn = teacher.dfeta_TRN;
             }
 
-            var status = trnRequest.TeacherId.HasValue ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
+            var status = trn != null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
 
             return new TrnRequestInfo()
             {

@@ -152,7 +152,7 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal("Notification for QTS Unit Team", crmTask.Subject);
             Assert.Equal(_clock.UtcNow, crmTask.ScheduledEnd);
 
-            var expectedDescription = $"Potential duplicate\nMatched on\n\t- First name: '{firstName}'\n\t- Middle name: '{middleName}'\n\t- Last name: '{lastName}'\n\t- Date of birth: '{birthDate:dd/MM/yyyy}'\n" +
+            var expectedDescription = $"Potential duplicate\nMatched on\n  - First name: '{firstName}'\n  - Middle name: '{middleName}'\n  - Last name: '{lastName}'\n  - Date of birth: '{birthDate:dd/MM/yyyy}'\n" +
                 expectedDescriptionSupplement;
 
             Assert.Equal(
