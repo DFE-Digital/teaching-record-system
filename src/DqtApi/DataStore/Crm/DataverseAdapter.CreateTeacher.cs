@@ -333,7 +333,11 @@ namespace DqtApi.DataStore.Crm
                         {
                             Contact.Fields.dfeta_ActiveSanctions,
                             Contact.Fields.dfeta_QTSDate,
-                            Contact.Fields.dfeta_EYTSDate
+                            Contact.Fields.dfeta_EYTSDate,
+                            Contact.Fields.FirstName,
+                            Contact.Fields.MiddleName,
+                            Contact.Fields.LastName,
+                            Contact.Fields.BirthDate
                         }
                     },
                     Criteria = filter
