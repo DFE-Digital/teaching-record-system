@@ -17,7 +17,7 @@ namespace DqtApi.Json
             var asString = reader.GetString();
             if (!DateOnly.TryParseExact(asString, Constants.DateFormat, out var value))
             {
-                throw new FormatException("The JSON value is not in a supported DateOnly format.");
+                throw new JsonException("The JSON value is not in a supported DateOnly format.");
             }
 
             return value;
