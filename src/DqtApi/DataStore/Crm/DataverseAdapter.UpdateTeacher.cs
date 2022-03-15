@@ -483,19 +483,19 @@ namespace DqtApi.DataStore.Crm
                     _command.InitialTeacherTraining.Subject1,
                     subject => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetIttSubjectKey(subject),
-                        _ => _dataverseAdapter.GetIttSubjectByName(subject)));
+                        _ => _dataverseAdapter.GetIttSubjectByCode(subject)));
 
                 var getSubject2Task = Let(
                     _command.InitialTeacherTraining.Subject2,
                     subject => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetIttSubjectKey(subject),
-                        _ => _dataverseAdapter.GetIttSubjectByName(subject)));
+                        _ => _dataverseAdapter.GetIttSubjectByCode(subject)));
 
                 var getSubject3Task = Let(
                     _command.InitialTeacherTraining.Subject3,
                     subject => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetIttSubjectKey(subject),
-                        _ => _dataverseAdapter.GetIttSubjectByName(subject)));
+                        _ => _dataverseAdapter.GetIttSubjectByCode(subject)));
 
                 var getQualificationTask = Let(
                     "First Degree",
@@ -513,7 +513,7 @@ namespace DqtApi.DataStore.Crm
                     _command.Qualification.Subject,
                     subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetHeSubjectKey(subjectName),
-                        _ => _dataverseAdapter.GetHeSubjectByName(subjectName)));
+                        _ => _dataverseAdapter.GetHeSubjectByCode(subjectName)));
 
                 var getEarlyYearsStatusTask = isEarlyYears ?
                     Let(

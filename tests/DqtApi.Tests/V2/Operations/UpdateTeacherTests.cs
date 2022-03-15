@@ -363,9 +363,9 @@ namespace DqtApi.Tests.V2.Operations
                     ProgrammeStartDate = new(2020, 4, 1),
                     ProgrammeEndDate = new(2020, 10, 10),
                     ProgrammeType = IttProgrammeType.GraduateTeacherProgramme,
-                    Subject1 = "Computer Science",
-                    Subject2 = "Mathematics",
-                    Subject3 = "Computer Science",
+                    Subject1 = "100366",  // computer science
+                    Subject2 = "100403",  // mathematics
+                    Subject3 = "100302",  // history
                     AgeRangeFrom = 5,
                     AgeRangeTo = 11
                 },
