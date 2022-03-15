@@ -101,9 +101,9 @@ namespace DqtApi.DataStore.Crm
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_hequalification>()).FirstOrDefault();
         }
 
-        public Task<dfeta_hesubject> GetHeSubjectByName(string name) => GetHeSubjectByName(name, requestBuilder: null);
+        public Task<dfeta_hesubject> GetHeSubjectByCode(string value) => GetHeSubjectByCode(value, requestBuilder: null);
 
-        private async Task<dfeta_hesubject> GetHeSubjectByName(string name, RequestBuilder requestBuilder)
+        private async Task<dfeta_hesubject> GetHeSubjectByCode(string value, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -112,7 +112,7 @@ namespace DqtApi.DataStore.Crm
                 ColumnSet = new() { AllColumns = true }
             };
 
-            query.AddAttributeValue(dfeta_hesubject.Fields.dfeta_name, name);
+            query.AddAttributeValue(dfeta_hesubject.Fields.dfeta_Value, value);
             query.AddAttributeValue(dfeta_hesubject.Fields.StateCode, (int)dfeta_hesubjectState.Active);
 
             var request = new RetrieveMultipleRequest()
@@ -179,9 +179,9 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
         }
 
-        public Task<dfeta_ittsubject> GetIttSubjectByName(string name) => GetIttSubjectByName(name, requestBuilder: null);
+        public Task<dfeta_ittsubject> GetIttSubjectByCode(string code) => GetIttSubjectByCode(code, requestBuilder: null);
 
-        private async Task<dfeta_ittsubject> GetIttSubjectByName(string name, RequestBuilder requestBuilder)
+        private async Task<dfeta_ittsubject> GetIttSubjectByCode(string code, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -190,7 +190,7 @@ namespace DqtApi.DataStore.Crm
                 ColumnSet = new() { AllColumns = true }
             };
 
-            query.AddAttributeValue(dfeta_ittsubject.Fields.dfeta_name, name);
+            query.AddAttributeValue(dfeta_ittsubject.Fields.dfeta_Value, code);
             query.AddAttributeValue(dfeta_ittsubject.Fields.StateCode, (int)dfeta_ittsubjectState.Active);
 
             var request = new RetrieveMultipleRequest()

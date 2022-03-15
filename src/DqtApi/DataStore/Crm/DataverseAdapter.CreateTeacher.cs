@@ -468,7 +468,7 @@ namespace DqtApi.DataStore.Crm
                         _command.InitialTeacherTraining.Subject1,
                         subject => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetIttSubjectKey(subject),
-                            _ => _dataverseAdapter.GetIttSubjectByName(subject, requestBuilder))) :
+                            _ => _dataverseAdapter.GetIttSubjectByCode(subject, requestBuilder))) :
                     null;
 
                 var getSubject2Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject2) ?
@@ -476,7 +476,7 @@ namespace DqtApi.DataStore.Crm
                         _command.InitialTeacherTraining.Subject2,
                         subject => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetIttSubjectKey(subject),
-                            _ => _dataverseAdapter.GetIttSubjectByName(subject, requestBuilder))) :
+                            _ => _dataverseAdapter.GetIttSubjectByCode(subject, requestBuilder))) :
                     null;
 
                 var getSubject3Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject3) ?
@@ -484,7 +484,7 @@ namespace DqtApi.DataStore.Crm
                         _command.InitialTeacherTraining.Subject3,
                         subject => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetIttSubjectKey(subject),
-                            _ => _dataverseAdapter.GetIttSubjectByName(subject, requestBuilder))) :
+                            _ => _dataverseAdapter.GetIttSubjectByCode(subject, requestBuilder))) :
                     null;
 
                 var getQualificationTask = Let(
@@ -514,7 +514,7 @@ namespace DqtApi.DataStore.Crm
                         _command.Qualification.Subject,
                         subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetHeSubjectKey(subjectName),
-                            _ => _dataverseAdapter.GetHeSubjectByName(subjectName, requestBuilder))) :
+                            _ => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
                     null;
 
                 var getEarlyYearsStatusTask = isEarlyYears ?

@@ -447,9 +447,9 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeStartDate = new(2020, 4, 1),
                     ProgrammeEndDate = new(2020, 10, 10),
                     ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
-                    Subject1 = "Computer Science",
-                    Subject2 = "Mathematics",
-                    Subject3 = "Geography",
+                    Subject1 = "100366",  // computer science
+                    Subject2 = "100403",  // mathematics
+                    Subject3 = "100302",  // history
                     AgeRangeFrom = dfeta_AgeRange._05,
                     AgeRangeTo = dfeta_AgeRange._11
                 },
@@ -457,7 +457,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 {
                     ProviderUkprn = "10044534",
                     CountryCode = "XK",
-                    Subject = "Computing",
+                    Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new(2021, 5, 3)
                 }

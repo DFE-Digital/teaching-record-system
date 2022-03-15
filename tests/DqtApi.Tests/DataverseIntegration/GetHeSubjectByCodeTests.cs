@@ -3,12 +3,12 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class GetHeSubjectByNameTests : IAsyncLifetime
+    public class GetHeSubjectByCodeTests : IAsyncLifetime
     {
         private readonly CrmClientFixture.TestDataScope _dataScope;
         private readonly DataverseAdapter _dataverseAdapter;
 
-        public GetHeSubjectByNameTests(CrmClientFixture crmClientFixture)
+        public GetHeSubjectByCodeTests(CrmClientFixture crmClientFixture)
         {
             _dataScope = crmClientFixture.CreateTestDataScope();
             _dataverseAdapter = _dataScope.CreateDataverseAdapter();
@@ -22,24 +22,24 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_valid_subject_name_returns_country()
         {
             // Arrange
-            var subjectName = "computer science";
+            var subjectCode = "100366";  // computer science
 
             // Act
-            var result = await _dataverseAdapter.GetHeSubjectByName(subjectName);
+            var result = await _dataverseAdapter.GetHeSubjectByCode(subjectCode);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(subjectName, result.dfeta_name);
+            Assert.Equal(subjectCode, result.dfeta_Value);
         }
 
         [Fact]
         public async Task Given_invalid_subject_name_returns_null()
         {
             // Arrange
-            var subjectName = "XXXX";
+            var subjectCode = "XXXX";
 
             // Act
-            var result = await _dataverseAdapter.GetHeSubjectByName(subjectName);
+            var result = await _dataverseAdapter.GetHeSubjectByCode(subjectCode);
 
             // Assert
             Assert.Null(result);
