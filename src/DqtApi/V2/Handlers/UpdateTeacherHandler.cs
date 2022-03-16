@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
 using DqtApi.Validation;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 
 namespace DqtApi.V2.Handlers
@@ -64,27 +67,85 @@ namespace DqtApi.V2.Handlers
 
             if (!updateTeacherResult.Succeeded)
             {
-                switch (updateTeacherResult.FailedReasons)
-                {
-                    case UpdateTeacherFailedReasons.AlreadyHaveEytsDate:
-                    case UpdateTeacherFailedReasons.AlreadyHaveQtsDate:
-                        throw new ErrorException(ErrorRegistry.TeacherAlreadyHasQtsDate());
-                    case UpdateTeacherFailedReasons.NoMatchingIttRecord:
-                        throw new ErrorException(ErrorRegistry.TeacherHasNoIncompleteIttRecord());
-                    case UpdateTeacherFailedReasons.CannotChangeProgrammeType:
-                        throw new ErrorException(ErrorRegistry.CannotChangeProgrammeType());
-                    case UpdateTeacherFailedReasons.QualificationCountryNotFound:
-                        throw new ErrorException(ErrorRegistry.CountryNotFound());;
-                    case UpdateTeacherFailedReasons.Subject1NotFound:
-                    case UpdateTeacherFailedReasons.QualificationSubjectNotFound:
-                    case UpdateTeacherFailedReasons.Subject2NotFound:
-                    case UpdateTeacherFailedReasons.Subject3NotFound:
-                        throw new ErrorException(ErrorRegistry.SubjectNotFound());
-                    default:
-                        throw new NotImplementedException($"Unknown {nameof(UpdateTeacherFailedReasons)}: '{updateTeacherResult.FailedReasons}.");
-                }
+                throw CreateValidationExceptionFromFailedReasons(updateTeacherResult.FailedReasons);
             }
             return Unit.Value;
+        }
+
+        private ValidationException CreateValidationExceptionFromFailedReasons(UpdateTeacherFailedReasons failedReasons)
+        {
+            var failures = new List<ValidationFailure>();
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.Subject1NotFound,
+                $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject1)}",
+                ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.Subject2NotFound,
+                $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}",
+                ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.Subject3NotFound,
+                $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject3)}",
+                ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.QualificationSubjectNotFound,
+                $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}",
+                ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.QualificationCountryNotFound,
+                $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.CountryCode)}",
+                ErrorRegistry.CountryNotFound().Title);
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.QualificationProviderNotFound,
+                $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}",
+                ErrorRegistry.OrganisationNotFound().Title);
+
+            ConsumeReason(
+                 UpdateTeacherFailedReasons.AlreadyHaveEytsDate,
+                 $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProgrammeType)}",
+                 ErrorRegistry.TeacherAlreadyHasQtsDate().Title);
+
+            ConsumeReason(
+                 UpdateTeacherFailedReasons.AlreadyHaveQtsDate,
+                 $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProgrammeType)}",
+                 ErrorRegistry.TeacherAlreadyHasQtsDate().Title);
+
+            ConsumeReason(
+                 UpdateTeacherFailedReasons.CannotChangeProgrammeType,
+                 $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProgrammeType)}",
+                 ErrorRegistry.CannotChangeProgrammeType().Title);
+
+            ConsumeReason(
+                 UpdateTeacherFailedReasons.NoMatchingIttRecord,
+                 $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}",
+                 ErrorRegistry.TeacherHasNoIncompleteIttRecord().Title);
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.IttProviderNotFound,
+                $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}",
+                ErrorRegistry.OrganisationNotFound().Title);
+
+            if (failedReasons != UpdateTeacherFailedReasons.None)
+            {
+                throw new NotImplementedException($"Unknown {nameof(UpdateTeacherFailedReasons)}: '{failedReasons}.");
+            }
+
+            return new ValidationException(failures);
+
+            void ConsumeReason(UpdateTeacherFailedReasons reason, string propertyName, string message)
+            {
+                if (failedReasons.HasFlag(reason))
+                {
+                    failures.Add(new ValidationFailure(propertyName, message));
+                    failedReasons = failedReasons & ~reason;
+                }
+            }
         }
     }
 }
