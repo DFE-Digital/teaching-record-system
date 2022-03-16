@@ -26,8 +26,9 @@ namespace DqtApi.DataStore.Crm
     {
         None = 0,
         AlreadyHaveQtsDate = 1,
+        NoMatchingIttRecord = 2,
         AlreadyHaveEytsDate = 4,
-        NoMatchingIttRecord = 8,
+        IttProviderNotFound = 8,
         MultipleInTrainingIttRecords = 16,
         Subject1NotFound = 32,
         Subject2NotFound = 64,

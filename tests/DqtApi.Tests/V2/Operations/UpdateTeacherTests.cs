@@ -8,6 +8,7 @@ using DqtApi.Properties;
 using DqtApi.TestCommon;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
+using DqtApi.Validation;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -63,7 +64,7 @@ namespace DqtApi.Tests.V2.Operations
                 CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
 
             // Assert
-            await AssertEx.ResponseIsError(response, errorCode: 10005, expectedStatusCode: StatusCodes.Status400BadRequest);
+            await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}", ErrorRegistry.TeacherHasNoIncompleteIttRecord().Title);
         }
 
         [Fact]
@@ -90,7 +91,7 @@ namespace DqtApi.Tests.V2.Operations
                 CreateRequest(req => req.InitialTeacherTraining.Subject1 = subject));
 
             // Assert
-            await AssertEx.ResponseIsError(response, errorCode: 10009, expectedStatusCode: StatusCodes.Status400BadRequest);
+            await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject1)}", ErrorRegistry.SubjectNotFound().Title);
         }
 
         [Fact]
@@ -117,7 +118,7 @@ namespace DqtApi.Tests.V2.Operations
                 CreateRequest(req => req.InitialTeacherTraining.Subject2 = subject));
 
             // Assert
-            await AssertEx.ResponseIsError(response, errorCode: 10009, expectedStatusCode: StatusCodes.Status400BadRequest);
+            await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
         }
 
         [Fact]
@@ -144,7 +145,7 @@ namespace DqtApi.Tests.V2.Operations
                 CreateRequest(req => req.InitialTeacherTraining.Subject3 = subject));
 
             // Assert
-            await AssertEx.ResponseIsError(response, errorCode: 10009, expectedStatusCode: StatusCodes.Status400BadRequest);
+            await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
         }
 
 
@@ -172,8 +173,37 @@ namespace DqtApi.Tests.V2.Operations
                 CreateRequest(req => req.Qualification.CountryCode = country));
 
             // Assert
-            await AssertEx.ResponseIsError(response, errorCode: 10010, expectedStatusCode: StatusCodes.Status400BadRequest);
+            await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.CountryCode)}", ErrorRegistry.CountryNotFound().Title);
         }
+
+        [Fact]
+        public async Task Given_multiple_lookups_failed_returns_error()
+        {
+            // Arrange
+            var subject = "xxx";
+            var contact = new Contact() { Id = Guid.NewGuid() };
+            var contactList = new[] { contact };
+            var dob = new DateOnly(1987, 01, 01);
+            var trn = "xxx";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                    .ReturnsAsync(contactList);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                    .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubjectNotFound | UpdateTeacherFailedReasons.Subject2NotFound));
+
+            // Act
+            var response = await HttpClient.PatchAsync(
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+                CreateRequest(req => req.Qualification.Subject = subject));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}", ErrorRegistry.SubjectNotFound().Title);
+            await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
+        }
+
 
         [Fact]
         public async Task Given_invalid_qualification_subject_returns_error()
@@ -199,7 +229,7 @@ namespace DqtApi.Tests.V2.Operations
                 CreateRequest(req => req.Qualification.Subject = subject));
 
             // Assert
-            await AssertEx.ResponseIsError(response, errorCode: 10009, expectedStatusCode: StatusCodes.Status400BadRequest);
+            await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}", ErrorRegistry.SubjectNotFound().Title);
         }
 
         [Fact]

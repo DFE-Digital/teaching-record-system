@@ -64,7 +64,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = ittProviderUkprn,
                 }
             });
 
@@ -130,7 +131,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = ittProviderUkprn,
                 }
             });
 
@@ -195,7 +197,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = ittProviderUkprn,
                 }
             });
 
@@ -283,7 +286,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = ittProviderUkprn,
                 }
             });
 
@@ -374,7 +378,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = ittProviderUkprn,
                 }
             });
 
@@ -412,7 +417,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = ittProviderUkprn,
                 }
             });
 
@@ -450,7 +456,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = ittProviderUkprn,
                 }
             });
 
@@ -529,7 +536,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Fourthclasshonours,
-                    Date = new DateOnly(2022, 01, 15)
+                    Date = new DateOnly(2022, 01, 15),
+                    ProviderUkprn = ittProviderUkprn
                 }
             });
 
@@ -633,7 +641,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Fourthclasshonours,
-                    Date = new DateOnly(2022, 01, 15)
+                    Date = new DateOnly(2022, 01, 15),
+                    ProviderUkprn = ittProviderUkprn,
                 }
             });
 
@@ -715,7 +724,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Fourthclasshonours,
-                    Date = new DateOnly(2022, 01, 15)
+                    Date = new DateOnly(2022, 01, 15),
+                    ProviderUkprn = ittProviderUkprn,
                 }
             });
 
@@ -778,7 +788,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = ittProviderUkprn,
                 }
             });
 
@@ -874,7 +885,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = "SOME INVALID"
                 }
             });
 
@@ -883,11 +895,11 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Theory]
-        [InlineData("Invalid Subject1", "Computer Science", "Geography", "XK", "Computer Science")]
-        [InlineData("Mathematics", "Invalid subject2", "History", "XK", "Computer Science")]
-        [InlineData("Mathematics", "Computer Science", "Geography", "INVALID COUNTRY CODE", "Computer Science")]
-        [InlineData("Mathematics", "Computer Science", "Geography", "XK", "Invalid Qualification subject")]
-        [InlineData("Mathematics", "Computer Science", "Invalid subject3", "XK", "Computer Science")]
+        [InlineData("Invalid Subject1", "100403", "100366", "XK", "Computer Science")]
+        [InlineData("100302", "Invalid subject2", "100403", "XK", "Computer Science")]
+        [InlineData("100302", "100403", "100366", "INVALID COUNTRY CODE", "Computer Science")]
+        [InlineData("100302", "100403", "100366", "XK", "Invalid Qualification subject")]
+        [InlineData("100302", "100403", "Invalid subject3", "XK", "Computer Science")]
         public async Task Given_Invalid_reference_data_request_fails(string ittSubject1, string ittSubject2, string ittSubject3, string qualificationCountryCode, string qualificationSubject)
         {
             // Arrange
@@ -918,7 +930,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = qualificationCountryCode,
                     Subject = qualificationSubject,
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = newIttProviderUkprn,
                 }
             });
 
@@ -962,7 +975,9 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XQ", //Africa
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new DateOnly(2022, 01, 28)
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = newIttProviderUkprn,
+
                 }
             });
 
