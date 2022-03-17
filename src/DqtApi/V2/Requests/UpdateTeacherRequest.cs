@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using DqtApi.V2.ApiModels;
-using DqtApi.V2.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -12,6 +12,7 @@ namespace DqtApi.V2.Requests
     {
         [SwaggerParameter(Description = "The TRN of the teacher to update")]
         [FromRoute(Name = "trn")]
+        [JsonIgnore]
         public string Trn { get; set; }
 
         [Required]
@@ -21,6 +22,7 @@ namespace DqtApi.V2.Requests
 
         [Required]
         [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true, Description = "DoB of teacher"), SwaggerSchema(Format = "date"), ModelBinder(typeof(ModelBinding.DateModelBinder))]
+        [JsonIgnore]
         public DateOnly? BirthDate { get; set; }
     }
 

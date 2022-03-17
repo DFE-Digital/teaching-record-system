@@ -868,25 +868,16 @@
       },
       "UpdateTeacherRequest": {
         "required": [
-          "birthDate",
           "initialTeacherTraining",
           "qualification"
         ],
         "type": "object",
         "properties": {
-          "trn": {
-            "type": "string",
-            "nullable": true
-          },
           "initialTeacherTraining": {
             "$ref": "#/components/schemas/UpdateTeacherRequestInitialTeacherTraining"
           },
           "qualification": {
             "$ref": "#/components/schemas/UpdateTeacherRequestRequestQualification"
-          },
-          "birthDate": {
-            "type": "string",
-            "format": "date"
           }
         },
         "additionalProperties": false
