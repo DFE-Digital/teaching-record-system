@@ -31,6 +31,10 @@ variable "api_app_name" {
   type = string
 }
 
+variable "prometheus_app" {
+  default = null
+}
+
 variable "api_docker_image" {
   type = string
 }
@@ -89,6 +93,7 @@ variable "hostnames" {
 locals {
   api_routes = flatten([
     cloudfoundry_route.api_public,
+    cloudfoundry_route.api_internal,
     values(cloudfoundry_route.api_education)
   ])
 }
