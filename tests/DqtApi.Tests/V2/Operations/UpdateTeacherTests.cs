@@ -310,7 +310,7 @@ namespace DqtApi.Tests.V2.Operations
                     ProgrammeType = IttProgrammeType.EYITTUndergraduate,
                     Subject1 = "Mathematics"
                 },
-                Qualification = new UpdateTeacherRequestRequestQualification()
+                Qualification = new UpdateTeacherRequestQualification()
                 {
                     ProviderUkprn = "123456",
                     CountryCode = "XK",
@@ -357,7 +357,7 @@ namespace DqtApi.Tests.V2.Operations
                     AgeRangeFrom = 1,
                     AgeRangeTo = 10
                 },
-                Qualification = new UpdateTeacherRequestRequestQualification()
+                Qualification = new UpdateTeacherRequestQualification()
                 {
                     ProviderUkprn = "123456",
                     CountryCode = "XK",
