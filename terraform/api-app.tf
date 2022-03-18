@@ -14,6 +14,13 @@ resource "cloudfoundry_route" "api_public" {
   space    = data.cloudfoundry_space.space.id
 }
 
+resource "cloudfoundry_route" "api_internal" {
+  count    = local.configure_prometheus_network_policy
+  domain   = data.cloudfoundry_domain.internal.id
+  hostname = var.api_app_name
+  space    = data.cloudfoundry_space.space.id
+}
+
 resource "cloudfoundry_route" "api_education" {
   for_each = toset(var.hostnames)
   domain   = data.cloudfoundry_domain.education_gov_uk.id

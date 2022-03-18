@@ -22,6 +22,10 @@ data "cloudfoundry_domain" "cloudapps" {
   name = "london.cloudapps.digital"
 }
 
+data "cloudfoundry_domain" "internal" {
+  name = "apps.internal"
+}
+
 data "cloudfoundry_domain" "education_gov_uk" {
   name = "education.gov.uk"
 }
