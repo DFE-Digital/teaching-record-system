@@ -29,6 +29,44 @@ namespace DqtApi.Tests.DataverseIntegration
 
         public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
+        [Fact]
+        public async Task Given_update_without_providing_qualification_ukprn_returns_success()
+        {
+            // Arrange
+            var (teacherId, _,
+                ittProviderUkprn, _, _,
+                _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+
+            var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
+            var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
+            var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
+            var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            {
+                TeacherId = teacherId.ToString(),
+                InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+                {
+                    ProviderUkprn = ittProviderUkprn,
+                    ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                    ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                    ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                    Subject1 = "100366",  // computer science
+                    Subject2 = "100403",  // mathematics
+                    Subject3 = "100302",  // history
+                    AgeRangeFrom = dfeta_AgeRange._11,
+                    AgeRangeTo = dfeta_AgeRange._12
+                },
+                Qualification = new UpdateTeacherCommandQualification()
+                {
+                    CountryCode = "XK",
+                    Subject = "100366",  // computer science
+                    Class = dfeta_classdivision.Firstclasshonours,
+                    Date = new DateOnly(2022, 01, 28),
+                }
+            });
+        }
 
         [Fact]
         public async Task Given_existing_itt_update_programmetype_from_qts_to_another_qts_programmetype_succeeds()
@@ -573,7 +611,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 },
                 item3 =>
                 {
-                    Assert.Null(item3.dfeta_HE_EstablishmentId);
+                    Assert.Equal(providerId.Id, item3.dfeta_HE_EstablishmentId.Id);
                     Assert.Equal(dfeta_classdivision.Fourthclasshonours, item3.dfeta_HE_ClassDivision);
                     Assert.Equal(new DateTime(2022, 01, 15), item3.dfeta_CompletionorAwardDate);
                 });
@@ -1037,7 +1075,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 {
                     Assert.Equal(updatedHeCountryId.Id, item1.dfeta_HE_CountryId.Id);
                     Assert.Equal(updateHeSubjectId.Id, item1.dfeta_HE_HESubject1Id.Id);
-                    Assert.Equal(oldProvider, item1.dfeta_HE_EstablishmentId.Id);
+                    Assert.Equal(newProviderProvider, item1.dfeta_HE_EstablishmentId.Id);
                     Assert.Equal(dfeta_classdivision.Firstclasshonours, item1.dfeta_HE_ClassDivision);
                     Assert.Equal(new DateTime(2022, 01, 28), item1.dfeta_CompletionorAwardDate);
                 });
