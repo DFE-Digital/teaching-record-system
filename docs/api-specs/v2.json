@@ -877,7 +877,7 @@
             "$ref": "#/components/schemas/UpdateTeacherRequestInitialTeacherTraining"
           },
           "qualification": {
-            "$ref": "#/components/schemas/UpdateTeacherRequestRequestQualification"
+            "$ref": "#/components/schemas/UpdateTeacherRequestQualification"
           }
         },
         "additionalProperties": false
@@ -886,13 +886,13 @@
         "required": [
           "programmeEndDate",
           "programmeStartDate",
-          "programmeType"
+          "programmeType",
+          "providerUkprn"
         ],
         "type": "object",
         "properties": {
           "providerUkprn": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "programmeStartDate": {
             "type": "string",
@@ -930,7 +930,7 @@
         },
         "additionalProperties": false
       },
-      "UpdateTeacherRequestRequestQualification": {
+      "UpdateTeacherRequestQualification": {
         "type": "object",
         "properties": {
           "providerUkprn": {
