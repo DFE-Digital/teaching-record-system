@@ -70,7 +70,7 @@ namespace DqtApi.DataStore.Crm
                     Target = reviewTask
                 });
             }
-            else if(ittLookupFailed == UpdateTeacherFailedReasons.NoMatchingIttRecord)
+            else if (ittLookupFailed == UpdateTeacherFailedReasons.NoMatchingIttRecord)
             {
                 //create itt record & review task
                 txnRequest.Requests.Add(new UpsertRequest()
@@ -182,6 +182,7 @@ namespace DqtApi.DataStore.Crm
                         dfeta_qualification.Fields.dfeta_PersonId
                     });
 
+
                 await Task.WhenAll(
                     getTeacherTask,
                     getIttRecordsTask,
@@ -240,7 +241,6 @@ namespace DqtApi.DataStore.Crm
             public (dfeta_qualification Result, UpdateTeacherFailedReasons? FailedReason) SelectQualificationRecord(
             IEnumerable<dfeta_qualification> qualificationRecords)
             {
-                // Find an Qualification for provider.
                 var qualificationForProvider = qualificationRecords
                     .ToArray();
 
@@ -385,6 +385,7 @@ namespace DqtApi.DataStore.Crm
                     dfeta_HE_HEQualificationId = new EntityReference(dfeta_hequalification.EntityLogicalName, referenceData.QualificationId.Value),
                     dfeta_Type = dfeta_qualification_dfeta_Type.HigherEducation,
                     dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, TeacherId),
+                    dfeta_HE_EstablishmentId = referenceData.QualificationProviderId.HasValue ? new EntityReference(Account.EntityLogicalName, referenceData.QualificationProviderId.Value) : null,
                 };
 
                 if (id.HasValue)
@@ -478,11 +479,13 @@ namespace DqtApi.DataStore.Crm
                         CacheKeys.GetOrganizationByUkprnKey(ukprn),
                         _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn)));
 
-                var getQualificationProviderTask = Let(
-                    _command.Qualification.ProviderUkprn,
-                    ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetOrganizationByUkprnKey(ukprn),
-                        _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn)));
+                var getQualificationProviderTask = !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn) ?
+                     Let(
+                         _command.Qualification.ProviderUkprn,
+                         ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
+                             CacheKeys.GetOrganizationByUkprnKey(ukprn),
+                             _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn))) :
+                     null;
 
                 var getIttCountryTask = Let(
                     "XK",  // XK == 'United Kingdom'
@@ -544,17 +547,23 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
-                await Task.WhenAll(getIttProviderTask,
-                    getIttCountryTask,
-                    getSubject1Task,
-                    getSubject2Task,
-                    getSubject3Task,
-                    getQualificationTask,
-                    getQualificationCountryTask,
-                    getQualificationSubjectTask,
-                    getEarlyYearsStatusTask,
-                    getTeacherStatusTask,
-                    getQualificationProviderTask);
+
+                var lookupTasks = new Task[]
+                {
+                   getIttProviderTask,
+                   getIttCountryTask,
+                   getSubject1Task,
+                   getSubject2Task,
+                   getSubject3Task,
+                   getQualificationTask,
+                   getQualificationCountryTask,
+                   getQualificationSubjectTask,
+                   getEarlyYearsStatusTask,
+                   getTeacherStatusTask,
+                   getQualificationProviderTask
+                }
+                .Where(t => t != null);
+                await Task.WhenAll(lookupTasks); ;
 
                 Debug.Assert(!isEarlyYears || getEarlyYearsStatusTask.Result != null, "Early years status lookup failed.");
                 Debug.Assert(isEarlyYears || getTeacherStatusTask.Result != null, "Teacher status lookup failed.");
@@ -571,7 +580,7 @@ namespace DqtApi.DataStore.Crm
                     QualificationSubjectId = getQualificationSubjectTask.Result?.Id,
                     EarlyYearsStatusId = getEarlyYearsStatusTask.Result?.Id,
                     TeacherStatusId = getTeacherStatusTask.Result?.Id,
-                    QualificationProviderId = getQualificationProviderTask.Result?.Id,
+                    QualificationProviderId = getQualificationProviderTask?.Result?.Id,
                 };
             }
         }

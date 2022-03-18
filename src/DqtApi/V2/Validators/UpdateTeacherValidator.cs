@@ -45,10 +45,6 @@ namespace DqtApi.V2.Validators
                     }
                 });
 
-
-            RuleFor(r => r.Qualification.ProviderUkprn)
-                .NotEmpty();
-
             RuleFor(r => r.Qualification.Class)
                 .IsInEnum();
 
