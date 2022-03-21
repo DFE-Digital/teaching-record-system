@@ -38,19 +38,19 @@
               "schema": {
                 "$ref": "#/components/schemas/SetIttOutcomeRequest"
               },
-              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22","birthDate":"1950-01-01"}
+              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22"}
             },
             "text/json": {
               "schema": {
                 "$ref": "#/components/schemas/SetIttOutcomeRequest"
               },
-              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22","birthDate":"1950-01-01"}
+              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22"}
             },
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/SetIttOutcomeRequest"
               },
-              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22","birthDate":"1950-01-01"}
+              "example": {"ittProviderUkprn":"1001234","outcome":"Pass","assessmentDate":"2021-12-22"}
             }
           }
         },
@@ -805,7 +805,6 @@
       },
       "SetIttOutcomeRequest": {
         "required": [
-          "birthDate",
           "ittProviderUkprn",
           "outcome"
         ],
@@ -821,10 +820,6 @@
             "type": "string",
             "format": "date",
             "nullable": true
-          },
-          "birthDate": {
-            "type": "string",
-            "format": "date"
           }
         },
         "additionalProperties": false
