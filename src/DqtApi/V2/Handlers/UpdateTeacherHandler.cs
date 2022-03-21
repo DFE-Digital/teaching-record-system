@@ -103,7 +103,7 @@ namespace DqtApi.V2.Handlers
 
             ConsumeReason(
                 UpdateTeacherFailedReasons.QualificationProviderNotFound,
-                $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}",
+                $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.ProviderUkprn)}",
                 ErrorRegistry.OrganisationNotFound().Title);
 
             ConsumeReason(
