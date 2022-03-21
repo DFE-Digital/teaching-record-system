@@ -624,7 +624,7 @@ namespace DqtApi.DataStore.Crm
                 (FieldName: Contact.Fields.FirstName, Value: filter.FirstName),
                 (FieldName: Contact.Fields.MiddleName, Value: filter.MiddleName),
                 (FieldName: Contact.Fields.LastName, Value: filter.LastName),
-                (FieldName: Contact.Fields.BirthDate, Value: (object)filter.DateOfBirth),
+                (FieldName: Contact.Fields.BirthDate, Value: (object)(filter.DateOfBirth.HasValue ? filter.DateOfBirth.Value.ToDateTime() : null)),
                 (FieldName: Contact.Fields.dfeta_NINumber, Value: filter.NationalInsuranceNumber),
                 (FieldName: Contact.Fields.EMailAddress1, Value: filter.EmailAddress),
                 (FieldName: Contact.Fields.FirstName, Value: filter.PreviousFirstName),
