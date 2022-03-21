@@ -29,6 +29,7 @@ namespace DqtApi.V2.Requests
 
         [Required]
         [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true, Description = "DoB of teacher"), SwaggerSchema(Format = "date"), ModelBinder(typeof(ModelBinding.DateModelBinder))]
+        [JsonIgnore]
         public DateOnly? BirthDate { get; set; }
     }
 
@@ -39,8 +40,7 @@ namespace DqtApi.V2.Requests
             Trn = "1234567",
             IttProviderUkprn = "1001234",
             Outcome = IttOutcome.Pass,
-            AssessmentDate = new DateOnly(2021, 12, 22),
-            BirthDate = new DateOnly(1950,1,1)
+            AssessmentDate = new DateOnly(2021, 12, 22)
         };
     }
 }
