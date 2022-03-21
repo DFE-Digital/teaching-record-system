@@ -126,8 +126,8 @@ namespace DqtApi.DataStore.Crm
                 _command = command;
                 TeacherId = new Guid(command.TeacherId);
             }
-            public Guid TeacherId { get; }
 
+            public Guid TeacherId { get; }
 
             public async Task<SetIttResultForUpdateTeacherLookupResult> LookupData()
             {
@@ -182,7 +182,6 @@ namespace DqtApi.DataStore.Crm
                         dfeta_qualification.Fields.dfeta_PersonId
                     });
 
-
                 await Task.WhenAll(
                     getTeacherTask,
                     getIttRecordsTask,
@@ -195,7 +194,6 @@ namespace DqtApi.DataStore.Crm
                 Debug.Assert(getEarlyYearsTraineeStatusIdTask.Result != null, "'Early Years Trainee' early years status lookup failed");
                 Debug.Assert(getAorCandidateTeacherStatusIdTask.Result != null, "'AOR Candidate' teacher status lookup failed");
                 Debug.Assert(getTraineeTeacherDmsTeacherStatusIdTask.Result != null, "'Trainee Teacher:DMS' teacher status lookup failed");
-
 
                 return new SetIttResultForUpdateTeacherLookupResult()
                 {
@@ -435,7 +433,7 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= UpdateTeacherFailedReasons.QualificationSubjectNotFound;
                 }
 
-                if (referenceData.QualificationProviderId == null)
+                if (referenceData.QualificationProviderId == null && !string.IsNullOrEmpty(_command.Qualification.ProviderUkprn))
                 {
                     failedReasons |= UpdateTeacherFailedReasons.QualificationProviderNotFound;
                 }
