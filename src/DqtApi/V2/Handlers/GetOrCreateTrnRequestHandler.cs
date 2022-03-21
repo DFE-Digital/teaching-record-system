@@ -95,7 +95,7 @@ namespace DqtApi.V2.Handlers
                         ProviderUkprn = request.Qualification.ProviderUkprn,
                         CountryCode = request.Qualification.CountryCode,
                         Subject = request.Qualification.Subject,
-                        Class = request.Qualification.Class.Value.ConvertToClassDivision(),
+                        Class = request.Qualification.Class?.ConvertToClassDivision(),
                         Date = request.Qualification.Date.Value
                     }
                 });
