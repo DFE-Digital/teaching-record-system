@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using DqtApi.TestCommon;
+using DqtApi.V2.Responses;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -75,6 +77,30 @@ namespace DqtApi.Tests.V2.Operations
                 },
                 expectedStatusCode: StatusCodes.Status200OK);
         }
+
+        [Fact]
+        public async Task Given_find_with_no_search_parameters_return_empty_collection()
+        {
+            // Arrange
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+                .ReturnsAsync((Contact[])null);
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?dateOfBirth&emailAddress&firstName&ittProviderName&lastName&nationalInsuranceNumber");
+
+            // Act
+            var response = await HttpClient.SendAsync(request);
+
+            // Assert
+            await AssertEx.JsonResponseEquals(
+                response,
+                expected: new
+                {
+                    results = Enumerable.Empty<FindTeacherResult>()
+                },
+                expectedStatusCode: StatusCodes.Status200OK);
+        }
+
 
         [Theory]
         [InlineData("someProvider", "")]

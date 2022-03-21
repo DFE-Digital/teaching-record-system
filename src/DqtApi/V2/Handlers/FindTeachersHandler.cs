@@ -54,7 +54,7 @@ namespace DqtApi.V2.Handlers
 
             return new FindTeachersResponse()
             {
-                Results = result.Select(a => new FindTeacherResult()
+                Results = result?.Select(a => new FindTeacherResult()
                 {
                     Trn = a.dfeta_TRN,
                     EmailAddresses = !string.IsNullOrEmpty(a.EMailAddress1) ? new List<string> { a.EMailAddress1 } : null,
@@ -63,7 +63,7 @@ namespace DqtApi.V2.Handlers
                     DateOfBirth = a.BirthDate.HasValue ? DateOnly.FromDateTime(a.BirthDate.Value) : null,
                     NationalInsuranceNumber = a.dfeta_NINumber,
                     Uid = a.Id.ToString()
-                })
+                }) ?? Enumerable.Empty<FindTeacherResult>()
             };
         }
     }
