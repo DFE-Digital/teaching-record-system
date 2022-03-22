@@ -300,7 +300,10 @@ namespace DqtApi
                     new Uri(configuration["CrmUrl"]),
                     configuration["CrmClientId"],
                     configuration["CrmClientSecret"],
-                    useUniqueInstance: true);
+                    useUniqueInstance: true)
+                {
+                    EnableAffinityCookie = false
+                };
 
             void ConfigureRateLimitServices()
             {
