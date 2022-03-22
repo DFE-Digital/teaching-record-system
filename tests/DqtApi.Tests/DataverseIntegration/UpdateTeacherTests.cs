@@ -39,7 +39,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -76,7 +76,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -138,7 +138,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -200,7 +200,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -289,7 +289,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -385,7 +385,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -422,7 +422,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -459,7 +459,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -537,7 +537,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -636,7 +636,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -693,7 +693,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -739,7 +739,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -840,7 +840,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = "SOME INVALID",
@@ -882,7 +882,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = newIttProviderUkprn,
@@ -925,7 +925,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = newIttProviderUkprn,
@@ -1015,6 +1015,37 @@ namespace DqtApi.Tests.DataverseIntegration
                     Assert.Equal(dfeta_classdivision.Firstclasshonours, item1.dfeta_HE_ClassDivision);
                     Assert.Equal(new DateTime(2022, 01, 28), item1.dfeta_CompletionorAwardDate);
                 });
+        }
+
+        [Fact]
+        public async Task Given_update_without_qualification_returns_success()
+        {
+            // Arrange
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+
+            // Act
+            var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            {
+                TeacherId = teacherId,
+                InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+                {
+                    ProviderUkprn = ittProviderUkprn,
+                    ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                    ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                    ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                    Subject1 = "100366",  // computer science
+                    Subject2 = "100403",  // mathematics
+                    Subject3 = "100302",  // history
+                    AgeRangeFrom = dfeta_AgeRange._11,
+                    AgeRangeTo = dfeta_AgeRange._12
+                },
+                Qualification = null
+            });
+
+            // Assert
+            txnRequest.AssertDoesNotContainCreateRequest<dfeta_hequalification>();
+            txnRequest.AssertDoesNotContainUpdateRequest<dfeta_hequalification>();
+            txnRequest.AssertDoesNotContainUpsertRequest<dfeta_hequalification>();
         }
 
         private async Task<(Guid TeacherId, string IttProviderUkprn)> CreatePerson(

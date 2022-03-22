@@ -159,6 +159,28 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Fact]
+        public async Task Given_request_with_null_qualification_passes_request_to_DataverseAdapter_successfully()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var teacherId = Guid.NewGuid();
+            var trn = "1234567";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+                .Verifiable();
+
+            var request = CreateRequest(req => req.Qualification = null);
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+        }
+
+        [Fact]
         public async Task Given_invalid_itt_provider_returns_error()
         {
             // Arrange
@@ -295,7 +317,6 @@ namespace DqtApi.Tests.V2.Operations
                 propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.ProviderUkprn)}",
                 expectedError: Properties.StringResources.Errors_10008_Title);
         }
-
 
         [Theory]
         [InlineData(1900,1,1)]

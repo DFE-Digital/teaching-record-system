@@ -5,11 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
-using DqtApi.DataStore.Sql;
-using DqtApi.Security;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
-using DqtApi.V2.Responses;
 using DqtApi.Validation;
 using FluentValidation;
 using FluentValidation.Results;
@@ -21,9 +18,7 @@ namespace DqtApi.V2.Handlers
     {
         private readonly IDataverseAdapter _dataverseAdapter;
 
-        public UpdateTeacherHandler(
-            IDataverseAdapter dataverseAdapter,
-            ICurrentClientProvider currentClientProvider)
+        public UpdateTeacherHandler(IDataverseAdapter dataverseAdapter)
         {
             _dataverseAdapter = dataverseAdapter;
         }
@@ -31,6 +26,7 @@ namespace DqtApi.V2.Handlers
         public async Task<Unit> Handle(UpdateTeacherRequest request, CancellationToken cancellationToken)
         {
             var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, activeOnly: true)).ToArray();
+
             if (teachers.Length == 0)
             {
                 throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
@@ -42,7 +38,7 @@ namespace DqtApi.V2.Handlers
 
             var updateTeacherResult = await _dataverseAdapter.UpdateTeacher(new UpdateTeacherCommand()
             {
-                TeacherId = teachers[0].Id.ToString(),
+                TeacherId = teachers[0].Id,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = request.InitialTeacherTraining.ProviderUkprn,
@@ -55,20 +51,23 @@ namespace DqtApi.V2.Handlers
                     AgeRangeFrom = request.InitialTeacherTraining.AgeRangeFrom.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeFrom.Value) : null,
                     AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null,
                 },
-                Qualification = new UpdateTeacherCommandQualification()
-                {
-                    ProviderUkprn = request.Qualification.ProviderUkprn,
-                    CountryCode = request.Qualification.CountryCode,
-                    Subject = request.Qualification.Subject,
-                    Class = request.Qualification.Class?.ConvertToClassDivision(),
-                    Date = request.Qualification.Date
-                }
+                Qualification = request.Qualification != null ?
+                    new UpdateTeacherCommandQualification()
+                    {
+                        ProviderUkprn = request.Qualification.ProviderUkprn,
+                        CountryCode = request.Qualification.CountryCode,
+                        Subject = request.Qualification.Subject,
+                        Class = request.Qualification.Class?.ConvertToClassDivision(),
+                        Date = request.Qualification.Date
+                    } :
+                    null
             });
 
             if (!updateTeacherResult.Succeeded)
             {
                 throw CreateValidationExceptionFromFailedReasons(updateTeacherResult.FailedReasons);
             }
+
             return Unit.Value;
         }
 
