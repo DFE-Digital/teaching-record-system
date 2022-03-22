@@ -22,6 +22,24 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Fact]
+        public async Task Given_missing_initialteachertraining_providerukprn_returns_error()
+        {
+            // Arrange
+            var trn = "1234567";
+
+            // Act
+            var response = await HttpClient.PatchAsync(
+                $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+                CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ""));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}",
+                expectedError: "Initial TeacherTraining ProviderUkprn is required.");
+        }
+
+        [Fact]
         public async Task Given_missing_birthdate_returns_error()
         {
             // Arrange
