@@ -12,6 +12,7 @@ using DqtApi.Json;
 using DqtApi.Logging;
 using DqtApi.ModelBinding;
 using DqtApi.Security;
+using DqtApi.Services;
 using DqtApi.Swagger;
 using DqtApi.Validation;
 using FluentValidation.AspNetCore;
@@ -199,6 +200,7 @@ namespace DqtApi
             services.AddSingleton<IClock, Clock>();
             services.AddMemoryCache();
             services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
+            services.AddSingleton<IWebApiAdapter, WebApiAdapter>();
 
             services.AddDbContext<DqtContext>(options =>
             {
@@ -221,6 +223,11 @@ namespace DqtApi
             {
                 ConfigureRateLimitServices();
                 ConfigureRedisServices();
+
+                if (Environment.GetEnvironmentVariable("CF_INSTANCE_INDEX") == "0")
+                {
+                    services.AddSingleton<IHostedService, LogRemainingCrmLimitsService>();
+                }
             }
 
             MetricLabels.ConfigureLabels(builder.Configuration);
@@ -297,7 +304,10 @@ namespace DqtApi
                     new Uri(configuration["CrmUrl"]),
                     configuration["CrmClientId"],
                     configuration["CrmClientSecret"],
-                    useUniqueInstance: true);
+                    useUniqueInstance: true)
+                {
+                    EnableAffinityCookie = false
+                };
 
             void ConfigureRateLimitServices()
             {
