@@ -111,49 +111,59 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Theory]
-        [InlineData(dfeta_ITTResult.Deferred)]
+        [InlineData(dfeta_ITTResult.Fail)]
         [InlineData(dfeta_ITTResult.DeferredforSkillsTests)]
-        [InlineData(dfeta_ITTResult.Fail)]
-        [InlineData(dfeta_ITTResult.Withdrawn)]
-        public async Task Given_valid_request_with_non_Pass_result_clears_TeacherStatusId(dfeta_ITTResult ittResult)
-        {
-            // Arrange
-            var (teacherId, _, _, ittProviderUkprn) = await CreatePerson(earlyYears: false);
-
-            // Act
-            var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
-                teacherId,
-                ittProviderUkprn,
-                ittResult,
-                assessmentDate: null);
-
-            // Assert
-            Assert.True(result.Succeeded);
-
-            var qtsUpdate = transactionRequest.AssertSingleUpdateRequest<dfeta_qtsregistration>();
-            Assert.Null(qtsUpdate.Attributes[dfeta_qtsregistration.Fields.dfeta_TeacherStatusId]);
-        }
-
-        [Theory]
-        [InlineData(dfeta_ITTResult.Fail)]
-        [InlineData(dfeta_ITTResult.Withdrawn)]
-        public async Task Given_valid_request_with_Fail_or_Withdrawn_result_for_early_years_clears_EarlyYearsStatusId(dfeta_ITTResult ittResult)
+        [InlineData(dfeta_ITTResult.Deferred)]
+        public async Task Given_valid_request_with_non_withdrawn_result_for_early_years_does_not_clear_earlyyearsstatusid(dfeta_ITTResult ittResult)
         {
             // Arrange
             var (teacherId, _, _, ittProviderUkprn) = await CreatePerson(earlyYears: true);
 
             // Act
-            var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
                 teacherId,
                 ittProviderUkprn,
                 ittResult,
                 assessmentDate: null);
+            var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(teacherId,
+                columnNames: new[]
+                {
+                    dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
+                    dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
+                    dfeta_qtsregistration.Fields.StateCode
+                });
 
             // Assert
             Assert.True(result.Succeeded);
+            Assert.NotNull(qts[0].dfeta_EarlyYearsStatusId?.Id);
+        }
 
-            var qtsUpdate = transactionRequest.AssertSingleUpdateRequest<dfeta_qtsregistration>();
-            Assert.Null(qtsUpdate.Attributes[dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId]);
+        [Theory]
+        [InlineData(dfeta_ITTResult.Fail)]
+        [InlineData(dfeta_ITTResult.DeferredforSkillsTests)]
+        [InlineData(dfeta_ITTResult.Deferred)]
+        public async Task Given_valid_request_with_non_withdrawn_result_for_teacher_does_not_clear_teacherstatusid(dfeta_ITTResult ittResult)
+        {
+            // Arrange
+            var (teacherId, _, _, ittProviderUkprn) = await CreatePerson(earlyYears: false);
+
+            // Act
+            var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+                teacherId,
+                ittProviderUkprn,
+                ittResult,
+                assessmentDate: null);
+            var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(teacherId,
+                columnNames: new[]
+                {
+                    dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
+                    dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
+                    dfeta_qtsregistration.Fields.StateCode
+                });
+
+            // Assert
+            Assert.True(result.Succeeded);
+            Assert.NotNull(qts[0].dfeta_TeacherStatusId?.Id);
         }
 
         [Theory]
@@ -215,7 +225,47 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Null(failedReason);
         }
 
-        // SelectQtsRecord
+        [Fact]
+        public async Task Given_earlyyears_teacher_is_withdrawn_earlyyearsstatusid_is_set_to_null()
+        {
+            // Arrange
+            var (teacherId, _, qtsId, ittProviderUkprn) = await CreatePerson(earlyYears: true);
+            var ittResult = dfeta_ITTResult.Withdrawn;
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+                teacherId,
+                ittProviderUkprn,
+                ittResult,
+                null);
+
+            // Assert
+            Assert.True(result.Succeeded);
+            var qtsUpdate = transactionRequest.AssertSingleUpdateRequest<dfeta_qtsregistration>();
+            Assert.Equal(qtsId, qtsUpdate.Id);
+            Assert.Null(qtsUpdate.dfeta_EarlyYearsStatusId?.Id);
+        }
+
+        [Fact]
+        public async Task Given_teacher_is_withdrawn_teacherstatusid_is_set_to_null()
+        {
+            // Arrange
+            var (teacherId, _, qtsId, ittProviderUkprn) = await CreatePerson(earlyYears: false);
+            var ittResult = dfeta_ITTResult.Withdrawn;
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+                teacherId,
+                ittProviderUkprn,
+                ittResult,
+                null);
+
+            // Assert
+            Assert.True(result.Succeeded);
+            var qtsUpdate = transactionRequest.AssertSingleUpdateRequest<dfeta_qtsregistration>();
+            Assert.Equal(qtsId, qtsUpdate.Id);
+            Assert.Null(qtsUpdate.dfeta_TeacherStatusId?.Id);
+        }
 
         public static class SelectIttRecordTestData
         {

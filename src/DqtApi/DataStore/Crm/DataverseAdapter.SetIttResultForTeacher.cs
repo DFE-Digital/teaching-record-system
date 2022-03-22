@@ -162,11 +162,12 @@ namespace DqtApi.DataStore.Crm
             }
             else
             {
-                qtsUpdate.Attributes[dfeta_qtsregistration.Fields.dfeta_TeacherStatusId] = null;
-
-                if ((result == dfeta_ITTResult.Fail || result == dfeta_ITTResult.Withdrawn) && isEarlyYears)
+                if (result == dfeta_ITTResult.Withdrawn)
                 {
-                    qtsUpdate.Attributes[dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId] = null;
+                    if (isEarlyYears)
+                        qtsUpdate.Attributes[dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId] = null;
+                    else
+                        qtsUpdate.Attributes[dfeta_qtsregistration.Fields.dfeta_TeacherStatusId] = null;
                 }
             }
 
