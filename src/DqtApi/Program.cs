@@ -199,6 +199,7 @@ namespace DqtApi
             services.AddSingleton<IClock, Clock>();
             services.AddMemoryCache();
             services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
+            services.AddSingleton<IWebApiAdapter, WebApiAdapter>();
 
             services.AddDbContext<DqtContext>(options =>
             {
