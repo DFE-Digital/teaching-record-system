@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
@@ -33,19 +34,12 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_update_without_providing_qualification_ukprn_returns_success()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
-
-            var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
-            var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
-            var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
-            var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
             // Act
-            var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -72,9 +66,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_existing_itt_update_programmetype_from_qts_to_another_qts_programmetype_succeeds()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
             var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
             var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
@@ -84,7 +76,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -107,7 +99,6 @@ namespace DqtApi.Tests.DataverseIntegration
                 }
             });
 
-            var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
             var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 teacherId,
                 columnNames: new[]
@@ -127,21 +118,17 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.True(result.Succeeded);
-            Assert.Collection(itt,
-                item1 =>
-                {
-                    Assert.Equal(dfeta_ITTProgrammeType.RegisteredTeacherProgramme, item1.dfeta_ProgrammeType);
-                }
-            );
+
+            Assert.Collection(
+                itt,
+                item1 => Assert.Equal(dfeta_ITTProgrammeType.RegisteredTeacherProgramme, item1.dfeta_ProgrammeType));
         }
 
         [Fact]
         public async Task Given_existing_itt_update_programmetype_from_eyts_to_another_eyts_programmetype_succeeds()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
             var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
@@ -151,7 +138,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -174,7 +161,6 @@ namespace DqtApi.Tests.DataverseIntegration
                 }
             });
 
-            var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
             var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 teacherId,
                 columnNames: new[]
@@ -194,21 +180,17 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.True(result.Succeeded);
-            Assert.Collection(itt,
-                item1 =>
-                {
-                    Assert.Equal(dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased, item1.dfeta_ProgrammeType);
-                }
-            );
+
+            Assert.Collection(
+                itt,
+                item1 => Assert.Equal(dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased, item1.dfeta_ProgrammeType));
         }
 
         [Fact]
         public async Task Given_updating_existing_contact_update_without_subject3_returns_success()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
             var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
@@ -218,7 +200,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -241,6 +223,7 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
+
             var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
                 columnNames: new[]
@@ -254,6 +237,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
                     dfeta_qualification.Fields.dfeta_HE_CountryId,
                 });
+
             var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 teacherId,
                 columnNames: new[]
@@ -274,7 +258,9 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.True(result.Succeeded);
-            Assert.Collection(itt,
+
+            Assert.Collection(
+                itt,
                 item1 =>
                 {
                     Assert.Equal(oldProvider, item1.dfeta_EstablishmentId.Id);
@@ -285,17 +271,14 @@ namespace DqtApi.Tests.DataverseIntegration
                     Assert.Equal(updateIttSubject1Id.Id, item1.dfeta_Subject1Id.Id);
                     Assert.Equal(updateIttSubject2Id.Id, item1.dfeta_Subject2Id.Id);
                     Assert.Null(item1.dfeta_Subject3Id);
-                }
-            );
+                });
         }
 
         [Fact]
         public async Task Given_existing_contact_update_itt_and_qualification_returns_success()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
             var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
@@ -306,7 +289,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -330,6 +313,7 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
+
             var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
                 columnNames: new[]
@@ -343,6 +327,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
                     dfeta_qualification.Fields.dfeta_HE_CountryId,
                 });
+
             var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 teacherId,
                 columnNames: new[]
@@ -363,7 +348,9 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.True(result.Succeeded);
-            Assert.Collection(itt,
+
+            Assert.Collection(
+                itt,
                 item1 =>
                 {
                     Assert.Equal(oldProvider, item1.dfeta_EstablishmentId.Id);
@@ -376,7 +363,9 @@ namespace DqtApi.Tests.DataverseIntegration
                     Assert.Equal(updateIttSubject3Id.Id, item1.dfeta_Subject3Id.Id);
                 }
             );
-            Assert.Collection(qualifications,
+
+            Assert.Collection(
+                qualifications,
                 item1 =>
                 {
                     Assert.Equal(updatedHeCountryId.Id, item1.dfeta_HE_CountryId.Id);
@@ -391,14 +380,12 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_update_itt_and_qualification_with_noactive_sanctions_does_not_create_crm_task_and_returns_success_w()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -430,14 +417,12 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_qts_itt_cannot_change_qts_programmetype_to_eyts_programmetype()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
             // Act
             var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -469,14 +454,12 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_earlyyears_itt_cannot_change_eyts_programmetype_to_qts()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             // Act
             var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -508,9 +491,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_two_or_more_qualifications_create_new_qualification_and_warning_crm_task()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             var countryId = await _dataverseAdapter.GetCountry("XK");
             var qualificationSubject1Id = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
@@ -556,7 +537,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -600,7 +581,8 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal("Notification for QTS unit - Register: matched record holds multiple qualifications", crmTask.Category);
             Assert.Equal("Register: multiple qualifications", crmTask.Subject);
 
-            Assert.Collection(qualifications,
+            Assert.Collection(
+                qualifications,
                 item1 =>
                 {
                     Assert.Equal(providerId.Id, item1.dfeta_HE_EstablishmentId.Id);
@@ -621,9 +603,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_there_are_no_records_matched_create_new_itt_and_warning_crm_task()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             // mark existing itt record as inactive
             var existingItt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
@@ -643,25 +623,20 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
                     dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
                 });
-            var entity = existingItt.FirstOrDefault();
-            await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
+
+            var entity = existingItt.Single();
+
+            await _organizationService.ExecuteAsync(new SetStateRequest()
             {
-                Requests = new()
-                {
-                    new SetStateRequest()
-                    {
-                        EntityMoniker = new EntityReference(dfeta_initialteachertraining.EntityLogicalName, entity.Id),
-                        State = new OptionSetValue(1),  // Inactive
-                        Status = new OptionSetValue(2)
-                    }
-                },
-                ReturnResponses = true
+                EntityMoniker = new EntityReference(dfeta_initialteachertraining.EntityLogicalName, entity.Id),
+                State = new OptionSetValue(1),  // Inactive
+                Status = new OptionSetValue(2)
             });
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -685,23 +660,6 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             var crmTask = transactionRequest.AssertSingleCreateRequest<CrmTask>();
-            var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
-                teacherId,
-                columnNames: new[]
-                {
-                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
-                    dfeta_initialteachertraining.Fields.dfeta_Result,
-                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
-                    dfeta_initialteachertraining.Fields.StateCode,
-                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
-                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
-                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
-                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
-                    dfeta_initialteachertraining.Fields.dfeta_Result,
-                    dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
-                    dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
-                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
-                });
 
             // Assert
             Assert.True(result.Succeeded);
@@ -714,37 +672,28 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_two_or_more_itt_earlyyears_records_match_create_new_itt_and_warning_crm_task()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             var providerId = await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn);
 
             // Create second Itt record
-            await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
+            await _organizationService.ExecuteAsync(new CreateRequest()
             {
-                Requests = new()
+                Target = new dfeta_initialteachertraining()
                 {
-                    new CreateRequest()
-                    {
-                        Target = new dfeta_initialteachertraining()
-                        {
-                            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
-                            dfeta_EstablishmentId = new EntityReference(Account.EntityLogicalName, providerId.Id),
-                            dfeta_ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
-                            dfeta_Result = dfeta_ITTResult.InTraining,
-                            dfeta_AgeRangeFrom = dfeta_AgeRange._00,
-                            dfeta_AgeRangeTo = dfeta_AgeRange._18
-                        }
-                    }
-                },
-                ReturnResponses = true
+                    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+                    dfeta_EstablishmentId = new EntityReference(Account.EntityLogicalName, providerId.Id),
+                    dfeta_ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
+                    dfeta_Result = dfeta_ITTResult.InTraining,
+                    dfeta_AgeRangeFrom = dfeta_AgeRange._00,
+                    dfeta_AgeRangeTo = dfeta_AgeRange._18
+                }
             });
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -768,22 +717,6 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             var crmTask = transactionRequest.AssertSingleCreateRequest<CrmTask>();
-            var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
-                teacherId,
-                columnNames: new[]
-                {
-                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
-                    dfeta_initialteachertraining.Fields.dfeta_Result,
-                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
-                    dfeta_initialteachertraining.Fields.StateCode,
-                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
-                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
-                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
-                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
-                    dfeta_initialteachertraining.Fields.dfeta_Result,
-                    dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
-                    dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
-                });
 
             // Assert
             Assert.True(result.Succeeded);
@@ -796,9 +729,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_existing_contact_update_itt_and_qualification_with_existing_active_sanction_returns_success_and_creates_crm_task()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: true);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: true);
 
             var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
             var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
@@ -808,7 +739,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = ittProviderUkprn,
@@ -832,6 +763,7 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
+
             var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
                 columnNames: new[]
@@ -845,6 +777,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
                     dfeta_qualification.Fields.dfeta_HE_CountryId,
                 });
+
             var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 teacherId,
                 columnNames: new[]
@@ -864,7 +797,9 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.True(result.Succeeded);
-            Assert.Collection(itt,
+
+            Assert.Collection(
+                itt,
                 item1 =>
                 {
                     Assert.Equal(oldProvider, item1.dfeta_EstablishmentId.Id);
@@ -876,7 +811,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Assert.Equal(updateIttSubject2Id.Id, item1.dfeta_Subject2Id.Id);
                 }
             );
-            Assert.Collection(qualifications,
+            Assert.Collection(
+                qualifications,
                 item1 =>
                 {
                     Assert.Equal(updatedHeCountryId.Id, item1.dfeta_HE_CountryId.Id);
@@ -899,14 +835,12 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_update_with_unknown_itt_provider_request_fails()
         {
             // Arrange
-            var (teacherId, _,
-                _, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             // Act
             var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = "SOME INVALID",
@@ -941,16 +875,14 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_Invalid_reference_data_request_fails(string ittSubject1, string ittSubject2, string ittSubject3, string qualificationCountryCode, string qualificationSubject)
         {
             // Arrange
-            var (teacherId, _,
-                _, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             var newIttProviderUkprn = "10045988";
 
             // Act
             var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = newIttProviderUkprn,
@@ -981,9 +913,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_existing_itt_and_qualification_create_new_itt_for_new_provider_and_update_exisitng_qualification_succeeds()
         {
             // Arrange
-            var (teacherId, _,
-                ittProviderUkprn, _, _,
-                _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
             var newIttProviderUkprn = "10045988";
             var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
@@ -995,7 +925,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
-                TeacherId = teacherId.ToString(),
+                TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = newIttProviderUkprn,
@@ -1021,6 +951,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
             var newProviderProvider = (await _dataverseAdapter.GetOrganizationByUkprn(newIttProviderUkprn)).Id;
+
             var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
                 columnNames: new[]
@@ -1034,6 +965,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
                     dfeta_qualification.Fields.dfeta_HE_CountryId,
                 });
+
             var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 teacherId,
                 columnNames: new[]
@@ -1054,7 +986,9 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.True(result.Succeeded);
-            Assert.Collection(itt,
+
+            Assert.Collection(
+                itt,
                 item1 =>
                 {
                     Assert.Equal(oldProvider, item1.dfeta_EstablishmentId.Id);
@@ -1070,7 +1004,9 @@ namespace DqtApi.Tests.DataverseIntegration
                     Assert.Equal(updateIttSubject3Id.Id, item2.dfeta_Subject3Id.Id);
                 }
             );
-            Assert.Collection(qualifications,
+
+            Assert.Collection(
+                qualifications,
                 item1 =>
                 {
                     Assert.Equal(updatedHeCountryId.Id, item1.dfeta_HE_CountryId.Id);
@@ -1081,12 +1017,42 @@ namespace DqtApi.Tests.DataverseIntegration
                 });
         }
 
-        private async Task<(Guid TeacherId, Guid IttId, string IttProviderUkprn, Guid qualificationId, Guid? sanctionId, string qualificationProviderUkprn)> CreatePerson(
+        [Fact]
+        public async Task Given_update_without_qualification_returns_success()
+        {
+            // Arrange
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+
+            // Act
+            var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            {
+                TeacherId = teacherId,
+                InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+                {
+                    ProviderUkprn = ittProviderUkprn,
+                    ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                    ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                    ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                    Subject1 = "100366",  // computer science
+                    Subject2 = "100403",  // mathematics
+                    Subject3 = "100302",  // history
+                    AgeRangeFrom = dfeta_AgeRange._11,
+                    AgeRangeTo = dfeta_AgeRange._12
+                },
+                Qualification = null
+            });
+
+            // Assert
+            txnRequest.AssertDoesNotContainCreateRequest<dfeta_hequalification>();
+            txnRequest.AssertDoesNotContainUpdateRequest<dfeta_hequalification>();
+            txnRequest.AssertDoesNotContainUpsertRequest<dfeta_hequalification>();
+        }
+
+        private async Task<(Guid TeacherId, string IttProviderUkprn)> CreatePerson(
             bool earlyYears,
             bool assessmentOnly = false,
             bool hasActiveSanctions = false)
         {
-            var sanctionId = default(Guid?);
             var teacherId = Guid.NewGuid();
 
             var programmeType = earlyYears ? dfeta_ITTProgrammeType.EYITTAssessmentOnly :
@@ -1109,89 +1075,78 @@ namespace DqtApi.Tests.DataverseIntegration
             var subject = (await _dataverseAdapter.GetHeSubjectByCode("100366"));  // computer science
             var qualification = (await _dataverseAdapter.GetHeQualificationByName("First Degree"));
 
-            var txnResponse = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
+            var requestBuilder = _dataverseAdapter.CreateTransactionRequestBuilder();
+
+            requestBuilder.AddRequest<CreateResponse>(new CreateRequest()
             {
-                Requests = new()
+                Target = new Contact()
                 {
-                    new CreateRequest()
-                    {
-                        Target = new Contact()
-                        {
-                            Id = teacherId,
-                            BirthDate = new DateTime(1990, 4, 1)
-                        }
-                    },
-                    new UpdateRequest()
-                    {
-                        Target = new Contact()
-                        {
-                            Id = teacherId,
-                            dfeta_TRNAllocateRequest = DateTime.UtcNow
-                        }
-                    },
-                    new CreateRequest()
-                    {
-                        Target = new dfeta_initialteachertraining()
-                        {
-                            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
-                            dfeta_EstablishmentId = new EntityReference(Account.EntityLogicalName, ittProviderId),
-                            dfeta_ProgrammeType = programmeType,
-                            dfeta_Result = assessmentOnly ? dfeta_ITTResult.UnderAssessment : dfeta_ITTResult.InTraining,
-                            dfeta_AgeRangeFrom = dfeta_AgeRange._00,
-                            dfeta_AgeRangeTo = dfeta_AgeRange._18
-                        }
-                    },
-                    new CreateRequest()
-                    {
-                        Target = new dfeta_qtsregistration()
-                        {
-                            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
-                            dfeta_EarlyYearsStatusId = earlyYearsStatusId.HasValue ? new EntityReference(dfeta_earlyyearsstatus.EntityLogicalName, earlyYearsStatusId.Value) : null,
-                            dfeta_TeacherStatusId = teacherStatusId.HasValue ? new EntityReference(dfeta_teacherstatus.EntityLogicalName, teacherStatusId.Value) : null
-                        }
-                    },
-                    new CreateRequest()
-                    {
-                        Target = new dfeta_qualification()
-                        {
-                            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
-                            dfeta_HE_CountryId = new EntityReference(dfeta_qualification.EntityLogicalName, countryCodeId),
-                            dfeta_HE_EstablishmentId = new EntityReference(Account.EntityLogicalName, ittProviderId),
-                            dfeta_Type = dfeta_qualification_dfeta_Type.HigherEducation,
-                            dfeta_HE_ClassDivision = dfeta_classdivision.Pass,
-                            dfeta_HE_CompletionDate = DateTime.Now.AddMonths(-1),
-                            dfeta_HE_HESubject1Id = new EntityReference(dfeta_hesubject.EntityLogicalName, subject.Id),
-                            dfeta_HE_HEQualificationId = new EntityReference(dfeta_hequalification.EntityLogicalName, qualification.Id)
-                        }
-                    }
-                },
-                ReturnResponses = true
+                    Id = teacherId,
+                    BirthDate = new DateTime(1990, 4, 1)
+                }
+            });
+
+            requestBuilder.AddRequest<UpdateResponse>(new UpdateRequest()
+            {
+                Target = new Contact()
+                {
+                    Id = teacherId,
+                    dfeta_TRNAllocateRequest = DateTime.UtcNow
+                }
+            });
+
+            requestBuilder.AddRequest<CreateResponse>(new CreateRequest()
+            {
+                Target = new dfeta_initialteachertraining()
+                {
+                    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+                    dfeta_EstablishmentId = new EntityReference(Account.EntityLogicalName, ittProviderId),
+                    dfeta_ProgrammeType = programmeType,
+                    dfeta_Result = assessmentOnly ? dfeta_ITTResult.UnderAssessment : dfeta_ITTResult.InTraining,
+                    dfeta_AgeRangeFrom = dfeta_AgeRange._00,
+                    dfeta_AgeRangeTo = dfeta_AgeRange._18
+                }
+            });
+
+            requestBuilder.AddRequest<CreateResponse>(new CreateRequest()
+            {
+                Target = new dfeta_qtsregistration()
+                {
+                    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+                    dfeta_EarlyYearsStatusId = earlyYearsStatusId.HasValue ? new EntityReference(dfeta_earlyyearsstatus.EntityLogicalName, earlyYearsStatusId.Value) : null,
+                    dfeta_TeacherStatusId = teacherStatusId.HasValue ? new EntityReference(dfeta_teacherstatus.EntityLogicalName, teacherStatusId.Value) : null
+                }
+            });
+
+            requestBuilder.AddRequest<CreateResponse>(new CreateRequest()
+            {
+                Target = new dfeta_qualification()
+                {
+                    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+                    dfeta_HE_CountryId = new EntityReference(dfeta_qualification.EntityLogicalName, countryCodeId),
+                    dfeta_HE_EstablishmentId = new EntityReference(Account.EntityLogicalName, ittProviderId),
+                    dfeta_Type = dfeta_qualification_dfeta_Type.HigherEducation,
+                    dfeta_HE_ClassDivision = dfeta_classdivision.Pass,
+                    dfeta_HE_CompletionDate = DateTime.Now.AddMonths(-1),
+                    dfeta_HE_HESubject1Id = new EntityReference(dfeta_hesubject.EntityLogicalName, subject.Id),
+                    dfeta_HE_HEQualificationId = new EntityReference(dfeta_hequalification.EntityLogicalName, qualification.Id)
+                }
             });
 
             if (hasActiveSanctions)
             {
-                var sanctionsResponse = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
+                requestBuilder.AddRequest<CreateResponse>(new CreateRequest()
                 {
-                    Requests = new()
+                    Target = new dfeta_sanction()
                     {
-                        new CreateRequest()
-                        {
-                            Target = new dfeta_sanction()
-                            {
-                                dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
-                            },
-                        }
+                        dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
                     },
-                    ReturnResponses = true
                 });
-
-                sanctionId = ((CreateResponse)sanctionsResponse.Responses[0]).id;
             }
 
-            var ittId = ((CreateResponse)txnResponse.Responses[2]).id;
-            var qtsId = ((CreateResponse)txnResponse.Responses[3]).id;
-            var qualificationId = ((CreateResponse)txnResponse.Responses[4]).id;
-            return (teacherId, ittId, ittProviderUkprn, qualificationId, sanctionId, ittProviderUkprn);
+            await requestBuilder.Execute();
+
+            return (teacherId, ittProviderUkprn);
         }
     }
 }

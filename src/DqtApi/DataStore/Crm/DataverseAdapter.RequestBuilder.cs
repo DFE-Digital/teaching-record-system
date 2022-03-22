@@ -23,7 +23,7 @@ namespace DqtApi.DataStore.Crm
         /// var response2 = request2.GetResponse();
         /// </code>
         /// </example>
-        private class RequestBuilder
+        public class RequestBuilder
         {
             private readonly IOrganizationServiceAsync _organizationService;
             private readonly RequestType _requestType;

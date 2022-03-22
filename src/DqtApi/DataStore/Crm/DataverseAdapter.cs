@@ -678,10 +678,10 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(entity => entity.ToEntity<Contact>()).ToArray();
         }
 
-        private RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);
+        public RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);
 
-        private RequestBuilder CreateSingleRequestBuilder() => RequestBuilder.CreateSingle(_service);
+        public RequestBuilder CreateSingleRequestBuilder() => RequestBuilder.CreateSingle(_service);
 
-        private RequestBuilder CreateTransactionRequestBuilder() => RequestBuilder.CreateTransaction(_service);
+        public RequestBuilder CreateTransactionRequestBuilder() => RequestBuilder.CreateTransaction(_service);
     }
 }

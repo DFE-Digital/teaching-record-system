@@ -5,7 +5,7 @@ namespace DqtApi.DataStore.Crm
 {
     public class UpdateTeacherCommand
     {
-        public string TeacherId { get; set; }
+        public Guid TeacherId { get; set; }
         public UpdateTeacherCommandInitialTeacherTraining InitialTeacherTraining { get; set; }
         public UpdateTeacherCommandQualification Qualification { get; set; }
         public DateOnly BirthDate { get; set; }

@@ -56,6 +56,14 @@ namespace DqtApi.Tests
                 request => request is UpdateRequest updateRequest && updateRequest.Target is TEntity);
         }
 
+        public static void AssertDoesNotContainUpsertRequest<TEntity>(this ExecuteTransactionRequest request)
+            where TEntity : Entity
+        {
+            Assert.DoesNotContain(
+                request.Requests,
+                request => request is UpsertRequest upsertRequest && upsertRequest.Target is TEntity);
+        }
+
         public static void AssertContainsRequest<TRequest>(this ExecuteTransactionRequest request, Predicate<TRequest> filter)
         {
             var requests = request.Requests.OfType<TRequest>();

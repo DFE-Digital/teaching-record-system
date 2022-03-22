@@ -251,6 +251,35 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Fact]
+        public async Task Given_valid_update_without_qualification_succeeds()
+        {
+            // Arrange
+            var trn = "123456";
+            var contact = new Contact() { Id = Guid.NewGuid() };
+            var contactList = new[] { contact };
+            var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
+            var dob = new DateOnly(1987, 01, 01);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                    .ReturnsAsync(contactList);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                    .ReturnsAsync(result);
+
+            var request = CreateRequest(req => req.Qualification = null);
+
+            // Act
+            var response = await HttpClient.PatchAsync(
+                $"v2/teachers/update/{trn}?birthdate={dob:yyyy-MM-dd}",
+                request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+        }
+
+        [Fact]
         public async Task Given_valid_update_succeeds_return_nocontent()
         {
             // Arrange
@@ -305,7 +334,6 @@ namespace DqtApi.Tests.V2.Operations
                 expectedErrorPropertyName,
                 expectedErrorMessage);
         }
-
 
         [Fact]
         public async Task Given_a_teacher_that_does_not_exist_returns_notfound()
