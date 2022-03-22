@@ -34,7 +34,7 @@ namespace DqtApi.V2.Handlers
             }
 
             var teacherId = teachers[0].Id;
-            var ittResult = request.Outcome.ConvertToITTResult();
+            var ittResult = request.Outcome.Value.ConvertToITTResult();
 
             var result = await _dataverseAdapter.SetIttResultForTeacher(
                 teacherId,

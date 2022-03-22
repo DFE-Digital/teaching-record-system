@@ -22,7 +22,7 @@ namespace DqtApi.V2.Requests
         public string IttProviderUkprn { get; set; }
 
         [Required]
-        public IttOutcome Outcome { get; set; }
+        public IttOutcome? Outcome { get; set; }
 
         [SwaggerParameter(description: $"The assessment date for a {nameof(IttOutcome.Pass)} outcome.")]
         public DateOnly? AssessmentDate { get; set; }

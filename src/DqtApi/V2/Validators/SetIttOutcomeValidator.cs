@@ -25,6 +25,10 @@ namespace DqtApi.V2.Validators
                     .WithMessage("Assessment date cannot be specified unless outcome is Pass.")
                 .LessThanOrEqualTo(clock.Today)
                     .WithMessage($"QTS date cannot be in the future.");
+
+            RuleFor(c => c.Outcome)
+                .NotNull()
+                .IsInEnum();
         }
     }
 }
