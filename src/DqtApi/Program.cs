@@ -12,6 +12,7 @@ using DqtApi.Json;
 using DqtApi.Logging;
 using DqtApi.ModelBinding;
 using DqtApi.Security;
+using DqtApi.Services;
 using DqtApi.Swagger;
 using DqtApi.Validation;
 using FluentValidation.AspNetCore;
@@ -200,6 +201,7 @@ namespace DqtApi
             services.AddMemoryCache();
             services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
             services.AddSingleton<IWebApiAdapter, WebApiAdapter>();
+            services.AddSingleton<IHostedService, LogRemainingCrmLimitsService>();
 
             services.AddDbContext<DqtContext>(options =>
             {
