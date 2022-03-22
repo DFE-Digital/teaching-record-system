@@ -48,6 +48,10 @@ namespace DqtApi.V2.Validators
             RuleFor(r => r.Qualification.Class)
                 .IsInEnum();
 
+            RuleFor(r => r.InitialTeacherTraining.ProviderUkprn)
+                .NotEmpty()
+                .WithMessage("Initial TeacherTraining ProviderUkprn is required.");
+
             RuleFor(x => x.BirthDate)
                 .NotEmpty()
                 .WithMessage("Birthdate is required.");
