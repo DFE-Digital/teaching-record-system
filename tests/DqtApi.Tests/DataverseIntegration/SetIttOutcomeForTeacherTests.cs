@@ -125,6 +125,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 ittProviderUkprn,
                 ittResult,
                 assessmentDate: null);
+
             var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(teacherId,
                 columnNames: new[]
                 {
@@ -267,6 +268,49 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Null(qtsUpdate.dfeta_TeacherStatusId?.Id);
         }
 
+        [Fact]
+        public async Task Given_teacher_with_active_sanctions_creates_review_task()
+        {
+            // Arrange
+            var (teacherId, _, _, ittProviderUkprn) = await CreatePerson(earlyYears: false, withActiveSanction: true);
+
+            var ittResult = dfeta_ITTResult.Pass;
+            var assessmentDate = _clock.Today;
+
+            // Act
+            var (_, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+                teacherId,
+                ittProviderUkprn,
+                ittResult,
+                assessmentDate);
+
+            // Assert
+            var crmTask = transactionRequest.AssertSingleCreateRequest<CrmTask>();
+            Assert.Equal("Notification for QTS unit - Register: matched record holds active sanction", crmTask.Category);
+            Assert.Equal($"Active sanction found: TRN {teacherId}", crmTask.Description);
+            Assert.Equal("Register: active sanction match", crmTask.Subject);
+        }
+
+        [Fact]
+        public async Task Given_teacher_without_active_sanctions_does_not_create_review_task()
+        {
+            // Arrange
+            var (teacherId, _, _, ittProviderUkprn) = await CreatePerson(earlyYears: false, withActiveSanction: false);
+
+            var ittResult = dfeta_ITTResult.Pass;
+            var assessmentDate = _clock.Today;
+
+            // Act
+            var (_, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+                teacherId,
+                ittProviderUkprn,
+                ittResult,
+                assessmentDate);
+
+            // Assert
+            transactionRequest.AssertDoesNotContainCreateRequest<CrmTask>();
+        }
+
         public static class SelectIttRecordTestData
         {
             public static readonly Guid TeacherId = Guid.NewGuid();
@@ -374,7 +418,8 @@ namespace DqtApi.Tests.DataverseIntegration
 
         private async Task<(Guid TeacherId, Guid IttId, Guid QtsId, string IttProviderUkprn)> CreatePerson(
             bool earlyYears,
-            bool assessmentOnly = false)
+            bool assessmentOnly = false,
+            bool withActiveSanction = false)
         {
             var teacherId = Guid.NewGuid();
 
@@ -394,7 +439,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 (await _dataverseAdapter.GetTeacherStatus(assessmentOnly ? "212" : "211", qtsDateRequired: false)).Id :  // 212 == 'AOR Candidate', 211 == 'Trainee Teacher:DMS'
                 (Guid?)null;
 
-            var txnResponse = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
+            var txnRequest = new ExecuteTransactionRequest()
             {
                 Requests = new()
                 {
@@ -435,7 +480,20 @@ namespace DqtApi.Tests.DataverseIntegration
                     }
                 },
                 ReturnResponses = true
-            });
+            };
+
+            if (withActiveSanction)
+            {
+                txnRequest.Requests.Add(new CreateRequest()
+                {
+                    Target = new dfeta_sanction()
+                    {
+                        dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+                    }
+                });
+            }
+
+            var txnResponse = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(txnRequest);
 
             var ittId = ((CreateResponse)txnResponse.Responses[2]).id;
             var qtsId = ((CreateResponse)txnResponse.Responses[3]).id;

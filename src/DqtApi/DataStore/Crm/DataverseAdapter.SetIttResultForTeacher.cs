@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Extensions.Caching.Memory;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace DqtApi.DataStore.Crm
 {
@@ -171,6 +172,14 @@ namespace DqtApi.DataStore.Crm
                 }
             }
 
+            if (lookupData.Teacher.dfeta_ActiveSanctions == true)
+            {
+                txnRequest.Requests.Add(new CreateRequest()
+                {
+                    Target = helper.CreateReviewTaskEntityForActiveSanctions()
+                });
+            }
+
             await _service.ExecuteAsync(txnRequest);
 
             return (SetIttResultForTeacherResult.Success(qtsDate), txnRequest);
@@ -207,6 +216,27 @@ namespace DqtApi.DataStore.Crm
                 _ittProviderUkprn = ittProviderUkprn;
             }
 
+            public CrmTask CreateReviewTaskEntityForActiveSanctions()
+            {
+                var description = GetDescription();
+
+                return new CrmTask()
+                {
+                    RegardingObjectId = new EntityReference(Contact.EntityLogicalName, _teacherId),
+                    Category = "Notification for QTS unit - Register: matched record holds active sanction",
+                    Subject = "Register: active sanction match",
+                    Description = description,
+                    ScheduledEnd = _dataverseAdapter._clock.UtcNow
+                };
+
+                string GetDescription()
+                {
+                    var sb = new StringBuilder();
+                    sb.Append($"Active sanction found: TRN {_teacherId}");
+                    return sb.ToString();
+                }
+            }
+
             public async Task<SetIttResultForTeacherLookupResult> LookupData()
             {
                 var getTeacherTask = _dataverseAdapter.GetTeacher(
@@ -215,7 +245,8 @@ namespace DqtApi.DataStore.Crm
                     {
                         Contact.Fields.dfeta_QTSDate,
                         Contact.Fields.dfeta_EYTSDate,
-                        Contact.Fields.StateCode
+                        Contact.Fields.StateCode,
+                        Contact.Fields.dfeta_ActiveSanctions
                     });
 
                 var getIttProviderTask = _dataverseAdapter.GetOrganizationByUkprn(_ittProviderUkprn);
