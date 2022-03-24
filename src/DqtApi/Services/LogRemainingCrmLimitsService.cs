@@ -2,6 +2,7 @@
 using System.Threading;
 using DqtApi.DataStore.Crm;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Prometheus;
 
 namespace DqtApi.Services
@@ -11,13 +12,14 @@ namespace DqtApi.Services
         private static readonly TimeSpan _pollInterval = TimeSpan.FromMinutes(1);
 
         private readonly IWebApiAdapter _webApiAdapter;
+        private readonly ILogger<LogRemainingCrmLimitsService> _logger;
         private readonly Gauge _remainingRequestsMetric;
         private readonly Gauge _remainingExecutionTimeMetric;
 
-        public LogRemainingCrmLimitsService(IWebApiAdapter webApiAdapter)
+        public LogRemainingCrmLimitsService(IWebApiAdapter webApiAdapter, ILogger<LogRemainingCrmLimitsService> logger)
         {
             _webApiAdapter = webApiAdapter;
-
+            _logger = logger;
             _remainingRequestsMetric = Metrics.CreateGauge("crm_remaining_requests", "Remaining CRM requests");
             _remainingExecutionTimeMetric = Metrics.CreateGauge("crm_remaining_execution_time", "Remaining CRM execution time");
         }
@@ -28,10 +30,17 @@ namespace DqtApi.Services
 
             do
             {
-                var limits = await _webApiAdapter.GetRemainingApiLimits();
+                try
+                {
+                    var limits = await _webApiAdapter.GetRemainingApiLimits();
 
-                _remainingRequestsMetric.Set(limits.NumberOfRequests);
-                _remainingExecutionTimeMetric.Set(limits.RemainingExecutionTime);
+                    _remainingRequestsMetric.Set(limits.NumberOfRequests);
+                    _remainingExecutionTimeMetric.Set(limits.RemainingExecutionTime);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed retrieving CRM API limits.");
+                }
             }
             while (await timer.WaitForNextTickAsync(stoppingToken));
         }
