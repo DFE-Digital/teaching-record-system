@@ -489,8 +489,8 @@ namespace DqtApi.DataStore.Crm
                 var getIttProviderTask = Let(
                     _command.InitialTeacherTraining.ProviderUkprn,
                     ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetOrganizationByUkprnKey(ukprn),
-                        _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn)));
+                        CacheKeys.GetIttProviderOrganizationByUkprnKey(ukprn),
+                        _ => _dataverseAdapter.GetIttProviderOrganizationByUkprn(ukprn)));
 
                 var getQualificationProviderTask = !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn) ?
                      Let(
