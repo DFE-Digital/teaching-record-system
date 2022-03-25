@@ -10,6 +10,8 @@
 
         public static object GetHeSubjectKey(string name) => $"he_subject:{name}";
 
+        public static object GetIttProviderOrganizationByUkprnKey(string ukprn) => $"organization_itt_provider:{ukprn}";
+
         public static object GetIttSubjectKey(string name) => $"itt_subject:{name}";
 
         public static object GetOrganizationByUkprnKey(string ukprn) => $"organization:{ukprn}";

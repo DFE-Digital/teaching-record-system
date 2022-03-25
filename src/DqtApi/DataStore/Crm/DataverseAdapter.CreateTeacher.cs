@@ -454,8 +454,8 @@ namespace DqtApi.DataStore.Crm
                 var getIttProviderTask = Let(
                     _command.InitialTeacherTraining.ProviderUkprn,
                     ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetOrganizationByUkprnKey(ukprn),
-                        _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn, columnNames: Array.Empty<string>(), requestBuilder)));
+                        CacheKeys.GetIttProviderOrganizationByUkprnKey(ukprn),
+                        _ => _dataverseAdapter.GetIttProviderOrganizationByUkprn(ukprn, columnNames: Array.Empty<string>(), requestBuilder)));
 
                 var getIttCountryTask = Let(
                     "XK",  // XK == 'United Kingdom'

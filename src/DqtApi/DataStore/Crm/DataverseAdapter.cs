@@ -334,6 +334,32 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
+        public Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, params string[] columnNames) =>
+            GetIttProviderOrganizationByUkprn(ukprn, columnNames, requestBuilder: null);
+
+        private async Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
+        {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
+            var query = new QueryByAttribute(Account.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames)
+            };
+
+            query.AddAttributeValue(Account.Fields.dfeta_TrainingProvider, true);
+            query.AddAttributeValue(Account.Fields.dfeta_UKPRN, ukprn);
+            query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
+
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
+
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
+        }
+
         public Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames) =>
             GetOrganizationByUkprn(ukprn, columnNames, requestBuilder: null);
 
