@@ -300,14 +300,7 @@
         },
         "responses": {
           "204": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FindTeachersResponse"
-                }
-              }
-            }
+            "description": "Success"
           },
           "429": {
             "description": "Too Many Requests",

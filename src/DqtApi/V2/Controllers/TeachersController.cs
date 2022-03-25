@@ -31,7 +31,7 @@ namespace DqtApi.V2.Controllers
 
         [HttpPatch("update/{trn}")]
         [SwaggerOperation(summary: "Updates a Teacher record")]
-        [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
         [MapError(10002, statusCode: StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Update([FromBody] UpdateTeacherRequest request)
