@@ -153,7 +153,7 @@ namespace DqtApi.DataStore.Crm
                         Contact.Fields.StateCode
                     });
 
-                var getIttProviderTask = _dataverseAdapter.GetOrganizationByUkprn(_command.InitialTeacherTraining.ProviderUkprn);
+                var getIttProviderTask = _dataverseAdapter.GetIttProviderOrganizationByUkprn(_command.InitialTeacherTraining.ProviderUkprn);
 
                 var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                     TeacherId,
