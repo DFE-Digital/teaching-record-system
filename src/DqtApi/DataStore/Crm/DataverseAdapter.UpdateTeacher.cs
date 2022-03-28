@@ -253,7 +253,7 @@ namespace DqtApi.DataStore.Crm
                 string GetDescription()
                 {
                     var sb = new StringBuilder();
-                    sb.Append($"No ITT UKPRN match for TRN {TeacherId}");
+                    sb.Append($"No ITT UKPRN match for TeacherId {TeacherId}");
                     return sb.ToString();
                 }
             }
@@ -274,7 +274,7 @@ namespace DqtApi.DataStore.Crm
                 string GetDescription()
                 {
                     var sb = new StringBuilder();
-                    sb.Append($"Multiple ITT UKPRNs found for TRN {TeacherId}");
+                    sb.Append($"Multiple ITT UKPRNs found for TeacherId {TeacherId}");
                     return sb.ToString();
                 }
             }
@@ -287,8 +287,8 @@ namespace DqtApi.DataStore.Crm
                 Debug.Assert(referenceData.IttSubject2Id.HasValue);
 
                 var cohortYear = _command.InitialTeacherTraining.ProgrammeEndDate?.Year.ToString();
-
-                return new dfeta_initialteachertraining()
+                var result = _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ? dfeta_ITTResult.UnderAssessment : dfeta_ITTResult.InTraining;
+                var entity =  new dfeta_initialteachertraining()
                 {
                     Id = id ?? Guid.NewGuid(),
                     dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, TeacherId),
@@ -303,7 +303,14 @@ namespace DqtApi.DataStore.Crm
                     dfeta_Subject3Id = referenceData.IttSubject3Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject3Id.Value) : null,
                     dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
                     dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
+                    dfeta_Result = !id.HasValue ? result : null
                 };
+
+                if (id.HasValue)
+                {
+                    entity.Attributes.Remove(dfeta_initialteachertraining.Fields.dfeta_Result);
+                }
+                return entity;
             }
 
             public dfeta_qualification CreateQualificationEntity(UpdateTeacherReferenceLookupResult referenceData, Guid? id)
