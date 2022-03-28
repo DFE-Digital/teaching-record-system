@@ -657,15 +657,16 @@ namespace DqtApi.DataStore.Crm
                 (FieldName: Contact.Fields.LastName, Value: filter.PreviousLastName),
             }.ToList();
 
-            // If fields are null in the input then don't try to match them (typically MiddleName)
-            fields.RemoveAll(f => f.Value == null);
+            // If fields are null/empty in the input then don't try to match them
+            fields.RemoveAll(f => f.Value == null || (f.Value is string str && string.IsNullOrEmpty(str)));
 
             var combinations = fields.GetCombinations(length: 2).ToArray();
 
             if (combinations.Length == 0)
             {
-                return null;
+                return Array.Empty<Contact>();
             }
+
             var combinationsFilter = new FilterExpression(LogicalOperator.Or);
 
             foreach (var combination in combinations)
@@ -683,20 +684,41 @@ namespace DqtApi.DataStore.Crm
             var query = new QueryExpression(Contact.EntityLogicalName)
             {
                 ColumnSet = new ColumnSet(true),
-                Criteria = combinationsFilter,
+                Criteria = new FilterExpression(LogicalOperator.And)
+                {
+                    Conditions =
+                    {
+                        new ConditionExpression(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active)
+                    },
+                    Filters =
+                    {
+                        combinationsFilter
+                    }
+                },
                 Orders =
                 {
                     new OrderExpression(Contact.Fields.LastName, OrderType.Ascending)
                 }
             };
 
-            // filter by IttProviderOrganisationId if provided
             if (filter.IttProviderOrganizationId.HasValue)
             {
-                var le1 = new LinkEntity(Contact.EntityLogicalName, dfeta_initialteachertraining.EntityLogicalName, Contact.PrimaryIdAttribute, dfeta_initialteachertraining.Fields.dfeta_PersonId, JoinOperator.LeftOuter);
-                le1.Columns = new ColumnSet(dfeta_initialteachertraining.Fields.dfeta_EstablishmentId);
-                le1.LinkCriteria.AddCondition(dfeta_initialteachertraining.Fields.dfeta_EstablishmentId, ConditionOperator.Equal, filter.IttProviderOrganizationId);
-                query.LinkEntities.Add(le1);
+                var ittProviderLink = new LinkEntity(
+                    Contact.EntityLogicalName,
+                    dfeta_initialteachertraining.EntityLogicalName,
+                    Contact.PrimaryIdAttribute,
+                    dfeta_initialteachertraining.Fields.dfeta_PersonId,
+                    JoinOperator.LeftOuter)
+                {
+                    Columns = new ColumnSet(dfeta_initialteachertraining.Fields.dfeta_EstablishmentId)
+                };
+
+                ittProviderLink.LinkCriteria.AddCondition(
+                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                    ConditionOperator.Equal,
+                    filter.IttProviderOrganizationId);
+
+                query.LinkEntities.Add(ittProviderLink);
             }
 
             var result = await _service.RetrieveMultipleAsync(query);
