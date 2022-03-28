@@ -249,7 +249,7 @@ namespace DqtApi.DataStore.Crm
                         Contact.Fields.dfeta_ActiveSanctions
                     });
 
-                var getIttProviderTask = _dataverseAdapter.GetOrganizationByUkprn(_ittProviderUkprn);
+                var getIttProviderTask = _dataverseAdapter.GetIttProviderOrganizationByUkprn(_ittProviderUkprn);
 
                 var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                     _teacherId,
