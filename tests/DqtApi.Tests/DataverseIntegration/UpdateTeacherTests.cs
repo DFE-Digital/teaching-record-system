@@ -37,7 +37,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
             // Act
-            await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
             {
                 TeacherId = teacherId,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -60,6 +60,10 @@ namespace DqtApi.Tests.DataverseIntegration
                     Date = new DateOnly(2022, 01, 28),
                 }
             });
+
+            // Assert
+            Assert.True(result.Succeeded);
+            transactionRequest.AssertSingleUpsertRequest<dfeta_qualification>();
         }
 
         [Fact]
@@ -377,7 +381,7 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Fact]
-        public async Task Given_update_itt_and_qualification_with_noactive_sanctions_does_not_create_crm_task_and_returns_success_w()
+        public async Task Given_update_itt_and_qualification_with_noactive_sanctions_does_not_create_crm_task_and_returns_success()
         {
             // Arrange
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
@@ -488,7 +492,7 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Fact]
-        public async Task Given_two_or_more_qualifications_create_new_qualification_and_warning_crm_task()
+        public async Task Given_two_or_more_qualifications_does_not_create_new_qualification_and_creates_warning_crm_task()
         {
             // Arrange
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
@@ -576,8 +580,9 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.True(result.Succeeded);
+            transactionRequest.AssertDoesNotContainUpsertRequest<dfeta_qualification>();
             var crmTask = transactionRequest.AssertSingleCreateRequest<CrmTask>();
-            Assert.Equal("More than one qualification record found", crmTask.Description);
+            Assert.Equal($"Incoming Subject: 100366,Incoming Date: {new DateOnly(2022, 01, 15)},Incoming Class {dfeta_classdivision.Fourthclasshonours},Incoming ProviderUkprn {ittProviderUkprn},Incoming CountryCode: XK", crmTask.Description);
             Assert.Equal("Notification for QTS unit - Register: matched record holds multiple qualifications", crmTask.Category);
             Assert.Equal("Register: multiple qualifications", crmTask.Subject);
 
@@ -590,12 +595,6 @@ namespace DqtApi.Tests.DataverseIntegration
                 item2 =>
                 {
                     Assert.Equal(providerId.Id, item2.dfeta_HE_EstablishmentId.Id);
-                },
-                item3 =>
-                {
-                    Assert.Equal(providerId.Id, item3.dfeta_HE_EstablishmentId.Id);
-                    Assert.Equal(dfeta_classdivision.Fourthclasshonours, item3.dfeta_HE_ClassDivision);
-                    Assert.Equal(new DateTime(2022, 01, 15), item3.dfeta_CompletionorAwardDate);
                 });
         }
 

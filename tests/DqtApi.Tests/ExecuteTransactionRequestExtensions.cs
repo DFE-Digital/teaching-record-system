@@ -30,6 +30,16 @@ namespace DqtApi.Tests
             return (TEntity)createRequest.Target;
         }
 
+        public static TEntity AssertSingleUpsertRequest<TEntity>(this ExecuteTransactionRequest request)
+            where TEntity : Entity
+        {
+            var upsertRequest = (UpsertRequest)Assert.Single(
+            request.Requests,
+            request => request is UpsertRequest upsertRequest && upsertRequest.Target is TEntity);
+
+            return (TEntity)upsertRequest.Target;
+        }
+
         public static void AssertDoesNotContainCreateRequest<TEntity>(this ExecuteTransactionRequest request)
             where TEntity : Entity
         {
