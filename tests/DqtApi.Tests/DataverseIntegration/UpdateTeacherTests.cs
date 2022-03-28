@@ -191,6 +191,62 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Fact]
+        public async Task Given_updating_existing_teacher_does_not_change_itt_result()
+        {
+            // Arrange
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            {
+                TeacherId = teacherId,
+                InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+                {
+                    ProviderUkprn = ittProviderUkprn,
+                    ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                    ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                    ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
+                    Subject1 = "100403",  // mathematics
+                    Subject2 = "100366",  // computer science
+                    AgeRangeFrom = dfeta_AgeRange._11,
+                    AgeRangeTo = dfeta_AgeRange._12
+                },
+                Qualification = new UpdateTeacherCommandQualification()
+                {
+                    CountryCode = "XK",
+                    Subject = "100366",  // computer science
+                    Class = dfeta_classdivision.Firstclasshonours,
+                    Date = new DateOnly(2022, 01, 28),
+                    ProviderUkprn = ittProviderUkprn,
+                }
+            });
+
+            var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+                teacherId,
+                columnNames: new[]
+                {
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                    dfeta_initialteachertraining.Fields.StateCode,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id
+                });
+
+            // Assert
+            Assert.True(result.Succeeded);
+            Assert.Collection(itt,
+                item1 => Assert.Equal(dfeta_ITTResult.InTraining, item1.dfeta_Result)
+            );
+        }
+
+        [Fact]
         public async Task Given_updating_existing_contact_update_without_subject3_returns_success()
         {
             // Arrange
@@ -598,8 +654,29 @@ namespace DqtApi.Tests.DataverseIntegration
                 });
         }
 
-        [Fact]
-        public async Task Given_there_are_no_records_matched_create_new_itt_and_warning_crm_task()
+        [Theory]
+        [InlineData(dfeta_ITTProgrammeType.AssessmentOnlyRoute, dfeta_ITTResult.UnderAssessment)]
+        [InlineData(dfeta_ITTProgrammeType.Apprenticeship, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.Core, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.CoreFlexible, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTAssessmentOnly, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTGraduateEntry, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTSchoolDirect_EarlyYears, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.EYITTUndergraduate, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.FutureTeachingScholars, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.GraduateTeacherProgramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.HEI, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.LicensedTeacherProgramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.OverseasTrainedTeacherProgramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.RegisteredTeacherProgramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Salaried, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Selffunded, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme_CC, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.UndergraduateOptIn, dfeta_ITTResult.InTraining)]
+        public async Task Given_there_are_no_records_matched_create_new_itt_with_correct_result_and_warning_crm_task(dfeta_ITTProgrammeType programmeType, dfeta_ITTResult ittResult )
         {
             // Arrange
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
@@ -641,7 +718,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProviderUkprn = ittProviderUkprn,
                     ProgrammeStartDate = new DateOnly(2011, 11, 01),
                     ProgrammeEndDate = new DateOnly(2012, 11, 01),
-                    ProgrammeType = dfeta_ITTProgrammeType.EYITTAssessmentOnly,
+                    ProgrammeType = programmeType,
                     Subject1 = "100366",  // computer science
                     Subject2 = "100403",  // mathematics
                     Subject3 = "100302",  // history
@@ -659,10 +736,12 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             var crmTask = transactionRequest.AssertSingleCreateRequest<CrmTask>();
+            var itt = transactionRequest.AssertSingleUpsertRequest<dfeta_initialteachertraining>();
 
             // Assert
             Assert.True(result.Succeeded);
-            Assert.Equal($"No ITT UKPRN match for TRN {teacherId}", crmTask.Description);
+            Assert.Equal(ittResult, itt.dfeta_Result);
+            Assert.Equal($"No ITT UKPRN match for TeacherId {teacherId}", crmTask.Description);
             Assert.Equal($"Register: missing ITT UKPRN", crmTask.Subject);
             Assert.Equal($"Notification for QTS unit - Register: matched record holds no ITT UKPRN", crmTask.Category);
         }
@@ -719,7 +798,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.True(result.Succeeded);
-            Assert.Equal($"Multiple ITT UKPRNs found for TRN {teacherId}", crmTask.Description);
+            Assert.Equal($"Multiple ITT UKPRNs found for TeacherId {teacherId}", crmTask.Description);
             Assert.Equal("Notification for QTS unit - Register: matched record holds multiple ITT UKPRNs", crmTask.Category);
             Assert.Equal("Register: multiple ITT UKPRNs", crmTask.Subject);
         }
