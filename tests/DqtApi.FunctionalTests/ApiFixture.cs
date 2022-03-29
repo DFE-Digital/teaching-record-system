@@ -6,9 +6,9 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Threading;
+using DqtApi.Configuration;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
-using DqtApi.Configuration;
 
 namespace DqtApi.FunctionalTests
 {

@@ -93,7 +93,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 _ => _nonmatchingTRN
             },
             BirthDate = matchingBirthdate ? MatchingBirthdate : NonmatchingBirthdate,
-            NationalInsuranceNumber =  matchingNationalInsuranceNumber.HasValue ? matchingNationalInsuranceNumber switch
+            NationalInsuranceNumber = matchingNationalInsuranceNumber.HasValue ? matchingNationalInsuranceNumber switch
             {
                 MatchFixture.One => _fixtures[0].NationalInsuranceNumber,
                 MatchFixture.Two => _fixtures[1].NationalInsuranceNumber,
