@@ -676,7 +676,7 @@ namespace DqtApi.Tests.DataverseIntegration
         [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme, dfeta_ITTResult.InTraining)]
         [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme_CC, dfeta_ITTResult.InTraining)]
         [InlineData(dfeta_ITTProgrammeType.UndergraduateOptIn, dfeta_ITTResult.InTraining)]
-        public async Task Given_there_are_no_records_matched_create_new_itt_with_correct_result_and_warning_crm_task(dfeta_ITTProgrammeType programmeType, dfeta_ITTResult ittResult )
+        public async Task Given_there_are_no_records_matched_create_new_itt_with_correct_result_and_warning_crm_task(dfeta_ITTProgrammeType programmeType, dfeta_ITTResult ittResult)
         {
             // Arrange
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);

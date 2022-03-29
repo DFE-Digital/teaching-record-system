@@ -288,7 +288,7 @@ namespace DqtApi.DataStore.Crm
 
                 var cohortYear = _command.InitialTeacherTraining.ProgrammeEndDate?.Year.ToString();
                 var result = _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ? dfeta_ITTResult.UnderAssessment : dfeta_ITTResult.InTraining;
-                var entity =  new dfeta_initialteachertraining()
+                var entity = new dfeta_initialteachertraining()
                 {
                     Id = id ?? Guid.NewGuid(),
                     dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, TeacherId),

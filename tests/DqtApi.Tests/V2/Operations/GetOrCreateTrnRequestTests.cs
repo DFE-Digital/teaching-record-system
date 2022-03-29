@@ -319,7 +319,7 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Theory]
-        [InlineData(1900,1,1)]
+        [InlineData(1900, 1, 1)]
         public async Task Given_dob_before_1_1_1940_returns_error(int year, int month, int day)
         {
             // Arrange
