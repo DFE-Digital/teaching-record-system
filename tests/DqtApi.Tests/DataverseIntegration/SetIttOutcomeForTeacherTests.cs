@@ -33,7 +33,6 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             // Arrange
             var (teacherId, ittId, qtsId, ittProviderUkprn) = await CreatePerson(earlyYears: true);
-
             var ittResult = dfeta_ITTResult.Pass;
             var assessmentDate = _clock.Today;
 
@@ -78,7 +77,6 @@ namespace DqtApi.Tests.DataverseIntegration
 
             var ittResult = dfeta_ITTResult.Pass;
             var assessmentDate = _clock.Today;
-
             var teacherStatusId = (await _dataverseAdapter.GetTeacherStatus(expectedTeacherStatus, qtsDateRequired: true)).Id;
 
             // Act
@@ -154,6 +152,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 ittProviderUkprn,
                 ittResult,
                 assessmentDate: null);
+
             var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(teacherId,
                 columnNames: new[]
                 {
@@ -175,7 +174,6 @@ namespace DqtApi.Tests.DataverseIntegration
             var teacherId = SelectIttRecordTestData.TeacherId;
             var ittProviderId = SelectIttRecordTestData.IttProviderId;
             var ittProviderUkprn = SelectIttRecordTestData.IttProviderUkprn;
-
             var helper = new DataverseAdapter.SetIttResultForTeacherHelper(_dataverseAdapter, teacherId, ittProviderUkprn);
 
             // Act
@@ -194,7 +192,6 @@ namespace DqtApi.Tests.DataverseIntegration
             var teacherId = SelectIttRecordTestData.TeacherId;
             var ittProviderId = SelectIttRecordTestData.IttProviderId;
             var ittProviderUkprn = SelectIttRecordTestData.IttProviderUkprn;
-
             var helper = new DataverseAdapter.SetIttResultForTeacherHelper(_dataverseAdapter, teacherId, ittProviderUkprn);
 
             // Act
@@ -215,7 +212,6 @@ namespace DqtApi.Tests.DataverseIntegration
             var teacherId = SelectIttRecordTestData.TeacherId;
             var ittProviderId = SelectIttRecordTestData.IttProviderId;
             var ittProviderUkprn = SelectIttRecordTestData.IttProviderUkprn;
-
             var helper = new DataverseAdapter.SetIttResultForTeacherHelper(_dataverseAdapter, teacherId, ittProviderUkprn);
 
             // Act
@@ -273,7 +269,6 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             // Arrange
             var (teacherId, _, _, ittProviderUkprn) = await CreatePerson(earlyYears: false, withActiveSanction: true);
-
             var ittResult = dfeta_ITTResult.Pass;
             var assessmentDate = _clock.Today;
 
@@ -287,8 +282,23 @@ namespace DqtApi.Tests.DataverseIntegration
             // Assert
             var crmTask = transactionRequest.AssertSingleCreateRequest<CrmTask>();
             Assert.Equal("Notification for QTS unit - Register: matched record holds active sanction", crmTask.Category);
-            Assert.Equal($"Active sanction found: TRN {teacherId}", crmTask.Description);
             Assert.Equal("Register: active sanction match", crmTask.Subject);
+        }
+
+        [Fact]
+        public void Given_teacher_creating_review_task_description_is_correct()
+        {
+            // Arrange
+            var teacherId = Guid.NewGuid();
+            var ukprn = "1234567";
+            var trn = "555555";
+            var helper = new DataverseAdapter.SetIttResultForTeacherHelper(_dataverseAdapter, teacherId, ukprn);
+
+            // Act
+            var crmTask = helper.CreateReviewTaskEntityForActiveSanctions(trn);
+
+            // Assert
+            Assert.Equal($"Active sanction found: TRN {trn}", crmTask.Description);
         }
 
         [Fact]
@@ -296,7 +306,6 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             // Arrange
             var (teacherId, _, _, ittProviderUkprn) = await CreatePerson(earlyYears: false, withActiveSanction: false);
-
             var ittResult = dfeta_ITTResult.Pass;
             var assessmentDate = _clock.Today;
 

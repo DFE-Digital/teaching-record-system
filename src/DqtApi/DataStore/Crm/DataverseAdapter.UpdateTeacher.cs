@@ -64,7 +64,7 @@ namespace DqtApi.DataStore.Crm
             if (ittLookupFailed == UpdateTeacherFailedReasons.MultipleInTrainingIttRecords)
             {
                 // unable to determine which itt record to update - create review task.
-                var reviewTask = helper.CreateMultipleMatchIttReviewTask(findExistingTeacherResult);
+                var reviewTask = helper.CreateMultipleMatchIttReviewTask();
                 txnRequest.Requests.Add(new CreateRequest()
                 {
                     Target = reviewTask
@@ -100,7 +100,7 @@ namespace DqtApi.DataStore.Crm
                 // Unable to determine what qualification to update - so create a crm review task
                 if (qualificationLookupFailed == UpdateTeacherFailedReasons.MultipleQualificationRecords)
                 {
-                    var reviewTask = helper.CreateReviewTaskEntityForMultipleQualifications(command);
+                    var reviewTask = helper.CreateReviewTaskEntityForMultipleQualifications();
 
                     txnRequest.Requests.Add(new CreateRequest()
                     {
@@ -139,9 +139,11 @@ namespace DqtApi.DataStore.Crm
                 _dataverseAdapter = dataverseAdapter;
                 _command = command;
                 TeacherId = command.TeacherId;
+                Trn = command.TRN;
             }
 
             public Guid TeacherId { get; }
+            public string Trn { get; }
 
             public (dfeta_initialteachertraining Result, UpdateTeacherFailedReasons? FailedReason) SelectIttRecord(
                 IEnumerable<dfeta_initialteachertraining> ittRecords,
@@ -207,12 +209,12 @@ namespace DqtApi.DataStore.Crm
                 string GetDescription()
                 {
                     var sb = new StringBuilder();
-                    sb.Append($"Active sanction found: TRN {TeacherId}");
+                    sb.Append($"Active sanction found: TRN {Trn}");
                     return sb.ToString();
                 }
             }
 
-            public CrmTask CreateReviewTaskEntityForMultipleQualifications(UpdateTeacherCommand command)
+            public CrmTask CreateReviewTaskEntityForMultipleQualifications()
             {
                 var description = GetDescription();
 
@@ -228,11 +230,11 @@ namespace DqtApi.DataStore.Crm
                 string GetDescription()
                 {
                     var sb = new StringBuilder();
-                    sb.Append($"Incoming Subject: {command.Qualification?.Subject},");
-                    sb.Append($"Incoming Date: {command.Qualification?.Date},");
-                    sb.Append($"Incoming Class {command.Qualification?.Class},");
-                    sb.Append($"Incoming ProviderUkprn {command.Qualification?.ProviderUkprn},");
-                    sb.Append($"Incoming CountryCode: {command.Qualification?.CountryCode}");
+                    sb.Append($"Incoming Subject: {_command.Qualification?.Subject},");
+                    sb.Append($"Incoming Date: {_command.Qualification?.Date},");
+                    sb.Append($"Incoming Class {_command.Qualification?.Class},");
+                    sb.Append($"Incoming ProviderUkprn {_command.Qualification?.ProviderUkprn},");
+                    sb.Append($"Incoming CountryCode: {_command.Qualification?.CountryCode}");
                     return sb.ToString();
                 }
             }
@@ -253,12 +255,12 @@ namespace DqtApi.DataStore.Crm
                 string GetDescription()
                 {
                     var sb = new StringBuilder();
-                    sb.Append($"No ITT UKPRN match for TeacherId {TeacherId}");
+                    sb.Append($"No ITT UKPRN match for TRN {Trn}");
                     return sb.ToString();
                 }
             }
 
-            public CrmTask CreateMultipleMatchIttReviewTask(UpdateTeacherFindResult teacher)
+            public CrmTask CreateMultipleMatchIttReviewTask()
             {
                 var description = GetDescription();
 
@@ -274,7 +276,7 @@ namespace DqtApi.DataStore.Crm
                 string GetDescription()
                 {
                     var sb = new StringBuilder();
-                    sb.Append($"Multiple ITT UKPRNs found for TeacherId {TeacherId}");
+                    sb.Append($"Multiple ITT UKPRNs found for TRN {Trn}");
                     return sb.ToString();
                 }
             }

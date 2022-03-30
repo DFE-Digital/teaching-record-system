@@ -176,7 +176,7 @@ namespace DqtApi.DataStore.Crm
             {
                 txnRequest.Requests.Add(new CreateRequest()
                 {
-                    Target = helper.CreateReviewTaskEntityForActiveSanctions()
+                    Target = helper.CreateReviewTaskEntityForActiveSanctions(lookupData.Teacher.dfeta_TRN)
                 });
             }
 
@@ -216,7 +216,7 @@ namespace DqtApi.DataStore.Crm
                 _ittProviderUkprn = ittProviderUkprn;
             }
 
-            public CrmTask CreateReviewTaskEntityForActiveSanctions()
+            public CrmTask CreateReviewTaskEntityForActiveSanctions(string trn)
             {
                 var description = GetDescription();
 
@@ -232,7 +232,7 @@ namespace DqtApi.DataStore.Crm
                 string GetDescription()
                 {
                     var sb = new StringBuilder();
-                    sb.Append($"Active sanction found: TRN {_teacherId}");
+                    sb.Append($"Active sanction found: TRN {trn}");
                     return sb.ToString();
                 }
             }
