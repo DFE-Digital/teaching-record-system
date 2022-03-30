@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace DqtApi.ModelBinding
 {
     public class DateModelBinder : IModelBinder
-    {       
+    {
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
             if (bindingContext == null)

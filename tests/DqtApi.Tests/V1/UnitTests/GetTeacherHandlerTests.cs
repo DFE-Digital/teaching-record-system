@@ -35,11 +35,11 @@ namespace DqtApi.Tests.V1.UnitTests
 
             Assert.True(response.ActiveAlert);
             Assert.Equal(birthDate, response.DateOfBirth);
-            Assert.Equal(fullName , response.Name);
+            Assert.Equal(fullName, response.Name);
             Assert.Equal(nationalInsuranceNumber, response.NationalInsuranceNumber);
             Assert.Equal(ContactState.Active, response.State);
             Assert.Equal(ContactState.Active.ToString(), response.StateName);
-            Assert.Equal(trn, response.Trn);            
+            Assert.Equal(trn, response.Trn);
         }
 
         [Fact]
@@ -124,7 +124,7 @@ namespace DqtApi.Tests.V1.UnitTests
             Assert.Equal(inductionStatusName, induction.InductionStatusName);
             Assert.Equal(startDate, induction.StartDate);
             Assert.Equal(dfeta_inductionState.Active, induction.State);
-            Assert.Equal(dfeta_inductionState.Active.ToString(), induction.StateName);            
+            Assert.Equal(dfeta_inductionState.Active.ToString(), induction.StateName);
         }
 
         [Fact]
@@ -156,7 +156,7 @@ namespace DqtApi.Tests.V1.UnitTests
                         new AliasedValue(dfeta_initialteachertraining.EntityLogicalName, dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate, programmeEndDate) },
                     { $"{prefix}.{dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate}",
                         new AliasedValue(dfeta_initialteachertraining.EntityLogicalName, dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate, programmeStartDate) },
-                    { $"{prefix}.{dfeta_initialteachertraining.Fields.StateCode}",      
+                    { $"{prefix}.{dfeta_initialteachertraining.Fields.StateCode}",
                         new AliasedValue(dfeta_initialteachertraining.EntityLogicalName, dfeta_initialteachertraining.Fields.StateCode, new OptionSetValue((int)dfeta_initialteachertrainingState.Active)) },
                     { $"{prefix}.{dfeta_initialteachertraining.PrimaryIdAttribute}",
                         new AliasedValue(dfeta_initialteachertraining.EntityLogicalName, dfeta_initialteachertraining.PrimaryIdAttribute, Guid.NewGuid())},

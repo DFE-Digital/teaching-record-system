@@ -53,12 +53,19 @@ jobs:
       with:
         dotnet-version: '6.0.x'
 
+    - name: Lint
+      run: |
+        #https://github.com/dotnet/format/issues/1433
+        dotnet tool install -g dotnet-format --version "6.*" --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json
+        dotnet-format --verify-no-changes
+
     - name: Build
       run: dotnet build --configuration Release
 
     - name: Test
       id: test
       run: dotnet test tests/DqtApi.Tests --configuration Release --no-build --logger trx
+      if: github.event_name == 'pull_request'
       env:
         IntegrationTests_CrmUrl: ${{ secrets.INTEGRATIONTESTS_CRMURL }}
         IntegrationTests_CrmClientId: ${{ secrets.INTEGRATIONTESTS_CRMCLIENTID }}
@@ -69,7 +76,7 @@ jobs:
 
     - name: Test report
       uses: dorny/test-reporter@v1
-      if: ${{ steps.test.outcome != 'skipped' }}
+      if: always() && github.event_name == 'pull_request'
       with:
         name: Test results
         path: "**/*.trx"

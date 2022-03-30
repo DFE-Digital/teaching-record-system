@@ -408,7 +408,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
-            var getIttRecords = await  _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+            var getIttRecords = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 result.TeacherId,
                 columnNames: new[]
                 {
