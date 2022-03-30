@@ -51,6 +51,8 @@ namespace DqtApi
 
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
+
             var services = builder.Services;
             var env = builder.Environment;
             var configuration = builder.Configuration;
