@@ -2,12 +2,10 @@
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using Microsoft.Xrm.Sdk.Messages;
 using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    [Collection(nameof(ExclusiveCrmTestCollection))]
     public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLifetime
     {
         private readonly CreateTeacherFixture _createTeacherFixture;
@@ -428,16 +426,16 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             var command = new CreateTeacherCommand()
             {
-                FirstName = "Minnie",
-                MiddleName = "Van",
-                LastName = "Ryder",
-                BirthDate = new(1990, 5, 23),
-                EmailAddress = "minnie.van.ryder@example.com",
+                FirstName = Faker.Name.First(),
+                MiddleName = Faker.Name.Middle(),
+                LastName = Faker.Name.Last(),
+                BirthDate = Faker.Identification.DateOfBirth(),
+                EmailAddress = Faker.Internet.Email(),
                 Address = new()
                 {
-                    AddressLine1 = "52 Quernmore Road",
-                    City = "Liverpool",
-                    PostalCode = "L33 6UZ",
+                    AddressLine1 = Faker.Address.StreetAddress(),
+                    City = Faker.Address.City(),
+                    PostalCode = Faker.Address.UkPostCode(),
                     Country = "United Kingdom"
                 },
                 GenderCode = Contact_GenderCode.Female,

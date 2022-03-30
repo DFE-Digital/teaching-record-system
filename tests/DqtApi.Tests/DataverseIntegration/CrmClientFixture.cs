@@ -8,7 +8,6 @@ using Azure.Storage.Blobs.Specialized;
 using DqtApi.DataStore.Crm;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 
 namespace DqtApi.Tests.DataverseIntegration
@@ -18,8 +17,9 @@ namespace DqtApi.Tests.DataverseIntegration
         private readonly ServiceClient _baseServiceClient;
         private readonly CancellationTokenSource _completedCts;
         private readonly EnvironmentLockManager _lockManager;
+        private readonly IMemoryCache _memoryCache;
 
-        public CrmClientFixture()
+        public CrmClientFixture(IMemoryCache memoryCache)
         {
             Clock = new();
             Configuration = GetConfiguration();
@@ -28,6 +28,7 @@ namespace DqtApi.Tests.DataverseIntegration
             _completedCts = new CancellationTokenSource();
             _lockManager = new EnvironmentLockManager(Configuration);
             _lockManager.AcquireLock(_completedCts.Token);
+            _memoryCache = memoryCache;
         }
 
         public TestableClock Clock { get; }
@@ -40,7 +41,8 @@ namespace DqtApi.Tests.DataverseIntegration
         /// </summary>
         public TestDataScope CreateTestDataScope() => new(
             _baseServiceClient,
-            orgService => new DataverseAdapter(orgService, Clock, new MemoryCache(Options.Create<MemoryCacheOptions>(new()))));
+            orgService => new DataverseAdapter(orgService, Clock, _memoryCache),
+            _memoryCache);
 
         public void Dispose()
         {
@@ -66,19 +68,24 @@ namespace DqtApi.Tests.DataverseIntegration
         public sealed class TestDataScope : IAsyncDisposable
         {
             private readonly Func<IOrganizationServiceAsync2, DataverseAdapter> _createDataverseAdapter;
+            private readonly IMemoryCache _memoryCache;
 
             internal TestDataScope(
                 ServiceClient serviceClient,
-                Func<IOrganizationServiceAsync2, DataverseAdapter> createDataverseAdapter)
+                Func<IOrganizationServiceAsync2, DataverseAdapter> createDataverseAdapter,
+                IMemoryCache memoryCache)
             {
                 OrganizationService = EntityTrackingOrganizationService.CreateProxy(serviceClient);
 
                 _createDataverseAdapter = createDataverseAdapter;
+                _memoryCache = memoryCache;
             }
 
             public ITrackedEntityOrganizationService OrganizationService { get; }
 
             public DataverseAdapter CreateDataverseAdapter() => _createDataverseAdapter(OrganizationService);
+
+            public TestDataHelper CreateTestDataHelper() => new TestDataHelper(this, _memoryCache);
 
             public ValueTask DisposeAsync() => OrganizationService.DisposeAsync();
         }
