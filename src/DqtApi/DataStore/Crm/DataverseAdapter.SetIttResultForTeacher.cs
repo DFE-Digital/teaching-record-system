@@ -246,7 +246,8 @@ namespace DqtApi.DataStore.Crm
                         Contact.Fields.dfeta_QTSDate,
                         Contact.Fields.dfeta_EYTSDate,
                         Contact.Fields.StateCode,
-                        Contact.Fields.dfeta_ActiveSanctions
+                        Contact.Fields.dfeta_ActiveSanctions,
+                        Contact.Fields.dfeta_TRN
                     });
 
                 var getIttProviderTask = _dataverseAdapter.GetIttProviderOrganizationByUkprn(_ittProviderUkprn);
