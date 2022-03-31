@@ -8,6 +8,7 @@ namespace DqtApi.Tests
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<CrmClientFixture>();
+            services.AddMemoryCache();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
@@ -12,18 +11,19 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    [Collection(nameof(ExclusiveCrmTestCollection))]
     public class UpdateTeacherTests : IAsyncLifetime
     {
         private readonly CrmClientFixture.TestDataScope _dataScope;
         private readonly DataverseAdapter _dataverseAdapter;
         private readonly IOrganizationServiceAsync _organizationService;
+        private readonly TestDataHelper _testDataHelper;
 
         public UpdateTeacherTests(CrmClientFixture crmClientFixture)
         {
             _dataScope = crmClientFixture.CreateTestDataScope();
             _dataverseAdapter = _dataScope.CreateDataverseAdapter();
             _organizationService = _dataScope.OrganizationService;
+            _testDataHelper = _dataScope.CreateTestDataHelper();
         }
 
         public Task InitializeAsync() => Task.CompletedTask;
@@ -1205,100 +1205,13 @@ namespace DqtApi.Tests.DataverseIntegration
             bool assessmentOnly = false,
             bool hasActiveSanctions = false)
         {
-            var teacherId = Guid.NewGuid();
+            var createPersonResult = await _testDataHelper.CreatePerson(
+                earlyYears,
+                assessmentOnly,
+                withQualification: true,
+                withActiveSanction: hasActiveSanctions);
 
-            var programmeType = earlyYears ? dfeta_ITTProgrammeType.EYITTAssessmentOnly :
-                    assessmentOnly ? dfeta_ITTProgrammeType.AssessmentOnlyRoute :
-                    dfeta_ITTProgrammeType.RegisteredTeacherProgramme;
-
-            var ittProviderUkprn = "10044534";
-
-            var ittProviderId = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
-
-            var earlyYearsStatusId = earlyYears ?
-                (await _dataverseAdapter.GetEarlyYearsStatus("220")).Id : // 220 == 'Early Years Trainee'
-                (Guid?)null;
-
-            var teacherStatusId = !earlyYears ?
-                (await _dataverseAdapter.GetTeacherStatus(assessmentOnly ? "212" : "211", qtsDateRequired: false)).Id :  // 212 == 'AOR Candidate', 211 == 'Trainee Teacher:DMS'
-                (Guid?)null;
-
-            var countryCodeId = (await _dataverseAdapter.GetCountry("XK")).Id;
-            var subject = (await _dataverseAdapter.GetHeSubjectByCode("100366"));  // computer science
-            var qualification = (await _dataverseAdapter.GetHeQualificationByName("First Degree"));
-
-            var requestBuilder = _dataverseAdapter.CreateTransactionRequestBuilder();
-
-            requestBuilder.AddRequest<CreateResponse>(new CreateRequest()
-            {
-                Target = new Contact()
-                {
-                    Id = teacherId,
-                    BirthDate = new DateTime(1990, 4, 1)
-                }
-            });
-
-            requestBuilder.AddRequest<UpdateResponse>(new UpdateRequest()
-            {
-                Target = new Contact()
-                {
-                    Id = teacherId,
-                    dfeta_TRNAllocateRequest = DateTime.UtcNow
-                }
-            });
-
-            requestBuilder.AddRequest<CreateResponse>(new CreateRequest()
-            {
-                Target = new dfeta_initialteachertraining()
-                {
-                    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
-                    dfeta_EstablishmentId = new EntityReference(Account.EntityLogicalName, ittProviderId),
-                    dfeta_ProgrammeType = programmeType,
-                    dfeta_Result = assessmentOnly ? dfeta_ITTResult.UnderAssessment : dfeta_ITTResult.InTraining,
-                    dfeta_AgeRangeFrom = dfeta_AgeRange._00,
-                    dfeta_AgeRangeTo = dfeta_AgeRange._18
-                }
-            });
-
-            requestBuilder.AddRequest<CreateResponse>(new CreateRequest()
-            {
-                Target = new dfeta_qtsregistration()
-                {
-                    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
-                    dfeta_EarlyYearsStatusId = earlyYearsStatusId.HasValue ? new EntityReference(dfeta_earlyyearsstatus.EntityLogicalName, earlyYearsStatusId.Value) : null,
-                    dfeta_TeacherStatusId = teacherStatusId.HasValue ? new EntityReference(dfeta_teacherstatus.EntityLogicalName, teacherStatusId.Value) : null
-                }
-            });
-
-            requestBuilder.AddRequest<CreateResponse>(new CreateRequest()
-            {
-                Target = new dfeta_qualification()
-                {
-                    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
-                    dfeta_HE_CountryId = new EntityReference(dfeta_qualification.EntityLogicalName, countryCodeId),
-                    dfeta_HE_EstablishmentId = new EntityReference(Account.EntityLogicalName, ittProviderId),
-                    dfeta_Type = dfeta_qualification_dfeta_Type.HigherEducation,
-                    dfeta_HE_ClassDivision = dfeta_classdivision.Pass,
-                    dfeta_HE_CompletionDate = DateTime.Now.AddMonths(-1),
-                    dfeta_HE_HESubject1Id = new EntityReference(dfeta_hesubject.EntityLogicalName, subject.Id),
-                    dfeta_HE_HEQualificationId = new EntityReference(dfeta_hequalification.EntityLogicalName, qualification.Id)
-                }
-            });
-
-            if (hasActiveSanctions)
-            {
-                requestBuilder.AddRequest<CreateResponse>(new CreateRequest()
-                {
-                    Target = new dfeta_sanction()
-                    {
-                        dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
-                    },
-                });
-            }
-
-            await requestBuilder.Execute();
-
-            return (teacherId, ittProviderUkprn);
+            return (createPersonResult.TeacherId, createPersonResult.IttProviderUkprn);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace DqtApi.DataStore.Crm
 
         public Task<dfeta_country> GetCountry(string value) => GetCountry(value, requestBuilder: null);
 
-        private async Task<dfeta_country> GetCountry(string value, RequestBuilder requestBuilder)
+        public async Task<dfeta_country> GetCountry(string value, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -55,7 +55,7 @@ namespace DqtApi.DataStore.Crm
 
         public Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value) => GetEarlyYearsStatus(value, requestBuilder: null);
 
-        private async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value, RequestBuilder requestBuilder)
+        public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -79,7 +79,7 @@ namespace DqtApi.DataStore.Crm
 
         public Task<dfeta_hequalification> GetHeQualificationByName(string name) => GetHeQualificationByName(name, requestBuilder: null);
 
-        private async Task<dfeta_hequalification> GetHeQualificationByName(string name, RequestBuilder requestBuilder)
+        public async Task<dfeta_hequalification> GetHeQualificationByName(string name, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -103,7 +103,7 @@ namespace DqtApi.DataStore.Crm
 
         public Task<dfeta_hesubject> GetHeSubjectByCode(string value) => GetHeSubjectByCode(value, requestBuilder: null);
 
-        private async Task<dfeta_hesubject> GetHeSubjectByCode(string value, RequestBuilder requestBuilder)
+        public async Task<dfeta_hesubject> GetHeSubjectByCode(string value, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -130,7 +130,7 @@ namespace DqtApi.DataStore.Crm
             params string[] columnNames) =>
                 GetInitialTeacherTrainingByTeacher(teacherId, columnNames, requestBuilder: null);
 
-        private async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
+        public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
             Guid teacherId,
             string[] columnNames,
             RequestBuilder requestBuilder)
@@ -181,7 +181,7 @@ namespace DqtApi.DataStore.Crm
 
         public Task<dfeta_ittsubject> GetIttSubjectByCode(string code) => GetIttSubjectByCode(code, requestBuilder: null);
 
-        private async Task<dfeta_ittsubject> GetIttSubjectByCode(string code, RequestBuilder requestBuilder)
+        public async Task<dfeta_ittsubject> GetIttSubjectByCode(string code, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -337,7 +337,7 @@ namespace DqtApi.DataStore.Crm
         public Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, params string[] columnNames) =>
             GetIttProviderOrganizationByUkprn(ukprn, columnNames, requestBuilder: null);
 
-        private async Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -363,7 +363,7 @@ namespace DqtApi.DataStore.Crm
         public Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames) =>
             GetOrganizationByUkprn(ukprn, columnNames, requestBuilder: null);
 
-        private async Task<Account> GetOrganizationByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<Account> GetOrganizationByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -390,7 +390,7 @@ namespace DqtApi.DataStore.Crm
             params string[] columnNames) =>
                 GetQtsRegistrationsByTeacher(teacherId, columnNames, requestBuilder: null);
 
-        private async Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(
+        public async Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(
             Guid teacherId,
             string[] columnNames,
             RequestBuilder requestBuilder)
@@ -545,7 +545,7 @@ namespace DqtApi.DataStore.Crm
         public Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, params string[] columnNames) =>
             GetCrmTasksForTeacher(teacherId, columnNames, requestBuilder: null);
 
-        private async Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -570,7 +570,7 @@ namespace DqtApi.DataStore.Crm
             bool qtsDateRequired) =>
                 GetTeacherStatus(value, qtsDateRequired, requestBuilder: null);
 
-        private async Task<dfeta_teacherstatus> GetTeacherStatus(
+        public async Task<dfeta_teacherstatus> GetTeacherStatus(
             string value,
             bool qtsDateRequired,
             RequestBuilder requestBuilder)
@@ -621,7 +621,7 @@ namespace DqtApi.DataStore.Crm
         public Task<Account> GetOrganizationByName(string name, params string[] columnNames) =>
             GetOrganizationByName(name, columnNames, requestBuilder: null);
 
-        private async Task<Account> GetOrganizationByName(string name, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<Account> GetOrganizationByName(string name, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 

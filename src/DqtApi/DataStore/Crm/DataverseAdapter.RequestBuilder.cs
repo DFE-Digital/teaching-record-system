@@ -48,6 +48,8 @@ namespace DqtApi.DataStore.Crm
             public static RequestBuilder CreateTransaction(IOrganizationServiceAsync organizationService) =>
                 new(organizationService, RequestType.Transaction);
 
+            public void AddRequest(OrganizationRequest request) => AddRequest<OrganizationResponse>(request);
+
             public IInnerRequestHandle<TResponse> AddRequest<TResponse>(OrganizationRequest request)
                 where TResponse : OrganizationResponse
             {
@@ -66,6 +68,14 @@ namespace DqtApi.DataStore.Crm
                 }
 
                 return new InnerRequestHandle<TResponse>(this, request);
+            }
+
+            public void AddRequests(params OrganizationRequest[] requests)
+            {
+                foreach (var request in requests)
+                {
+                    AddRequest<OrganizationResponse>(request);
+                }
             }
 
             public Task Execute()
