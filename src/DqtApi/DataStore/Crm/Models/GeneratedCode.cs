@@ -4060,6 +4060,7 @@ namespace DqtApi.DataStore.Crm.Models
 		public static class Fields
 		{
 			public const string dfeta_PersonId = "dfeta_personid";
+			public const string dfeta_SanctionCodeId = "dfeta_sanctioncodeid";
 			public const string dfeta_sanctionId = "dfeta_sanctionid";
 			public const string Id = "dfeta_sanctionid";
 			public const string StateCode = "statecode";
@@ -4127,6 +4128,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_PersonId");
 				this.SetAttributeValue("dfeta_personid", value);
 				this.OnPropertyChanged("dfeta_PersonId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for Sanction Code associated with Sanction.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sanctioncodeid")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_SanctionCodeId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_sanctioncodeid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_SanctionCodeId");
+				this.SetAttributeValue("dfeta_sanctioncodeid", value);
+				this.OnPropertyChanged("dfeta_SanctionCodeId");
 			}
 		}
 		
