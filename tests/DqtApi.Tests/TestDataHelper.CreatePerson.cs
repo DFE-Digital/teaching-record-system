@@ -151,6 +151,7 @@ namespace DqtApi.Tests
                     Target = new dfeta_sanction()
                     {
                         dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+                        dfeta_SanctionCodeId = new EntityReference(dfeta_sanction.EntityLogicalName, new Guid("95790cd0-c83b-e311-82ec-005056b1356a"))  // T1
                     }
                 });
             }

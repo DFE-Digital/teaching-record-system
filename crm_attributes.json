@@ -113,10 +113,10 @@
     "dfeta_sanctioncodeid",
     "statecode"
   ],
-  "dfeta_sanction":
-  [
+  "dfeta_sanction": [
     "dfeta_personid",
     "dfeta_sanctionid",
+    "dfeta_sanctioncodeid",
     "statecode"
   ],
   "task": [
