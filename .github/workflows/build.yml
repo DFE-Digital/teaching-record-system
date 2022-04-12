@@ -98,7 +98,7 @@ jobs:
         echo "$(echo "\set ON_ERROR_STOP true"; echo ""; cat $migrations_file)" > $migrations_file
 
     - name: Publish migrations
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: migrations
         path: migrations
