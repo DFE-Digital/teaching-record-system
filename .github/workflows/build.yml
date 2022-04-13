@@ -305,6 +305,6 @@ jobs:
         environment_name: production
         docker_image: ${{ needs.build.outputs.docker_image }}
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-        terraform_vars: prod.tfvars.json
-        terraform_backend_vars: prod.backend.tfvars
+        terraform_vars: production.tfvars.json
+        terraform_backend_vars: production.backend.tfvars
         skip_functional_tests: true
