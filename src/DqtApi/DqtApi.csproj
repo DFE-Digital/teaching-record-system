@@ -24,7 +24,7 @@
     <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
     <PackageReference Include="Scrutor" Version="4.1.0" />
     <PackageReference Include="Sentry.AspNetCore" Version="3.15.0" />
-    <PackageReference Include="Sentry.Serilog" Version="3.14.1" />
+    <PackageReference Include="Sentry.Serilog" Version="3.16.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
