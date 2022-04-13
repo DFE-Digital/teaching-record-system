@@ -6,8 +6,8 @@ test:
 	$(eval DEPLOY_ENV=test)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
 
-preprod:
-	$(eval DEPLOY_ENV=preprod)
+pre-production:
+	$(eval DEPLOY_ENV=pre-production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
 
 production:
