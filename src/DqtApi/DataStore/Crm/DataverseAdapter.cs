@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.ServiceModel;
@@ -334,6 +336,32 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
+        public Task<Account> GetIttProviderOrganizationByName(string name, params string[] columnNames) =>
+            GetIttProviderOrganizationByUkprn(name, columnNames, requestBuilder: null);
+
+        public async Task<Account> GetIttProviderOrganizationByName(string name, string[] columnNames, RequestBuilder requestBuilder)
+        {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
+            var query = new QueryByAttribute(Account.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames)
+            };
+
+            query.AddAttributeValue(Account.Fields.dfeta_TrainingProvider, true);
+            query.AddAttributeValue(Account.Fields.Name, name);
+            query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
+
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
+
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
+        }
+
         public Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, params string[] columnNames) =>
             GetIttProviderOrganizationByUkprn(ukprn, columnNames, requestBuilder: null);
 
@@ -643,42 +671,113 @@ namespace DqtApi.DataStore.Crm
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
         }
 
-        public async Task<Contact[]> FindTeachers(FindTeachersQuery filter)
+        public async Task<Contact[]> FindTeachers(FindTeachersQuery findTeachersQuery)
         {
-            var fields = new[]
+            var conditions = new List<object>();  //  Either ConditionExpresssion or FilterExpression
+
+            void AddEqualCondition(string fieldName, object value)
             {
-                (FieldName: Contact.Fields.FirstName, Value: filter.FirstName),
-                (FieldName: Contact.Fields.MiddleName, Value: filter.MiddleName),
-                (FieldName: Contact.Fields.LastName, Value: filter.LastName),
-                (FieldName: Contact.Fields.BirthDate, Value: (object)(filter.DateOfBirth.HasValue ? filter.DateOfBirth.Value.ToDateTime() : null)),
-                (FieldName: Contact.Fields.dfeta_NINumber, Value: filter.NationalInsuranceNumber),
-                (FieldName: Contact.Fields.EMailAddress1, Value: filter.EmailAddress),
-                (FieldName: Contact.Fields.FirstName, Value: filter.PreviousFirstName),
-                (FieldName: Contact.Fields.LastName, Value: filter.PreviousLastName),
-            }.ToList();
+                if (value is null || (value is string str && string.IsNullOrEmpty(str)))
+                {
+                    return;
+                }
 
-            // If fields are null/empty in the input then don't try to match them
-            fields.RemoveAll(f => f.Value == null || (f.Value is string str && string.IsNullOrEmpty(str)));
+                conditions.Add(new ConditionExpression(fieldName, ConditionOperator.Equal, value));
+            }
 
-            var combinations = fields.GetCombinations(length: 2).ToArray();
+            AddEqualCondition(Contact.Fields.BirthDate, findTeachersQuery.DateOfBirth?.ToDateTime());
+            AddEqualCondition(Contact.Fields.dfeta_NINumber, findTeachersQuery.NationalInsuranceNumber);
 
-            if (combinations.Length == 0)
+            {
+                // Find all the permutations of names to match on
+                var firstNames = new[] { findTeachersQuery.FirstName, findTeachersQuery.PreviousFirstName };
+                var lastNames = new[] { findTeachersQuery.LastName, findTeachersQuery.PreviousLastName };
+
+                var firstNamesFilter = new FilterExpression(LogicalOperator.Or);
+                foreach (var firstName in firstNames)
+                {
+                    if (!string.IsNullOrEmpty(firstName))
+                    {
+                        firstNamesFilter.AddCondition(Contact.Fields.FirstName, ConditionOperator.Equal, firstName);
+                    }
+                }
+
+                var lastNamesFilter = new FilterExpression(LogicalOperator.Or);
+                foreach (var lastName in lastNames)
+                {
+                    if (!string.IsNullOrEmpty(lastName))
+                    {
+                        lastNamesFilter.AddCondition(Contact.Fields.LastName, ConditionOperator.Equal, lastName);
+                    }
+                }
+
+                var nameFilter = new FilterExpression(LogicalOperator.And);
+
+                if (firstNamesFilter.Conditions.Count > 0)
+                {
+                    nameFilter.AddFilter(firstNamesFilter);
+                }
+
+                if (lastNamesFilter.Conditions.Count > 0)
+                {
+                    nameFilter.AddFilter(lastNamesFilter);
+                }
+
+                if (nameFilter.Filters.Count > 0)
+                {
+                    conditions.Add(nameFilter);
+                }
+            }
+
+            LinkEntity ittProviderLink = null;
+
+            if (findTeachersQuery.IttProviderOrganizationId.HasValue)
+            {
+                ittProviderLink = new LinkEntity(
+                    Contact.EntityLogicalName,
+                    dfeta_initialteachertraining.EntityLogicalName,
+                    Contact.PrimaryIdAttribute,
+                    dfeta_initialteachertraining.Fields.dfeta_PersonId,
+                    JoinOperator.LeftOuter)
+                {
+                    Columns = new ColumnSet(dfeta_initialteachertraining.Fields.dfeta_EstablishmentId)
+                };
+
+                conditions.Add(
+                    new ConditionExpression(
+                        dfeta_initialteachertraining.EntityLogicalName,
+                        dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                        ConditionOperator.Equal,
+                        findTeachersQuery.IttProviderOrganizationId));
+            }
+
+            // If we still don't have at least 3 identifiers to match on then we're done
+            var identifierCount = conditions.Count;
+            if (identifierCount < 3)
             {
                 return Array.Empty<Contact>();
             }
 
-            var combinationsFilter = new FilterExpression(LogicalOperator.Or);
-
-            foreach (var combination in combinations)
+            // Get all permutations of 3 matching conditions
+            var filter = new FilterExpression(LogicalOperator.Or);
+            foreach (var permutationConditions in conditions.GetCombinations(length: 3))
             {
                 var innerFilter = new FilterExpression(LogicalOperator.And);
 
-                foreach (var (fieldName, value) in combination)
+                foreach (var condition in permutationConditions)
                 {
-                    innerFilter.AddCondition(fieldName, ConditionOperator.Equal, value);
+                    if (condition is FilterExpression filterCondition)
+                    {
+                        innerFilter.AddFilter(filterCondition);
+                    }
+                    else
+                    {
+                        Debug.Assert(condition is ConditionExpression);
+                        innerFilter.AddCondition((ConditionExpression)condition);
+                    }
                 }
 
-                combinationsFilter.AddFilter(innerFilter);
+                filter.AddFilter(innerFilter);
             }
 
             var query = new QueryExpression(Contact.EntityLogicalName)
@@ -692,38 +791,27 @@ namespace DqtApi.DataStore.Crm
                     },
                     Filters =
                     {
-                        combinationsFilter
+                        filter
                     }
                 },
                 Orders =
                 {
-                    new OrderExpression(Contact.Fields.LastName, OrderType.Ascending)
+                    new OrderExpression(Contact.Fields.LastName, OrderType.Ascending),
+                    new OrderExpression(Contact.Fields.FirstName, OrderType.Ascending)
                 }
             };
 
-            if (filter.IttProviderOrganizationId.HasValue)
+            if (ittProviderLink != null)
             {
-                var ittProviderLink = new LinkEntity(
-                    Contact.EntityLogicalName,
-                    dfeta_initialteachertraining.EntityLogicalName,
-                    Contact.PrimaryIdAttribute,
-                    dfeta_initialteachertraining.Fields.dfeta_PersonId,
-                    JoinOperator.LeftOuter)
-                {
-                    Columns = new ColumnSet(dfeta_initialteachertraining.Fields.dfeta_EstablishmentId)
-                };
-
-                ittProviderLink.LinkCriteria.AddCondition(
-                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
-                    ConditionOperator.Equal,
-                    filter.IttProviderOrganizationId);
-
                 query.LinkEntities.Add(ittProviderLink);
             }
 
             var result = await _service.RetrieveMultipleAsync(query);
 
-            return result.Entities.Select(entity => entity.ToEntity<Contact>()).ToArray();
+            var contacts = result.Entities.Select(entity => entity.ToEntity<Contact>());
+
+            // De-dup records (we might get multiple results for the same person because of the ITT provider join)
+            return contacts.GroupBy(c => c.Id).Select(c => c.First()).ToArray();
         }
 
         public RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);

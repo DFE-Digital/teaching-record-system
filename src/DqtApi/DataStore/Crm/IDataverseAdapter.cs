@@ -24,6 +24,10 @@ namespace DqtApi.DataStore.Crm
 
         Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);
 
+        Task<Account> GetIttProviderOrganizationByName(string ukprn, params string[] columnNames);
+
+        Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, params string[] columnNames);
+
         Task<Account> GetOrganizationByName(string providerName, params string[] columnNames);
 
         Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames);

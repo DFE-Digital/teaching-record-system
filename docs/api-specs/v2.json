@@ -147,25 +147,9 @@
         "summary": "Returns teachers matching the specified criteria",
         "parameters": [
           {
-            "name": "emailAddress",
-            "in": "query",
-            "description": "Email Address",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "firstName",
             "in": "query",
             "description": "First name of person",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "middleName",
-            "in": "query",
-            "description": "Middle name of person",
             "schema": {
               "type": "string"
             }
