@@ -21,6 +21,12 @@ namespace DqtApi.Tests
             }
 
             var teacherId = Guid.NewGuid();
+            var firstName = Faker.Name.First();
+            var middleName = Faker.Name.Middle();
+            var lastName = Faker.Name.Last();
+            var birthDate = Faker.Identification.DateOfBirth();
+            var nino = Faker.Identification.UkNationalInsuranceNumber();
+            var email = Faker.Internet.Email();
 
             var programmeType = earlyYears ? dfeta_ITTProgrammeType.EYITTAssessmentOnly :
                 assessmentOnly ? dfeta_ITTProgrammeType.AssessmentOnlyRoute :
@@ -84,12 +90,12 @@ namespace DqtApi.Tests
                     Target = new Contact()
                     {
                         Id = teacherId,
-                        FirstName = Faker.Name.First(),
-                        MiddleName = Faker.Name.Middle(),
-                        LastName = Faker.Name.Last(),
-                        BirthDate = Faker.Identification.DateOfBirth(),
-                        dfeta_NINumber = Faker.Identification.UkNationalInsuranceNumber(),
-                        EMailAddress1 = Faker.Internet.Email(),
+                        FirstName = firstName,
+                        MiddleName = middleName,
+                        LastName = lastName,
+                        BirthDate = birthDate,
+                        dfeta_NINumber = nino,
+                        EMailAddress1 = email,
                         Address1_Line1 = Faker.Address.StreetAddress(),
                         Address1_City = Faker.Address.City(),
                         Address1_Country = "United Kingdom",
@@ -161,13 +167,18 @@ namespace DqtApi.Tests
             var ittId = createIttTask.GetResponse().id;
             var qtsId = createQtsTask.GetResponse().id;
 
-            return new CreatePersonResult(teacherId, ittId, qtsId, ittProviderUkprn);
+            return new CreatePersonResult(teacherId, firstName, lastName, DateOnly.FromDateTime(birthDate), nino, ittId, qtsId, ittProvider.Id, ittProviderUkprn);
         }
 
         public record CreatePersonResult(
             Guid TeacherId,
+            string FirstName,
+            string LastName,
+            DateOnly BirthDate,
+            string Nino,
             Guid InitialTeacherTrainingId,
             Guid QtsRegistrationId,
+            Guid IttProviderId,
             string IttProviderUkprn);
     }
 }

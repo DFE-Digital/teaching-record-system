@@ -8,17 +8,9 @@ namespace DqtApi.V2.Requests
 {
     public class FindTeachersRequest : IRequest<FindTeachersResponse>
     {
-        [SwaggerParameter(Description = "Email Address")]
-        [FromQuery(Name = "emailAddress")]
-        public string EmailAddress { get; set; }
-
         [SwaggerParameter(Description = "First name of person")]
         [FromQuery(Name = "firstName")]
         public string FirstName { get; set; }
-
-        [SwaggerParameter(Description = "Middle name of person")]
-        [FromQuery(Name = "middleName")]
-        public string MiddleName { get; set; }
 
         [SwaggerParameter(Description = "Last name of person")]
         [FromQuery(Name = "lastName")]

@@ -32,7 +32,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_valid_request_with_Pass_result_for_early_years_updates_qts_and_does_not_create_induction()
         {
             // Arrange
-            var (teacherId, ittId, qtsId, ittProviderUkprn) = await _testDataHelper.CreatePerson(earlyYears: true);
+            var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: true);
             var ittResult = dfeta_ITTResult.Pass;
             var assessmentDate = _clock.Today;
 
@@ -40,8 +40,8 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
-                teacherId,
-                ittProviderUkprn,
+                createPersonResult.TeacherId,
+                createPersonResult.IttProviderUkprn,
                 ittResult,
                 assessmentDate);
 
@@ -49,11 +49,11 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.True(result.Succeeded);
 
             var ittUpdate = transactionRequest.AssertSingleUpdateRequest<dfeta_initialteachertraining>();
-            Assert.Equal(ittId, ittUpdate.Id);
+            Assert.Equal(createPersonResult.InitialTeacherTrainingId, ittUpdate.Id);
             Assert.Equal(ittResult, ittUpdate.dfeta_Result);
 
             var qtsUpdate = transactionRequest.AssertSingleUpdateRequest<dfeta_qtsregistration>();
-            Assert.Equal(qtsId, qtsUpdate.Id);
+            Assert.Equal(createPersonResult.QtsRegistrationId, qtsUpdate.Id);
             Assert.Equal(earlyYearsTeacherStatusId, qtsUpdate.dfeta_EarlyYearsStatusId?.Id);
             Assert.Equal(assessmentDate.ToDateTime(), qtsUpdate.dfeta_EYTSDate);
             Assert.Null(qtsUpdate.dfeta_QTSDate);
@@ -61,7 +61,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             transactionRequest.AssertDoesNotContainUpdateRequest<dfeta_induction>();
 
-            var teacher = await _dataverseAdapter.GetTeacher(teacherId, columnNames: Contact.Fields.dfeta_EYTSDate);
+            var teacher = await _dataverseAdapter.GetTeacher(createPersonResult.TeacherId, columnNames: Contact.Fields.dfeta_EYTSDate);
             Assert.Equal(assessmentDate.ToDateTime(), teacher.dfeta_EYTSDate);
         }
 
@@ -73,7 +73,7 @@ namespace DqtApi.Tests.DataverseIntegration
             string expectedTeacherStatus)
         {
             // Arrange
-            var (teacherId, ittId, qtsId, ittProviderUkprn) = await _testDataHelper.CreatePerson(earlyYears: false, assessmentOnly);
+            var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, assessmentOnly);
 
             var ittResult = dfeta_ITTResult.Pass;
             var assessmentDate = _clock.Today;
@@ -81,8 +81,8 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
-                teacherId,
-                ittProviderUkprn,
+                createPersonResult.TeacherId,
+                createPersonResult.IttProviderUkprn,
                 ittResult,
                 assessmentDate);
 
@@ -90,21 +90,21 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.True(result.Succeeded);
 
             var ittUpdate = transactionRequest.AssertSingleUpdateRequest<dfeta_initialteachertraining>();
-            Assert.Equal(ittId, ittUpdate.Id);
+            Assert.Equal(createPersonResult.InitialTeacherTrainingId, ittUpdate.Id);
             Assert.Equal(ittResult, ittUpdate.dfeta_Result);
 
             var qtsUpdate = transactionRequest.AssertSingleUpdateRequest<dfeta_qtsregistration>();
-            Assert.Equal(qtsId, qtsUpdate.Id);
+            Assert.Equal(createPersonResult.QtsRegistrationId, qtsUpdate.Id);
             Assert.Null(qtsUpdate.dfeta_EarlyYearsStatusId);
             Assert.Null(qtsUpdate.dfeta_EYTSDate);
             Assert.Equal(assessmentDate.ToDateTime(), qtsUpdate.dfeta_QTSDate);
             Assert.Equal(teacherStatusId, qtsUpdate.dfeta_TeacherStatusId?.Id);
 
             var induction = transactionRequest.AssertSingleCreateRequest<dfeta_induction>();
-            Assert.Equal(teacherId, induction.dfeta_PersonId?.Id);
+            Assert.Equal(createPersonResult.TeacherId, induction.dfeta_PersonId?.Id);
             Assert.Equal(dfeta_InductionStatus.RequiredtoComplete, induction.dfeta_InductionStatus);
 
-            var teacher = await _dataverseAdapter.GetTeacher(teacherId, columnNames: Contact.Fields.dfeta_QTSDate);
+            var teacher = await _dataverseAdapter.GetTeacher(createPersonResult.TeacherId, columnNames: Contact.Fields.dfeta_QTSDate);
             Assert.Equal(assessmentDate.ToDateTime(), teacher.dfeta_QTSDate);
         }
 
@@ -115,16 +115,16 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_valid_request_with_non_withdrawn_result_for_early_years_does_not_clear_earlyyearsstatusid(dfeta_ITTResult ittResult)
         {
             // Arrange
-            var (teacherId, _, _, ittProviderUkprn) = await _testDataHelper.CreatePerson(earlyYears: true);
+            var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: true);
 
             // Act
             var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
-                teacherId,
-                ittProviderUkprn,
+                createPersonResult.TeacherId,
+                createPersonResult.IttProviderUkprn,
                 ittResult,
                 assessmentDate: null);
 
-            var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(teacherId,
+            var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(createPersonResult.TeacherId,
                 columnNames: new[]
                 {
                     dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
@@ -144,16 +144,16 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_valid_request_with_non_withdrawn_result_for_teacher_does_not_clear_teacherstatusid(dfeta_ITTResult ittResult)
         {
             // Arrange
-            var (teacherId, _, _, ittProviderUkprn) = await _testDataHelper.CreatePerson(earlyYears: false);
+            var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false);
 
             // Act
             var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
-                teacherId,
-                ittProviderUkprn,
+                createPersonResult.TeacherId,
+                createPersonResult.IttProviderUkprn,
                 ittResult,
                 assessmentDate: null);
 
-            var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(teacherId,
+            var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(createPersonResult.TeacherId,
                 columnNames: new[]
                 {
                     dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
@@ -226,20 +226,20 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_earlyyears_teacher_is_withdrawn_earlyyearsstatusid_is_set_to_null()
         {
             // Arrange
-            var (teacherId, _, qtsId, ittProviderUkprn) = await _testDataHelper.CreatePerson(earlyYears: true);
+            var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: true);
             var ittResult = dfeta_ITTResult.Withdrawn;
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
-                teacherId,
-                ittProviderUkprn,
+                createPersonResult.TeacherId,
+                createPersonResult.IttProviderUkprn,
                 ittResult,
                 null);
 
             // Assert
             Assert.True(result.Succeeded);
             var qtsUpdate = transactionRequest.AssertSingleUpdateRequest<dfeta_qtsregistration>();
-            Assert.Equal(qtsId, qtsUpdate.Id);
+            Assert.Equal(createPersonResult.QtsRegistrationId, qtsUpdate.Id);
             Assert.Null(qtsUpdate.dfeta_EarlyYearsStatusId?.Id);
         }
 
@@ -247,20 +247,20 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_teacher_is_withdrawn_teacherstatusid_is_set_to_null()
         {
             // Arrange
-            var (teacherId, _, qtsId, ittProviderUkprn) = await _testDataHelper.CreatePerson(earlyYears: false);
+            var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false);
             var ittResult = dfeta_ITTResult.Withdrawn;
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
-                teacherId,
-                ittProviderUkprn,
+                createPersonResult.TeacherId,
+                createPersonResult.IttProviderUkprn,
                 ittResult,
                 null);
 
             // Assert
             Assert.True(result.Succeeded);
             var qtsUpdate = transactionRequest.AssertSingleUpdateRequest<dfeta_qtsregistration>();
-            Assert.Equal(qtsId, qtsUpdate.Id);
+            Assert.Equal(createPersonResult.QtsRegistrationId, qtsUpdate.Id);
             Assert.Null(qtsUpdate.dfeta_TeacherStatusId?.Id);
         }
 
@@ -268,14 +268,14 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_teacher_with_active_sanctions_creates_review_task()
         {
             // Arrange
-            var (teacherId, _, _, ittProviderUkprn) = await _testDataHelper.CreatePerson(earlyYears: false, withActiveSanction: true);
+            var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, withActiveSanction: true);
             var ittResult = dfeta_ITTResult.Pass;
             var assessmentDate = _clock.Today;
 
             // Act
             var (_, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
-                teacherId,
-                ittProviderUkprn,
+                createPersonResult.TeacherId,
+                createPersonResult.IttProviderUkprn,
                 ittResult,
                 assessmentDate);
 
@@ -305,14 +305,14 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_teacher_without_active_sanctions_does_not_create_review_task()
         {
             // Arrange
-            var (teacherId, _, _, ittProviderUkprn) = await _testDataHelper.CreatePerson(earlyYears: false, withActiveSanction: false);
+            var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, withActiveSanction: false);
             var ittResult = dfeta_ITTResult.Pass;
             var assessmentDate = _clock.Today;
 
             // Act
             var (_, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
-                teacherId,
-                ittProviderUkprn,
+                createPersonResult.TeacherId,
+                createPersonResult.IttProviderUkprn,
                 ittResult,
                 assessmentDate);
 

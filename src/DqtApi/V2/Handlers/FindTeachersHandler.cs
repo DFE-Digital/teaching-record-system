@@ -23,26 +23,31 @@ namespace DqtApi.V2.Handlers
 
         public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
         {
-            var ittProvider = default(Account);
+            Account ittProvider = null;
+
             if (!string.IsNullOrEmpty(request.IttProviderUkprn))
             {
-                ittProvider = await _dataverseAdapter.GetOrganizationByUkprn(request.IttProviderUkprn);
+                ittProvider = await _dataverseAdapter.GetIttProviderOrganizationByUkprn(request.IttProviderUkprn);
+
                 if (ittProvider == null)
+                {
                     throw new ErrorException(ErrorRegistry.OrganisationNotFound());
+                }
             }
             else if (!string.IsNullOrEmpty(request.IttProviderName))
             {
-                ittProvider = await _dataverseAdapter.GetOrganizationByName(request.IttProviderName);
+                ittProvider = await _dataverseAdapter.GetIttProviderOrganizationByName(request.IttProviderName);
+
                 if (ittProvider == null)
+                {
                     throw new ErrorException(ErrorRegistry.OrganisationNotFound());
+                }
             }
 
             var query = new FindTeachersQuery()
             {
                 FirstName = request.FirstName,
-                MiddleName = request.MiddleName,
                 LastName = request.LastName,
-                EmailAddress = request.EmailAddress,
                 PreviousFirstName = request.PreviousFirstName,
                 PreviousLastName = request.PreviousLastName,
                 NationalInsuranceNumber = request.NationalInsuranceNumber,
