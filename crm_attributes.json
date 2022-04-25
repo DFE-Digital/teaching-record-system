@@ -101,7 +101,8 @@
     "dfeta_he_hesubject2id",
     "dfeta_he_hesubject3id",
     "dfeta_personid",
-    "dfeta_type"
+    "dfeta_type",
+    "statecode"
   ],
   "dfeta_teacherstatus": [
     "dfeta_name",

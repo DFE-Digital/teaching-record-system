@@ -3615,6 +3615,7 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string dfeta_HE_HESubject3Id = "dfeta_he_hesubject3id";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_Type = "dfeta_type";
+			public const string StateCode = "statecode";
 			public const string dfeta_account_dfeta_qualification_he = "dfeta_account_dfeta_qualification_he";
 			public const string dfeta_contact_dfeta_qualification = "dfeta_contact_dfeta_qualification";
 			public const string dfeta_dfeta_country_dfeta_qualification_he = "dfeta_dfeta_country_dfeta_qualification_he";
@@ -3884,6 +3885,41 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_Type");
 				this.SetAttributeValue("dfeta_type", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
 				this.OnPropertyChanged("dfeta_Type");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the Qualification
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<DqtApi.DataStore.Crm.Models.dfeta_qualificationState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((DqtApi.DataStore.Crm.Models.dfeta_qualificationState)(System.Enum.ToObject(typeof(DqtApi.DataStore.Crm.Models.dfeta_qualificationState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
 			}
 		}
 		
