@@ -447,6 +447,7 @@ namespace DqtApi.DataStore.Crm
         {
             var filter = new FilterExpression();
             filter.AddCondition(dfeta_qualification.Fields.dfeta_PersonId, ConditionOperator.Equal, teacherId);
+            filter.AddCondition(dfeta_qtsregistration.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_qualificationState.Active);
 
             var query = new QueryExpression(dfeta_qualification.EntityLogicalName)
             {
