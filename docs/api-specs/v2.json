@@ -521,6 +521,9 @@
           "uid": {
             "type": "string",
             "nullable": true
+          },
+          "hasActiveSanctions": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

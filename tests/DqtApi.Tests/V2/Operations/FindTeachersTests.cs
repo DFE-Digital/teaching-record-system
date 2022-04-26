@@ -71,7 +71,8 @@ namespace DqtApi.Tests.V2.Operations
                              lastName = contact1.LastName,
                              dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
                              nationalInsuranceNumber = contact1.dfeta_NINumber,
-                             uid = contact1.Id.ToString()
+                             uid = contact1.Id.ToString(),
+                             hasActiveSanctions = false
                         }
                     }
                 },
@@ -165,7 +166,8 @@ namespace DqtApi.Tests.V2.Operations
                              lastName = contact1.LastName,
                              dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
                              nationalInsuranceNumber = contact1.dfeta_NINumber,
-                             uid = contact1.Id.ToString()
+                             uid = contact1.Id.ToString(),
+                             hasActiveSanctions = false
                         }
                     }
                 },
@@ -189,6 +191,84 @@ namespace DqtApi.Tests.V2.Operations
 
             // Assert
             Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Given_search_returns_a_result_with_no_active_sanctions_returns_expected_response()
+        {
+            // Arrange
+            var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference", dfeta_ActiveSanctions = null };
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+                .ReturnsAsync(new[] { contact1 });
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
+
+            // Act
+            var response = await HttpClient.SendAsync(request);
+
+            // Assert
+            await AssertEx.JsonResponseEquals(
+                response,
+                expected: new
+                {
+                    results = new[]
+                    {
+                        new
+                        {
+                             trn = contact1.dfeta_TRN,
+                             emailAddresses = default(List<string>),
+                             firstName = contact1.FirstName,
+                             lastName = contact1.LastName,
+                             dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
+                             nationalInsuranceNumber = contact1.dfeta_NINumber,
+                             uid = contact1.Id.ToString(),
+                             hasActiveSanctions = false
+                        }
+                    }
+                },
+                expectedStatusCode: StatusCodes.Status200OK);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Given_search_returns_a_result_with_activesanctions_set_returns_expected_response(bool? activeSanctions)
+        {
+            // Arrange
+            var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference", dfeta_ActiveSanctions= activeSanctions };
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+                .ReturnsAsync(new[] { contact1 });
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
+
+            // Act
+            var response = await HttpClient.SendAsync(request);
+
+            // Assert
+            await AssertEx.JsonResponseEquals(
+                response,
+                expected: new
+                {
+                    results = new[]
+                    {
+                        new
+                        {
+                             trn = contact1.dfeta_TRN,
+                             emailAddresses = default(List<string>),
+                             firstName = contact1.FirstName,
+                             lastName = contact1.LastName,
+                             dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
+                             nationalInsuranceNumber = contact1.dfeta_NINumber,
+                             uid = contact1.Id.ToString(),
+                             hasActiveSanctions = activeSanctions
+                        }
+                    }
+                },
+                expectedStatusCode: StatusCodes.Status200OK);
         }
     }
 }

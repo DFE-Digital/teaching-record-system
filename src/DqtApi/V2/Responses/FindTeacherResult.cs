@@ -12,5 +12,6 @@ namespace DqtApi.V2.Responses
         public DateOnly? DateOfBirth { get; set; }
         public string NationalInsuranceNumber { get; set; }
         public string Uid { get; set; }
+        public bool HasActiveSanctions { get; set; }
     }
 }

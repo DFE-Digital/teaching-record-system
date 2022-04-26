@@ -783,7 +783,15 @@ namespace DqtApi.DataStore.Crm
 
             var query = new QueryExpression(Contact.EntityLogicalName)
             {
-                ColumnSet = new ColumnSet(true),
+                ColumnSet = new ColumnSet(
+                    Contact.Fields.dfeta_TRN,
+                    Contact.Fields.EMailAddress1,
+                    Contact.Fields.FirstName,
+                    Contact.Fields.LastName,
+                    Contact.Fields.BirthDate,
+                    Contact.Fields.dfeta_NINumber,
+                    Contact.Fields.dfeta_ActiveSanctions
+                ),
                 Criteria = new FilterExpression(LogicalOperator.And)
                 {
                     Conditions =
