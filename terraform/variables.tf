@@ -14,7 +14,6 @@ variable "key_vault_name" {
 variable "resource_group_name" {
   type = string
 }
-
 variable "paas_api_url" {
   default = "https://api.london.cloud.service.gov.uk"
 }
