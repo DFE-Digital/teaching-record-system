@@ -197,16 +197,7 @@ namespace DqtApi.Tests.V2.Operations
         public async Task Given_search_returns_a_result_with_no_active_sanctions_returns_expected_response()
         {
             // Arrange
-            var contact1 = new Contact() {
-                FirstName = "test",
-                LastName = "testing",
-                Id = Guid.NewGuid(),
-                dfeta_NINumber = "1111",
-                BirthDate = new DateTime(1988, 2, 1),
-                dfeta_TRN = "someReference",
-                dfeta_ActiveSanctions = null
-            };
-
+            var contact1 = new Contact() {FirstName = "test",LastName = "testing",Id = Guid.NewGuid(),dfeta_NINumber = "1111",BirthDate = new DateTime(1988, 2, 1),dfeta_TRN = "someReference",dfeta_ActiveSanctions = null};
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
                 .ReturnsAsync(new[] { contact1 });
@@ -245,16 +236,7 @@ namespace DqtApi.Tests.V2.Operations
         public async Task Given_search_returns_a_result_with_activesanctions_set_returns_expected_response(bool? activeSanctions)
         {
             // Arrange
-            var contact1 = new Contact() {
-                FirstName = "test",
-                LastName = "testing",
-                Id = Guid.NewGuid(),
-                dfeta_NINumber = "1111",
-                BirthDate = new DateTime(1988, 2, 1),
-                dfeta_TRN = "someReference",
-                dfeta_ActiveSanctions= activeSanctions
-            };
-
+            var contact1 = new Contact() {FirstName = "test",LastName = "testing",Id = Guid.NewGuid(),dfeta_NINumber = "1111",BirthDate = new DateTime(1988, 2, 1),dfeta_TRN = "someReference", dfeta_ActiveSanctions= activeSanctions};
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
                 .ReturnsAsync(new[] { contact1 });
