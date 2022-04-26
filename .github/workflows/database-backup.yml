@@ -1,0 +1,78 @@
+name: Backup Database to Azure Storage
+
+on:
+  workflow_dispatch:
+  schedule: # 01:00 UTC
+    - cron: '0 1 * * *'
+
+jobs:
+  backup:
+    name: Backup PaaS Database ( Production )
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.azure_credentials }}
+
+      - name: Set environment variables
+        shell: bash
+        run: |
+          tf_vars_file=terraform/production.tfvars.json
+          echo "KEY_VAULT_NAME=$(jq -r '.key_vault_name' ${tf_vars_file})" >> $GITHUB_ENV
+          echo "PAAS_SPACE=$(jq -r '.paas_space' ${tf_vars_file})" >> $GITHUB_ENV
+
+      - uses: Azure/get-keyvault-secrets@v1
+        id: get_secrets
+        with:
+          keyvault: ${{ env.KEY_VAULT_NAME }}
+          secrets: 'BACKUP-STORAGE-CONNECTION-STRING,PAAS-USER,PAAS-PASSWORD'
+
+      - uses: DfE-Digital/keyvault-yaml-secret@v1
+        id:  keyvault-yaml-secret
+        with:
+          keyvault: ${{ env.KEY_VAULT_NAME }}
+          secret: MONITORING
+          key: SLACK_WEBHOOK
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Setup cf cli
+        uses: DFE-Digital/github-actions/setup-cf-cli@master
+        with:
+          CF_USERNAME: ${{ steps.get_secrets.outputs.PAAS-USER }}
+          CF_PASSWORD: ${{ steps.get_secrets.outputs.PAAS-PASSWORD }}
+          CF_SPACE_NAME: ${{ env.PAAS_SPACE }}
+          INSTALL_CONDUIT: true
+
+      - name: Setup postgres client
+        uses: DFE-Digital/github-actions/install-postgres-client@master
+
+      - name: Set environment variable
+        run: echo "BACKUP_FILE_NAME=qualified-teachers-api-prod-pg-svc-$(date +"%F-%H-%M-%S")" >> $GITHUB_ENV
+
+      - name: Backup Dev DB
+        run: |
+          cf conduit qualified-teachers-api-prod-pg-svc -- pg_dump -E utf8 --clean --if-exists --no-owner --verbose --no-password -f ${BACKUP_FILE_NAME}.sql
+          tar -cvzf ${BACKUP_FILE_NAME}.tar.gz ${BACKUP_FILE_NAME}.sql
+
+      - name: Upload Backup to Azure Storage
+        run: |
+          az storage blob upload --container-name dqt-api \
+          --file ${BACKUP_FILE_NAME}.tar.gz --name ${BACKUP_FILE_NAME}.tar.gz \
+          --connection-string '${{ steps.get_secrets.outputs.BACKUP-STORAGE-CONNECTION-STRING }}'
+
+      - name: Notify Slack channel on job failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_USERNAME: CI Deployment
+          SLACK_TITLE: Database backup failure
+          SLACK_MESSAGE: Production database backup job failed
+          SLACK_WEBHOOK: ${{ steps.keyvault-yaml-secret.outputs.SLACK_WEBHOOK }}
+          SLACK_COLOR: failure
+          SLACK_FOOTER: Sent from backup job in database-backup workflow

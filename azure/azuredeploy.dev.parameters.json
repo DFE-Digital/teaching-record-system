@@ -5,7 +5,7 @@
     "keyVaultName": {
       "value": "s165d01-kv"
     },
-    "storageAccountName": {
+    "tfStateStorageAccountName": {
       "value": "s165d01tfstate"
     }
   }
