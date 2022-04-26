@@ -5,18 +5,22 @@ help: ## Show this help
 dev:
 	$(eval DEPLOY_ENV=dev)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-development)
+	$(eval SERVICE_PRINCIPAL_NAME=s165d01-keyvault-readonly-access)
 
 test:
 	$(eval DEPLOY_ENV=test)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
+	$(eval SERVICE_PRINCIPAL_NAME=s165t01-keyvault-readonly-access)
 
 pre-production:
 	$(eval DEPLOY_ENV=pre-production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
+	$(eval SERVICE_PRINCIPAL_NAME=s165t01-preprod-keyvault-readonly-access)
 
 production:
 	$(eval DEPLOY_ENV=production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-production)
+	$(eval SERVICE_PRINCIPAL_NAME=s165p01-keyvault-readonly-access)
 
 read-keyvault-config:
 	$(eval KEY_VAULT_NAME=$(shell jq -r '.key_vault_name' terraform/$(DEPLOY_ENV).tfvars.json))
@@ -26,6 +30,7 @@ read-deployment-config:
 	$(eval SPACE=$(shell jq -r '.paas_space' terraform/$(DEPLOY_ENV).tfvars.json))
 	$(eval POSTGRES_DATABASE_NAME=$(shell jq -r '.postgres_database_name' terraform/$(DEPLOY_ENV).tfvars.json))
 	$(eval API_APP_NAME=$(shell jq -r '.api_app_name' terraform/$(DEPLOY_ENV).tfvars.json))
+	$(eval RESOURCE_GROUP_NAME=$(shell jq -r '.resource_group_name' terraform/$(DEPLOY_ENV).tfvars.json))
 
 set-azure-account: ${environment}
 	echo "Logging on to ${AZURE_SUBSCRIPTION}"
@@ -91,6 +96,10 @@ restore-postgres: terraform-init read-deployment-config ## make dev restore-post
 	$(eval export TF_VAR_paas_restore_db_from_point_in_time_before=$(BEFORE_TIME))
 	echo "Restoring ${POSTGRES_DATABASE_NAME} from $(TF_VAR_paas_restore_db_from_db_instance) before $(TF_VAR_paas_restore_db_from_point_in_time_before)"
 	make ${DEPLOY_ENV} terraform-apply
+
+deploy-storage: read-deployment-config ## make dev deploy-storage CONFIRM_DEPLOY=1
+	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
+	pwsh ./azure/Set-ResourceGroup.ps1 -ResourceGroupName ${RESOURCE_GROUP_NAME} -Subscription ${AZURE_SUBSCRIPTION} -EnvironmentName ${DEPLOY_ENV} -ParametersFile "./azure/azuredeploy.${DEPLOY_ENV}.parameters.json" -ServicePrincipalName ${SERVICE_PRINCIPAL_NAME}
 
 terraform-init:
 	$(if $(or $(DISABLE_PASSCODE),$(PASSCODE)), , $(error Missing environment variable "PASSCODE", retrieve from https://login.london.cloud.service.gov.uk/passcode))

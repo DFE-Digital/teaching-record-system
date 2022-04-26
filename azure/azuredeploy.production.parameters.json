@@ -3,10 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "keyVaultName": {
-      "value": "s165t01-preprod-kv"
+      "value": "s165p01-kv"
     },
-    "storageAccountName": {
-      "value": "s165t01preprodtfstate"
+    "tfStateStorageAccountName": {
+      "value": "s165p01tfstate"
+    },
+    "dbBackupStorageAccountName": {
+      "value": "s165p01dbbackup"
     }
   }
 }
