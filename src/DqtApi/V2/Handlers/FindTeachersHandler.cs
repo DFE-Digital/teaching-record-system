@@ -67,7 +67,8 @@ namespace DqtApi.V2.Handlers
                     LastName = a.LastName,
                     DateOfBirth = a.BirthDate.HasValue ? DateOnly.FromDateTime(a.BirthDate.Value) : null,
                     NationalInsuranceNumber = a.dfeta_NINumber,
-                    Uid = a.Id.ToString()
+                    Uid = a.Id.ToString(),
+                    HasActiveSanctions = a.dfeta_ActiveSanctions == true
                 }) ?? Enumerable.Empty<FindTeacherResult>()
             };
         }
