@@ -1,0 +1,31 @@
+#!/bin/bash
+set -eu
+
+AZURE_BACKUP_STORAGE_ACCOUNT_NAME=$1
+AZURE_BACKUP_STORAGE_CONTAINER_NAME=$2
+BACKUP_FILENAME=$3
+
+if [[ -z "${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" ]]; then
+  echo "AZURE_BACKUP_STORAGE_ACCOUNT_NAME environment variable not set"
+  exit 1
+fi
+if [[ -z "${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" ]]; then
+  echo "AZURE_BACKUP_STORAGE_CONTAINER_NAME environment variable not set"
+  exit 1
+fi
+
+if [[ -z "${BACKUP_FILENAME}" ]]; then
+  echo "BACKUP_FILENAME environment variable not set"
+  exit 1
+fi
+
+Exists=$(az storage blob exists --account-name ${AZURE_BACKUP_STORAGE_ACCOUNT_NAME} -c ${AZURE_BACKUP_STORAGE_CONTAINER_NAME} -n ${BACKUP_FILENAME} -o tsv)
+
+if [[ "${Exists}" = "False" ]]; then
+  echo "There are no files found matching the filename ${BACKUP_FILENAME} in container ${AZURE_BACKUP_STORAGE_CONTAINER_NAME}"
+  exit 1
+else
+  echo "File ${BACKUP_FILENAME} found in container ${AZURE_BACKUP_STORAGE_CONTAINER_NAME}. Downloading"
+  az storage blob download --account-name ${AZURE_BACKUP_STORAGE_ACCOUNT_NAME} -c ${AZURE_BACKUP_STORAGE_CONTAINER_NAME} -n ${BACKUP_FILENAME} -f ${BACKUP_FILENAME}
+  tar -xvzf "${BACKUP_FILENAME}"
+fi
