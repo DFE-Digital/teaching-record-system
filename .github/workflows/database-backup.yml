@@ -53,7 +53,7 @@ jobs:
         uses: DFE-Digital/github-actions/install-postgres-client@master
 
       - name: Set environment variable
-        run: echo "BACKUP_FILE_NAME=qualified-teachers-api-prod-pg-svc-$(date +"%F-%H-%M-%S")" >> $GITHUB_ENV
+        run: echo "BACKUP_FILE_NAME=qualified-teachers-api-prod-pg-svc-$(date +"%F-%H")" >> $GITHUB_ENV
 
       - name: Backup Dev DB
         run: |
@@ -64,7 +64,8 @@ jobs:
         run: |
           az storage blob upload --container-name dqt-api \
           --file ${BACKUP_FILE_NAME}.tar.gz --name ${BACKUP_FILE_NAME}.tar.gz \
-          --connection-string '${{ steps.get_secrets.outputs.BACKUP-STORAGE-CONNECTION-STRING }}'
+          --connection-string '${{ steps.get_secrets.outputs.BACKUP-STORAGE-CONNECTION-STRING }}' \
+          --overwrite true
 
       - name: Notify Slack channel on job failure
         if: failure()
