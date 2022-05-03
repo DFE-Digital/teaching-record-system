@@ -1,26 +1,35 @@
+.DEFAULT_GOAL		:=help
+SHELL				:=/bin/bash
+
 .PHONY: help
 help: ## Show this help
 	@grep -E '^[a-zA-Z\.\-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+.PHONY: dev
 dev:
 	$(eval DEPLOY_ENV=dev)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-development)
 	$(eval SERVICE_PRINCIPAL_NAME=s165d01-keyvault-readonly-access)
 
+.PHONY: test
 test:
 	$(eval DEPLOY_ENV=test)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
 	$(eval SERVICE_PRINCIPAL_NAME=s165t01-keyvault-readonly-access)
 
+.PHONY: pre-production
 pre-production:
 	$(eval DEPLOY_ENV=pre-production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
 	$(eval SERVICE_PRINCIPAL_NAME=s165t01-preprod-keyvault-readonly-access)
 
+.PHONY: production
 production:
 	$(eval DEPLOY_ENV=production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-production)
 	$(eval SERVICE_PRINCIPAL_NAME=s165p01-keyvault-readonly-access)
+	$(eval AZURE_BACKUP_STORAGE_ACCOUNT_NAME=s165p01dbbackup)
+	$(eval AZURE_BACKUP_STORAGE_CONTAINER_NAME=dqt-api)
 
 read-keyvault-config:
 	$(eval KEY_VAULT_NAME=$(shell jq -r '.key_vault_name' terraform/$(DEPLOY_ENV).tfvars.json))
@@ -96,6 +105,13 @@ restore-postgres: terraform-init read-deployment-config ## make dev restore-post
 	$(eval export TF_VAR_paas_restore_db_from_point_in_time_before=$(BEFORE_TIME))
 	echo "Restoring ${POSTGRES_DATABASE_NAME} from $(TF_VAR_paas_restore_db_from_db_instance) before $(TF_VAR_paas_restore_db_from_point_in_time_before)"
 	make ${DEPLOY_ENV} terraform-apply
+
+restore-data-from-backup: read-deployment-config # make production restore-data-from-backup CONFIRM_RESTORE=YES BACKUP_FILENAME="qualified-teachers-api-prod-pg-svc-2022-04-28-01"
+	@if [[ "$(CONFIRM_RESTORE)" != YES ]]; then echo "Please enter "CONFIRM_RESTORE=YES" to run workflow"; exit 1; fi
+	$(eval export AZURE_BACKUP_STORAGE_ACCOUNT_NAME=$(AZURE_BACKUP_STORAGE_ACCOUNT_NAME))
+	$(if $(BACKUP_FILENAME), , $(error can only run with BACKUP_FILENAME, eg BACKUP_FILENAME="qualified-teachers-api-prod-pg-svc-2022-04-28-01"))
+	bin/download-db-backup ${AZURE_BACKUP_STORAGE_ACCOUNT_NAME} ${AZURE_BACKUP_STORAGE_CONTAINER_NAME} ${BACKUP_FILENAME}.tar.gz
+	bin/restore-db ${DEPLOY_ENV} ${CONFIRM_RESTORE} ${SPACE} ${BACKUP_FILENAME}.sql ${POSTGRES_DATABASE_NAME}
 
 deploy-storage: read-deployment-config ## make dev deploy-storage CONFIRM_DEPLOY=1
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
