@@ -24,7 +24,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Arrange
 
             // Act
-            var result = await _dataverseAdapter.GetIttProviders();
+            var result = await _dataverseAdapter.GetIttProviders(false);
 
             // Assert
             Assert.NotEmpty(result);

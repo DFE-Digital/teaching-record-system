@@ -19,7 +19,7 @@ namespace DqtApi.V2.Handlers
 
         public async Task<GetIttProvidersResponse> Handle(GetIttProvidersRequest request, CancellationToken cancellationToken)
         {
-            var ittProviders = await _dataverseAdapter.GetIttProviders();
+            var ittProviders = await _dataverseAdapter.GetIttProviders(false);
 
             return new GetIttProvidersResponse()
             {

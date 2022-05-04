@@ -157,10 +157,11 @@ namespace DqtApi.DataStore.Crm
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>()).ToArray();
         }
 
-        public async Task<Account[]> GetIttProviders()
+        public async Task<Account[]> GetIttProviders(bool activeOnly)
         {
             var filter = new FilterExpression(LogicalOperator.And);
-            filter.AddCondition(Account.Fields.StateCode, ConditionOperator.Equal, (int)AccountState.Active);
+            if (activeOnly)
+                filter.AddCondition(Account.Fields.StateCode, ConditionOperator.Equal, (int)AccountState.Active);
             filter.AddCondition(Account.Fields.dfeta_TrainingProvider, ConditionOperator.Equal, true);
             filter.AddCondition(Account.Fields.dfeta_UKPRN, ConditionOperator.NotNull);
 
@@ -336,8 +337,8 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
-        public Task<Account> GetIttProviderOrganizationByName(string name, params string[] columnNames) =>
-            GetIttProviderOrganizationByUkprn(name, columnNames, requestBuilder: null);
+        public Task<Account> GetIttProviderOrganizationByName(string name, bool activeOnly, params string[] columnNames) =>
+            GetIttProviderOrganizationByUkprn(name, activeOnly, columnNames, requestBuilder: null);
 
         public async Task<Account> GetIttProviderOrganizationByName(string name, string[] columnNames, RequestBuilder requestBuilder)
         {
@@ -362,10 +363,10 @@ namespace DqtApi.DataStore.Crm
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
         }
 
-        public Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, params string[] columnNames) =>
-            GetIttProviderOrganizationByUkprn(ukprn, columnNames, requestBuilder: null);
+        public Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, bool activeOnly, params string[] columnNames) =>
+            GetIttProviderOrganizationByUkprn(ukprn, activeOnly, columnNames, requestBuilder: null);
 
-        public async Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -376,7 +377,9 @@ namespace DqtApi.DataStore.Crm
 
             query.AddAttributeValue(Account.Fields.dfeta_TrainingProvider, true);
             query.AddAttributeValue(Account.Fields.dfeta_UKPRN, ukprn);
-            query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
+
+            if (activeOnly)
+                query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
 
             var request = new RetrieveMultipleRequest()
             {
@@ -647,10 +650,10 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
-        public Task<Account> GetOrganizationByName(string name, params string[] columnNames) =>
-            GetOrganizationByName(name, columnNames, requestBuilder: null);
+        public Task<Account> GetOrganizationByName(string name, bool activeOnly, params string[] columnNames) =>
+            GetOrganizationByName(name, activeOnly, columnNames, requestBuilder: null);
 
-        public async Task<Account> GetOrganizationByName(string name, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<Account> GetOrganizationByName(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -660,7 +663,9 @@ namespace DqtApi.DataStore.Crm
             };
 
             query.AddAttributeValue(Account.Fields.Name, name);
-            query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
+
+            if (activeOnly)
+                query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
 
             var request = new RetrieveMultipleRequest()
             {

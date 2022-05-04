@@ -8,7 +8,7 @@ namespace DqtApi.DataStore.Crm
     {
         Task<CreateTeacherResult> CreateTeacher(CreateTeacherCommand command);
 
-        Task<Account[]> GetIttProviders();
+        Task<Account[]> GetIttProviders(bool activeOnly);
 
         Task<Contact[]> FindTeachers(FindTeachersByTrnBirthDateAndNinoQuery query);
 
@@ -24,11 +24,11 @@ namespace DqtApi.DataStore.Crm
 
         Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);
 
-        Task<Account> GetIttProviderOrganizationByName(string ukprn, params string[] columnNames);
+        Task<Account> GetIttProviderOrganizationByName(string ukprn, bool activeOnly, params string[] columnNames);
 
-        Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, params string[] columnNames);
+        Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, bool activeOnly, params string[] columnNames);
 
-        Task<Account> GetOrganizationByName(string providerName, params string[] columnNames);
+        Task<Account> GetOrganizationByName(string providerName, bool activeOnly, params string[] columnNames);
 
         Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames);
 
