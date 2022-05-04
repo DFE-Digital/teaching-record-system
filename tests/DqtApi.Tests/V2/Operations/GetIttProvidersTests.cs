@@ -31,7 +31,7 @@ namespace DqtApi.Tests.V2.Operations
             };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetIttProviders())
+                .Setup(mock => mock.GetIttProviders(false))
                 .ReturnsAsync(new[] { provider1, provider2 });
 
             var request = new HttpRequestMessage(HttpMethod.Get, "/v2/itt-providers");

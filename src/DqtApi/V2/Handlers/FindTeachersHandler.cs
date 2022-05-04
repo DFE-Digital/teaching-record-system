@@ -27,7 +27,7 @@ namespace DqtApi.V2.Handlers
 
             if (!string.IsNullOrEmpty(request.IttProviderUkprn))
             {
-                ittProvider = await _dataverseAdapter.GetIttProviderOrganizationByUkprn(request.IttProviderUkprn);
+                ittProvider = await _dataverseAdapter.GetIttProviderOrganizationByUkprn(request.IttProviderUkprn, false);
 
                 if (ittProvider == null)
                 {
@@ -36,7 +36,7 @@ namespace DqtApi.V2.Handlers
             }
             else if (!string.IsNullOrEmpty(request.IttProviderName))
             {
-                ittProvider = await _dataverseAdapter.GetIttProviderOrganizationByName(request.IttProviderName);
+                ittProvider = await _dataverseAdapter.GetIttProviderOrganizationByName(request.IttProviderName, false);
 
                 if (ittProvider == null)
                 {

@@ -161,7 +161,6 @@ namespace DqtApi.Tests
                     }
                 });
             }
-
             await txnRequestBuilder.Execute();
 
             var ittId = createIttTask.GetResponse().id;
