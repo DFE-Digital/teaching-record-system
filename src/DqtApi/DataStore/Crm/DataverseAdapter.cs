@@ -338,9 +338,9 @@ namespace DqtApi.DataStore.Crm
         }
 
         public Task<Account> GetIttProviderOrganizationByName(string name, bool activeOnly, params string[] columnNames) =>
-            GetIttProviderOrganizationByUkprn(name, activeOnly, columnNames, requestBuilder: null);
+            GetIttProviderOrganizationByName(name, activeOnly, columnNames, requestBuilder: null);
 
-        public async Task<Account> GetIttProviderOrganizationByName(string name, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<Account> GetIttProviderOrganizationByName(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -351,7 +351,11 @@ namespace DqtApi.DataStore.Crm
 
             query.AddAttributeValue(Account.Fields.dfeta_TrainingProvider, true);
             query.AddAttributeValue(Account.Fields.Name, name);
-            query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
+
+            if (activeOnly)
+            {
+                query.AddAttributeValue(Account.Fields.StateCode, (int)AccountState.Active);
+            }
 
             var request = new RetrieveMultipleRequest()
             {
