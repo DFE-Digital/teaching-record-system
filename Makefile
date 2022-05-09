@@ -9,25 +9,21 @@ help: ## Show this help
 dev:
 	$(eval DEPLOY_ENV=dev)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-development)
-	$(eval SERVICE_PRINCIPAL_NAME=s165d01-keyvault-readonly-access)
 
 .PHONY: test
 test:
 	$(eval DEPLOY_ENV=test)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
-	$(eval SERVICE_PRINCIPAL_NAME=s165t01-keyvault-readonly-access)
 
 .PHONY: pre-production
 pre-production:
 	$(eval DEPLOY_ENV=pre-production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
-	$(eval SERVICE_PRINCIPAL_NAME=s165t01-preprod-keyvault-readonly-access)
 
 .PHONY: production
 production:
 	$(eval DEPLOY_ENV=production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-production)
-	$(eval SERVICE_PRINCIPAL_NAME=s165p01-keyvault-readonly-access)
 	$(eval AZURE_BACKUP_STORAGE_ACCOUNT_NAME=s165p01dbbackup)
 	$(eval AZURE_BACKUP_STORAGE_CONTAINER_NAME=dqt-api)
 
@@ -39,7 +35,6 @@ read-deployment-config:
 	$(eval SPACE=$(shell jq -r '.paas_space' terraform/$(DEPLOY_ENV).tfvars.json))
 	$(eval POSTGRES_DATABASE_NAME=$(shell jq -r '.postgres_database_name' terraform/$(DEPLOY_ENV).tfvars.json))
 	$(eval API_APP_NAME=$(shell jq -r '.api_app_name' terraform/$(DEPLOY_ENV).tfvars.json))
-	$(eval RESOURCE_GROUP_NAME=$(shell jq -r '.resource_group_name' terraform/$(DEPLOY_ENV).tfvars.json))
 
 set-azure-account: ${environment}
 	echo "Logging on to ${AZURE_SUBSCRIPTION}"
@@ -112,10 +107,6 @@ restore-data-from-backup: read-deployment-config # make production restore-data-
 	$(if $(BACKUP_FILENAME), , $(error can only run with BACKUP_FILENAME, eg BACKUP_FILENAME="qualified-teachers-api-prod-pg-svc-2022-04-28-01"))
 	bin/download-db-backup ${AZURE_BACKUP_STORAGE_ACCOUNT_NAME} ${AZURE_BACKUP_STORAGE_CONTAINER_NAME} ${BACKUP_FILENAME}.tar.gz
 	bin/restore-db ${DEPLOY_ENV} ${CONFIRM_RESTORE} ${SPACE} ${BACKUP_FILENAME}.sql ${POSTGRES_DATABASE_NAME}
-
-deploy-storage: read-deployment-config ## make dev deploy-storage CONFIRM_DEPLOY=1
-	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
-	pwsh ./azure/Set-ResourceGroup.ps1 -ResourceGroupName ${RESOURCE_GROUP_NAME} -Subscription ${AZURE_SUBSCRIPTION} -EnvironmentName ${DEPLOY_ENV} -ParametersFile "./azure/azuredeploy.${DEPLOY_ENV}.parameters.json" -ServicePrincipalName ${SERVICE_PRINCIPAL_NAME}
 
 terraform-init:
 	$(if $(or $(DISABLE_PASSCODE),$(PASSCODE)), , $(error Missing environment variable "PASSCODE", retrieve from https://login.london.cloud.service.gov.uk/passcode))
