@@ -287,7 +287,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 }
             });
 
-            var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
+            var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn)).Single().Id;
 
             var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
@@ -377,7 +377,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 }
             });
 
-            var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
+            var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn)).Single().Id;
 
             var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
@@ -581,7 +581,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             var countryId = await _dataverseAdapter.GetCountry("XK");
             var qualificationSubject1Id = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
-            var providerId = await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn);
+            var providerId = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn)).Single();
             var qualification = await _dataverseAdapter.GetHeQualificationByName("First Degree");
 
             var txnResponse = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
@@ -777,7 +777,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Arrange
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
-            var providerId = await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn);
+            var providerId = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn)).Single();
 
             // Create second Itt record
             await _organizationService.ExecuteAsync(new CreateRequest()
@@ -918,7 +918,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 }
             });
 
-            var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
+            var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn)).Single().Id;
 
             var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,
@@ -1101,8 +1101,8 @@ namespace DqtApi.Tests.DataverseIntegration
                 }
             });
 
-            var oldProvider = (await _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn)).Id;
-            var newProviderProvider = (await _dataverseAdapter.GetOrganizationByUkprn(newIttProviderUkprn)).Id;
+            var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn)).Single().Id;
+            var newProviderProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(newIttProviderUkprn)).Single().Id;
 
             var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
                 teacherId,

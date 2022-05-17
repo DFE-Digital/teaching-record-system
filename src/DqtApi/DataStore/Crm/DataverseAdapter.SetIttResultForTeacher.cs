@@ -250,7 +250,8 @@ namespace DqtApi.DataStore.Crm
                         Contact.Fields.dfeta_TRN
                     });
 
-                var getIttProviderTask = _dataverseAdapter.GetIttProviderOrganizationByUkprn(_ittProviderUkprn, true);
+                var getIttProviderTask = _dataverseAdapter.GetIttProviderOrganizationsByUkprn(_ittProviderUkprn, activeOnly: true)
+                    .ContinueWith(t => t.Result.SingleOrDefault());
 
                 var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                     _teacherId,

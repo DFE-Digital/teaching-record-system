@@ -96,7 +96,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     }),
                 ((FindTeachersQuery q) => q.DateOfBirth = _findTeachersFixture.MatchingTeacherBirthDate, (FindTeachersQuery q) => q.DateOfBirth = _findTeachersFixture.MatchingTeacherBirthDate.AddDays(1)),
                 ((FindTeachersQuery q) => q.NationalInsuranceNumber = _findTeachersFixture.MatchingTeacherNino, (FindTeachersQuery q) => q.NationalInsuranceNumber = "ABC"),
-                ((FindTeachersQuery q) => q.IttProviderOrganizationId = _findTeachersFixture.MatchingTeacherIttProviderId, (FindTeachersQuery q) => q.IttProviderOrganizationId = Guid.NewGuid()),
+                ((FindTeachersQuery q) => q.IttProviderOrganizationIds = new[] { _findTeachersFixture.MatchingTeacherIttProviderId }, (FindTeachersQuery q) => q.IttProviderOrganizationIds = new[] { Guid.NewGuid() }),
             };
 
             var combinations = fields.GetCombinations(matchingFieldsCount);

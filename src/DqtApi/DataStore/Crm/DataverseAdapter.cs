@@ -337,10 +337,10 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
-        public Task<Account> GetIttProviderOrganizationByName(string name, bool activeOnly, params string[] columnNames) =>
-            GetIttProviderOrganizationByName(name, activeOnly, columnNames, requestBuilder: null);
+        public Task<Account[]> GetIttProviderOrganizationsByName(string name, bool activeOnly, params string[] columnNames) =>
+            GetIttProviderOrganizationsByName(name, activeOnly, columnNames, requestBuilder: null);
 
-        public async Task<Account> GetIttProviderOrganizationByName(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<Account[]> GetIttProviderOrganizationsByName(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -364,13 +364,13 @@ namespace DqtApi.DataStore.Crm
 
             var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
 
-            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
         }
 
-        public Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, bool activeOnly, params string[] columnNames) =>
-            GetIttProviderOrganizationByUkprn(ukprn, activeOnly, columnNames, requestBuilder: null);
+        public Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, bool activeOnly, params string[] columnNames) =>
+            GetIttProviderOrganizationsByUkprn(ukprn, activeOnly, columnNames, requestBuilder: null);
 
-        public async Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -392,13 +392,13 @@ namespace DqtApi.DataStore.Crm
 
             var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
 
-            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
         }
 
-        public Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames) =>
-            GetOrganizationByUkprn(ukprn, columnNames, requestBuilder: null);
+        public Task<Account[]> GetOrganizationsByUkprn(string ukprn, params string[] columnNames) =>
+            GetOrganizationsByUkprn(ukprn, columnNames, requestBuilder: null);
 
-        public async Task<Account> GetOrganizationByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<Account[]> GetOrganizationsByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -417,7 +417,7 @@ namespace DqtApi.DataStore.Crm
 
             var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
 
-            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
         }
 
         public Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(
@@ -654,10 +654,10 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
-        public Task<Account> GetOrganizationByName(string name, bool activeOnly, params string[] columnNames) =>
-            GetOrganizationByName(name, activeOnly, columnNames, requestBuilder: null);
+        public Task<Account[]> GetOrganizationsByName(string name, bool activeOnly, params string[] columnNames) =>
+            GetOrganizationsByName(name, activeOnly, columnNames, requestBuilder: null);
 
-        public async Task<Account> GetOrganizationByName(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
+        public async Task<Account[]> GetOrganizationsByName(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -678,7 +678,7 @@ namespace DqtApi.DataStore.Crm
 
             var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
 
-            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).SingleOrDefault();
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
         }
 
         public async Task<Contact[]> FindTeachers(FindTeachersQuery findTeachersQuery)
@@ -740,8 +740,9 @@ namespace DqtApi.DataStore.Crm
             }
 
             LinkEntity ittProviderLink = null;
+            var ittProviderOrganizationIdsArray = findTeachersQuery.IttProviderOrganizationIds?.ToArray() ?? Array.Empty<Guid>();
 
-            if (findTeachersQuery.IttProviderOrganizationId.HasValue)
+            if (ittProviderOrganizationIdsArray.Length > 0)
             {
                 ittProviderLink = new LinkEntity(
                     Contact.EntityLogicalName,
@@ -757,8 +758,8 @@ namespace DqtApi.DataStore.Crm
                     new ConditionExpression(
                         dfeta_initialteachertraining.EntityLogicalName,
                         dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
-                        ConditionOperator.Equal,
-                        findTeachersQuery.IttProviderOrganizationId));
+                        ConditionOperator.In,
+                        ittProviderOrganizationIdsArray.Cast<object>().ToArray()));  // https://community.dynamics.com/crm/b/crmbusiness/posts/crm-2011-odd-error-with-query-expression-and-conditionoperator-in
             }
 
             // If we still don't have at least 3 identifiers to match on then we're done
