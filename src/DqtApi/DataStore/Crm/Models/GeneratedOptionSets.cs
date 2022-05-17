@@ -739,6 +739,14 @@ namespace DqtApi.DataStore.Crm.Models
 		Male = 1,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Not available", 4, "#0000ff")]
+		Notavailable = 389040002,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Not provided", 3, "#0000ff")]
+		Notprovided = 389040001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Other", 2)]
 		Other = 389040000,
 	}
@@ -1748,6 +1756,32 @@ namespace DqtApi.DataStore.Crm.Models
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_sanction_StatusCode
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Active", 0)]
+		Active = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Inactive", 1)]
+		Inactive = 2,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_sanctioncode_StatusCode
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Active", 0)]
+		Active = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Inactive", 1)]
+		Inactive = 2,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_teacherstatus_StatusCode
 	{
 		
@@ -1821,5 +1855,43 @@ namespace DqtApi.DataStore.Crm.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mail App", 2, "#0000ff")]
 		MailApp = 2,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum msdyn_forecastsettingsandsummary_msdyn_ForecastJobStatus
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Success", 0, "#0000ff")]
+		Success = 192350000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Data Failure", 1, "#0000ff")]
+		DataFailure = 192350001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Pipeline Failure", 2, "#0000ff")]
+		PipelineFailure = 192350002,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum msdyn_knowledgemanagementsetting_msdyn_actionlist
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Link / unlink article", 0, "#0000ff")]
+		Linkunlinkarticle = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Copy URL", 1, "#0000ff")]
+		CopyURL = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Link article and email URL", 2, "#0000ff")]
+		LinkarticleandemailURL = 2,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Link article and send article content", 3, "#0000ff")]
+		Linkarticleandsendarticlecontent = 3,
 	}
 }
