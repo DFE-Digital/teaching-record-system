@@ -455,7 +455,8 @@ namespace DqtApi.DataStore.Crm
                     _command.InitialTeacherTraining.ProviderUkprn,
                     ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetIttProviderOrganizationByUkprnKey(ukprn),
-                        _ => _dataverseAdapter.GetIttProviderOrganizationByUkprn(ukprn, true, columnNames: Array.Empty<string>(), requestBuilder)));
+                        _ => _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, true, columnNames: Array.Empty<string>(), requestBuilder)
+                            .ContinueWith(t => t.Result.SingleOrDefault())));
 
                 var getIttCountryTask = Let(
                     "XK",  // XK == 'United Kingdom'
@@ -498,7 +499,8 @@ namespace DqtApi.DataStore.Crm
                         _command.Qualification.ProviderUkprn,
                         ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetOrganizationByUkprnKey(ukprn),
-                            _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn, columnNames: Array.Empty<string>(), requestBuilder))) :
+                            _ => _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: Array.Empty<string>(), requestBuilder)
+                                .ContinueWith(t => t.Result.SingleOrDefault()))) :
                     null;
 
                 var getQualificationCountryTask = !string.IsNullOrEmpty(_command.Qualification?.CountryCode) ?

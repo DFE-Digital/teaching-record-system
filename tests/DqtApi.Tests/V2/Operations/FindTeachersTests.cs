@@ -135,12 +135,12 @@ namespace DqtApi.Tests.V2.Operations
             var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 1, 1), dfeta_TRN = "someReference" };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetIttProviderOrganizationByName(It.IsAny<string>(), false))
-                .ReturnsAsync(account);
+                .Setup(mock => mock.GetIttProviderOrganizationsByName(It.IsAny<string>(), false))
+                .ReturnsAsync(new[] { account });
 
             ApiFixture.DataverseAdapter
-                 .Setup(mock => mock.GetIttProviderOrganizationByUkprn(It.IsAny<string>(), false))
-                 .ReturnsAsync(account);
+                 .Setup(mock => mock.GetIttProviderOrganizationsByUkprn(It.IsAny<string>(), false))
+                 .ReturnsAsync(new[] { account });
 
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))

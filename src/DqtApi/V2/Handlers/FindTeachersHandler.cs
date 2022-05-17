@@ -23,22 +23,22 @@ namespace DqtApi.V2.Handlers
 
         public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
         {
-            Account ittProvider = null;
+            var ittProviders = Array.Empty<Account>();
 
             if (!string.IsNullOrEmpty(request.IttProviderUkprn))
             {
-                ittProvider = await _dataverseAdapter.GetIttProviderOrganizationByUkprn(request.IttProviderUkprn, false);
+                ittProviders = await _dataverseAdapter.GetIttProviderOrganizationsByUkprn(request.IttProviderUkprn, false);
 
-                if (ittProvider == null)
+                if (ittProviders.Length == 0)
                 {
                     throw new ErrorException(ErrorRegistry.OrganisationNotFound());
                 }
             }
             else if (!string.IsNullOrEmpty(request.IttProviderName))
             {
-                ittProvider = await _dataverseAdapter.GetIttProviderOrganizationByName(request.IttProviderName, false);
+                ittProviders = await _dataverseAdapter.GetIttProviderOrganizationsByName(request.IttProviderName, false);
 
-                if (ittProvider == null)
+                if (ittProviders.Length == 0)
                 {
                     throw new ErrorException(ErrorRegistry.OrganisationNotFound());
                 }
@@ -52,7 +52,7 @@ namespace DqtApi.V2.Handlers
                 PreviousLastName = request.PreviousLastName,
                 NationalInsuranceNumber = request.NationalInsuranceNumber,
                 DateOfBirth = request.DateOfBirth,
-                IttProviderOrganizationId = ittProvider != null ? ittProvider.Id : null
+                IttProviderOrganizationIds = ittProviders.Select(a => a.Id)
             };
 
             var result = await _dataverseAdapter.FindTeachers(query);

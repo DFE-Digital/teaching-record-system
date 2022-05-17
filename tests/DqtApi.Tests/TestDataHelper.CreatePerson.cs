@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.Extensions.Caching.Memory;
@@ -38,7 +39,8 @@ namespace DqtApi.Tests
 
             var getIttProviderTask = _globalCache.GetOrCreateAsync(
                 CacheKeys.GetIttProviderOrganizationByUkprnKey(ittProviderUkprn),
-                _ => _dataverseAdapter.GetOrganizationByUkprn(ittProviderUkprn, columnNames: Array.Empty<string>(), lookupRequestBuilder));
+                _ => _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn, columnNames: Array.Empty<string>(), lookupRequestBuilder)
+                    .ContinueWith(t => t.Result.SingleOrDefault()));
 
             var earlyYearsStatus = "220"; // 220 == 'Early Years Trainee'
 

@@ -4,12 +4,12 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class GetOrganizationByUkprnTests : IAsyncLifetime
+    public class GetOrganizationsByUkprnTests : IAsyncLifetime
     {
         private readonly CrmClientFixture.TestDataScope _dataScope;
         private readonly DataverseAdapter _dataverseAdapter;
 
-        public GetOrganizationByUkprnTests(CrmClientFixture crmClientFixture)
+        public GetOrganizationsByUkprnTests(CrmClientFixture crmClientFixture)
         {
             _dataScope = crmClientFixture.CreateTestDataScope();
             _dataverseAdapter = _dataScope.CreateDataverseAdapter();
@@ -26,11 +26,12 @@ namespace DqtApi.Tests.DataverseIntegration
             var ukprn = "10044534";
 
             // Act
-            var result = await _dataverseAdapter.GetOrganizationByUkprn(ukprn, columnNames: Account.Fields.dfeta_UKPRN);
+            var result = await _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: Account.Fields.dfeta_UKPRN);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(ukprn, result.dfeta_UKPRN);
+            Assert.Collection(
+                result,
+                record => Assert.Equal(ukprn, record.dfeta_UKPRN));
         }
 
         [Fact]
@@ -40,10 +41,10 @@ namespace DqtApi.Tests.DataverseIntegration
             var ukprn = "xxx";
 
             // Act
-            var result = await _dataverseAdapter.GetOrganizationByUkprn(ukprn, columnNames: Account.Fields.dfeta_UKPRN);
+            var result = await _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: Account.Fields.dfeta_UKPRN);
 
             // Assert
-            Assert.Null(result);
+            Assert.Empty(result);
         }
     }
 }

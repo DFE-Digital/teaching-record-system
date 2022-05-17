@@ -463,14 +463,14 @@ namespace DqtApi.DataStore.Crm
                     _command.InitialTeacherTraining.ProviderUkprn,
                     ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetIttProviderOrganizationByUkprnKey(ukprn),
-                        _ => _dataverseAdapter.GetIttProviderOrganizationByUkprn(ukprn, true)));
+                        _ => _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, true).ContinueWith(t => t.Result.SingleOrDefault())));
 
                 var getQualificationProviderTask = !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn) ?
                      Let(
                          _command.Qualification.ProviderUkprn,
                          ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
                              CacheKeys.GetOrganizationByUkprnKey(ukprn),
-                             _ => _dataverseAdapter.GetOrganizationByUkprn(ukprn))) :
+                             _ => _dataverseAdapter.GetOrganizationsByUkprn(ukprn).ContinueWith(t => t.Result.SingleOrDefault()))) :
                      null;
 
                 var getIttCountryTask = Let(

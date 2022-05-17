@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DqtApi.DataStore.Crm
 {
@@ -10,6 +11,6 @@ namespace DqtApi.DataStore.Crm
         public string PreviousLastName { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public string NationalInsuranceNumber { get; set; }
-        public Guid? IttProviderOrganizationId { get; set; }
+        public IEnumerable<Guid> IttProviderOrganizationIds { get; set; }
     }
 }

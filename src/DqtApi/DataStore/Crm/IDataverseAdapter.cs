@@ -24,13 +24,13 @@ namespace DqtApi.DataStore.Crm
 
         Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);
 
-        Task<Account> GetIttProviderOrganizationByName(string ukprn, bool activeOnly, params string[] columnNames);
+        Task<Account[]> GetIttProviderOrganizationsByName(string ukprn, bool activeOnly, params string[] columnNames);
 
-        Task<Account> GetIttProviderOrganizationByUkprn(string ukprn, bool activeOnly, params string[] columnNames);
+        Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, bool activeOnly, params string[] columnNames);
 
-        Task<Account> GetOrganizationByName(string providerName, bool activeOnly, params string[] columnNames);
+        Task<Account[]> GetOrganizationsByName(string providerName, bool activeOnly, params string[] columnNames);
 
-        Task<Account> GetOrganizationByUkprn(string ukprn, params string[] columnNames);
+        Task<Account[]> GetOrganizationsByUkprn(string ukprn, params string[] columnNames);
 
         Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, params string[] columnNames);
 
