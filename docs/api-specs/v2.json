@@ -544,7 +544,9 @@
         "enum": [
           "Male",
           "Female",
-          "Other"
+          "Other",
+          "NotProvided",
+          "NotAvailable"
         ],
         "type": "string"
       },
