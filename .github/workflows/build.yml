@@ -230,7 +230,7 @@ jobs:
         echo "replacer.full_list(0).regex=false" >> options.prop
         echo "replacer.full_list(0).replacement=Bearer ${{ needs.deploy_dev.outputs.test_user_api_key }}" >> options.prop
 
-    - uses: zaproxy/action-api-scan@v0.1.0
+    - uses: zaproxy/action-api-scan@v0.1.1
       with:
         target: ${{ needs.deploy_dev.outputs.environment_url }}swagger/${{ matrix.version }}/swagger.json
         format: openapi
