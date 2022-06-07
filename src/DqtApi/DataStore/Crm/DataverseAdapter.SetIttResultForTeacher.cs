@@ -137,7 +137,7 @@ namespace DqtApi.DataStore.Crm
                     var earlyYearsStatus = await GetEarlyYearsStatus("221");  // 221 == 'Early Years Teacher Status'
                     Debug.Assert(earlyYearsStatus != null);
 
-                    qtsUpdate.dfeta_EarlyYearsStatusId = new EntityReference(dfeta_earlyyearsstatus.EntityLogicalName, earlyYearsStatus.Id);
+                    qtsUpdate.dfeta_EarlyYearsStatusId = earlyYearsStatus.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName);
                     qtsUpdate.dfeta_EYTSDate = qtsDate.Value.ToDateTime();
                 }
                 else
@@ -148,14 +148,14 @@ namespace DqtApi.DataStore.Crm
                             "71");  // 71 == 'Qualified teacher (trained)'
                     Debug.Assert(teacherStatus != null);
 
-                    qtsUpdate.dfeta_TeacherStatusId = new EntityReference(dfeta_teacherstatus.EntityLogicalName, teacherStatus.Id);
+                    qtsUpdate.dfeta_TeacherStatusId = teacherStatus.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
                     qtsUpdate.dfeta_QTSDate = qtsDate.Value.ToDateTime();
 
                     txnRequest.Requests.Add(new CreateRequest()
                     {
                         Target = new dfeta_induction()
                         {
-                            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+                            dfeta_PersonId = teacherId.ToEntityReference(Contact.EntityLogicalName),
                             dfeta_InductionStatus = dfeta_InductionStatus.RequiredtoComplete
                         }
                     });
@@ -222,7 +222,7 @@ namespace DqtApi.DataStore.Crm
 
                 return new CrmTask()
                 {
-                    RegardingObjectId = new EntityReference(Contact.EntityLogicalName, _teacherId),
+                    RegardingObjectId = _teacherId.ToEntityReference(Contact.EntityLogicalName),
                     Category = "Notification for QTS unit - Register: matched record holds active sanction",
                     Subject = "Register: active sanction match",
                     Description = description,
