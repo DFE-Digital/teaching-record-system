@@ -73,7 +73,7 @@ namespace DqtApi.DataStore.Crm
                 // Retrieve the generated TRN
                 txnRequest.Requests.Add(new RetrieveRequest()
                 {
-                    Target = new EntityReference(Contact.EntityLogicalName, helper.TeacherId),
+                    Target = helper.TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     ColumnSet = new ColumnSet(Contact.Fields.dfeta_TRN)
                 });
             }
@@ -121,8 +121,8 @@ namespace DqtApi.DataStore.Crm
 
                 return new CrmTask()
                 {
-                    RegardingObjectId = new EntityReference(Contact.EntityLogicalName, TeacherId),
-                    dfeta_potentialduplicateid = new EntityReference(Contact.EntityLogicalName, duplicate.TeacherId),
+                    RegardingObjectId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
+                    dfeta_potentialduplicateid = duplicate.TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     Category = "DMSImportTrn",
                     Subject = "Notification for QTS Unit Team",
                     Description = description,
@@ -183,7 +183,7 @@ namespace DqtApi.DataStore.Crm
 
                 return new CrmTask()
                 {
-                    RegardingObjectId = new EntityReference(Contact.EntityLogicalName, TeacherId),
+                    RegardingObjectId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     Category = "DMSImportTrn",
                     Subject = "Notification for QTS Unit Team",
                     Description = description,
@@ -263,16 +263,16 @@ namespace DqtApi.DataStore.Crm
 
                 return new dfeta_initialteachertraining()
                 {
-                    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, TeacherId),
-                    dfeta_CountryId = new EntityReference(dfeta_country.EntityLogicalName, referenceData.IttCountryId.Value),
-                    dfeta_EstablishmentId = new EntityReference(Account.EntityLogicalName, referenceData.IttProviderId.Value),
+                    dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
+                    dfeta_CountryId = referenceData.IttCountryId.Value.ToEntityReference(dfeta_country.EntityLogicalName),
+                    dfeta_EstablishmentId = referenceData.IttProviderId.Value.ToEntityReference(Account.EntityLogicalName),
                     dfeta_ProgrammeStartDate = _command.InitialTeacherTraining.ProgrammeStartDate.ToDateTime(),
                     dfeta_ProgrammeEndDate = _command.InitialTeacherTraining.ProgrammeEndDate.ToDateTime(),
                     dfeta_ProgrammeType = _command.InitialTeacherTraining.ProgrammeType,
                     dfeta_CohortYear = cohortYear,
-                    dfeta_Subject1Id = referenceData.IttSubject1Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject1Id.Value) : null,
-                    dfeta_Subject2Id = referenceData.IttSubject2Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject2Id.Value) : null,
-                    dfeta_Subject3Id = referenceData.IttSubject3Id.HasValue ? new EntityReference(dfeta_ittsubject.EntityLogicalName, referenceData.IttSubject3Id.Value) : null,
+                    dfeta_Subject1Id = referenceData.IttSubject1Id?.ToEntityReference(dfeta_ittsubject.EntityLogicalName),
+                    dfeta_Subject2Id = referenceData.IttSubject2Id?.ToEntityReference(dfeta_ittsubject.EntityLogicalName),
+                    dfeta_Subject3Id = referenceData.IttSubject3Id?.ToEntityReference(dfeta_ittsubject.EntityLogicalName),
                     dfeta_Result = result,
                     dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
                     dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
@@ -285,14 +285,14 @@ namespace DqtApi.DataStore.Crm
 
                 return new dfeta_qualification()
                 {
-                    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, TeacherId),
+                    dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_Type = dfeta_qualification_dfeta_Type.HigherEducation,
-                    dfeta_HE_CountryId = referenceData.QualificationCountryId.HasValue ? new EntityReference(dfeta_country.EntityLogicalName, referenceData.QualificationCountryId.Value) : null,
-                    dfeta_HE_HESubject1Id = referenceData.QualificationSubjectId.HasValue ? new EntityReference(dfeta_hesubject.EntityLogicalName, referenceData.QualificationSubjectId.Value) : null,
+                    dfeta_HE_CountryId = referenceData.QualificationCountryId?.ToEntityReference(dfeta_country.EntityLogicalName),
+                    dfeta_HE_HESubject1Id = referenceData.QualificationSubjectId?.ToEntityReference(dfeta_hesubject.EntityLogicalName),
                     dfeta_HE_ClassDivision = _command.Qualification?.Class,
-                    dfeta_HE_EstablishmentId = referenceData.QualificationProviderId.HasValue ? new EntityReference(Account.EntityLogicalName, referenceData.QualificationProviderId.Value) : null,
+                    dfeta_HE_EstablishmentId = referenceData.QualificationProviderId?.ToEntityReference(Account.EntityLogicalName),
                     dfeta_HE_CompletionDate = _command.Qualification?.Date?.ToDateTime(),
-                    dfeta_HE_HEQualificationId = new EntityReference(dfeta_hequalification.EntityLogicalName, referenceData.QualificationId.Value)
+                    dfeta_HE_HEQualificationId = referenceData.QualificationId.Value.ToEntityReference(dfeta_hequalification.EntityLogicalName)
                 };
             }
 
@@ -300,13 +300,9 @@ namespace DqtApi.DataStore.Crm
             {
                 return new dfeta_qtsregistration()
                 {
-                    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, TeacherId),
-                    dfeta_EarlyYearsStatusId = referenceData.EarlyYearsStatusId.HasValue ?
-                        new EntityReference(dfeta_earlyyearsstatus.EntityLogicalName, referenceData.EarlyYearsStatusId.Value) :
-                        null,
-                    dfeta_TeacherStatusId = referenceData.TeacherStatusId.HasValue ?
-                        new EntityReference(dfeta_teacherstatus.EntityLogicalName, referenceData.TeacherStatusId.Value) :
-                        null
+                    dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
+                    dfeta_EarlyYearsStatusId = referenceData.EarlyYearsStatusId?.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
+                    dfeta_TeacherStatusId = referenceData.TeacherStatusId?.ToEntityReference(dfeta_teacherstatus.EntityLogicalName)
                 };
             }
 
