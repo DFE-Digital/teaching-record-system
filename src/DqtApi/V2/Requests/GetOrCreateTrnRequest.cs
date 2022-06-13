@@ -33,6 +33,8 @@ namespace DqtApi.V2.Requests
         public GetOrCreateTrnRequestInitialTeacherTraining InitialTeacherTraining { get; set; }
         [Required]
         public GetOrCreateTrnRequestQualification Qualification { get; set; }
+
+
     }
 
     public class GetOrCreateTrnRequestAddress
@@ -60,6 +62,7 @@ namespace DqtApi.V2.Requests
         public string Subject3 { get; set; }
         public int? AgeRangeFrom { get; set; }
         public int? AgeRangeTo { get; set; }
+        public IttQualificationType? IttQualificationType { get; set; }
     }
 
     public class GetOrCreateTrnRequestQualification
@@ -69,5 +72,6 @@ namespace DqtApi.V2.Requests
         public string Subject { get; set; }
         public ClassDivision? Class { get; set; }
         public DateOnly? Date { get; set; }
+        public HeQualificationType? HeQualificationType { get; set; }
     }
 }
