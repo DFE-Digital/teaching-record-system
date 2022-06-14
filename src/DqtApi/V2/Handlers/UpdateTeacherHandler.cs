@@ -61,7 +61,8 @@ namespace DqtApi.V2.Handlers
                         Class = request.Qualification.Class?.ConvertToClassDivision(),
                         Date = request.Qualification.Date
                     } :
-                    null
+                    null,
+                HusId = request.HusId
             });
 
             if (!updateTeacherResult.Succeeded)

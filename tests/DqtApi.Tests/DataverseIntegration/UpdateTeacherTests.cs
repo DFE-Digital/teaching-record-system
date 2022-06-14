@@ -833,7 +833,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Arrange
             var teacherId = Guid.NewGuid();
             var trn = "1234567";
-            var updateCommand = new UpdateTeacherCommand() { TRN = trn, BirthDate = new DateOnly(1991, 01, 05), TeacherId = teacherId };
+            var updateCommand = new UpdateTeacherCommand() { TRN = trn, TeacherId = teacherId };
             var helper = new DataverseAdapter.UpdateTeacherHelper(_dataverseAdapter, updateCommand);
 
             // Act
@@ -849,7 +849,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Arrange
             var teacherId = Guid.NewGuid();
             var trn = "1234567";
-            var updateCommand = new UpdateTeacherCommand() { TRN = trn, BirthDate = new DateOnly(1991, 01, 05), TeacherId = teacherId };
+            var updateCommand = new UpdateTeacherCommand() { TRN = trn, TeacherId = teacherId };
             var helper = new DataverseAdapter.UpdateTeacherHelper(_dataverseAdapter, updateCommand);
 
             // Act
@@ -871,7 +871,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var date = new DateOnly(1990, 01, 05);
             var ProviderUkprn = "12345";
             var qualification = new UpdateTeacherCommandQualification() { Subject = subject, Class = classdivision, CountryCode = countrycode, Date = date, ProviderUkprn = ProviderUkprn };
-            var updateCommand = new UpdateTeacherCommand() { Qualification = qualification, TRN = trn, BirthDate = new DateOnly(1991, 01, 05), TeacherId = teacherId };
+            var updateCommand = new UpdateTeacherCommand() { Qualification = qualification, TRN = trn, TeacherId = teacherId };
             var helper = new DataverseAdapter.UpdateTeacherHelper(_dataverseAdapter, updateCommand);
 
             // Act
@@ -1062,7 +1062,7 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Fact]
-        public async Task Given_existing_itt_and_qualification_create_new_itt_for_new_provider_and_update_exisitng_qualification_succeeds()
+        public async Task Given_existing_itt_and_qualification_create_new_itt_for_new_provider_and_update_existing_qualification_succeeds()
         {
             // Arrange
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
@@ -1073,6 +1073,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
             var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
             var updateIttSubject3Id = await _dataverseAdapter.GetIttSubjectByCode("100302");  // history
+            var husId = "1234567890123";
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -1097,8 +1098,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = newIttProviderUkprn,
-
-                }
+                },
+                HusId = husId
             });
 
             var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn)).Single().Id;
@@ -1134,6 +1135,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
                     dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
                     dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
+                    dfeta_initialteachertraining.Fields.dfeta_TraineeID
                 });
 
             // Assert
@@ -1154,6 +1156,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     Assert.Equal(updateIttSubject1Id.Id, item2.dfeta_Subject1Id.Id);
                     Assert.Equal(updateIttSubject2Id.Id, item2.dfeta_Subject2Id.Id);
                     Assert.Equal(updateIttSubject3Id.Id, item2.dfeta_Subject3Id.Id);
+                    Assert.Equal(husId, item2.dfeta_TraineeID);
                 }
             );
 
@@ -1198,6 +1201,38 @@ namespace DqtApi.Tests.DataverseIntegration
             txnRequest.AssertDoesNotContainCreateRequest<dfeta_hequalification>();
             txnRequest.AssertDoesNotContainUpdateRequest<dfeta_hequalification>();
             txnRequest.AssertDoesNotContainUpsertRequest<dfeta_hequalification>();
+        }
+
+        [Fact]
+        public async Task Given_update_with_changed_husid_updates_contact()
+        {
+            // Arrange
+            var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+            var husId = "1234567890123";
+
+            // Act
+            var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+            {
+                TeacherId = teacherId,
+                InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+                {
+                    ProviderUkprn = ittProviderUkprn,
+                    ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                    ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                    ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                    Subject1 = "100366",  // computer science
+                    Subject2 = "100403",  // mathematics
+                    Subject3 = "100302",  // history
+                    AgeRangeFrom = dfeta_AgeRange._11,
+                    AgeRangeTo = dfeta_AgeRange._12
+                },
+                Qualification = null,
+                HusId = husId
+            });
+
+            // Assert
+            var contact = txnRequest.AssertSingleUpdateRequest<Contact>();
+            Assert.Equal(husId, contact.dfeta_HUSID);
         }
 
         private async Task<(Guid TeacherId, string IttProviderUkprn)> CreatePerson(

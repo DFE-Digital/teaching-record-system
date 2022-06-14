@@ -222,7 +222,6 @@ namespace DqtApi.Tests.V2.Operations
             await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
         }
 
-
         [Fact]
         public async Task Given_invalid_qualification_subject_returns_error()
         {
@@ -371,7 +370,6 @@ namespace DqtApi.Tests.V2.Operations
                 Content = CreateJsonContent(requestBody)
             };
 
-
             // Act
             var response = await HttpClient.SendAsync(request);
 
@@ -452,7 +450,8 @@ namespace DqtApi.Tests.V2.Operations
                     Subject = "Computing",
                     Class = ClassDivision.FirstClassHonours,
                     Date = new(2021, 5, 3)
-                }
+                },
+                HusId = "1234567890123"
             };
 
             configureRequest?.Invoke(request);

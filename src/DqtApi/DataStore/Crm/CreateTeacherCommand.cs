@@ -14,7 +14,7 @@ namespace DqtApi.DataStore.Crm
         public Contact_GenderCode GenderCode { get; set; }
         public CreateTeacherCommandInitialTeacherTraining InitialTeacherTraining { get; set; }
         public CreateTeacherCommandQualification Qualification { get; set; }
-        public Guid? HusId { get; set; }
+        public string HusId { get; set; }
     }
 
     public class CreateTeacherCommandAddress

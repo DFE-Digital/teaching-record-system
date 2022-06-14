@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using DqtApi.DataStore.Crm.Models;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 
 namespace DqtApi.DataStore.Crm
@@ -34,7 +33,7 @@ namespace DqtApi.DataStore.Crm
                 return (UpdateTeacherResult.Failed(failedReasons), null);
             }
 
-            var (itt, ittLookupFailed) = helper.SelectIttRecord(referenceData.Itt, referenceData.IttProviderId.Value);
+            var (itt, ittLookupFailedReasons) = helper.SelectIttRecord(referenceData.Itt, referenceData.IttProviderId.Value);
             var isEarlyYears = command.InitialTeacherTraining.ProgrammeType.IsEarlyYears();
 
             if (isEarlyYears && referenceData.Teacher.dfeta_EYTSDate.HasValue)
@@ -59,9 +58,7 @@ namespace DqtApi.DataStore.Crm
                 Requests = new()
             };
 
-            var findExistingTeacherResult = await helper.FindExistingTeacherToUpdate();
-
-            if (ittLookupFailed == UpdateTeacherFailedReasons.MultipleInTrainingIttRecords)
+            if (ittLookupFailedReasons == UpdateTeacherFailedReasons.MultipleInTrainingIttRecords)
             {
                 // unable to determine which itt record to update - create review task.
                 var reviewTask = helper.CreateMultipleMatchIttReviewTask();
@@ -70,7 +67,7 @@ namespace DqtApi.DataStore.Crm
                     Target = reviewTask
                 });
             }
-            else if (ittLookupFailed == UpdateTeacherFailedReasons.NoMatchingIttRecord)
+            else if (ittLookupFailedReasons == UpdateTeacherFailedReasons.NoMatchingIttRecord)
             {
                 // Create itt record & review task
                 txnRequest.Requests.Add(new UpsertRequest()
@@ -110,17 +107,27 @@ namespace DqtApi.DataStore.Crm
                 else
                 {
                     txnRequest.Requests.Add(
-                           new UpsertRequest() { Target = helper.CreateQualificationEntity(referenceData, qualification?.Id) });
+                        new UpsertRequest() { Target = helper.CreateQualificationEntity(referenceData, qualification?.Id) });
                 }
             }
 
-            if (findExistingTeacherResult.HasActiveSanctions)
+            if (referenceData.TeacherHasActiveSanctions)
             {
                 var reviewTask = helper.CreateReviewTaskEntityForActiveSanctions();
 
                 txnRequest.Requests.Add(new CreateRequest()
                 {
                     Target = reviewTask
+                });
+            }
+
+            if (referenceData.TeacherHusId != command.HusId)
+            {
+                var contact = helper.CreateContactEntity();
+
+                txnRequest.Requests.Add(new UpdateRequest()
+                {
+                    Target = contact
                 });
             }
 
@@ -191,6 +198,15 @@ namespace DqtApi.DataStore.Crm
                 {
                     return (null, null);
                 }
+            }
+
+            public Contact CreateContactEntity()
+            {
+                return new Contact()
+                {
+                    Id = TeacherId,
+                    dfeta_HUSID = _command.HusId
+                };
             }
 
             public CrmTask CreateReviewTaskEntityForActiveSanctions()
@@ -305,7 +321,8 @@ namespace DqtApi.DataStore.Crm
                     dfeta_Subject3Id = referenceData.IttSubject3Id?.ToEntityReference(dfeta_ittsubject.EntityLogicalName),
                     dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
                     dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
-                    dfeta_Result = !id.HasValue ? result : null
+                    dfeta_Result = !id.HasValue ? result : null,
+                    dfeta_TraineeID = _command.HusId
                 };
 
                 if (id.HasValue)
@@ -389,28 +406,6 @@ namespace DqtApi.DataStore.Crm
                 return failedReasons;
             }
 
-            public async Task<UpdateTeacherFindResult> FindExistingTeacherToUpdate()
-            {
-                var match = await _dataverseAdapter.GetTeacher(
-                    TeacherId,
-                    columnNames: new[]
-                    {
-                        Contact.Fields.dfeta_ActiveSanctions,
-                        Contact.Fields.dfeta_QTSDate,
-                        Contact.Fields.dfeta_EYTSDate,
-                        Contact.Fields.BirthDate
-                    });
-
-                return new UpdateTeacherFindResult()
-                {
-                    TeacherId = match.Id,
-                    HasActiveSanctions = match.dfeta_ActiveSanctions == true,
-                    HasQtsDate = match.dfeta_QTSDate.HasValue,
-                    HasEytsDate = match.dfeta_EYTSDate.HasValue,
-                    DateOfBirth = match.BirthDate.HasValue ? DateOnly.FromDateTime(match.BirthDate.Value) : null
-                };
-            }
-
             public async Task<UpdateTeacherReferenceLookupResult> LookupReferenceData()
             {
                 Debug.Assert(!string.IsNullOrEmpty(_command.InitialTeacherTraining.ProviderUkprn));
@@ -423,6 +418,8 @@ namespace DqtApi.DataStore.Crm
                     {
                         Contact.Fields.dfeta_QTSDate,
                         Contact.Fields.dfeta_EYTSDate,
+                        Contact.Fields.dfeta_ActiveSanctions,
+                        Contact.Fields.dfeta_HUSID,
                         Contact.Fields.StateCode
                     });
 
@@ -445,7 +442,6 @@ namespace DqtApi.DataStore.Crm
                         dfeta_qtsregistration.Fields.StateCode
                     });
 
-
                 var getQualifications = _dataverseAdapter.GetQualificationsForTeacher(TeacherId,
                     columnNames: new[]
                     {
@@ -457,66 +453,76 @@ namespace DqtApi.DataStore.Crm
 
                 var isEarlyYears = _command.InitialTeacherTraining.ProgrammeType.IsEarlyYears();
 
+                var requestBuilder = _dataverseAdapter.CreateMultipleRequestBuilder();
+
                 static TResult Let<T, TResult>(T value, Func<T, TResult> getResult) => getResult(value);
 
                 var getIttProviderTask = Let(
                     _command.InitialTeacherTraining.ProviderUkprn,
                     ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetIttProviderOrganizationByUkprnKey(ukprn),
-                        _ => _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, true).ContinueWith(t => t.Result.SingleOrDefault())));
-
-                var getQualificationProviderTask = !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn) ?
-                     Let(
-                         _command.Qualification.ProviderUkprn,
-                         ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
-                             CacheKeys.GetOrganizationByUkprnKey(ukprn),
-                             _ => _dataverseAdapter.GetOrganizationsByUkprn(ukprn).ContinueWith(t => t.Result.SingleOrDefault()))) :
-                     null;
+                        _ => _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, true, columnNames: Array.Empty<string>(), requestBuilder)
+                            .ContinueWith(t => t.Result.SingleOrDefault())));
 
                 var getIttCountryTask = Let(
                     "XK",  // XK == 'United Kingdom'
                     country => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetCountryKey(country),
-                        _ => _dataverseAdapter.GetCountry(country)));
+                        _ => _dataverseAdapter.GetCountry(country, requestBuilder)));
 
-                var getSubject1Task = Let(
-                    _command.InitialTeacherTraining.Subject1,
-                    subject => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetIttSubjectKey(subject),
-                        _ => _dataverseAdapter.GetIttSubjectByCode(subject)));
+                var getSubject1Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject1) ?
+                    Let(
+                        _command.InitialTeacherTraining.Subject1,
+                        subject => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetIttSubjectKey(subject),
+                            _ => _dataverseAdapter.GetIttSubjectByCode(subject, requestBuilder))) :
+                    null;
 
-                var getSubject2Task = Let(
-                    _command.InitialTeacherTraining.Subject2,
-                    subject => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetIttSubjectKey(subject),
-                        _ => _dataverseAdapter.GetIttSubjectByCode(subject)));
+                var getSubject2Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject2) ?
+                    Let(
+                        _command.InitialTeacherTraining.Subject2,
+                        subject => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetIttSubjectKey(subject),
+                            _ => _dataverseAdapter.GetIttSubjectByCode(subject, requestBuilder))) :
+                    null;
 
-                var getSubject3Task = Let(
-                    _command.InitialTeacherTraining.Subject3,
-                    subject => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetIttSubjectKey(subject),
-                        _ => _dataverseAdapter.GetIttSubjectByCode(subject)));
+                var getSubject3Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject3) ?
+                    Let(
+                        _command.InitialTeacherTraining.Subject3,
+                        subject => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetIttSubjectKey(subject),
+                            _ => _dataverseAdapter.GetIttSubjectByCode(subject, requestBuilder))) :
+                    null;
 
                 var getQualificationTask = Let(
                     "First Degree",
                     qualificationName => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetHeQualificationKey(qualificationName),
-                        _ => _dataverseAdapter.GetHeQualificationByName(qualificationName)));
+                        _ => _dataverseAdapter.GetHeQualificationByName(qualificationName, requestBuilder)));
 
-                var getQualificationCountryTask = _command.Qualification != null ?
+                var getQualificationProviderTask = !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn) ?
+                    Let(
+                        _command.Qualification.ProviderUkprn,
+                        ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetOrganizationByUkprnKey(ukprn),
+                            _ => _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: Array.Empty<string>(), requestBuilder)
+                                .ContinueWith(t => t.Result.SingleOrDefault()))) :
+                    null;
+
+                var getQualificationCountryTask = !string.IsNullOrEmpty(_command.Qualification?.CountryCode) ?
                     Let(
                         _command.Qualification.CountryCode,
                         country => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetCountryKey(country),
-                            _ => _dataverseAdapter.GetCountry(country))) :
+                            _ => _dataverseAdapter.GetCountry(country, requestBuilder))) :
                     null;
 
-                var getQualificationSubjectTask = _command.Qualification != null ?
+                var getQualificationSubjectTask = !string.IsNullOrEmpty(_command.Qualification?.Subject) ?
                     Let(
                         _command.Qualification.Subject,
                         subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetHeSubjectKey(subjectName),
-                            _ => _dataverseAdapter.GetHeSubjectByCode(subjectName))) :
+                            _ => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
                     null;
 
                 var getEarlyYearsStatusTask = isEarlyYears ?
@@ -524,19 +530,18 @@ namespace DqtApi.DataStore.Crm
                         "220", // 220 == 'Early Years Trainee'
                         earlyYearsStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetEarlyYearsStatusKey(earlyYearsStatusId),
-                            _ => _dataverseAdapter.GetEarlyYearsStatus(earlyYearsStatusId))) :
+                            _ => _dataverseAdapter.GetEarlyYearsStatus(earlyYearsStatusId, requestBuilder))) :
                     Task.FromResult<dfeta_earlyyearsstatus>(null);
 
                 var getTeacherStatusTask = !isEarlyYears ?
                     Let(
                         _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
                             "212" :  // 212 == 'AOR Candidate'
-                            "211",   // 211 == 'Trainee Teacher:DMS'
+                            "211",   // 211 == 'Trainee Teacher'
                         teacherStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetTeacherStatusKey(teacherStatusId),
-                            _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false))) :
+                            _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false, requestBuilder))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
-
 
                 var lookupTasks = new Task[]
                 {
@@ -558,6 +563,7 @@ namespace DqtApi.DataStore.Crm
                 }
                 .Where(t => t != null);
 
+                await requestBuilder.Execute();
                 await Task.WhenAll(lookupTasks);
 
                 Debug.Assert(!isEarlyYears || getEarlyYearsStatusTask.Result != null, "Early years status lookup failed.");
@@ -565,11 +571,11 @@ namespace DqtApi.DataStore.Crm
 
                 return new()
                 {
-                    IttProviderId = getIttProviderTask.Result?.Id,
-                    IttCountryId = getIttCountryTask.Result?.Id,
-                    IttSubject1Id = getSubject1Task.Result?.Id,
-                    IttSubject2Id = getSubject2Task.Result?.Id,
-                    IttSubject3Id = getSubject3Task.Result?.Id,
+                    IttProviderId = getIttProviderTask?.Result?.Id,
+                    IttCountryId = getIttCountryTask?.Result?.Id,
+                    IttSubject1Id = getSubject1Task?.Result?.Id,
+                    IttSubject2Id = getSubject2Task?.Result?.Id,
+                    IttSubject3Id = getSubject3Task?.Result?.Id,
                     QualificationId = getQualificationTask?.Result?.Id,
                     QualificationCountryId = getQualificationCountryTask?.Result?.Id,
                     QualificationSubjectId = getQualificationSubjectTask?.Result?.Id,
@@ -579,19 +585,11 @@ namespace DqtApi.DataStore.Crm
                     Teacher = getTeacherTask.Result,
                     Itt = getIttRecordsTask.Result,
                     QtsRegistrations = getQtsRegistrationsTask.Result,
-                    Qualifications = getQualifications.Result
+                    Qualifications = getQualifications.Result,
+                    TeacherHasActiveSanctions = getTeacherTask.Result?.dfeta_ActiveSanctions == true,
+                    TeacherHusId = getTeacherTask.Result?.dfeta_HUSID
                 };
             }
-        }
-
-        internal class UpdateTeacherFindResult
-        {
-            public Guid TeacherId { get; set; }
-            public string[] MatchedAttributes { get; set; }
-            public bool HasActiveSanctions { get; set; }
-            public bool HasQtsDate { get; set; }
-            public bool HasEytsDate { get; set; }
-            public DateOnly? DateOfBirth { get; set; }
         }
 
         internal class UpdateTeacherReferenceLookupResult
@@ -610,11 +608,9 @@ namespace DqtApi.DataStore.Crm
             public Contact Teacher { get; set; }
             public IEnumerable<dfeta_initialteachertraining> Itt { get; set; }
             public IEnumerable<dfeta_qtsregistration> QtsRegistrations { get; set; }
-            public Guid EarlyYearsTraineeStatusId { get; set; }
-            public Guid AorCandidateTeacherStatusId { get; set; }
-            public Guid TraineeTeacherDmsTeacherStatusId { get; set; }
             public IEnumerable<dfeta_qualification> Qualifications { get; set; }
-            public Account QualificationProvider { get; set; }
+            public bool TeacherHasActiveSanctions { get; set; }
+            public string TeacherHusId { get; set; }
         }
     }
 }

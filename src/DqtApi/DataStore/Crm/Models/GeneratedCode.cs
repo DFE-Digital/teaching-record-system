@@ -410,6 +410,7 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string BirthDate = "birthdate";
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
+			public const string dfeta_HUSID = "dfeta_husid";
 			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
 			public const string dfeta_NINumber = "dfeta_ninumber";
 			public const string dfeta_QTSDate = "dfeta_qtsdate";
@@ -667,6 +668,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_EYTSDate");
 				this.SetAttributeValue("dfeta_eytsdate", value);
 				this.OnPropertyChanged("dfeta_EYTSDate");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_husid")]
+		public string dfeta_HUSID
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_husid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_HUSID");
+				this.SetAttributeValue("dfeta_husid", value);
+				this.OnPropertyChanged("dfeta_HUSID");
 			}
 		}
 		
@@ -2490,6 +2511,7 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string dfeta_Subject1Id = "dfeta_subject1id";
 			public const string dfeta_Subject2Id = "dfeta_subject2id";
 			public const string dfeta_Subject3Id = "dfeta_subject3id";
+			public const string dfeta_TraineeID = "dfeta_traineeid";
 			public const string StateCode = "statecode";
 			public const string dfeta_account_dfeta_initialteachertraining = "dfeta_account_dfeta_initialteachertraining";
 			public const string dfeta_contact_dfeta_initialteachertraining = "dfeta_contact_dfeta_initialteachertraining";
@@ -2820,6 +2842,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_Subject3Id");
 				this.SetAttributeValue("dfeta_subject3id", value);
 				this.OnPropertyChanged("dfeta_Subject3Id");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_traineeid")]
+		public string dfeta_TraineeID
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_traineeid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_TraineeID");
+				this.SetAttributeValue("dfeta_traineeid", value);
+				this.OnPropertyChanged("dfeta_TraineeID");
 			}
 		}
 		
