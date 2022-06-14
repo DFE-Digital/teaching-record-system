@@ -602,6 +602,10 @@
           },
           "qualification": {
             "$ref": "#/components/schemas/GetOrCreateTrnRequestQualification"
+          },
+          "husId": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -680,6 +684,9 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "ittQualificationType": {
+            "$ref": "#/components/schemas/IttQualificationType"
           }
         },
         "additionalProperties": false
@@ -706,9 +713,103 @@
             "type": "string",
             "format": "date",
             "nullable": true
+          },
+          "heQualificationType": {
+            "$ref": "#/components/schemas/HeQualificationType"
           }
         },
         "additionalProperties": false
+      },
+      "HeQualificationType": {
+        "enum": [
+          "BEd",
+          "BEdHons",
+          "BSc_Education",
+          "BScHons_Education",
+          "BTechEducation",
+          "BTechHons_Education",
+          "BA_Education",
+          "BAHons_Education",
+          "BACombinedStudies_EducationOfTheDeaf",
+          "BAHonsCombinedStudies_EducationOfTheDeaf",
+          "BAwithIntercalatedPGCE",
+          "BScHonsWithIntercalatedPGCE",
+          "BAHonsWithIntercalatedPGCE",
+          "BachelorOfArts",
+          "BachelorOfArtsEconomics",
+          "BachelorOfArtsInArchitecture",
+          "BachelorOftheArtOfObstetrics",
+          "BachelorOfArchitecture",
+          "BachelorOfAppliedScience",
+          "BachelorOfAgriculture",
+          "BachelorOfAccountancy",
+          "BachelorOfAdministration",
+          "BachelorOfBusinessAdministration",
+          "BachelorOfCombinedStudies",
+          "BachelorOfCommerce",
+          "BachelorOfDivinity",
+          "BachelorOfDentalSurgery",
+          "BachelorOfEngineering",
+          "BachelorOfEngineeringWithBusinessStudies",
+          "BachelorOfFineArt",
+          "BachelorOfGeneralStudies",
+          "BachelorOfHumanities",
+          "BachelorOfHygiene",
+          "BachelorOfLaw",
+          "BachelorOfLibrarianship",
+          "BachelorOfLibrarianshipAndInfoStudies",
+          "BachelorOfLiterature",
+          "BachelorOfLandEconomy",
+          "BachelorOfMedicalScience",
+          "BachelorOfMedicine",
+          "BachelorOfMetallurgy",
+          "BachelorOfMetallurgyAndEngineering",
+          "BachelorOfMusic",
+          "BachelorOfNursing",
+          "BachelorOfPharmacy",
+          "BachelorOfScience",
+          "BachelorOfScienceEconomics",
+          "BachelorOfScienceAndEngineering",
+          "BachelorOfScienceAndTechnology",
+          "BachelorOfScienceInSocialScience",
+          "BachelorOfScienceISpeechTherapy",
+          "BachelorOfSocialScience",
+          "BachelorOfSurgery",
+          "BachelorOfChirurgiae",
+          "BachelorOfTechnology",
+          "BachelorOfTheology",
+          "BachelorOfVeterinaryMedicine",
+          "BachelorOfVeterinaryMedicineAndSurgery",
+          "BachelorOfVeterinaryScience",
+          "BachelorOfEducationScotlandAndNIreland",
+          "BachelorOfPhilosophy",
+          "MasterOfArts",
+          "MasterOfLibrarianship",
+          "MasterOfLiterature",
+          "MasterOfMusic",
+          "MasterOfPhilosophy",
+          "MasterOfScience",
+          "MasterOfTheology",
+          "CertificateOfMembershipOfCranfieldInstituteOfTechnology",
+          "MasterOfEducation",
+          "MasterOfBusinessStudies",
+          "MasterOfSocialStudies",
+          "MasterOfEngineering",
+          "MasterOfLaw",
+          "MasterOfBusinessAdministration",
+          "DoctorOfDivinity",
+          "DoctorOfCivilLaw",
+          "DoctorOfMedicine",
+          "DoctorOfMusic",
+          "DoctorOfScience",
+          "DoctorOfPhilosophy",
+          "PHD",
+          "FirstDegree",
+          "HigherDegree",
+          "DegreeEquivalent",
+          "Unknown"
+        ],
+        "type": "string"
       },
       "IttOutcome": {
         "enum": [
@@ -757,6 +858,71 @@
           }
         },
         "additionalProperties": false
+      },
+      "IttQualificationType": {
+        "enum": [
+          "BEd",
+          "BEdHons",
+          "BSc",
+          "BScHons",
+          "BTech_Education",
+          "BTechHons_Education",
+          "BA",
+          "BAHons",
+          "BACombinedStudies_EducationOfTheDeaf",
+          "BAHonsCombinedStudies_EducationOfTheDeaf",
+          "BAEducationQTS",
+          "BAWithIntercalatedPGCE",
+          "BScHonsWithIntercalatedPGCE",
+          "BAHonsWithIntercalatedPGCE",
+          "BSc_EducationQTS",
+          "BEngHons_Education",
+          "BSc_CertificateInEducationQTS",
+          "BA_CertificateInEducationQTS",
+          "PostgraduateCertificateInEducationFlexible",
+          "PostgraduateCertificateInEducation",
+          "PGCForTeachersOfTheDeaf",
+          "PostgraduateArtTeachersCertificate",
+          "PostgraduateArtTeachersDiploma",
+          "GraduateCertificateInScienceAndEducation",
+          "GraduateCertificateInMathematicsAndEducation",
+          "PGCEArticledTeachersScheme",
+          "QTSAwardOnly",
+          "UndergraduateMasterOfTeaching",
+          "QTSAssessmentOnly",
+          "CertificateInEducation",
+          "ProfessionalGraduateCertificateInEducation",
+          "CertificateInEducationFurtherEducation",
+          "PostgraduateCertificateInEducationFurtherEducation",
+          "TeachersCertificateFurtherEducation",
+          "TeachersCertificate",
+          "QualificationGainedInEurope",
+          "ProfessionalGraduateDiplomaInEducation",
+          "AssessmentOnlyRoute",
+          "TeachFirstTNP",
+          "TroopsToTeach",
+          "OTTRecognition",
+          "GTP",
+          "RTP",
+          "OTT",
+          "OTTExemptFromInduction",
+          "TeachFirst",
+          "EEA",
+          "Scotland",
+          "NorthernIreland",
+          "FE",
+          "ISC",
+          "FlexiblePGCE",
+          "FlexibleAssessmentOnly",
+          "LicensedTeacherProgramme",
+          "FlexibleProfGCE",
+          "Degree",
+          "HigherDegree",
+          "DegreeEquivalent",
+          "NoQualificationRestrictedByOtherGTC",
+          "Unknown"
+        ],
+        "type": "string"
       },
       "ProblemDetails": {
         "type": "object",
@@ -855,6 +1021,10 @@
           },
           "qualification": {
             "$ref": "#/components/schemas/UpdateTeacherRequestQualification"
+          },
+          "husId": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -903,6 +1073,9 @@
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "ittQualificationType": {
+            "$ref": "#/components/schemas/IttQualificationType"
           }
         },
         "additionalProperties": false
@@ -929,6 +1102,9 @@
             "type": "string",
             "format": "date",
             "nullable": true
+          },
+          "heQualificationType": {
+            "$ref": "#/components/schemas/HeQualificationType"
           }
         },
         "additionalProperties": false

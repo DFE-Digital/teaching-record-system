@@ -24,6 +24,8 @@ namespace DqtApi.V2.Requests
         [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true, Description = "DoB of teacher"), SwaggerSchema(Format = "date"), ModelBinder(typeof(ModelBinding.DateModelBinder))]
         [JsonIgnore]
         public DateOnly? BirthDate { get; set; }
+
+        public string HusId { get; set; }
     }
 
     public class UpdateTeacherRequestInitialTeacherTraining
@@ -41,6 +43,7 @@ namespace DqtApi.V2.Requests
         public string Subject3 { get; set; }
         public int? AgeRangeFrom { get; set; }
         public int? AgeRangeTo { get; set; }
+        public IttQualificationType? IttQualificationType { get; set; }
     }
 
     public class UpdateTeacherRequestQualification
@@ -50,5 +53,6 @@ namespace DqtApi.V2.Requests
         public string Subject { get; set; }
         public ClassDivision? Class { get; set; }
         public DateOnly? Date { get; set; }
+        public HeQualificationType? HeQualificationType { get; set; }
     }
 }
