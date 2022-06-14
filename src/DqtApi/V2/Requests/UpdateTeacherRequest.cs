@@ -24,6 +24,8 @@ namespace DqtApi.V2.Requests
         [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true, Description = "DoB of teacher"), SwaggerSchema(Format = "date"), ModelBinder(typeof(ModelBinding.DateModelBinder))]
         [JsonIgnore]
         public DateOnly? BirthDate { get; set; }
+
+        public string HusId { get; set; }
     }
 
     public class UpdateTeacherRequestInitialTeacherTraining

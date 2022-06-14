@@ -33,8 +33,7 @@ namespace DqtApi.V2.Requests
         public GetOrCreateTrnRequestInitialTeacherTraining InitialTeacherTraining { get; set; }
         [Required]
         public GetOrCreateTrnRequestQualification Qualification { get; set; }
-
-
+        public string HusId { get; set; }
     }
 
     public class GetOrCreateTrnRequestAddress

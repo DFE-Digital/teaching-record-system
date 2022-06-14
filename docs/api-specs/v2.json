@@ -602,6 +602,10 @@
           },
           "qualification": {
             "$ref": "#/components/schemas/GetOrCreateTrnRequestQualification"
+          },
+          "husId": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1017,6 +1021,10 @@
           },
           "qualification": {
             "$ref": "#/components/schemas/UpdateTeacherRequestQualification"
+          },
+          "husId": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
