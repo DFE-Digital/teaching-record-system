@@ -192,6 +192,7 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(command.BirthDate, entity.BirthDate);
             Assert.Equal(command.EmailAddress, entity.EMailAddress1);
             Assert.Equal(command.GenderCode, entity.GenderCode);
+            Assert.Equal(command.HusId, entity.dfeta_HUSID);
         }
 
         [Theory]
@@ -257,6 +258,7 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(command.InitialTeacherTraining.AgeRangeTo, result.dfeta_AgeRangeTo);
             Assert.Equal(dfeta_ittsubject.EntityLogicalName, result.dfeta_Subject3Id?.LogicalName);
             Assert.Equal(referenceData.IttSubject3Id, result.dfeta_Subject3Id?.Id);
+            Assert.Equal(command.HusId, result.dfeta_TraineeID);
         }
 
         [Fact]

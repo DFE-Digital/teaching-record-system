@@ -237,6 +237,7 @@ namespace DqtApi.DataStore.Crm
                     Address1_PostalCode = _command.Address?.PostalCode,
                     Address1_Country = _command.Address?.Country,
                     GenderCode = _command.GenderCode,
+                    dfeta_HUSID = _command.HusId
                 };
 
                 // We get a NullReferenceException back from CRM if City is null or empty
@@ -276,6 +277,7 @@ namespace DqtApi.DataStore.Crm
                     dfeta_Result = result,
                     dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
                     dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
+                    dfeta_TraineeID = _command.HusId
                 };
             }
 
@@ -527,7 +529,7 @@ namespace DqtApi.DataStore.Crm
                     Let(
                         _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
                             "212" :  // 212 == 'AOR Candidate'
-                            "211",   // 211 == 'Trainee Teacher:DMS'
+                            "211",   // 211 == 'Trainee Teacher'
                         teacherStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetTeacherStatusKey(teacherStatusId),
                             _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false, requestBuilder))) :

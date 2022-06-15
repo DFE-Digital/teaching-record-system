@@ -99,7 +99,8 @@ namespace DqtApi.V2.Handlers
                             Class = request.Qualification.Class?.ConvertToClassDivision(),
                             Date = request.Qualification.Date.Value
                         } :
-                        null
+                        null,
+                    HusId = request.HusId
                 });
 
                 if (!createTeacherResult.Succeeded)

@@ -451,7 +451,8 @@ namespace DqtApi.Tests.V2.Operations
                     Subject = "100366",  // computer science
                     Class = ClassDivision.FirstClassHonours,
                     Date = new(2021, 5, 3)
-                }
+                },
+                HusId = "1234567890123"
             };
 
             configureRequest?.Invoke(request);
