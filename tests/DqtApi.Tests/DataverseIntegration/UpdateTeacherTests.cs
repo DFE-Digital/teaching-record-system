@@ -762,7 +762,7 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             var crmTask = transactionRequest.AssertSingleCreateRequest<CrmTask>();
-            var itt = transactionRequest.AssertSingleUpsertRequest<dfeta_initialteachertraining>();
+            var itt = transactionRequest.AssertSingleCreateRequest<dfeta_initialteachertraining>();
 
             // Assert
             Assert.True(result.Succeeded);

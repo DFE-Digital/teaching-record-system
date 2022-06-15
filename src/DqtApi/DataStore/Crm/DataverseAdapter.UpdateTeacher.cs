@@ -70,9 +70,9 @@ namespace DqtApi.DataStore.Crm
             else if (ittLookupFailedReasons == UpdateTeacherFailedReasons.NoMatchingIttRecord)
             {
                 // Create itt record & review task
-                txnRequest.Requests.Add(new UpsertRequest()
+                txnRequest.Requests.Add(new CreateRequest()
                 {
-                    Target = helper.CreateInitialTeacherTrainingEntity(referenceData, itt?.Id)
+                    Target = helper.CreateInitialTeacherTrainingEntity(referenceData, id: null)
                 });
 
                 var reviewTask = helper.CreateNoMatchIttReviewTask();
@@ -84,9 +84,10 @@ namespace DqtApi.DataStore.Crm
             else
             {
                 // update existing itt record
-                txnRequest.Requests.Add(new UpsertRequest()
+                Debug.Assert(itt != null);
+                txnRequest.Requests.Add(new UpdateRequest()
                 {
-                    Target = helper.CreateInitialTeacherTrainingEntity(referenceData, itt?.Id)
+                    Target = helper.CreateInitialTeacherTrainingEntity(referenceData, itt.Id)
                 });
             }
 
