@@ -1,0 +1,47 @@
+name: Deploy to PaaS
+
+on:
+  push:
+    branches:
+    - main
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+    - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: 'docs/.nvmrc'
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        working-directory: './docs'
+        bundler-cache: true
+
+    - run: cd docs && bundle exec middleman build
+    - run: cp manifest.yml build
+
+    - uses: Azure/login@v1
+      with:
+        creds: ${{ secrets.azure_credentials }}
+
+    - uses: Azure/get-keyvault-secrets@v1
+      id: get_secrets
+      with:
+        keyvault: s165d01-kv
+        secrets: 'PAAS-USER,PAAS-PASSWORD'
+
+    - uses: DFE-Digital/github-actions/setup-cf-cli@master
+      name: Install cf CLI
+      with:
+        CF_USERNAME: ${{ steps.get_secrets.outputs.PAAS-USER }}
+        CF_PASSWORD: ${{ steps.get_secrets.outputs.PAAS-PASSWORD }}
+        CF_SPACE_NAME: tra-dev
