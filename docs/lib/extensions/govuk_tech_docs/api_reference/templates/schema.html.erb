@@ -1,0 +1,37 @@
+<h3 id="<%= id = 'schema-' + title; id.parameterize %>"><%= title %></h3>
+<%= render_markdown(schema.description) %>
+<% if properties.any? %>
+<table class='<%= id.parameterize %>'>
+<thead>
+<tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th><th>Schema</th></tr>
+</thead>
+<tbody>
+<% properties.each do |property_name, property_attributes| %>
+<tr>
+<td><%= property_name %></td>
+<td><%= property_attributes.type %></td>
+<td><%= schema.requires?(property_name) %></td>
+<td><%= render_markdown(property_attributes.description) %></td>
+<td>
+  <%=
+  linked_schema = property_attributes
+  # If property is an array, check the items property for a reference.
+  if property_attributes.type == 'array'
+    linked_schema = property_attributes['items']
+  end
+  # Only print a link if it's a named schema
+  get_schema_link(linked_schema) if linked_schema.name %>
+</td>
+</tr>
+<% end %>
+</tbody>
+</table>
+<% end %>
+<% if schema.enum %>
+<p>This schema can be any one of the following <%= schema.type.pluralize %>:</p>
+<ul>
+<% schema.enum.each do |value| %>
+<li><%= value %></li>
+<% end %>
+</ul>
+<% end %>

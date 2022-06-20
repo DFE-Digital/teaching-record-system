@@ -16,6 +16,9 @@ jobs:
     environment: dev
 
     steps:
+    - name: Install jq for pre-processing the OpenAPI JSON
+      run: sudo apt-get install -y jq
+
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v3
       with:
@@ -27,7 +30,6 @@ jobs:
         bundler-cache: true
 
     - run: cd docs && bundle exec middleman build
-    - run: cp manifest.yml build
 
     - uses: Azure/login@v1
       with:
@@ -45,3 +47,5 @@ jobs:
         CF_USERNAME: ${{ steps.get_secrets.outputs.PAAS-USER }}
         CF_PASSWORD: ${{ steps.get_secrets.outputs.PAAS-PASSWORD }}
         CF_SPACE_NAME: tra-dev
+
+    - run: cf push qualified-teachers-api-tech-docs

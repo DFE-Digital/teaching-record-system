@@ -1,0 +1,7 @@
+---
+applications:
+- name: qualified-teachers-api-tech-docs
+  memory: 64M
+  instances: 2
+  buildpacks:
+    - staticfile_buildpack
