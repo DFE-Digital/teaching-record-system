@@ -347,3 +347,8 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# Document site
+docs/tmp
+docs/build
+docs/source/dqt-api.yaml

@@ -1,0 +1,7 @@
+<% if request_body && request_body.content['application/json'] %>
+<h4 id="<%= id %>">Request body</h4>
+<p><%= get_schema_link(request_body.content['application/json'].schema) %></p>
+<% if example = request_body.content['application/json']["example"] %>
+<pre><code><%= json_prettyprint(example) %></code></pre>
+<% end %>
+<% end %>

@@ -1,0 +1,10 @@
+<h3 id="<%= id %>"><%= key %></h3>
+<% if operation.summary %>
+  <p><em><%= operation.summary %></em></p>
+<% end %>
+<% if operation.description %>
+  <%= render_markdown(operation.description) %>
+<% end %>
+<%= parameters %>
+<%= request_body %>
+<%= responses %>

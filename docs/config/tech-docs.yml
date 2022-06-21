@@ -1,0 +1,7 @@
+# Header-related options
+show_govuk_logo: true
+service_name: Qualified Teachers API
+service_link: https://teacherservices.education.gov.uk/
+phase: Beta
+
+api_path: source/dqt-api.yaml
