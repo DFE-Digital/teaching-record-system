@@ -51,6 +51,7 @@ namespace DqtApi.V2.Handlers
                     Subject3 = request.InitialTeacherTraining.Subject3,
                     AgeRangeFrom = request.InitialTeacherTraining.AgeRangeFrom.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeFrom.Value) : null,
                     AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null,
+                    IttQualificationValue = request.InitialTeacherTraining.IttQualificationType?.GetIttQualificationValue()
                 },
                 Qualification = request.Qualification != null ?
                     new UpdateTeacherCommandQualification()

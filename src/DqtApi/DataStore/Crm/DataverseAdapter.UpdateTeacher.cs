@@ -323,7 +323,8 @@ namespace DqtApi.DataStore.Crm
                     dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
                     dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
                     dfeta_Result = !id.HasValue ? result : null,
-                    dfeta_TraineeID = _command.HusId
+                    dfeta_TraineeID = _command.HusId,
+                    dfeta_ITTQualificationId = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName)
                 };
 
                 if (id.HasValue)
@@ -382,6 +383,11 @@ namespace DqtApi.DataStore.Crm
                 if (referenceData.IttSubject3Id == null && !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject3))
                 {
                     failedReasons |= UpdateTeacherFailedReasons.Subject3NotFound;
+                }
+
+                if (referenceData.IttQualificationId == null && !string.IsNullOrEmpty(_command.InitialTeacherTraining.IttQualificationValue))
+                {
+                    failedReasons |= UpdateTeacherFailedReasons.IttQualificationNotFound;
                 }
 
                 if (referenceData.QualificationId == null)
@@ -495,6 +501,14 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetIttSubjectByCode(subject, requestBuilder))) :
                     null;
 
+                var getIttQualificationTask = !string.IsNullOrEmpty(_command.InitialTeacherTraining.IttQualificationValue) ?
+                    Let(
+                        _command.InitialTeacherTraining.IttQualificationValue,
+                        ittQualificationCode => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetIttQualificationKey(ittQualificationCode),
+                            _ => _dataverseAdapter.GetIttQualificationByCode(ittQualificationCode, requestBuilder))) :
+                    null;
+
                 var getQualificationTask = Let(
                     "First Degree",
                     qualificationName => _dataverseAdapter._cache.GetOrCreateAsync(
@@ -551,6 +565,7 @@ namespace DqtApi.DataStore.Crm
                    getSubject1Task,
                    getSubject2Task,
                    getSubject3Task,
+                   getIttQualificationTask,
                    getQualificationTask,
                    getQualificationCountryTask,
                    getQualificationSubjectTask,
@@ -577,6 +592,7 @@ namespace DqtApi.DataStore.Crm
                     IttSubject1Id = getSubject1Task?.Result?.Id,
                     IttSubject2Id = getSubject2Task?.Result?.Id,
                     IttSubject3Id = getSubject3Task?.Result?.Id,
+                    IttQualificationId = getIttQualificationTask?.Result?.Id,
                     QualificationId = getQualificationTask?.Result?.Id,
                     QualificationCountryId = getQualificationCountryTask?.Result?.Id,
                     QualificationSubjectId = getQualificationSubjectTask?.Result?.Id,
@@ -600,6 +616,7 @@ namespace DqtApi.DataStore.Crm
             public Guid? IttSubject1Id { get; set; }
             public Guid? IttSubject2Id { get; set; }
             public Guid? IttSubject3Id { get; set; }
+            public Guid? IttQualificationId { get; set; }
             public Guid? QualificationId { get; set; }
             public Guid? QualificationProviderId { get; set; }
             public Guid? QualificationCountryId { get; set; }

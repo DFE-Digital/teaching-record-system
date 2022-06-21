@@ -182,6 +182,30 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
         }
 
+        public Task<dfeta_ittqualification> GetIttQualificationByCode(string code) => GetIttQualificationByCode(code, requestBuilder: null);
+
+        public async Task<dfeta_ittqualification> GetIttQualificationByCode(string code, RequestBuilder requestBuilder)
+        {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
+            var query = new QueryByAttribute(dfeta_ittqualification.EntityLogicalName)
+            {
+                ColumnSet = new() { AllColumns = true }
+            };
+
+            query.AddAttributeValue(dfeta_ittqualification.Fields.dfeta_Value, code);
+            query.AddAttributeValue(dfeta_ittqualification.Fields.StateCode, (int)dfeta_ittqualificationState.Active);
+
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
+
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_ittqualification>()).FirstOrDefault();
+        }
+
         public Task<dfeta_ittsubject> GetIttSubjectByCode(string code) => GetIttSubjectByCode(code, requestBuilder: null);
 
         public async Task<dfeta_ittsubject> GetIttSubjectByCode(string code, RequestBuilder requestBuilder)

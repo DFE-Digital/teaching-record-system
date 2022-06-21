@@ -45,6 +45,9 @@ namespace DqtApi.V2.Validators
                     }
                 });
 
+            RuleFor(r => r.InitialTeacherTraining.IttQualificationType)
+                .IsInEnum();
+
             RuleFor(r => r.Qualification.Class)
                 .IsInEnum()
                 .When(r => r.Qualification != null);

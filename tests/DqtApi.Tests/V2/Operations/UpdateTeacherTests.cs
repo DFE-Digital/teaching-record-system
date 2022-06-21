@@ -166,6 +166,34 @@ namespace DqtApi.Tests.V2.Operations
             await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
         }
 
+        [Fact]
+        public async Task Given_invalid_itt_qualification_returns_error()
+        {
+            // Arrange
+            var trn = "12345";
+            var contact = new Contact() { Id = Guid.NewGuid() };
+            var contactList = new[] { contact };
+            var dob = new DateOnly(1987, 01, 01);
+            var ittQualificationType = (IttQualificationType)(-1);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.IttQualificationNotFound));
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                    .ReturnsAsync(contactList);
+
+            var request = CreateRequest(req => req.InitialTeacherTraining.IttQualificationType = ittQualificationType);
+
+            // Act
+            var response = await HttpClient.PatchAsync(
+                $"v2/teachers/update/{trn}?birthdate={dob:yyyy-MM-dd)}",
+                request);
+
+            // Assert
+            Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        }
 
         [Fact]
         public async Task Given_invalid_qualification_country_returns_error()

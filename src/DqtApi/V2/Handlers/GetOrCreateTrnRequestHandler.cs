@@ -88,7 +88,8 @@ namespace DqtApi.V2.Handlers
                         Subject2 = request.InitialTeacherTraining.Subject2,
                         Subject3 = request.InitialTeacherTraining.Subject3,
                         AgeRangeFrom = request.InitialTeacherTraining.AgeRangeFrom.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeFrom.Value) : null,
-                        AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null
+                        AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null,
+                        IttQualificationValue = request.InitialTeacherTraining.IttQualificationType?.GetIttQualificationValue()
                     },
                     Qualification = request.Qualification != null ?
                         new CreateTeacherCommandQualification()
@@ -157,6 +158,11 @@ namespace DqtApi.V2.Handlers
                 CreateTeacherFailedReasons.Subject3NotFound,
                 $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject3)}",
                 ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.IttQualificationNotFound,
+                $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.IttQualificationType)}",
+                ErrorRegistry.IttQualificationNotFound().Title);
 
             ConsumeReason(
                 CreateTeacherFailedReasons.QualificationCountryNotFound,

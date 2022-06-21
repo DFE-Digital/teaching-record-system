@@ -23,6 +23,7 @@ namespace DqtApi.DataStore.Crm
         public string Subject3 { get; set; }
         public dfeta_AgeRange? AgeRangeFrom { get; set; }
         public dfeta_AgeRange? AgeRangeTo { get; set; }
+        public string IttQualificationValue { get; set; }
     }
 
     public class UpdateTeacherCommandQualification

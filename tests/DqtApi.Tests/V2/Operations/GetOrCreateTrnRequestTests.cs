@@ -8,6 +8,7 @@ using DqtApi.Properties;
 using DqtApi.TestCommon;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -247,6 +248,26 @@ namespace DqtApi.Tests.V2.Operations
                 response,
                 propertyName: $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject2)}",
                 expectedError: Properties.StringResources.Errors_10009_Title);
+        }
+
+        [Fact]
+        public async Task Given_invalid_itt_qualification_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var ittQualificationType = (IttQualificationType)(-1);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.IttQualificationNotFound));
+
+            // Act
+            var response = await HttpClient.PutAsync(
+                $"v2/trn-requests/{requestId}",
+                CreateRequest(req => req.InitialTeacherTraining.IttQualificationType = ittQualificationType));
+
+            // Assert
+            Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         }
 
         [Fact]

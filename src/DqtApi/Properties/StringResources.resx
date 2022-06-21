@@ -174,4 +174,7 @@
   <data name="Errors.10011.Title" xml:space="preserve">
     <value>ProgrammeType cannot be change</value>
   </data>
+  <data name="Errors.10012.Title" xml:space="preserve">
+    <value>ITT qualification not found</value>
+  </data>
 </root>

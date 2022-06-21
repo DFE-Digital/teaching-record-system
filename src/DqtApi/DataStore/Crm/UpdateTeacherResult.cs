@@ -39,6 +39,6 @@ namespace DqtApi.DataStore.Crm
         MultipleQualificationRecords = 2048,
         CannotChangeProgrammeType = 4096,
         Subject3NotFound = 8192,
-
+        IttQualificationNotFound = 16384,
     }
 }
