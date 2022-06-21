@@ -1,14 +1,10 @@
-name: Deploy to PaaS
+name: Deploy tech doc site to PaaS
 
 on:
   push:
     branches:
     - main
   workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches:
-    - main
 
 jobs:
   deploy:
@@ -30,6 +26,7 @@ jobs:
         bundler-cache: true
 
     - run: cd docs && bundle exec middleman build
+    - run: cd docs && cp manifest.yml build
 
     - uses: Azure/login@v1
       with:
@@ -48,4 +45,4 @@ jobs:
         CF_PASSWORD: ${{ steps.get_secrets.outputs.PAAS-PASSWORD }}
         CF_SPACE_NAME: tra-dev
 
-    - run: cf push qualified-teachers-api-tech-docs
+    - run: cd docs/build && cf push qualified-teachers-api-tech-docs
