@@ -230,5 +230,14 @@ namespace DqtApi.Properties {
                 return ResourceManager.GetString("Errors.10011.Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ITT qualification not found.
+        /// </summary>
+        public static string Errors_10012_Title {
+            get {
+                return ResourceManager.GetString("Errors.10012.Title", resourceCulture);
+            }
+        }
     }
 }

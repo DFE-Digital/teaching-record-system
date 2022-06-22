@@ -345,11 +345,12 @@ namespace DqtApi.Tests.DataverseIntegration
             // Arrange
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
-            var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
-            var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
-            var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
-            var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
-            var updateIttSubject3Id = await _dataverseAdapter.GetIttSubjectByCode("100302");  // history
+            var updateHeSubject = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
+            var updatedHeCountry = await _dataverseAdapter.GetCountry("XK");
+            var updateIttSubject1 = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
+            var updateIttSubject2 = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
+            var updateIttSubject3 = await _dataverseAdapter.GetIttSubjectByCode("100302");  // history
+            var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -365,7 +366,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Subject2 = "100366",  // computer science
                     Subject3 = "100302",  // history
                     AgeRangeFrom = dfeta_AgeRange._11,
-                    AgeRangeTo = dfeta_AgeRange._12
+                    AgeRangeTo = dfeta_AgeRange._12,
+                    IttQualificationValue = updateIttQualification.dfeta_Value
                 },
                 Qualification = new UpdateTeacherCommandQualification()
                 {
@@ -408,7 +410,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_initialteachertraining.Fields.dfeta_Result,
                     dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
                     dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
-                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id
+                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id,
+                    dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId
                 });
 
             // Assert
@@ -423,9 +426,10 @@ namespace DqtApi.Tests.DataverseIntegration
                     Assert.Equal(dfeta_AgeRange._11, item1.dfeta_AgeRangeFrom);
                     Assert.Equal(dfeta_AgeRange._12, item1.dfeta_AgeRangeTo);
                     Assert.Equal(dfeta_ITTResult.InTraining, item1.dfeta_Result);
-                    Assert.Equal(updateIttSubject1Id.Id, item1.dfeta_Subject1Id.Id);
-                    Assert.Equal(updateIttSubject2Id.Id, item1.dfeta_Subject2Id.Id);
-                    Assert.Equal(updateIttSubject3Id.Id, item1.dfeta_Subject3Id.Id);
+                    Assert.Equal(updateIttSubject1.Id, item1.dfeta_Subject1Id.Id);
+                    Assert.Equal(updateIttSubject2.Id, item1.dfeta_Subject2Id.Id);
+                    Assert.Equal(updateIttSubject3.Id, item1.dfeta_Subject3Id.Id);
+                    Assert.Equal(updateIttQualification.Id, item1.dfeta_ITTQualificationId.Id);
                 }
             );
 
@@ -433,8 +437,8 @@ namespace DqtApi.Tests.DataverseIntegration
                 qualifications,
                 item1 =>
                 {
-                    Assert.Equal(updatedHeCountryId.Id, item1.dfeta_HE_CountryId.Id);
-                    Assert.Equal(updateHeSubjectId.Id, item1.dfeta_HE_HESubject1Id.Id);
+                    Assert.Equal(updatedHeCountry.Id, item1.dfeta_HE_CountryId.Id);
+                    Assert.Equal(updateHeSubject.Id, item1.dfeta_HE_HESubject1Id.Id);
                     Assert.Equal(oldProvider, item1.dfeta_HE_EstablishmentId.Id);
                     Assert.Equal(dfeta_classdivision.Firstclasshonours, item1.dfeta_HE_ClassDivision);
                     Assert.Equal(new DateTime(2022, 01, 28), item1.dfeta_CompletionorAwardDate);
@@ -1019,12 +1023,20 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Theory]
-        [InlineData("Invalid Subject1", "100403", "100366", "XK", "Computer Science")]
-        [InlineData("100302", "Invalid subject2", "100403", "XK", "Computer Science")]
-        [InlineData("100302", "100403", "100366", "INVALID COUNTRY CODE", "Computer Science")]
-        [InlineData("100302", "100403", "100366", "XK", "Invalid Qualification subject")]
-        [InlineData("100302", "100403", "Invalid subject3", "XK", "Computer Science")]
-        public async Task Given_Invalid_reference_data_request_fails(string ittSubject1, string ittSubject2, string ittSubject3, string qualificationCountryCode, string qualificationSubject)
+        [InlineData("Invalid Subject1", "100403", "100366", "001", "XK", "100366", UpdateTeacherFailedReasons.Subject1NotFound)]
+        [InlineData("100302", "Invalid subject2", "100403", "001", "XK", "100366", UpdateTeacherFailedReasons.Subject2NotFound)]
+        [InlineData("100302", "100403", "Invalid subject3", "001", "XK", "100366", UpdateTeacherFailedReasons.Subject3NotFound)]
+        [InlineData("100302", "100403", "100366", "001", "XK", "Invalid Qualification subject", UpdateTeacherFailedReasons.QualificationSubjectNotFound)]
+        [InlineData("100302", "100403", "100366", "001", "INVALID COUNTRY CODE", "100366", UpdateTeacherFailedReasons.QualificationCountryNotFound)]
+        [InlineData("100302", "100403", "100366", "xxx", "XK", "100366", UpdateTeacherFailedReasons.IttQualificationNotFound)]
+        public async Task Given_invalid_reference_data_request_fails(
+            string ittSubject1,
+            string ittSubject2,
+            string ittSubject3,
+            string ittQualificationCode,
+            string qualificationCountryCode,
+            string qualificationSubject,
+            UpdateTeacherFailedReasons expectedFailedReasons)
         {
             // Arrange
             var (teacherId, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
@@ -1045,7 +1057,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Subject2 = ittSubject2,
                     Subject3 = ittSubject3,
                     AgeRangeFrom = dfeta_AgeRange._11,
-                    AgeRangeTo = dfeta_AgeRange._12
+                    AgeRangeTo = dfeta_AgeRange._12,
+                    IttQualificationValue = ittQualificationCode
                 },
                 Qualification = new UpdateTeacherCommandQualification()
                 {
@@ -1059,6 +1072,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.False(result.Succeeded);
+            Assert.Equal(expectedFailedReasons, result.FailedReasons);
         }
 
         [Fact]
@@ -1224,7 +1238,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Subject2 = "100403",  // mathematics
                     Subject3 = "100302",  // history
                     AgeRangeFrom = dfeta_AgeRange._11,
-                    AgeRangeTo = dfeta_AgeRange._12
+                    AgeRangeTo = dfeta_AgeRange._12,
+                    IttQualificationValue = "001"  // BEd
                 },
                 Qualification = null,
                 HusId = husId

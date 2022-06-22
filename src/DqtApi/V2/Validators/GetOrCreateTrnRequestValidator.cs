@@ -2,6 +2,7 @@
 using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql.Models;
 using DqtApi.Properties;
+using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
 using FluentValidation;
 
@@ -101,6 +102,9 @@ namespace DqtApi.V2.Validators
                         ctx.AddFailure(ctx.PropertyName, StringResources.ErrorMessages_AgeToCannotBeLessThanAgeFrom);
                     }
                 });
+
+            RuleFor(r => r.InitialTeacherTraining.IttQualificationType)
+                .IsInEnum();
 
             RuleFor(r => r.Qualification.Class)
                 .IsInEnum()
