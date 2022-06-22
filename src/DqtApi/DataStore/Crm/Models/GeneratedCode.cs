@@ -2517,6 +2517,7 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string dfeta_contact_dfeta_initialteachertraining = "dfeta_contact_dfeta_initialteachertraining";
 			public const string dfeta_contact_dfeta_initialteachertraining1 = "dfeta_contact_dfeta_initialteachertraining1";
 			public const string dfeta_dfeta_country_dfeta_initialteachertrainin = "dfeta_dfeta_country_dfeta_initialteachertrainin";
+			public const string dfeta_dfeta_ittqualification_dfeta_initialteach = "dfeta_dfeta_ittqualification_dfeta_initialteach";
 			public const string dfeta_dfeta_ittsubject1_dfeta_initialteachertra = "dfeta_dfeta_ittsubject1_dfeta_initialteachertra";
 			public const string dfeta_dfeta_ittsubject2_dfeta_initialteachertra = "dfeta_dfeta_ittsubject2_dfeta_initialteachertra";
 			public const string dfeta_dfeta_ittsubject3_dfeta_initialteachertra = "dfeta_dfeta_ittsubject3_dfeta_initialteachertra";
@@ -2985,6 +2986,27 @@ namespace DqtApi.DataStore.Crm.Models
 		}
 		
 		/// <summary>
+		/// N:1 dfeta_dfeta_ittqualification_dfeta_initialteach
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ittqualificationid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittqualification_dfeta_initialteach")]
+		public DqtApi.DataStore.Crm.Models.dfeta_ittqualification dfeta_dfeta_ittqualification_dfeta_initialteach
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<DqtApi.DataStore.Crm.Models.dfeta_ittqualification>("dfeta_dfeta_ittqualification_dfeta_initialteach", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_ittqualification_dfeta_initialteach");
+				this.SetRelatedEntity<DqtApi.DataStore.Crm.Models.dfeta_ittqualification>("dfeta_dfeta_ittqualification_dfeta_initialteach", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_ittqualification_dfeta_initialteach");
+			}
+		}
+		
+		/// <summary>
 		/// N:1 dfeta_dfeta_ittsubject1_dfeta_initialteachertra
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_subject1id")]
@@ -3044,6 +3066,175 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
 				this.SetRelatedEntity<DqtApi.DataStore.Crm.Models.dfeta_ittsubject>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_ittqualificationState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_ittqualification")]
+	public partial class dfeta_ittqualification : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_ittqualification entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string dfeta_name = "dfeta_name";
+			public const string dfeta_Value = "dfeta_value";
+			public const string StateCode = "statecode";
+			public const string dfeta_dfeta_ittqualification_dfeta_initialteach = "dfeta_dfeta_ittqualification_dfeta_initialteach";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_ittqualification() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "dfeta_ittqualification";
+		
+		public const string PrimaryIdAttribute = "dfeta_ittqualificationid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_ittqualification";
+		
+		public const string EntityLogicalCollectionName = "dfeta_ittqualifications";
+		
+		public const string EntitySetName = "dfeta_ittqualifications";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// The name of the custom entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
+		public string dfeta_name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_name");
+				this.SetAttributeValue("dfeta_name", value);
+				this.OnPropertyChanged("dfeta_name");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
+		public string dfeta_Value
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_value");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Value");
+				this.SetAttributeValue("dfeta_value", value);
+				this.OnPropertyChanged("dfeta_Value");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the ITT Qualification
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<DqtApi.DataStore.Crm.Models.dfeta_ittqualificationState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((DqtApi.DataStore.Crm.Models.dfeta_ittqualificationState)(System.Enum.ToObject(typeof(DqtApi.DataStore.Crm.Models.dfeta_ittqualificationState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_dfeta_ittqualification_dfeta_initialteach
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_ittqualification_dfeta_initialteach")]
+		public System.Collections.Generic.IEnumerable<DqtApi.DataStore.Crm.Models.dfeta_initialteachertraining> dfeta_dfeta_ittqualification_dfeta_initialteach
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<DqtApi.DataStore.Crm.Models.dfeta_initialteachertraining>("dfeta_dfeta_ittqualification_dfeta_initialteach", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_ittqualification_dfeta_initialteach");
+				this.SetRelatedEntities<DqtApi.DataStore.Crm.Models.dfeta_initialteachertraining>("dfeta_dfeta_ittqualification_dfeta_initialteach", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_ittqualification_dfeta_initialteach");
 			}
 		}
 	}

@@ -83,6 +83,11 @@
     "dfeta_value",
     "statecode"
   ],
+  "dfeta_ittqualification": [
+    "dfeta_name",
+    "dfeta_value",
+    "statecode"
+  ],
   "dfeta_qtsregistration": [
     "dfeta_earlyyearsstatusid",
     "dfeta_eytsdate",

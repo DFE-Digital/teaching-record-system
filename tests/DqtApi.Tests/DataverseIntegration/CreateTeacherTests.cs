@@ -231,6 +231,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 IttSubject1Id = Guid.NewGuid(),
                 IttSubject2Id = Guid.NewGuid(),
                 IttSubject3Id = Guid.NewGuid(),
+                IttQualificationId = Guid.NewGuid()
             };
 
             var helper = new DataverseAdapter.CreateTeacherHelper(_dataverseAdapter, command);
@@ -253,6 +254,7 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(referenceData.IttSubject1Id, result.dfeta_Subject1Id?.Id);
             Assert.Equal(dfeta_ittsubject.EntityLogicalName, result.dfeta_Subject2Id?.LogicalName);
             Assert.Equal(referenceData.IttSubject2Id, result.dfeta_Subject2Id?.Id);
+            Assert.Equal(referenceData.IttQualificationId, result.dfeta_ITTQualificationId?.Id);
             Assert.Equal(expectedResult, result.dfeta_Result);
             Assert.Equal(command.InitialTeacherTraining.AgeRangeFrom, result.dfeta_AgeRangeFrom);
             Assert.Equal(command.InitialTeacherTraining.AgeRangeTo, result.dfeta_AgeRangeTo);
@@ -424,6 +426,20 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(endDate, savedProgrammeEndDate);
         }
 
+        [Fact]
+        public async Task Given_invalid_IttQualificationValue_returns_failed()
+        {
+            // Arrange
+            var command = CreateCommand(cmd => cmd.InitialTeacherTraining.IttQualificationValue = "xxx");
+
+            // Act
+            var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
+
+            // Assert
+            Assert.False(result.Succeeded);
+            Assert.Equal(CreateTeacherFailedReasons.IttQualificationNotFound, result.FailedReasons);
+        }
+
         private static CreateTeacherCommand CreateCommand(Action<CreateTeacherCommand> configureCommand = null)
         {
             var command = new CreateTeacherCommand()
@@ -451,7 +467,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Subject2 = "100403",  // mathematics
                     Subject3 = "100302",  // history
                     AgeRangeFrom = dfeta_AgeRange._05,
-                    AgeRangeTo = dfeta_AgeRange._11
+                    AgeRangeTo = dfeta_AgeRange._11,
+                    IttQualificationValue = "001"  // BEd
                 },
                 Qualification = new()
                 {
