@@ -284,7 +284,7 @@
         },
         "responses": {
           "204": {
-            "description": "Success"
+            "description": "No Content"
           },
           "429": {
             "description": "Too Many Requests",
@@ -391,7 +391,7 @@
             }
           },
           "201": {
-            "description": "Success",
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
@@ -444,7 +444,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Success"
+            "description": "No Content"
           },
           "404": {
             "description": "Not Found"

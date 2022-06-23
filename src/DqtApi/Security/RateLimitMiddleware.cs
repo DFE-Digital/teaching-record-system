@@ -14,11 +14,10 @@ namespace DqtApi.Security
             RequestDelegate next,
             IProcessingStrategy processingStrategy,
             IOptions<ClientRateLimitOptions> options,
-            IRateLimitCounterStore counterStore,
             IClientPolicyStore policyStore,
             IRateLimitConfiguration config,
             ILogger<ClientRateLimitMiddleware> logger)
-            : base(next, processingStrategy, options, counterStore, policyStore, config, logger)
+            : base(next, processingStrategy, options, policyStore, config, logger)
         {
             _options = options.Value;
         }
