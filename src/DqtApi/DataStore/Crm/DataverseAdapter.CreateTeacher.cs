@@ -496,10 +496,10 @@ namespace DqtApi.DataStore.Crm
                     null;
 
                 var getQualificationTask = Let(
-                    "First Degree",
-                    qualificationName => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetHeQualificationKey(qualificationName),
-                        _ => _dataverseAdapter.GetHeQualificationByName(qualificationName, requestBuilder)));
+                    !string.IsNullOrEmpty(_command.Qualification?.HeQualificationValue) ? _command.Qualification.HeQualificationValue : "400",   // 400 = First Degree
+                    qualificationCode => _dataverseAdapter._cache.GetOrCreateAsync(
+                        CacheKeys.GetHeQualificationKey(qualificationCode),
+                        _ => _dataverseAdapter.GetHeQualificationByCode(qualificationCode, requestBuilder)));
 
                 var getQualificationProviderTask = !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn) ?
                     Let(
@@ -627,6 +627,11 @@ namespace DqtApi.DataStore.Crm
                 if (referenceData.QualificationSubjectId == null && !string.IsNullOrEmpty(_command.Qualification?.Subject))
                 {
                     failedReasons |= CreateTeacherFailedReasons.QualificationSubjectNotFound;
+                }
+
+                if (referenceData.QualificationId == null)
+                {
+                    failedReasons |= CreateTeacherFailedReasons.QualificationNotFound;
                 }
 
                 return failedReasons;

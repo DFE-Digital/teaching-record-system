@@ -339,6 +339,26 @@ namespace DqtApi.Tests.V2.Operations
                 expectedError: Properties.StringResources.Errors_10008_Title);
         }
 
+        [Fact]
+        public async Task Given_invalid_qualification_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var heQualificationType = (HeQualificationType)(-1);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationNotFound));
+
+            // Act
+            var response = await HttpClient.PutAsync(
+                $"v2/trn-requests/{requestId}",
+                CreateRequest(req => req.Qualification.HeQualificationType = heQualificationType));
+
+            // Assert
+            Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        }
+
         [Theory]
         [InlineData(1900, 1, 1)]
         public async Task Given_dob_before_1_1_1940_returns_error(int year, int month, int day)

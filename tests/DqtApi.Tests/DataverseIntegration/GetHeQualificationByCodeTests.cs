@@ -3,12 +3,12 @@ using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
-    public class GetHeQualificationByNameTests : IAsyncLifetime
+    public class GetHeQualificationByCodeTests : IAsyncLifetime
     {
         private readonly CrmClientFixture.TestDataScope _dataScope;
         private readonly DataverseAdapter _dataverseAdapter;
 
-        public GetHeQualificationByNameTests(CrmClientFixture crmClientFixture)
+        public GetHeQualificationByCodeTests(CrmClientFixture crmClientFixture)
         {
             _dataScope = crmClientFixture.CreateTestDataScope();
             _dataverseAdapter = _dataScope.CreateDataverseAdapter();
@@ -22,24 +22,24 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_valid_qualification_name_returns_country()
         {
             // Arrange
-            var qualificationName = "First Degree";
+            var qualificationCode = "400";  // First Degree
 
             // Act
-            var result = await _dataverseAdapter.GetHeQualificationByName(qualificationName);
+            var result = await _dataverseAdapter.GetHeQualificationByCode(qualificationCode);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(qualificationName, result.dfeta_name);
+            Assert.Equal(qualificationCode, result.dfeta_Value);
         }
 
         [Fact]
         public async Task Given_invalid_qualification_name_returns_null()
         {
             // Arrange
-            var QualificationName = "XXXX";
+            var qualificationCode = "XXXX";
 
             // Act
-            var result = await _dataverseAdapter.GetHeQualificationByName(QualificationName);
+            var result = await _dataverseAdapter.GetHeQualificationByCode(qualificationCode);
 
             // Assert
             Assert.Null(result);

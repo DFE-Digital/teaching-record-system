@@ -60,7 +60,8 @@ namespace DqtApi.V2.Handlers
                         CountryCode = request.Qualification.CountryCode,
                         Subject = request.Qualification.Subject,
                         Class = request.Qualification.Class?.ConvertToClassDivision(),
-                        Date = request.Qualification.Date
+                        Date = request.Qualification.Date,
+                        HeQualificationValue = request.Qualification.HeQualificationType?.GetHeQualificationValue()
                     } :
                     null,
                 HusId = request.HusId
