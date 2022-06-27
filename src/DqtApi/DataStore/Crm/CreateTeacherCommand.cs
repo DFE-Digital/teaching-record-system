@@ -48,5 +48,6 @@ namespace DqtApi.DataStore.Crm
         public string Subject { get; set; }
         public dfeta_classdivision? Class { get; set; }
         public DateOnly? Date { get; set; }
+        public string HeQualificationValue { get; set; }
     }
 }

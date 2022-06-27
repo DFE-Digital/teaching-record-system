@@ -177,4 +177,7 @@
   <data name="Errors.10012.Title" xml:space="preserve">
     <value>ITT qualification not found</value>
   </data>
+  <data name="Errors.10013.Title" xml:space="preserve">
+    <value>HE qualification not found</value>
+  </data>
 </root>

@@ -70,10 +70,10 @@ namespace DqtApi.Tests
                 CacheKeys.GetHeSubjectKey(heSubjectCode),
                 _ => _dataverseAdapter.GetHeSubjectByCode(heSubjectCode, lookupRequestBuilder));
 
-            var qualificationName = "First Degree";
+            var qualificationCode = "400";  // First Degree
             var getQualificationTask = _globalCache.GetOrCreateAsync(
-                CacheKeys.GetHeQualificationKey(qualificationName),
-                _ => _dataverseAdapter.GetHeQualificationByName(qualificationName, lookupRequestBuilder));
+                CacheKeys.GetHeQualificationKey(qualificationCode),
+                _ => _dataverseAdapter.GetHeQualificationByCode(qualificationCode, lookupRequestBuilder));
 
             await lookupRequestBuilder.Execute();
 

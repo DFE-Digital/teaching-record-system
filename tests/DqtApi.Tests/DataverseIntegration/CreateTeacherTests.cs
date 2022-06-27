@@ -78,6 +78,37 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Fact]
+        public async Task Given_specified_qualification_type_creates_qualification_with_type()
+        {
+            // Arrange
+            var qualificationValue = "401";  // Higher Degree
+            var command = CreateCommand(cmd => cmd.Qualification.HeQualificationValue = qualificationValue);
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+
+            // Assert
+            Assert.True(result.Succeeded);
+            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(result.TeacherId);
+            Assert.Collection(qualifications, qualification => Assert.Equal("Higher Degree", qualification.Extract<dfeta_hequalification>().dfeta_name));
+        }
+
+        [Fact]
+        public async Task Given_no_specified_qualification_type_creates_qualification_with_default_type()
+        {
+            // Arrange
+            var command = CreateCommand(cmd => cmd.Qualification.HeQualificationValue = null);
+
+            // Act
+            var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+
+            // Assert
+            Assert.True(result.Succeeded);
+            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(result.TeacherId);
+            Assert.Collection(qualifications, qualification => Assert.Equal("First Degree", qualification.Extract<dfeta_hequalification>().dfeta_name));
+        }
+
+        [Fact]
         public async Task Given_details_that_do_not_match_existing_records_allocates_trn_and_does_not_create_QTS_task()
         {
             // Arrange
@@ -440,6 +471,20 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(CreateTeacherFailedReasons.IttQualificationNotFound, result.FailedReasons);
         }
 
+        [Fact]
+        public async Task Given_invalid_HeQualificationValue_returns_failed()
+        {
+            // Arrange
+            var command = CreateCommand(cmd => cmd.Qualification.HeQualificationValue = "xxx");
+
+            // Act
+            var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
+
+            // Assert
+            Assert.False(result.Succeeded);
+            Assert.Equal(CreateTeacherFailedReasons.QualificationNotFound, result.FailedReasons);
+        }
+
         private static CreateTeacherCommand CreateCommand(Action<CreateTeacherCommand> configureCommand = null)
         {
             var command = new CreateTeacherCommand()
@@ -476,7 +521,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     CountryCode = "XK",
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
-                    Date = new(2021, 5, 3)
+                    Date = new(2021, 5, 3),
+                    HeQualificationValue = "401"  // Higher Degree
                 }
             };
 

@@ -35,5 +35,6 @@ namespace DqtApi.DataStore.Crm
         QualificationProviderNotFound = 32,
         Subject3NotFound = 64,
         IttQualificationNotFound = 128,
+        QualificationNotFound = 256,
     }
 }

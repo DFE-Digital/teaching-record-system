@@ -19,6 +19,7 @@ namespace DqtApi.Validation
             ErrorDescriptor.Create(10010),  // County not found,
             ErrorDescriptor.Create(10011),  // Cannot change Programme Type 
             ErrorDescriptor.Create(10012),  // ITT qualification not found
+            ErrorDescriptor.Create(10013),  // HE qualification not found
         }.ToDictionary(d => d.ErrorCode, d => d);
 
         public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);
@@ -44,6 +45,8 @@ namespace DqtApi.Validation
         public static Error CannotChangeProgrammeType() => CreateError(10011);
 
         public static Error IttQualificationNotFound() => CreateError(10012);
+
+        public static Error HeQualificationNotFound() => CreateError(10013);
 
         private static Error CreateError(int errorCode)
         {

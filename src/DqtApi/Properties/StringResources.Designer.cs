@@ -239,5 +239,14 @@ namespace DqtApi.Properties {
                 return ResourceManager.GetString("Errors.10012.Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HE qualification not found.
+        /// </summary>
+        public static string Errors_10013_Title {
+            get {
+                return ResourceManager.GetString("Errors.10013.Title", resourceCulture);
+            }
+        }
     }
 }

@@ -223,6 +223,33 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Fact]
+        public async Task Given_invalid_qualification_type_returns_error()
+        {
+            // Arrange
+            var trn = "123456";
+            var heQualificationType = (HeQualificationType)(-1);
+            var contact = new Contact() { Id = Guid.NewGuid() };
+            var contactList = new[] { contact };
+            var dob = new DateOnly(1987, 01, 01);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                    .ReturnsAsync(contactList);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                    .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationNotFound));
+
+            // Act
+            var response = await HttpClient.PatchAsync(
+                $"v2/teachers/update/{trn}?birthdate={dob:yyyy-MM-dd}",
+                CreateRequest(req => req.Qualification.HeQualificationType = heQualificationType));
+
+            // Assert
+            Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        }
+
+        [Fact]
         public async Task Given_multiple_lookups_failed_returns_error()
         {
             // Arrange

@@ -351,6 +351,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var updateIttSubject2 = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
             var updateIttSubject3 = await _dataverseAdapter.GetIttSubjectByCode("100302");  // history
             var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
+            var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -376,6 +377,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = ittProviderUkprn,
+                    HeQualificationValue = updateHeQualification.dfeta_Value
                 }
             });
 
@@ -393,6 +395,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_qualification.Fields.dfeta_HE_CompletionDate,
                     dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
                     dfeta_qualification.Fields.dfeta_HE_CountryId,
+                    dfeta_qualification.Fields.dfeta_HE_HEQualificationId
                 });
 
             var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
@@ -442,6 +445,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     Assert.Equal(oldProvider, item1.dfeta_HE_EstablishmentId.Id);
                     Assert.Equal(dfeta_classdivision.Firstclasshonours, item1.dfeta_HE_ClassDivision);
                     Assert.Equal(new DateTime(2022, 01, 28), item1.dfeta_CompletionorAwardDate);
+                    Assert.Equal(updateHeQualification.Id, item1.dfeta_HE_HEQualificationId.Id);
                 });
         }
 
@@ -586,7 +590,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var countryId = await _dataverseAdapter.GetCountry("XK");
             var qualificationSubject1Id = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
             var providerId = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn)).Single();
-            var qualification = await _dataverseAdapter.GetHeQualificationByName("First Degree");
+            var qualification = await _dataverseAdapter.GetHeQualificationByCode("400");  // First Degree
 
             var txnResponse = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
             {
@@ -1023,12 +1027,13 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Theory]
-        [InlineData("Invalid Subject1", "100403", "100366", "001", "XK", "100366", UpdateTeacherFailedReasons.Subject1NotFound)]
-        [InlineData("100302", "Invalid subject2", "100403", "001", "XK", "100366", UpdateTeacherFailedReasons.Subject2NotFound)]
-        [InlineData("100302", "100403", "Invalid subject3", "001", "XK", "100366", UpdateTeacherFailedReasons.Subject3NotFound)]
-        [InlineData("100302", "100403", "100366", "001", "XK", "Invalid Qualification subject", UpdateTeacherFailedReasons.QualificationSubjectNotFound)]
-        [InlineData("100302", "100403", "100366", "001", "INVALID COUNTRY CODE", "100366", UpdateTeacherFailedReasons.QualificationCountryNotFound)]
-        [InlineData("100302", "100403", "100366", "xxx", "XK", "100366", UpdateTeacherFailedReasons.IttQualificationNotFound)]
+        [InlineData("Invalid Subject1", "100403", "100366", "001", "XK", "100366", "400", UpdateTeacherFailedReasons.Subject1NotFound)]
+        [InlineData("100302", "Invalid subject2", "100403", "001", "XK", "100366", "400", UpdateTeacherFailedReasons.Subject2NotFound)]
+        [InlineData("100302", "100403", "Invalid subject3", "001", "XK", "100366", "400", UpdateTeacherFailedReasons.Subject3NotFound)]
+        [InlineData("100302", "100403", "100366", "001", "XK", "Invalid Qualification subject", "400", UpdateTeacherFailedReasons.QualificationSubjectNotFound)]
+        [InlineData("100302", "100403", "100366", "001", "INVALID COUNTRY CODE", "100366", "400", UpdateTeacherFailedReasons.QualificationCountryNotFound)]
+        [InlineData("100302", "100403", "100366", "xxx", "XK", "100366", "400", UpdateTeacherFailedReasons.IttQualificationNotFound)]
+        [InlineData("100302", "100403", "100366", "001", "XK", "100366", "xxx", UpdateTeacherFailedReasons.QualificationNotFound)]
         public async Task Given_invalid_reference_data_request_fails(
             string ittSubject1,
             string ittSubject2,
@@ -1036,6 +1041,7 @@ namespace DqtApi.Tests.DataverseIntegration
             string ittQualificationCode,
             string qualificationCountryCode,
             string qualificationSubject,
+            string heQualificationCode,
             UpdateTeacherFailedReasons expectedFailedReasons)
         {
             // Arrange
@@ -1067,6 +1073,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = newIttProviderUkprn,
+                    HeQualificationValue = heQualificationCode
                 }
             });
 
