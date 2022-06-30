@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
+using DqtApi.DataStore.Sql;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
 using DqtApi.Validation;
@@ -17,14 +18,20 @@ namespace DqtApi.V2.Handlers
     public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
     {
         private readonly IDataverseAdapter _dataverseAdapter;
+        private readonly DqtContext _dqtContext;
 
-        public UpdateTeacherHandler(IDataverseAdapter dataverseAdapter)
+        public UpdateTeacherHandler(IDataverseAdapter dataverseAdapter, DqtContext dqtContext)
         {
             _dataverseAdapter = dataverseAdapter;
+            _dqtContext = dqtContext;
         }
 
         public async Task<Unit> Handle(UpdateTeacherRequest request, CancellationToken cancellationToken)
         {
+            using var transaction = await _dqtContext.Database.BeginTransactionAsync();
+
+            await transaction.AcquireAdvisoryLock(request.Trn);
+
             var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, activeOnly: true)).ToArray();
 
             if (teachers.Length == 0)
