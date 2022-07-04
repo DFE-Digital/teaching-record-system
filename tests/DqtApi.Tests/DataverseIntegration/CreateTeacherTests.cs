@@ -249,6 +249,8 @@ namespace DqtApi.Tests.DataverseIntegration
         [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme, dfeta_ITTResult.InTraining)]
         [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme_CC, dfeta_ITTResult.InTraining)]
         [InlineData(dfeta_ITTProgrammeType.UndergraduateOptIn, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.Providerled_postgrad, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.Providerled_undergrad, dfeta_ITTResult.InTraining)]
         public void CreateInitialTeacherTrainingEntity_maps_entity_from_command_correctly(
             dfeta_ITTProgrammeType programmeType,
             dfeta_ITTResult expectedResult)

@@ -67,6 +67,12 @@ namespace DqtApi.V2.ApiModels
 
         [Description("Undergraduate Opt In")]
         UndergraduateOptIn = 389040013,
+
+        [Description("Provider-led (postgrad)")]
+        ProviderLedPostgrad = 389040021,
+
+        [Description("Provider-led (undergrad)")]
+        ProviderLedUndergrad = 389040022,
     }
 
     public static class IttProgrammeTypeExtensions
