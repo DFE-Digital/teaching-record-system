@@ -5204,6 +5204,214 @@ namespace DqtApi.DataStore.Crm.Models
 		}
 	}
 	
+	/// <summary>
+	/// Represents a source of entities bound to a CRM service. It tracks and manages changes made to the retrieved entities.
+	/// </summary>
+	public partial class DqtCrmServiceContext : Microsoft.Xrm.Sdk.Client.OrganizationServiceContext
+	{
+		
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public DqtCrmServiceContext(Microsoft.Xrm.Sdk.IOrganizationService service) : 
+				base(service)
+		{
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.Account"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.Account> AccountSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.Account>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.Contact"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.Contact> ContactSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.Contact>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_country"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_country> dfeta_countrySet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_country>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_earlyyearsstatus"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_earlyyearsstatus> dfeta_earlyyearsstatusSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_earlyyearsstatus>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_hequalification"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_hequalification> dfeta_hequalificationSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_hequalification>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_hesubject"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_hesubject> dfeta_hesubjectSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_hesubject>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_induction"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_induction> dfeta_inductionSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_induction>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_initialteachertraining"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_initialteachertraining> dfeta_initialteachertrainingSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_initialteachertraining>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_ittqualification"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_ittqualification> dfeta_ittqualificationSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_ittqualification>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_ittsubject"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_ittsubject> dfeta_ittsubjectSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_ittsubject>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_qtsregistration"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_qtsregistration> dfeta_qtsregistrationSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_qtsregistration>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_qualification"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_qualification> dfeta_qualificationSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_qualification>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_sanction"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_sanction> dfeta_sanctionSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_sanction>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_sanctioncode"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_sanctioncode> dfeta_sanctioncodeSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_sanctioncode>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.dfeta_teacherstatus"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.dfeta_teacherstatus> dfeta_teacherstatusSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.dfeta_teacherstatus>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="DqtApi.DataStore.Crm.Models.Task"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<DqtApi.DataStore.Crm.Models.Task> TaskSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<DqtApi.DataStore.Crm.Models.Task>();
+			}
+		}
+	}
+	
 	internal sealed class EntityOptionSetEnum
 	{
 		
