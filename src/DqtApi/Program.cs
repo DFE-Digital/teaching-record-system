@@ -301,15 +301,21 @@ namespace DqtApi
 
             app.Run();
 
-            ServiceClient GetCrmServiceClient() =>
-                new ServiceClient(
+            ServiceClient GetCrmServiceClient()
+            {
+                ServiceClient.MaxConnectionTimeout = TimeSpan.FromSeconds(30);
+
+                return new ServiceClient(
                     new Uri(configuration["CrmUrl"]),
                     configuration["CrmClientId"],
                     configuration["CrmClientSecret"],
                     useUniqueInstance: true)
                 {
-                    EnableAffinityCookie = false
+                    EnableAffinityCookie = false,
+                    MaxRetryCount = 2,
+                    RetryPauseTime = TimeSpan.FromSeconds(1)
                 };
+            }
 
             void ConfigureRateLimitServices()
             {
