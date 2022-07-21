@@ -687,6 +687,9 @@
           },
           "ittQualificationType": {
             "$ref": "#/components/schemas/IttQualificationType"
+          },
+          "ittQualificationAim": {
+            "$ref": "#/components/schemas/IttQualificationAim"
           }
         },
         "additionalProperties": false
@@ -858,6 +861,14 @@
           }
         },
         "additionalProperties": false
+      },
+      "IttQualificationAim": {
+        "enum": [
+          "ProfessionalStatusOnly",
+          "ProfessionalStatusAndAcademicAward",
+          "ProfessionalStatusByAssessmentOnly"
+        ],
+        "type": "string"
       },
       "IttQualificationType": {
         "enum": [
@@ -1082,6 +1093,9 @@
           },
           "ittQualificationType": {
             "$ref": "#/components/schemas/IttQualificationType"
+          },
+          "ittQualificationAim": {
+            "$ref": "#/components/schemas/IttQualificationAim"
           }
         },
         "additionalProperties": false

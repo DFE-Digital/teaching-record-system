@@ -2502,6 +2502,7 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string dfeta_CohortYear = "dfeta_cohortyear";
 			public const string dfeta_CountryId = "dfeta_countryid";
 			public const string dfeta_EstablishmentId = "dfeta_establishmentid";
+			public const string dfeta_ittqualificationaim = "dfeta_ittqualificationaim";
 			public const string dfeta_ITTQualificationId = "dfeta_ittqualificationid";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_ProgrammeEndDate = "dfeta_programmeenddate";
@@ -2663,6 +2664,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_EstablishmentId");
 				this.SetAttributeValue("dfeta_establishmentid", value);
 				this.OnPropertyChanged("dfeta_EstablishmentId");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_ittqualificationaim")]
+		public virtual dfeta_ITTQualificationAim? dfeta_ittqualificationaim
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_ITTQualificationAim?)(EntityOptionSetEnum.GetEnum(this, "dfeta_ittqualificationaim")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_ittqualificationaim");
+				this.SetAttributeValue("dfeta_ittqualificationaim", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("dfeta_ittqualificationaim");
 			}
 		}
 		

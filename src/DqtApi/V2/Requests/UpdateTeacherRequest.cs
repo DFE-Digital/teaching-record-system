@@ -44,6 +44,7 @@ namespace DqtApi.V2.Requests
         public int? AgeRangeFrom { get; set; }
         public int? AgeRangeTo { get; set; }
         public IttQualificationType? IttQualificationType { get; set; }
+        public IttQualificationAim? IttQualificationAim { get; set; }
     }
 
     public class UpdateTeacherRequestQualification
