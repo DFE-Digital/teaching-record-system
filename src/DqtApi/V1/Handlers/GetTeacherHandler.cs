@@ -89,7 +89,9 @@ namespace DqtApi.V1.Handlers
                     {
                         StartDate = induction.dfeta_StartDate,
                         CompletionDate = induction.dfeta_CompletionDate,
-                        InductionStatusName = induction.FormattedValues[dfeta_induction.Fields.dfeta_InductionStatus],
+                        InductionStatusName = induction.FormattedValues.ContainsKey(dfeta_induction.Fields.dfeta_InductionStatus) ?
+                            induction.FormattedValues[dfeta_induction.Fields.dfeta_InductionStatus] :
+                            null,
                         State = induction.StateCode.Value,
                         StateName = induction.FormattedValues[dfeta_induction.Fields.StateCode]
                     } :
