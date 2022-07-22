@@ -39,6 +39,7 @@ namespace DqtApi.DataStore.Crm
         public dfeta_AgeRange? AgeRangeFrom { get; set; }
         public dfeta_AgeRange? AgeRangeTo { get; set; }
         public string IttQualificationValue { get; set; }
+        public dfeta_ITTQualificationAim? IttQualificationAim { get; set; }
     }
 
     public class CreateTeacherCommandQualification

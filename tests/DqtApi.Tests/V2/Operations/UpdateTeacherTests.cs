@@ -496,7 +496,8 @@ namespace DqtApi.Tests.V2.Operations
                     Subject2 = "100403",  // mathematics
                     Subject3 = "100302",  // history
                     AgeRangeFrom = 5,
-                    AgeRangeTo = 11
+                    AgeRangeTo = 11,
+                    IttQualificationAim = IttQualificationAim.ProfessionalStatusAndAcademicAward
                 },
                 Qualification = new()
                 {

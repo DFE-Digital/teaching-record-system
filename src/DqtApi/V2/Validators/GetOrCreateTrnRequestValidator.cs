@@ -77,6 +77,9 @@ namespace DqtApi.V2.Validators
                 .NotNull()
                 .IsInEnum();
 
+            RuleFor(r => r.InitialTeacherTraining.IttQualificationAim)
+                .IsInEnum();
+
             RuleFor(r => r.InitialTeacherTraining.AgeRangeFrom)
                 .Must(v => AgeRange.TryConvertFromValue(v.Value, out _))
                     .When(r => r.InitialTeacherTraining.AgeRangeFrom.HasValue)

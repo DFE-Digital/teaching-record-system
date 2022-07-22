@@ -278,7 +278,9 @@ namespace DqtApi.DataStore.Crm
                     dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
                     dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
                     dfeta_TraineeID = _command.HusId,
-                    dfeta_ITTQualificationId = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName)
+                    dfeta_ITTQualificationId = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName),
+                    dfeta_ittqualificationaim = _command.InitialTeacherTraining.IttQualificationAim
+                    //dfeta_IT = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName)
                 };
             }
 

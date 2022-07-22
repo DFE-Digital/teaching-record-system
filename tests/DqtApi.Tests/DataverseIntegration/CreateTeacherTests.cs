@@ -67,6 +67,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProgrammeStartDate = new(2020, 4, 1),
                     ProgrammeEndDate = new(2020, 10, 10),
                     ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                    IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
                 }
             };
 
@@ -292,6 +293,7 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(dfeta_ittsubject.EntityLogicalName, result.dfeta_Subject3Id?.LogicalName);
             Assert.Equal(referenceData.IttSubject3Id, result.dfeta_Subject3Id?.Id);
             Assert.Equal(command.HusId, result.dfeta_TraineeID);
+            Assert.Equal(command.InitialTeacherTraining.IttQualificationAim, result.dfeta_ittqualificationaim);
         }
 
         [Fact]
@@ -435,7 +437,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     ProviderUkprn = "10044534",  // ARK Teacher Training
                     ProgrammeStartDate = startDate,
                     ProgrammeEndDate = endDate,
-                    ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                    ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme
                 }
             };
 
@@ -513,7 +515,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Subject3 = "100302",  // history
                     AgeRangeFrom = dfeta_AgeRange._05,
                     AgeRangeTo = dfeta_AgeRange._11,
-                    IttQualificationValue = "001"  // BEd
+                    IttQualificationValue = "001",  // BEd
+                    IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
                 },
                 Qualification = new()
                 {

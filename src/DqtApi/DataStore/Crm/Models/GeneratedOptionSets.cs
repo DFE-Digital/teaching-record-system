@@ -1428,7 +1428,7 @@ namespace DqtApi.DataStore.Crm.Models
 		EYITTUndergraduate = 389040017,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Future Teaching Scholars", 20, "#0000ff")]
+		[OptionSetMetadataAttribute("Future Teaching Scholars", 22, "#0000ff")]
 		FutureTeachingScholars = 389040020,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
@@ -1446,6 +1446,14 @@ namespace DqtApi.DataStore.Crm.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Overseas Trained Teacher Programme", 8)]
 		OverseasTrainedTeacherProgramme = 389040007,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Provider-led (postgrad)", 20, "#0000ff")]
+		Providerled_postgrad = 389040021,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Provider-led (undergrad)", 21, "#0000ff")]
+		Providerled_undergrad = 389040022,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Registered Teacher Programme", 9)]

@@ -76,7 +76,8 @@
     "dfeta_subject2id",
     "dfeta_subject3id",
     "dfeta_traineeid",
-    "statecode"
+    "statecode",
+    "dfeta_ittqualificationaim"
   ],
   "dfeta_ittsubject": [
     "dfeta_name",

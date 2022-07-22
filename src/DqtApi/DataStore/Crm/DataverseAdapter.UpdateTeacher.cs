@@ -324,7 +324,8 @@ namespace DqtApi.DataStore.Crm
                     dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
                     dfeta_Result = !id.HasValue ? result : null,
                     dfeta_TraineeID = _command.HusId,
-                    dfeta_ITTQualificationId = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName)
+                    dfeta_ITTQualificationId = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName),
+                    dfeta_ittqualificationaim = _command.InitialTeacherTraining.IttQualificationAim
                 };
 
                 if (id.HasValue)
