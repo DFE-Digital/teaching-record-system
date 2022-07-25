@@ -846,7 +846,9 @@
           "EYITTUndergraduate",
           "EYITTSchoolDirectEarlyYears",
           "Apprenticeship",
-          "FutureTeachingScholars"
+          "FutureTeachingScholars",
+          "ProviderLedPostgrad",
+          "ProviderLedUndergrad"
         ],
         "type": "string"
       },

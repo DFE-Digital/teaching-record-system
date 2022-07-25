@@ -545,6 +545,8 @@ namespace DqtApi.Tests.DataverseIntegration
         [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme)]
         [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme_CC)]
         [InlineData(dfeta_ITTProgrammeType.UndergraduateOptIn)]
+        [InlineData(dfeta_ITTProgrammeType.Providerled_postgrad)]
+        [InlineData(dfeta_ITTProgrammeType.Providerled_undergrad)]
         public async Task Given_earlyyears_itt_cannot_change_eyts_programmetype_to_qts(dfeta_ITTProgrammeType programmeType)
         {
             // Arrange
@@ -710,6 +712,8 @@ namespace DqtApi.Tests.DataverseIntegration
         [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme, dfeta_ITTResult.InTraining)]
         [InlineData(dfeta_ITTProgrammeType.TeachFirstProgramme_CC, dfeta_ITTResult.InTraining)]
         [InlineData(dfeta_ITTProgrammeType.UndergraduateOptIn, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.Providerled_postgrad, dfeta_ITTResult.InTraining)]
+        [InlineData(dfeta_ITTProgrammeType.Providerled_undergrad, dfeta_ITTResult.InTraining)]
         public async Task Given_there_are_no_records_matched_create_new_itt_with_correct_result_and_warning_crm_task(dfeta_ITTProgrammeType programmeType, dfeta_ITTResult ittResult)
         {
             // Arrange
