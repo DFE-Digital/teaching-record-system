@@ -206,6 +206,34 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Fact]
+        public async Task Given_qualification_subject2_that_is_not_found_returns_failed()
+        {
+            // Arrange
+            var command = CreateCommand(command => command.Qualification.Subject2 = "SOME BAD SUBJECT");
+
+            // Act
+            var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
+
+            // Assert
+            Assert.False(result.Succeeded);
+            Assert.True(result.FailedReasons.HasFlag(CreateTeacherFailedReasons.QualificationSubject2NotFound));
+        }
+
+        [Fact]
+        public async Task Given_qualification_subject3_that_is_not_found_returns_failed()
+        {
+            // Arrange
+            var command = CreateCommand(command => command.Qualification.Subject3 = "SOME BAD SUBJECT");
+
+            // Act
+            var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
+
+            // Assert
+            Assert.False(result.Succeeded);
+            Assert.True(result.FailedReasons.HasFlag(CreateTeacherFailedReasons.QualificationSubject3NotFound));
+        }
+
+        [Fact]
         public void CreateTeacherEntity_maps_contact_record_correctly()
         {
             // Arrange
@@ -309,7 +337,9 @@ namespace DqtApi.Tests.DataverseIntegration
                 QualificationId = Guid.NewGuid(),
                 QualificationCountryId = Guid.NewGuid(),
                 QualificationSubjectId = Guid.NewGuid(),
-                QualificationProviderId = Guid.NewGuid()
+                QualificationProviderId = Guid.NewGuid(),
+                QualificationSubject2Id = Guid.NewGuid(),
+                QualificationSubject3Id = Guid.NewGuid()
             };
 
             var helper = new DataverseAdapter.CreateTeacherHelper(_dataverseAdapter, command);
@@ -329,6 +359,10 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(Account.EntityLogicalName, result.dfeta_HE_EstablishmentId?.LogicalName);
             Assert.Equal(referenceData.QualificationProviderId, result.dfeta_HE_EstablishmentId?.Id);
             Assert.Equal(command.Qualification.Date, DateOnly.FromDateTime(result.dfeta_HE_CompletionDate.Value));
+            Assert.Equal(referenceData.QualificationSubject2Id, result.dfeta_HE_HESubject2Id?.Id);
+            Assert.Equal(dfeta_hesubject.EntityLogicalName, result.dfeta_HE_HESubject2Id?.LogicalName);
+            Assert.Equal(referenceData.QualificationSubject3Id, result.dfeta_HE_HESubject3Id?.Id);
+            Assert.Equal(dfeta_hesubject.EntityLogicalName, result.dfeta_HE_HESubject3Id?.LogicalName);
         }
 
         [Fact]
@@ -527,7 +561,9 @@ namespace DqtApi.Tests.DataverseIntegration
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new(2021, 5, 3),
-                    HeQualificationValue = "401"  // Higher Degree
+                    HeQualificationValue = "401",  // Higher Degree,
+                    Subject2 = "H6601", //Radio Technology
+                    Subject3 = "V1030" //Regional History
                 }
             };
 

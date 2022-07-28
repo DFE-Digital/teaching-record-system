@@ -352,6 +352,8 @@ namespace DqtApi.DataStore.Crm
                     dfeta_Type = dfeta_qualification_dfeta_Type.HigherEducation,
                     dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_HE_EstablishmentId = referenceData.QualificationProviderId?.ToEntityReference(Account.EntityLogicalName),
+                    dfeta_HE_HESubject2Id = referenceData.QualificationSubject2Id?.ToEntityReference(dfeta_hesubject.EntityLogicalName),
+                    dfeta_HE_HESubject3Id = referenceData.QualificationSubject3Id?.ToEntityReference(dfeta_hesubject.EntityLogicalName),
                 };
 
                 if (id.HasValue)
@@ -405,6 +407,17 @@ namespace DqtApi.DataStore.Crm
                 {
                     failedReasons |= UpdateTeacherFailedReasons.QualificationSubjectNotFound;
                 }
+
+                if (referenceData.QualificationSubject2Id == null && _command.Qualification != null && !string.IsNullOrEmpty(_command.Qualification?.Subject2))
+                {
+                    failedReasons |= UpdateTeacherFailedReasons.QualificationSubject2NotFound;
+                }
+
+                if (referenceData.QualificationSubject3Id == null && _command.Qualification != null && !string.IsNullOrEmpty(_command.Qualification.Subject3))
+                {
+                    failedReasons |= UpdateTeacherFailedReasons.QualificationSubject3NotFound;
+                }
+
 
                 if (referenceData.QualificationProviderId == null && !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn))
                 {
@@ -541,6 +554,22 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
                     null;
 
+                var getQualificationSubject2Task = !string.IsNullOrEmpty(_command.Qualification?.Subject2) ?
+                    Let(
+                        _command.Qualification.Subject2,
+                        subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetHeSubjectKey(subjectName),
+                            _ => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
+                    null;
+
+                var getQualificationSubject3Task = !string.IsNullOrEmpty(_command.Qualification?.Subject3) ?
+                    Let(
+                        _command.Qualification.Subject3,
+                        subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetHeSubjectKey(subjectName),
+                            _ => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
+                    null;
+
                 var getEarlyYearsStatusTask = isEarlyYears ?
                     Let(
                         "220", // 220 == 'Early Years Trainee'
@@ -576,7 +605,9 @@ namespace DqtApi.DataStore.Crm
                    getTeacherTask,
                    getIttRecordsTask,
                    getQtsRegistrationsTask,
-                   getQualifications
+                   getQualifications,
+                   getQualificationSubject2Task,
+                   getQualificationSubject3Task
                 }
                 .Where(t => t != null);
 
@@ -597,6 +628,8 @@ namespace DqtApi.DataStore.Crm
                     QualificationId = getQualificationTask?.Result?.Id,
                     QualificationCountryId = getQualificationCountryTask?.Result?.Id,
                     QualificationSubjectId = getQualificationSubjectTask?.Result?.Id,
+                    QualificationSubject2Id = getQualificationSubject2Task?.Result?.Id,
+                    QualificationSubject3Id = getQualificationSubject3Task?.Result?.Id,
                     EarlyYearsStatusId = getEarlyYearsStatusTask.Result?.Id,
                     TeacherStatusId = getTeacherStatusTask.Result?.Id,
                     QualificationProviderId = getQualificationProviderTask?.Result?.Id,
@@ -630,6 +663,8 @@ namespace DqtApi.DataStore.Crm
             public IEnumerable<dfeta_qualification> Qualifications { get; set; }
             public bool TeacherHasActiveSanctions { get; set; }
             public string TeacherHusId { get; set; }
+            public Guid? QualificationSubject2Id { get; set; }
+            public Guid? QualificationSubject3Id { get; set; }
         }
     }
 }

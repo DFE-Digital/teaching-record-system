@@ -70,6 +70,8 @@ namespace DqtApi.V2.Requests
         public string ProviderUkprn { get; set; }
         public string CountryCode { get; set; }
         public string Subject { get; set; }
+        public string Subject2 { get; set; }
+        public string Subject3 { get; set; }
         public ClassDivision? Class { get; set; }
         public DateOnly? Date { get; set; }
         public HeQualificationType? HeQualificationType { get; set; }

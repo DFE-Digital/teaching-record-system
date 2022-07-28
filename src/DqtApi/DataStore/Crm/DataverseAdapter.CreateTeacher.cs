@@ -297,7 +297,9 @@ namespace DqtApi.DataStore.Crm
                     dfeta_HE_ClassDivision = _command.Qualification?.Class,
                     dfeta_HE_EstablishmentId = referenceData.QualificationProviderId?.ToEntityReference(Account.EntityLogicalName),
                     dfeta_HE_CompletionDate = _command.Qualification?.Date?.ToDateTime(),
-                    dfeta_HE_HEQualificationId = referenceData.QualificationId.Value.ToEntityReference(dfeta_hequalification.EntityLogicalName)
+                    dfeta_HE_HEQualificationId = referenceData.QualificationId.Value.ToEntityReference(dfeta_hequalification.EntityLogicalName),
+                    dfeta_HE_HESubject2Id = referenceData.QualificationSubject2Id?.ToEntityReference(dfeta_hesubject.EntityLogicalName),
+                    dfeta_HE_HESubject3Id = referenceData.QualificationSubject3Id?.ToEntityReference(dfeta_hesubject.EntityLogicalName),
                 };
             }
 
@@ -528,6 +530,22 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
                     null;
 
+                var getQualificationSubjectTask2 = !string.IsNullOrEmpty(_command.Qualification?.Subject2) ?
+                    Let(
+                        _command.Qualification.Subject2,
+                        subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetHeSubjectKey(subjectName),
+                            _ => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
+                    null;
+
+                var getQualificationSubjectTask3 = !string.IsNullOrEmpty(_command.Qualification?.Subject3) ?
+                    Let(
+                        _command.Qualification.Subject3,
+                        subjectName => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetHeSubjectKey(subjectName),
+                            _ => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
+                    null;
+
                 var getEarlyYearsStatusTask = isEarlyYears ?
                     Let(
                         "220", // 220 == 'Early Years Trainee'
@@ -559,7 +577,9 @@ namespace DqtApi.DataStore.Crm
                     getQualificationCountryTask,
                     getQualificationSubjectTask,
                     getEarlyYearsStatusTask,
-                    getTeacherStatusTask
+                    getTeacherStatusTask,
+                    getQualificationSubjectTask2,
+                    getQualificationSubjectTask3
                 }
                 .Where(t => t != null);
 
@@ -583,7 +603,9 @@ namespace DqtApi.DataStore.Crm
                     QualificationCountryId = getQualificationCountryTask?.Result?.Id,
                     QualificationSubjectId = getQualificationSubjectTask?.Result?.Id,
                     EarlyYearsStatusId = getEarlyYearsStatusTask?.Result?.Id,
-                    TeacherStatusId = getTeacherStatusTask?.Result?.Id
+                    TeacherStatusId = getTeacherStatusTask?.Result?.Id,
+                    QualificationSubject2Id = getQualificationSubjectTask2?.Result?.Id,
+                    QualificationSubject3Id = getQualificationSubjectTask3?.Result?.Id,
                 };
             }
 
@@ -631,6 +653,16 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= CreateTeacherFailedReasons.QualificationSubjectNotFound;
                 }
 
+                if (referenceData.QualificationSubject2Id == null && !string.IsNullOrEmpty(_command.Qualification?.Subject2))
+                {
+                    failedReasons |= CreateTeacherFailedReasons.QualificationSubject2NotFound;
+                }
+
+                if (referenceData.QualificationSubject3Id == null && !string.IsNullOrEmpty(_command.Qualification?.Subject3))
+                {
+                    failedReasons |= CreateTeacherFailedReasons.QualificationSubject3NotFound;
+                }
+
                 if (referenceData.QualificationId == null)
                 {
                     failedReasons |= CreateTeacherFailedReasons.QualificationNotFound;
@@ -652,6 +684,8 @@ namespace DqtApi.DataStore.Crm
             public Guid? QualificationProviderId { get; set; }
             public Guid? QualificationCountryId { get; set; }
             public Guid? QualificationSubjectId { get; set; }
+            public Guid? QualificationSubject2Id { get; set; }
+            public Guid? QualificationSubject3Id { get; set; }
             public Guid? TeacherStatusId { get; set; }
             public Guid? EarlyYearsStatusId { get; set; }
         }

@@ -47,6 +47,8 @@ namespace DqtApi.DataStore.Crm
         public string ProviderUkprn { get; set; }
         public string CountryCode { get; set; }
         public string Subject { get; set; }
+        public string Subject2 { get; set; }
+        public string Subject3 { get; set; }
         public dfeta_classdivision? Class { get; set; }
         public DateOnly? Date { get; set; }
         public string HeQualificationValue { get; set; }

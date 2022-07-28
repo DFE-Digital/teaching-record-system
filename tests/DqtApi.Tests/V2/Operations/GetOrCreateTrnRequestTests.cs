@@ -182,6 +182,95 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Fact]
+        public async Task Given_request_with_null_qualification_subject2_request_to_DataverseAdapter_successfully()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var teacherId = Guid.NewGuid();
+            var trn = "1234567";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+                .Verifiable();
+
+            var request = CreateRequest(req => req.Qualification.Subject2 = null);
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+        }
+
+
+        [Fact]
+        public async Task Given_request_with_null_qualification_subject3_request_to_DataverseAdapter_successfully()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var teacherId = Guid.NewGuid();
+            var trn = "1234567";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+                .Verifiable();
+
+            var request = CreateRequest(req => req.Qualification.Subject3 = null);
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+        }
+
+        [Fact]
+        public async Task Given_invalid_qualification_subject2_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubject2NotFound));
+
+            // Act
+            var response = await HttpClient.PutAsync(
+                $"v2/trn-requests/{requestId}",
+                CreateRequest(req => req.Qualification.Subject2 = "some invalid subject"));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.Subject2)}",
+                expectedError: Properties.StringResources.Errors_10009_Title);
+        }
+
+        [Fact]
+        public async Task Given_invalid_qualification_subject3_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubject3NotFound));
+
+            // Act
+            var response = await HttpClient.PutAsync(
+                $"v2/trn-requests/{requestId}",
+                CreateRequest(req => req.Qualification.Subject3 = "some invalid subject"));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.Subject3)}",
+                expectedError: Properties.StringResources.Errors_10009_Title);
+        }
+
+        [Fact]
         public async Task Given_invalid_itt_provider_returns_error()
         {
             // Arrange
@@ -491,7 +580,9 @@ namespace DqtApi.Tests.V2.Operations
                     CountryCode = "UK",
                     Subject = "100366",  // computer science
                     Class = ClassDivision.FirstClassHonours,
-                    Date = new(2021, 5, 3)
+                    Date = new(2021, 5, 3),
+                    Subject2 = "X300", // Academic Studies in Education
+                    Subject3 = "N400"  // Accounting
                 },
                 HusId = "1234567890123"
             };
