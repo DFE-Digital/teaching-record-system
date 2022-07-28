@@ -69,7 +69,9 @@ namespace DqtApi.V2.Handlers
                         Subject = request.Qualification.Subject,
                         Class = request.Qualification.Class?.ConvertToClassDivision(),
                         Date = request.Qualification.Date,
-                        HeQualificationValue = request.Qualification.HeQualificationType?.GetHeQualificationValue()
+                        HeQualificationValue = request.Qualification.HeQualificationType?.GetHeQualificationValue(),
+                        Subject2 = request.Qualification.Subject2,
+                        Subject3 = request.Qualification.Subject3,
                     } :
                     null,
                 HusId = request.HusId
@@ -105,6 +107,16 @@ namespace DqtApi.V2.Handlers
             ConsumeReason(
                 UpdateTeacherFailedReasons.QualificationSubjectNotFound,
                 $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}",
+                ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.QualificationSubject2NotFound,
+                $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject2)}",
+                ErrorRegistry.SubjectNotFound().Title);
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.QualificationSubject3NotFound,
+                $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject3)}",
                 ErrorRegistry.SubjectNotFound().Title);
 
             ConsumeReason(

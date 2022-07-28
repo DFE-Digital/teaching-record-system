@@ -709,6 +709,14 @@
             "type": "string",
             "nullable": true
           },
+          "subject2": {
+            "type": "string",
+            "nullable": true
+          },
+          "subject3": {
+            "type": "string",
+            "nullable": true
+          },
           "class": {
             "$ref": "#/components/schemas/ClassDivision"
           },
@@ -1114,6 +1122,14 @@
             "nullable": true
           },
           "subject": {
+            "type": "string",
+            "nullable": true
+          },
+          "subject2": {
+            "type": "string",
+            "nullable": true
+          },
+          "subject3": {
             "type": "string",
             "nullable": true
           },

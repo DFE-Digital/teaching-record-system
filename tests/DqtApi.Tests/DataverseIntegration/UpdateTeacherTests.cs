@@ -58,6 +58,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
+                    Subject2 = "H6601", //Radio Technology
+                    Subject3 = "V1030" //Regional History
                 }
             });
 
@@ -73,6 +75,8 @@ namespace DqtApi.Tests.DataverseIntegration
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
             var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
+            var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
+            var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
             var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
             var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
             var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
@@ -100,6 +104,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = ittProviderUkprn,
+                    Subject2 = "X300",
+                    Subject3 = "N400"
                 }
             });
 
@@ -301,6 +307,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_qualification.Fields.dfeta_HE_CompletionDate,
                     dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
                     dfeta_qualification.Fields.dfeta_HE_CountryId,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject2Id,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject3Id,
                 });
 
             var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
@@ -345,6 +353,8 @@ namespace DqtApi.Tests.DataverseIntegration
             // Arrange
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
+            var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
+            var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
             var updateHeSubject = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
             var updatedHeCountry = await _dataverseAdapter.GetCountry("XK");
             var updateIttSubject1 = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
@@ -377,7 +387,9 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = ittProviderUkprn,
-                    HeQualificationValue = updateHeQualification.dfeta_Value
+                    HeQualificationValue = updateHeQualification.dfeta_Value,
+                    Subject2 = "X300",
+                    Subject3 = "N400"
                 }
             });
 
@@ -394,6 +406,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_qualification.Fields.dfeta_HE_ClassDivision,
                     dfeta_qualification.Fields.dfeta_HE_CompletionDate,
                     dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject2Id,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject3Id,
                     dfeta_qualification.Fields.dfeta_HE_CountryId,
                     dfeta_qualification.Fields.dfeta_HE_HEQualificationId
                 });
@@ -442,6 +456,8 @@ namespace DqtApi.Tests.DataverseIntegration
                 {
                     Assert.Equal(updatedHeCountry.Id, item1.dfeta_HE_CountryId.Id);
                     Assert.Equal(updateHeSubject.Id, item1.dfeta_HE_HESubject1Id.Id);
+                    Assert.Equal(updateHeSubject2Id.Id, item1.dfeta_HE_HESubject2Id.Id);
+                    Assert.Equal(updateHeSubject3Id.Id, item1.dfeta_HE_HESubject3Id.Id);
                     Assert.Equal(oldProvider, item1.dfeta_HE_EstablishmentId.Id);
                     Assert.Equal(dfeta_classdivision.Firstclasshonours, item1.dfeta_HE_ClassDivision);
                     Assert.Equal(new DateTime(2022, 01, 28), item1.dfeta_CompletionorAwardDate);
@@ -478,6 +494,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = ittProviderUkprn,
+                    Subject2 = "X300",
+                    Subject3 = "N400"
                 }
             });
 
@@ -520,6 +538,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = ittProviderUkprn,
+                    Subject2 = "X300",
+                    Subject3 = "N400"
                 }
             });
 
@@ -575,6 +595,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = ittProviderUkprn,
+                    Subject2 = "X300",
+                    Subject3 = "N400"
                 }
             });
 
@@ -593,6 +615,8 @@ namespace DqtApi.Tests.DataverseIntegration
             var qualificationSubject1Id = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
             var providerId = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn)).Single();
             var qualification = await _dataverseAdapter.GetHeQualificationByCode("400");  // First Degree
+            var HeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
+            var HeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
 
             var txnResponse = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
             {
@@ -609,7 +633,9 @@ namespace DqtApi.Tests.DataverseIntegration
                             dfeta_HE_ClassDivision = dfeta_classdivision.Pass,
                             dfeta_HE_CompletionDate = DateTime.Now.AddMonths(-1),
                             dfeta_HE_HESubject1Id = new EntityReference(dfeta_hesubject.EntityLogicalName, qualificationSubject1Id.Id),
-                            dfeta_HE_HEQualificationId = new EntityReference(dfeta_hequalification.EntityLogicalName, qualification.Id)
+                            dfeta_HE_HEQualificationId = new EntityReference(dfeta_hequalification.EntityLogicalName, qualification.Id),
+                            dfeta_HE_HESubject2Id = new EntityReference(dfeta_hesubject.EntityLogicalName, HeSubject2Id.Id),
+                            dfeta_HE_HESubject3Id = new EntityReference(dfeta_hesubject.EntityLogicalName, HeSubject3Id.Id),
                         }
                     }
                 },
@@ -628,6 +654,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_qualification.Fields.dfeta_HE_CompletionDate,
                     dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
                     dfeta_qualification.Fields.dfeta_HE_CountryId,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject2Id,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject3Id,
                 });
 
             // Act
@@ -644,7 +672,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     Subject2 = "100403",  // mathematics
                     Subject3 = "100302",  // history
                     AgeRangeFrom = dfeta_AgeRange._11,
-                    AgeRangeTo = dfeta_AgeRange._12
+                    AgeRangeTo = dfeta_AgeRange._12,
                 },
                 Qualification = new UpdateTeacherCommandQualification()
                 {
@@ -667,6 +695,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_qualification.Fields.dfeta_HE_ClassDivision,
                     dfeta_qualification.Fields.dfeta_HE_CompletionDate,
                     dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject2Id,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject3Id,
                     dfeta_qualification.Fields.dfeta_HE_CountryId,
                 });
 
@@ -831,6 +861,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Fourthclasshonours,
                     Date = new DateOnly(2022, 01, 15),
                     ProviderUkprn = ittProviderUkprn,
+                    Subject2 = "X300", //Academic studies in education
+                    Subject3 = "N400"  //accounting
                 }
             });
 
@@ -931,6 +963,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = ittProviderUkprn,
+                    Subject2 = "X300", //Academic studies in education
+                    Subject3 = "N400"  //accounting
                 }
             });
 
@@ -1029,7 +1063,9 @@ namespace DqtApi.Tests.DataverseIntegration
                     Subject = "100366",  // computer science
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
-                    ProviderUkprn = "SOME INVALID"
+                    ProviderUkprn = "SOME INVALID",
+                    Subject2 = "X300", //Academic studies in education
+                    Subject3 = "N400"  //accounting
                 }
             });
 
@@ -1038,13 +1074,15 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Theory]
-        [InlineData("Invalid Subject1", "100403", "100366", "001", "XK", "100366", "400", UpdateTeacherFailedReasons.Subject1NotFound)]
-        [InlineData("100302", "Invalid subject2", "100403", "001", "XK", "100366", "400", UpdateTeacherFailedReasons.Subject2NotFound)]
-        [InlineData("100302", "100403", "Invalid subject3", "001", "XK", "100366", "400", UpdateTeacherFailedReasons.Subject3NotFound)]
-        [InlineData("100302", "100403", "100366", "001", "XK", "Invalid Qualification subject", "400", UpdateTeacherFailedReasons.QualificationSubjectNotFound)]
-        [InlineData("100302", "100403", "100366", "001", "INVALID COUNTRY CODE", "100366", "400", UpdateTeacherFailedReasons.QualificationCountryNotFound)]
-        [InlineData("100302", "100403", "100366", "xxx", "XK", "100366", "400", UpdateTeacherFailedReasons.IttQualificationNotFound)]
-        [InlineData("100302", "100403", "100366", "001", "XK", "100366", "xxx", UpdateTeacherFailedReasons.QualificationNotFound)]
+        [InlineData("Invalid Subject1", "100403", "100366", "001", "XK", "100366", "400", "N400", "X300", UpdateTeacherFailedReasons.Subject1NotFound)]
+        [InlineData("100302", "Invalid subject2", "100403", "001", "XK", "100366", "400", "N400", "X300", UpdateTeacherFailedReasons.Subject2NotFound)]
+        [InlineData("100302", "100403", "Invalid subject3", "001", "XK", "100366", "400", "N400", "X300", UpdateTeacherFailedReasons.Subject3NotFound)]
+        [InlineData("100302", "100403", "100366", "001", "XK", "Invalid Qualification subject", "400", "N400", "X300", UpdateTeacherFailedReasons.QualificationSubjectNotFound)]
+        [InlineData("100302", "100403", "100366", "001", "INVALID COUNTRY CODE", "100366", "400", "N400", "X300", UpdateTeacherFailedReasons.QualificationCountryNotFound)]
+        [InlineData("100302", "100403", "100366", "xxx", "XK", "100366", "400", "N400", "X300", UpdateTeacherFailedReasons.IttQualificationNotFound)]
+        [InlineData("100302", "100403", "100366", "001", "XK", "100366", "xxx", "N400", "X300", UpdateTeacherFailedReasons.QualificationNotFound)]
+        [InlineData("100302", "100403", "100366", "001", "XK", "100366", "400", "NOT VALID SUBJECT2", "X300", UpdateTeacherFailedReasons.QualificationSubject2NotFound)]
+        [InlineData("100302", "100403", "100366", "001", "XK", "100366", "400", "N400", "NOT VALID SUBJECT3", UpdateTeacherFailedReasons.QualificationSubject3NotFound)]
         public async Task Given_invalid_reference_data_request_fails(
             string ittSubject1,
             string ittSubject2,
@@ -1053,6 +1091,8 @@ namespace DqtApi.Tests.DataverseIntegration
             string qualificationCountryCode,
             string qualificationSubject,
             string heQualificationCode,
+            string qualificationSubject2,
+            string qualificationSubject3,
             UpdateTeacherFailedReasons expectedFailedReasons)
         {
             // Arrange
@@ -1085,7 +1125,9 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = newIttProviderUkprn,
-                    HeQualificationValue = heQualificationCode
+                    HeQualificationValue = heQualificationCode,
+                    Subject2 = qualificationSubject2,
+                    Subject3 = qualificationSubject3,
                 }
             });
 
@@ -1107,6 +1149,8 @@ namespace DqtApi.Tests.DataverseIntegration
             var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
             var updateIttSubject3Id = await _dataverseAdapter.GetIttSubjectByCode("100302");  // history
             var husId = "1234567890123";
+            var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
+            var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
 
             // Act
             var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -1132,6 +1176,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     Class = dfeta_classdivision.Firstclasshonours,
                     Date = new DateOnly(2022, 01, 28),
                     ProviderUkprn = newIttProviderUkprn,
+                    Subject2 = "X300", //Academic studies in education
+                    Subject3 = "N400"  //accounting
                 },
                 HusId = husId
             });
@@ -1150,6 +1196,8 @@ namespace DqtApi.Tests.DataverseIntegration
                     dfeta_qualification.Fields.dfeta_HE_ClassDivision,
                     dfeta_qualification.Fields.dfeta_HE_CompletionDate,
                     dfeta_qualification.Fields.dfeta_HE_HESubject1Id,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject2Id,
+                    dfeta_qualification.Fields.dfeta_HE_HESubject3Id,
                     dfeta_qualification.Fields.dfeta_HE_CountryId,
                 });
 
@@ -1202,6 +1250,8 @@ namespace DqtApi.Tests.DataverseIntegration
                 {
                     Assert.Equal(updatedHeCountryId.Id, item1.dfeta_HE_CountryId.Id);
                     Assert.Equal(updateHeSubjectId.Id, item1.dfeta_HE_HESubject1Id.Id);
+                    Assert.Equal(updateHeSubject2Id.Id, item1.dfeta_HE_HESubject2Id.Id);
+                    Assert.Equal(updateHeSubject3Id.Id, item1.dfeta_HE_HESubject3Id.Id);
                     Assert.Equal(newProviderProvider, item1.dfeta_HE_EstablishmentId.Id);
                     Assert.Equal(dfeta_classdivision.Firstclasshonours, item1.dfeta_HE_ClassDivision);
                     Assert.Equal(new DateTime(2022, 01, 28), item1.dfeta_CompletionorAwardDate);

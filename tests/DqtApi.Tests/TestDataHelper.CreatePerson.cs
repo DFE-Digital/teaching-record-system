@@ -70,6 +70,16 @@ namespace DqtApi.Tests
                 CacheKeys.GetHeSubjectKey(heSubjectCode),
                 _ => _dataverseAdapter.GetHeSubjectByCode(heSubjectCode, lookupRequestBuilder));
 
+            var heSubject2Code = "B780";  // Paramedical Nursing
+            var getHeSubject2Task = _globalCache.GetOrCreateAsync(
+                CacheKeys.GetHeSubjectKey(heSubject2Code),
+                _ => _dataverseAdapter.GetHeSubjectByCode(heSubjectCode, lookupRequestBuilder));
+
+            var heSubject3Code = "101076";  // Laser Physics
+            var getHeSubject3Task = _globalCache.GetOrCreateAsync(
+                CacheKeys.GetHeSubjectKey(heSubject3Code),
+                _ => _dataverseAdapter.GetHeSubjectByCode(heSubjectCode, lookupRequestBuilder));
+
             var qualificationCode = "400";  // First Degree
             var getQualificationTask = _globalCache.GetOrCreateAsync(
                 CacheKeys.GetHeQualificationKey(qualificationCode),
@@ -82,6 +92,8 @@ namespace DqtApi.Tests
             var teacherStatusId = getTeacherStatusTask?.Result?.Id;
             var countryId = getCountryCodeTask.Result.Id;
             var heSubjectId = getHeSubjectTask.Result.Id;
+            var heSubject2Id = getHeSubject2Task.Result.Id;
+            var heSubject3Id = getHeSubject3Task.Result.Id;
             var qualificationId = getQualificationTask.Result.Id;
 
             var txnRequestBuilder = _dataverseAdapter.CreateTransactionRequestBuilder();
@@ -147,6 +159,8 @@ namespace DqtApi.Tests
                         dfeta_HE_ClassDivision = dfeta_classdivision.Pass,
                         dfeta_HE_CompletionDate = DateTime.Now.AddMonths(-1),
                         dfeta_HE_HESubject1Id = new EntityReference(dfeta_hesubject.EntityLogicalName, heSubjectId),
+                        dfeta_HE_HESubject2Id = new EntityReference(dfeta_hesubject.EntityLogicalName, heSubject2Id),
+                        dfeta_HE_HESubject3Id = new EntityReference(dfeta_hesubject.EntityLogicalName, heSubject3Id),
                         dfeta_HE_HEQualificationId = new EntityReference(dfeta_hequalification.EntityLogicalName, qualificationId)
                     }
                 });

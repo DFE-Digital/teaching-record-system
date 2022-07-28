@@ -59,6 +59,58 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Fact]
+        public async Task Given_invalid_qualification_subject2_returns_error()
+        {
+            // Arrange
+            var trn = "12345";
+            var contact = new Contact() { Id = Guid.NewGuid() };
+            var contactList = new[] { contact };
+            var dob = new DateOnly(1987, 01, 01);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubject2NotFound));
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .ReturnsAsync(contactList);
+
+            // Act
+            var response = await HttpClient.PatchAsync(
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+                CreateRequest(req => req.Qualification.Subject2 = "some invalid subject"));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
+        }
+
+        [Fact]
+        public async Task Given_invalid_qualification_subject3_returns_error()
+        {
+            // Arrange
+            var trn = "12345";
+            var contact = new Contact() { Id = Guid.NewGuid() };
+            var contactList = new[] { contact };
+            var dob = new DateOnly(1987, 01, 01);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubject3NotFound));
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .ReturnsAsync(contactList);
+
+            // Act
+            var response = await HttpClient.PatchAsync(
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+                CreateRequest(req => req.Qualification.Subject3 = "some invalid"));
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
+        }
+
+        [Fact]
         public async Task Given_invalid_itt_provider_returns_error()
         {
             // Arrange
@@ -505,7 +557,9 @@ namespace DqtApi.Tests.V2.Operations
                     CountryCode = "UK",
                     Subject = "Computing",
                     Class = ClassDivision.FirstClassHonours,
-                    Date = new(2021, 5, 3)
+                    Date = new(2021, 5, 3),
+                    Subject2 = "X300", // Academic Studies in Education
+                    Subject3 = "N400"  // Accounting
                 },
                 HusId = "1234567890123"
             };
