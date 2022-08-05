@@ -210,6 +210,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Email of person",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
