@@ -212,7 +212,7 @@
             }
           },
           {
-            "name": "email",
+            "name": "emailAddress",
             "in": "query",
             "description": "Email of person",
             "schema": {
