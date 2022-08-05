@@ -42,7 +42,7 @@ namespace DqtApi.V2.Requests
         public string IttProviderUkprn { get; set; }
 
         [SwaggerParameter(Description = "Email of person")]
-        [FromQuery(Name = "email")]
+        [FromQuery(Name = "emailAddress")]
         public string EmailAddress { get; set; }
     }
 }
