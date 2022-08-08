@@ -248,5 +248,14 @@ namespace DqtApi.Properties {
                 return ResourceManager.GetString("Errors.10013.Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to unlock teacher with active sanctions.
+        /// </summary>
+        public static string Errors_10014_Title {
+            get {
+                return ResourceManager.GetString("Errors.10014.Title", resourceCulture);
+            }
+        }
     }
 }
