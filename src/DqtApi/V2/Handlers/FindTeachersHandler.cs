@@ -52,7 +52,8 @@ namespace DqtApi.V2.Handlers
                 PreviousLastName = request.PreviousLastName,
                 NationalInsuranceNumber = request.NationalInsuranceNumber,
                 DateOfBirth = request.DateOfBirth,
-                IttProviderOrganizationIds = ittProviders.Select(a => a.Id)
+                IttProviderOrganizationIds = ittProviders.Select(a => a.Id),
+                EmailAddress = request.EmailAddress
             };
 
             var result = await _dataverseAdapter.FindTeachers(query);

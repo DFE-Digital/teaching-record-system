@@ -40,5 +40,9 @@ namespace DqtApi.V2.Requests
         [SwaggerParameter(Description = "UKPRN of teacher training provider")]
         [FromQuery(Name = "ittProviderUkprn")]
         public string IttProviderUkprn { get; set; }
+
+        [SwaggerParameter(Description = "Email of person")]
+        [FromQuery(Name = "emailAddress")]
+        public string EmailAddress { get; set; }
     }
 }

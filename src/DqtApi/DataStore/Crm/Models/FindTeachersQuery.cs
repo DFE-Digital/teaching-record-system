@@ -12,5 +12,6 @@ namespace DqtApi.DataStore.Crm
         public DateOnly? DateOfBirth { get; set; }
         public string NationalInsuranceNumber { get; set; }
         public IEnumerable<Guid> IttProviderOrganizationIds { get; set; }
+        public string EmailAddress { get; set; }
     }
 }
