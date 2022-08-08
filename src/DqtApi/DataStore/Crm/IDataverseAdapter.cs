@@ -20,6 +20,8 @@ namespace DqtApi.DataStore.Crm
 
         Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, bool activeOnly = true, params string[] columnNames);
 
+        Task<Contact> GetTeacherByTsPersonId(string tsPersonId, params string[] columnNames);
+
         Task<Contact[]> FindTeachers(FindTeachersQuery query);
 
         Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);
@@ -39,6 +41,8 @@ namespace DqtApi.DataStore.Crm
             string ittProviderUkprn,
             dfeta_ITTResult result,
             DateOnly? assessmentDate);
+
+        Task SetTsPersonId(Guid teacherId, string tsPersonId);
 
         Task<bool> UnlockTeacherRecord(Guid teacherId);
     }

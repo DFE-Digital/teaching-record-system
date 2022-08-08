@@ -417,6 +417,7 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string dfeta_TRN = "dfeta_trn";
 			public const string dfeta_TRNAllocateRequest = "dfeta_trnallocaterequest";
 			public const string dfeta_trnrequired = "dfeta_trnrequired";
+			public const string dfeta_TSPersonID = "dfeta_tspersonid";
 			public const string EMailAddress1 = "emailaddress1";
 			public const string FirstName = "firstname";
 			public const string FullName = "fullname";
@@ -808,6 +809,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_trnrequired");
 				this.SetAttributeValue("dfeta_trnrequired", value);
 				this.OnPropertyChanged("dfeta_trnrequired");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_tspersonid")]
+		public string dfeta_TSPersonID
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_tspersonid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_TSPersonID");
+				this.SetAttributeValue("dfeta_tspersonid", value);
+				this.OnPropertyChanged("dfeta_TSPersonID");
 			}
 		}
 		
