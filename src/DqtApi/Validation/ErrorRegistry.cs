@@ -19,8 +19,12 @@ namespace DqtApi.Validation
             ErrorDescriptor.Create(10010),  // County not found,
             ErrorDescriptor.Create(10011),  // Cannot change Programme Type 
             ErrorDescriptor.Create(10012),  // ITT qualification not found
-            ErrorDescriptor.Create(10013),  // HE qualification not found,
-            ErrorDescriptor.Create(10014),  // teacher has active sanctions
+            ErrorDescriptor.Create(10013),  // HE qualification not found
+            ErrorDescriptor.Create(10014),  // Teacher has active sanctions
+
+            ErrorDescriptor.Create(10015),  // Teacher with specified TsPersonId not found
+            ErrorDescriptor.Create(10016),  // Another teacher has the specified TsPersonId assigned
+            ErrorDescriptor.Create(10017),  // Teacher already has a TsPersonId defined
         }.ToDictionary(d => d.ErrorCode, d => d);
 
         public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);
@@ -50,6 +54,12 @@ namespace DqtApi.Validation
         public static Error HeQualificationNotFound() => CreateError(10013);
 
         public static Error TeacherHasActiveSanctions() => CreateError(10014);
+
+        public static Error TeacherWithSpecifiedTsPersonIdNotFound() => CreateError(10015);
+
+        public static Error AnotherTeacherHasTheSpecifiedTsPersonIdAssigned() => CreateError(10016);
+
+        public static Error TeacherAlreadyHasTsPersonIdDefined() => CreateError(10017);
 
         private static Error CreateError(int errorCode)
         {

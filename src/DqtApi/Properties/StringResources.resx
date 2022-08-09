@@ -183,4 +183,13 @@
   <data name="Errors.10014.Title" xml:space="preserve">
     <value>Unable to unlock teacher with active sanctions</value>
   </data>
+  <data name="Errors.10015.Title" xml:space="preserve">
+    <value>Teacher with specified TsPersonId not found</value>
+  </data>
+  <data name="Errors.10016.Title" xml:space="preserve">
+    <value>Another teacher has the specified TsPersonId assigned</value>
+  </data>
+  <data name="Errors.10017.Title" xml:space="preserve">
+    <value>Teacher already has TsPersonId defined</value>
+  </data>
 </root>

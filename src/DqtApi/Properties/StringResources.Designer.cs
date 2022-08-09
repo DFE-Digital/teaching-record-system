@@ -250,11 +250,35 @@ namespace DqtApi.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to unlock teacher with active sanctions.
         /// </summary>
         public static string Errors_10014_Title {
             get {
                 return ResourceManager.GetString("Errors.10014.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teacher with specified TsPersonId not found.
+        /// </summary>
+        public static string Errors_10015_Title {
+            get {
+                return ResourceManager.GetString("Errors.10015.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Another teacher has the specified TsPersonId assigned.
+        /// </summary>
+        public static string Errors_10016_Title {
+            get {
+                return ResourceManager.GetString("Errors.10016.Title", resourceCulture);
+            }
+        }
+        
+        /// </summary>
+        public static string Errors_10017_Title {
+            get {
+                return ResourceManager.GetString("Errors.10017.Title", resourceCulture);
             }
         }
     }

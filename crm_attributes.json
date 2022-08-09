@@ -19,6 +19,7 @@
     "dfeta_loginfailedcounter",
     "dfeta_ninumber",
     "dfeta_qtsdate",
+    "dfeta_tspersonid",
     "dfeta_trn",
     "dfeta_trnallocaterequest",
     "dfeta_trnrequired",

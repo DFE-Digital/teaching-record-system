@@ -858,6 +858,32 @@ namespace DqtApi.DataStore.Crm
             return contacts.GroupBy(c => c.Id).Select(c => c.First()).ToArray();
         }
 
+        public async Task<Contact> GetTeacherByTsPersonId(string tsPersonId, params string[] columnNames)
+        {
+            var filter = new FilterExpression(LogicalOperator.And);
+            filter.AddCondition(Contact.Fields.dfeta_TSPersonID, ConditionOperator.Equal, tsPersonId);
+            filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+
+            var query = new QueryExpression(Contact.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames),
+                Criteria = filter
+            };
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(e => e.ToEntity<Contact>()).SingleOrDefault();
+        }
+
+        public Task SetTsPersonId(Guid teacherId, string tsPersonId)
+        {
+            return _service.UpdateAsync(new Contact()
+            {
+                Id = teacherId,
+                dfeta_TSPersonID = tsPersonId
+            });
+        }
+
         public RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);
 
         public RequestBuilder CreateSingleRequestBuilder() => RequestBuilder.CreateSingle(_service);
