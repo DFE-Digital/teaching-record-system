@@ -680,6 +680,7 @@
         "type": "object",
         "properties": {
           "firstName": {
+            "minLength": 1,
             "type": "string"
           },
           "middleName": {
@@ -687,6 +688,7 @@
             "nullable": true
           },
           "lastName": {
+            "minLength": 1,
             "type": "string"
           },
           "birthDate": {
@@ -756,6 +758,7 @@
         "type": "object",
         "properties": {
           "providerUkprn": {
+            "minLength": 1,
             "type": "string"
           },
           "programmeStartDate": {
@@ -1094,6 +1097,7 @@
         "type": "object",
         "properties": {
           "ittProviderUkprn": {
+            "minLength": 1,
             "type": "string"
           },
           "outcome": {
@@ -1128,6 +1132,7 @@
         "type": "object",
         "properties": {
           "tsPersonId": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -1200,6 +1205,7 @@
         "type": "object",
         "properties": {
           "providerUkprn": {
+            "minLength": 1,
             "type": "string"
           },
           "programmeStartDate": {
