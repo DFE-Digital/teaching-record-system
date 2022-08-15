@@ -15,6 +15,7 @@ using DqtApi.Security;
 using DqtApi.Services;
 using DqtApi.Swagger;
 using DqtApi.Validation;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -104,12 +105,13 @@ namespace DqtApi
                 .ConfigureApiBehaviorOptions(options =>
                 {
                     options.SuppressInferBindingSourcesForParameters = true;
-                })
-                .AddFluentValidation(fv =>
-                {
-                    fv.RegisterValidatorsFromAssemblyContaining(typeof(Program));
-                    fv.DisableDataAnnotationsValidation = true;
                 });
+
+            services.AddHttpContextAccessor();
+
+            services.AddFluentValidationAutoValidation(options => options.DisableDataAnnotationsValidation = true);
+
+            services.AddValidatorsFromAssemblyContaining(typeof(Program));
 
             services.AddTransient<IValidatorInterceptor, PreferModelBindingErrorsValidationInterceptor>();
 
