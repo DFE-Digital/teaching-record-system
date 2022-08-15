@@ -64,25 +64,33 @@ namespace DqtApi.V2.Validators
             RuleFor(r => r.GenderCode)
                 .IsInEnum();
 
+            RuleFor(r => r.InitialTeacherTraining)
+                .NotNull();
+
             RuleFor(r => r.InitialTeacherTraining.ProviderUkprn)
-                .NotEmpty();
+                .NotEmpty()
+                .When(r => r.InitialTeacherTraining != null);
 
             RuleFor(r => r.InitialTeacherTraining.ProgrammeStartDate)
-                .NotNull();
+                .NotNull()
+                .When(r => r.InitialTeacherTraining != null);
 
             RuleFor(r => r.InitialTeacherTraining.ProgrammeEndDate)
-                .NotNull();
+                .NotNull()
+                .When(r => r.InitialTeacherTraining != null);
 
             RuleFor(r => r.InitialTeacherTraining.ProgrammeType)
                 .NotNull()
-                .IsInEnum();
+                .IsInEnum()
+                .When(r => r.InitialTeacherTraining != null);
 
             RuleFor(r => r.InitialTeacherTraining.IttQualificationAim)
-                .IsInEnum();
+                .IsInEnum()
+                .When(r => r.InitialTeacherTraining != null);
 
             RuleFor(r => r.InitialTeacherTraining.AgeRangeFrom)
                 .Must(v => AgeRange.TryConvertFromValue(v.Value, out _))
-                    .When(r => r.InitialTeacherTraining.AgeRangeFrom.HasValue)
+                    .When(r => r.InitialTeacherTraining?.AgeRangeFrom.HasValue == true)
                     .WithMessage(StringResources.ErrorMessages_AgeMustBe0To19Inclusive);
 
             RuleFor(r => r.InitialTeacherTraining.AgeRangeTo)
@@ -104,10 +112,12 @@ namespace DqtApi.V2.Validators
                     {
                         ctx.AddFailure(ctx.PropertyName, StringResources.ErrorMessages_AgeToCannotBeLessThanAgeFrom);
                     }
-                });
+                })
+                .When(r => r.InitialTeacherTraining != null);
 
             RuleFor(r => r.InitialTeacherTraining.IttQualificationType)
-                .IsInEnum();
+                .IsInEnum()
+                .When(r => r.InitialTeacherTraining != null);
 
             RuleFor(r => r.Qualification.Class)
                 .IsInEnum()
