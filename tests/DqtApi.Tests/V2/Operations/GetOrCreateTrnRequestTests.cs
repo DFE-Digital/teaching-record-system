@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading.Tasks;
+using Castle.Components.DictionaryAdapter.Xml;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql.Models;
@@ -521,6 +523,41 @@ namespace DqtApi.Tests.V2.Operations
                 response,
                 expectedErrorPropertyName,
                 expectedErrorMessage);
+        }
+
+        [Theory]
+        [InlineData("", "Joe Xavier", "Andre", "Joe Xavier", "Andre")]
+        [InlineData("123", "Joe Xavier", "Andre", "Joe", "Xavier Andre")]
+        [InlineData("123", "Joe Xavier", "", "Joe", "Xavier")]
+        public async Task Given_trainee_with_multiple_first_names_populates_middlename_field(
+            string husid,
+            string firstName,
+            string middleName,
+            string expectedFirstName,
+            string expectedMiddleName)
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var teacherId = Guid.NewGuid();
+            var trn = "1234567";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn));
+
+            var request = CreateRequest(cmd =>
+            {
+                cmd.HusId = husid;
+                cmd.FirstName = firstName;
+                cmd.MiddleName = middleName;
+            });
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            ApiFixture.DataverseAdapter
+                .Verify(mock => mock.CreateTeacher(It.Is<CreateTeacherCommand>(cmd => cmd.FirstName == expectedFirstName && cmd.MiddleName == expectedMiddleName)));
         }
 
         public static TheoryData<int?, int?, string, string> InvalidAgeCombinationsData { get; } = new()

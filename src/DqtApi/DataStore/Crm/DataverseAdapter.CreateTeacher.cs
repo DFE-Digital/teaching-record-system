@@ -400,7 +400,7 @@ namespace DqtApi.DataStore.Crm
                     }.ToList();
 
                     // If fields are null in the input then don't try to match them (typically MiddleName)
-                    fields.RemoveAll(f => f.Value == null);
+                    fields.RemoveAll(f => f.Value == null || (f.Value is string stringValue && string.IsNullOrEmpty(stringValue)));
 
                     var combinations = fields.GetCombinations(length: 3).ToArray();
 

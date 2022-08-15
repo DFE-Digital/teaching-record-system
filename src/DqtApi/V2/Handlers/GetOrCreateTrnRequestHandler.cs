@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
@@ -61,11 +62,23 @@ namespace DqtApi.V2.Handlers
             }
             else
             {
+                var firstName = request.FirstName;
+                var middleName = request.MiddleName ?? string.Empty;
+                var lastName = request.LastName;
+
+                var isHesaTrainee = !string.IsNullOrEmpty(request.HusId);
+                if (isHesaTrainee)
+                {
+                    var firstAndMiddleNames = $"{firstName} {middleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    firstName = firstAndMiddleNames[0];
+                    middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
+                }
+
                 var createTeacherResult = await _dataverseAdapter.CreateTeacher(new CreateTeacherCommand()
                 {
-                    FirstName = request.FirstName,
-                    MiddleName = request.MiddleName,
-                    LastName = request.LastName,
+                    FirstName = firstName,
+                    MiddleName = middleName,
+                    LastName = lastName,
                     BirthDate = request.BirthDate.ToDateTime(),
                     EmailAddress = request.EmailAddress,
                     Address = new CreateTeacherCommandAddress()
