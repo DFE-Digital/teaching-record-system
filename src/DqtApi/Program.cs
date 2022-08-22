@@ -10,6 +10,7 @@ using DqtApi.DataStore.Sql;
 using DqtApi.Filters;
 using DqtApi.Json;
 using DqtApi.Logging;
+using DqtApi.Middleware;
 using DqtApi.ModelBinding;
 using DqtApi.Security;
 using DqtApi.Services;
@@ -254,14 +255,8 @@ namespace DqtApi
                 app.UseMiddleware<RateLimitMiddleware>();
             }
 
-            app.Use((ctx, next) =>
-            {
-                ctx.Response.Headers.Add("X-Frame-Options", "deny");
-                ctx.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-                ctx.Response.Headers.Add("X-XSS-Protection", "0");
+            app.UseMiddleware<AppendSecurityResponseHeadersMiddleware>();
 
-                return next();
-            });
 
             app.UseEndpoints(endpoints =>
             {
