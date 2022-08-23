@@ -12,6 +12,7 @@ using Microsoft.PowerPlatform.Dataverse.Client.Utils;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using Newtonsoft.Json.Linq;
 
 namespace DqtApi.DataStore.Crm
 {
@@ -53,6 +54,30 @@ namespace DqtApi.DataStore.Crm
             var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
 
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_country>()).FirstOrDefault();
+        }
+
+        public Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(Guid earlyYearsStatusId) => GetEarlyYearsStatus(earlyYearsStatusId, requestBuilder: null);
+
+        public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(Guid earlyYearsStatusId, RequestBuilder requestBuilder)
+        {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
+            var query = new QueryByAttribute(dfeta_earlyyearsstatus.EntityLogicalName)
+            {
+                ColumnSet = new() { AllColumns = true }
+            };
+
+            query.AddAttributeValue(dfeta_earlyyearsstatus.PrimaryIdAttribute, earlyYearsStatusId);
+            query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.StateCode, (int)dfeta_earlyyearsStatusState.Active);
+
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
+
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_earlyyearsstatus>()).FirstOrDefault();
         }
 
         public Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value) => GetEarlyYearsStatus(value, requestBuilder: null);

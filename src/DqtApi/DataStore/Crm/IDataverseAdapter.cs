@@ -12,6 +12,10 @@ namespace DqtApi.DataStore.Crm
 
         Task<Contact[]> FindTeachers(FindTeachersByTrnBirthDateAndNinoQuery query);
 
+        Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(Guid earlyYearsStatusId);
+
+        Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(Guid teacherId, params string[] columnNames);
+
         Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, params string[] columnNames);
 
         Task<Contact> GetTeacher(Guid teacherId, bool resolveMerges = true, params string[] columnNames);
@@ -21,6 +25,8 @@ namespace DqtApi.DataStore.Crm
         Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, bool activeOnly = true, params string[] columnNames);
 
         Task<Contact> GetTeacherByTsPersonId(string tsPersonId, params string[] columnNames);
+
+        Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(Guid teacherId, params string[] columnNames);
 
         Task<Contact[]> FindTeachers(FindTeachersQuery query);
 

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using DqtApi.Filters;
+using DqtApi.Logging;
 using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
 using MediatR;
@@ -27,6 +28,18 @@ namespace DqtApi.V2.Controllers
         {
             var response = await _mediator.Send(request);
             return Ok(response);
+        }
+
+        [HttpGet("{trn}")]
+        [SwaggerOperation(
+            summary: "Teacher",
+            description: "Get an individual teacher by their TRN")]
+        [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
+        [RedactQueryParam("birthdate")]
+        public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)
+        {
+            var response = await _mediator.Send(request);
+            return response != null ? Ok(response) : NotFound();
         }
 
         [HttpPatch("update/{trn}")]
