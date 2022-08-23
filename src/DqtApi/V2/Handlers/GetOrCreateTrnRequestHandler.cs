@@ -83,12 +83,12 @@ namespace DqtApi.V2.Handlers
                     EmailAddress = request.EmailAddress,
                     Address = new CreateTeacherCommandAddress()
                     {
-                        AddressLine1 = request.Address.AddressLine1,
-                        AddressLine2 = request.Address.AddressLine2,
-                        AddressLine3 = request.Address.AddressLine3,
-                        City = request.Address.City,
-                        PostalCode = request.Address.PostalCode,
-                        Country = request.Address.Country
+                        AddressLine1 = request.Address?.AddressLine1,
+                        AddressLine2 = request.Address?.AddressLine2,
+                        AddressLine3 = request.Address?.AddressLine3,
+                        City = request.Address?.City,
+                        PostalCode = request.Address?.PostalCode,
+                        Country = request.Address?.Country
                     },
                     GenderCode = request.GenderCode.ConvertToContact_GenderCode(),
                     InitialTeacherTraining = new CreateTeacherCommandInitialTeacherTraining()

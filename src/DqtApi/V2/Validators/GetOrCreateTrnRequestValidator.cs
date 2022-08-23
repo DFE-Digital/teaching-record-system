@@ -44,22 +44,28 @@ namespace DqtApi.V2.Validators
                 .MaximumLength(AttributeConstraints.Contact.EMailAddress1MaxLength);
 
             RuleFor(r => r.Address.AddressLine1)
-                .MaximumLength(AttributeConstraints.Contact.Address1_Line1MaxLength);
+                .MaximumLength(AttributeConstraints.Contact.Address1_Line1MaxLength)
+                .When(r => r.Address != null);
 
             RuleFor(r => r.Address.AddressLine2)
-                .MaximumLength(AttributeConstraints.Contact.Address1_Line2MaxLength);
+                .MaximumLength(AttributeConstraints.Contact.Address1_Line2MaxLength)
+                .When(r => r.Address != null);
 
             RuleFor(r => r.Address.AddressLine3)
-                .MaximumLength(AttributeConstraints.Contact.Address1_Line3MaxLength);
+                .MaximumLength(AttributeConstraints.Contact.Address1_Line3MaxLength)
+                .When(r => r.Address != null);
 
             RuleFor(r => r.Address.City)
-                .MaximumLength(AttributeConstraints.Contact.Address1_CityMaxLength);
+                .MaximumLength(AttributeConstraints.Contact.Address1_CityMaxLength)
+                .When(r => r.Address != null);
 
             RuleFor(r => r.Address.Country)
-                .MaximumLength(AttributeConstraints.Contact.Address1_CountryMaxLength);
+                .MaximumLength(AttributeConstraints.Contact.Address1_CountryMaxLength)
+                .When(r => r.Address != null);
 
             RuleFor(r => r.Address.PostalCode)
-                .MaximumLength(AttributeConstraints.Contact.Address1_PostalCodeLength);
+                .MaximumLength(AttributeConstraints.Contact.Address1_PostalCodeLength)
+                .When(r => r.Address != null);
 
             RuleFor(r => r.GenderCode)
                 .IsInEnum();
