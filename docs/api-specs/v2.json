@@ -244,6 +244,56 @@
         }
       }
     },
+    "/v2/teachers/{trn}": {
+      "get": {
+        "tags": [
+          "Teachers"
+        ],
+        "summary": "Teacher",
+        "description": "Get an individual teacher by their TRN",
+        "parameters": [
+          {
+            "name": "trn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "birthdate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTeacherResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/teachers/update/{trn}": {
       "patch": {
         "tags": [
@@ -840,6 +890,93 @@
         },
         "additionalProperties": false
       },
+      "GetTeacherResponse": {
+        "type": "object",
+        "properties": {
+          "trn": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "nationalInsuranceNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasActiveSanctions": {
+            "type": "boolean"
+          },
+          "qtsDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "eytsDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "earlyYearsStatus": {
+            "$ref": "#/components/schemas/GetTeacherResponseEarlyYearsStatus"
+          },
+          "initialTeacherTraining": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTraining"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseEarlyYearsStatus": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseInitialTeacherTraining": {
+        "type": "object",
+        "properties": {
+          "programmeStartDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "programmeEndDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "programmeType": {
+            "type": "string",
+            "nullable": true
+          },
+          "result": {
+            "$ref": "#/components/schemas/IttOutcome"
+          }
+        },
+        "additionalProperties": false
+      },
       "HeQualificationType": {
         "enum": [
           "BEd",
@@ -939,7 +1076,14 @@
           "Fail",
           "Withdrawn",
           "Deferred",
-          "DeferredForSkillsTests"
+          "DeferredForSkillsTests",
+          "ApplicationReceived",
+          "ApplicationUnsuccessful",
+          "Approved",
+          "Info",
+          "InTraining",
+          "NoResultSubmitted",
+          "UnderAssessment"
         ],
         "type": "string"
       },

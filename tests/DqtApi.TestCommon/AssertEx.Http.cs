@@ -32,7 +32,7 @@ namespace DqtApi.TestCommon
         public static async Task JsonResponseEquals(HttpResponseMessage response, object expected, int expectedStatusCode = StatusCodes.Status200OK)
         {
             var jsonResponse = await JsonResponse<JObject>(response, expectedStatusCode);
-            JsonObjectEquals(JToken.FromObject(expected), jsonResponse);
+            JsonObjectEquals(jsonResponse, JToken.FromObject(expected));
         }
 
         public static async Task ResponseIsError(HttpResponseMessage response, int errorCode, int expectedStatusCode)
