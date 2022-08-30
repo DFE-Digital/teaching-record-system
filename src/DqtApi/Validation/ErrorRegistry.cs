@@ -25,6 +25,7 @@ namespace DqtApi.Validation
             ErrorDescriptor.Create(10015),  // Teacher with specified TsPersonId not found
             ErrorDescriptor.Create(10016),  // Another teacher has the specified TsPersonId assigned
             ErrorDescriptor.Create(10017),  // Teacher already has a TsPersonId defined
+            ErrorDescriptor.Create(10018),  // Husid already being used for an existing teacher
         }.ToDictionary(d => d.ErrorCode, d => d);
 
         public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);
@@ -60,6 +61,8 @@ namespace DqtApi.Validation
         public static Error AnotherTeacherHasTheSpecifiedTsPersonIdAssigned() => CreateError(10016);
 
         public static Error TeacherAlreadyHasTsPersonIdDefined() => CreateError(10017);
+
+        public static Error ExistingTeacherAlreadyHasHusId() => CreateError(10018);
 
         private static Error CreateError(int errorCode)
         {

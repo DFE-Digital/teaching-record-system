@@ -418,10 +418,14 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= UpdateTeacherFailedReasons.QualificationSubject3NotFound;
                 }
 
-
                 if (referenceData.QualificationProviderId == null && !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn))
                 {
                     failedReasons |= UpdateTeacherFailedReasons.QualificationProviderNotFound;
+                }
+
+                if (referenceData.HaveExistingTeacherWithHusId == true)
+                {
+                    failedReasons |= UpdateTeacherFailedReasons.DuplicateHusId;
                 }
 
                 return failedReasons;
@@ -588,6 +592,12 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false, requestBuilder))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
+                var existingTeacherWithHusIdTask = !string.IsNullOrEmpty(_command.HusId) ? _dataverseAdapter.GetTeacherByHusId(_command.HusId, columnNames: new[]
+                {
+                    Contact.Fields.dfeta_TRN,
+                    Contact.Fields.dfeta_HUSID,
+                }) : Task.FromResult<Contact>(null);
+
                 var lookupTasks = new Task[]
                 {
                    getIttProviderTask,
@@ -607,7 +617,8 @@ namespace DqtApi.DataStore.Crm
                    getQtsRegistrationsTask,
                    getQualifications,
                    getQualificationSubject2Task,
-                   getQualificationSubject3Task
+                   getQualificationSubject3Task,
+                   existingTeacherWithHusIdTask
                 }
                 .Where(t => t != null);
 
@@ -638,7 +649,8 @@ namespace DqtApi.DataStore.Crm
                     QtsRegistrations = getQtsRegistrationsTask.Result,
                     Qualifications = getQualifications.Result,
                     TeacherHasActiveSanctions = getTeacherTask.Result?.dfeta_ActiveSanctions == true,
-                    TeacherHusId = getTeacherTask.Result?.dfeta_HUSID
+                    TeacherHusId = getTeacherTask.Result?.dfeta_HUSID,
+                    HaveExistingTeacherWithHusId = existingTeacherWithHusIdTask?.Result != null && existingTeacherWithHusIdTask.Result?.dfeta_TRN != _command.TRN
                 };
             }
         }
@@ -665,6 +677,7 @@ namespace DqtApi.DataStore.Crm
             public string TeacherHusId { get; set; }
             public Guid? QualificationSubject2Id { get; set; }
             public Guid? QualificationSubject3Id { get; set; }
+            public bool HaveExistingTeacherWithHusId { get; set; }
         }
     }
 }

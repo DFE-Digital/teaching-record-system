@@ -534,6 +534,36 @@ namespace DqtApi.Tests.V2.Operations
             await AssertEx.ResponseIsError(response, errorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
         }
 
+        [Fact]
+        public async Task Given_request_with_existing_husid_for_another_teacher_returns_error()
+        {
+            // Arrange
+            var trn = "123456";
+            var contact = new Contact() { Id = Guid.NewGuid() };
+            var contactList = new[] { contact };
+            var result = UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.DuplicateHusId);
+            var dob = new DateOnly(1987, 01, 01);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                    .ReturnsAsync(contactList);
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                    .ReturnsAsync(result);
+
+            // Act
+            var response = await HttpClient.PatchAsync(
+                $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+                CreateRequest());
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                $"{nameof(GetOrCreateTrnRequest.HusId)}.{nameof(GetOrCreateTrnRequest.HusId)}",
+                StringResources.Errors_10018_Title);
+        }
+
         private JsonContent CreateRequest(Action<UpdateTeacherRequest> configureRequest = null)
         {
             var request = new UpdateTeacherRequest()
