@@ -13,5 +13,6 @@ namespace DqtApi.DataStore.Crm
         public string NationalInsuranceNumber { get; set; }
         public IEnumerable<Guid> IttProviderOrganizationIds { get; set; }
         public string EmailAddress { get; set; }
+        public string Trn { get; set; }
     }
 }

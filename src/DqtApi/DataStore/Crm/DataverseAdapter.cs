@@ -747,6 +747,7 @@ namespace DqtApi.DataStore.Crm
             AddEqualCondition(Contact.Fields.BirthDate, findTeachersQuery.DateOfBirth?.ToDateTime());
             AddEqualCondition(Contact.Fields.dfeta_NINumber, findTeachersQuery.NationalInsuranceNumber);
             AddEqualCondition(Contact.Fields.EMailAddress1, findTeachersQuery.EmailAddress);
+            AddEqualCondition(Contact.Fields.dfeta_TRN, findTeachersQuery.Trn);
 
             {
                 // Find all the permutations of names to match on

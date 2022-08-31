@@ -1,6 +1,5 @@
 using System;
 using System.Net.Http;
-using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using DqtApi.Properties;
 using DqtApi.TestCommon;

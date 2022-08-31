@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DqtApi.DataStore.Crm
+namespace DqtApi.DataStore.Crm.Models
 {
     public class FindTeachersByTrnBirthDateAndNinoQuery
     {

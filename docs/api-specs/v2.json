@@ -218,6 +218,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "trn",
+            "in": "query",
+            "description": "TRN of person",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {

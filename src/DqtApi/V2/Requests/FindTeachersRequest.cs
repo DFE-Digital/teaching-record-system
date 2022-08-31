@@ -44,5 +44,9 @@ namespace DqtApi.V2.Requests
         [SwaggerParameter(Description = "Email of person")]
         [FromQuery(Name = "emailAddress")]
         public string EmailAddress { get; set; }
+
+        [SwaggerParameter(Description = "TRN of person")]
+        [FromQuery(Name = "trn")]
+        public string Trn { get; set; }
     }
 }
