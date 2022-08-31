@@ -232,6 +232,8 @@ namespace DqtApi
                 {
                     services.AddSingleton<IHostedService, LogRemainingCrmLimitsService>();
                 }
+
+                services.AddSingleton<IHostedService, CrmKeepAliveService>();
             }
 
             MetricLabels.ConfigureLabels(builder.Configuration);
