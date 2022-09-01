@@ -68,14 +68,9 @@ namespace DqtApi.Tests.DataverseIntegration
                     }
                     else
                     {
-                        ((Task)result).ContinueWith(t =>
-                        {
-                            if (t.Status == TaskStatus.RanToCompletion)
-                            {
-                                result = resultType.GetProperty("Result").GetValue(result);
-                                ExtractCreatedEntitiesFromInvocation(invocation, result);
-                            }
-                        });
+                        result = GetType().GetMethod(nameof(CreateExtractCreatedEntitiesContinuation), BindingFlags.NonPublic | BindingFlags.Instance)
+                            .MakeGenericMethod(resultType.GetGenericArguments()[0])
+                            .Invoke(this, new object[] { result, invocation });
                     }
 
                     invocation.ReturnValue = result;
@@ -103,6 +98,21 @@ namespace DqtApi.Tests.DataverseIntegration
                 }
             }
 
+            private Task<T> CreateExtractCreatedEntitiesContinuation<T>(Task result, IInvocation invocation) =>
+                ((Task<T>)result).ContinueWith(t =>
+                {
+                    if (t.Status == TaskStatus.RanToCompletion)
+                    {
+                        var asyncResult = t.Result;
+                        ExtractCreatedEntitiesFromInvocation(invocation, asyncResult);
+                        return Task.FromResult(asyncResult);
+                    }
+                    else
+                    {
+                        return t;
+                    }
+                }, TaskContinuationOptions.ExecuteSynchronously).Unwrap();
+
             private void ExtractCreatedEntitiesFromInvocation(IInvocation invocation, object underlyingResult)
             {
                 if (underlyingResult is OrganizationResponse organizationResponse)
@@ -118,7 +128,6 @@ namespace DqtApi.Tests.DataverseIntegration
 
                     _createdEntities.Add(entityReference);
                 }
-
             }
 
             private void ExtractCreatedEntitiesFromMessages(OrganizationRequest request, OrganizationResponse response)

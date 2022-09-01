@@ -588,7 +588,6 @@ namespace DqtApi.DataStore.Crm
 
                 Debug.Assert(!isEarlyYears || getEarlyYearsStatusTask.Result != null, "Early years status lookup failed.");
                 Debug.Assert(isEarlyYears || getTeacherStatusTask.Result != null, "Teacher status lookup failed.");
-                Debug.Assert(getQualificationTask.Result != null);
 
                 return new()
                 {

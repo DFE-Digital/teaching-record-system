@@ -85,7 +85,8 @@ namespace DqtApi.Tests.DataverseIntegration
                         Target = new Microsoft.Xrm.Sdk.EntityReference(Contact.EntityLogicalName, teacherId),
                         ColumnSet = new(Contact.Fields.dfeta_TRN)
                     }
-                }
+                },
+                ReturnResponses = true
             };
 
             var response = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(request);
