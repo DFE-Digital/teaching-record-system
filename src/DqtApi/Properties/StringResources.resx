@@ -192,4 +192,7 @@
   <data name="Errors.10017.Title" xml:space="preserve">
     <value>Teacher already has TsPersonId defined</value>
   </data>
+  <data name="Errors.10018.Title" xml:space="preserve">
+    <value>Husid registered for an existing teacher</value>
+  </data>
 </root>

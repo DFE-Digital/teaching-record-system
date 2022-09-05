@@ -560,6 +560,26 @@ namespace DqtApi.Tests.V2.Operations
                 .Verify(mock => mock.CreateTeacher(It.Is<CreateTeacherCommand>(cmd => cmd.FirstName == expectedFirstName && cmd.MiddleName == expectedMiddleName)));
         }
 
+        [Fact]
+        public async Task Given_request_with_existing_husid_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var request = CreateRequest();
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.DuplicateHusId));
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                $"{nameof(GetOrCreateTrnRequest.HusId)}.{nameof(GetOrCreateTrnRequest.HusId)}",
+                StringResources.Errors_10018_Title);
+        }
+
         public static TheoryData<int?, int?, string, string> InvalidAgeCombinationsData { get; } = new()
         {
             {

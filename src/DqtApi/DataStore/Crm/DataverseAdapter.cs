@@ -655,6 +655,23 @@ namespace DqtApi.DataStore.Crm
             bool qtsDateRequired) =>
                 GetTeacherStatus(value, qtsDateRequired, requestBuilder: null);
 
+        public async Task<Contact> GetTeacherByHusId(string husId, params string[] columnNames)
+        {
+            var filter = new FilterExpression(LogicalOperator.And);
+            filter.AddCondition(Contact.Fields.dfeta_HUSID, ConditionOperator.Equal, husId);
+            filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+
+            var query = new QueryExpression(Contact.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames),
+                Criteria = filter
+            };
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(e => e.ToEntity<Contact>()).SingleOrDefault();
+        }
+
         public async Task<dfeta_teacherstatus> GetTeacherStatus(
             string value,
             bool qtsDateRequired,

@@ -32,6 +32,9 @@ namespace DqtApi.V2.Handlers
 
             await transaction.AcquireAdvisoryLock(request.Trn);
 
+            if (!string.IsNullOrEmpty(request.HusId))
+                await transaction.AcquireAdvisoryLock(request.HusId);
+
             var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, activeOnly: true)).ToArray();
 
             if (teachers.Length == 0)
@@ -153,6 +156,11 @@ namespace DqtApi.V2.Handlers
                 UpdateTeacherFailedReasons.IttProviderNotFound,
                 $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}",
                 ErrorRegistry.OrganisationNotFound().Title);
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.DuplicateHusId,
+                $"{nameof(UpdateTeacherRequest.HusId)}.{nameof(UpdateTeacherRequest.HusId)}",
+                ErrorRegistry.ExistingTeacherAlreadyHasHusId().Title);
 
             if (failedReasons != UpdateTeacherFailedReasons.None)
             {

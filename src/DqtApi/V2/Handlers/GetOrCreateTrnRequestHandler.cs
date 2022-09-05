@@ -45,6 +45,9 @@ namespace DqtApi.V2.Handlers
             // This prevents us racing with another request with the same IDs; we don't want multiple CRM records created.
             await transaction.AcquireAdvisoryLock(currentClientId, request.RequestId);
 
+            if (!string.IsNullOrEmpty(request.HusId))
+                await transaction.AcquireAdvisoryLock(request.HusId);
+
             var trnRequest = await _dqtContext.TrnRequests
                 .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == request.RequestId);
 
@@ -205,6 +208,11 @@ namespace DqtApi.V2.Handlers
                 CreateTeacherFailedReasons.QualificationProviderNotFound,
                 $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.ProviderUkprn)}",
                 ErrorRegistry.OrganisationNotFound().Title);
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.DuplicateHusId,
+                $"{nameof(GetOrCreateTrnRequest.HusId)}.{nameof(GetOrCreateTrnRequest.HusId)}",
+                ErrorRegistry.ExistingTeacherAlreadyHasHusId().Title);
 
             if (failedReasons != CreateTeacherFailedReasons.None)
             {

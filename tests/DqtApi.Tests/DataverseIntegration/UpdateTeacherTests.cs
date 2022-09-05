@@ -1148,7 +1148,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
             var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
             var updateIttSubject3Id = await _dataverseAdapter.GetIttSubjectByCode("100302");  // history
-            var husId = "1234567890123";
+            var husId = "12345678901233411";
             var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
             var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
 
@@ -1295,7 +1295,7 @@ namespace DqtApi.Tests.DataverseIntegration
         {
             // Arrange
             var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
-            var husId = "1234567890123";
+            var husId = "1234567890123156";
 
             // Act
             var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()

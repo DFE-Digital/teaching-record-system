@@ -564,6 +564,12 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false, requestBuilder))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
+                var existingTeacherWithHusIdTask = !string.IsNullOrEmpty(_command.HusId) ? _dataverseAdapter.GetTeacherByHusId(_command.HusId, columnNames: new[]
+                {
+                    Contact.Fields.dfeta_TRN,
+                    Contact.Fields.dfeta_HUSID,
+                }) : Task.FromResult<Contact>(null);
+
                 var lookupTasks = new Task[]
                 {
                     getIttProviderTask,
@@ -579,7 +585,8 @@ namespace DqtApi.DataStore.Crm
                     getEarlyYearsStatusTask,
                     getTeacherStatusTask,
                     getQualificationSubjectTask2,
-                    getQualificationSubjectTask3
+                    getQualificationSubjectTask3,
+                    existingTeacherWithHusIdTask
                 }
                 .Where(t => t != null);
 
@@ -605,6 +612,7 @@ namespace DqtApi.DataStore.Crm
                     TeacherStatusId = getTeacherStatusTask?.Result?.Id,
                     QualificationSubject2Id = getQualificationSubjectTask2?.Result?.Id,
                     QualificationSubject3Id = getQualificationSubjectTask3?.Result?.Id,
+                    HaveExistingTeacherWithHusId = existingTeacherWithHusIdTask?.Result != null
                 };
             }
 
@@ -667,6 +675,11 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= CreateTeacherFailedReasons.QualificationNotFound;
                 }
 
+                if (referenceData.HaveExistingTeacherWithHusId == true)
+                {
+                    failedReasons |= CreateTeacherFailedReasons.DuplicateHusId;
+                }
+
                 return failedReasons;
             }
         }
@@ -687,6 +700,7 @@ namespace DqtApi.DataStore.Crm
             public Guid? QualificationSubject3Id { get; set; }
             public Guid? TeacherStatusId { get; set; }
             public Guid? EarlyYearsStatusId { get; set; }
+            public bool? HaveExistingTeacherWithHusId { get; set; }
         }
 
         internal class CreateTeacherDuplicateTeacherResult
