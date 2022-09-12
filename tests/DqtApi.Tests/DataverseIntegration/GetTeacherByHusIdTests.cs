@@ -54,7 +54,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var result = await _dataverseAdapter.GetTeachersByHusId("SOME_NONE_EXISTENT_HUSID", columnNames: Contact.Fields.dfeta_HUSID);
 
             // Assert
-            Assert.Null(result);
+            Assert.Empty(result);
         }
 
         private async Task<(Guid TeacherId, string Trn)> CreateTeacher(string husId)
