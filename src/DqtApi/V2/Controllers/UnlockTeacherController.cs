@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using DqtApi.V2.Requests;
+using DqtApi.V2.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +21,13 @@ namespace DqtApi.V2.Controllers
 
         [HttpPut("{teacherId}")]
         [SwaggerOperation(description: "Unlocks the teacher record allowing the teacher to sign in to the portals")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(UnlockTeacherResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UnlockTeacher([FromRoute] UnlockTeacherRequest request)
         {
             try
             {
-                await _mediator.Send(request);
-                return NoContent();
+                return Ok(await _mediator.Send(request));
             }
             catch (NotFoundException)
             {

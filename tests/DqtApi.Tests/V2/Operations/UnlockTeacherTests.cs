@@ -23,8 +23,8 @@ namespace DqtApi.Tests.V2.Operations
             var teacherId = Guid.NewGuid();
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.UnlockTeacherRecord(teacherId))
-                .ReturnsAsync(false);
+                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<bool>(), /* columnNames: */ It.IsAny<string[]>()))
+                .ReturnsAsync((Contact)null);
 
             var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
 
@@ -36,10 +36,19 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Fact]
-        public async Task Given_a_teacher_that_does_exist_returns_nocontent()
+        public async Task Given_a_teacher_that_does_exist_and_is_locked_returns_ok()
         {
             // Arrange
             var teacherId = Guid.NewGuid();
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<bool>(), /* columnNames: */ It.IsAny<string[]>()))
+                .ReturnsAsync(new Contact()
+                {
+                    Id = teacherId,
+                    dfeta_ActiveSanctions = false,
+                    dfeta_loginfailedcounter = 3
+                });
 
             ApiFixture.DataverseAdapter
                 .Setup(mock => mock.UnlockTeacherRecord(teacherId))
@@ -52,8 +61,50 @@ namespace DqtApi.Tests.V2.Operations
             var response = await HttpClient.SendAsync(request);
 
             // Assert
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-            ApiFixture.DataverseAdapter.Verify();
+            await AssertEx.JsonResponseEquals(
+                response,
+                new
+                {
+                    hasBeenUnlocked = true
+                });
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        public async Task Given_a_teacher_that_does_exist_but_is_not_locked_returns_ok(int? loginFailedCounter)
+        {
+            // Arrange
+            var teacherId = Guid.NewGuid();
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<bool>(), /* columnNames: */ It.IsAny<string[]>()))
+                .ReturnsAsync(new Contact()
+                {
+                    Id = teacherId,
+                    dfeta_ActiveSanctions = false,
+                    dfeta_loginfailedcounter = loginFailedCounter
+                });
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.UnlockTeacherRecord(teacherId))
+                .ReturnsAsync(true)
+                .Verifiable();
+
+            var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
+
+            // Act
+            var response = await HttpClient.SendAsync(request);
+
+            // Assert
+            await AssertEx.JsonResponseEquals(
+                response,
+                new
+                {
+                    hasBeenUnlocked = false
+                });
         }
 
         [Fact]

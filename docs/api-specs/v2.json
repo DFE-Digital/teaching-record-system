@@ -607,8 +607,15 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnlockTeacherResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found"
@@ -1326,6 +1333,16 @@
           "Completed"
         ],
         "type": "string"
+      },
+      "UnlockTeacherResponse": {
+        "type": "object",
+        "properties": {
+          "hasBeenUnlocked": {
+            "type": "boolean",
+            "description": "Whether the account has been unlocked"
+          }
+        },
+        "additionalProperties": false
       },
       "UpdateTeacherRequest": {
         "required": [
