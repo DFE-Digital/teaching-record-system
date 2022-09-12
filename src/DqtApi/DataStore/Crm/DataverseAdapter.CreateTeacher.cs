@@ -564,11 +564,11 @@ namespace DqtApi.DataStore.Crm
                             _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false, requestBuilder))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
-                var existingTeacherWithHusIdTask = !string.IsNullOrEmpty(_command.HusId) ? _dataverseAdapter.GetTeacherByHusId(_command.HusId, columnNames: new[]
+                var existingTeachersWithHusIdTask = !string.IsNullOrEmpty(_command.HusId) ? _dataverseAdapter.GetTeachersByHusId(_command.HusId, columnNames: new[]
                 {
                     Contact.Fields.dfeta_TRN,
                     Contact.Fields.dfeta_HUSID,
-                }) : Task.FromResult<Contact>(null);
+                }) : Task.FromResult<Contact[]>(null);
 
                 var lookupTasks = new Task[]
                 {
@@ -586,7 +586,7 @@ namespace DqtApi.DataStore.Crm
                     getTeacherStatusTask,
                     getQualificationSubjectTask2,
                     getQualificationSubjectTask3,
-                    existingTeacherWithHusIdTask
+                    existingTeachersWithHusIdTask
                 }
                 .Where(t => t != null);
 
@@ -612,7 +612,7 @@ namespace DqtApi.DataStore.Crm
                     TeacherStatusId = getTeacherStatusTask?.Result?.Id,
                     QualificationSubject2Id = getQualificationSubjectTask2?.Result?.Id,
                     QualificationSubject3Id = getQualificationSubjectTask3?.Result?.Id,
-                    HaveExistingTeacherWithHusId = existingTeacherWithHusIdTask?.Result != null
+                    HaveExistingTeacherWithHusId = existingTeachersWithHusIdTask?.Result?.Count() > 0
                 };
             }
 
