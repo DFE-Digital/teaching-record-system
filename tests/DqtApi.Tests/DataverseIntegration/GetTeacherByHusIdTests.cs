@@ -36,11 +36,11 @@ namespace DqtApi.Tests.DataverseIntegration
             var (_, _) = await CreateTeacher(husId);
 
             // Act
-            var result = await _dataverseAdapter.GetTeacherByHusId(husId, columnNames: Contact.Fields.dfeta_HUSID);
+            var result = await _dataverseAdapter.GetTeachersByHusId(husId, columnNames: Contact.Fields.dfeta_HUSID);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(husId, result.dfeta_HUSID);
+            Assert.NotEmpty(result);
+            Assert.Equal(husId, result[0].dfeta_HUSID);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var (_, _) = await CreateTeacher(husId);
 
             // Act
-            var result = await _dataverseAdapter.GetTeacherByHusId("SOME_NONE_EXISTENT_HUSID", columnNames: Contact.Fields.dfeta_HUSID);
+            var result = await _dataverseAdapter.GetTeachersByHusId("SOME_NONE_EXISTENT_HUSID", columnNames: Contact.Fields.dfeta_HUSID);
 
             // Assert
             Assert.Null(result);

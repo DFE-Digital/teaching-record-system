@@ -52,6 +52,6 @@ namespace DqtApi.DataStore.Crm
 
         Task<bool> UnlockTeacherRecord(Guid teacherId);
 
-        Task<Contact> GetTeacherByHusId(string husId, params string[] columnNames);
+        Task<Contact[]> GetTeachersByHusId(string husId, params string[] columnNames);
     }
 }
