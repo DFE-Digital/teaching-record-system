@@ -10,8 +10,5 @@ namespace DqtApi.V2.Requests
     {
         [FromRoute(Name = "trn")]
         public string Trn { get; set; }
-
-        [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true), ModelBinder(typeof(ModelBinding.DateModelBinder))]
-        public DateOnly? BirthDate { get; set; }
     }
 }

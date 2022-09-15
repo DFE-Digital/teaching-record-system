@@ -24,8 +24,7 @@ namespace DqtApi.Tests.V2.Operations
         public async Task Given_invalid_trn_returns_error(string trn)
         {
             // Arrange
-            var birthDate = "1990-04-01";
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}?birthdate={birthDate}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
 
             // Act
             var response = await HttpClient.SendAsync(request);
@@ -34,33 +33,18 @@ namespace DqtApi.Tests.V2.Operations
             await AssertEx.ResponseIsValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
         }
 
-        [Theory]
-        [InlineData("xxx")]
-        public async Task Given_invalid_birthdate_returns_error(string birthDate)
-        {
-            // Arrange
-            var trn = "1234567";
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}?birthdate={birthDate}");
-
-            // Act
-            var response = await HttpClient.SendAsync(request);
-
-            // Assert
-            await AssertEx.ResponseIsValidationErrorForProperty(response, "birthdate", expectedError: $"The value '{birthDate}' is not valid for BirthDate.");
-        }
-
         [Fact]
         public async Task Given_no_match_found_returns_notfound()
         {
             // Arrange
             var trn = "1234567";
-            var birthDate = "1990-04-01";
+
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, DateOnly.Parse(birthDate), true, It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrn(trn, true, It.IsAny<string[]>()))
                 .ReturnsAsync(Array.Empty<Contact>());
 
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}?birthdate={birthDate}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
 
             // Act
             var response = await HttpClient.SendAsync(request);
@@ -125,7 +109,7 @@ namespace DqtApi.Tests.V2.Operations
             };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, DateOnly.Parse(birthDate), true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrn(trn, true, /* columnNames: */ It.IsAny<string[]>()))
                 .ReturnsAsync(new[] { contact });
 
             ApiFixture.DataverseAdapter
@@ -140,7 +124,7 @@ namespace DqtApi.Tests.V2.Operations
                 .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(teacherId, /* columnNames: */ It.IsAny<string[]>()))
                 .ReturnsAsync(new[] { itt });
 
-            var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}?birthdate={birthDate}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
 
             // Act
             var response = await HttpClient.SendAsync(request);
