@@ -591,7 +591,7 @@ namespace DqtApi.Tests.V2.Operations
                     Subject2 = "X300", // Academic Studies in Education
                     Subject3 = "N400"  // Accounting
                 },
-                HusId = "1234567890123"
+                HusId = new Random().NextInt64(2000000000000, 2999999999999).ToString()
             };
 
             configureRequest?.Invoke(request);

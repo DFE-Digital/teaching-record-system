@@ -32,7 +32,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_existing_teacher_matches_on_husid_return_teacher()
         {
             // Arrange
-            var husId = "9876543211461";
+            var husId = new Random().NextInt64(2000000000000, 2999999999999).ToString();
             var (_, _) = await CreateTeacher(husId);
 
             // Act
@@ -47,7 +47,7 @@ namespace DqtApi.Tests.DataverseIntegration
         public async Task Given_teacher_for_husid_does_not_exist_return_empty_array()
         {
             // Arrange
-            var husId = "9876543213";
+            var husId = new Random().NextInt64(2000000000000, 2999999999999).ToString();
             var (_, _) = await CreateTeacher(husId);
 
             // Act
