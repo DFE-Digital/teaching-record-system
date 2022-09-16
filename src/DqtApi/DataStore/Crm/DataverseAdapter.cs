@@ -319,6 +319,10 @@ namespace DqtApi.DataStore.Crm
 
                 initialTeacherTrainingLink.EntityAlias = nameof(dfeta_initialteachertraining);
 
+                var filter = new FilterExpression();
+                filter.AddCondition(dfeta_initialteachertraining.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_initialteachertrainingState.Active);
+                initialTeacherTrainingLink.LinkCriteria = filter;
+
                 AddSubjectLinks(initialTeacherTrainingLink);
             }
 
@@ -342,6 +346,10 @@ namespace DqtApi.DataStore.Crm
                 subjectLink.Columns = new ColumnSet(dfeta_ittsubject.Fields.dfeta_Value);
 
                 subjectLink.EntityAlias = alias;
+
+                var filter = new FilterExpression();
+                filter.AddCondition(dfeta_ittsubject.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_ittsubjectState.Active);
+                subjectLink.LinkCriteria = filter;
             }
 
             static void AddInductionLink(QueryExpression query)
@@ -361,6 +369,10 @@ namespace DqtApi.DataStore.Crm
                 );
 
                 inductionLink.EntityAlias = nameof(dfeta_induction);
+
+                var filter = new FilterExpression();
+                filter.AddCondition(dfeta_induction.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_inductionState.Active);
+                inductionLink.LinkCriteria = filter;
             }
 
             static void AddQualifiedTeacherStatusLink(QueryExpression query)
@@ -381,7 +393,7 @@ namespace DqtApi.DataStore.Crm
                 qualifiedTeacherStatusLink.EntityAlias = nameof(dfeta_qtsregistration);
 
                 var filter = new FilterExpression();
-                filter.AddCondition(dfeta_initialteachertraining.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_initialteachertrainingState.Active);
+                filter.AddCondition(dfeta_qtsregistration.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_qtsregistrationState.Active);
                 qualifiedTeacherStatusLink.LinkCriteria = filter;
             }
         }
