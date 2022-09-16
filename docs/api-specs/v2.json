@@ -267,15 +267,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "birthdate",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
           }
         ],
         "responses": {

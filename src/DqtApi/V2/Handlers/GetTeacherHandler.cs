@@ -22,9 +22,8 @@ namespace DqtApi.V2.Handlers
 
         public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
         {
-            var teachers = await _dataverseAdapter.GetTeachersByTrnAndDoB(
+            var teachers = await _dataverseAdapter.GetTeachersByTrn(
                 request.Trn,
-                request.BirthDate.Value,
                 activeOnly: true,
                 columnNames: new[]
                 {
