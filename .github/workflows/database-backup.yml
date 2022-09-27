@@ -32,7 +32,7 @@ jobs:
           keyvault: ${{ env.KEY_VAULT_NAME }}
           secrets: 'BACKUP-STORAGE-CONNECTION-STRING,PAAS-USER,PAAS-PASSWORD'
 
-      - uses: DfE-Digital/keyvault-yaml-secret@v1
+      - uses: DfE-Digital/keyvault-yaml-secret@v2
         id:  keyvault-yaml-secret
         with:
           keyvault: ${{ env.KEY_VAULT_NAME }}
