@@ -880,7 +880,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Arrange
             var teacherId = Guid.NewGuid();
             var trn = "1234567";
-            var updateCommand = new UpdateTeacherCommand() { TRN = trn, TeacherId = teacherId };
+            var updateCommand = new UpdateTeacherCommand() { Trn = trn, TeacherId = teacherId };
             var helper = new DataverseAdapter.UpdateTeacherHelper(_dataverseAdapter, updateCommand);
 
             // Act
@@ -896,7 +896,7 @@ namespace DqtApi.Tests.DataverseIntegration
             // Arrange
             var teacherId = Guid.NewGuid();
             var trn = "1234567";
-            var updateCommand = new UpdateTeacherCommand() { TRN = trn, TeacherId = teacherId };
+            var updateCommand = new UpdateTeacherCommand() { Trn = trn, TeacherId = teacherId };
             var helper = new DataverseAdapter.UpdateTeacherHelper(_dataverseAdapter, updateCommand);
 
             // Act
@@ -918,7 +918,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var date = new DateOnly(1990, 01, 05);
             var ProviderUkprn = "12345";
             var qualification = new UpdateTeacherCommandQualification() { Subject = subject, Class = classdivision, CountryCode = countrycode, Date = date, ProviderUkprn = ProviderUkprn };
-            var updateCommand = new UpdateTeacherCommand() { Qualification = qualification, TRN = trn, TeacherId = teacherId };
+            var updateCommand = new UpdateTeacherCommand() { Qualification = qualification, Trn = trn, TeacherId = teacherId };
             var helper = new DataverseAdapter.UpdateTeacherHelper(_dataverseAdapter, updateCommand);
 
             // Act

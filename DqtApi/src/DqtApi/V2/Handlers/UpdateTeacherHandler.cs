@@ -50,7 +50,7 @@ namespace DqtApi.V2.Handlers
             var updateTeacherResult = await _dataverseAdapter.UpdateTeacher(new UpdateTeacherCommand()
             {
                 TeacherId = teachers[0].Id,
-                TRN = request.Trn,
+                Trn = request.Trn,
                 InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
                 {
                     ProviderUkprn = request.InitialTeacherTraining.ProviderUkprn,
