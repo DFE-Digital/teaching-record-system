@@ -9,16 +9,19 @@ using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
 using DqtApi.Validation;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace DqtApi.V2.Handlers
 {
     public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeachersResponse>
     {
         private readonly IDataverseAdapter _dataverseAdapter;
+        private readonly ILogger<FindTeachersHandler> _logger;
 
-        public FindTeachersHandler(IDataverseAdapter dataverseAdapter)
+        public FindTeachersHandler(IDataverseAdapter dataverseAdapter, ILogger<FindTeachersHandler> logger)
         {
             _dataverseAdapter = dataverseAdapter;
+            _logger = logger;
         }
 
         public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
@@ -31,7 +34,7 @@ namespace DqtApi.V2.Handlers
 
                 if (ittProviders.Length == 0)
                 {
-                    throw new ErrorException(ErrorRegistry.OrganisationNotFound());
+                    _logger.LogDebug("Failed to find an ITT provider by UKPRN: '{IttProviderUkprn}'.", request.IttProviderUkprn);
                 }
             }
             else if (!string.IsNullOrEmpty(request.IttProviderName))
@@ -40,7 +43,7 @@ namespace DqtApi.V2.Handlers
 
                 if (ittProviders.Length == 0)
                 {
-                    throw new ErrorException(ErrorRegistry.OrganisationNotFound());
+                    _logger.LogDebug("Failed to find an ITT provider by name: '{IttProviderName}'.", request.IttProviderName);
                 }
             }
 

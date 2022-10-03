@@ -102,28 +102,6 @@ namespace DqtApi.Tests.V2.Operations
                 expectedStatusCode: StatusCodes.Status200OK);
         }
 
-
-        [Theory]
-        [InlineData("someProvider", "")]
-        [InlineData(null, "1005811506")]
-        public async Task Given_provider_does_not_exist_returns_error(string providerName, string providerUkprn)
-        {
-            // Arrange
-            var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 1, 1), dfeta_TRN = "someReference" };
-
-            ApiFixture.DataverseAdapter
-                .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
-                .ReturnsAsync(new[] { contact1 });
-
-            var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn={providerUkprn}&IttProviderName={providerName}");
-
-            // Act
-            var response = await HttpClient.SendAsync(request);
-
-            // Assert
-            Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        }
-
         [Theory]
         [InlineData("someProvider", "")]
         [InlineData(null, "1005811506")]
