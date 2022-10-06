@@ -9,6 +9,9 @@ help: ## Show this help
 dev:
 	$(eval DEPLOY_ENV=dev)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-development)
+	$(eval RESOURCE_NAME_PREFIX=s165d01)
+	$(eval ENV_SHORT=dv)
+	$(eval ENV_TAG=dev)
 
 .PHONY: test
 test:
@@ -19,13 +22,27 @@ test:
 pre-production:
 	$(eval DEPLOY_ENV=pre-production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
+	$(eval RESOURCE_NAME_PREFIX=s165t01)
+	$(eval ENV_SHORT=pp)
+	$(eval ENV_TAG=pre-prod)
 
 .PHONY: production
 production:
 	$(eval DEPLOY_ENV=production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-production)
+	$(eval RESOURCE_NAME_PREFIX=s165p01)
+	$(eval ENV_SHORT=pd)
+	$(eval ENV_TAG=prod)
 	$(eval AZURE_BACKUP_STORAGE_ACCOUNT_NAME=s165p01dbbackup)
 	$(eval AZURE_BACKUP_STORAGE_CONTAINER_NAME=dqt-api)
+
+.PHONY: domain
+domain:
+	$(eval DEPLOY_ENV=production)
+	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-production)
+	$(eval RESOURCE_NAME_PREFIX=s165p01)
+	$(eval ENV_SHORT=pd)
+	$(eval ENV_TAG=prod)
 
 read-keyvault-config:
 	$(eval KEY_VAULT_NAME=$(shell jq -r '.key_vault_name' terraform/$(DEPLOY_ENV).tfvars.json))
@@ -44,6 +61,9 @@ ci:	## Run in automation environment
 	$(eval DISABLE_PASSCODE=true)
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SP_AUTH=true)
+
+tags: ##Tags that will be added to resource group on it's creation in ARM template
+	$(eval RG_TAGS=$(shell echo '{"Portfolio": "Early Years and Schools Group", "Parent Business":"Teacher Training and Qualifications", "Product" : "Database of Qualified Teachers", "Service Line": "Teaching Workforce", "Service": "Teacher Training and Qualifications", "Service Offering": "Database of Qualified Teachers", "Environment" : "$(ENV_TAG)"}' | jq . ))
 
 .PHONY: install-fetch-config
 install-fetch-config: ## Install the fetch-config script, for viewing/editing secrets in Azure Key Vault
@@ -121,3 +141,14 @@ terraform-apply: terraform-init
 
 terraform-destroy: terraform-init
 	terraform -chdir=terraform destroy -var-file ${DEPLOY_ENV}.tfvars.json ${AUTO_APPROVE}
+
+deploy-azure-resources: set-azure-account tags # make dev deploy-azure-resources CONFIRM_DEPLOY=1
+	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
+	az deployment sub create -l "West Europe" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-dqtapi-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "environment=${DEPLOY_ENV}" "tfStorageAccountName=${RESOURCE_NAME_PREFIX}dqtapitfstate${ENV_SHORT}" "tfStorageContainerName=dqtapi-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultName=${RESOURCE_NAME_PREFIX}-dqtapi-${ENV_SHORT}-kv"
+
+validate-azure-resources: set-azure-account  tags# make dev validate-azure-resources
+	az deployment sub create -l "West Europe" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-dqtapi-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "environment=${DEPLOY_ENV}" "tfStorageAccountName=${RESOURCE_NAME_PREFIX}dqtapitfstate${ENV_SHORT}" "tfStorageContainerName=dqtapi-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultName=${RESOURCE_NAME_PREFIX}-dqtapi-${ENV_SHORT}-kv" --what-if
+
+domain-azure-resources: set-azure-account tags # make domain deploy-custom-domain CONFIRM_DEPLOY=1
+	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
+	az deployment sub create -l "West Europe" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-dqtdomains-rg" 'tags=${RG_TAGS}' "environment=${DEPLOY_ENV}" "tfStorageAccountName=${RESOURCE_NAME_PREFIX}dqtdomainstf" "tfStorageContainerName=dqtdomains-tf"  "keyVaultName=${RESOURCE_NAME_PREFIX}-dqtdomain-kv"
