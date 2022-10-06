@@ -75,7 +75,7 @@ namespace DqtApi.V2.Validators
 
             RuleFor(r => r.InitialTeacherTraining.ProviderUkprn)
                 .NotEmpty()
-                .When(r => r.InitialTeacherTraining != null);
+                .When(r => r.InitialTeacherTraining != null && r.TeacherType == CreateTeacherType.TraineeTeacher);
 
             RuleFor(r => r.InitialTeacherTraining.ProgrammeStartDate)
                 .NotNull()
@@ -86,9 +86,13 @@ namespace DqtApi.V2.Validators
                 .When(r => r.InitialTeacherTraining != null);
 
             RuleFor(r => r.InitialTeacherTraining.ProgrammeType)
-                .NotNull()
+                .Cascade(CascadeMode.Stop)
                 .IsInEnum()
-                .When(r => r.InitialTeacherTraining != null);
+                    .When(r => r.InitialTeacherTraining != null, ApplyConditionTo.CurrentValidator)
+                .NotNull()
+                    .When(r => r.InitialTeacherTraining != null && r.TeacherType == CreateTeacherType.TraineeTeacher, ApplyConditionTo.CurrentValidator)
+                .Must(pt => !pt.HasValue || !pt.Value.ConvertToIttProgrammeType().IsEarlyYears())
+                    .When(r => r.InitialTeacherTraining != null && r.TeacherType == CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator);
 
             RuleFor(r => r.InitialTeacherTraining.IttQualificationAim)
                 .IsInEnum()
@@ -125,6 +129,12 @@ namespace DqtApi.V2.Validators
                 .IsInEnum()
                 .When(r => r.InitialTeacherTraining != null);
 
+            RuleFor(r => r.InitialTeacherTraining.TrainingCountry)
+                .Null()
+                    .When(r => r.InitialTeacherTraining != null && r.TeacherType == CreateTeacherType.TraineeTeacher, ApplyConditionTo.CurrentValidator)
+                .NotNull()
+                    .When(r => r.InitialTeacherTraining != null && r.TeacherType == CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator);
+
             RuleFor(r => r.Qualification.Class)
                 .IsInEnum()
                 .When(r => r.Qualification != null);
@@ -132,6 +142,24 @@ namespace DqtApi.V2.Validators
             RuleFor(r => r.Qualification.HeQualificationType)
                 .IsInEnum()
                 .When(r => r.Qualification != null);
+
+            RuleFor(r => r.RecognitionRoute)
+                .NotNull()
+                    .When(r => r.TeacherType == CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator)
+                .Null()
+                    .When(r => r.TeacherType != CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator);
+
+            RuleFor(r => r.QtsDate)
+                .NotNull()
+                    .When(r => r.TeacherType == CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator)
+                .Null()
+                    .When(r => r.TeacherType != CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator);
+
+            RuleFor(r => r.InductionRequired)
+                .NotNull()
+                    .When(r => r.TeacherType == CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator)
+                .Null()
+                    .When(r => r.TeacherType != CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator);
         }
     }
 }

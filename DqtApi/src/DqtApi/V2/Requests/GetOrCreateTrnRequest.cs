@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Principal;
 using System.Text.Json.Serialization;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Responses;
@@ -34,6 +35,10 @@ namespace DqtApi.V2.Requests
         [Required]
         public GetOrCreateTrnRequestQualification Qualification { get; set; }
         public string HusId { get; set; }
+        public CreateTeacherType TeacherType { get; set; }
+        public CreateTeacherRecognitionRoute? RecognitionRoute { get; set; }
+        public DateOnly? QtsDate { get; set; }
+        public bool? InductionRequired { get; set; }
     }
 
     public class GetOrCreateTrnRequestAddress
@@ -63,6 +68,7 @@ namespace DqtApi.V2.Requests
         public int? AgeRangeTo { get; set; }
         public IttQualificationType? IttQualificationType { get; set; }
         public IttQualificationAim? IttQualificationAim { get; set; }
+        public string TrainingCountry { get; set; }
     }
 
     public class GetOrCreateTrnRequestQualification
@@ -75,5 +81,19 @@ namespace DqtApi.V2.Requests
         public ClassDivision? Class { get; set; }
         public DateOnly? Date { get; set; }
         public HeQualificationType? HeQualificationType { get; set; }
+    }
+
+    public enum CreateTeacherType
+    {
+        TraineeTeacher = 0,
+        OverseasQualifiedTeacher = 1
+    }
+
+    public enum CreateTeacherRecognitionRoute
+    {
+        Scotland = 1,
+        NorthernIreland = 2,
+        EuropeanEconomicArea = 3,
+        OverseasTrainedTeachers = 4
     }
 }

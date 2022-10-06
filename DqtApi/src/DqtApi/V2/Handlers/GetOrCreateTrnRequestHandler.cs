@@ -102,14 +102,15 @@ namespace DqtApi.V2.Handlers
                         ProviderUkprn = request.InitialTeacherTraining.ProviderUkprn,
                         ProgrammeStartDate = request.InitialTeacherTraining.ProgrammeStartDate.Value,
                         ProgrammeEndDate = request.InitialTeacherTraining.ProgrammeEndDate.Value,
-                        ProgrammeType = request.InitialTeacherTraining.ProgrammeType.Value.ConvertToIttProgrammeType(),
+                        ProgrammeType = request.InitialTeacherTraining.ProgrammeType?.ConvertToIttProgrammeType(),
                         Subject1 = request.InitialTeacherTraining.Subject1,
                         Subject2 = request.InitialTeacherTraining.Subject2,
                         Subject3 = request.InitialTeacherTraining.Subject3,
                         AgeRangeFrom = request.InitialTeacherTraining.AgeRangeFrom.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeFrom.Value) : null,
                         AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null,
                         IttQualificationValue = request.InitialTeacherTraining.IttQualificationType?.GetIttQualificationValue(),
-                        IttQualificationAim = request.InitialTeacherTraining.IttQualificationAim?.ConvertToIttQualficationAim()
+                        IttQualificationAim = request.InitialTeacherTraining.IttQualificationAim?.ConvertToIttQualficationAim(),
+                        TrainingCountry = request.InitialTeacherTraining.TrainingCountry
                     },
                     Qualification = request.Qualification != null ?
                         new CreateTeacherCommandQualification()
@@ -124,7 +125,13 @@ namespace DqtApi.V2.Handlers
                             Subject3 = request.Qualification.Subject3
                         } :
                         null,
-                    HusId = request.HusId
+                    HusId = request.HusId,
+                    TeacherType = EnumHelper.ConvertToEnum<Requests.CreateTeacherType, DataStore.Crm.CreateTeacherType>(request.TeacherType),
+                    RecognitionRoute = request.RecognitionRoute.HasValue ?
+                        EnumHelper.ConvertToEnum<Requests.CreateTeacherRecognitionRoute, DataStore.Crm.CreateTeacherRecognitionRoute>(request.RecognitionRoute.Value) :
+                        null,
+                    QtsDate = request.QtsDate,
+                    InductionRequired = request.InductionRequired
                 });
 
                 if (!createTeacherResult.Succeeded)
@@ -212,8 +219,13 @@ namespace DqtApi.V2.Handlers
 
             ConsumeReason(
                 CreateTeacherFailedReasons.DuplicateHusId,
-                $"{nameof(GetOrCreateTrnRequest.HusId)}.{nameof(GetOrCreateTrnRequest.HusId)}",
+                $"{nameof(GetOrCreateTrnRequest.HusId)}",
                 ErrorRegistry.ExistingTeacherAlreadyHasHusId().Title);
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.TrainingCountryNotFound,
+                $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.TrainingCountry)}",
+                ErrorRegistry.CountryNotFound().Title);
 
             if (failedReasons != CreateTeacherFailedReasons.None)
             {

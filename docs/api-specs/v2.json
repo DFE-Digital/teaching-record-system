@@ -356,104 +356,6 @@
         }
       }
     },
-    "/v2/teachers/teacher-identity": {
-      "get": {
-        "tags": [
-          "Teachers"
-        ],
-        "summary": "Sets the teacher identity info for the teacher with the specified tsPersonId",
-        "parameters": [
-          {
-            "name": "tsPersonId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeacherIdentityInfo"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v2/teachers/teacher-identity/{trn}": {
-      "put": {
-        "tags": [
-          "Teachers"
-        ],
-        "summary": "Sets the teacher identity info for a teacher",
-        "parameters": [
-          {
-            "name": "trn",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetTeacherIdentityInfoRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetTeacherIdentityInfoRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetTeacherIdentityInfoRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeacherIdentityInfo"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v2/trn-requests/{requestId}": {
       "get": {
         "tags": [
@@ -649,6 +551,22 @@
         ],
         "type": "string"
       },
+      "CreateTeacherRecognitionRoute": {
+        "enum": [
+          "Scotland",
+          "NorthernIreland",
+          "EuropeanEconomicArea",
+          "OverseasTrainedTeachers"
+        ],
+        "type": "string"
+      },
+      "CreateTeacherType": {
+        "enum": [
+          "TraineeTeacher",
+          "OverseasQualifiedTeacher"
+        ],
+        "type": "string"
+      },
       "FindTeacherResult": {
         "type": "object",
         "properties": {
@@ -770,6 +688,21 @@
           "husId": {
             "type": "string",
             "nullable": true
+          },
+          "teacherType": {
+            "$ref": "#/components/schemas/CreateTeacherType"
+          },
+          "recognitionRoute": {
+            "$ref": "#/components/schemas/CreateTeacherRecognitionRoute"
+          },
+          "qtsDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "inductionRequired": {
+            "type": "boolean",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -855,6 +788,10 @@
           },
           "ittQualificationAim": {
             "$ref": "#/components/schemas/IttQualificationAim"
+          },
+          "trainingCountry": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1270,33 +1207,6 @@
           "qtsDate": {
             "type": "string",
             "format": "date",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "SetTeacherIdentityInfoRequest": {
-        "required": [
-          "tsPersonId"
-        ],
-        "type": "object",
-        "properties": {
-          "tsPersonId": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "TeacherIdentityInfo": {
-        "type": "object",
-        "properties": {
-          "tsPersonId": {
-            "type": "string",
-            "nullable": true
-          },
-          "trn": {
-            "type": "string",
             "nullable": true
           }
         },

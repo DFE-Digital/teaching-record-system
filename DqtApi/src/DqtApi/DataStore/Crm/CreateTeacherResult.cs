@@ -38,6 +38,7 @@ namespace DqtApi.DataStore.Crm
         QualificationNotFound = 256,
         QualificationSubject2NotFound = 512,
         QualificationSubject3NotFound = 1024,
-        DuplicateHusId = 2048
+        DuplicateHusId = 2048,
+        TrainingCountryNotFound = 4096
     }
 }
