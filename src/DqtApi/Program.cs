@@ -35,6 +35,8 @@ using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Npgsql;
 using Prometheus;
+using RedLockNet.SERedis;
+using RedLockNet.SERedis.Configuration;
 using Sentry.AspNetCore;
 using Sentry.Extensibility;
 using Serilog;
@@ -234,6 +236,20 @@ namespace DqtApi
                 }
 
                 services.AddSingleton<IHostedService, CrmKeepAliveService>();
+            }
+
+            if (env.IsProduction())
+            {
+                services.AddSingleton<IDistributedLockService, RedisDistributedLockService>();
+                services.AddSingleton<RedLockFactory>(sp =>
+                {
+                    var connectionMultiplexer = new RedLockMultiplexer(sp.GetRequiredService<IConnectionMultiplexer>());
+                    return RedLockFactory.Create(new List<RedLockMultiplexer>() { connectionMultiplexer });
+                });
+            }
+            else
+            {
+                services.AddSingleton<IDistributedLockService, LocalDistributedLockService>();
             }
 
             MetricLabels.ConfigureLabels(builder.Configuration);

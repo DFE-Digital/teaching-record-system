@@ -8,6 +8,7 @@ using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql;
 using DqtApi.DataStore.Sql.Models;
 using DqtApi.Security;
+using DqtApi.Services;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
@@ -21,32 +22,34 @@ namespace DqtApi.V2.Handlers
 {
     public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnRequest, TrnRequestInfo>
     {
+        private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
+
         private readonly DqtContext _dqtContext;
         private readonly IDataverseAdapter _dataverseAdapter;
         private readonly ICurrentClientProvider _currentClientProvider;
+        private readonly IDistributedLockService _distributedLockService;
 
         public GetOrCreateTrnRequestHandler(
             DqtContext dqtContext,
             IDataverseAdapter dataverseAdapter,
-            ICurrentClientProvider currentClientProvider)
+            ICurrentClientProvider currentClientProvider,
+            IDistributedLockService distributedLockService)
         {
             _dqtContext = dqtContext;
             _dataverseAdapter = dataverseAdapter;
             _currentClientProvider = currentClientProvider;
+            _distributedLockService = distributedLockService;
         }
 
         public async Task<TrnRequestInfo> Handle(GetOrCreateTrnRequest request, CancellationToken cancellationToken)
         {
             var currentClientId = _currentClientProvider.GetCurrentClientId();
 
-            using var transaction = await _dqtContext.Database.BeginTransactionAsync();
+            await using var requestIdLock = await _distributedLockService.AcquireLock(key: $"{currentClientId}:{request.RequestId}", _lockTimeout);
 
-            // Get an advisory lock, scoped to this client + request ID.
-            // This prevents us racing with another request with the same IDs; we don't want multiple CRM records created.
-            await transaction.AcquireAdvisoryLock(currentClientId, request.RequestId);
-
-            if (!string.IsNullOrEmpty(request.HusId))
-                await transaction.AcquireAdvisoryLock(request.HusId);
+            await using var husidLock = !string.IsNullOrEmpty(request.HusId) ?
+                await _distributedLockService.AcquireLock(request.HusId, _lockTimeout) :
+                NoopAsyncDisposable.Instance;
 
             var trnRequest = await _dqtContext.TrnRequests
                 .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == request.RequestId);
@@ -141,8 +144,6 @@ namespace DqtApi.V2.Handlers
                 wasCreated = true;
                 trn = createTeacherResult.Trn;
             }
-
-            await transaction.CommitAsync();
 
             var status = trn != null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
 
