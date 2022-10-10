@@ -346,10 +346,6 @@ namespace DqtApi.DataStore.Crm
                 subjectLink.Columns = new ColumnSet(dfeta_ittsubject.Fields.dfeta_Value);
 
                 subjectLink.EntityAlias = alias;
-
-                var filter = new FilterExpression();
-                filter.AddCondition(dfeta_ittsubject.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_ittsubjectState.Active);
-                subjectLink.LinkCriteria = filter;
             }
 
             static void AddInductionLink(QueryExpression query)
