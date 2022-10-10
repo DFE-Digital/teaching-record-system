@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
-using DqtApi.DataStore.Sql;
+using DqtApi.Services;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
@@ -14,20 +14,20 @@ namespace DqtApi.V2.Handlers
 {
     public class SetIttOutcomeHandler : IRequestHandler<SetIttOutcomeRequest, SetIttOutcomeResponse>
     {
-        private readonly IDataverseAdapter _dataverseAdapter;
-        private readonly DqtContext _dqtContext;
+        private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 
-        public SetIttOutcomeHandler(IDataverseAdapter dataverseAdapter, DqtContext dqtContext)
+        private readonly IDataverseAdapter _dataverseAdapter;
+        private readonly IDistributedLockService _distributedLockService;
+
+        public SetIttOutcomeHandler(IDataverseAdapter dataverseAdapter, IDistributedLockService distributedLockService)
         {
             _dataverseAdapter = dataverseAdapter;
-            _dqtContext = dqtContext;
+            _distributedLockService = distributedLockService;
         }
 
         public async Task<SetIttOutcomeResponse> Handle(SetIttOutcomeRequest request, CancellationToken cancellationToken)
         {
-            using var transaction = await _dqtContext.Database.BeginTransactionAsync();
-
-            await transaction.AcquireAdvisoryLock(request.Trn);
+            await using var trnLock = await _distributedLockService.AcquireLock(request.Trn, _lockTimeout);
 
             var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, activeOnly: true)).ToArray();
 

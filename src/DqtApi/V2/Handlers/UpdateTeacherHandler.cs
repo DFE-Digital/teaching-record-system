@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
-using DqtApi.DataStore.Sql;
+using DqtApi.Services;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
 using DqtApi.Validation;
@@ -17,23 +17,24 @@ namespace DqtApi.V2.Handlers
 {
     public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
     {
-        private readonly IDataverseAdapter _dataverseAdapter;
-        private readonly DqtContext _dqtContext;
+        private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 
-        public UpdateTeacherHandler(IDataverseAdapter dataverseAdapter, DqtContext dqtContext)
+        private readonly IDataverseAdapter _dataverseAdapter;
+        private readonly IDistributedLockService _distributedLockService;
+
+        public UpdateTeacherHandler(IDataverseAdapter dataverseAdapter, IDistributedLockService distributedLockService)
         {
             _dataverseAdapter = dataverseAdapter;
-            _dqtContext = dqtContext;
+            _distributedLockService = distributedLockService;
         }
 
         public async Task<Unit> Handle(UpdateTeacherRequest request, CancellationToken cancellationToken)
         {
-            using var transaction = await _dqtContext.Database.BeginTransactionAsync();
+            await using var trnLock = await _distributedLockService.AcquireLock(request.Trn, _lockTimeout);
 
-            await transaction.AcquireAdvisoryLock(request.Trn);
-
-            if (!string.IsNullOrEmpty(request.HusId))
-                await transaction.AcquireAdvisoryLock(request.HusId);
+            await using var husidLock = !string.IsNullOrEmpty(request.HusId) ?
+                await _distributedLockService.AcquireLock(request.HusId, _lockTimeout) :
+                NoopAsyncDisposable.Instance;
 
             var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, activeOnly: true)).ToArray();
 
