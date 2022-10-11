@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -360,15 +361,15 @@ namespace DqtApi.DataStore.Crm
                 {
                     (
                         Attribute: Contact.Fields.FirstName,
-                        Matches: _command.FirstName?.Equals(match.FirstName, StringComparison.OrdinalIgnoreCase) ?? false
+                        Matches: NamesAreEqual(_command.FirstName, match.FirstName)
                     ),
                     (
                         Attribute: Contact.Fields.MiddleName,
-                        Matches: _command.MiddleName?.Equals(match.MiddleName, StringComparison.OrdinalIgnoreCase) ?? false
+                        Matches: NamesAreEqual(_command.MiddleName, match.MiddleName)
                     ),
                     (
                         Attribute: Contact.Fields.LastName,
-                        Matches: _command.LastName?.Equals(match.LastName, StringComparison.OrdinalIgnoreCase) ?? false
+                        Matches: NamesAreEqual(_command.LastName, match.LastName)
                     ),
                     (
                         Attribute: Contact.Fields.BirthDate,
@@ -427,6 +428,9 @@ namespace DqtApi.DataStore.Crm
                     filter = combinationsFilter;
                     return true;
                 }
+
+                static bool NamesAreEqual(string a, string b) =>
+                    string.Compare(a, b, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) == 0;
             }
 
             public void FlagBadData(ExecuteTransactionRequest txnRequest)
