@@ -33,7 +33,7 @@ production:
 	$(eval RESOURCE_NAME_PREFIX=s165p01)
 	$(eval ENV_SHORT=pd)
 	$(eval ENV_TAG=prod)
-	$(eval AZURE_BACKUP_STORAGE_ACCOUNT_NAME=s165p01dbbackup)
+	$(eval AZURE_BACKUP_STORAGE_ACCOUNT_NAME=s165p01dqtapidbbackup)
 	$(eval AZURE_BACKUP_STORAGE_CONTAINER_NAME=dqt-api)
 
 .PHONY: domain
