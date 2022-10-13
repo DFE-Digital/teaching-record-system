@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
@@ -40,11 +41,25 @@ namespace DqtApi.V2.Handlers
             }
 
             string trn = null;
+            DateOnly? qtsDate = null;
 
             if (trnRequest.TeacherId.HasValue)
             {
-                var teacher = await _dataverseAdapter.GetTeacher(trnRequest.TeacherId.Value, columnNames: Contact.Fields.dfeta_TRN);
+                var teacher = await _dataverseAdapter.GetTeacher(
+                    trnRequest.TeacherId.Value,
+                    columnNames: new[]
+                    {
+                        Contact.Fields.dfeta_TRN,
+                        Contact.Fields.dfeta_QTSDate
+                    });
+
+                if (teacher is null)
+                {
+                    throw new Exception($"Failed retrieving contact '{trnRequest.TeacherId.Value}' for request ID '{request.RequestId}'.");
+                }
+
                 trn = teacher.dfeta_TRN;
+                qtsDate = teacher.dfeta_QTSDate.ToDateOnly();
             }
 
             var status = trn != null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
@@ -53,7 +68,9 @@ namespace DqtApi.V2.Handlers
             {
                 RequestId = request.RequestId,
                 Status = status,
-                Trn = trn
+                Trn = trn,
+                QtsDate = qtsDate,
+                PotentialDuplicate = status == TrnRequestStatus.Pending
             };
         }
     }

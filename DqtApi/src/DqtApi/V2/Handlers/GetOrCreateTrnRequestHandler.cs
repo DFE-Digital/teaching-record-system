@@ -56,15 +56,17 @@ namespace DqtApi.V2.Handlers
 
             bool wasCreated;
             string trn;
+            DateOnly? qtsDate = null;
 
             if (trnRequest != null)
             {
                 var teacher = trnRequest.TeacherId.HasValue ?
-                    await _dataverseAdapter.GetTeacher(trnRequest.TeacherId.Value) :
+                    await _dataverseAdapter.GetTeacher(trnRequest.TeacherId.Value, columnNames: new[] { Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_QTSDate }) :
                     null;
 
                 wasCreated = false;
                 trn = teacher?.dfeta_TRN;
+                qtsDate = teacher?.dfeta_QTSDate?.ToDateOnly();
             }
             else
             {
@@ -150,6 +152,7 @@ namespace DqtApi.V2.Handlers
 
                 wasCreated = true;
                 trn = createTeacherResult.Trn;
+                qtsDate = request.QtsDate;
             }
 
             var status = trn != null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
@@ -159,7 +162,9 @@ namespace DqtApi.V2.Handlers
                 WasCreated = wasCreated,
                 RequestId = request.RequestId,
                 Trn = trn,
-                Status = status
+                Status = status,
+                QtsDate = qtsDate,
+                PotentialDuplicate = status == TrnRequestStatus.Pending
             };
         }
 

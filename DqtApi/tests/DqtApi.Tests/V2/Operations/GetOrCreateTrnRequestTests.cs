@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql.Models;
@@ -58,7 +59,9 @@ namespace DqtApi.Tests.V2.Operations
                 {
                     requestId = requestId,
                     trn = trn,
-                    status = "Completed"
+                    status = "Completed",
+                    qtsDate = (DateOnly?)null,
+                    potentialDuplicate = false
                 },
                 expectedStatusCode: 200);
         }
@@ -91,7 +94,9 @@ namespace DqtApi.Tests.V2.Operations
                 {
                     requestId = requestId,
                     trn = (string)null,
-                    status = "Pending"
+                    status = "Pending",
+                    qtsDate = (DateOnly?)null,
+                    potentialDuplicate = true
                 },
                 expectedStatusCode: 200);
         }
@@ -129,9 +134,12 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Theory]
-        [InlineData("1234567", "Completed")]
-        [InlineData(null, "Pending")]
-        public async Task Given_request_with_new_id_creates_teacher_and_returns_created(string trn, string expectedStatus)
+        [InlineData("1234567", "Completed", false)]
+        [InlineData(null, "Pending", true)]
+        public async Task Given_request_with_new_id_creates_teacher_and_returns_created(
+            string trn,
+            string expectedStatus,
+            bool expectedPotentialDuplicate)
         {
             // Arrange
             var requestId = Guid.NewGuid().ToString();
@@ -154,7 +162,9 @@ namespace DqtApi.Tests.V2.Operations
                 {
                     requestId = requestId,
                     trn = trn,
-                    status = expectedStatus
+                    status = expectedStatus,
+                    qtsDate = (DateOnly?)null,
+                    potentialDuplicate = expectedPotentialDuplicate
                 },
                 expectedStatusCode: 201);
         }

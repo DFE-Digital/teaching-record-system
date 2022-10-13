@@ -381,7 +381,7 @@
                 "schema": {
                   "$ref": "#/components/schemas/TrnRequestInfo"
                 },
-                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567"}
+                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567","potentialDuplicate":false,"qtsDate":null}
               }
             }
           },
@@ -443,7 +443,7 @@
                 "schema": {
                   "$ref": "#/components/schemas/TrnRequestInfo"
                 },
-                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567"}
+                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567","potentialDuplicate":false,"qtsDate":null}
               }
             }
           },
@@ -454,7 +454,7 @@
                 "schema": {
                   "$ref": "#/components/schemas/TrnRequestInfo"
                 },
-                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567"}
+                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567","potentialDuplicate":false,"qtsDate":null}
               }
             }
           },
@@ -1223,6 +1223,14 @@
           },
           "trn": {
             "type": "string",
+            "nullable": true
+          },
+          "potentialDuplicate": {
+            "type": "boolean"
+          },
+          "qtsDate": {
+            "type": "string",
+            "format": "date",
             "nullable": true
           }
         },
