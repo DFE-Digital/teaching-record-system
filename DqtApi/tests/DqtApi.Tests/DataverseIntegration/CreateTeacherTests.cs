@@ -159,17 +159,20 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Theory]
-        [InlineData(false, false, false, "")]
-        [InlineData(true, false, false, "Matched record has active sanctions\n")]
-        [InlineData(false, true, false, "Matched record has QTS date\n")]
-        [InlineData(false, false, true, "Matched record has EYTS date\n")]
-        [InlineData(true, true, false, "Matched record has active sanctions & QTS date\n")]
-        [InlineData(true, false, true, "Matched record has active sanctions & EYTS date\n")]
+        [InlineData(CreateTeacherType.TraineeTeacher, false, false, false, "", "DMSImportTrn")]
+        [InlineData(CreateTeacherType.OverseasQualifiedTeacher, false, false, false, "", "ApplyForQts")]
+        [InlineData(CreateTeacherType.TraineeTeacher, true, false, false, "Matched record has active sanctions\n", "DMSImportTrn")]
+        [InlineData(CreateTeacherType.TraineeTeacher, false, true, false, "Matched record has QTS date\n", "DMSImportTrn")]
+        [InlineData(CreateTeacherType.TraineeTeacher, false, false, true, "Matched record has EYTS date\n", "DMSImportTrn")]
+        [InlineData(CreateTeacherType.TraineeTeacher, true, true, false, "Matched record has active sanctions & QTS date\n", "DMSImportTrn")]
+        [InlineData(CreateTeacherType.TraineeTeacher, true, false, true, "Matched record has active sanctions & EYTS date\n", "DMSImportTrn")]
         public async Task Given_details_that_does_match_existing_record_does_not_allocate_trn_and_creates_QTS_task(
+            CreateTeacherType teacherType,
             bool hasActiveSanctions,
             bool hasQts,
             bool hasEyts,
-            string expectedDescriptionSupplement)
+            string expectedDescriptionSupplement,
+            string expectedCategory)
         {
             // Arrange
             var firstName = _createTeacherFixture.ExistingTeacherFirstName;
@@ -188,12 +191,18 @@ namespace DqtApi.Tests.DataverseIntegration
                     HasEytsDate = hasEyts
                 });
 
-            var command = CreateCommand(configureCommand: command =>
+            var command = CreateCommand(teacherType, configureCommand: command =>
             {
                 command.FirstName = firstName;
                 command.MiddleName = middleName;
                 command.LastName = lastName;
                 command.BirthDate = birthDate;
+
+                if (teacherType == CreateTeacherType.OverseasQualifiedTeacher)
+                {
+                    command.QtsDate = new DateOnly(2020, 10, 1);
+                    command.RecognitionRoute = CreateTeacherRecognitionRoute.Scotland;
+                }
             });
 
             // Act
@@ -208,7 +217,7 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(result.TeacherId, crmTask.RegardingObjectId?.Id);
             Assert.Equal(Contact.EntityLogicalName, crmTask.dfeta_potentialduplicateid?.LogicalName);
             Assert.Equal(existingTeacherId, crmTask.dfeta_potentialduplicateid?.Id);
-            Assert.Equal("DMSImportTrn", crmTask.Category);
+            Assert.Equal(expectedCategory, crmTask.Category);
             Assert.Equal("Notification for QTS Unit Team", crmTask.Subject);
             Assert.Equal(_clock.UtcNow, crmTask.ScheduledEnd);
 

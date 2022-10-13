@@ -129,7 +129,7 @@ namespace DqtApi.DataStore.Crm
                 {
                     RegardingObjectId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_potentialduplicateid = duplicate.TeacherId.ToEntityReference(Contact.EntityLogicalName),
-                    Category = "DMSImportTrn",
+                    Category = _command.TeacherType == CreateTeacherType.TraineeTeacher ? "DMSImportTrn" : "ApplyForQts",
                     Subject = "Notification for QTS Unit Team",
                     Description = description,
                     ScheduledEnd = _dataverseAdapter._clock.UtcNow

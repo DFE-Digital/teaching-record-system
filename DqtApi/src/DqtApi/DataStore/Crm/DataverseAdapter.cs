@@ -12,7 +12,6 @@ using Microsoft.PowerPlatform.Dataverse.Client.Utils;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
-using Newtonsoft.Json.Linq;
 
 namespace DqtApi.DataStore.Crm
 {
@@ -658,11 +657,6 @@ namespace DqtApi.DataStore.Crm
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<CrmTask>()).ToArray();
         }
 
-        public Task<dfeta_teacherstatus> GetTeacherStatus(
-            string value,
-            bool qtsDateRequired) =>
-                GetTeacherStatus(value, qtsDateRequired, requestBuilder: null);
-
         public async Task<Contact[]> GetTeachersByHusId(string husId, params string[] columnNames)
         {
             var filter = new FilterExpression(LogicalOperator.And);
@@ -679,6 +673,11 @@ namespace DqtApi.DataStore.Crm
 
             return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
         }
+
+        public Task<dfeta_teacherstatus> GetTeacherStatus(
+            string value,
+            bool qtsDateRequired) =>
+                GetTeacherStatus(value, qtsDateRequired, requestBuilder: null);
 
         public async Task<dfeta_teacherstatus> GetTeacherStatus(
             string value,
