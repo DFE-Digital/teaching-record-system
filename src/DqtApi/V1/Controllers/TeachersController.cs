@@ -27,7 +27,7 @@ namespace DqtApi.V1.Controllers
         [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-        [RedactQueryParam("birthdate")]
+        [RedactQueryParam("birthdate"), RedactQueryParam("nino")]
         public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)
         {
             var response = await _mediator.Send(request);

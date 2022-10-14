@@ -35,7 +35,6 @@ namespace DqtApi.V2.Controllers
             summary: "Teacher",
             description: "Get an individual teacher by their TRN")]
         [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
-        [RedactQueryParam("birthdate")]
         public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)
         {
             var response = await _mediator.Send(request);
@@ -47,6 +46,7 @@ namespace DqtApi.V2.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
         [MapError(10002, statusCode: StatusCodes.Status409Conflict)]
+        [RedactQueryParam("birthdate")]
         public async Task<IActionResult> Update([FromBody] UpdateTeacherRequest request)
         {
             await _mediator.Send(request);
