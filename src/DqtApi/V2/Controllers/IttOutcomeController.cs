@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using DqtApi.Filters;
+using DqtApi.Logging;
 using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
 using MediatR;
@@ -27,6 +28,7 @@ namespace DqtApi.V2.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
         [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
         [MapError(10002, statusCode: StatusCodes.Status409Conflict)]
+        [RedactQueryParam("birthdate")]
         public async Task<IActionResult> SetIttOutcome([FromBody] SetIttOutcomeRequest request)
         {
             var response = await _mediator.Send(request);
