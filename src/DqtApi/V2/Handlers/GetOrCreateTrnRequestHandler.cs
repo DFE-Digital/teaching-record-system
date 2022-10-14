@@ -102,7 +102,7 @@ namespace DqtApi.V2.Handlers
                         ProviderUkprn = request.InitialTeacherTraining.ProviderUkprn,
                         ProgrammeStartDate = request.InitialTeacherTraining.ProgrammeStartDate.Value,
                         ProgrammeEndDate = request.InitialTeacherTraining.ProgrammeEndDate.Value,
-                        ProgrammeType = request.InitialTeacherTraining.ProgrammeType.Value.ConvertToIttProgrammeType(),
+                        //ProgrammeType = request.InitialTeacherTraining.ProgrammeType.Value.ConvertToIttProgrammeType(),
                         Subject1 = request.InitialTeacherTraining.Subject1,
                         Subject2 = request.InitialTeacherTraining.Subject2,
                         Subject3 = request.InitialTeacherTraining.Subject3,
@@ -118,7 +118,7 @@ namespace DqtApi.V2.Handlers
                             CountryCode = request.Qualification.CountryCode,
                             Subject = request.Qualification.Subject,
                             Class = request.Qualification.Class?.ConvertToClassDivision(),
-                            Date = request.Qualification.Date.Value,
+                            Date = request.Qualification.Date,
                             HeQualificationValue = request.Qualification.HeQualificationType?.GetHeQualificationValue(),
                             Subject2 = request.Qualification.Subject2,
                             Subject3 = request.Qualification.Subject3
