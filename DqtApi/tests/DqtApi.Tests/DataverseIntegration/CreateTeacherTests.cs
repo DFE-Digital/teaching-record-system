@@ -159,15 +159,18 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Theory]
-        [InlineData(CreateTeacherType.TraineeTeacher, false, false, false, "", "DMSImportTrn")]
-        [InlineData(CreateTeacherType.OverseasQualifiedTeacher, false, false, false, "", "ApplyForQts")]
-        [InlineData(CreateTeacherType.TraineeTeacher, true, false, false, "Matched record has active sanctions\n", "DMSImportTrn")]
-        [InlineData(CreateTeacherType.TraineeTeacher, false, true, false, "Matched record has QTS date\n", "DMSImportTrn")]
-        [InlineData(CreateTeacherType.TraineeTeacher, false, false, true, "Matched record has EYTS date\n", "DMSImportTrn")]
-        [InlineData(CreateTeacherType.TraineeTeacher, true, true, false, "Matched record has active sanctions & QTS date\n", "DMSImportTrn")]
-        [InlineData(CreateTeacherType.TraineeTeacher, true, false, true, "Matched record has active sanctions & EYTS date\n", "DMSImportTrn")]
+        [InlineData(CreateTeacherType.TraineeTeacher, null, false, false, false, "", "DMSImportTrn")]
+        //[InlineData(CreateTeacherType.TraineeTeacher, "1234", false, false, false, "", "HESAImportTrn")]
+        [InlineData(CreateTeacherType.OverseasQualifiedTeacher, null, false, false, false, "", "ApplyForQts")]
+        //[InlineData(CreateTeacherType.OverseasQualifiedTeacher, "2345", false, false, false, "", "ApplyForQts")]
+        [InlineData(CreateTeacherType.TraineeTeacher, null, true, false, false, "Matched record has active sanctions\n", "DMSImportTrn")]
+        [InlineData(CreateTeacherType.TraineeTeacher, null, false, true, false, "Matched record has QTS date\n", "DMSImportTrn")]
+        [InlineData(CreateTeacherType.TraineeTeacher, null, false, false, true, "Matched record has EYTS date\n", "DMSImportTrn")]
+        [InlineData(CreateTeacherType.TraineeTeacher, null, true, true, false, "Matched record has active sanctions & QTS date\n", "DMSImportTrn")]
+        [InlineData(CreateTeacherType.TraineeTeacher, null, true, false, true, "Matched record has active sanctions & EYTS date\n", "DMSImportTrn")]
         public async Task Given_details_that_does_match_existing_record_does_not_allocate_trn_and_creates_QTS_task(
             CreateTeacherType teacherType,
+            string husId,
             bool hasActiveSanctions,
             bool hasQts,
             bool hasEyts,
@@ -197,6 +200,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 command.MiddleName = middleName;
                 command.LastName = lastName;
                 command.BirthDate = birthDate;
+                command.HusId = husId;
 
                 if (teacherType == CreateTeacherType.OverseasQualifiedTeacher)
                 {

@@ -125,11 +125,15 @@ namespace DqtApi.DataStore.Crm
             {
                 var description = GetDescription();
 
+                var category = _command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher ? "ApplyForQts" :
+                    !string.IsNullOrEmpty(_command.HusId) ? "HESAImportTrn" :
+                    "DMSImportTrn";
+
                 return new CrmTask()
                 {
                     RegardingObjectId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_potentialduplicateid = duplicate.TeacherId.ToEntityReference(Contact.EntityLogicalName),
-                    Category = _command.TeacherType == CreateTeacherType.TraineeTeacher ? "DMSImportTrn" : "ApplyForQts",
+                    Category = category,
                     Subject = "Notification for QTS Unit Team",
                     Description = description,
                     ScheduledEnd = _dataverseAdapter._clock.UtcNow
