@@ -102,7 +102,7 @@ namespace DqtApi.V2.Handlers
                         ProviderUkprn = request.InitialTeacherTraining.ProviderUkprn,
                         ProgrammeStartDate = request.InitialTeacherTraining.ProgrammeStartDate.Value,
                         ProgrammeEndDate = request.InitialTeacherTraining.ProgrammeEndDate.Value,
-                        //ProgrammeType = request.InitialTeacherTraining.ProgrammeType.Value.ConvertToIttProgrammeType(),
+                        ProgrammeType = request.InitialTeacherTraining.ProgrammeType.Value.ConvertToIttProgrammeType(),
                         Subject1 = request.InitialTeacherTraining.Subject1,
                         Subject2 = request.InitialTeacherTraining.Subject2,
                         Subject3 = request.InitialTeacherTraining.Subject3,
