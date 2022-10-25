@@ -1,0 +1,35 @@
+name: Run tests and report results
+
+inputs:
+  test_project_path:
+    description: 'The path to the test project'
+    required: true
+  report_name:
+    description: 'The name of the test report'
+    required: true
+  dotnet_test_args:
+    description: 'Additional arguments to pass to dotnet test'
+    required: false
+
+runs:
+  using: composite
+
+  steps:
+    - name: Run tests
+      run: |
+        if [ ! -d "$PROJECT_PATH" ]; then
+          echo "test_project_path must be a path to the directory containing the test project" >&2
+          exit 1
+        fi
+
+        cd $PROJECT_PATH && dotnet test --configuration Release --logger trx ${{ inputs.dotnet_test_args }}
+      shell: bash
+      env:
+        PROJECT_PATH: ${{ inputs.test_project_path }}
+
+    - uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: ${{ inputs.report_name }}
+        path: '${{ inputs.test_project_path }}/**/*.trx'
+        reporter: dotnet-trx
