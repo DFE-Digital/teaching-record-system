@@ -10,7 +10,7 @@ on:
     - main
   workflow_dispatch:
     inputs:
-      deploy_to_prod:
+      deploy_to_production:
         type: boolean
         description: 'Deploy to production'
         default: false
@@ -18,20 +18,13 @@ on:
 env:
   CONTAINER_REGISTRY: ghcr.io
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  setup:
-    name: Setup
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Cancel Previous Runs
-      uses: styfle/cancel-workflow-action@0.9.1
-      with:
-        access_token: ${{ github.token }}
-
   build:
     name: Build & test
-    needs: [setup]
     runs-on: ubuntu-latest
     concurrency: build
 
@@ -64,29 +57,24 @@ jobs:
         #https://github.com/dotnet/format/issues/1433
         dotnet tool install -g dotnet-format --version "6.*" --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json
         dotnet-format --verify-no-changes
+      working-directory: DqtApi
 
     - name: Build
       run: dotnet build --configuration Release
+      working-directory: DqtApi
 
-    - name: Test
-      id: test
-      run: dotnet test tests/DqtApi.Tests --configuration Release --no-build --logger trx
-      if: github.event_name == 'pull_request'
-      env:
-        IntegrationTests_CrmUrl: ${{ secrets.INTEGRATIONTESTS_CRMURL }}
-        IntegrationTests_CrmClientId: ${{ secrets.INTEGRATIONTESTS_CRMCLIENTID }}
-        IntegrationTests_CrmClientSecret: ${{ secrets.INTEGRATIONTESTS_CRMCLIENTSECRET }}
-        IntegrationTests_BuildEnvLockBlobUri: ${{ secrets.INTEGRATIONTESTS_BUILDENVLOCKBLOBURI }}
-        IntegrationTests_BuildEnvLockBlobSasToken: ${{ secrets.INTEGRATIONTESTS_BUILDENVLOCKBLOBSASTOKEN }}
-        ConnectionStrings__DefaultConnection: "Host=localhost;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }};Database=dqt"
-
-    - name: Test report
-      uses: dorny/test-reporter@v1
-      if: always() && github.event_name == 'pull_request'
+    - name: Tests
+      uses: ./.github/workflows/actions/test
       with:
-        name: Test results
-        path: "**/*.trx"
-        reporter: dotnet-trx
+        test_project_path: DqtApi/tests/DqtApi.Tests
+        report_name: "Test results"
+        dotnet_test_args: >-
+          -e IntegrationTests_CrmUrl="${{ secrets.INTEGRATIONTESTS_CRMURL }}"
+          -e IntegrationTests_CrmClientId="${{ secrets.INTEGRATIONTESTS_CRMCLIENTID }}"
+          -e IntegrationTests_CrmClientSecret="${{ secrets.INTEGRATIONTESTS_CRMCLIENTSECRET }}"
+          -e IntegrationTests_BuildEnvLockBlobUri="${{ secrets.INTEGRATIONTESTS_BUILDENVLOCKBLOBURI }}"
+          -e IntegrationTests_BuildEnvLockBlobSasToken="${{ secrets.INTEGRATIONTESTS_BUILDENVLOCKBLOBSASTOKEN }}"
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }};Database=dqt"
 
     # TODO Use migration bundles when https://github.com/dotnet/efcore/issues/25555 is fixed
     - name: Generate migrations artifact
@@ -102,15 +90,17 @@ jobs:
 
         # Ensure any errors return a non-zero exit code when migrations are applied
         echo "$(echo "\set ON_ERROR_STOP true"; echo ""; cat $migrations_file)" > $migrations_file
+      working-directory: DqtApi
 
     - name: Publish migrations
       uses: actions/upload-artifact@v3
       with:
         name: migrations
-        path: migrations
+        path: DqtApi/migrations
 
     - name: Publish
       run: dotnet publish --configuration Release --no-build src/DqtApi/DqtApi.csproj
+      working-directory: DqtApi
 
     - name: Docker image tag
       id: image
@@ -127,7 +117,7 @@ jobs:
     - name: Docker build & push
       uses: docker/build-push-action@v2
       with:
-        context: .
+        context: DqtApi/src/DqtApi
         push: true
         tags: ${{ steps.image.outputs.tag }}
         build-args: |
@@ -135,7 +125,6 @@ jobs:
 
   validate_terraform:
     name: Validate Terraform
-    needs: [setup]
     runs-on: ubuntu-latest
 
     steps:
@@ -293,7 +282,7 @@ jobs:
     name: Deploy to production environment
     needs: [build, deploy_preprod]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_prod == 'true')
+    if: (github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch') || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_production == 'true')
     environment:
       name: production
       url: ${{ steps.deploy.outputs.environment_url }}
