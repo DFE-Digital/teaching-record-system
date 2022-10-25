@@ -57,14 +57,16 @@ jobs:
         #https://github.com/dotnet/format/issues/1433
         dotnet tool install -g dotnet-format --version "6.*" --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json
         dotnet-format --verify-no-changes
+      working-directory: DqtApi
 
     - name: Build
       run: dotnet build --configuration Release
+      working-directory: DqtApi
 
     - name: Tests
       uses: ./.github/workflows/actions/test
       with:
-        test_project_path: tests/DqtApi.Tests
+        test_project_path: DqtApi/tests/DqtApi.Tests
         report_name: "Test results"
         dotnet_test_args: >-
           -e IntegrationTests_CrmUrl="${{ secrets.INTEGRATIONTESTS_CRMURL }}"
@@ -88,15 +90,17 @@ jobs:
 
         # Ensure any errors return a non-zero exit code when migrations are applied
         echo "$(echo "\set ON_ERROR_STOP true"; echo ""; cat $migrations_file)" > $migrations_file
+      working-directory: DqtApi
 
     - name: Publish migrations
       uses: actions/upload-artifact@v3
       with:
         name: migrations
-        path: migrations
+        path: DqtApi/migrations
 
     - name: Publish
       run: dotnet publish --configuration Release --no-build src/DqtApi/DqtApi.csproj
+      working-directory: DqtApi
 
     - name: Docker image tag
       id: image
@@ -113,7 +117,7 @@ jobs:
     - name: Docker build & push
       uses: docker/build-push-action@v2
       with:
-        context: .
+        context: DqtApi/src/DqtApi
         push: true
         tags: ${{ steps.image.outputs.tag }}
         build-args: |
