@@ -18,20 +18,13 @@ on:
 env:
   CONTAINER_REGISTRY: ghcr.io
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  setup:
-    name: Setup
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Cancel Previous Runs
-      uses: styfle/cancel-workflow-action@0.9.1
-      with:
-        access_token: ${{ github.token }}
-
   build:
     name: Build & test
-    needs: [setup]
     runs-on: ubuntu-latest
     concurrency: build
 
@@ -135,7 +128,6 @@ jobs:
 
   validate_terraform:
     name: Validate Terraform
-    needs: [setup]
     runs-on: ubuntu-latest
 
     steps:
