@@ -10,7 +10,7 @@ on:
     - main
   workflow_dispatch:
     inputs:
-      deploy_to_prod:
+      deploy_to_production:
         type: boolean
         description: 'Deploy to production'
         default: false
@@ -285,7 +285,7 @@ jobs:
     name: Deploy to production environment
     needs: [build, deploy_preprod]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_prod == 'true')
+    if: (github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch') || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_production == 'true')
     environment:
       name: production
       url: ${{ steps.deploy.outputs.environment_url }}
