@@ -129,7 +129,7 @@ namespace DqtApi.V2.Validators
                 .IsInEnum()
                 .When(r => r.InitialTeacherTraining != null);
 
-            RuleFor(r => r.InitialTeacherTraining.TrainingCountry)
+            RuleFor(r => r.InitialTeacherTraining.TrainingCountryCode)
                 .Null()
                     .When(r => r.InitialTeacherTraining != null && r.TeacherType == CreateTeacherType.TraineeTeacher, ApplyConditionTo.CurrentValidator)
                 .NotNull()

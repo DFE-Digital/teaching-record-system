@@ -710,7 +710,7 @@ namespace DqtApi.Tests.DataverseIntegration
                     AgeRangeTo = dfeta_AgeRange._11,
                     IttQualificationValue = "001",  // BEd
                     IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward,
-                    TrainingCountry = type == CreateTeacherType.OverseasQualifiedTeacher ?
+                    TrainingCountryCode = type == CreateTeacherType.OverseasQualifiedTeacher ?
                         "SC" :  // Scotland
                         null
                 },

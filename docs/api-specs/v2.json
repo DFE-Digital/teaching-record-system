@@ -789,7 +789,7 @@
           "ittQualificationAim": {
             "$ref": "#/components/schemas/IttQualificationAim"
           },
-          "trainingCountry": {
+          "trainingCountryCode": {
             "type": "string",
             "nullable": true
           }

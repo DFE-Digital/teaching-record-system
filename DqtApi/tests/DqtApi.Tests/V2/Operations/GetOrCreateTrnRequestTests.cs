@@ -605,7 +605,7 @@ namespace DqtApi.Tests.V2.Operations
             {
                 req.TeacherType = DqtApi.V2.Requests.CreateTeacherType.OverseasQualifiedTeacher;
                 req.InitialTeacherTraining.ProviderUkprn = null;
-                req.InitialTeacherTraining.TrainingCountry = "SC";
+                req.InitialTeacherTraining.TrainingCountryCode = "SC";
                 req.InitialTeacherTraining.ProgrammeType = IttProgrammeType.EYITTAssessmentOnly;
                 req.QtsDate = new DateOnly(2020, 10, 10);
                 req.RecognitionRoute = DqtApi.V2.Requests.CreateTeacherRecognitionRoute.Scotland;
@@ -636,7 +636,7 @@ namespace DqtApi.Tests.V2.Operations
             {
                 req.TeacherType = DqtApi.V2.Requests.CreateTeacherType.OverseasQualifiedTeacher;
                 req.InitialTeacherTraining.ProviderUkprn = null;
-                req.InitialTeacherTraining.TrainingCountry = "SC";
+                req.InitialTeacherTraining.TrainingCountryCode = "SC";
                 req.QtsDate = new DateOnly(2020, 10, 10);
                 req.RecognitionRoute = DqtApi.V2.Requests.CreateTeacherRecognitionRoute.Scotland;
                 req.InductionRequired = false;

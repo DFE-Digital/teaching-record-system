@@ -112,7 +112,7 @@ namespace DqtApi.V2.Handlers
                         AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null,
                         IttQualificationValue = request.InitialTeacherTraining.IttQualificationType?.GetIttQualificationValue(),
                         IttQualificationAim = request.InitialTeacherTraining.IttQualificationAim?.ConvertToIttQualficationAim(),
-                        TrainingCountry = request.InitialTeacherTraining.TrainingCountry
+                        TrainingCountryCode = request.InitialTeacherTraining.TrainingCountryCode
                     },
                     Qualification = request.Qualification != null ?
                         new CreateTeacherCommandQualification()
@@ -229,7 +229,7 @@ namespace DqtApi.V2.Handlers
 
             ConsumeReason(
                 CreateTeacherFailedReasons.TrainingCountryNotFound,
-                $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.TrainingCountry)}",
+                $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.TrainingCountryCode)}",
                 ErrorRegistry.CountryNotFound().Title);
 
             if (failedReasons != CreateTeacherFailedReasons.None)

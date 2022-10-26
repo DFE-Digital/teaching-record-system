@@ -522,7 +522,7 @@ namespace DqtApi.DataStore.Crm
             public async Task<CreateTeacherReferenceLookupResult> LookupReferenceData()
             {
                 Debug.Assert(_command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher || !string.IsNullOrEmpty(_command.InitialTeacherTraining.ProviderUkprn));
-                Debug.Assert(_command.TeacherType != CreateTeacherType.OverseasQualifiedTeacher || !string.IsNullOrEmpty(_command.InitialTeacherTraining.TrainingCountry));
+                Debug.Assert(_command.TeacherType != CreateTeacherType.OverseasQualifiedTeacher || !string.IsNullOrEmpty(_command.InitialTeacherTraining.TrainingCountryCode));
 
                 var isEarlyYears = _command.InitialTeacherTraining.ProgrammeType?.IsEarlyYears() == true;
 
@@ -547,7 +547,7 @@ namespace DqtApi.DataStore.Crm
                 var getIttCountryTask = Let(
                     _command.TeacherType == CreateTeacherType.TraineeTeacher ?
                         "XK" :  // XK == 'United Kingdom'
-                        _command.InitialTeacherTraining.TrainingCountry,
+                        _command.InitialTeacherTraining.TrainingCountryCode,
                     country => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetCountryKey(country),
                         _ => _dataverseAdapter.GetCountry(country, requestBuilder)));
