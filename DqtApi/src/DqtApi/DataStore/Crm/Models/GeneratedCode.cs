@@ -430,6 +430,7 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string account_primary_contact = "account_primary_contact";
 			public const string Referencedcontact_customer_contacts = "Referencedcontact_customer_contacts";
 			public const string Referencedcontact_master_contact = "Referencedcontact_master_contact";
+			public const string Referencedcontact_parent_contact = "Referencedcontact_parent_contact";
 			public const string Contact_Tasks = "Contact_Tasks";
 			public const string dfeta_contact_dfeta_induction = "dfeta_contact_dfeta_induction";
 			public const string dfeta_contact_dfeta_induction1 = "dfeta_contact_dfeta_induction1";
@@ -443,6 +444,7 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string contact_customer_accounts = "contact_customer_accounts";
 			public const string Referencingcontact_customer_contacts = "contact_customer_contacts";
 			public const string Referencingcontact_master_contact = "contact_master_contact";
+			public const string Referencingcontact_parent_contact = "contact_parent_contact";
 			public const string dfeta_dfeta_country_contact1 = "dfeta_dfeta_country_contact1";
 			public const string dfeta_dfeta_qtsregistration_contact = "dfeta_dfeta_qtsregistration_contact";
 		}
@@ -1086,6 +1088,26 @@ namespace DqtApi.DataStore.Crm.Models
 		}
 		
 		/// <summary>
+		/// 1:N contact_parent_contact
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<DqtApi.DataStore.Crm.Models.Contact> Referencedcontact_parent_contact
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<DqtApi.DataStore.Crm.Models.Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedcontact_parent_contact");
+				this.SetRelatedEntities<DqtApi.DataStore.Crm.Models.Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedcontact_parent_contact");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N Contact_Tasks
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Contact_Tasks")]
@@ -1345,6 +1367,27 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("Referencingcontact_master_contact");
 				this.SetRelatedEntity<DqtApi.DataStore.Crm.Models.Contact>("contact_master_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
 				this.OnPropertyChanged("Referencingcontact_master_contact");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 contact_parent_contact
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parent_contactid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public DqtApi.DataStore.Crm.Models.Contact Referencingcontact_parent_contact
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<DqtApi.DataStore.Crm.Models.Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingcontact_parent_contact");
+				this.SetRelatedEntity<DqtApi.DataStore.Crm.Models.Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingcontact_parent_contact");
 			}
 		}
 		
@@ -3496,6 +3539,7 @@ namespace DqtApi.DataStore.Crm.Models
 		{
 			public const string dfeta_EarlyYearsStatusId = "dfeta_earlyyearsstatusid";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
+			public const string dfeta_InductionId = "dfeta_inductionid";
 			public const string dfeta_name = "dfeta_name";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_QTSDate = "dfeta_qtsdate";
@@ -3589,6 +3633,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_EYTSDate");
 				this.SetAttributeValue("dfeta_eytsdate", value);
 				this.OnPropertyChanged("dfeta_EYTSDate");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for Induction associated with QTS.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionid")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_InductionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_inductionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_InductionId");
+				this.SetAttributeValue("dfeta_inductionid", value);
+				this.OnPropertyChanged("dfeta_InductionId");
 			}
 		}
 		

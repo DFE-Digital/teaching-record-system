@@ -94,6 +94,7 @@
   "dfeta_qtsregistration": [
     "dfeta_earlyyearsstatusid",
     "dfeta_eytsdate",
+    "dfeta_inductionid",
     "dfeta_name",
     "dfeta_personid",
     "dfeta_qtsdate",

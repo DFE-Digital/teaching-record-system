@@ -87,18 +87,35 @@ namespace DqtApi.DataStore.Crm
                 });
             }
 
-            txnRequest.Requests.Add(new CreateRequest() { Target = helper.CreateQtsRegistrationEntity(referenceData) });
+            var qtsEntity = helper.CreateQtsRegistrationEntity(referenceData);
+            txnRequest.Requests.Add(new CreateRequest() { Target = qtsEntity });
 
+            Guid? inductionId = null;
             if (command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher)
             {
-                txnRequest.Requests.Add(new CreateRequest() { Target = helper.CreateInductionEntity() });
+                var inductionEntity = helper.CreateInductionEntity();
+                inductionId = inductionEntity.Id;
+                txnRequest.Requests.Add(new CreateRequest() { Target = inductionEntity });
+            }
+
+            // Update the QTS record with the induction ID; we can't set it in the Create above as Induction can't be created before QTS
+            if (inductionId.HasValue)
+            {
+                txnRequest.Requests.Add(new UpdateRequest()
+                {
+                    Target = new dfeta_qtsregistration()
+                    {
+                        Id = qtsEntity.Id,
+                        dfeta_InductionId = inductionId.Value.ToEntityReference(dfeta_induction.EntityLogicalName)
+                    }
+                });
             }
 
             var txnResponse = (ExecuteTransactionResponse)await _service.ExecuteAsync(txnRequest);
 
             // If a TRN was allocated we have a RetrieveResponse that contains the value
             string trn = allocateTrn ?
-                ((RetrieveResponse)txnResponse.Responses.OfType<RetrieveResponse>().Single()).Entity.ToEntity<Contact>().dfeta_TRN :
+                txnResponse.Responses.OfType<RetrieveResponse>().Single().Entity.ToEntity<Contact>().dfeta_TRN :
                 null;
 
             return (CreateTeacherResult.Success(helper.TeacherId, trn), txnRequest);
@@ -278,6 +295,7 @@ namespace DqtApi.DataStore.Crm
 
                 return new dfeta_induction()
                 {
+                    Id = Guid.NewGuid(),
                     dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_InductionStatus = _command.InductionRequired.Value ? dfeta_InductionStatus.RequiredtoComplete : dfeta_InductionStatus.Exempt,
                     dfeta_InductionExemptionReason = exemptionReason
@@ -341,6 +359,7 @@ namespace DqtApi.DataStore.Crm
             {
                 return new dfeta_qtsregistration()
                 {
+                    Id = Guid.NewGuid(),
                     dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_EarlyYearsStatusId = referenceData.EarlyYearsStatusId?.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
                     dfeta_TeacherStatusId = referenceData.TeacherStatusId?.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
