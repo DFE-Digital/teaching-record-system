@@ -147,10 +147,11 @@ namespace DqtApi.DataStore.Crm
                 _dataverseAdapter = dataverseAdapter;
                 _command = command;
                 TeacherId = command.TeacherId;
-                Trn = command.TRN;
+                Trn = command.Trn;
             }
 
             public Guid TeacherId { get; }
+
             public string Trn { get; }
 
             public (dfeta_initialteachertraining Result, UpdateTeacherFailedReasons? FailedReason) SelectIttRecord(
@@ -650,7 +651,7 @@ namespace DqtApi.DataStore.Crm
                     Qualifications = getQualifications.Result,
                     TeacherHasActiveSanctions = getTeacherTask.Result?.dfeta_ActiveSanctions == true,
                     TeacherHusId = getTeacherTask.Result?.dfeta_HUSID,
-                    HaveExistingTeacherWithHusId = existingTeachersWithHusIdTask?.Result != null && existingTeachersWithHusIdTask?.Result.Select(x => x.dfeta_TRN != _command.TRN).Count() > 0
+                    HaveExistingTeacherWithHusId = existingTeachersWithHusIdTask?.Result != null && existingTeachersWithHusIdTask.Result.Count(x => x.Id != _command.TeacherId) > 0
                 };
             }
         }
