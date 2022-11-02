@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -13,6 +14,10 @@ namespace DqtApi.V2.Responses
 
         public string Trn { get; set; }
 
+        public bool PotentialDuplicate { get; set; }
+
+        public DateOnly? QtsDate { get; set; }
+
         [JsonIgnore]
         public bool WasCreated { get; set; }
     }
@@ -23,7 +28,9 @@ namespace DqtApi.V2.Responses
         {
             RequestId = "72888c5d-db14-4222-829b-7db9c2ec0dc3",
             Status = TrnRequestStatus.Completed,
-            Trn = "1234567"
+            Trn = "1234567",
+            PotentialDuplicate = false,
+            QtsDate = null
         };
     }
 }

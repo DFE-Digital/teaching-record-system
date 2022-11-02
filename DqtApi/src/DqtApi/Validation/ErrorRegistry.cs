@@ -21,7 +21,6 @@ namespace DqtApi.Validation
             ErrorDescriptor.Create(10012),  // ITT qualification not found
             ErrorDescriptor.Create(10013),  // HE qualification not found
             ErrorDescriptor.Create(10014),  // Teacher has active sanctions
-
             ErrorDescriptor.Create(10015),  // Teacher with specified TsPersonId not found
             ErrorDescriptor.Create(10016),  // Another teacher has the specified TsPersonId assigned
             ErrorDescriptor.Create(10017),  // Teacher already has a TsPersonId defined

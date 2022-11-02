@@ -2264,6 +2264,7 @@ namespace DqtApi.DataStore.Crm.Models
 		public static class Fields
 		{
 			public const string dfeta_CompletionDate = "dfeta_completiondate";
+			public const string dfeta_InductionExemptionReason = "dfeta_inductionexemptionreason";
 			public const string dfeta_InductionStatus = "dfeta_inductionstatus";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_StartDate = "dfeta_startdate";
@@ -2333,6 +2334,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_CompletionDate");
 				this.SetAttributeValue("dfeta_completiondate", value);
 				this.OnPropertyChanged("dfeta_CompletionDate");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionexemptionreason")]
+		public virtual dfeta_InductionExemptionReason? dfeta_InductionExemptionReason
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_InductionExemptionReason?)(EntityOptionSetEnum.GetEnum(this, "dfeta_inductionexemptionreason")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_InductionExemptionReason");
+				this.SetAttributeValue("dfeta_inductionexemptionreason", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("dfeta_InductionExemptionReason");
 			}
 		}
 		
@@ -3518,6 +3539,7 @@ namespace DqtApi.DataStore.Crm.Models
 		{
 			public const string dfeta_EarlyYearsStatusId = "dfeta_earlyyearsstatusid";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
+			public const string dfeta_InductionId = "dfeta_inductionid";
 			public const string dfeta_name = "dfeta_name";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_QTSDate = "dfeta_qtsdate";
@@ -3611,6 +3633,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_EYTSDate");
 				this.SetAttributeValue("dfeta_eytsdate", value);
 				this.OnPropertyChanged("dfeta_EYTSDate");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for Induction associated with QTS.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionid")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_InductionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_inductionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_InductionId");
+				this.SetAttributeValue("dfeta_inductionid", value);
+				this.OnPropertyChanged("dfeta_InductionId");
 			}
 		}
 		

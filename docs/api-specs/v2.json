@@ -356,104 +356,6 @@
         }
       }
     },
-    "/v2/teachers/teacher-identity": {
-      "get": {
-        "tags": [
-          "Teachers"
-        ],
-        "summary": "Sets the teacher identity info for the teacher with the specified tsPersonId",
-        "parameters": [
-          {
-            "name": "tsPersonId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeacherIdentityInfo"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v2/teachers/teacher-identity/{trn}": {
-      "put": {
-        "tags": [
-          "Teachers"
-        ],
-        "summary": "Sets the teacher identity info for a teacher",
-        "parameters": [
-          {
-            "name": "trn",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetTeacherIdentityInfoRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetTeacherIdentityInfoRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetTeacherIdentityInfoRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TeacherIdentityInfo"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v2/trn-requests/{requestId}": {
       "get": {
         "tags": [
@@ -479,7 +381,7 @@
                 "schema": {
                   "$ref": "#/components/schemas/TrnRequestInfo"
                 },
-                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567"}
+                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567","potentialDuplicate":false,"qtsDate":null}
               }
             }
           },
@@ -541,7 +443,7 @@
                 "schema": {
                   "$ref": "#/components/schemas/TrnRequestInfo"
                 },
-                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567"}
+                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567","potentialDuplicate":false,"qtsDate":null}
               }
             }
           },
@@ -552,7 +454,7 @@
                 "schema": {
                   "$ref": "#/components/schemas/TrnRequestInfo"
                 },
-                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567"}
+                "example": {"requestId":"72888c5d-db14-4222-829b-7db9c2ec0dc3","status":"Completed","trn":"1234567","potentialDuplicate":false,"qtsDate":null}
               }
             }
           },
@@ -646,6 +548,22 @@
           "Notapplicable",
           "NotKnown",
           "HigherDegree"
+        ],
+        "type": "string"
+      },
+      "CreateTeacherRecognitionRoute": {
+        "enum": [
+          "Scotland",
+          "NorthernIreland",
+          "EuropeanEconomicArea",
+          "OverseasTrainedTeachers"
+        ],
+        "type": "string"
+      },
+      "CreateTeacherType": {
+        "enum": [
+          "TraineeTeacher",
+          "OverseasQualifiedTeacher"
         ],
         "type": "string"
       },
@@ -770,6 +688,21 @@
           "husId": {
             "type": "string",
             "nullable": true
+          },
+          "teacherType": {
+            "$ref": "#/components/schemas/CreateTeacherType"
+          },
+          "recognitionRoute": {
+            "$ref": "#/components/schemas/CreateTeacherRecognitionRoute"
+          },
+          "qtsDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "inductionRequired": {
+            "type": "boolean",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -855,6 +788,10 @@
           },
           "ittQualificationAim": {
             "$ref": "#/components/schemas/IttQualificationAim"
+          },
+          "trainingCountryCode": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1275,33 +1212,6 @@
         },
         "additionalProperties": false
       },
-      "SetTeacherIdentityInfoRequest": {
-        "required": [
-          "tsPersonId"
-        ],
-        "type": "object",
-        "properties": {
-          "tsPersonId": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "TeacherIdentityInfo": {
-        "type": "object",
-        "properties": {
-          "tsPersonId": {
-            "type": "string",
-            "nullable": true
-          },
-          "trn": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "TrnRequestInfo": {
         "type": "object",
         "properties": {
@@ -1313,6 +1223,14 @@
           },
           "trn": {
             "type": "string",
+            "nullable": true
+          },
+          "potentialDuplicate": {
+            "type": "boolean"
+          },
+          "qtsDate": {
+            "type": "string",
+            "format": "date",
             "nullable": true
           }
         },

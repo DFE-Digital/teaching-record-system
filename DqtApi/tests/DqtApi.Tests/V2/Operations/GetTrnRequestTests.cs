@@ -84,7 +84,9 @@ namespace DqtApi.Tests.V2.Operations
                 {
                     requestId = requestId,
                     status = "Pending",
-                    trn = (string)null
+                    trn = (string)null,
+                    qtsDate = (DateOnly?)null,
+                    potentialDuplicate = true,
                 },
                 expectedStatusCode: StatusCodes.Status200OK);
         }
@@ -127,7 +129,9 @@ namespace DqtApi.Tests.V2.Operations
                 {
                     requestId = requestId,
                     status = "Completed",
-                    trn = trn
+                    trn = trn,
+                    qtsDate = (DateOnly?)null,
+                    potentialDuplicate = false,
                 },
                 expectedStatusCode: StatusCodes.Status200OK);
         }

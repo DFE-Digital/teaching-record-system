@@ -15,6 +15,10 @@ namespace DqtApi.DataStore.Crm
         public CreateTeacherCommandInitialTeacherTraining InitialTeacherTraining { get; set; }
         public CreateTeacherCommandQualification Qualification { get; set; }
         public string HusId { get; set; }
+        public CreateTeacherType TeacherType { get; set; }
+        public CreateTeacherRecognitionRoute? RecognitionRoute { get; set; }
+        public DateOnly? QtsDate { get; set; }
+        public bool? InductionRequired { get; set; }
     }
 
     public class CreateTeacherCommandAddress
@@ -32,7 +36,7 @@ namespace DqtApi.DataStore.Crm
         public string ProviderUkprn { get; set; }
         public DateOnly ProgrammeStartDate { get; set; }
         public DateOnly ProgrammeEndDate { get; set; }
-        public dfeta_ITTProgrammeType ProgrammeType { get; set; }
+        public dfeta_ITTProgrammeType? ProgrammeType { get; set; }
         public string Subject1 { get; set; }
         public string Subject2 { get; set; }
         public string Subject3 { get; set; }
@@ -40,6 +44,7 @@ namespace DqtApi.DataStore.Crm
         public dfeta_AgeRange? AgeRangeTo { get; set; }
         public string IttQualificationValue { get; set; }
         public dfeta_ITTQualificationAim? IttQualificationAim { get; set; }
+        public string TrainingCountryCode { get; set; }
     }
 
     public class CreateTeacherCommandQualification
@@ -52,5 +57,19 @@ namespace DqtApi.DataStore.Crm
         public dfeta_classdivision? Class { get; set; }
         public DateOnly? Date { get; set; }
         public string HeQualificationValue { get; set; }
+    }
+
+    public enum CreateTeacherType
+    {
+        TraineeTeacher = 0,
+        OverseasQualifiedTeacher = 1
+    }
+
+    public enum CreateTeacherRecognitionRoute
+    {
+        Scotland = 1,
+        NorthernIreland = 2,
+        EuropeanEconomicArea = 3,
+        OverseasTrainedTeachers = 4
     }
 }

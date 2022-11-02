@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm.Models;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 
@@ -47,8 +47,7 @@ namespace DqtApi.DataStore.Crm
                 {
                     new CreateRequest() { Target = helper.CreateContactEntity() },
                     new CreateRequest() { Target = helper.CreateInitialTeacherTrainingEntity(referenceData) },
-                    new CreateRequest() { Target = helper.CreateQualificationEntity(referenceData) },
-                    new CreateRequest() { Target = helper.CreateQtsRegistrationEntity(referenceData) }
+                    new CreateRequest() { Target = helper.CreateQualificationEntity(referenceData) }
                 }
             };
 
@@ -88,11 +87,35 @@ namespace DqtApi.DataStore.Crm
                 });
             }
 
+            var qtsEntity = helper.CreateQtsRegistrationEntity(referenceData);
+            txnRequest.Requests.Add(new CreateRequest() { Target = qtsEntity });
+
+            Guid? inductionId = null;
+            if (command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher)
+            {
+                var inductionEntity = helper.CreateInductionEntity();
+                inductionId = inductionEntity.Id;
+                txnRequest.Requests.Add(new CreateRequest() { Target = inductionEntity });
+            }
+
+            // Update the QTS record with the induction ID; we can't set it in the Create above as Induction can't be created before QTS
+            if (inductionId.HasValue)
+            {
+                txnRequest.Requests.Add(new UpdateRequest()
+                {
+                    Target = new dfeta_qtsregistration()
+                    {
+                        Id = qtsEntity.Id,
+                        dfeta_InductionId = inductionId.Value.ToEntityReference(dfeta_induction.EntityLogicalName)
+                    }
+                });
+            }
+
             var txnResponse = (ExecuteTransactionResponse)await _service.ExecuteAsync(txnRequest);
 
-            // If a TRN was allocated the final response in the ExecuteTransactionResponse has it
+            // If a TRN was allocated we have a RetrieveResponse that contains the value
             string trn = allocateTrn ?
-                ((RetrieveResponse)txnResponse.Responses.Last()).Entity.ToEntity<Contact>().dfeta_TRN :
+                txnResponse.Responses.OfType<RetrieveResponse>().Single().Entity.ToEntity<Contact>().dfeta_TRN :
                 null;
 
             return (CreateTeacherResult.Success(helper.TeacherId, trn), txnRequest);
@@ -119,11 +142,15 @@ namespace DqtApi.DataStore.Crm
             {
                 var description = GetDescription();
 
+                var category = _command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher ? "ApplyForQts" :
+                    !string.IsNullOrEmpty(_command.HusId) ? "HESAImportTrn" :
+                    "DMSImportTrn";
+
                 return new CrmTask()
                 {
                     RegardingObjectId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_potentialduplicateid = duplicate.TeacherId.ToEntityReference(Contact.EntityLogicalName),
-                    Category = "DMSImportTrn",
+                    Category = category,
                     Subject = "Notification for QTS Unit Team",
                     Description = description,
                     ScheduledEnd = _dataverseAdapter._clock.UtcNow
@@ -251,6 +278,30 @@ namespace DqtApi.DataStore.Crm
                 return contact;
             }
 
+            public dfeta_induction CreateInductionEntity()
+            {
+                Debug.Assert(_command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher);
+
+                var exemptionReason = _command.InductionRequired.Value ?
+                    (dfeta_InductionExemptionReason?)null :
+                    _command.RecognitionRoute switch
+                    {
+                        CreateTeacherRecognitionRoute.Scotland => dfeta_InductionExemptionReason.HasoriseligibleforfullregistrationinScotland,
+                        CreateTeacherRecognitionRoute.NorthernIreland => dfeta_InductionExemptionReason.SuccessfullycompletedinductioninNorthernIreland,
+                        CreateTeacherRecognitionRoute.OverseasTrainedTeachers => dfeta_InductionExemptionReason.OverseasTrainedTeacher,
+                        CreateTeacherRecognitionRoute.EuropeanEconomicArea => dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute,
+                        _ => throw new NotImplementedException($"Unknown {nameof(CreateTeacherRecognitionRoute)}: '{_command.RecognitionRoute}'.")
+                    };
+
+                return new dfeta_induction()
+                {
+                    Id = Guid.NewGuid(),
+                    dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
+                    dfeta_InductionStatus = _command.InductionRequired.Value ? dfeta_InductionStatus.RequiredtoComplete : dfeta_InductionStatus.Exempt,
+                    dfeta_InductionExemptionReason = exemptionReason
+                };
+            }
+
             public dfeta_initialteachertraining CreateInitialTeacherTrainingEntity(CreateTeacherReferenceLookupResult referenceData)
             {
                 Debug.Assert(referenceData.IttCountryId.HasValue);
@@ -258,7 +309,9 @@ namespace DqtApi.DataStore.Crm
 
                 var cohortYear = _command.InitialTeacherTraining.ProgrammeEndDate.Year.ToString();
 
-                var result = _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
+                var result = _command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher ?
+                    dfeta_ITTResult.Approved :
+                    _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
                     dfeta_ITTResult.UnderAssessment :
                     dfeta_ITTResult.InTraining;
 
@@ -280,7 +333,6 @@ namespace DqtApi.DataStore.Crm
                     dfeta_TraineeID = _command.HusId,
                     dfeta_ITTQualificationId = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName),
                     dfeta_ittqualificationaim = _command.InitialTeacherTraining.IttQualificationAim
-                    //dfeta_IT = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName)
                 };
             }
 
@@ -307,9 +359,11 @@ namespace DqtApi.DataStore.Crm
             {
                 return new dfeta_qtsregistration()
                 {
+                    Id = Guid.NewGuid(),
                     dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_EarlyYearsStatusId = referenceData.EarlyYearsStatusId?.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
-                    dfeta_TeacherStatusId = referenceData.TeacherStatusId?.ToEntityReference(dfeta_teacherstatus.EntityLogicalName)
+                    dfeta_TeacherStatusId = referenceData.TeacherStatusId?.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
+                    dfeta_QTSDate = _command.QtsDate.ToDateTime()
                 };
             }
 
@@ -360,15 +414,15 @@ namespace DqtApi.DataStore.Crm
                 {
                     (
                         Attribute: Contact.Fields.FirstName,
-                        Matches: _command.FirstName?.Equals(match.FirstName, StringComparison.OrdinalIgnoreCase) ?? false
+                        Matches: NamesAreEqual(_command.FirstName, match.FirstName)
                     ),
                     (
                         Attribute: Contact.Fields.MiddleName,
-                        Matches: _command.MiddleName?.Equals(match.MiddleName, StringComparison.OrdinalIgnoreCase) ?? false
+                        Matches: NamesAreEqual(_command.MiddleName, match.MiddleName)
                     ),
                     (
                         Attribute: Contact.Fields.LastName,
-                        Matches: _command.LastName?.Equals(match.LastName, StringComparison.OrdinalIgnoreCase) ?? false
+                        Matches: NamesAreEqual(_command.LastName, match.LastName)
                     ),
                     (
                         Attribute: Contact.Fields.BirthDate,
@@ -427,6 +481,46 @@ namespace DqtApi.DataStore.Crm
                     filter = combinationsFilter;
                     return true;
                 }
+
+                static bool NamesAreEqual(string a, string b) =>
+                    string.Compare(a, b, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) == 0;
+            }
+
+            public string DeriveTeacherStatus(out bool qtsDateRequired)
+            {
+                if (_command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher)
+                {
+                    Debug.Assert(_command.RecognitionRoute.HasValue);
+
+                    qtsDateRequired = true;
+                    return _command.RecognitionRoute.Value switch
+                    {
+                        CreateTeacherRecognitionRoute.Scotland => "68",
+                        CreateTeacherRecognitionRoute.NorthernIreland => "69",
+                        CreateTeacherRecognitionRoute.EuropeanEconomicArea => "223",
+                        CreateTeacherRecognitionRoute.OverseasTrainedTeachers => "103",
+                        _ => throw new NotImplementedException($"Unknown {nameof(CreateTeacherRecognitionRoute)}: '{_command.RecognitionRoute.Value}'.")
+                    };
+                }
+
+                Debug.Assert(_command.TeacherType == CreateTeacherType.TraineeTeacher);
+
+                qtsDateRequired = false;
+                return _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
+                    "212" :  // 212 == 'AOR Candidate'
+                    "211";   // 211 == 'Trainee Teacher'
+            }
+
+            public string DeriveIttProviderNameForOverseasQualifiedTeacher()
+            {
+                Debug.Assert(_command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher);
+
+                return _command.RecognitionRoute.Value switch
+                {
+                    CreateTeacherRecognitionRoute.Scotland or CreateTeacherRecognitionRoute.NorthernIreland => "UK establishment (Scotland/Northern Ireland)",
+                    CreateTeacherRecognitionRoute.EuropeanEconomicArea or CreateTeacherRecognitionRoute.OverseasTrainedTeachers => "Non-UK establishment",
+                    _ => throw new NotImplementedException($"Unknown {nameof(CreateTeacherRecognitionRoute)}: '{_command.RecognitionRoute.Value}'.")
+                };
             }
 
             public void FlagBadData(ExecuteTransactionRequest txnRequest)
@@ -446,23 +540,33 @@ namespace DqtApi.DataStore.Crm
 
             public async Task<CreateTeacherReferenceLookupResult> LookupReferenceData()
             {
-                Debug.Assert(!string.IsNullOrEmpty(_command.InitialTeacherTraining.ProviderUkprn));
+                Debug.Assert(_command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher || !string.IsNullOrEmpty(_command.InitialTeacherTraining.ProviderUkprn));
+                Debug.Assert(_command.TeacherType != CreateTeacherType.OverseasQualifiedTeacher || !string.IsNullOrEmpty(_command.InitialTeacherTraining.TrainingCountryCode));
 
-                var isEarlyYears = _command.InitialTeacherTraining.ProgrammeType.IsEarlyYears();
+                var isEarlyYears = _command.InitialTeacherTraining.ProgrammeType?.IsEarlyYears() == true;
 
                 var requestBuilder = _dataverseAdapter.CreateMultipleRequestBuilder();
 
                 static TResult Let<T, TResult>(T value, Func<T, TResult> getResult) => getResult(value);
 
-                var getIttProviderTask = Let(
-                    _command.InitialTeacherTraining.ProviderUkprn,
-                    ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
-                        CacheKeys.GetIttProviderOrganizationByUkprnKey(ukprn),
-                        _ => _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, true, columnNames: Array.Empty<string>(), requestBuilder)
-                            .ContinueWith(t => t.Result.SingleOrDefault())));
+                var getIttProviderTask = !string.IsNullOrEmpty(_command.InitialTeacherTraining.ProviderUkprn) ?
+                    Let(
+                        _command.InitialTeacherTraining.ProviderUkprn,
+                        ukprn => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetIttProviderOrganizationByUkprnKey(ukprn),
+                            _ => _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, true, columnNames: Array.Empty<string>(), requestBuilder)
+                                .ContinueWith(t => t.Result.SingleOrDefault()))) :
+                    Let(
+                        DeriveIttProviderNameForOverseasQualifiedTeacher(),
+                        providerName => _dataverseAdapter._cache.GetOrCreateAsync(
+                            CacheKeys.GetIttProviderOrganizationByNameKey(providerName),
+                            _ => _dataverseAdapter.GetIttProviderOrganizationsByName(providerName, true, columnNames: Array.Empty<string>(), requestBuilder)
+                                .ContinueWith(t => t.Result.SingleOrDefault())));
 
                 var getIttCountryTask = Let(
-                    "XK",  // XK == 'United Kingdom'
+                    _command.TeacherType == CreateTeacherType.TraineeTeacher ?
+                        "XK" :  // XK == 'United Kingdom'
+                        _command.InitialTeacherTraining.TrainingCountryCode,
                     country => _dataverseAdapter._cache.GetOrCreateAsync(
                         CacheKeys.GetCountryKey(country),
                         _ => _dataverseAdapter.GetCountry(country, requestBuilder)));
@@ -556,12 +660,10 @@ namespace DqtApi.DataStore.Crm
 
                 var getTeacherStatusTask = !isEarlyYears ?
                     Let(
-                        _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
-                            "212" :  // 212 == 'AOR Candidate'
-                            "211",   // 211 == 'Trainee Teacher'
+                        DeriveTeacherStatus(out var qtsDateRequired),
                         teacherStatusId => _dataverseAdapter._cache.GetOrCreateAsync(
                             CacheKeys.GetTeacherStatusKey(teacherStatusId),
-                            _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false, requestBuilder))) :
+                            _ => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired, requestBuilder))) :
                     Task.FromResult<dfeta_teacherstatus>(null);
 
                 var existingTeachersWithHusIdTask = !string.IsNullOrEmpty(_command.HusId) ? _dataverseAdapter.GetTeachersByHusId(_command.HusId, columnNames: new[]
@@ -678,6 +780,11 @@ namespace DqtApi.DataStore.Crm
                 if (referenceData.HaveExistingTeacherWithHusId == true)
                 {
                     failedReasons |= CreateTeacherFailedReasons.DuplicateHusId;
+                }
+
+                if (referenceData.IttCountryId == null)
+                {
+                    failedReasons |= CreateTeacherFailedReasons.TrainingCountryNotFound;
                 }
 
                 return failedReasons;

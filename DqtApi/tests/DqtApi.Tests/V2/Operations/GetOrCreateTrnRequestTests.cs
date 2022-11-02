@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
-using Castle.Components.DictionaryAdapter.Xml;
+using System.Threading;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql.Models;
@@ -60,7 +59,9 @@ namespace DqtApi.Tests.V2.Operations
                 {
                     requestId = requestId,
                     trn = trn,
-                    status = "Completed"
+                    status = "Completed",
+                    qtsDate = (DateOnly?)null,
+                    potentialDuplicate = false
                 },
                 expectedStatusCode: 200);
         }
@@ -93,7 +94,9 @@ namespace DqtApi.Tests.V2.Operations
                 {
                     requestId = requestId,
                     trn = (string)null,
-                    status = "Pending"
+                    status = "Pending",
+                    qtsDate = (DateOnly?)null,
+                    potentialDuplicate = true
                 },
                 expectedStatusCode: 200);
         }
@@ -131,9 +134,12 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Theory]
-        [InlineData("1234567", "Completed")]
-        [InlineData(null, "Pending")]
-        public async Task Given_request_with_new_id_creates_teacher_and_returns_created(string trn, string expectedStatus)
+        [InlineData("1234567", "Completed", false)]
+        [InlineData(null, "Pending", true)]
+        public async Task Given_request_with_new_id_creates_teacher_and_returns_created(
+            string trn,
+            string expectedStatus,
+            bool expectedPotentialDuplicate)
         {
             // Arrange
             var requestId = Guid.NewGuid().ToString();
@@ -156,7 +162,9 @@ namespace DqtApi.Tests.V2.Operations
                 {
                     requestId = requestId,
                     trn = trn,
-                    status = expectedStatus
+                    status = expectedStatus,
+                    qtsDate = (DateOnly?)null,
+                    potentialDuplicate = expectedPotentialDuplicate
                 },
                 expectedStatusCode: 201);
         }
@@ -576,8 +584,70 @@ namespace DqtApi.Tests.V2.Operations
             // Assert
             await AssertEx.ResponseIsValidationErrorForProperty(
                 response,
-                $"{nameof(GetOrCreateTrnRequest.HusId)}.{nameof(GetOrCreateTrnRequest.HusId)}",
+                $"{nameof(GetOrCreateTrnRequest.HusId)}",
                 StringResources.Errors_10018_Title);
+        }
+
+        [Fact]
+        public async Task Given_OverseasQualifiedTeacher_and_EarlyYears_ProgrammeType_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var teacherId = Guid.NewGuid();
+            var trn = "1234567";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+                .Verifiable();
+
+            var request = CreateRequest(req =>
+            {
+                req.TeacherType = DqtApi.V2.Requests.CreateTeacherType.OverseasQualifiedTeacher;
+                req.InitialTeacherTraining.ProviderUkprn = null;
+                req.InitialTeacherTraining.TrainingCountryCode = "SC";
+                req.InitialTeacherTraining.ProgrammeType = IttProgrammeType.EYITTAssessmentOnly;
+                req.QtsDate = new DateOnly(2020, 10, 10);
+                req.RecognitionRoute = DqtApi.V2.Requests.CreateTeacherRecognitionRoute.Scotland;
+                req.InductionRequired = false;
+            });
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Given_valid_OverseasQualifiedTeacher_request_passes_request_to_DataverseAdapter_successfully()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var teacherId = Guid.NewGuid();
+            var trn = "1234567";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+                .Verifiable();
+
+            var request = CreateRequest(req =>
+            {
+                req.TeacherType = DqtApi.V2.Requests.CreateTeacherType.OverseasQualifiedTeacher;
+                req.InitialTeacherTraining.ProviderUkprn = null;
+                req.InitialTeacherTraining.TrainingCountryCode = "SC";
+                req.QtsDate = new DateOnly(2020, 10, 10);
+                req.RecognitionRoute = DqtApi.V2.Requests.CreateTeacherRecognitionRoute.Scotland;
+                req.InductionRequired = false;
+            });
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+            ApiFixture.DataverseAdapter.Verify();
         }
 
         public static TheoryData<int?, int?, string, string> InvalidAgeCombinationsData { get; } = new()
