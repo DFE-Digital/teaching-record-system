@@ -198,35 +198,35 @@ jobs:
           exit 1
         )
 
-  zap_scan:
-    name: OWASP ZAP API scan
-    needs: deploy_dev
-    runs-on: ubuntu-latest
-    concurrency: deploy_dev
-    strategy:
-      matrix:
-        version: [v1, v2]
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Create config file
-      run: |
-        echo "replacer.full_list(0).description=auth1" >> options.prop
-        echo "replacer.full_list(0).enabled=true" >> options.prop
-        echo "replacer.full_list(0).matchtype=REQ_HEADER" >> options.prop
-        echo "replacer.full_list(0).matchstr=Authorization" >> options.prop
-        echo "replacer.full_list(0).regex=false" >> options.prop
-        echo "replacer.full_list(0).replacement=Bearer ${{ needs.deploy_dev.outputs.test_user_api_key }}" >> options.prop
-
-    - uses: zaproxy/action-api-scan@v0.1.1
-      with:
-        target: ${{ needs.deploy_dev.outputs.environment_url }}swagger/${{ matrix.version }}/swagger.json
-        format: openapi
-        allow_issue_writing: false
-        fail_action: true
-        rules_file_name: '.zap/rules.tsv'
-        cmd_options: '-z "-configFile /zap/wrk/options.prop"'
+#  zap_scan:
+#    name: OWASP ZAP API scan
+#    needs: deploy_dev
+#    runs-on: ubuntu-latest
+#    concurrency: deploy_dev
+#    strategy:
+#      matrix:
+#        version: [v1, v2]
+#
+#    steps:
+#    - uses: actions/checkout@v3
+#
+#    - name: Create config file
+#      run: |
+#        echo "replacer.full_list(0).description=auth1" >> options.prop
+#        echo "replacer.full_list(0).enabled=true" >> options.prop
+#        echo "replacer.full_list(0).matchtype=REQ_HEADER" >> options.prop
+#        echo "replacer.full_list(0).matchstr=Authorization" >> options.prop
+#        echo "replacer.full_list(0).regex=false" >> options.prop
+#        echo "replacer.full_list(0).replacement=Bearer ${{ needs.deploy_dev.outputs.test_user_api_key }}" >> options.prop
+#
+#    - uses: zaproxy/action-api-scan@v0.1.1
+#      with:
+#        target: ${{ needs.deploy_dev.outputs.environment_url }}swagger/${{ matrix.version }}/swagger.json
+#        format: openapi
+#        allow_issue_writing: false
+#        fail_action: true
+#        rules_file_name: '.zap/rules.tsv'
+#        cmd_options: '-z "-configFile /zap/wrk/options.prop"'
 
   deploy_test:
     name: Deploy to test environment
