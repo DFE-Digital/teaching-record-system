@@ -29,7 +29,7 @@ jobs:
     concurrency: build
 
     outputs:
-      docker_image: ${{ steps.image.outputs.tag }}
+      docker_image: ${{ env.tag }}
 
     services:
       postgres:
@@ -105,7 +105,7 @@ jobs:
     - name: Docker image tag
       id: image
       run: |
-        echo ::set-output name=tag::$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):$GITHUB_SHA
+        echo "tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):$GITHUB_SHA"  >> $GITHUB_ENV
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v1
@@ -119,7 +119,7 @@ jobs:
       with:
         context: DqtApi/src/DqtApi
         push: true
-        tags: ${{ steps.image.outputs.tag }}
+        tags: ${{ env.tag }}
         build-args: |
           GIT_SHA=${{ github.sha }}
 
