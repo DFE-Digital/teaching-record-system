@@ -63,6 +63,7 @@ namespace DqtApi
             var paasEnvironmentName = configuration["PaasEnvironment"];
 
             builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
+            builder.Services.AddApplicationInsightsTelemetry();
 
             if (env.IsProduction())
             {

@@ -1,6 +1,13 @@
 locals {
   api_app_config = {
-    AppConfig       = data.azurerm_key_vault_secret.secrets["APP-CONFIG"].value,
+    AppConfig = jsonencode(merge(
+      jsondecode(data.azurerm_key_vault_secret.secrets["APP-CONFIG"].value),
+      {
+        "ApplicationInsights" : {
+          "ConnectionString" : azurerm_application_insights.api_app_insights.connection_string
+        }
+      }
+    )),
     AppVersion      = var.api_app_version,
     PaasEnvironment = var.environment_name
   }
@@ -43,6 +50,13 @@ resource "cloudfoundry_service_instance" "postgres" {
     create = "60m"
     update = "60m"
   }
+}
+
+resource "azurerm_application_insights" "api_app_insights" {
+  name                = var.api_app_insights_name
+  resource_group_name = var.resource_group_name
+  location            = "West Europe"
+  application_type    = "web"
 }
 
 resource "null_resource" "migrations" {
@@ -96,6 +110,7 @@ resource "cloudfoundry_app" "api" {
   }
 
   depends_on = [
-    null_resource.migrations
+    null_resource.migrations,
+    azurerm_application_insights.api_app_insights
   ]
 }

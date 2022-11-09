@@ -27,6 +27,10 @@ variable "paas_space" {
   type = string
 }
 
+variable "api_app_insights_name" {
+  type = string
+}
+
 variable "api_app_name" {
   type = string
 }
