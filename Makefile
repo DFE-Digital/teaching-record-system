@@ -17,6 +17,9 @@ dev:
 test:
 	$(eval DEPLOY_ENV=test)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
+	$(eval RESOURCE_NAME_PREFIX=s165t01)
+	$(eval ENV_SHORT=ts)
+	$(eval ENV_TAG=test)
 
 .PHONY: pre-production
 pre-production:
