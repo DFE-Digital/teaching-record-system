@@ -346,13 +346,13 @@ namespace DqtApi.DataStore.Crm
                 {
                     Id = id ?? Guid.NewGuid(),
                     dfeta_HE_CountryId = referenceData.QualificationCountryId.Value.ToEntityReference(dfeta_country.EntityLogicalName),
-                    dfeta_HE_HESubject1Id = referenceData.QualificationSubjectId.Value.ToEntityReference(dfeta_hesubject.EntityLogicalName),
                     dfeta_HE_ClassDivision = _command.Qualification.Class,
                     dfeta_HE_CompletionDate = _command.Qualification.Date?.ToDateTime(),
                     dfeta_HE_HEQualificationId = referenceData.QualificationId.Value.ToEntityReference(dfeta_hequalification.EntityLogicalName),
                     dfeta_Type = dfeta_qualification_dfeta_Type.HigherEducation,
                     dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_HE_EstablishmentId = referenceData.QualificationProviderId?.ToEntityReference(Account.EntityLogicalName),
+                    dfeta_HE_HESubject1Id = referenceData.QualificationSubjectId?.ToEntityReference(dfeta_hesubject.EntityLogicalName),
                     dfeta_HE_HESubject2Id = referenceData.QualificationSubject2Id?.ToEntityReference(dfeta_hesubject.EntityLogicalName),
                     dfeta_HE_HESubject3Id = referenceData.QualificationSubject3Id?.ToEntityReference(dfeta_hesubject.EntityLogicalName),
                 };
@@ -404,17 +404,17 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= UpdateTeacherFailedReasons.QualificationCountryNotFound;
                 }
 
-                if (referenceData.QualificationSubjectId == null && _command.Qualification != null)
+                if (referenceData.QualificationSubjectId == null && !string.IsNullOrEmpty(_command.Qualification?.Subject))
                 {
                     failedReasons |= UpdateTeacherFailedReasons.QualificationSubjectNotFound;
                 }
 
-                if (referenceData.QualificationSubject2Id == null && _command.Qualification != null && !string.IsNullOrEmpty(_command.Qualification?.Subject2))
+                if (referenceData.QualificationSubject2Id == null && !string.IsNullOrEmpty(_command.Qualification?.Subject2))
                 {
                     failedReasons |= UpdateTeacherFailedReasons.QualificationSubject2NotFound;
                 }
 
-                if (referenceData.QualificationSubject3Id == null && _command.Qualification != null && !string.IsNullOrEmpty(_command.Qualification.Subject3))
+                if (referenceData.QualificationSubject3Id == null && !string.IsNullOrEmpty(_command.Qualification?.Subject3))
                 {
                     failedReasons |= UpdateTeacherFailedReasons.QualificationSubject3NotFound;
                 }
