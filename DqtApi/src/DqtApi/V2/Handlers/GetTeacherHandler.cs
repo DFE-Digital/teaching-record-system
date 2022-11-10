@@ -95,7 +95,7 @@ namespace DqtApi.V2.Handlers
                 {
                     ProgrammeEndDate = i.dfeta_ProgrammeEndDate.ToDateOnly(),
                     ProgrammeStartDate = i.dfeta_ProgrammeStartDate.ToDateOnly(),
-                    ProgrammeType = i.dfeta_ProgrammeType.Value.ToString(),
+                    ProgrammeType = i.dfeta_ProgrammeType?.ToString(),
                     Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null
                 })
             };
