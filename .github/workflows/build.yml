@@ -135,7 +135,7 @@ jobs:
         terraform_version: 1.0.10
 
     - name: Check formatting
-      run: terraform fmt -check
+      run: terraform fmt -check -diff
       working-directory: terraform
 
     - name: Validate
