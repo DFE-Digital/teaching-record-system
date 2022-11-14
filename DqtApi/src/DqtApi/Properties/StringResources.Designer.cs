@@ -293,5 +293,41 @@ namespace DqtApi.Properties {
                 return ResourceManager.GetString("Errors.10018.Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CompletionDate cannot be in the future.
+        /// </summary>
+        public static string Errors_10019_Title {
+            get {
+                return ResourceManager.GetString("Errors.10019.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple qualifications with qualification type..
+        /// </summary>
+        public static string Errors_10020_Title {
+            get {
+                return ResourceManager.GetString("Errors.10020.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to update npq qualifications not created by API.
+        /// </summary>
+        public static string Errors_10021_Title {
+            get {
+                return ResourceManager.GetString("Errors.10021.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Completed date cannot be before 1/11/2021.
+        /// </summary>
+        public static string Errors_10022_Title {
+            get {
+                return ResourceManager.GetString("Errors.10022.Title", resourceCulture);
+            }
+        }
     }
 }

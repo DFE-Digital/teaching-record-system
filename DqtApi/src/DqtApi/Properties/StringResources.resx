@@ -195,4 +195,16 @@
   <data name="Errors.10018.Title" xml:space="preserve">
     <value>Husid registered for an existing teacher</value>
   </data>
+  <data name="Errors.10019.Title" xml:space="preserve">
+    <value>CompletionDate cannot be in the future</value>
+  </data>
+  <data name="Errors.10020.Title" xml:space="preserve">
+    <value>Multiple qualifications with qualification type.</value>
+  </data>
+  <data name="Errors.10021.Title" xml:space="preserve">
+    <value>Unable to update npq qualifications not created by API</value>
+  </data>
+  <data name="Errors.10022.Title" xml:space="preserve">
+    <value>Completed date cannot be before 1/11/2021</value>
+  </data>
 </root>

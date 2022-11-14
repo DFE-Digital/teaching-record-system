@@ -952,6 +952,7 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(e => e.ToEntity<Contact>()).SingleOrDefault();
         }
 
+
         public Task SetTsPersonId(Guid teacherId, string tsPersonId)
         {
             return _service.UpdateAsync(new Contact()
