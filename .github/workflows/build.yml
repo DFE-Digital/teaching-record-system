@@ -74,6 +74,8 @@ jobs:
           -e IntegrationTests_CrmClientSecret="${{ secrets.INTEGRATIONTESTS_CRMCLIENTSECRET }}"
           -e IntegrationTests_BuildEnvLockBlobUri="${{ secrets.INTEGRATIONTESTS_BUILDENVLOCKBLOBURI }}"
           -e IntegrationTests_BuildEnvLockBlobSasToken="${{ secrets.INTEGRATIONTESTS_BUILDENVLOCKBLOBSASTOKEN }}"
+          -e IntegrationTests_TrnGenerationApi__BaseAddress="${{ secrets.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIBASEADDRESS }}"
+          -e IntegrationTests_TrnGenerationApi__ApiKey="${{ secrets.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIAPIKEY }}"
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }};Database=dqt"
 
     # TODO Use migration bundles when https://github.com/dotnet/efcore/issues/25555 is fixed
