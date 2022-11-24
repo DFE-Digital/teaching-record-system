@@ -13,33 +13,34 @@ namespace DqtApi.Logging
         {
             app.Use(async (ctx, next) =>
             {
-                LogContext.Push(new RemoveRedactedUrlParametersEnricher(ctx));
-                LogContext.PushProperty("CorrelationId", ctx.TraceIdentifier);
-
-                if (logRequestBody)
+                using (LogContext.Push(new RemoveRedactedUrlParametersEnricher(ctx)))
+                using (LogContext.PushProperty("CorrelationId", ctx.TraceIdentifier))
                 {
-                    if (ctx.Request.GetTypedHeaders().ContentType?.MediaType == "application/json")
+                    if (logRequestBody)
                     {
-                        ctx.Request.EnableBuffering();
-
-                        const int bufferSize = 1024;
-
-                        using (var reader = new StreamReader(
-                            ctx.Request.Body,
-                            encoding: Encoding.UTF8,
-                            detectEncodingFromByteOrderMarks: false,
-                            bufferSize: bufferSize,
-                            leaveOpen: true))
+                        if (ctx.Request.GetTypedHeaders().ContentType?.MediaType == "application/json")
                         {
-                            var body = await reader.ReadToEndAsync();
-                            LogContext.PushProperty("RequestBody", body);
+                            ctx.Request.EnableBuffering();
 
-                            ctx.Request.Body.Seek(0L, SeekOrigin.Begin);
+                            const int bufferSize = 1024;
+
+                            using (var reader = new StreamReader(
+                                ctx.Request.Body,
+                                encoding: Encoding.UTF8,
+                                detectEncodingFromByteOrderMarks: false,
+                                bufferSize: bufferSize,
+                                leaveOpen: true))
+                            {
+                                var body = await reader.ReadToEndAsync();
+                                LogContext.PushProperty("RequestBody", body);
+
+                                ctx.Request.Body.Seek(0L, SeekOrigin.Begin);
+                            }
                         }
                     }
-                }
 
-                await next();
+                    await next();
+                }
             });
 
             app.UseSerilogRequestLogging();
