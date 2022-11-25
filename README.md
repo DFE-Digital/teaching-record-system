@@ -25,6 +25,23 @@ dotnet user-secrets --id DqtApiTests set ConnectionStrings:DefaultConnection "Ho
 
 The databases will be created automatically when running the API or tests in development mode.
 
+### External API setup
+
+The DQT API can be configured to call a TRN Generation REST API to generate a TRN.
+The is a feature which can be toggled on and off via config (it will default to being toggled off).
+There are tests with this feature toggled on and off so it does not need to be set in config for tests.
+
+```shell
+dotnet user-secrets --id DqtApi set FeatureManagement:UseTrnGenerationApi true|false
+dotnet user-secrets --id DqtApi set TrnGenerationApi:BaseAddress "base_address_for_trn_generation_api"
+dotnet user-secrets --id DqtApi set TrnGenerationApi:ApiKey "api_key_for_trn_generation_api"
+dotnet user-secrets --id DqtApiTests set TrnGenerationApi:BaseAddress "base_address_for_trn_generation_api"
+dotnet user-secrets --id DqtApiTests set TrnGenerationApi:ApiKey "api_key_for_trn_generation_api"
+```
+Where `base_address_for_trn_generation_api` is the base address URL to access the TRN Generation API e.g. locally or deployed to Build/Dev.
+Where `api_key_for_trn_generation_api` is an API Key to be able to access the TRN Generation API e.g. locally or deployed to Build/Dev.
+
+
 ### CRM connection
 
 The `build` CRM environment is used for local development. Connection information is stored in user secrets in the `CrmUrl`, `CrmClientId` and `CrmClientSecret` keys.

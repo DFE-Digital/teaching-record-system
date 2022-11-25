@@ -130,7 +130,7 @@ namespace DqtApi.Tests.DataverseIntegration
                 }
             };
 
-            await using var localDataScope = _crmClientFixture.CreateTestDataScope(isUseTrnGenerationApiEnabled: true);
+            await using var localDataScope = _crmClientFixture.CreateTestDataScope(useTrnGenerationApi: true);
             var localDataverseAdapter = localDataScope.CreateDataverseAdapter();
 
             // Act

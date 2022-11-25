@@ -53,14 +53,14 @@ namespace DqtApi.Tests.DataverseIntegration
         /// Creates a scope that owns an implementation of <see cref="IOrganizationServiceAsync2"/> that tracks the entities created through it.
         /// When <see cref="IAsyncDisposable.DisposeAsync"/> is called the created entities will be deleted from CRM.
         /// </summary>
-        public TestDataScope CreateTestDataScope(bool isUseTrnGenerationApiEnabled = false) => new(
+        public TestDataScope CreateTestDataScope(bool useTrnGenerationApi = false) => new(
             _baseServiceClient,
             orgService => new DataverseAdapter(
                 orgService,
                 Clock,
                 _memoryCache,
-                isUseTrnGenerationApiEnabled ? _featureIsEnabledFeatureManager : _featureIsNotEnabledFeatureManager,
-                isUseTrnGenerationApiEnabled ? _realTrnGenerationApiClient : _noopTrnGenerationApiClient),
+                useTrnGenerationApi ? _featureIsEnabledFeatureManager : _featureIsNotEnabledFeatureManager,
+                useTrnGenerationApi ? _realTrnGenerationApiClient : _noopTrnGenerationApiClient),
             _memoryCache);
 
         public void Dispose()
