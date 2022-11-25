@@ -1,9 +1,9 @@
-﻿namespace DqtApi.Services.TrnGenerationApi
-{
-    using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
+namespace DqtApi.Services.TrnGenerationApi
+{
     public interface ITrnGenerationApiClient
     {
-        Task<string> GenerateTrnAsync();
+        Task<string> GenerateTrn();
     }
 }

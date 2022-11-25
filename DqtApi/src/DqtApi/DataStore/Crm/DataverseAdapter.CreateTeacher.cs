@@ -39,13 +39,6 @@ namespace DqtApi.DataStore.Crm
             }
 
             var newContact = helper.CreateContactEntity();
-            string trn = null;
-            bool isUseTrnGenerationApiFeatureEnabled = await _featureManager.IsEnabledAsync(FeatureFlags.UseTrnGenerationApi);
-            if (isUseTrnGenerationApiFeatureEnabled)
-            {
-                trn = await _trnGenerationApiClient.GenerateTrnAsync();
-                newContact.dfeta_TRN= trn;
-            }
 
             // Send a single Transaction request with all the data changes in.
             // This is important for atomicity; we really do not want torn writes here.
@@ -64,10 +57,17 @@ namespace DqtApi.DataStore.Crm
 
             var findExistingTeacherResult = await (findExistingTeacher ?? helper.FindExistingTeacher)();
             var allocateTrn = findExistingTeacherResult == null;
+            string trn = null;
+            bool useTrnGenerationApi = await _featureManager.IsEnabledAsync(FeatureFlags.UseTrnGenerationApi);
 
             if (allocateTrn)
             {
-                if (!isUseTrnGenerationApiFeatureEnabled)
+                if (useTrnGenerationApi)
+                {
+                    trn = await _trnGenerationApiClient.GenerateTrn();
+                    newContact.dfeta_TRN = trn;
+                }
+                else
                 {
                     // Set the flag to allocate a TRN
                     // N.B. setting this attribute has to be in an Update, setting it in the initial Create doesn't work
@@ -126,7 +126,7 @@ namespace DqtApi.DataStore.Crm
             var txnResponse = (ExecuteTransactionResponse)await _service.ExecuteAsync(txnRequest);
 
             // If a TRN was allocated via CRM we have a RetrieveResponse that contains the value otherwise it should already be set from the TRN Generation API
-            if (allocateTrn && !isUseTrnGenerationApiFeatureEnabled)
+            if (allocateTrn && !useTrnGenerationApi)
             {
                 trn = txnResponse.Responses.OfType<RetrieveResponse>().Single().Entity.ToEntity<Contact>().dfeta_TRN;
             }

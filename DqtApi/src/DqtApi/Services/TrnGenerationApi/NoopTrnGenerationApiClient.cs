@@ -1,13 +1,12 @@
-﻿namespace DqtApi.Services.TrnGenerationApi
-{
-    using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-    public class NoopTrnGenerationApiClient : ITrnGenerationApiClient
+namespace DqtApi.Services.TrnGenerationApi;
+
+public class NoopTrnGenerationApiClient : ITrnGenerationApiClient
+{
+    public Task<string> GenerateTrn()
     {
-        public Task<string> GenerateTrnAsync()
-        {
-            string trn = null;
-            return Task.FromResult(trn);
-        }
+        string trn = null;
+        return Task.FromResult(trn);
     }
 }
