@@ -163,7 +163,7 @@ namespace DqtApi.DataStore.Crm
                 // in which case the status should be UnderAssessment.
 
                 var inTrainingForProvider = ittRecords
-                    .Where(r => r.dfeta_Result == dfeta_ITTResult.InTraining ||
+                    .Where(r => (r.dfeta_ProgrammeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute && r.dfeta_Result == dfeta_ITTResult.InTraining) ||
                         (r.dfeta_ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute && r.dfeta_Result == dfeta_ITTResult.UnderAssessment))
                     .Where(r => r.StateCode == dfeta_initialteachertrainingState.Active && r.dfeta_EstablishmentId.Id == ittProviderId)
                     .ToArray();
