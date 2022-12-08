@@ -38,6 +38,8 @@ namespace DqtApi.DataStore.Crm
                 return (CreateTeacherResult.Failed(failedReasons), null);
             }
 
+            var newContact = helper.CreateContactEntity();
+
             // Send a single Transaction request with all the data changes in.
             // This is important for atomicity; we really do not want torn writes here.
             var txnRequest = new ExecuteTransactionRequest()
@@ -45,7 +47,7 @@ namespace DqtApi.DataStore.Crm
                 ReturnResponses = true,
                 Requests = new()
                 {
-                    new CreateRequest() { Target = helper.CreateContactEntity() },
+                    new CreateRequest() { Target = newContact },
                     new CreateRequest() { Target = helper.CreateInitialTeacherTrainingEntity(referenceData) },
                     new CreateRequest() { Target = helper.CreateQualificationEntity(referenceData) }
                 }
@@ -55,26 +57,36 @@ namespace DqtApi.DataStore.Crm
 
             var findExistingTeacherResult = await (findExistingTeacher ?? helper.FindExistingTeacher)();
             var allocateTrn = findExistingTeacherResult == null;
+            string trn = null;
+            bool useTrnGenerationApi = await _featureManager.IsEnabledAsync(FeatureFlags.UseTrnGenerationApi);
 
             if (allocateTrn)
             {
-                // Set the flag to allocate a TRN
-                // N.B. setting this attribute has to be in an Update, setting it in the initial Create doesn't work
-                txnRequest.Requests.Add(new UpdateRequest()
+                if (useTrnGenerationApi)
                 {
-                    Target = new Contact()
+                    trn = await _trnGenerationApiClient.GenerateTrn();
+                    newContact.dfeta_TRN = trn;
+                }
+                else
+                {
+                    // Set the flag to allocate a TRN
+                    // N.B. setting this attribute has to be in an Update, setting it in the initial Create doesn't work
+                    txnRequest.Requests.Add(new UpdateRequest()
                     {
-                        Id = helper.TeacherId,
-                        dfeta_TRNAllocateRequest = _clock.UtcNow
-                    }
-                });
+                        Target = new Contact()
+                        {
+                            Id = helper.TeacherId,
+                            dfeta_TRNAllocateRequest = _clock.UtcNow
+                        }
+                    });
 
-                // Retrieve the generated TRN
-                txnRequest.Requests.Add(new RetrieveRequest()
-                {
-                    Target = helper.TeacherId.ToEntityReference(Contact.EntityLogicalName),
-                    ColumnSet = new ColumnSet(Contact.Fields.dfeta_TRN)
-                });
+                    // Retrieve the generated TRN
+                    txnRequest.Requests.Add(new RetrieveRequest()
+                    {
+                        Target = helper.TeacherId.ToEntityReference(Contact.EntityLogicalName),
+                        ColumnSet = new ColumnSet(Contact.Fields.dfeta_TRN)
+                    });
+                }
             }
             else
             {
@@ -113,10 +125,11 @@ namespace DqtApi.DataStore.Crm
 
             var txnResponse = (ExecuteTransactionResponse)await _service.ExecuteAsync(txnRequest);
 
-            // If a TRN was allocated we have a RetrieveResponse that contains the value
-            string trn = allocateTrn ?
-                txnResponse.Responses.OfType<RetrieveResponse>().Single().Entity.ToEntity<Contact>().dfeta_TRN :
-                null;
+            // If a TRN was allocated via CRM we have a RetrieveResponse that contains the value otherwise it should already be set from the TRN Generation API
+            if (allocateTrn && !useTrnGenerationApi)
+            {
+                trn = txnResponse.Responses.OfType<RetrieveResponse>().Single().Entity.ToEntity<Contact>().dfeta_TRN;
+            }
 
             return (CreateTeacherResult.Success(helper.TeacherId, trn), txnRequest);
         }

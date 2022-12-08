@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
 using DqtApi.DataStore.Crm;
+using DqtApi.Services.TrnGenerationApi;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.FeatureManagement;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Moq;
 
 namespace DqtApi.Tests.DataverseIntegration
 {
@@ -18,12 +23,21 @@ namespace DqtApi.Tests.DataverseIntegration
         private readonly CancellationTokenSource _completedCts;
         private readonly EnvironmentLockManager _lockManager;
         private readonly IMemoryCache _memoryCache;
+        private readonly IFeatureManager _featureIsEnabledFeatureManager;
+        private readonly IFeatureManager _featureIsNotEnabledFeatureManager;
+        private readonly ITrnGenerationApiClient _realTrnGenerationApiClient;
+        private readonly ITrnGenerationApiClient _noopTrnGenerationApiClient;
 
         public CrmClientFixture(IMemoryCache memoryCache)
         {
             Clock = new();
             Configuration = GetConfiguration();
             _baseServiceClient = GetCrmServiceClient();
+
+            _featureIsEnabledFeatureManager = GetFeatureManager(true);
+            _featureIsNotEnabledFeatureManager = GetFeatureManager(false);
+            _realTrnGenerationApiClient = GetTrnGenerationApiClient(true);
+            _noopTrnGenerationApiClient = GetTrnGenerationApiClient(false);
 
             _completedCts = new CancellationTokenSource();
             _lockManager = new EnvironmentLockManager(Configuration);
@@ -39,9 +53,14 @@ namespace DqtApi.Tests.DataverseIntegration
         /// Creates a scope that owns an implementation of <see cref="IOrganizationServiceAsync2"/> that tracks the entities created through it.
         /// When <see cref="IAsyncDisposable.DisposeAsync"/> is called the created entities will be deleted from CRM.
         /// </summary>
-        public TestDataScope CreateTestDataScope() => new(
+        public TestDataScope CreateTestDataScope(bool useTrnGenerationApi = false) => new(
             _baseServiceClient,
-            orgService => new DataverseAdapter(orgService, Clock, _memoryCache),
+            orgService => new DataverseAdapter(
+                orgService,
+                Clock,
+                _memoryCache,
+                useTrnGenerationApi ? _featureIsEnabledFeatureManager : _featureIsNotEnabledFeatureManager,
+                useTrnGenerationApi ? _realTrnGenerationApiClient : _noopTrnGenerationApiClient),
             _memoryCache);
 
         public void Dispose()
@@ -64,6 +83,33 @@ namespace DqtApi.Tests.DataverseIntegration
                 Configuration["CrmClientId"],
                 Configuration["CrmClientSecret"],
                 useUniqueInstance: true)).Result;
+
+        private IFeatureManager GetFeatureManager(bool isUseTrnGenerationApiEnabled)
+        {
+            var featureManager = Mock.Of<IFeatureManager>();
+            Mock.Get(featureManager)
+                .Setup(f => f.IsEnabledAsync(FeatureFlags.UseTrnGenerationApi))
+                .ReturnsAsync(isUseTrnGenerationApiEnabled);
+            return featureManager;
+        }
+
+        private ITrnGenerationApiClient GetTrnGenerationApiClient(bool isUseTrnGenerationApiEnabled)
+        {
+            ITrnGenerationApiClient trnGenerationApiClient;
+            if (isUseTrnGenerationApiEnabled)
+            {
+                var httpClient = new HttpClient();
+                httpClient.BaseAddress = new Uri(Configuration["TrnGenerationApi:BaseAddress"]);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Configuration["TrnGenerationApi:ApiKey"]);
+                trnGenerationApiClient = new TrnGenerationApiClient(httpClient);
+            }
+            else
+            {
+                trnGenerationApiClient = new NoopTrnGenerationApiClient();
+            }
+
+            return trnGenerationApiClient;
+        }
 
         public sealed class TestDataScope : IAsyncDisposable
         {

@@ -13,6 +13,7 @@ using DqtApi.Logging;
 using DqtApi.ModelBinding;
 using DqtApi.Security;
 using DqtApi.Services;
+using DqtApi.Services.TrnGenerationApi;
 using DqtApi.Swagger;
 using DqtApi.Validation;
 using FluentValidation;
@@ -31,6 +32,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Npgsql;
@@ -66,6 +68,8 @@ namespace DqtApi
 
             builder.Services.AddApplicationInsightsTelemetry()
                 .AddApplicationInsightsTelemetryProcessor<RedactedUrlTelemetryProcessor>();
+
+            builder.Services.AddFeatureManagement();
 
             if (env.IsProduction())
             {
@@ -217,6 +221,8 @@ namespace DqtApi
             });
 
             services.AddDatabaseDeveloperPageExceptionFilter();
+
+            services.AddTrnGenerationApi(configuration);
 
             if (env.EnvironmentName != "Testing")
             {

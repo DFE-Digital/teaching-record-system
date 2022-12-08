@@ -6,7 +6,9 @@ using System.Net;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm.Models;
+using DqtApi.Services.TrnGenerationApi;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.FeatureManagement;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.PowerPlatform.Dataverse.Client.Utils;
 using Microsoft.Xrm.Sdk;
@@ -20,15 +22,21 @@ namespace DqtApi.DataStore.Crm
         private readonly IOrganizationServiceAsync _service;
         private readonly IClock _clock;
         private readonly IMemoryCache _cache;
+        private readonly IFeatureManager _featureManager;
+        private readonly ITrnGenerationApiClient _trnGenerationApiClient;
 
         public DataverseAdapter(
             IOrganizationServiceAsync organizationServiceAsync,
             IClock clock,
-            IMemoryCache cache)
+            IMemoryCache cache,
+            IFeatureManager featureManager,
+            ITrnGenerationApiClient trnGenerationApiClient)
         {
             _service = organizationServiceAsync;
             _clock = clock;
             _cache = cache;
+            _featureManager = featureManager;
+            _trnGenerationApiClient = trnGenerationApiClient;
         }
 
         public Task<dfeta_country> GetCountry(string value) => GetCountry(value, requestBuilder: null);
