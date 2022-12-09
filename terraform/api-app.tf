@@ -60,6 +60,7 @@ resource "azurerm_application_insights" "api_app_insights" {
 }
 
 resource "null_resource" "migrations" {
+  count = var.migrations_file == "" ? 0 : 1
   triggers = {
     migrations = "${sha1(file(var.migrations_file))}"
   }
