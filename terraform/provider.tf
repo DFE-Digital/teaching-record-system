@@ -20,6 +20,5 @@ provider "cloudfoundry" {
 }
 
 provider "statuscake" {
-  username = local.monitoring_secrets.STATUSCAKE_USERNAME
-  apikey   = local.monitoring_secrets.STATUSCAKE_PASSWORD
+  api_token = local.monitoring_secrets.STATUSCAKE_PASSWORD
 }
