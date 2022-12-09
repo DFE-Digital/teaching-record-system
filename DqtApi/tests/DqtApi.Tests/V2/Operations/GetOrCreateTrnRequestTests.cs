@@ -534,11 +534,9 @@ namespace DqtApi.Tests.V2.Operations
         }
 
         [Theory]
-        [InlineData("", "Joe Xavier", "Andre", "Joe Xavier", "Andre")]
-        [InlineData("123", "Joe Xavier", "Andre", "Joe", "Xavier Andre")]
-        [InlineData("123", "Joe Xavier", "", "Joe", "Xavier")]
+        [InlineData("Joe Xavier", "Andre", "Joe", "Xavier Andre")]
+        [InlineData("Joe Xavier", "", "Joe", "Xavier")]
         public async Task Given_trainee_with_multiple_first_names_populates_middlename_field(
-            string husid,
             string firstName,
             string middleName,
             string expectedFirstName,
@@ -555,7 +553,6 @@ namespace DqtApi.Tests.V2.Operations
 
             var request = CreateRequest(cmd =>
             {
-                cmd.HusId = husid;
                 cmd.FirstName = firstName;
                 cmd.MiddleName = middleName;
             });

@@ -70,17 +70,10 @@ namespace DqtApi.V2.Handlers
             }
             else
             {
-                var firstName = request.FirstName;
-                var middleName = request.MiddleName ?? string.Empty;
                 var lastName = request.LastName;
-
-                var isHesaTrainee = !string.IsNullOrEmpty(request.HusId);
-                if (isHesaTrainee)
-                {
-                    var firstAndMiddleNames = $"{firstName} {middleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                    firstName = firstAndMiddleNames[0];
-                    middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
-                }
+                var firstAndMiddleNames = $"{request.FirstName} {request.MiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var firstName = firstAndMiddleNames[0];
+                var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
 
                 var createTeacherResult = await _dataverseAdapter.CreateTeacher(new CreateTeacherCommand()
                 {
