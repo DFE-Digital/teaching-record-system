@@ -73,6 +73,9 @@ namespace DqtApi.V2.ApiModels
 
         [Description("Provider-led (undergrad)")]
         ProviderLedUndergrad = 389040022,
+
+        [Description("International qualified teacher status")]
+        InternationalQualifiedTeacherStatus = 389040023
     }
 
     public static class IttProgrammeTypeExtensions

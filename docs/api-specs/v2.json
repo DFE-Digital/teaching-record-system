@@ -1054,7 +1054,8 @@
           "Apprenticeship",
           "FutureTeachingScholars",
           "ProviderLedPostgrad",
-          "ProviderLedUndergrad"
+          "ProviderLedUndergrad",
+          "InternationalQualifiedTeacherStatus"
         ],
         "type": "string"
       },

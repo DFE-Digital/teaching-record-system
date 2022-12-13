@@ -1440,6 +1440,10 @@ namespace DqtApi.DataStore.Crm.Models
 		HEI = 389040001,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("International qualified teacher status", 23, "#0000ff")]
+		Internationalqualifiedteacherstatus = 389040023,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Licensed Teacher Programme", 12, "", "Added by helpdesk call R120680")]
 		LicensedTeacherProgramme = 389040012,
 		
@@ -1876,6 +1880,23 @@ namespace DqtApi.DataStore.Crm.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Mail App", 2, "#0000ff")]
 		MailApp = 2,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum card_Sizes
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Small", 0, "#0000ff")]
+		Small = 200000000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Medium", 1, "#0000ff")]
+		Medium = 200000001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Large", 2, "#0000ff")]
+		Large = 200000002,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
