@@ -1,5 +1,9 @@
 fetch_config.rb
 
+# Local terraform files
+.terraform.lock.hcl
+.terraform/
+
 # Document site
 docs/tmp
 docs/build
