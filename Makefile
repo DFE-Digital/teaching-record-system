@@ -134,7 +134,7 @@ restore-data-from-backup: read-deployment-config # make production restore-data-
 terraform-init:
 	$(if $(or $(DISABLE_PASSCODE),$(PASSCODE)), , $(error Missing environment variable "PASSCODE", retrieve from https://login.london.cloud.service.gov.uk/passcode))
 	[[ "${SP_AUTH}" != "true" ]] && az account set -s $(AZURE_SUBSCRIPTION) || true
-	terraform -chdir=terraform init -backend-config ${DEPLOY_ENV}.backend.tfvars -upgrade -reconfigure
+	terraform -chdir=terraform init -backend-config ${DEPLOY_ENV}.backend.tfvars -reconfigure
 
 terraform-plan: terraform-init
 	terraform -chdir=terraform plan -var-file ${DEPLOY_ENV}.tfvars.json

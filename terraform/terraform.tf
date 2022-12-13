@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.0"
+  required_version = "1.0.10"
 
   backend "azurerm" {
     container_name = "dqtapi-tfstate"
@@ -8,12 +8,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 2.84"
+      version = "2.99.0"
     }
 
     cloudfoundry = {
       source  = "cloudfoundry-community/cloudfoundry"
-      version = "~> 0.15"
+      version = "0.50.2"
     }
 
     statuscake = {
