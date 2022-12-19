@@ -23,10 +23,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  generate_postgres_password:
+    name: Generate Postgres password
+    runs-on: ubuntu-latest
+    outputs:
+      POSTGRES_PASSWORD: ${{ steps.generate_password.outputs.POSTGRES_PASSWORD }}
+
+    steps:
+    - id: generate_password
+      run: |
+        chars=abcd1234ABCD
+        for i in {1..8} ; do
+          echo -n "POSTGRES_PASSWORD=${chars:RANDOM%${#chars}:1}" >> $GITHUB_OUTPUT
+        done
+
   build:
     name: Build & test
     runs-on: ubuntu-latest
     concurrency: build
+    needs: [generate_postgres_password]
 
     outputs:
       docker_image: ${{ env.tag }}
@@ -35,7 +50,7 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_PASSWORD: ${{ needs.generate_postgres_password.outputs.POSTGRES_PASSWORD }}
           POSTGRES_DB: dqt
         options: >-
           --health-cmd pg_isready
@@ -47,6 +62,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Extract configuration from tfvars
+      id: config
+      run: |
+        KEY_VAULT_NAME=$(jq -r '.key_vault_name' $TFVARS)
+        if [ -z "$KEY_VAULT_NAME" ]; then
+          echo "::error ::Failed to extract key_vault_name from $TFVARS"
+          exit 1
+        fi
+        echo "key_vault_name=$KEY_VAULT_NAME" >> $GITHUB_ENV
+      env:
+        TFVARS: dev.tfvars.json
+      shell: bash
+      working-directory: terraform
+
+    - uses: Azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - uses: actions/setup-dotnet@v2
       with:
@@ -63,20 +96,40 @@ jobs:
       run: dotnet build --configuration Release
       working-directory: DqtApi
 
+    - uses: Azure/get-keyvault-secrets@v1
+      id: get_secrets
+      with:
+        keyvault: ${{ env.key_vault_name }}
+        secrets: 'INTEGRATION-TEST-CONFIG'
+
+    - name: Set secret environment variables
+      id: set_outputs
+      run: |
+        SECRET_KEYS=($(jq -r <<< "$SECRETS_JSON" | jq -r 'keys | @sh' | tr -d \'))
+        for s in "${SECRET_KEYS[@]}"
+        do
+          SECRET=$(jq -r .${s} <<< "$SECRETS_JSON")
+          echo "::add-mask::$SECRET"
+          echo ${s}=$SECRET >> $GITHUB_ENV
+        done
+      env:
+        SECRETS_JSON: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
+      shell: bash
+
     - name: Tests
       uses: ./.github/workflows/actions/test
       with:
         test_project_path: DqtApi/tests/DqtApi.Tests
         report_name: "Test results"
         dotnet_test_args: >-
-          -e IntegrationTests_CrmUrl="${{ secrets.INTEGRATIONTESTS_CRMURL }}"
-          -e IntegrationTests_CrmClientId="${{ secrets.INTEGRATIONTESTS_CRMCLIENTID }}"
-          -e IntegrationTests_CrmClientSecret="${{ secrets.INTEGRATIONTESTS_CRMCLIENTSECRET }}"
-          -e IntegrationTests_BuildEnvLockBlobUri="${{ secrets.INTEGRATIONTESTS_BUILDENVLOCKBLOBURI }}"
-          -e IntegrationTests_BuildEnvLockBlobSasToken="${{ secrets.INTEGRATIONTESTS_BUILDENVLOCKBLOBSASTOKEN }}"
-          -e IntegrationTests_TrnGenerationApi__BaseAddress="${{ secrets.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIBASEADDRESS }}"
-          -e IntegrationTests_TrnGenerationApi__ApiKey="${{ secrets.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIAPIKEY }}"
-          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=${{ secrets.POSTGRES_PASSWORD }};Database=dqt"
+          -e IntegrationTests_CrmUrl="${{ env.INTEGRATIONTESTS_CRMURL }}"
+          -e IntegrationTests_CrmClientId="${{ env.INTEGRATIONTESTS_CRMCLIENTID }}"
+          -e IntegrationTests_CrmClientSecret="${{ env.INTEGRATIONTESTS_CRMCLIENTSECRET }}"
+          -e IntegrationTests_BuildEnvLockBlobUri="${{ env.INTEGRATIONTESTS_BUILDENVLOCKBLOBURI }}"
+          -e IntegrationTests_BuildEnvLockBlobSasToken="${{ env.INTEGRATIONTESTS_BUILDENVLOCKBLOBSASTOKEN }}"
+          -e IntegrationTests_TrnGenerationApi__BaseAddress="${{ env.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIBASEADDRESS }}"
+          -e IntegrationTests_TrnGenerationApi__ApiKey="${{ env.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIAPIKEY }}"
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=${{ needs.generate_postgres_password.outputs.POSTGRES_PASSWORD }};Database=dqt"
 
     # TODO Use migration bundles when https://github.com/dotnet/efcore/issues/25555 is fixed
     - name: Generate migrations artifact
