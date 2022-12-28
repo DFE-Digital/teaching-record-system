@@ -63,7 +63,8 @@ namespace DqtApi.V2.Handlers
                     AgeRangeFrom = request.InitialTeacherTraining.AgeRangeFrom.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeFrom.Value) : null,
                     AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null,
                     IttQualificationValue = request.InitialTeacherTraining.IttQualificationType?.GetIttQualificationValue(),
-                    IttQualificationAim = request.InitialTeacherTraining.IttQualificationAim?.ConvertToIttQualficationAim()
+                    IttQualificationAim = request.InitialTeacherTraining.IttQualificationAim?.ConvertToIttQualficationAim(),
+                    TrainingCountryCode = request.InitialTeacherTraining.TrainingCountryCode
                 },
                 Qualification = request.Qualification != null ?
                     new UpdateTeacherCommandQualification()
@@ -157,6 +158,11 @@ namespace DqtApi.V2.Handlers
                 UpdateTeacherFailedReasons.IttProviderNotFound,
                 $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}",
                 ErrorRegistry.OrganisationNotFound().Title);
+
+            ConsumeReason(
+                UpdateTeacherFailedReasons.TrainingCountryNotFound,
+                $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.TrainingCountryCode)}",
+                ErrorRegistry.CountryNotFound().Title);
 
             ConsumeReason(
                 UpdateTeacherFailedReasons.DuplicateHusId,

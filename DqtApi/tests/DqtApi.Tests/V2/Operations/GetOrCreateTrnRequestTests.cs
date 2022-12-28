@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading;
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql.Models;
@@ -637,6 +636,35 @@ namespace DqtApi.Tests.V2.Operations
                 req.QtsDate = new DateOnly(2020, 10, 10);
                 req.RecognitionRoute = DqtApi.V2.Requests.CreateTeacherRecognitionRoute.Scotland;
                 req.InductionRequired = false;
+            });
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+            ApiFixture.DataverseAdapter.Verify();
+        }
+
+        [Fact]
+        public async Task Given_valid_InternationalQualifiedTeacherStatus_request_passes_request_to_DataverseAdapter_successfully()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var teacherId = Guid.NewGuid();
+            var trn = "1234567";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+                .Verifiable();
+
+            var request = CreateRequest(req =>
+            {
+                req.TeacherType = DqtApi.V2.Requests.CreateTeacherType.TraineeTeacher;
+                req.InitialTeacherTraining.ProgrammeType = IttProgrammeType.InternationalQualifiedTeacherStatus;
+                req.InitialTeacherTraining.IttQualificationType = IttQualificationType.InternationalQualifiedTeacherStatus;
+                req.InitialTeacherTraining.TrainingCountryCode = "SC";
             });
 
             // Act

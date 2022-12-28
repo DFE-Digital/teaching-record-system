@@ -13,6 +13,7 @@ namespace DqtApi.Tests
         public async Task<CreatePersonResult> CreatePerson(
             bool earlyYears = false,
             bool assessmentOnly = false,
+            bool iqts = false,
             bool withQualification = false,
             bool withActiveSanction = false)
         {
@@ -29,7 +30,8 @@ namespace DqtApi.Tests
             var nino = Faker.Identification.UkNationalInsuranceNumber();
             var email = Faker.Internet.Email();
 
-            var programmeType = earlyYears ? dfeta_ITTProgrammeType.EYITTAssessmentOnly :
+            var programmeType = iqts ? dfeta_ITTProgrammeType.Internationalqualifiedteacherstatus :
+                earlyYears ? dfeta_ITTProgrammeType.EYITTAssessmentOnly :
                 assessmentOnly ? dfeta_ITTProgrammeType.AssessmentOnlyRoute :
                 dfeta_ITTProgrammeType.RegisteredTeacherProgramme;
 

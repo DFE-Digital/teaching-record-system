@@ -127,13 +127,19 @@ namespace DqtApi.V2.Validators
 
             RuleFor(r => r.InitialTeacherTraining.IttQualificationType)
                 .IsInEnum()
-                .When(r => r.InitialTeacherTraining != null);
+                    .When(r => r.InitialTeacherTraining != null)
+                 .Must(qt => qt != IttQualificationType.InternationalQualifiedTeacherStatus)
+                    .When(r => r.InitialTeacherTraining != null && r.InitialTeacherTraining.ProgrammeType != IttProgrammeType.InternationalQualifiedTeacherStatus);
+
+            Func<GetOrCreateTrnRequest, bool> trainingCountryRequired = r =>
+                r.TeacherType == CreateTeacherType.OverseasQualifiedTeacher || r.InitialTeacherTraining.ProgrammeType == IttProgrammeType.InternationalQualifiedTeacherStatus;
 
             RuleFor(r => r.InitialTeacherTraining.TrainingCountryCode)
-                .Null()
-                    .When(r => r.InitialTeacherTraining != null && r.TeacherType == CreateTeacherType.TraineeTeacher, ApplyConditionTo.CurrentValidator)
-                .NotNull()
-                    .When(r => r.InitialTeacherTraining != null && r.TeacherType == CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator);
+                .Empty()
+                    .When(r => !trainingCountryRequired(r), ApplyConditionTo.CurrentValidator)
+                .NotEmpty()
+                    .When(trainingCountryRequired, ApplyConditionTo.CurrentValidator)
+                .When(r => r.InitialTeacherTraining != null, ApplyConditionTo.AllValidators);
 
             RuleFor(r => r.Qualification.Class)
                 .IsInEnum()
