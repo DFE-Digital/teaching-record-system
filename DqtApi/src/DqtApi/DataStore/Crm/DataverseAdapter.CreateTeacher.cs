@@ -569,15 +569,15 @@ namespace DqtApi.DataStore.Crm
                             CacheKeys.GetIttProviderOrganizationByUkprnKey(ukprn),
                             () => _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, true, columnNames: Array.Empty<string>(), requestBuilder)
                                 .ContinueWith(t => t.Result.SingleOrDefault()))) :
-                    Let(
-                        DeriveIttProviderNameForOverseasQualifiedTeacher(),
-                        providerName => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
-                            CacheKeys.GetIttProviderOrganizationByNameKey(providerName),
-                            () => _dataverseAdapter.GetIttProviderOrganizationsByName(providerName, true, columnNames: Array.Empty<string>(), requestBuilder)
-                                .ContinueWith(t => t.Result.SingleOrDefault())));
+                Let(
+                    DeriveIttProviderNameForOverseasQualifiedTeacher(),
+                    providerName => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
+                        CacheKeys.GetIttProviderOrganizationByNameKey(providerName),
+                        () => _dataverseAdapter.GetIttProviderOrganizationsByName(providerName, true, columnNames: Array.Empty<string>(), requestBuilder)
+                            .ContinueWith(t => t.Result.SingleOrDefault())));
 
                 var getIttCountryTask = Let(
-                    _command.TeacherType == CreateTeacherType.TraineeTeacher ?
+                    string.IsNullOrEmpty(_command.InitialTeacherTraining.TrainingCountryCode) ?
                         "XK" :  // XK == 'United Kingdom'
                         _command.InitialTeacherTraining.TrainingCountryCode,
                     country => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(

@@ -1124,6 +1124,7 @@
           "TeachFirstTNP",
           "TroopsToTeach",
           "OTTRecognition",
+          "InternationalQualifiedTeacherStatus",
           "GTP",
           "RTP",
           "OTT",
@@ -1325,6 +1326,10 @@
           },
           "ittQualificationAim": {
             "$ref": "#/components/schemas/IttQualificationAim"
+          },
+          "trainingCountryCode": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

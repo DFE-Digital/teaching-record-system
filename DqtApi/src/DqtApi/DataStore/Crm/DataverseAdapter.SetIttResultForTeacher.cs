@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 
 namespace DqtApi.DataStore.Crm
@@ -142,10 +141,12 @@ namespace DqtApi.DataStore.Crm
                 }
                 else
                 {
-                    var teacherStatus = await GetTeacherStatus(
-                        itt.dfeta_ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
-                            "100" :  // 100 == 'Qualified Teacher: Assessment Only Route'
-                            "71");  // 71 == 'Qualified teacher (trained)'
+                    var teacherStatus = await GetTeacherStatus(itt.dfeta_ProgrammeType switch
+                    {
+                        dfeta_ITTProgrammeType.Internationalqualifiedteacherstatus => "90",  // Qualified teacher: by virtue of achieving international qualified teacher status
+                        dfeta_ITTProgrammeType.AssessmentOnlyRoute => "100",  // 'Qualified Teacher: Assessment Only Route'
+                        _ => "71"  // 'Qualified teacher (trained)'
+                    });
                     Debug.Assert(teacherStatus != null);
 
                     qtsUpdate.dfeta_TeacherStatusId = teacherStatus.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
