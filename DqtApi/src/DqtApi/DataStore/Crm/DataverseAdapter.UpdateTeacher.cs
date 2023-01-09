@@ -301,18 +301,16 @@ namespace DqtApi.DataStore.Crm
 
             public dfeta_initialteachertraining CreateInitialTeacherTrainingEntity(UpdateTeacherReferenceLookupResult referenceData, Guid? id)
             {
-                Debug.Assert(referenceData.IttCountryId.HasValue);
                 Debug.Assert(referenceData.IttProviderId.HasValue);
                 Debug.Assert(referenceData.IttSubject1Id.HasValue);
-                Debug.Assert(referenceData.IttSubject2Id.HasValue);
 
                 var cohortYear = _command.InitialTeacherTraining.ProgrammeEndDate?.Year.ToString();
                 var result = _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ? dfeta_ITTResult.UnderAssessment : dfeta_ITTResult.InTraining;
+
                 var entity = new dfeta_initialteachertraining()
                 {
                     Id = id ?? Guid.NewGuid(),
                     dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
-                    dfeta_CountryId = referenceData.IttCountryId.Value.ToEntityReference(dfeta_country.EntityLogicalName),
                     dfeta_EstablishmentId = referenceData.IttProviderId.Value.ToEntityReference(Account.EntityLogicalName),
                     dfeta_ProgrammeStartDate = _command.InitialTeacherTraining.ProgrammeStartDate?.ToDateTime(),
                     dfeta_ProgrammeEndDate = _command.InitialTeacherTraining.ProgrammeEndDate?.ToDateTime(),
@@ -329,10 +327,16 @@ namespace DqtApi.DataStore.Crm
                     dfeta_ittqualificationaim = _command.InitialTeacherTraining.IttQualificationAim
                 };
 
+                if (referenceData.IttCountryId is Guid countryId)
+                {
+                    entity.dfeta_CountryId = countryId.ToEntityReference(dfeta_country.EntityLogicalName);
+                }
+
                 if (id.HasValue)
                 {
                     entity.Attributes.Remove(dfeta_initialteachertraining.Fields.dfeta_Result);
                 }
+
                 return entity;
             }
 
@@ -394,6 +398,11 @@ namespace DqtApi.DataStore.Crm
                     failedReasons |= UpdateTeacherFailedReasons.IttQualificationNotFound;
                 }
 
+                if (referenceData.IttCountryId == null && !string.IsNullOrEmpty(_command.InitialTeacherTraining.TrainingCountryCode))
+                {
+                    failedReasons |= UpdateTeacherFailedReasons.TrainingCountryNotFound;
+                }
+
                 if (referenceData.QualificationId == null)
                 {
                     failedReasons |= UpdateTeacherFailedReasons.QualificationNotFound;
@@ -436,7 +445,6 @@ namespace DqtApi.DataStore.Crm
             {
                 Debug.Assert(!string.IsNullOrEmpty(_command.InitialTeacherTraining.ProviderUkprn));
                 Debug.Assert(!string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject1));
-                Debug.Assert(!string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject2));
 
                 var getTeacherTask = _dataverseAdapter.GetTeacher(
                     TeacherId,
@@ -490,11 +498,13 @@ namespace DqtApi.DataStore.Crm
                         () => _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, true, columnNames: Array.Empty<string>(), requestBuilder)
                             .ContinueWith(t => t.Result.SingleOrDefault())));
 
-                var getIttCountryTask = Let(
-                    "XK",  // XK == 'United Kingdom'
-                    country => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
-                        CacheKeys.GetCountryKey(country),
-                        () => _dataverseAdapter.GetCountry(country, requestBuilder)));
+                var getIttCountryTask = !string.IsNullOrEmpty(_command.InitialTeacherTraining.TrainingCountryCode) ?
+                    Let(
+                        _command.InitialTeacherTraining.TrainingCountryCode,
+                        country => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
+                            CacheKeys.GetCountryKey(country),
+                            () => _dataverseAdapter.GetCountry(country, requestBuilder))) :
+                    null;
 
                 var getSubject1Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject1) ?
                     Let(

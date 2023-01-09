@@ -1,5 +1,6 @@
 ﻿using DqtApi.DataStore.Crm.Models;
 using DqtApi.Properties;
+using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
 using FluentValidation;
 
@@ -46,7 +47,9 @@ namespace DqtApi.V2.Validators
                 });
 
             RuleFor(r => r.InitialTeacherTraining.IttQualificationType)
-                .IsInEnum();
+                .IsInEnum()
+                .Must(qt => qt != ApiModels.IttQualificationType.InternationalQualifiedTeacherStatus)
+                    .When(r => r.InitialTeacherTraining.ProgrammeType != ApiModels.IttProgrammeType.InternationalQualifiedTeacherStatus);
 
             RuleFor(r => r.Qualification.Class)
                 .IsInEnum()
@@ -66,6 +69,11 @@ namespace DqtApi.V2.Validators
 
             RuleFor(r => r.InitialTeacherTraining.IttQualificationAim)
                 .IsInEnum();
+
+            RuleFor(r => r.InitialTeacherTraining.TrainingCountryCode)
+                .Empty()
+                    .When(r => r.InitialTeacherTraining.ProgrammeType != IttProgrammeType.InternationalQualifiedTeacherStatus, ApplyConditionTo.CurrentValidator)
+                .When(r => r.InitialTeacherTraining != null, ApplyConditionTo.AllValidators);
         }
     }
 }

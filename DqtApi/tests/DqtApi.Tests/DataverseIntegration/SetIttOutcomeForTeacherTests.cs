@@ -66,14 +66,16 @@ namespace DqtApi.Tests.DataverseIntegration
         }
 
         [Theory]
-        [InlineData(true, "100")]
-        [InlineData(false, "71")]
+        [InlineData(true, false, "100")]
+        [InlineData(false, false, "71")]
+        [InlineData(false, true, "90")]
         public async Task Given_valid_request_with_Pass_result_for_qts_updates_qts_and_creates_induction(
             bool assessmentOnly,
+            bool iqtsProgrammeType,
             string expectedTeacherStatus)
         {
             // Arrange
-            var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, assessmentOnly);
+            var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, assessmentOnly, iqts: iqtsProgrammeType);
 
             var ittResult = dfeta_ITTResult.Pass;
             var assessmentDate = _clock.Today;
