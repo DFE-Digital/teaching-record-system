@@ -328,6 +328,15 @@ namespace DqtApi
                 }
             }
 
+            if (env.IsProduction())
+            {
+                using (var scope = app.Services.CreateScope())
+                {
+                    var clientPolicyStore = scope.ServiceProvider.GetRequiredService<IClientPolicyStore>();
+                    clientPolicyStore.SeedAsync().GetAwaiter().GetResult();
+                }
+            }
+
             app.Run();
 
             ServiceClient GetCrmServiceClient()
@@ -357,6 +366,7 @@ namespace DqtApi
             void ConfigureRateLimitServices()
             {
                 services.Configure<ClientRateLimitOptions>(configuration.GetSection("ClientRateLimiting"));
+                services.Configure<ClientRateLimitPolicies>(configuration.GetSection("ClientRateLimitPolicies"));
 
                 services.AddDistributedRateLimiting<AsyncKeyLockProcessingStrategy>();
                 services.AddDistributedRateLimiting<RedisProcessingStrategy>();
