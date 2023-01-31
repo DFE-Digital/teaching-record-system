@@ -161,23 +161,42 @@ namespace DqtApi.DataStore.Crm
 
         public Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
             Guid teacherId,
-            string[] columnNames) =>
-                GetInitialTeacherTrainingByTeacher(teacherId, columnNames, requestBuilder: null);
+            string[] columnNames,
+            string[] establishmentColumnNames = null) =>
+                GetInitialTeacherTrainingByTeacher(teacherId, columnNames, establishmentColumnNames, requestBuilder: null);
 
         public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
             Guid teacherId,
             string[] columnNames,
+            string[] establishmentColumnNames,
             RequestBuilder requestBuilder)
         {
             requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
-            var query = new QueryByAttribute(dfeta_initialteachertraining.EntityLogicalName)
+            var query = new QueryExpression(dfeta_initialteachertraining.EntityLogicalName)
             {
                 ColumnSet = new(columnNames)
             };
 
-            query.AddAttributeValue(dfeta_initialteachertraining.Fields.dfeta_PersonId, teacherId);
-            query.AddAttributeValue(dfeta_initialteachertraining.Fields.StateCode, (int)dfeta_initialteachertrainingState.Active);
+            query.Criteria.AddCondition(dfeta_initialteachertraining.Fields.dfeta_PersonId, ConditionOperator.Equal, teacherId);
+            query.Criteria.AddCondition(dfeta_initialteachertraining.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_initialteachertrainingState.Active);
+
+            if (establishmentColumnNames?.Length > 0)
+            {
+                var establishmentLink = query.AddLink(
+                    Account.EntityLogicalName,
+                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                    Account.PrimaryIdAttribute,
+                    JoinOperator.Inner);
+
+                establishmentLink.Columns = new ColumnSet(establishmentColumnNames);
+
+                establishmentLink.EntityAlias = "establishment";
+
+                var filter = new FilterExpression();
+                filter.AddCondition(Account.Fields.StateCode, ConditionOperator.Equal, (int)AccountState.Active);
+                establishmentLink.LinkCriteria = filter;
+            }
 
             var request = new RetrieveMultipleRequest()
             {

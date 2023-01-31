@@ -14,7 +14,7 @@ namespace DqtApi.DataStore.Crm
 
         Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(Guid earlyYearsStatusId);
 
-        Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(Guid teacherId, string[] columnNames);
+        Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(Guid teacherId, string[] columnNames, string[] establishmentColumnNames);
 
         Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, string[] columnNames);
 

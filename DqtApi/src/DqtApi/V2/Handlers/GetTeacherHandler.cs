@@ -8,6 +8,7 @@ using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
 using DqtApi.Validation;
 using MediatR;
+using Microsoft.Crm.Sdk.Messages;
 
 namespace DqtApi.V2.Handlers
 {
@@ -66,12 +67,18 @@ namespace DqtApi.V2.Handlers
 
             var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 teacher.Id,
-                columnNames: new string[]
+                columnNames: new[]
                 {
                     dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
                     dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
                     dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
-                    dfeta_initialteachertraining.Fields.dfeta_Result
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId
+                },
+                establishmentColumnNames: new[]
+                {
+                    Account.PrimaryIdAttribute,
+                    Account.Fields.dfeta_UKPRN
                 });
 
             return new GetTeacherResponse()
@@ -96,7 +103,11 @@ namespace DqtApi.V2.Handlers
                     ProgrammeEndDate = i.dfeta_ProgrammeEndDate.ToDateOnly(),
                     ProgrammeStartDate = i.dfeta_ProgrammeStartDate.ToDateOnly(),
                     ProgrammeType = i.dfeta_ProgrammeType?.ToString(),
-                    Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null
+                    Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
+                    Provider = new()
+                    {
+                        Ukprn = i.Extract<Account>("establishment", Account.PrimaryIdAttribute).dfeta_UKPRN
+                    }
                 })
             };
         }

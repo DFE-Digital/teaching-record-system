@@ -916,6 +916,19 @@
           },
           "result": {
             "$ref": "#/components/schemas/IttOutcome"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingProvider"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseInitialTeacherTrainingProvider": {
+        "type": "object",
+        "properties": {
+          "ukprn": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
