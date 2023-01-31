@@ -680,7 +680,7 @@ namespace DqtApi.DataStore.Crm
                     Task.FromResult<dfeta_teacherstatus>(null);
 
                 var existingTeachersWithHusIdTask = !string.IsNullOrEmpty(_command.HusId) ?
-                    _dataverseAdapter.GetTeachersByHusId(_command.HusId) :
+                    _dataverseAdapter.GetTeachersByHusId(_command.HusId, columnNames: Array.Empty<string>()) :
                     Task.FromResult<Contact[]>(null);
 
                 var lookupTasks = new Task[]

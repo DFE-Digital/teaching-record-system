@@ -14,33 +14,33 @@ namespace DqtApi.DataStore.Crm
 
         Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(Guid earlyYearsStatusId);
 
-        Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(Guid teacherId, params string[] columnNames);
+        Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(Guid teacherId, string[] columnNames, string[] establishmentColumnNames);
 
-        Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, params string[] columnNames);
+        Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, string[] columnNames);
 
-        Task<Contact> GetTeacher(Guid teacherId, bool resolveMerges = true, params string[] columnNames);
+        Task<Contact> GetTeacher(Guid teacherId, string[] columnNames, bool resolveMerges = true);
 
-        Task<Contact[]> GetTeachersByTrn(string trn, bool activeOnly = true, params string[] columnNames);
+        Task<Contact[]> GetTeachersByTrn(string trn, string[] columnNames, bool activeOnly = true);
 
-        Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, bool activeOnly = true, params string[] columnNames);
+        Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, string[] columnNames, bool activeOnly = true);
 
-        Task<Contact> GetTeacherByTsPersonId(string tsPersonId, params string[] columnNames);
+        Task<Contact> GetTeacherByTsPersonId(string tsPersonId, string[] columnNames);
 
-        Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(Guid teacherId, params string[] columnNames);
+        Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(Guid teacherId, string[] columnNames);
 
         Task<Contact[]> FindTeachers(FindTeachersQuery query);
 
         Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);
 
-        Task<Account[]> GetIttProviderOrganizationsByName(string ukprn, bool activeOnly, params string[] columnNames);
+        Task<Account[]> GetIttProviderOrganizationsByName(string ukprn, string[] columnNames, bool activeOnly);
 
-        Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, bool activeOnly, params string[] columnNames);
+        Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, string[] columnNames, bool activeOnly);
 
-        Task<Account[]> GetOrganizationsByName(string providerName, bool activeOnly, params string[] columnNames);
+        Task<Account[]> GetOrganizationsByName(string providerName, string[] columnNames, bool activeOnly);
 
-        Task<Account[]> GetOrganizationsByUkprn(string ukprn, params string[] columnNames);
+        Task<Account[]> GetOrganizationsByUkprn(string ukprn, string[] columnNames);
 
-        Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, params string[] columnNames);
+        Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames);
 
         Task<SetIttResultForTeacherResult> SetIttResultForTeacher(
             Guid teacherId,
@@ -52,6 +52,6 @@ namespace DqtApi.DataStore.Crm
 
         Task<bool> UnlockTeacherRecord(Guid teacherId);
 
-        Task<Contact[]> GetTeachersByHusId(string husId, params string[] columnNames);
+        Task<Contact[]> GetTeachersByHusId(string husId, string[] columnNames);
     }
 }

@@ -25,7 +25,7 @@ namespace DqtApi.Tests.V2.Operations
             var dob = new DateOnly(1987, 1, 1);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(Array.Empty<Contact>());
 
             var requestBody = new SetIttOutcomeRequest()
@@ -59,7 +59,7 @@ namespace DqtApi.Tests.V2.Operations
             var teacher2 = new Contact() { dfeta_TRN = trn };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(new[] { teacher1, teacher2 });
 
             var requestBody = new SetIttOutcomeRequest()
@@ -246,7 +246,7 @@ namespace DqtApi.Tests.V2.Operations
             var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(new[] { contact });
 
             ApiFixture.DataverseAdapter
@@ -294,7 +294,7 @@ namespace DqtApi.Tests.V2.Operations
             var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(new[] { contact });
 
             ApiFixture.DataverseAdapter

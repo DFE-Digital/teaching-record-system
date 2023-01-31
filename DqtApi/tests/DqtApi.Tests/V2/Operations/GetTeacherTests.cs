@@ -5,6 +5,7 @@ using DqtApi.Properties;
 using DqtApi.TestCommon;
 using DqtApi.V2.ApiModels;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Xrm.Sdk;
 using Moq;
 using Xunit;
 
@@ -41,7 +42,7 @@ namespace DqtApi.Tests.V2.Operations
 
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrn(trn, true, It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), true))
                 .ReturnsAsync(Array.Empty<Contact>());
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
@@ -72,6 +73,7 @@ namespace DqtApi.Tests.V2.Operations
             var ittEndDate = new DateOnly(2022, 7, 29);
             var ittProgrammeType = IttProgrammeType.EYITTGraduateEntry;
             var ittResult = IttOutcome.Pass;
+            var ittProviderUkprn = "12345";
 
             var contact = new Contact()
             {
@@ -107,9 +109,11 @@ namespace DqtApi.Tests.V2.Operations
                 dfeta_ProgrammeType = ittProgrammeType.ConvertToIttProgrammeType(),
                 dfeta_Result = ittResult.ConvertToITTResult()
             };
+            itt.Attributes.Add($"establishment.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, Guid.NewGuid()));
+            itt.Attributes.Add($"establishment.{Account.Fields.dfeta_UKPRN}", new AliasedValue(Account.EntityLogicalName, Account.Fields.dfeta_UKPRN, ittProviderUkprn));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrn(trn, true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(new[] { contact });
 
             ApiFixture.DataverseAdapter
@@ -121,7 +125,10 @@ namespace DqtApi.Tests.V2.Operations
                 .ReturnsAsync(earlyYearsStatus);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(teacherId, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
+                    teacherId,
+                    /* columnNames: */ It.IsAny<string[]>(),
+                    /*establishmentColumnNames: */It.IsAny<string[]>()))
                 .ReturnsAsync(new[] { itt });
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
@@ -154,7 +161,11 @@ namespace DqtApi.Tests.V2.Operations
                             programmeStartDate = ittStartDate.ToString("yyyy-MM-dd"),
                             programmeEndDate = ittEndDate.ToString("yyyy-MM-dd"),
                             programmeType = ittProgrammeType.ToString(),
-                            result = ittResult.ToString()
+                            result = ittResult.ToString(),
+                            provider = new
+                            {
+                                ukprn = ittProviderUkprn
+                            }
                         }
                     }
                 });

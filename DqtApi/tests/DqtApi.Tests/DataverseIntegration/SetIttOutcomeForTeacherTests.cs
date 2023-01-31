@@ -61,7 +61,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             transactionRequest.AssertDoesNotContainUpdateRequest<dfeta_induction>();
 
-            var teacher = await _dataverseAdapter.GetTeacher(createPersonResult.TeacherId, columnNames: Contact.Fields.dfeta_EYTSDate);
+            var teacher = await _dataverseAdapter.GetTeacher(createPersonResult.TeacherId, columnNames: new[] { Contact.Fields.dfeta_EYTSDate });
             Assert.Equal(assessmentDate.ToDateTime(), teacher.dfeta_EYTSDate);
         }
 
@@ -106,7 +106,7 @@ namespace DqtApi.Tests.DataverseIntegration
             Assert.Equal(createPersonResult.TeacherId, induction.dfeta_PersonId?.Id);
             Assert.Equal(dfeta_InductionStatus.RequiredtoComplete, induction.dfeta_InductionStatus);
 
-            var teacher = await _dataverseAdapter.GetTeacher(createPersonResult.TeacherId, columnNames: Contact.Fields.dfeta_QTSDate);
+            var teacher = await _dataverseAdapter.GetTeacher(createPersonResult.TeacherId, columnNames: new[] { Contact.Fields.dfeta_QTSDate });
             Assert.Equal(assessmentDate.ToDateTime(), teacher.dfeta_QTSDate);
         }
 

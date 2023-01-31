@@ -29,7 +29,7 @@ namespace DqtApi.V2.Handlers
         {
             await using var trnLock = await _distributedLockService.AcquireLock(request.Trn, _lockTimeout);
 
-            var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, activeOnly: true)).ToArray();
+            var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
 
             if (teachers.Length == 0)
             {

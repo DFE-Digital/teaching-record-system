@@ -26,7 +26,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var ukprn = "10044534";
 
             // Act
-            var result = await _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: Account.Fields.dfeta_UKPRN);
+            var result = await _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: new[] { Account.Fields.dfeta_UKPRN });
 
             // Assert
             Assert.Collection(
@@ -41,7 +41,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var ukprn = "xxx";
 
             // Act
-            var result = await _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: Account.Fields.dfeta_UKPRN);
+            var result = await _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: new[] { Account.Fields.dfeta_UKPRN });
 
             // Assert
             Assert.Empty(result);

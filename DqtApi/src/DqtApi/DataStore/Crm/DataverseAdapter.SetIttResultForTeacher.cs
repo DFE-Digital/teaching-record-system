@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Xrm.Sdk.Messages;
 
@@ -251,7 +252,7 @@ namespace DqtApi.DataStore.Crm
                         Contact.Fields.dfeta_TRN
                     });
 
-                var getIttProviderTask = _dataverseAdapter.GetIttProviderOrganizationsByUkprn(_ittProviderUkprn, activeOnly: true)
+                var getIttProviderTask = _dataverseAdapter.GetIttProviderOrganizationsByUkprn(_ittProviderUkprn, columnNames: Array.Empty<string>(), activeOnly: true)
                     .ContinueWith(t => t.Result.SingleOrDefault());
 
                 var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
