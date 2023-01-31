@@ -73,7 +73,7 @@ namespace DqtApi.Tests.V2.Operations
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubject2NotFound));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
             // Act
@@ -99,7 +99,7 @@ namespace DqtApi.Tests.V2.Operations
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubject3NotFound));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
             // Act
@@ -126,7 +126,7 @@ namespace DqtApi.Tests.V2.Operations
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingIttRecord));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
             // Act
@@ -153,7 +153,7 @@ namespace DqtApi.Tests.V2.Operations
                     .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject1NotFound));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             // Act
@@ -180,7 +180,7 @@ namespace DqtApi.Tests.V2.Operations
                     .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject2NotFound));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             // Act
@@ -207,7 +207,7 @@ namespace DqtApi.Tests.V2.Operations
                     .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject3NotFound));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             // Act
@@ -234,7 +234,7 @@ namespace DqtApi.Tests.V2.Operations
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.IttQualificationNotFound));
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             var request = CreateRequest(req => req.InitialTeacherTraining.IttQualificationType = ittQualificationType);
@@ -259,7 +259,7 @@ namespace DqtApi.Tests.V2.Operations
             var dob = new DateOnly(1987, 01, 01);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             ApiFixture.DataverseAdapter
@@ -286,7 +286,7 @@ namespace DqtApi.Tests.V2.Operations
             var dob = new DateOnly(1987, 01, 01);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             ApiFixture.DataverseAdapter
@@ -313,7 +313,7 @@ namespace DqtApi.Tests.V2.Operations
             var trn = "xxx";
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             ApiFixture.DataverseAdapter
@@ -341,7 +341,7 @@ namespace DqtApi.Tests.V2.Operations
             var trn = "xxx";
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             ApiFixture.DataverseAdapter
@@ -368,7 +368,7 @@ namespace DqtApi.Tests.V2.Operations
             var dob = new DateOnly(1987, 01, 01);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             ApiFixture.DataverseAdapter
@@ -398,7 +398,7 @@ namespace DqtApi.Tests.V2.Operations
             var dob = new DateOnly(1987, 01, 01);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             ApiFixture.DataverseAdapter
@@ -450,7 +450,7 @@ namespace DqtApi.Tests.V2.Operations
             var dob = new DateOnly(1987, 01, 01);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(Array.Empty<Contact>());
 
             var requestBody = new UpdateTeacherRequest()
@@ -520,7 +520,7 @@ namespace DqtApi.Tests.V2.Operations
             };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
             var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}")
@@ -546,7 +546,7 @@ namespace DqtApi.Tests.V2.Operations
             var dob = new DateOnly(1987, 01, 01);
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                     .ReturnsAsync(contactList);
 
             ApiFixture.DataverseAdapter

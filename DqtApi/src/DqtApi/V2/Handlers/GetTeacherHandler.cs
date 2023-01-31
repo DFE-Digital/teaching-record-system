@@ -24,7 +24,6 @@ namespace DqtApi.V2.Handlers
         {
             var teachers = await _dataverseAdapter.GetTeachersByTrn(
                 request.Trn,
-                activeOnly: true,
                 columnNames: new[]
                 {
                     Contact.Fields.FirstName,
@@ -35,7 +34,8 @@ namespace DqtApi.V2.Handlers
                     Contact.Fields.dfeta_ActiveSanctions,
                     Contact.Fields.dfeta_NINumber,
                     Contact.Fields.dfeta_TRN
-                });
+                },
+                activeOnly: true);
 
             if (teachers.Length == 0)
             {

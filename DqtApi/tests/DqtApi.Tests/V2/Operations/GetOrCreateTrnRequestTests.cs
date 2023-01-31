@@ -29,7 +29,7 @@ namespace DqtApi.Tests.V2.Operations
             var trn = "1234567";
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ true, It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
                 .ReturnsAsync(new Contact()
                 {
                     Id = teacherId,

@@ -41,7 +41,7 @@ namespace DqtApi.Tests.V2.Operations
 
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrn(trn, true, It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), true))
                 .ReturnsAsync(Array.Empty<Contact>());
 
             var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
@@ -109,7 +109,7 @@ namespace DqtApi.Tests.V2.Operations
             };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeachersByTrn(trn, true, /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(new[] { contact });
 
             ApiFixture.DataverseAdapter

@@ -161,7 +161,7 @@ namespace DqtApi.DataStore.Crm
 
         public Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
             Guid teacherId,
-            params string[] columnNames) =>
+            string[] columnNames) =>
                 GetInitialTeacherTrainingByTeacher(teacherId, columnNames, requestBuilder: null);
 
         public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
@@ -401,7 +401,7 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
-        public Task<Account[]> GetIttProviderOrganizationsByName(string name, bool activeOnly, params string[] columnNames) =>
+        public Task<Account[]> GetIttProviderOrganizationsByName(string name, string[] columnNames, bool activeOnly) =>
             GetIttProviderOrganizationsByName(name, activeOnly, columnNames, requestBuilder: null);
 
         public async Task<Account[]> GetIttProviderOrganizationsByName(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
@@ -431,7 +431,7 @@ namespace DqtApi.DataStore.Crm
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
         }
 
-        public Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, bool activeOnly, params string[] columnNames) =>
+        public Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, string[] columnNames, bool activeOnly) =>
             GetIttProviderOrganizationsByUkprn(ukprn, activeOnly, columnNames, requestBuilder: null);
 
         public async Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
@@ -459,7 +459,7 @@ namespace DqtApi.DataStore.Crm
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
         }
 
-        public Task<Account[]> GetOrganizationsByUkprn(string ukprn, params string[] columnNames) =>
+        public Task<Account[]> GetOrganizationsByUkprn(string ukprn, string[] columnNames) =>
             GetOrganizationsByUkprn(ukprn, columnNames, requestBuilder: null);
 
         public async Task<Account[]> GetOrganizationsByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
@@ -486,7 +486,7 @@ namespace DqtApi.DataStore.Crm
 
         public Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(
             Guid teacherId,
-            params string[] columnNames) =>
+            string[] columnNames) =>
                 GetQtsRegistrationsByTeacher(teacherId, columnNames, requestBuilder: null);
 
         public async Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(
@@ -514,7 +514,7 @@ namespace DqtApi.DataStore.Crm
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_qtsregistration>()).ToArray();
         }
 
-        public async Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, params string[] columnNames)
+        public async Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, string[] columnNames)
         {
             var filter = new FilterExpression();
             filter.AddCondition(dfeta_qualification.Fields.dfeta_PersonId, ConditionOperator.Equal, teacherId);
@@ -572,7 +572,7 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
-        public async Task<Contact> GetTeacher(Guid teacherId, bool resolveMerges = true, params string[] columnNames)
+        public async Task<Contact> GetTeacher(Guid teacherId, string[] columnNames, bool resolveMerges = true)
         {
             var columnSet = new ColumnSet(
                 columnNames
@@ -595,13 +595,13 @@ namespace DqtApi.DataStore.Crm
             while (resolveMerges && teacher.Merged == true)
             {
                 var masterReference = teacher.MasterId;
-                return await GetTeacher(masterReference.Id, resolveMerges, columnNames);
+                return await GetTeacher(masterReference.Id, columnNames, resolveMerges);
             }
 
             return teacher;
         }
 
-        public async Task<Contact[]> GetTeachersByTrn(string trn, bool activeOnly = true, params string[] columnNames)
+        public async Task<Contact[]> GetTeachersByTrn(string trn, string[] columnNames, bool activeOnly = true)
         {
             var filter = new FilterExpression(LogicalOperator.And);
             filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
@@ -621,7 +621,7 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
         }
 
-        public async Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, bool activeOnly = true, params string[] columnNames)
+        public async Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, string[] columnNames, bool activeOnly = true)
         {
             var filter = new FilterExpression(LogicalOperator.And);
             filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
@@ -642,7 +642,7 @@ namespace DqtApi.DataStore.Crm
             return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
         }
 
-        public Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, params string[] columnNames) =>
+        public Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames) =>
             GetCrmTasksForTeacher(teacherId, columnNames, requestBuilder: null);
 
         public async Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames, RequestBuilder requestBuilder)
@@ -665,7 +665,7 @@ namespace DqtApi.DataStore.Crm
             return result.EntityCollection.Entities.Select(entity => entity.ToEntity<CrmTask>()).ToArray();
         }
 
-        public async Task<Contact[]> GetTeachersByHusId(string husId, params string[] columnNames)
+        public async Task<Contact[]> GetTeachersByHusId(string husId, string[] columnNames)
         {
             var filter = new FilterExpression(LogicalOperator.And);
             filter.AddCondition(Contact.Fields.dfeta_HUSID, ConditionOperator.Equal, husId);
@@ -735,7 +735,7 @@ namespace DqtApi.DataStore.Crm
             }
         }
 
-        public Task<Account[]> GetOrganizationsByName(string name, bool activeOnly, params string[] columnNames) =>
+        public Task<Account[]> GetOrganizationsByName(string name, string[] columnNames, bool activeOnly) =>
             GetOrganizationsByName(name, activeOnly, columnNames, requestBuilder: null);
 
         public async Task<Account[]> GetOrganizationsByName(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
@@ -916,7 +916,7 @@ namespace DqtApi.DataStore.Crm
             return contacts.GroupBy(c => c.Id).Select(c => c.First()).ToArray();
         }
 
-        public async Task<Contact> GetTeacherByTsPersonId(string tsPersonId, params string[] columnNames)
+        public async Task<Contact> GetTeacherByTsPersonId(string tsPersonId, string[] columnNames)
         {
             var filter = new FilterExpression(LogicalOperator.And);
             filter.AddCondition(Contact.Fields.dfeta_TSPersonID, ConditionOperator.Equal, tsPersonId);

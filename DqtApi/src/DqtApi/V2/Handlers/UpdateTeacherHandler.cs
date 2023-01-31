@@ -36,7 +36,7 @@ namespace DqtApi.V2.Handlers
                 await _distributedLockService.AcquireLock(request.HusId, _lockTimeout) :
                 NoopAsyncDisposable.Instance;
 
-            var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, activeOnly: true)).ToArray();
+            var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
 
             if (teachers.Length == 0)
             {

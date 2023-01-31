@@ -23,7 +23,7 @@ namespace DqtApi.Tests.V2.Operations
             var teacherId = Guid.NewGuid();
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<bool>(), /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
                 .ReturnsAsync((Contact)null);
 
             var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
@@ -42,7 +42,7 @@ namespace DqtApi.Tests.V2.Operations
             var teacherId = Guid.NewGuid();
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<bool>(), /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
                 .ReturnsAsync(new Contact()
                 {
                     Id = teacherId,
@@ -80,7 +80,7 @@ namespace DqtApi.Tests.V2.Operations
             var teacherId = Guid.NewGuid();
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<bool>(), /* columnNames: */ It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
                 .ReturnsAsync(new Contact()
                 {
                     Id = teacherId,
@@ -115,7 +115,7 @@ namespace DqtApi.Tests.V2.Operations
             var teacher = new Contact() { dfeta_ActiveSanctions = true };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetTeacher(teacherId, It.IsAny<bool>(), It.IsAny<string[]>()))
+                .Setup(mock => mock.GetTeacher(teacherId, It.IsAny<string[]>(), It.IsAny<bool>()))
                 .ReturnsAsync(teacher);
 
             var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");

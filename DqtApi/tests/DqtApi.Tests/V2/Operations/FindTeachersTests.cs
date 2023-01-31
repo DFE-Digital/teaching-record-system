@@ -113,11 +113,11 @@ namespace DqtApi.Tests.V2.Operations
             var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 1, 1), dfeta_TRN = "someReference" };
 
             ApiFixture.DataverseAdapter
-                .Setup(mock => mock.GetIttProviderOrganizationsByName(It.IsAny<string>(), false))
+                .Setup(mock => mock.GetIttProviderOrganizationsByName(It.IsAny<string>(), It.IsAny<string[]>(), /*activeOnly: */false))
                 .ReturnsAsync(new[] { account });
 
             ApiFixture.DataverseAdapter
-                 .Setup(mock => mock.GetIttProviderOrganizationsByUkprn(It.IsAny<string>(), false))
+                 .Setup(mock => mock.GetIttProviderOrganizationsByUkprn(It.IsAny<string>(), It.IsAny<string[]>(), /*activeOnly: */false))
                  .ReturnsAsync(new[] { account });
 
             ApiFixture.DataverseAdapter

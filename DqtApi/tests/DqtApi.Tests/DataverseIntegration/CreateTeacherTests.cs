@@ -2,6 +2,7 @@
 using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using StackExchange.Redis;
 using Xunit;
 
 namespace DqtApi.Tests.DataverseIntegration
@@ -152,7 +153,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.True(result.Succeeded);
-            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(result.TeacherId);
+            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(result.TeacherId, columnNames: Array.Empty<string>());
             Assert.Collection(qualifications, qualification => Assert.Equal("Higher Degree", qualification.Extract<dfeta_hequalification>().dfeta_name));
         }
 
@@ -167,7 +168,7 @@ namespace DqtApi.Tests.DataverseIntegration
 
             // Assert
             Assert.True(result.Succeeded);
-            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(result.TeacherId);
+            var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(result.TeacherId, columnNames: Array.Empty<string>());
             Assert.Collection(qualifications, qualification => Assert.Equal("First Degree", qualification.Extract<dfeta_hequalification>().dfeta_name));
         }
 

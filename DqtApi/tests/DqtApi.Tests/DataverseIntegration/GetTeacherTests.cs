@@ -32,7 +32,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var teacherId = Guid.NewGuid();
 
             // Act
-            var result = await _dataverseAdapter.GetTeacher(teacherId, resolveMerges: false, Contact.Fields.StateCode);
+            var result = await _dataverseAdapter.GetTeacher(teacherId, new[] { Contact.Fields.StateCode }, resolveMerges: false);
 
             // Assert
             Assert.Null(result);
@@ -45,7 +45,7 @@ namespace DqtApi.Tests.DataverseIntegration
             var teacherId = await _organizationService.CreateAsync(new Contact());
 
             // Act
-            var result = await _dataverseAdapter.GetTeacher(teacherId, resolveMerges: false, Contact.Fields.StateCode);
+            var result = await _dataverseAdapter.GetTeacher(teacherId, new[] { Contact.Fields.StateCode }, resolveMerges: false);
 
             // Assert
             Assert.NotNull(result);
@@ -69,7 +69,7 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             // Act
-            var result = await _dataverseAdapter.GetTeacher(teacherId, resolveMerges: true, Contact.Fields.StateCode, Contact.Fields.FirstName);
+            var result = await _dataverseAdapter.GetTeacher(teacherId, new[] { Contact.Fields.FirstName }, resolveMerges: true);
 
             // Assert
             Assert.NotNull(result);
@@ -93,7 +93,7 @@ namespace DqtApi.Tests.DataverseIntegration
             });
 
             // Act
-            var result = await _dataverseAdapter.GetTeacher(teacherId, resolveMerges: false, Contact.Fields.StateCode);
+            var result = await _dataverseAdapter.GetTeacher(teacherId, new[] { Contact.Fields.StateCode }, resolveMerges: false);
 
             // Assert
             Assert.NotNull(result);
