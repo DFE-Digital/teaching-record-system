@@ -657,7 +657,6 @@ namespace DqtApi.DataStore.Crm
                     QualificationProviderId = getQualificationProviderTask?.Result?.Id,
                     Teacher = getTeacherTask.Result,
                     Itt = getIttRecordsTask.Result,
-                    QtsRegistrations = getQtsRegistrationsTask.Result,
                     Qualifications = getQualifications.Result,
                     TeacherHasActiveSanctions = getTeacherTask.Result?.dfeta_ActiveSanctions == true,
                     TeacherHusId = getTeacherTask.Result?.dfeta_HUSID,
@@ -682,7 +681,6 @@ namespace DqtApi.DataStore.Crm
             public Guid? EarlyYearsStatusId { get; set; }
             public Contact Teacher { get; set; }
             public IEnumerable<dfeta_initialteachertraining> Itt { get; set; }
-            public IEnumerable<dfeta_qtsregistration> QtsRegistrations { get; set; }
             public IEnumerable<dfeta_qualification> Qualifications { get; set; }
             public bool TeacherHasActiveSanctions { get; set; }
             public string TeacherHusId { get; set; }
