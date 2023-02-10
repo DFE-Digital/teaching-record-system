@@ -28,7 +28,7 @@ namespace DqtApi.V2.Responses
     {
         public DateOnly? ProgrammeStartDate { get; set; }
         public DateOnly? ProgrammeEndDate { get; set; }
-        public string ProgrammeType { get; set; }
+        public IttProgrammeType? ProgrammeType { get; set; }
         public IttOutcome? Result { get; set; }
         public GetTeacherResponseInitialTeacherTrainingProvider Provider { get; set; }
     }
