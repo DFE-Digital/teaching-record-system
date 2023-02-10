@@ -911,8 +911,7 @@
             "nullable": true
           },
           "programmeType": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/IttProgrammeType"
           },
           "result": {
             "$ref": "#/components/schemas/IttOutcome"
