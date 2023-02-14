@@ -13,5 +13,7 @@ namespace DqtApi.DataStore.Sql.Models
         public string ClientId { get; set; }
         public string RequestId { get; set; }
         public Guid? TeacherId { get; set; }
+        public Guid? IdentityUserId { get; set; }
+        public bool LinkedToIdentity { get; set; }
     }
 }

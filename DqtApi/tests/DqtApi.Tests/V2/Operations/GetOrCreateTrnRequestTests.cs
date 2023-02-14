@@ -5,6 +5,7 @@ using DqtApi.DataStore.Crm;
 using DqtApi.DataStore.Crm.Models;
 using DqtApi.DataStore.Sql.Models;
 using DqtApi.Properties;
+using DqtApi.Services.GetAnIdentityApi;
 using DqtApi.TestCommon;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
@@ -182,6 +183,73 @@ namespace DqtApi.Tests.V2.Operations
                 .Verifiable();
 
             var request = CreateRequest(req => req.Qualification = null);
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+        }
+
+        [Fact]
+        public async Task Given_request_with_non_existent_identityuser_returns_error()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var teacherId = Guid.NewGuid();
+            var trn = "1234567";
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+                .Verifiable();
+
+            ApiFixture.IdentityApiClient
+                .Setup(mock => mock.GetUserById(It.IsAny<Guid>()))
+                .ReturnsAsync(default(GetAnIdentityApiUser))
+                .Verifiable();
+
+            var request = CreateRequest(req =>
+            {
+                req.IdentityUserId = Guid.NewGuid();
+                req.Qualification = null;
+            });
+
+            // Act
+            var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
+
+            // Assert
+            Assert.False(response.IsSuccessStatusCode);
+            await AssertEx.ResponseIsValidationErrorForProperty(
+                response,
+                propertyName: nameof(GetOrCreateTrnRequest.IdentityUserId),
+                expectedError: Properties.StringResources.Errors_10022_Title);
+        }
+
+        [Fact]
+        public async Task Given_request_with_valid_existent_identityuser_returns_success()
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var teacherId = Guid.NewGuid();
+            var trn = "1234567";
+            var identityUserId = Guid.NewGuid();
+
+            ApiFixture.DataverseAdapter
+                .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+                .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+                .Verifiable();
+
+            ApiFixture.IdentityApiClient
+                .Setup(mock => mock.GetUserById(It.IsAny<Guid>()))
+                .ReturnsAsync(new GetAnIdentityApiUser() { UserId = identityUserId })
+                .Verifiable();
+
+            var request = CreateRequest(req =>
+            {
+                req.IdentityUserId = identityUserId;
+                req.Qualification = null;
+            });
 
             // Act
             var response = await HttpClient.PutAsync($"v2/trn-requests/{requestId}", request);
@@ -736,7 +804,8 @@ namespace DqtApi.Tests.V2.Operations
                     Subject2 = "X300", // Academic Studies in Education
                     Subject3 = "N400"  // Accounting
                 },
-                HusId = "1234567890123"
+                HusId = "1234567890123",
+                IdentityUserId = null
             };
 
             configureRequest?.Invoke(request);

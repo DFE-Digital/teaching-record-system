@@ -207,4 +207,7 @@
   <data name="Errors.10022.Title" xml:space="preserve">
     <value>Completed date cannot be before 1/11/2021</value>
   </data>
+  <data name="Errors.10023.Title" xml:space="preserve">
+    <value>User with specified UserId not found</value>
+  </data>
 </root>

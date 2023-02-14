@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using DqtApi.DataStore.Crm;
+using DqtApi.Services.GetAnIdentityApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,8 @@ namespace DqtApi.Tests
         public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
 
         public Mock<IDataverseAdapter> DataverseAdapter { get; } = new Mock<IDataverseAdapter>();
+
+        public Mock<IGetAnIdentityApiClient> IdentityApiClient { get; } = new Mock<IGetAnIdentityApiClient>();
 
         public async Task InitializeAsync()
         {
@@ -39,6 +42,7 @@ namespace DqtApi.Tests
                 services.AddMvc().AddApplicationPart(typeof(ApiFixture).Assembly);
 
                 services.AddSingleton(DataverseAdapter.Object);
+                services.AddSingleton(IdentityApiClient.Object);
                 services.AddSingleton<IClock, TestableClock>();
 
                 services.AddSingleton(sp =>
