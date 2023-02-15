@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 
 $BaseUrl = $BaseUrl.TrimEnd("/")
 
-$versions = @("v1", "v2")
+$versions = @("v1", "v2", "v3")
 $output = Join-Path $PSScriptRoot "docs" "api-specs"
 
 New-Item $output -ItemType Directory -ErrorAction SilentlyContinue

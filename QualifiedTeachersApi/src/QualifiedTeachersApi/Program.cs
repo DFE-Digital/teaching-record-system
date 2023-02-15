@@ -154,6 +154,7 @@ public class Program
         {
             c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
             c.SwaggerDoc("v2", new OpenApiInfo() { Title = "DQT API", Version = "v2" });
+            c.SwaggerDoc("v3", new OpenApiInfo() { Title = "DQT API", Version = "v3" });
 
             c.DocInclusionPredicate((docName, api) => docName.Equals(api.GroupName, StringComparison.OrdinalIgnoreCase));
             c.EnableAnnotations();
@@ -334,6 +335,7 @@ public class Program
             {
                 c.SwaggerEndpoint("v1/swagger.json", "DQT API v1");
                 c.SwaggerEndpoint("v2/swagger.json", "DQT API v2");
+                c.SwaggerEndpoint("v3/swagger.json", "DQT API v3");
                 c.EnablePersistAuthorization();
             });
 
