@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Security.Claims;
 using AspNetCoreRateLimit;
 using AspNetCoreRateLimit.Redis;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -85,7 +87,13 @@ public class Program
         }
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
-            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { });
+            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
+            .AddJwtBearer(options =>
+            {
+                options.Authority = configuration["GetAnIdentity:Authority"];
+                options.MapInboundClaims = false;
+                options.TokenValidationParameters.ValidateAudience = false;
+            });
 
         services.AddAuthorization(options =>
         {
@@ -95,7 +103,16 @@ public class Program
                     .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
                     .RequireClaim(ClaimTypes.Name));
 
-            options.DefaultPolicy = options.GetPolicy(AuthorizationPolicies.ApiKey);
+            options.AddPolicy(
+                    AuthorizationPolicies.IdentityUserWithTrn,
+                    policy => policy
+                        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                        .RequireAssertion(ctx =>
+                        {
+                            var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                            return scopes.Contains("dqt:read");
+                        })
+                        .RequireClaim("trn"));
         });
 
         services

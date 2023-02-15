@@ -2,5 +2,6 @@
 
 public static class AuthorizationPolicies
 {
-    public const string ApiKey = "ApiKey";
+    public const string ApiKey = nameof(ApiKey);
+    public const string IdentityUserWithTrn = nameof(IdentityUserWithTrn);
 }
