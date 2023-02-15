@@ -9,8 +9,8 @@ Provides a RESTful API for integrating with the Database of Qualified Teachers C
 
 ### Software requirements
 
-The API is an ASP.NET Core 6 web application. To develop locally you will need the following installed:
-- Visual Studio 2022 (or the .NET 6 SDK an alternative IDE/editor);
+The API is an ASP.NET Core 7 web application. To develop locally you will need the following installed:
+- Visual Studio 2022 (or the .NET 7 SDK an alternative IDE/editor);
 - a local Postgres 13+ instance.
 
 ### Database setup
