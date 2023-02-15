@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -91,12 +90,12 @@ public class Program
         services.AddAuthorization(options =>
         {
             options.AddPolicy(
-                "Bearer",
+                AuthorizationPolicies.ApiKey,
                 policy => policy
                     .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
                     .RequireClaim(ClaimTypes.Name));
 
-            options.DefaultPolicy = options.GetPolicy("Bearer");
+            options.DefaultPolicy = options.GetPolicy(AuthorizationPolicies.ApiKey);
         });
 
         services
@@ -104,7 +103,6 @@ public class Program
             {
                 options.AddHybridBodyModelBinderProvider();
 
-                options.Filters.Add(new AuthorizeFilter());
                 options.Filters.Add(new ProducesJsonOrProblemAttribute());
                 options.Filters.Add(new CrmServiceProtectionFaultExceptionFilter());
                 options.Filters.Add(new DefaultErrorExceptionFilter(statusCode: StatusCodes.Status400BadRequest));
