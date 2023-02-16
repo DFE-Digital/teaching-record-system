@@ -1739,31 +1739,51 @@ namespace DqtApi.DataStore.Crm.Models
 	{
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Higher Education", 0)]
+		[OptionSetMetadataAttribute("Higher Education", 5)]
 		HigherEducation = 389040000,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("HLTA", 3)]
+		[OptionSetMetadataAttribute("HLTA", 8)]
 		HLTA = 389040003,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Mandatory Qualification", 2)]
+		[OptionSetMetadataAttribute("Mandatory Qualification", 7)]
 		MandatoryQualification = 389040002,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("NPQEL", 6, "#0000ff")]
+		[OptionSetMetadataAttribute("NPQEL", 11, "#0000ff")]
 		NPQEL = 389040006,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("NPQH", 1)]
+		[OptionSetMetadataAttribute("NPQEYL", 0, "#0000ff")]
+		NPQEYL = 389040010,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("NPQH", 6)]
 		NPQH = 389040001,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("NPQML", 4)]
+		[OptionSetMetadataAttribute("NPQLBC", 4, "#0000ff")]
+		NPQLBC = 389040009,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("NPQLL", 1, "#0000ff")]
+		NPQLL = 389040011,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("NPQLT", 2, "#0000ff")]
+		NPQLT = 389040007,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("NPQLTD", 3, "#0000ff")]
+		NPQLTD = 389040008,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("NPQML", 9)]
 		NPQML = 389040005,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("NPQSL", 5)]
+		[OptionSetMetadataAttribute("NPQSL", 10)]
 		NPQSL = 389040004,
 	}
 	

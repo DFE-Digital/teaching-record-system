@@ -139,6 +139,69 @@
         }
       }
     },
+    "/v2/npq-qualifications": {
+      "put": {
+        "tags": [
+          "NpqQualifications"
+        ],
+        "summary": "Set NPQ qualification for a teacher",
+        "parameters": [
+          {
+            "name": "trn",
+            "in": "query",
+            "description": "Trn",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetNpqQualificationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetNpqQualificationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetNpqQualificationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/teachers/find": {
       "get": {
         "tags": [
@@ -1190,6 +1253,19 @@
         },
         "additionalProperties": { }
       },
+      "QualificationType": {
+        "enum": [
+          "NPQEL",
+          "NPQH",
+          "NPQSL",
+          "NPQLT",
+          "NPQLTD",
+          "NPQLBC",
+          "NPQLL",
+          "NPQEYL"
+        ],
+        "type": "string"
+      },
       "SetIttOutcomeRequest": {
         "required": [
           "ittProviderUkprn",
@@ -1222,6 +1298,28 @@
             "type": "string",
             "format": "date",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SetNpqQualificationRequest": {
+        "required": [
+          "completionDate",
+          "qualificationType",
+          "trn"
+        ],
+        "type": "object",
+        "properties": {
+          "completionDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "trn": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "qualificationType": {
+            "$ref": "#/components/schemas/QualificationType"
           }
         },
         "additionalProperties": false

@@ -3922,6 +3922,7 @@ namespace DqtApi.DataStore.Crm.Models
 		public static class Fields
 		{
 			public const string dfeta_CompletionorAwardDate = "dfeta_completionorawarddate";
+			public const string dfeta_createdbyapi = "dfeta_createdbyapi";
 			public const string dfeta_HE_ClassDivision = "dfeta_he_classdivision";
 			public const string dfeta_HE_CompletionDate = "dfeta_he_completiondate";
 			public const string dfeta_HE_CountryId = "dfeta_he_countryid";
@@ -3930,6 +3931,24 @@ namespace DqtApi.DataStore.Crm.Models
 			public const string dfeta_HE_HESubject1Id = "dfeta_he_hesubject1id";
 			public const string dfeta_HE_HESubject2Id = "dfeta_he_hesubject2id";
 			public const string dfeta_HE_HESubject3Id = "dfeta_he_hesubject3id";
+			public const string dfeta_NPQEL_Awarded = "dfeta_npqel_awarded";
+			public const string dfeta_NPQEL_Date = "dfeta_npqel_date";
+			public const string dfeta_npqeyl_awarded = "dfeta_npqeyl_awarded";
+			public const string dfeta_npqeyl_date = "dfeta_npqeyl_date";
+			public const string dfeta_NPQH_Awarded = "dfeta_npqh_awarded";
+			public const string dfeta_NPQH_Date = "dfeta_npqh_date";
+			public const string dfeta_npqlbc_awarded = "dfeta_npqlbc_awarded";
+			public const string dfeta_npqlbc_date = "dfeta_npqlbc_date";
+			public const string dfeta_npqll_awarded = "dfeta_npqll_awarded";
+			public const string dfeta_npqll_date = "dfeta_npqll_date";
+			public const string dfeta_npqlt_awarded = "dfeta_npqlt_awarded";
+			public const string dfeta_npqlt_date = "dfeta_npqlt_date";
+			public const string dfeta_npqltd_awarded = "dfeta_npqltd_awarded";
+			public const string dfeta_npqltd_date = "dfeta_npqltd_date";
+			public const string dfeta_npqml_awarded = "dfeta_npqml_awarded";
+			public const string dfeta_npqml_date = "dfeta_npqml_date";
+			public const string dfeta_npqsl_awarded = "dfeta_npqsl_awarded";
+			public const string dfeta_npqsl_date = "dfeta_npqsl_date";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_Type = "dfeta_type";
 			public const string StateCode = "statecode";
@@ -4002,6 +4021,26 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_CompletionorAwardDate");
 				this.SetAttributeValue("dfeta_completionorawarddate", value);
 				this.OnPropertyChanged("dfeta_CompletionorAwardDate");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_createdbyapi")]
+		public System.Nullable<bool> dfeta_createdbyapi
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_createdbyapi");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_createdbyapi");
+				this.SetAttributeValue("dfeta_createdbyapi", value);
+				this.OnPropertyChanged("dfeta_createdbyapi");
 			}
 		}
 		
@@ -4162,6 +4201,366 @@ namespace DqtApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_HE_HESubject3Id");
 				this.SetAttributeValue("dfeta_he_hesubject3id", value);
 				this.OnPropertyChanged("dfeta_HE_HESubject3Id");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqel_awarded")]
+		public System.Nullable<bool> dfeta_NPQEL_Awarded
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqel_awarded");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_NPQEL_Awarded");
+				this.SetAttributeValue("dfeta_npqel_awarded", value);
+				this.OnPropertyChanged("dfeta_NPQEL_Awarded");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqel_date")]
+		public System.Nullable<System.DateTime> dfeta_NPQEL_Date
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqel_date");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_NPQEL_Date");
+				this.SetAttributeValue("dfeta_npqel_date", value);
+				this.OnPropertyChanged("dfeta_NPQEL_Date");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqeyl_awarded")]
+		public System.Nullable<bool> dfeta_npqeyl_awarded
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqeyl_awarded");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqeyl_awarded");
+				this.SetAttributeValue("dfeta_npqeyl_awarded", value);
+				this.OnPropertyChanged("dfeta_npqeyl_awarded");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqeyl_date")]
+		public System.Nullable<System.DateTime> dfeta_npqeyl_date
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqeyl_date");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqeyl_date");
+				this.SetAttributeValue("dfeta_npqeyl_date", value);
+				this.OnPropertyChanged("dfeta_npqeyl_date");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqh_awarded")]
+		public System.Nullable<bool> dfeta_NPQH_Awarded
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqh_awarded");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_NPQH_Awarded");
+				this.SetAttributeValue("dfeta_npqh_awarded", value);
+				this.OnPropertyChanged("dfeta_NPQH_Awarded");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqh_date")]
+		public System.Nullable<System.DateTime> dfeta_NPQH_Date
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqh_date");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_NPQH_Date");
+				this.SetAttributeValue("dfeta_npqh_date", value);
+				this.OnPropertyChanged("dfeta_NPQH_Date");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqlbc_awarded")]
+		public System.Nullable<bool> dfeta_npqlbc_awarded
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqlbc_awarded");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqlbc_awarded");
+				this.SetAttributeValue("dfeta_npqlbc_awarded", value);
+				this.OnPropertyChanged("dfeta_npqlbc_awarded");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqlbc_date")]
+		public System.Nullable<System.DateTime> dfeta_npqlbc_date
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqlbc_date");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqlbc_date");
+				this.SetAttributeValue("dfeta_npqlbc_date", value);
+				this.OnPropertyChanged("dfeta_npqlbc_date");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqll_awarded")]
+		public System.Nullable<bool> dfeta_npqll_awarded
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqll_awarded");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqll_awarded");
+				this.SetAttributeValue("dfeta_npqll_awarded", value);
+				this.OnPropertyChanged("dfeta_npqll_awarded");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqll_date")]
+		public System.Nullable<System.DateTime> dfeta_npqll_date
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqll_date");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqll_date");
+				this.SetAttributeValue("dfeta_npqll_date", value);
+				this.OnPropertyChanged("dfeta_npqll_date");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqlt_awarded")]
+		public System.Nullable<bool> dfeta_npqlt_awarded
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqlt_awarded");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqlt_awarded");
+				this.SetAttributeValue("dfeta_npqlt_awarded", value);
+				this.OnPropertyChanged("dfeta_npqlt_awarded");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqlt_date")]
+		public System.Nullable<System.DateTime> dfeta_npqlt_date
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqlt_date");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqlt_date");
+				this.SetAttributeValue("dfeta_npqlt_date", value);
+				this.OnPropertyChanged("dfeta_npqlt_date");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqltd_awarded")]
+		public System.Nullable<bool> dfeta_npqltd_awarded
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqltd_awarded");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqltd_awarded");
+				this.SetAttributeValue("dfeta_npqltd_awarded", value);
+				this.OnPropertyChanged("dfeta_npqltd_awarded");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqltd_date")]
+		public System.Nullable<System.DateTime> dfeta_npqltd_date
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqltd_date");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqltd_date");
+				this.SetAttributeValue("dfeta_npqltd_date", value);
+				this.OnPropertyChanged("dfeta_npqltd_date");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqml_awarded")]
+		public System.Nullable<bool> dfeta_npqml_awarded
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqml_awarded");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqml_awarded");
+				this.SetAttributeValue("dfeta_npqml_awarded", value);
+				this.OnPropertyChanged("dfeta_npqml_awarded");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqml_date")]
+		public System.Nullable<System.DateTime> dfeta_npqml_date
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqml_date");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqml_date");
+				this.SetAttributeValue("dfeta_npqml_date", value);
+				this.OnPropertyChanged("dfeta_npqml_date");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqsl_awarded")]
+		public System.Nullable<bool> dfeta_npqsl_awarded
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_npqsl_awarded");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqsl_awarded");
+				this.SetAttributeValue("dfeta_npqsl_awarded", value);
+				this.OnPropertyChanged("dfeta_npqsl_awarded");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_npqsl_date")]
+		public System.Nullable<System.DateTime> dfeta_npqsl_date
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_npqsl_date");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_npqsl_date");
+				this.SetAttributeValue("dfeta_npqsl_date", value);
+				this.OnPropertyChanged("dfeta_npqsl_date");
 			}
 		}
 		
