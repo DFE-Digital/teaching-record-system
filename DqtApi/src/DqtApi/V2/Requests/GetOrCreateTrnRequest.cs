@@ -39,6 +39,7 @@ namespace DqtApi.V2.Requests
         public CreateTeacherRecognitionRoute? RecognitionRoute { get; set; }
         public DateOnly? QtsDate { get; set; }
         public bool? InductionRequired { get; set; }
+        public Guid? IdentityUserId { get; set; }
     }
 
     public class GetOrCreateTrnRequestAddress

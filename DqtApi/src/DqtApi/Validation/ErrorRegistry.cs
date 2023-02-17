@@ -27,7 +27,8 @@ namespace DqtApi.Validation
             ErrorDescriptor.Create(10018),  // Husid already being used for an existing teacher
             ErrorDescriptor.Create(10019),  // Qualification completion date cannot be in the future
             ErrorDescriptor.Create(10020),  // Multiple npq qualiications for Qualification Type
-            ErrorDescriptor.Create(10021)  // Npq Qualification not created by api
+            ErrorDescriptor.Create(10021),  // Npq Qualification not created by api
+            ErrorDescriptor.Create(10022),  // Identity user not found
         }.ToDictionary(d => d.ErrorCode, d => d);
 
         public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);
@@ -69,7 +70,10 @@ namespace DqtApi.Validation
         public static Error QualificationCompletionDateInTheFuture() => CreateError(10019);
 
         public static Error MultipleNpqQualificationWithQualificationType() => CreateError(10020);
+
         public static Error NpqQualificationNotCreatedByApi() => CreateError(10021);
+
+        public static Error IdentityUserNotFound() => CreateError(10022);
 
         private static Error CreateError(int errorCode)
         {

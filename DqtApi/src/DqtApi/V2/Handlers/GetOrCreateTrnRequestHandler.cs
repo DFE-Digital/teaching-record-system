@@ -9,6 +9,7 @@ using DqtApi.DataStore.Sql;
 using DqtApi.DataStore.Sql.Models;
 using DqtApi.Security;
 using DqtApi.Services;
+using DqtApi.Services.GetAnIdentityApi;
 using DqtApi.V2.ApiModels;
 using DqtApi.V2.Requests;
 using DqtApi.V2.Responses;
@@ -28,17 +29,20 @@ namespace DqtApi.V2.Handlers
         private readonly IDataverseAdapter _dataverseAdapter;
         private readonly ICurrentClientProvider _currentClientProvider;
         private readonly IDistributedLockService _distributedLockService;
+        private readonly IGetAnIdentityApiClient _identityApiClient;
 
         public GetOrCreateTrnRequestHandler(
             DqtContext dqtContext,
             IDataverseAdapter dataverseAdapter,
             ICurrentClientProvider currentClientProvider,
-            IDistributedLockService distributedLockService)
+            IDistributedLockService distributedLockService,
+            IGetAnIdentityApiClient identityApiClient)
         {
             _dqtContext = dqtContext;
             _dataverseAdapter = dataverseAdapter;
             _currentClientProvider = currentClientProvider;
             _distributedLockService = distributedLockService;
+            _identityApiClient = identityApiClient;
         }
 
         public async Task<TrnRequestInfo> Handle(GetOrCreateTrnRequest request, CancellationToken cancellationToken)
@@ -75,6 +79,16 @@ namespace DqtApi.V2.Handlers
                 var firstName = firstAndMiddleNames[0];
                 var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
 
+                if (request.IdentityUserId.HasValue)
+                {
+                    var user = await _identityApiClient.GetUserById(request.IdentityUserId.Value);
+                    if (user is null)
+                    {
+                        throw CreateValidationExceptionFromFailedReasons(CreateTeacherFailedReasons.IdentityUserNotFound);
+                    }
+                }
+
+
                 var createTeacherResult = await _dataverseAdapter.CreateTeacher(new CreateTeacherCommand()
                 {
                     FirstName = firstName,
@@ -108,23 +122,23 @@ namespace DqtApi.V2.Handlers
                         TrainingCountryCode = request.InitialTeacherTraining.TrainingCountryCode
                     },
                     Qualification = request.Qualification != null ?
-                        new CreateTeacherCommandQualification()
-                        {
-                            ProviderUkprn = request.Qualification.ProviderUkprn,
-                            CountryCode = request.Qualification.CountryCode,
-                            Subject = request.Qualification.Subject,
-                            Class = request.Qualification.Class?.ConvertToClassDivision(),
-                            Date = request.Qualification.Date,
-                            HeQualificationValue = request.Qualification.HeQualificationType?.GetHeQualificationValue(),
-                            Subject2 = request.Qualification.Subject2,
-                            Subject3 = request.Qualification.Subject3
-                        } :
-                        null,
+                    new CreateTeacherCommandQualification()
+                    {
+                        ProviderUkprn = request.Qualification.ProviderUkprn,
+                        CountryCode = request.Qualification.CountryCode,
+                        Subject = request.Qualification.Subject,
+                        Class = request.Qualification.Class?.ConvertToClassDivision(),
+                        Date = request.Qualification.Date,
+                        HeQualificationValue = request.Qualification.HeQualificationType?.GetHeQualificationValue(),
+                        Subject2 = request.Qualification.Subject2,
+                        Subject3 = request.Qualification.Subject3
+                    } :
+                    null,
                     HusId = request.HusId,
                     TeacherType = EnumHelper.ConvertToEnum<Requests.CreateTeacherType, DataStore.Crm.CreateTeacherType>(request.TeacherType),
                     RecognitionRoute = request.RecognitionRoute.HasValue ?
-                        EnumHelper.ConvertToEnum<Requests.CreateTeacherRecognitionRoute, DataStore.Crm.CreateTeacherRecognitionRoute>(request.RecognitionRoute.Value) :
-                        null,
+                    EnumHelper.ConvertToEnum<Requests.CreateTeacherRecognitionRoute, DataStore.Crm.CreateTeacherRecognitionRoute>(request.RecognitionRoute.Value) :
+                    null,
                     QtsDate = request.QtsDate,
                     InductionRequired = request.InductionRequired
                 });
@@ -138,7 +152,9 @@ namespace DqtApi.V2.Handlers
                 {
                     ClientId = currentClientId,
                     RequestId = request.RequestId,
-                    TeacherId = createTeacherResult.TeacherId
+                    TeacherId = createTeacherResult.TeacherId,
+                    LinkedToIdentity = false,
+                    IdentityUserId = request.IdentityUserId
                 });
 
                 await _dqtContext.SaveChangesAsync();
@@ -159,6 +175,7 @@ namespace DqtApi.V2.Handlers
                 QtsDate = qtsDate,
                 PotentialDuplicate = status == TrnRequestStatus.Pending
             };
+
         }
 
         private ValidationException CreateValidationExceptionFromFailedReasons(CreateTeacherFailedReasons failedReasons)
@@ -224,6 +241,11 @@ namespace DqtApi.V2.Handlers
                 CreateTeacherFailedReasons.TrainingCountryNotFound,
                 $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.TrainingCountryCode)}",
                 ErrorRegistry.CountryNotFound().Title);
+
+            ConsumeReason(
+                CreateTeacherFailedReasons.IdentityUserNotFound,
+                $"{nameof(GetOrCreateTrnRequest.IdentityUserId)}",
+                ErrorRegistry.IdentityUserNotFound().Title);
 
             if (failedReasons != CreateTeacherFailedReasons.None)
             {

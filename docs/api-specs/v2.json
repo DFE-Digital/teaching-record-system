@@ -766,6 +766,11 @@
           "inductionRequired": {
             "type": "boolean",
             "nullable": true
+          },
+          "identityUserId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
           }
         },
         "additionalProperties": false

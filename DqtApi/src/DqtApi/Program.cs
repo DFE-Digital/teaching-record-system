@@ -13,6 +13,7 @@ using DqtApi.Logging;
 using DqtApi.ModelBinding;
 using DqtApi.Security;
 using DqtApi.Services;
+using DqtApi.Services.GetAnIdentityApi;
 using DqtApi.Services.TrnGenerationApi;
 using DqtApi.Swagger;
 using DqtApi.Validation;
@@ -223,6 +224,7 @@ namespace DqtApi
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddTrnGenerationApi(configuration);
+            services.AddIdentityApi(configuration, env);
 
             if (env.EnvironmentName != "Testing")
             {
@@ -261,6 +263,7 @@ namespace DqtApi
                 services.AddSingleton<IDistributedLockService, LocalDistributedLockService>();
             }
 
+            services.AddTransient<IHostedService, LinkTrnToIdentityUserService>();
             MetricLabels.ConfigureLabels(builder.Configuration);
 
             var app = builder.Build();

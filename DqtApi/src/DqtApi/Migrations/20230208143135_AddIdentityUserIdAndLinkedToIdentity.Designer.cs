@@ -3,6 +3,7 @@ using System;
 using DqtApi.DataStore.Sql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DqtApi.Migrations
 {
     [DbContext(typeof(DqtContext))]
-    partial class DqtContextModelSnapshot : ModelSnapshot
+    [Migration("20230208143135_AddIdentityUserIdAndLinkedToIdentity")]
+    partial class AddIdentityUserIdAndLinkedToIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
