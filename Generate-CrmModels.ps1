@@ -54,9 +54,9 @@ function Set-Configuration {
 
 Set-Configuration
 
-$namespace = "DqtApi.DataStore.Crm.Models"
-$entitiesOutput = Join-Path -Path $PSScriptRoot -ChildPath DqtApi src DqtApi DataStore Crm Models GeneratedCode.cs
-$optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath DqtApi src DqtApi DataStore Crm Models GeneratedOptionSets.cs
+$namespace = "QualifiedTeachersApi.DataStore.Crm.Models"
+$entitiesOutput = Join-Path -Path $PSScriptRoot -ChildPath QualifiedTeachersApi src QualifiedTeachersApi DataStore Crm Models GeneratedCode.cs
+$optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath QualifiedTeachersApi src QualifiedTeachersApi DataStore Crm Models GeneratedOptionSets.cs
 mkdir (Split-Path $entitiesOutput) -Force | Out-Null
 
 $crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"

@@ -15,12 +15,12 @@ The API is an ASP.NET Core 7 web application. To develop locally you will need t
 
 ### Database setup
 
-Install Postgres then add a connection string to user secrets for both the `DqtApi` and `DqtApiTests` projects.
+Install Postgres then add a connection string to user secrets for both the `QualifiedTeachersApi` and `QualifiedTeachersApi.Tests` projects.
 
 e.g.
 ```shell
-dotnet user-secrets --id DqtApi set ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=dqt"
-dotnet user-secrets --id DqtApiTests set ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=dqt_tests"
+dotnet user-secrets --id QualifiedTeachersApi set ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=dqt"
+dotnet user-secrets --id QualifiedTeachersApiTests set ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=dqt_tests"
 ```
 
 The databases will be created automatically when running the API or tests in development mode.
@@ -32,11 +32,11 @@ The is a feature which can be toggled on and off via config (it will default to 
 There are tests with this feature toggled on and off so it does not need to be set in config for tests.
 
 ```shell
-dotnet user-secrets --id DqtApi set FeatureManagement:UseTrnGenerationApi true|false
-dotnet user-secrets --id DqtApi set TrnGenerationApi:BaseAddress "base_address_for_trn_generation_api"
-dotnet user-secrets --id DqtApi set TrnGenerationApi:ApiKey "api_key_for_trn_generation_api"
-dotnet user-secrets --id DqtApiTests set TrnGenerationApi:BaseAddress "base_address_for_trn_generation_api"
-dotnet user-secrets --id DqtApiTests set TrnGenerationApi:ApiKey "api_key_for_trn_generation_api"
+dotnet user-secrets --id QualifiedTeachersApi set FeatureManagement:UseTrnGenerationApi true|false
+dotnet user-secrets --id QualifiedTeachersApi set TrnGenerationApi:BaseAddress "base_address_for_trn_generation_api"
+dotnet user-secrets --id QualifiedTeachersApi set TrnGenerationApi:ApiKey "api_key_for_trn_generation_api"
+dotnet user-secrets --id QualifiedTeachersApiTests set TrnGenerationApi:BaseAddress "base_address_for_trn_generation_api"
+dotnet user-secrets --id QualifiedTeachersApiTests set TrnGenerationApi:ApiKey "api_key_for_trn_generation_api"
 ```
 Where `base_address_for_trn_generation_api` is the base address URL to access the TRN Generation API e.g. locally or deployed to Build/Dev.
 Where `api_key_for_trn_generation_api` is an API Key to be able to access the TRN Generation API e.g. locally or deployed to Build/Dev.
@@ -51,7 +51,7 @@ Ask a developer on the team for the user secrets to connect to this environment.
 ## CRM code generation
 
 A tool is used to generated proxy classes for the entities defined within the DQT CRM.
-The tool generates the `DqtApi.DataStore.Crm.Models.GeneratedCode.cs` and `DqtApi.DataStore.Crm.Models.GeneratedOptionSets.cs` files.
+The tool generates the `QualifiedTeachersApi.DataStore.Crm.Models.GeneratedCode.cs` and `QualifiedTeachersApi.DataStore.Crm.Models.GeneratedOptionSets.cs` files.
 A configuration file at `crm_attributes.json` whitelists the entities and their attributes which are included on the generated types.
 
 The Powershell script `Generate-CrmModels.ps1` will re-run the code generator against the `build` environment using the configuration file above.
