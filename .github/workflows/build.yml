@@ -96,11 +96,11 @@ jobs:
         #https://github.com/dotnet/format/issues/1433
         dotnet tool install -g dotnet-format --version "7.*" --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json
         dotnet-format --verify-no-changes
-      working-directory: DqtApi
+      working-directory: QualifiedTeachersApi
 
     - name: Build
       run: dotnet build --configuration Release
-      working-directory: DqtApi
+      working-directory: QualifiedTeachersApi
 
     - uses: Azure/get-keyvault-secrets@v1
       id: get_secrets
@@ -125,7 +125,7 @@ jobs:
     - name: Tests
       uses: ./.github/workflows/actions/test
       with:
-        test_project_path: DqtApi/tests/DqtApi.Tests
+        test_project_path: QualifiedTeachersApi/tests/QualifiedTeachersApi.Tests
         report_name: "Test results"
         dotnet_test_args: >-
           -e IntegrationTests_CrmUrl="${{ env.INTEGRATIONTESTS_CRMURL }}"
@@ -144,24 +144,24 @@ jobs:
         migrations_file=migrations/script.sql
 
         dotnet tool install --global dotnet-ef
-        dotnet ef migrations script --idempotent --output $migrations_file --configuration Release --project src/DqtApi/DqtApi.csproj --no-build
+        dotnet ef migrations script --idempotent --output $migrations_file --configuration Release --project src/QualifiedTeachersApi/QualifiedTeachersApi.csproj --no-build
 
         # Remove the BOM
         sed -i $'1s/^\uFEFF//' $migrations_file
 
         # Ensure any errors return a non-zero exit code when migrations are applied
         echo "$(echo "\set ON_ERROR_STOP true"; echo ""; cat $migrations_file)" > $migrations_file
-      working-directory: DqtApi
+      working-directory: QualifiedTeachersApi
 
     - name: Publish migrations
       uses: actions/upload-artifact@v3
       with:
         name: migrations
-        path: DqtApi/migrations
+        path: QualifiedTeachersApi/migrations
 
     - name: Publish
-      run: dotnet publish --configuration Release --no-build src/DqtApi/DqtApi.csproj
-      working-directory: DqtApi
+      run: dotnet publish --configuration Release --no-build src/QualifiedTeachersApi/QualifiedTeachersApi.csproj
+      working-directory: QualifiedTeachersApi
 
     - name: Docker image tag
       id: image
@@ -178,7 +178,7 @@ jobs:
     - name: Docker build & push
       uses: docker/build-push-action@v4
       with:
-        context: DqtApi/src/DqtApi
+        context: QualifiedTeachersApi/src/QualifiedTeachersApi
         push: true
         tags: ${{ env.tag }}
         build-args: |
