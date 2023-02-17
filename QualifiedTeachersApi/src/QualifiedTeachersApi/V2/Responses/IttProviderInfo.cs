@@ -1,13 +1,12 @@
 ﻿using Swashbuckle.AspNetCore.Annotations;
 
-namespace QualifiedTeachersApi.V2.Responses
-{
-    public class IttProviderInfo
-    {
-        [SwaggerSchema(Nullable = false)]
-        public string Ukprn { get; set; }
+namespace QualifiedTeachersApi.V2.Responses;
 
-        [SwaggerSchema(Nullable = false)]
-        public string ProviderName { get; set; }
-    }
+public class IttProviderInfo
+{
+    [SwaggerSchema(Nullable = false)]
+    public string Ukprn { get; set; }
+
+    [SwaggerSchema(Nullable = false)]
+    public string ProviderName { get; set; }
 }

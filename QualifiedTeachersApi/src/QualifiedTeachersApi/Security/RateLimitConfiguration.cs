@@ -2,22 +2,21 @@
 using Microsoft.Extensions.Options;
 using BaseRateLimitConfiguration = AspNetCoreRateLimit.RateLimitConfiguration;
 
-namespace QualifiedTeachersApi.Security
+namespace QualifiedTeachersApi.Security;
+
+public class RateLimitConfiguration : BaseRateLimitConfiguration
 {
-    public class RateLimitConfiguration : BaseRateLimitConfiguration
+    public RateLimitConfiguration(
+        IOptions<IpRateLimitOptions> ipOptions,
+        IOptions<ClientRateLimitOptions> clientOptions)
+        : base(ipOptions, clientOptions)
     {
-        public RateLimitConfiguration(
-            IOptions<IpRateLimitOptions> ipOptions,
-            IOptions<ClientRateLimitOptions> clientOptions)
-            : base(ipOptions, clientOptions)
-        {
-        }
+    }
 
-        public override void RegisterResolvers()
-        {
-            base.RegisterResolvers();
+    public override void RegisterResolvers()
+    {
+        base.RegisterResolvers();
 
-            this.ClientResolvers.Add(new ApiClientResolveContributor());
-        }
+        this.ClientResolvers.Add(new ApiClientResolveContributor());
     }
 }

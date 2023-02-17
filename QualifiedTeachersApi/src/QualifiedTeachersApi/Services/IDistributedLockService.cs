@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace QualifiedTeachersApi.Services
+namespace QualifiedTeachersApi.Services;
+
+public interface IDistributedLockService
 {
-    public interface IDistributedLockService
-    {
-        System.Threading.Tasks.Task<IAsyncDisposable> AcquireLock(string key, TimeSpan timeout);
-    }
+    System.Threading.Tasks.Task<IAsyncDisposable> AcquireLock(string key, TimeSpan timeout);
 }

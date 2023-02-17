@@ -2,14 +2,13 @@
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Http;
 
-namespace QualifiedTeachersApi.Security
+namespace QualifiedTeachersApi.Security;
+
+public class ApiClientResolveContributor : IClientResolveContributor
 {
-    public class ApiClientResolveContributor : IClientResolveContributor
+    public Task<string> ResolveClientAsync(HttpContext httpContext)
     {
-        public Task<string> ResolveClientAsync(HttpContext httpContext)
-        {
-            var clientId = ClaimsPrincipalCurrentClientProvider.GetCurrentClientIdFromHttpContext(httpContext);
-            return Task.FromResult(clientId);
-        }
+        var clientId = ClaimsPrincipalCurrentClientProvider.GetCurrentClientIdFromHttpContext(httpContext);
+        return Task.FromResult(clientId);
     }
 }

@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 
-namespace QualifiedTeachersApi.Security
+namespace QualifiedTeachersApi.Security;
+
+public class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions
 {
-    public class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions
-    {
-    }
 }

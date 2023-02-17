@@ -1,7 +1,6 @@
-﻿namespace QualifiedTeachersApi.Security
+﻿namespace QualifiedTeachersApi.Security;
+
+public interface IApiClientRepository
 {
-    public interface IApiClientRepository
-    {
-        ApiClient GetClientByKey(string apiKey);
-    }
+    ApiClient GetClientByKey(string apiKey);
 }

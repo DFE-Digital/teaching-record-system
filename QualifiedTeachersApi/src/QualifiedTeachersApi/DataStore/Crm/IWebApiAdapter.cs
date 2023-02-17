@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace QualifiedTeachersApi.DataStore.Crm
+namespace QualifiedTeachersApi.DataStore.Crm;
+
+public interface IWebApiAdapter
 {
-    public interface IWebApiAdapter
-    {
-        Task<(int NumberOfRequests, double RemainingExecutionTime)> GetRemainingApiLimits();
-    }
+    Task<(int NumberOfRequests, double RemainingExecutionTime)> GetRemainingApiLimits();
 }

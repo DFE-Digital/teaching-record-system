@@ -1,7 +1,6 @@
-﻿namespace QualifiedTeachersApi.Security
+﻿namespace QualifiedTeachersApi.Security;
+
+public interface ICurrentClientProvider
 {
-    public interface ICurrentClientProvider
-    {
-        string GetCurrentClientId();
-    }
+    string GetCurrentClientId();
 }

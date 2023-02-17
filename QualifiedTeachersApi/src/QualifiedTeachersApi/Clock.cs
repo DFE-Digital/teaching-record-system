@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace QualifiedTeachersApi
+namespace QualifiedTeachersApi;
+
+public sealed class Clock : IClock
 {
-    public sealed class Clock : IClock
-    {
-        public DateTime UtcNow => DateTime.UtcNow;
-    }
+    public DateTime UtcNow => DateTime.UtcNow;
 }

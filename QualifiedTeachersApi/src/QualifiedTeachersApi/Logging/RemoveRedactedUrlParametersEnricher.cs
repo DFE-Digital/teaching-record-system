@@ -2,26 +2,25 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace QualifiedTeachersApi.Logging
+namespace QualifiedTeachersApi.Logging;
+
+public class RemoveRedactedUrlParametersEnricher : ILogEventEnricher
 {
-    public class RemoveRedactedUrlParametersEnricher : ILogEventEnricher
+    private readonly HttpContext _httpContext;
+
+    public RemoveRedactedUrlParametersEnricher(HttpContext httpContext)
     {
-        private readonly HttpContext _httpContext;
+        _httpContext = httpContext;
+    }
 
-        public RemoveRedactedUrlParametersEnricher(HttpContext httpContext)
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+    {
+        const string requestPathPropertyName = "RequestPath";
+
+        if (logEvent.Properties.ContainsKey(requestPathPropertyName))
         {
-            _httpContext = httpContext;
-        }
-
-        public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
-        {
-            const string requestPathPropertyName = "RequestPath";
-
-            if (logEvent.Properties.ContainsKey(requestPathPropertyName))
-            {
-                var scrubbedRequestPath = _httpContext.Request.GetScrubbedRequestPathAndQuery();
-                logEvent.AddOrUpdateProperty(new LogEventProperty(requestPathPropertyName, new ScalarValue(scrubbedRequestPath)));
-            }
+            var scrubbedRequestPath = _httpContext.Request.GetScrubbedRequestPathAndQuery();
+            logEvent.AddOrUpdateProperty(new LogEventProperty(requestPathPropertyName, new ScalarValue(scrubbedRequestPath)));
         }
     }
 }

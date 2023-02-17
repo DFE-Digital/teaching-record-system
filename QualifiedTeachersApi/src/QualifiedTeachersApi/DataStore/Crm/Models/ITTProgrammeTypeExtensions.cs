@@ -1,15 +1,14 @@
-﻿namespace QualifiedTeachersApi.DataStore.Crm.Models
+﻿namespace QualifiedTeachersApi.DataStore.Crm.Models;
+
+public static class ITTProgrammeTypeExtensions
 {
-    public static class ITTProgrammeTypeExtensions
+    public static bool IsEarlyYears(this dfeta_ITTProgrammeType programmeType) => programmeType switch
     {
-        public static bool IsEarlyYears(this dfeta_ITTProgrammeType programmeType) => programmeType switch
-        {
-            dfeta_ITTProgrammeType.EYITTAssessmentOnly => true,
-            dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased => true,
-            dfeta_ITTProgrammeType.EYITTGraduateEntry => true,
-            dfeta_ITTProgrammeType.EYITTSchoolDirect_EarlyYears => true,
-            dfeta_ITTProgrammeType.EYITTUndergraduate => true,
-            _ => false
-        };
-    }
+        dfeta_ITTProgrammeType.EYITTAssessmentOnly => true,
+        dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased => true,
+        dfeta_ITTProgrammeType.EYITTGraduateEntry => true,
+        dfeta_ITTProgrammeType.EYITTSchoolDirect_EarlyYears => true,
+        dfeta_ITTProgrammeType.EYITTUndergraduate => true,
+        _ => false
+    };
 }

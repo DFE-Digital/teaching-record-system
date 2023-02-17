@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace QualifiedTeachersApi.DataStore.Crm.Models
+namespace QualifiedTeachersApi.DataStore.Crm.Models;
+
+public class FindTeachersByTrnBirthDateAndNinoQuery
 {
-    public class FindTeachersByTrnBirthDateAndNinoQuery
-    {
-        public string Trn { get; set; }
-        public DateTime? BirthDate { get; set; }
-        public string NationalInsuranceNumber { get; set; }
-    }
+    public string Trn { get; set; }
+    public DateTime? BirthDate { get; set; }
+    public string NationalInsuranceNumber { get; set; }
 }

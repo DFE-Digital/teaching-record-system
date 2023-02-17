@@ -2,33 +2,32 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
-namespace QualifiedTeachersApi.Logging
+namespace QualifiedTeachersApi.Logging;
+
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+public sealed class RedactQueryParamAttribute : Attribute, IActionModelConvention
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public sealed class RedactQueryParamAttribute : Attribute, IActionModelConvention
+    public RedactQueryParamAttribute(string queryParameterName)
     {
-        public RedactQueryParamAttribute(string queryParameterName)
-        {
-            QueryParameterName = queryParameterName ?? throw new ArgumentNullException(nameof(queryParameterName));
-        }
+        QueryParameterName = queryParameterName ?? throw new ArgumentNullException(nameof(queryParameterName));
+    }
 
-        public string QueryParameterName { get; }
+    public string QueryParameterName { get; }
 
-        public void Apply(ActionModel action)
+    public void Apply(ActionModel action)
+    {
+        foreach (var selector in action.Selectors)
         {
-            foreach (var selector in action.Selectors)
+            var endpointMetadata = selector.EndpointMetadata;
+
+            var redactedInfo = endpointMetadata.OfType<RedactedUrlParameters>().SingleOrDefault();
+            if (redactedInfo is null)
             {
-                var endpointMetadata = selector.EndpointMetadata;
-
-                var redactedInfo = endpointMetadata.OfType<RedactedUrlParameters>().SingleOrDefault();
-                if (redactedInfo is null)
-                {
-                    redactedInfo = new();
-                    endpointMetadata.Add(redactedInfo);
-                }
-
-                redactedInfo.QueryParameters.Add(QueryParameterName);
+                redactedInfo = new();
+                endpointMetadata.Add(redactedInfo);
             }
+
+            redactedInfo.QueryParameters.Add(QueryParameterName);
         }
     }
 }

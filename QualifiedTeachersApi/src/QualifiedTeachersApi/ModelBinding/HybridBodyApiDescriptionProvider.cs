@@ -5,77 +5,76 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace QualifiedTeachersApi.ModelBinding
+namespace QualifiedTeachersApi.ModelBinding;
+
+public class HybridBodyApiDescriptionProvider : IApiDescriptionProvider
 {
-    public class HybridBodyApiDescriptionProvider : IApiDescriptionProvider
+    private readonly IModelMetadataProvider _modelMetadataProvider;
+
+    public HybridBodyApiDescriptionProvider(IModelMetadataProvider modelMetadataProvider)
     {
-        private readonly IModelMetadataProvider _modelMetadataProvider;
+        _modelMetadataProvider = modelMetadataProvider;
+    }
 
-        public HybridBodyApiDescriptionProvider(IModelMetadataProvider modelMetadataProvider)
+    public int Order => 0;
+
+    public void OnProvidersExecuted(ApiDescriptionProviderContext context)
+    {
+        foreach (var apiDescription in context.Results)
         {
-            _modelMetadataProvider = modelMetadataProvider;
-        }
-
-        public int Order => 0;
-
-        public void OnProvidersExecuted(ApiDescriptionProviderContext context)
-        {
-            foreach (var apiDescription in context.Results)
+            foreach (var parameterDescription in apiDescription.ParameterDescriptions.ToArray())
             {
-                foreach (var parameterDescription in apiDescription.ParameterDescriptions.ToArray())
+                if (parameterDescription.BindingInfo?.BindingSource == BindingSource.Body)
                 {
-                    if (parameterDescription.BindingInfo?.BindingSource == BindingSource.Body)
+                    var bodyParameterType = parameterDescription.Type;
+
+                    foreach (var property in bodyParameterType.GetProperties())
                     {
-                        var bodyParameterType = parameterDescription.Type;
+                        var fromQueryAttribute = property.GetCustomAttribute<FromQueryAttribute>();
+                        var fromRouteAttribute = property.GetCustomAttribute<FromRouteAttribute>();
 
-                        foreach (var property in bodyParameterType.GetProperties())
+                        if (fromQueryAttribute != null || fromRouteAttribute != null)
                         {
-                            var fromQueryAttribute = property.GetCustomAttribute<FromQueryAttribute>();
-                            var fromRouteAttribute = property.GetCustomAttribute<FromRouteAttribute>();
+                            var modelMetadata = _modelMetadataProvider.GetMetadataForProperty(bodyParameterType, property.Name);
+                            var bindingInfo = BindingInfo.GetBindingInfo(property.GetCustomAttributes(), modelMetadata);
 
-                            if (fromQueryAttribute != null || fromRouteAttribute != null)
+                            var name = ModelNames.CreatePropertyModelName(
+                                prefix: string.Empty,
+                                propertyName: !string.IsNullOrEmpty(modelMetadata.BinderModelName) ? modelMetadata.BinderModelName : modelMetadata.PropertyName);
+
+                            if (fromRouteAttribute != null)
                             {
-                                var modelMetadata = _modelMetadataProvider.GetMetadataForProperty(bodyParameterType, property.Name);
-                                var bindingInfo = BindingInfo.GetBindingInfo(property.GetCustomAttributes(), modelMetadata);
+                                // We should have an existing parameter for this property (that comes from the route template).
+                                // If so, enrich it rather than replacing it
 
-                                var name = ModelNames.CreatePropertyModelName(
-                                    prefix: string.Empty,
-                                    propertyName: !string.IsNullOrEmpty(modelMetadata.BinderModelName) ? modelMetadata.BinderModelName : modelMetadata.PropertyName);
+                                var existingRouteParameter = apiDescription.ParameterDescriptions
+                                    .SingleOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && p.Source == BindingSource.Path);
 
-                                if (fromRouteAttribute != null)
+                                if (existingRouteParameter != null)
                                 {
-                                    // We should have an existing parameter for this property (that comes from the route template).
-                                    // If so, enrich it rather than replacing it
+                                    existingRouteParameter.ModelMetadata = modelMetadata;
+                                    existingRouteParameter.Type = modelMetadata.ModelType;
 
-                                    var existingRouteParameter = apiDescription.ParameterDescriptions
-                                        .SingleOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && p.Source == BindingSource.Path);
-
-                                    if (existingRouteParameter != null)
-                                    {
-                                        existingRouteParameter.ModelMetadata = modelMetadata;
-                                        existingRouteParameter.Type = modelMetadata.ModelType;
-
-                                        continue;
-                                    }
+                                    continue;
                                 }
-
-                                apiDescription.ParameterDescriptions.Add(new ApiParameterDescription()
-                                {
-                                    BindingInfo = bindingInfo,
-                                    Name = name,
-                                    Source = modelMetadata.BindingSource,
-                                    Type = modelMetadata.ModelType,
-                                    ModelMetadata = modelMetadata
-                                });
                             }
+
+                            apiDescription.ParameterDescriptions.Add(new ApiParameterDescription()
+                            {
+                                BindingInfo = bindingInfo,
+                                Name = name,
+                                Source = modelMetadata.BindingSource,
+                                Type = modelMetadata.ModelType,
+                                ModelMetadata = modelMetadata
+                            });
                         }
                     }
                 }
             }
         }
+    }
 
-        public void OnProvidersExecuting(ApiDescriptionProviderContext context)
-        {
-        }
+    public void OnProvidersExecuting(ApiDescriptionProviderContext context)
+    {
     }
 }

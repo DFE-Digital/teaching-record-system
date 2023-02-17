@@ -7,64 +7,63 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 
-namespace QualifiedTeachersApi.Security
+namespace QualifiedTeachersApi.Security;
+
+public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
 {
-    public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
+    public const string AuthenticationScheme = "ApiKey";
+    private const string AuthenticationHeaderScheme = "Bearer";
+
+    private readonly IApiClientRepository _clientRepository;
+
+    public ApiKeyAuthenticationHandler(
+        IApiClientRepository clientRepository,
+        IOptionsMonitor<ApiKeyAuthenticationOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder,
+        ISystemClock clock)
+        : base(options, logger, encoder, clock)
     {
-        public const string AuthenticationScheme = "ApiKey";
-        private const string AuthenticationHeaderScheme = "Bearer";
+        _clientRepository = clientRepository;
+    }
 
-        private readonly IApiClientRepository _clientRepository;
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+    {
+        string authorizationHeader = Request.Headers["Authorization"];
 
-        public ApiKeyAuthenticationHandler(
-            IApiClientRepository clientRepository,
-            IOptionsMonitor<ApiKeyAuthenticationOptions> options,
-            ILoggerFactory logger,
-            UrlEncoder encoder,
-            ISystemClock clock)
-            : base(options, logger, encoder, clock)
+        if (string.IsNullOrEmpty(authorizationHeader))
         {
-            _clientRepository = clientRepository;
+            return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+        if (!authorizationHeader.StartsWith(AuthenticationHeaderScheme + " ", StringComparison.OrdinalIgnoreCase))
         {
-            string authorizationHeader = Request.Headers["Authorization"];
-
-            if (string.IsNullOrEmpty(authorizationHeader))
-            {
-                return Task.FromResult(AuthenticateResult.NoResult());
-            }
-
-            if (!authorizationHeader.StartsWith(AuthenticationHeaderScheme + " ", StringComparison.OrdinalIgnoreCase))
-            {
-                return Task.FromResult(AuthenticateResult.NoResult());
-            }
-
-            var key = authorizationHeader.Substring(AuthenticationHeaderScheme.Length + 1);
-            var client = _clientRepository.GetClientByKey(key);
-
-            if (client is null)
-            {
-                return Task.FromResult(AuthenticateResult.Fail($"No client found with specified API key."));
-            }
-
-            var principal = CreatePrincipal(client);
-            var ticket = new AuthenticationTicket(principal, Scheme.Name);
-
-            LogContext.PushProperty("ClientId", client.ClientId);
-
-            return Task.FromResult(AuthenticateResult.Success(ticket));
+            return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        private static ClaimsPrincipal CreatePrincipal(ApiClient client)
-        {
-            var identity = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.Name, client.ClientId)
-            });
+        var key = authorizationHeader.Substring(AuthenticationHeaderScheme.Length + 1);
+        var client = _clientRepository.GetClientByKey(key);
 
-            return new ClaimsPrincipal(identity);
+        if (client is null)
+        {
+            return Task.FromResult(AuthenticateResult.Fail($"No client found with specified API key."));
         }
+
+        var principal = CreatePrincipal(client);
+        var ticket = new AuthenticationTicket(principal, Scheme.Name);
+
+        LogContext.PushProperty("ClientId", client.ClientId);
+
+        return Task.FromResult(AuthenticateResult.Success(ticket));
+    }
+
+    private static ClaimsPrincipal CreatePrincipal(ApiClient client)
+    {
+        var identity = new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.Name, client.ClientId)
+        });
+
+        return new ClaimsPrincipal(identity);
     }
 }

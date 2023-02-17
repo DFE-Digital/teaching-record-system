@@ -2,22 +2,21 @@
 using Sentry;
 using Sentry.Extensibility;
 
-namespace QualifiedTeachersApi.Logging
+namespace QualifiedTeachersApi.Logging;
+
+public class RemoveRedactedUrlParametersEventProcessor : ISentryEventProcessor
 {
-    public class RemoveRedactedUrlParametersEventProcessor : ISentryEventProcessor
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public RemoveRedactedUrlParametersEventProcessor(IHttpContextAccessor httpContextAccessor)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        _httpContextAccessor = httpContextAccessor;
+    }
 
-        public RemoveRedactedUrlParametersEventProcessor(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-        public SentryEvent Process(SentryEvent @event)
-        {
-            var httpContext = _httpContextAccessor.HttpContext;
-            @event.Request.QueryString = httpContext.Request.GetScrubbedQueryString();
-            return @event;
-        }
+    public SentryEvent Process(SentryEvent @event)
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        @event.Request.QueryString = httpContext.Request.GetScrubbedQueryString();
+        return @event;
     }
 }

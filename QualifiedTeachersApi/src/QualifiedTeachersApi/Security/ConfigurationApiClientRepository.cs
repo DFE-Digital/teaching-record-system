@@ -2,42 +2,41 @@
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 
-namespace QualifiedTeachersApi.Security
+namespace QualifiedTeachersApi.Security;
+
+public class ConfigurationApiClientRepository : IApiClientRepository
 {
-    public class ConfigurationApiClientRepository : IApiClientRepository
+    private const string ConfigurationSection = "ApiClients";
+
+    private readonly ApiClient[] _clients;
+
+    public ConfigurationApiClientRepository(IConfiguration configuration)
     {
-        private const string ConfigurationSection = "ApiClients";
+        _clients = GetClientsFromConfiguration(configuration);
+    }
 
-        private readonly ApiClient[] _clients;
+    public ApiClient GetClientByKey(string apiKey) => _clients.SingleOrDefault(c => c.ApiKey.Any(x => x == apiKey));
 
-        public ConfigurationApiClientRepository(IConfiguration configuration)
-        {
-            _clients = GetClientsFromConfiguration(configuration);
-        }
-
-        public ApiClient GetClientByKey(string apiKey) => _clients.SingleOrDefault(c => c.ApiKey.Any(x => x == apiKey));
-
-        private static ApiClient[] GetClientsFromConfiguration(IConfiguration configuration)
-        {
-            var section = configuration.GetSection(ConfigurationSection);
-            return section.GetChildren().AsEnumerable()
-                .Select((kvp, value) =>
+    private static ApiClient[] GetClientsFromConfiguration(IConfiguration configuration)
+    {
+        var section = configuration.GetSection(ConfigurationSection);
+        return section.GetChildren().AsEnumerable()
+            .Select((kvp, value) =>
+            {
+                var clientId = kvp.Key;
+                var apiKey = kvp.GetSection("apiKey").Value;
+                var client = new ApiClient()
                 {
-                    var clientId = kvp.Key;
-                    var apiKey = kvp.GetSection("apiKey").Value;
-                    var client = new ApiClient()
-                    {
-                        ClientId = clientId,
-                        ApiKey = new List<string>()
+                    ClientId = clientId,
+                    ApiKey = new List<string>()
 
-                    };
-                    kvp.Bind(client);
-                    if (!client.ApiKey.Any() && !string.IsNullOrEmpty(apiKey))
-                        client.ApiKey.Add(apiKey);
+                };
+                kvp.Bind(client);
+                if (!client.ApiKey.Any() && !string.IsNullOrEmpty(apiKey))
+                    client.ApiKey.Add(apiKey);
 
-                    return client;
-                })
-                .ToArray();
-        }
+                return client;
+            })
+            .ToArray();
     }
 }
