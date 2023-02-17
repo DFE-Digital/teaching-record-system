@@ -10,70 +10,69 @@ using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
 using QualifiedTeachersApi.Validation;
 
-namespace QualifiedTeachersApi.V2.Handlers
+namespace QualifiedTeachersApi.V2.Handlers;
+
+public class SetIttOutcomeHandler : IRequestHandler<SetIttOutcomeRequest, SetIttOutcomeResponse>
 {
-    public class SetIttOutcomeHandler : IRequestHandler<SetIttOutcomeRequest, SetIttOutcomeResponse>
+    private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
+
+    private readonly IDataverseAdapter _dataverseAdapter;
+    private readonly IDistributedLockService _distributedLockService;
+
+    public SetIttOutcomeHandler(IDataverseAdapter dataverseAdapter, IDistributedLockService distributedLockService)
     {
-        private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
+        _dataverseAdapter = dataverseAdapter;
+        _distributedLockService = distributedLockService;
+    }
 
-        private readonly IDataverseAdapter _dataverseAdapter;
-        private readonly IDistributedLockService _distributedLockService;
+    public async Task<SetIttOutcomeResponse> Handle(SetIttOutcomeRequest request, CancellationToken cancellationToken)
+    {
+        await using var trnLock = await _distributedLockService.AcquireLock(request.Trn, _lockTimeout);
 
-        public SetIttOutcomeHandler(IDataverseAdapter dataverseAdapter, IDistributedLockService distributedLockService)
+        var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
+
+        if (teachers.Length == 0)
         {
-            _dataverseAdapter = dataverseAdapter;
-            _distributedLockService = distributedLockService;
+            throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
+        }
+        else if (teachers.Length > 1)
+        {
+            throw new ErrorException(ErrorRegistry.MultipleTeachersFoundWithSpecifiedTrn());
         }
 
-        public async Task<SetIttOutcomeResponse> Handle(SetIttOutcomeRequest request, CancellationToken cancellationToken)
+        var teacherId = teachers[0].Id;
+        var ittResult = request.Outcome.Value.ConvertToITTResult();
+
+        var result = await _dataverseAdapter.SetIttResultForTeacher(
+            teacherId,
+            request.IttProviderUkprn,
+            ittResult,
+            request.AssessmentDate);
+
+        if (!result.Succeeded)
         {
-            await using var trnLock = await _distributedLockService.AcquireLock(request.Trn, _lockTimeout);
-
-            var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
-
-            if (teachers.Length == 0)
+            switch (result.FailedReason)
             {
-                throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
+                case SetIttResultForTeacherFailedReason.AlreadyHaveEytsDate:
+                case SetIttResultForTeacherFailedReason.AlreadyHaveQtsDate:
+                    throw new ErrorException(ErrorRegistry.TeacherAlreadyHasQtsDate());
+                case SetIttResultForTeacherFailedReason.MultipleInTrainingIttRecords:
+                    throw new ErrorException(ErrorRegistry.TeacherAlreadyMultipleIncompleteIttRecords());
+                case SetIttResultForTeacherFailedReason.NoMatchingIttRecord:
+                    throw new ErrorException(ErrorRegistry.TeacherHasNoIncompleteIttRecord());
+                case SetIttResultForTeacherFailedReason.NoMatchingQtsRecord:
+                    throw new ErrorException(ErrorRegistry.TeacherHasNoQtsRecord());
+                case SetIttResultForTeacherFailedReason.MultipleQtsRecords:
+                    throw new ErrorException(ErrorRegistry.TeacherHasMultipleQtsRecords());
+                default:
+                    throw new NotImplementedException($"Unknown {nameof(SetIttResultForTeacherFailedReason)}: '{result.FailedReason}.");
             }
-            else if (teachers.Length > 1)
-            {
-                throw new ErrorException(ErrorRegistry.MultipleTeachersFoundWithSpecifiedTrn());
-            }
-
-            var teacherId = teachers[0].Id;
-            var ittResult = request.Outcome.Value.ConvertToITTResult();
-
-            var result = await _dataverseAdapter.SetIttResultForTeacher(
-                teacherId,
-                request.IttProviderUkprn,
-                ittResult,
-                request.AssessmentDate);
-
-            if (!result.Succeeded)
-            {
-                switch (result.FailedReason)
-                {
-                    case SetIttResultForTeacherFailedReason.AlreadyHaveEytsDate:
-                    case SetIttResultForTeacherFailedReason.AlreadyHaveQtsDate:
-                        throw new ErrorException(ErrorRegistry.TeacherAlreadyHasQtsDate());
-                    case SetIttResultForTeacherFailedReason.MultipleInTrainingIttRecords:
-                        throw new ErrorException(ErrorRegistry.TeacherAlreadyMultipleIncompleteIttRecords());
-                    case SetIttResultForTeacherFailedReason.NoMatchingIttRecord:
-                        throw new ErrorException(ErrorRegistry.TeacherHasNoIncompleteIttRecord());
-                    case SetIttResultForTeacherFailedReason.NoMatchingQtsRecord:
-                        throw new ErrorException(ErrorRegistry.TeacherHasNoQtsRecord());
-                    case SetIttResultForTeacherFailedReason.MultipleQtsRecords:
-                        throw new ErrorException(ErrorRegistry.TeacherHasMultipleQtsRecords());
-                    default:
-                        throw new NotImplementedException($"Unknown {nameof(SetIttResultForTeacherFailedReason)}: '{result.FailedReason}.");
-                }
-            }
-
-            return new SetIttOutcomeResponse()
-            {
-                Trn = request.Trn,
-                QtsDate = result.QtsDate
-            };
         }
+
+        return new SetIttOutcomeResponse()
+        {
+            Trn = request.Trn,
+            QtsDate = result.QtsDate
+        };
     }
 }

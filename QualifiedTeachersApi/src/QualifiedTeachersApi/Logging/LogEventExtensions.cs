@@ -1,13 +1,12 @@
 ﻿using Serilog.Events;
 
-namespace QualifiedTeachersApi.Logging
+namespace QualifiedTeachersApi.Logging;
+
+public static class LogEventExtensions
 {
-    public static class LogEventExtensions
+    public static T GetScalarPropertyValue<T>(this LogEvent logEvent, string propertyKey)
     {
-        public static T GetScalarPropertyValue<T>(this LogEvent logEvent, string propertyKey)
-        {
-            var property = logEvent.Properties[propertyKey];
-            return (T)(((ScalarValue)property).Value);
-        }
+        var property = logEvent.Properties[propertyKey];
+        return (T)(((ScalarValue)property).Value);
     }
 }

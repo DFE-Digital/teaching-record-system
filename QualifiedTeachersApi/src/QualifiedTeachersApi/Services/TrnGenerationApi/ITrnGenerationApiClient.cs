@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace QualifiedTeachersApi.Services.TrnGenerationApi
+namespace QualifiedTeachersApi.Services.TrnGenerationApi;
+
+public interface ITrnGenerationApiClient
 {
-    public interface ITrnGenerationApiClient
-    {
-        Task<string> GenerateTrn();
-    }
+    Task<string> GenerateTrn();
 }

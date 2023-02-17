@@ -5,73 +5,72 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 
-namespace QualifiedTeachersApi.Configuration
+namespace QualifiedTeachersApi.Configuration;
+
+/// <summary>
+/// Represents an environment variable with JSON contents as an <see cref="IConfigurationSource"/>.
+/// </summary>
+public class EnvironmentVariableJsonConfigurationSource : IConfigurationSource
 {
     /// <summary>
-    /// Represents an environment variable with JSON contents as an <see cref="IConfigurationSource"/>.
+    /// The prefix to add to configuration keys.
     /// </summary>
-    public class EnvironmentVariableJsonConfigurationSource : IConfigurationSource
+    public string ConfigurationKeyPrefix { get; set; }
+
+    /// <summary>
+    /// The environment variable to read JSON from.
+    /// </summary>
+    public string EnvironmentVariableName { get; set; }
+
+    /// <inheritdoc/>
+    public IConfigurationProvider Build(IConfigurationBuilder builder)
     {
-        /// <summary>
-        /// The prefix to add to configuration keys.
-        /// </summary>
-        public string ConfigurationKeyPrefix { get; set; }
-
-        /// <summary>
-        /// The environment variable to read JSON from.
-        /// </summary>
-        public string EnvironmentVariableName { get; set; }
-
-        /// <inheritdoc/>
-        public IConfigurationProvider Build(IConfigurationBuilder builder)
+        if (string.IsNullOrEmpty(EnvironmentVariableName))
         {
-            if (string.IsNullOrEmpty(EnvironmentVariableName))
-            {
-                throw new Exception($"{nameof(EnvironmentVariableName)} must be specified.");
-            }
-
-            return new WrapperSource(this).Build(builder);
+            throw new Exception($"{nameof(EnvironmentVariableName)} must be specified.");
         }
 
-        private class WrapperSource : JsonStreamConfigurationSource
+        return new WrapperSource(this).Build(builder);
+    }
+
+    private class WrapperSource : JsonStreamConfigurationSource
+    {
+        private const string EmptyJson = "{}";
+
+        public WrapperSource(EnvironmentVariableJsonConfigurationSource source)
         {
-            private const string EmptyJson = "{}";
+            var envVar = Environment.GetEnvironmentVariable(source.EnvironmentVariableName) ?? EmptyJson;
+            var envVarBytes = Encoding.ASCII.GetBytes(envVar);
+            Stream = new MemoryStream(envVarBytes);
 
-            public WrapperSource(EnvironmentVariableJsonConfigurationSource source)
-            {
-                var envVar = Environment.GetEnvironmentVariable(source.EnvironmentVariableName) ?? EmptyJson;
-                var envVarBytes = Encoding.ASCII.GetBytes(envVar);
-                Stream = new MemoryStream(envVarBytes);
-
-                ConfigurationKeyPrefix = source.ConfigurationKeyPrefix?.TrimEnd(':');  // ':' == ConfigurationPath.KeyDelimiter
-            }
-
-            public string ConfigurationKeyPrefix { get; }
-
-            public override IConfigurationProvider Build(IConfigurationBuilder builder) => new WrapperProvider(this);
+            ConfigurationKeyPrefix = source.ConfigurationKeyPrefix?.TrimEnd(':');  // ':' == ConfigurationPath.KeyDelimiter
         }
 
-        private class WrapperProvider : JsonStreamConfigurationProvider
+        public string ConfigurationKeyPrefix { get; }
+
+        public override IConfigurationProvider Build(IConfigurationBuilder builder) => new WrapperProvider(this);
+    }
+
+    private class WrapperProvider : JsonStreamConfigurationProvider
+    {
+        private readonly WrapperSource _source;
+
+        public WrapperProvider(WrapperSource source) : base(source)
         {
-            private readonly WrapperSource _source;
+            _source = source;
+        }
 
-            public WrapperProvider(WrapperSource source) : base(source)
+        public override void Load()
+        {
+            base.Load();
+
+            if (!string.IsNullOrEmpty(_source.ConfigurationKeyPrefix))
             {
-                _source = source;
-            }
-
-            public override void Load()
-            {
-                base.Load();
-
-                if (!string.IsNullOrEmpty(_source.ConfigurationKeyPrefix))
+                foreach (var key in Data.Keys.ToArray())
                 {
-                    foreach (var key in Data.Keys.ToArray())
-                    {
-                        var prefixedKey = $"{_source.ConfigurationKeyPrefix}:{key}";
-                        Data[prefixedKey] = Data[key];
-                        Data.Remove(key);
-                    }
+                    var prefixedKey = $"{_source.ConfigurationKeyPrefix}:{key}";
+                    Data[prefixedKey] = Data[key];
+                    Data.Remove(key);
                 }
             }
         }

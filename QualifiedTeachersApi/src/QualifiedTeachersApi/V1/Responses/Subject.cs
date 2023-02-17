@@ -1,7 +1,6 @@
-﻿namespace QualifiedTeachersApi.V1.Responses
+﻿namespace QualifiedTeachersApi.V1.Responses;
+
+public class Subject
 {
-    public class Subject
-    {
-        public string Code { get; set; }
-    }
+    public string Code { get; set; }
 }

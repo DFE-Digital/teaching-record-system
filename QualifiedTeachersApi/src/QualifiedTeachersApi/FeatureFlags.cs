@@ -1,7 +1,6 @@
-﻿namespace QualifiedTeachersApi
+﻿namespace QualifiedTeachersApi;
+
+public static class FeatureFlags
 {
-    public static class FeatureFlags
-    {
-        public const string UseTrnGenerationApi = "UseTrnGenerationApi";
-    }
+    public const string UseTrnGenerationApi = "UseTrnGenerationApi";
 }

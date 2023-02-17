@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xrm.Sdk;
 
-namespace QualifiedTeachersApi.DataStore.Crm
+namespace QualifiedTeachersApi.DataStore.Crm;
+
+internal static class FormattedValueCollectionExtensions
 {
-    internal static class FormattedValueCollectionExtensions
-    {
-        public static string ValueOrNull(this FormattedValueCollection collection, string key) =>
-            collection.Contains(key) ? collection[key] : null;
-    }
+    public static string ValueOrNull(this FormattedValueCollection collection, string key) =>
+        collection.Contains(key) ? collection[key] : null;
 }

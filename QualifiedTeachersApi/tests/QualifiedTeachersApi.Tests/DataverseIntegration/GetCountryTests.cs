@@ -1,48 +1,47 @@
 ﻿using QualifiedTeachersApi.DataStore.Crm;
 using Xunit;
 
-namespace QualifiedTeachersApi.Tests.DataverseIntegration
+namespace QualifiedTeachersApi.Tests.DataverseIntegration;
+
+public class GetCountryTests : IAsyncLifetime
 {
-    public class GetCountryTests : IAsyncLifetime
+    private readonly CrmClientFixture.TestDataScope _dataScope;
+    private readonly DataverseAdapter _dataverseAdapter;
+
+    public GetCountryTests(CrmClientFixture crmClientFixture)
     {
-        private readonly CrmClientFixture.TestDataScope _dataScope;
-        private readonly DataverseAdapter _dataverseAdapter;
+        _dataScope = crmClientFixture.CreateTestDataScope();
+        _dataverseAdapter = _dataScope.CreateDataverseAdapter();
+    }
 
-        public GetCountryTests(CrmClientFixture crmClientFixture)
-        {
-            _dataScope = crmClientFixture.CreateTestDataScope();
-            _dataverseAdapter = _dataScope.CreateDataverseAdapter();
-        }
+    public Task InitializeAsync() => Task.CompletedTask;
 
-        public Task InitializeAsync() => Task.CompletedTask;
+    public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
-        public async Task DisposeAsync() => await _dataScope.DisposeAsync();
+    [Fact]
+    public async Task Given_valid_country_code_returns_country()
+    {
+        // Arrange
+        var countryCode = "XK";
 
-        [Fact]
-        public async Task Given_valid_country_code_returns_country()
-        {
-            // Arrange
-            var countryCode = "XK";
+        // Act
+        var result = await _dataverseAdapter.GetCountry(countryCode);
 
-            // Act
-            var result = await _dataverseAdapter.GetCountry(countryCode);
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(countryCode, result.dfeta_Value);
+    }
 
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(countryCode, result.dfeta_Value);
-        }
+    [Fact]
+    public async Task Given_invalid_country_code_returns_null()
+    {
+        // Arrange
+        var countryCode = "XXXX";
 
-        [Fact]
-        public async Task Given_invalid_country_code_returns_null()
-        {
-            // Arrange
-            var countryCode = "XXXX";
+        // Act
+        var result = await _dataverseAdapter.GetCountry(countryCode);
 
-            // Act
-            var result = await _dataverseAdapter.GetCountry(countryCode);
-
-            // Assert
-            Assert.Null(result);
-        }
+        // Assert
+        Assert.Null(result);
     }
 }

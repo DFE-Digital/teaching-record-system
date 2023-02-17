@@ -26,4 +26,10 @@ indent_style = tab
 indent_size = 2
 
 [*.cs]
+dotnet_diagnostic.IDE0005.severity = error
 dotnet_sort_system_directives_first = true
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = true:warning
+
+[QualifiedTeachersApi/src/**/Migrations/*]
+generated_code = true

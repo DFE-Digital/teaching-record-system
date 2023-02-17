@@ -3,36 +3,35 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QualifiedTeachersApi.Services
-{
-    public class LocalDistributedLockService : IDistributedLockService
-    {
-        private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
+namespace QualifiedTeachersApi.Services;
 
-        public async Task<IAsyncDisposable> AcquireLock(string key, TimeSpan timeout)
+public class LocalDistributedLockService : IDistributedLockService
+{
+    private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
+
+    public async Task<IAsyncDisposable> AcquireLock(string key, TimeSpan timeout)
+    {
+        var sem = _locks.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));
+        if (!await sem.WaitAsync(timeout))
         {
-            var sem = _locks.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));
-            if (!await sem.WaitAsync(timeout))
-            {
-                throw new Exception($"Failed to acquire lock for key: '{key}' after {timeout.TotalSeconds}s.");
-            }
-            return new LockDisposableWrapper(sem);
+            throw new Exception($"Failed to acquire lock for key: '{key}' after {timeout.TotalSeconds}s.");
+        }
+        return new LockDisposableWrapper(sem);
+    }
+
+    private sealed class LockDisposableWrapper : IAsyncDisposable
+    {
+        private readonly SemaphoreSlim _semaphore;
+
+        public LockDisposableWrapper(SemaphoreSlim semaphore)
+        {
+            _semaphore = semaphore;
         }
 
-        private sealed class LockDisposableWrapper : IAsyncDisposable
+        public ValueTask DisposeAsync()
         {
-            private readonly SemaphoreSlim _semaphore;
-
-            public LockDisposableWrapper(SemaphoreSlim semaphore)
-            {
-                _semaphore = semaphore;
-            }
-
-            public ValueTask DisposeAsync()
-            {
-                _semaphore.Release();
-                return default;
-            }
+            _semaphore.Release();
+            return default;
         }
     }
 }

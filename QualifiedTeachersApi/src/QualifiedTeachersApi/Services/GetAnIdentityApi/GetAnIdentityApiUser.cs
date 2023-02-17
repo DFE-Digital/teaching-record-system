@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace QualifiedTeachersApi.Services.GetAnIdentityApi
+namespace QualifiedTeachersApi.Services.GetAnIdentityApi;
+
+public class GetAnIdentityApiUser
 {
-    public class GetAnIdentityApiUser
-    {
-        public Guid UserId { get; init; }
-        public string FirstName { get; init; }
-        public string LastName { get; init; }
-    }
+    public Guid UserId { get; init; }
+    public string FirstName { get; init; }
+    public string LastName { get; init; }
 }

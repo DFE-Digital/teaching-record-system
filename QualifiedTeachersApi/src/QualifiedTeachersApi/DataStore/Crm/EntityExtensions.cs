@@ -1,39 +1,38 @@
 ﻿using Microsoft.Xrm.Sdk;
 
-namespace QualifiedTeachersApi.DataStore.Crm
+namespace QualifiedTeachersApi.DataStore.Crm;
+
+public static class EntityExtensions
 {
-    public static class EntityExtensions
+    public static T Extract<T>(this Entity source)
+        where T : Entity, new()
     {
-        public static T Extract<T>(this Entity source)
-            where T : Entity, new()
-        {
-            string prefix = typeof(T).Name;
+        string prefix = typeof(T).Name;
 
-            return Extract<T>(source, prefix, idAttribute: prefix + "id");
+        return Extract<T>(source, prefix, idAttribute: prefix + "id");
+    }
+
+    public static T Extract<T>(this Entity source, string prefix, string idAttribute)
+        where T : Entity, new()
+    {
+        var attributes = source.Attributes
+            .MapCollection<object, AttributeCollection>(attribute => source.GetAttributeValue<AliasedValue>(attribute.Key).Value, prefix);
+
+        if (!attributes.ContainsKey(idAttribute))
+        {
+            return null;
         }
 
-        public static T Extract<T>(this Entity source, string prefix, string idAttribute)
-            where T : Entity, new()
+        var formattedValues = source.FormattedValues
+            .MapCollection<string, FormattedValueCollection>(formattedValue => formattedValue.Value, prefix);
+
+        var entity = new T()
         {
-            var attributes = source.Attributes
-                .MapCollection<object, AttributeCollection>(attribute => source.GetAttributeValue<AliasedValue>(attribute.Key).Value, prefix);
+            Attributes = attributes
+        };
 
-            if (!attributes.ContainsKey(idAttribute))
-            {
-                return null;
-            }
+        entity.FormattedValues.AddRange(formattedValues);
 
-            var formattedValues = source.FormattedValues
-                .MapCollection<string, FormattedValueCollection>(formattedValue => formattedValue.Value, prefix);
-
-            var entity = new T()
-            {
-                Attributes = attributes
-            };
-
-            entity.FormattedValues.AddRange(formattedValues);
-
-            return entity;
-        }
+        return entity;
     }
 }

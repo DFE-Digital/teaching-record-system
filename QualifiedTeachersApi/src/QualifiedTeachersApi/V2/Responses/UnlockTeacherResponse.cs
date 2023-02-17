@@ -1,10 +1,9 @@
 ﻿using Swashbuckle.AspNetCore.Annotations;
 
-namespace QualifiedTeachersApi.V2.Responses
+namespace QualifiedTeachersApi.V2.Responses;
+
+public class UnlockTeacherResponse
 {
-    public class UnlockTeacherResponse
-    {
-        [SwaggerSchema(description: "Whether the account has been unlocked")]
-        public bool HasBeenUnlocked { get; set; }
-    }
+    [SwaggerSchema(description: "Whether the account has been unlocked")]
+    public bool HasBeenUnlocked { get; set; }
 }

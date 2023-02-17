@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace QualifiedTeachersApi
+namespace QualifiedTeachersApi;
+
+public sealed class NoopAsyncDisposable : IAsyncDisposable
 {
-    public sealed class NoopAsyncDisposable : IAsyncDisposable
+    private NoopAsyncDisposable()
     {
-        private NoopAsyncDisposable()
-        {
-        }
-
-        public static NoopAsyncDisposable Instance { get; } = new NoopAsyncDisposable();
-
-        public ValueTask DisposeAsync() => default;
     }
+
+    public static NoopAsyncDisposable Instance { get; } = new NoopAsyncDisposable();
+
+    public ValueTask DisposeAsync() => default;
 }

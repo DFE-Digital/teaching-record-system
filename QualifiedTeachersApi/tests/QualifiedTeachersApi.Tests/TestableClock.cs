@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace QualifiedTeachersApi.Tests
+namespace QualifiedTeachersApi.Tests;
+
+public class TestableClock : IClock
 {
-    public class TestableClock : IClock
-    {
-        public static DateTime Initial => new(2021, 1, 4);  // Arbitary start date
+    public static DateTime Initial => new(2021, 1, 4);  // Arbitary start date
 
-        public DateTime UtcNow { get; set; } = Initial;
-        public DateOnly Today => DateOnly.FromDateTime(UtcNow);
+    public DateTime UtcNow { get; set; } = Initial;
+    public DateOnly Today => DateOnly.FromDateTime(UtcNow);
 
-        public void Reset() => UtcNow = Initial;
-    }
+    public void Reset() => UtcNow = Initial;
 }

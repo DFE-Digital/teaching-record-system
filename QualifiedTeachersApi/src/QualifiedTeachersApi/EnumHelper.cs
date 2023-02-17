@@ -1,37 +1,36 @@
 ﻿using System;
 
-namespace QualifiedTeachersApi
-{
-    public static class EnumHelper
-    {
-        public static TResult ConvertToEnum<TSource, TResult>(this TSource input)
-            where TSource : struct, Enum
-            where TResult : struct, Enum
-        {
-            if (!TryConvertToEnum<TSource, TResult>(input, out var result))
-            {
-                throw new FormatException($"Unknown {typeof(TSource).Name}: '{input}'.");
-            }
+namespace QualifiedTeachersApi;
 
-            return result;
+public static class EnumHelper
+{
+    public static TResult ConvertToEnum<TSource, TResult>(this TSource input)
+        where TSource : struct, Enum
+        where TResult : struct, Enum
+    {
+        if (!TryConvertToEnum<TSource, TResult>(input, out var result))
+        {
+            throw new FormatException($"Unknown {typeof(TSource).Name}: '{input}'.");
         }
 
-        public static bool TryConvertToEnum<TSource, TResult>(this TSource input, out TResult result)
-            where TSource : struct, Enum
-            where TResult : struct, Enum
-        {
-            var inputAsInt = Convert.ToInt32(input);
+        return result;
+    }
 
-            if (Enum.IsDefined(typeof(TResult), inputAsInt))
-            {
-                result = (TResult)Enum.ToObject(typeof(TResult), inputAsInt);
-                return true;
-            }
-            else
-            {
-                result = default;
-                return false;
-            }
+    public static bool TryConvertToEnum<TSource, TResult>(this TSource input, out TResult result)
+        where TSource : struct, Enum
+        where TResult : struct, Enum
+    {
+        var inputAsInt = Convert.ToInt32(input);
+
+        if (Enum.IsDefined(typeof(TResult), inputAsInt))
+        {
+            result = (TResult)Enum.ToObject(typeof(TResult), inputAsInt);
+            return true;
+        }
+        else
+        {
+            result = default;
+            return false;
         }
     }
 }

@@ -1,9 +1,8 @@
 using Xunit;
 
-namespace QualifiedTeachersApi.Tests
+namespace QualifiedTeachersApi.Tests;
+
+[CollectionDefinition("Api")]
+public class ApiCollection : ICollectionFixture<ApiFixture>
 {
-    [CollectionDefinition("Api")]
-    public class ApiCollection : ICollectionFixture<ApiFixture>
-    {
-    }
 }

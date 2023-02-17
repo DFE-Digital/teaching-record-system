@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -8,55 +7,54 @@ using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using Xunit;
 
-namespace QualifiedTeachersApi.Tests
+namespace QualifiedTeachersApi.Tests;
+
+public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
+    public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
+
+    public Mock<IDataverseAdapter> DataverseAdapter { get; } = new Mock<IDataverseAdapter>();
+
+    public Mock<IGetAnIdentityApiClient> IdentityApiClient { get; } = new Mock<IGetAnIdentityApiClient>();
+
+    public async Task InitializeAsync()
     {
-        public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
-
-        public Mock<IDataverseAdapter> DataverseAdapter { get; } = new Mock<IDataverseAdapter>();
-
-        public Mock<IGetAnIdentityApiClient> IdentityApiClient { get; } = new Mock<IGetAnIdentityApiClient>();
-
-        public async Task InitializeAsync()
-        {
-            await DbHelper.ResetSchema();
-        }
-
-        public void ResetMocks()
-        {
-            DataverseAdapter.Reset();
-        }
-
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            builder.UseEnvironment("Testing");
-
-            // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
-            // i.e. Program.cs and that has a dependency on IConfiguration
-            builder.UseConfiguration(GetTestConfiguration());
-
-            builder.ConfigureServices(services =>
-            {
-                // Add controllers defined in this test assembly
-                services.AddMvc().AddApplicationPart(typeof(ApiFixture).Assembly);
-
-                services.AddSingleton(DataverseAdapter.Object);
-                services.AddSingleton(IdentityApiClient.Object);
-                services.AddSingleton<IClock, TestableClock>();
-
-                services.AddSingleton(sp =>
-                {
-                    var configuration = sp.GetRequiredService<IConfiguration>();
-                    var connectionString = configuration.GetConnectionString("DefaultConnection");
-                    return new DbHelper(connectionString);
-                });
-            });
-        }
-
-        Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
-
-        private static IConfiguration GetTestConfiguration() =>
-            new ConfigurationBuilder().AddUserSecrets<ApiFixture>(optional: true).Build();
+        await DbHelper.ResetSchema();
     }
+
+    public void ResetMocks()
+    {
+        DataverseAdapter.Reset();
+    }
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseEnvironment("Testing");
+
+        // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
+        // i.e. Program.cs and that has a dependency on IConfiguration
+        builder.UseConfiguration(GetTestConfiguration());
+
+        builder.ConfigureServices(services =>
+        {
+            // Add controllers defined in this test assembly
+            services.AddMvc().AddApplicationPart(typeof(ApiFixture).Assembly);
+
+            services.AddSingleton(DataverseAdapter.Object);
+            services.AddSingleton(IdentityApiClient.Object);
+            services.AddSingleton<IClock, TestableClock>();
+
+            services.AddSingleton(sp =>
+            {
+                var configuration = sp.GetRequiredService<IConfiguration>();
+                var connectionString = configuration.GetConnectionString("DefaultConnection");
+                return new DbHelper(connectionString);
+            });
+        });
+    }
+
+    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+
+    private static IConfiguration GetTestConfiguration() =>
+        new ConfigurationBuilder().AddUserSecrets<ApiFixture>(optional: true).Build();
 }

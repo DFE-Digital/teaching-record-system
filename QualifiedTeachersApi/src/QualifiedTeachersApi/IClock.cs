@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace QualifiedTeachersApi
+namespace QualifiedTeachersApi;
+
+public interface IClock
 {
-    public interface IClock
-    {
-        DateTime UtcNow { get; }
-        DateOnly Today => DateOnly.FromDateTime(UtcNow);
-    }
+    DateTime UtcNow { get; }
+    DateOnly Today => DateOnly.FromDateTime(UtcNow);
 }

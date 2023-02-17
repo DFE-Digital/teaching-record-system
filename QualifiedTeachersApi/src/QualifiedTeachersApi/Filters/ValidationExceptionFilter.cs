@@ -6,22 +6,21 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace QualifiedTeachersApi.Filters
+namespace QualifiedTeachersApi.Filters;
+
+public class ValidationExceptionFilter : IExceptionFilter
 {
-    public class ValidationExceptionFilter : IExceptionFilter
+    public void OnException(ExceptionContext context)
     {
-        public void OnException(ExceptionContext context)
+        if (context.Exception is ValidationException validationException)
         {
-            if (context.Exception is ValidationException validationException)
-            {
-                var validationResult = new ValidationResult(validationException.Errors);
-                validationResult.AddToModelState(context.ModelState, prefix: null);
+            var validationResult = new ValidationResult(validationException.Errors);
+            validationResult.AddToModelState(context.ModelState, prefix: null);
 
-                var problemDetailsFactory = context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
-                context.Result = new ObjectResult(problemDetailsFactory.CreateValidationProblemDetails(context.HttpContext, context.ModelState));
+            var problemDetailsFactory = context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
+            context.Result = new ObjectResult(problemDetailsFactory.CreateValidationProblemDetails(context.HttpContext, context.ModelState));
 
-                context.ExceptionHandled = true;
-            }
+            context.ExceptionHandled = true;
         }
     }
 }

@@ -8,151 +8,150 @@ using QualifiedTeachersApi.Services.TrnGenerationApi;
 using Xunit;
 using static QualifiedTeachersApi.Tests.DataverseIntegration.GetMatchingTeachersFixture.MatchFixture;
 
-namespace QualifiedTeachersApi.Tests.DataverseIntegration
+namespace QualifiedTeachersApi.Tests.DataverseIntegration;
+
+[Collection(nameof(ExclusiveCrmTestCollection))]
+public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture>
 {
-    [Collection(nameof(ExclusiveCrmTestCollection))]
-    public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture>
+    private readonly GetMatchingTeachersFixture _fixture;
+    private readonly IDataverseAdapter _dataverseAdapter;
+
+    public GetMatchingTeachersTests(GetMatchingTeachersFixture fixture)
     {
-        private readonly GetMatchingTeachersFixture _fixture;
-        private readonly IDataverseAdapter _dataverseAdapter;
+        _fixture = fixture;
 
-        public GetMatchingTeachersTests(GetMatchingTeachersFixture fixture)
-        {
-            _fixture = fixture;
+        var featureManager = Mock.Of<IFeatureManager>();
+        Mock.Get(featureManager)
+            .Setup(f => f.IsEnabledAsync(FeatureFlags.UseTrnGenerationApi))
+            .ReturnsAsync(false);
+        var trnGenerationApiClient = new NoopTrnGenerationApiClient();
 
-            var featureManager = Mock.Of<IFeatureManager>();
-            Mock.Get(featureManager)
-                .Setup(f => f.IsEnabledAsync(FeatureFlags.UseTrnGenerationApi))
-                .ReturnsAsync(false);
-            var trnGenerationApiClient = new NoopTrnGenerationApiClient();
+        _dataverseAdapter = new DataverseAdapter(
+            _fixture.Service,
+            new TestableClock(),
+            new MemoryCache(Options.Create<MemoryCacheOptions>(new())),
+            featureManager,
+            trnGenerationApiClient);
+    }
 
-            _dataverseAdapter = new DataverseAdapter(
-                _fixture.Service,
-                new TestableClock(),
-                new MemoryCache(Options.Create<MemoryCacheOptions>(new())),
-                featureManager,
-                trnGenerationApiClient);
-        }
+    [Fact]
+    public async void Given_matching_TRN_and_matching_birth_date_return_unique_teacher()
+    {
+        var request = _fixture.GetQuery(One, true);
 
-        [Fact]
-        public async void Given_matching_TRN_and_matching_birth_date_return_unique_teacher()
-        {
-            var request = _fixture.GetQuery(One, true);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        Assert.Single(matchingTeachers);
 
-            Assert.Single(matchingTeachers);
+        _fixture.AssertMatchesFixture(matchingTeachers.Single(), 0);
+    }
 
-            _fixture.AssertMatchesFixture(matchingTeachers.Single(), 0);
-        }
+    [Fact]
+    public async void Given_non_matching_TRN_return_no_teachers()
+    {
+        var request = _fixture.GetQuery(None, true);
 
-        [Fact]
-        public async void Given_non_matching_TRN_return_no_teachers()
-        {
-            var request = _fixture.GetQuery(None, true);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        Assert.Empty(matchingTeachers);
+    }
 
-            Assert.Empty(matchingTeachers);
-        }
+    [Fact]
+    public async void Given_non_matching_birth_date_return_no_teachers()
+    {
+        var request = _fixture.GetQuery(One, false);
 
-        [Fact]
-        public async void Given_non_matching_birth_date_return_no_teachers()
-        {
-            var request = _fixture.GetQuery(One, false);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        Assert.Empty(matchingTeachers);
+    }
 
-            Assert.Empty(matchingTeachers);
-        }
+    [Fact]
+    public async void Given_non_matching_TRN_and_non_matching_birth_date_return_no_teachers()
+    {
+        var request = _fixture.GetQuery(None, false);
 
-        [Fact]
-        public async void Given_non_matching_TRN_and_non_matching_birth_date_return_no_teachers()
-        {
-            var request = _fixture.GetQuery(None, false);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        Assert.Empty(matchingTeachers);
+    }
 
-            Assert.Empty(matchingTeachers);
-        }
+    [Fact]
+    public async void Given_matching_national_insurance_number_and_matching_birth_date_and_matching_TRN_return_teacher()
+    {
+        var request = _fixture.GetQuery(One, true, One);
 
-        [Fact]
-        public async void Given_matching_national_insurance_number_and_matching_birth_date_and_matching_TRN_return_teacher()
-        {
-            var request = _fixture.GetQuery(One, true, One);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        Assert.Single(matchingTeachers);
 
-            Assert.Single(matchingTeachers);
+        _fixture.AssertMatchesFixture(matchingTeachers.Single(), 0);
+    }
 
-            _fixture.AssertMatchesFixture(matchingTeachers.Single(), 0);
-        }
+    [Fact]
+    public async void Given_matching_national_insurance_number_and_matching_birth_date_and_different_matching_TRN_return_teacher()
+    {
+        var request = _fixture.GetQuery(One, true, Two);
 
-        [Fact]
-        public async void Given_matching_national_insurance_number_and_matching_birth_date_and_different_matching_TRN_return_teacher()
-        {
-            var request = _fixture.GetQuery(One, true, Two);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        Assert.Collection(matchingTeachers,
+            firstTeacher => _fixture.AssertMatchesFixture(firstTeacher, 0),
+            secondTeacher => _fixture.AssertMatchesFixture(secondTeacher, 1)
+        );
+    }
 
-            Assert.Collection(matchingTeachers,
-                firstTeacher => _fixture.AssertMatchesFixture(firstTeacher, 0),
-                secondTeacher => _fixture.AssertMatchesFixture(secondTeacher, 1)
-            );
-        }
+    [Fact]
+    public async void Given_matching_national_insurance_number_and_matching_birth_date_but_non_matching_TRN_return_teacher()
+    {
+        var request = _fixture.GetQuery(None, true, One);
 
-        [Fact]
-        public async void Given_matching_national_insurance_number_and_matching_birth_date_but_non_matching_TRN_return_teacher()
-        {
-            var request = _fixture.GetQuery(None, true, One);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        Assert.Single(matchingTeachers);
 
-            Assert.Single(matchingTeachers);
+        _fixture.AssertMatchesFixture(matchingTeachers.Single(), 0);
+    }
 
-            _fixture.AssertMatchesFixture(matchingTeachers.Single(), 0);
-        }
+    [Fact]
+    public async void Given_matching_TRN_and_matching_birth_date_but_non_matching_national_insurance_number_return_teacher()
+    {
+        var request = _fixture.GetQuery(One, true, None);
 
-        [Fact]
-        public async void Given_matching_TRN_and_matching_birth_date_but_non_matching_national_insurance_number_return_teacher()
-        {
-            var request = _fixture.GetQuery(One, true, None);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        Assert.Single(matchingTeachers);
 
-            Assert.Single(matchingTeachers);
+        _fixture.AssertMatchesFixture(matchingTeachers.Single(), 0);
+    }
 
-            _fixture.AssertMatchesFixture(matchingTeachers.Single(), 0);
-        }
+    [Fact]
+    public async void Given_matching_national_insurance_number_but_non_matching_TRN_and_non_matching_birth_date_return_empty()
+    {
+        var request = _fixture.GetQuery(None, false, One);
 
-        [Fact]
-        public async void Given_matching_national_insurance_number_but_non_matching_TRN_and_non_matching_birth_date_return_empty()
-        {
-            var request = _fixture.GetQuery(None, false, One);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        Assert.Empty(matchingTeachers);
+    }
 
-            Assert.Empty(matchingTeachers);
-        }
+    [Fact]
+    public async void Given_matching_TRN_but_non_matching_national_insurance_number_and_non_matching_birth_date_return_empty()
+    {
+        var request = _fixture.GetQuery(One, false, None);
 
-        [Fact]
-        public async void Given_matching_TRN_but_non_matching_national_insurance_number_and_non_matching_birth_date_return_empty()
-        {
-            var request = _fixture.GetQuery(One, false, None);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        Assert.Empty(matchingTeachers);
+    }
 
-            Assert.Empty(matchingTeachers);
-        }
+    [Fact]
+    public async void Given_matching_TRN_and_matching_national_insurance_number_but_non_matching_birth_date_return_empty()
+    {
+        var request = _fixture.GetQuery(One, false, One);
 
-        [Fact]
-        public async void Given_matching_TRN_and_matching_national_insurance_number_but_non_matching_birth_date_return_empty()
-        {
-            var request = _fixture.GetQuery(One, false, One);
+        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
 
-            var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
-
-            Assert.Empty(matchingTeachers);
-        }
+        Assert.Empty(matchingTeachers);
     }
 }

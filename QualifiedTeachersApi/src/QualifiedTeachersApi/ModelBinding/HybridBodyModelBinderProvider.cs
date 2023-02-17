@@ -1,81 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
-namespace QualifiedTeachersApi.ModelBinding
+namespace QualifiedTeachersApi.ModelBinding;
+
+public class HybridBodyModelBinderProvider : IModelBinderProvider
 {
-    public class HybridBodyModelBinderProvider : IModelBinderProvider
+    private readonly BodyModelBinderProvider _innerProvider;
+
+    public HybridBodyModelBinderProvider(BodyModelBinderProvider innerProvider)
     {
-        private readonly BodyModelBinderProvider _innerProvider;
+        _innerProvider = innerProvider;
+    }
 
-        public HybridBodyModelBinderProvider(BodyModelBinderProvider innerProvider)
+    public IModelBinder GetBinder(ModelBinderProviderContext context)
+    {
+        var modelBinder = _innerProvider.GetBinder(context);
+
+        if (modelBinder == null || context.BindingInfo.BindingSource != BindingSource.Body)
         {
-            _innerProvider = innerProvider;
+            return modelBinder;
         }
 
-        public IModelBinder GetBinder(ModelBinderProviderContext context)
+        var propertyBinders = new Dictionary<ModelMetadata, IModelBinder>();
+        foreach (var property in context.Metadata.Properties)
         {
-            var modelBinder = _innerProvider.GetBinder(context);
+            var createPropertyBinder = property.BindingSource == BindingSource.Path ||
+                                       property.BindingSource == BindingSource.Query;
 
-            if (modelBinder == null || context.BindingInfo.BindingSource != BindingSource.Body)
+            if (createPropertyBinder)
             {
-                return modelBinder;
+                propertyBinders.Add(property, context.CreateBinder(property));
             }
-
-            var propertyBinders = new Dictionary<ModelMetadata, IModelBinder>();
-            foreach (var property in context.Metadata.Properties)
-            {
-                var createPropertyBinder = property.BindingSource == BindingSource.Path ||
-                    property.BindingSource == BindingSource.Query;
-
-                if (createPropertyBinder)
-                {
-                    propertyBinders.Add(property, context.CreateBinder(property));
-                }
-            }
-
-            return new HybridBodyModelBinder(modelBinder, propertyBinders);
         }
 
-        private class HybridBodyModelBinder : IModelBinder
+        return new HybridBodyModelBinder(modelBinder, propertyBinders);
+    }
+
+    private class HybridBodyModelBinder : IModelBinder
+    {
+        private readonly IModelBinder _innerModelBinder;
+        private readonly Dictionary<ModelMetadata, IModelBinder> _propertyBinders;
+
+        public HybridBodyModelBinder(IModelBinder innerModelBinder, Dictionary<ModelMetadata, IModelBinder> propertyBinders)
         {
-            private readonly IModelBinder _innerModelBinder;
-            private readonly Dictionary<ModelMetadata, IModelBinder> _propertyBinders;
+            _innerModelBinder = innerModelBinder;
+            _propertyBinders = propertyBinders;
+        }
 
-            public HybridBodyModelBinder(IModelBinder innerModelBinder, Dictionary<ModelMetadata, IModelBinder> propertyBinders)
+        public async Task BindModelAsync(ModelBindingContext bindingContext)
+        {
+            await _innerModelBinder.BindModelAsync(bindingContext);
+
+            if (bindingContext.Result.IsModelSet)
             {
-                _innerModelBinder = innerModelBinder;
-                _propertyBinders = propertyBinders;
-            }
-
-            public async Task BindModelAsync(ModelBindingContext bindingContext)
-            {
-                await _innerModelBinder.BindModelAsync(bindingContext);
-
-                if (bindingContext.Result.IsModelSet)
+                foreach (var (property, propertyBinder) in _propertyBinders)
                 {
-                    foreach (var (property, propertyBinder) in _propertyBinders)
+                    var fieldName = property.PropertyName;
+                    var modelName = ModelNames.CreatePropertyModelName(bindingContext.ModelName, fieldName);
+
+                    ModelBindingResult result;
+                    using (bindingContext.EnterNestedScope(property, fieldName, modelName, model: null))
                     {
-                        var fieldName = property.PropertyName;
-                        var modelName = ModelNames.CreatePropertyModelName(bindingContext.ModelName, fieldName);
-
-                        ModelBindingResult result;
-                        using (bindingContext.EnterNestedScope(property, fieldName, modelName, model: null))
-                        {
-                            await propertyBinder.BindModelAsync(bindingContext);
-                            result = bindingContext.Result;
-                        }
-
-                        property.PropertySetter(
-                            bindingContext.Result.Model,
-                            result.IsModelSet ? result.Model : CreateDefaultValue(property.ModelType));
+                        await propertyBinder.BindModelAsync(bindingContext);
+                        result = bindingContext.Result;
                     }
-                }
 
-                static object CreateDefaultValue(Type type) => type.IsValueType ? Activator.CreateInstance(type) : null;
+                    property.PropertySetter(
+                        bindingContext.Result.Model,
+                        result.IsModelSet ? result.Model : CreateDefaultValue(property.ModelType));
+                }
             }
+
+            static object CreateDefaultValue(Type type) => type.IsValueType ? Activator.CreateInstance(type) : null;
         }
     }
 }

@@ -5,44 +5,43 @@ using Microsoft.Extensions.Logging;
 using Prometheus;
 using QualifiedTeachersApi.DataStore.Crm;
 
-namespace QualifiedTeachersApi.Services
+namespace QualifiedTeachersApi.Services;
+
+public class LogRemainingCrmLimitsService : BackgroundService
 {
-    public class LogRemainingCrmLimitsService : BackgroundService
+    private static readonly TimeSpan _pollInterval = TimeSpan.FromMinutes(1);
+
+    private readonly IWebApiAdapter _webApiAdapter;
+    private readonly ILogger<LogRemainingCrmLimitsService> _logger;
+    private readonly Gauge _remainingRequestsMetric;
+    private readonly Gauge _remainingExecutionTimeMetric;
+
+    public LogRemainingCrmLimitsService(IWebApiAdapter webApiAdapter, ILogger<LogRemainingCrmLimitsService> logger)
     {
-        private static readonly TimeSpan _pollInterval = TimeSpan.FromMinutes(1);
+        _webApiAdapter = webApiAdapter;
+        _logger = logger;
+        _remainingRequestsMetric = Metrics.CreateGauge("crm_remaining_requests", "Remaining CRM requests");
+        _remainingExecutionTimeMetric = Metrics.CreateGauge("crm_remaining_execution_time", "Remaining CRM execution time");
+    }
 
-        private readonly IWebApiAdapter _webApiAdapter;
-        private readonly ILogger<LogRemainingCrmLimitsService> _logger;
-        private readonly Gauge _remainingRequestsMetric;
-        private readonly Gauge _remainingExecutionTimeMetric;
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        var timer = new PeriodicTimer(_pollInterval);
 
-        public LogRemainingCrmLimitsService(IWebApiAdapter webApiAdapter, ILogger<LogRemainingCrmLimitsService> logger)
+        do
         {
-            _webApiAdapter = webApiAdapter;
-            _logger = logger;
-            _remainingRequestsMetric = Metrics.CreateGauge("crm_remaining_requests", "Remaining CRM requests");
-            _remainingExecutionTimeMetric = Metrics.CreateGauge("crm_remaining_execution_time", "Remaining CRM execution time");
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            var timer = new PeriodicTimer(_pollInterval);
-
-            do
+            try
             {
-                try
-                {
-                    var limits = await _webApiAdapter.GetRemainingApiLimits();
+                var limits = await _webApiAdapter.GetRemainingApiLimits();
 
-                    _remainingRequestsMetric.Set(limits.NumberOfRequests);
-                    _remainingExecutionTimeMetric.Set(limits.RemainingExecutionTime);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Failed retrieving CRM API limits.");
-                }
+                _remainingRequestsMetric.Set(limits.NumberOfRequests);
+                _remainingExecutionTimeMetric.Set(limits.RemainingExecutionTime);
             }
-            while (await timer.WaitForNextTickAsync(stoppingToken));
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed retrieving CRM API limits.");
+            }
         }
+        while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 }

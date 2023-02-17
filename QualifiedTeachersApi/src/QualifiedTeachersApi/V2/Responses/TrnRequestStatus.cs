@@ -1,8 +1,7 @@
-﻿namespace QualifiedTeachersApi.V2.Responses
+﻿namespace QualifiedTeachersApi.V2.Responses;
+
+public enum TrnRequestStatus
 {
-    public enum TrnRequestStatus
-    {
-        Pending = 0,
-        Completed = 1
-    }
+    Pending = 0,
+    Completed = 1
 }
