@@ -1,10 +1,5 @@
 ﻿using System.Linq;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using Microsoft.FeatureManagement;
-using Moq;
 using QualifiedTeachersApi.DataStore.Crm;
-using QualifiedTeachersApi.Services.TrnGenerationApi;
 using Xunit;
 using static QualifiedTeachersApi.Tests.DataverseIntegration.GetMatchingTeachersFixture.MatchFixture;
 
@@ -19,19 +14,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     public GetMatchingTeachersTests(GetMatchingTeachersFixture fixture)
     {
         _fixture = fixture;
-
-        var featureManager = Mock.Of<IFeatureManager>();
-        Mock.Get(featureManager)
-            .Setup(f => f.IsEnabledAsync(FeatureFlags.UseTrnGenerationApi))
-            .ReturnsAsync(false);
-        var trnGenerationApiClient = new NoopTrnGenerationApiClient();
-
-        _dataverseAdapter = new DataverseAdapter(
-            _fixture.Service,
-            new TestableClock(),
-            new MemoryCache(Options.Create<MemoryCacheOptions>(new())),
-            featureManager,
-            trnGenerationApiClient);
+        _dataverseAdapter = fixture.DataScope.CreateDataverseAdapter();
     }
 
     [Fact]

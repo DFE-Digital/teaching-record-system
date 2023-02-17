@@ -9,9 +9,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.FeatureManagement;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using Moq;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
 
@@ -23,26 +21,18 @@ public sealed class CrmClientFixture : IDisposable
     private readonly CancellationTokenSource _completedCts;
     private readonly EnvironmentLockManager _lockManager;
     private readonly IMemoryCache _memoryCache;
-    private readonly IFeatureManager _featureIsEnabledFeatureManager;
-    private readonly IFeatureManager _featureIsNotEnabledFeatureManager;
-    private readonly ITrnGenerationApiClient _realTrnGenerationApiClient;
-    private readonly ITrnGenerationApiClient _noopTrnGenerationApiClient;
+    private readonly ITrnGenerationApiClient _trnGenerationApiClient;
 
     public CrmClientFixture(IMemoryCache memoryCache)
     {
         Clock = new();
         Configuration = GetConfiguration();
         _baseServiceClient = GetCrmServiceClient();
-
-        _featureIsEnabledFeatureManager = GetFeatureManager(true);
-        _featureIsNotEnabledFeatureManager = GetFeatureManager(false);
-        _realTrnGenerationApiClient = GetTrnGenerationApiClient(true);
-        _noopTrnGenerationApiClient = GetTrnGenerationApiClient(false);
-
         _completedCts = new CancellationTokenSource();
         _lockManager = new EnvironmentLockManager(Configuration);
         _lockManager.AcquireLock(_completedCts.Token);
         _memoryCache = memoryCache;
+        _trnGenerationApiClient = GetTrnGenerationApiClient();
     }
 
     public TestableClock Clock { get; }
@@ -53,14 +43,9 @@ public sealed class CrmClientFixture : IDisposable
     /// Creates a scope that owns an implementation of <see cref="IOrganizationServiceAsync2"/> that tracks the entities created through it.
     /// When <see cref="IAsyncDisposable.DisposeAsync"/> is called the created entities will be deleted from CRM.
     /// </summary>
-    public TestDataScope CreateTestDataScope(bool useTrnGenerationApi = false) => new(
+    public TestDataScope CreateTestDataScope() => new(
         _baseServiceClient,
-        orgService => new DataverseAdapter(
-            orgService,
-            Clock,
-            _memoryCache,
-            useTrnGenerationApi ? _featureIsEnabledFeatureManager : _featureIsNotEnabledFeatureManager,
-            useTrnGenerationApi ? _realTrnGenerationApiClient : _noopTrnGenerationApiClient),
+        orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient),
         _memoryCache);
 
     public void Dispose()
@@ -84,31 +69,14 @@ public sealed class CrmClientFixture : IDisposable
             Configuration["CrmClientSecret"],
             useUniqueInstance: true)).Result;
 
-    private IFeatureManager GetFeatureManager(bool isUseTrnGenerationApiEnabled)
+    private ITrnGenerationApiClient GetTrnGenerationApiClient()
     {
-        var featureManager = Mock.Of<IFeatureManager>();
-        Mock.Get(featureManager)
-            .Setup(f => f.IsEnabledAsync(FeatureFlags.UseTrnGenerationApi))
-            .ReturnsAsync(isUseTrnGenerationApiEnabled);
-        return featureManager;
-    }
-
-    private ITrnGenerationApiClient GetTrnGenerationApiClient(bool isUseTrnGenerationApiEnabled)
-    {
-        ITrnGenerationApiClient trnGenerationApiClient;
-        if (isUseTrnGenerationApiEnabled)
+        var httpClient = new HttpClient
         {
-            var httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(Configuration["TrnGenerationApi:BaseAddress"]);
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Configuration["TrnGenerationApi:ApiKey"]);
-            trnGenerationApiClient = new TrnGenerationApiClient(httpClient);
-        }
-        else
-        {
-            trnGenerationApiClient = new NoopTrnGenerationApiClient();
-        }
-
-        return trnGenerationApiClient;
+            BaseAddress = new Uri(Configuration["TrnGenerationApi:BaseAddress"])
+        };
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Configuration["TrnGenerationApi:ApiKey"]);
+        return new TrnGenerationApiClient(httpClient);
     }
 
     public sealed class TestDataScope : IAsyncDisposable

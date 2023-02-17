@@ -16,8 +16,7 @@ public class GetMatchingTeachersFixture : IAsyncLifetime
         public Guid ID { get; set; }
     }
 
-    private readonly CrmClientFixture.TestDataScope _dataScope;
-
+    public CrmClientFixture.TestDataScope DataScope { get; }
     public IOrganizationServiceAsync Service { get; }
     private readonly string _nonmatchingNationalInsuranceNumber;
     private readonly string _nonmatchingTRN;
@@ -29,8 +28,8 @@ public class GetMatchingTeachersFixture : IAsyncLifetime
 
     public GetMatchingTeachersFixture(CrmClientFixture crmClientFixture)
     {
-        _dataScope = crmClientFixture.CreateTestDataScope();
-        Service = _dataScope.OrganizationService;
+        DataScope = crmClientFixture.CreateTestDataScope();
+        Service = DataScope.OrganizationService;
 
         var nationalInsuranceNumberGenerator = new NationalInsuranceNumberGenerator(Service);
 
@@ -107,5 +106,5 @@ public class GetMatchingTeachersFixture : IAsyncLifetime
 
     public Task InitializeAsync() => Task.CompletedTask;
 
-    public async Task DisposeAsync() => await _dataScope.DisposeAsync();
+    public async Task DisposeAsync() => await DataScope.DisposeAsync();
 }

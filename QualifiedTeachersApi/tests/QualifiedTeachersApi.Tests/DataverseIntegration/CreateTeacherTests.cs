@@ -9,7 +9,6 @@ namespace QualifiedTeachersApi.Tests.DataverseIntegration;
 public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLifetime
 {
     private readonly CreateTeacherFixture _createTeacherFixture;
-    private readonly CrmClientFixture _crmClientFixture;
     private readonly TestableClock _clock;
     private readonly CrmClientFixture.TestDataScope _dataScope;
     private readonly DataverseAdapter _dataverseAdapter;
@@ -18,7 +17,6 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     public CreateTeacherTests(CreateTeacherFixture createTeacherFixture, CrmClientFixture crmClientFixture)
     {
         _createTeacherFixture = createTeacherFixture;
-        _crmClientFixture = crmClientFixture;
         _clock = crmClientFixture.Clock;
         _dataScope = crmClientFixture.CreateTestDataScope();
         _dataverseAdapter = _dataScope.CreateDataverseAdapter();
@@ -105,36 +103,6 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
-
-        // Assert
-        Assert.True(result.Succeeded);
-    }
-
-    [Fact]
-    public async Task Given_minimal_details_request_and_feature_to_generate_trn_via_api_is_enabled_succeeds()
-    {
-        // Arrange
-        var command = new CreateTeacherCommand()
-        {
-            FirstName = "Minnie",
-            LastName = "Ryder",
-            BirthDate = new(1990, 5, 23),
-            GenderCode = Contact_GenderCode.Female,
-            InitialTeacherTraining = new()
-            {
-                ProviderUkprn = "10044534",  // ARK Teacher Training
-                ProgrammeStartDate = new(2020, 4, 1),
-                ProgrammeEndDate = new(2020, 10, 10),
-                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
-                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
-            }
-        };
-
-        await using var localDataScope = _crmClientFixture.CreateTestDataScope(useTrnGenerationApi: true);
-        var localDataverseAdapter = localDataScope.CreateDataverseAdapter();
-
-        // Act
-        var (result, transactionRequest) = await localDataverseAdapter.CreateTeacherImpl(command);
 
         // Assert
         Assert.True(result.Succeeded);

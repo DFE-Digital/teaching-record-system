@@ -6,7 +6,6 @@ using System.Net;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.FeatureManagement;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.PowerPlatform.Dataverse.Client.Utils;
 using Microsoft.Xrm.Sdk;
@@ -22,20 +21,17 @@ public partial class DataverseAdapter : IDataverseAdapter
     private readonly IOrganizationServiceAsync _service;
     private readonly IClock _clock;
     private readonly IMemoryCache _cache;
-    private readonly IFeatureManager _featureManager;
     private readonly ITrnGenerationApiClient _trnGenerationApiClient;
 
     public DataverseAdapter(
         IOrganizationServiceAsync organizationServiceAsync,
         IClock clock,
         IMemoryCache cache,
-        IFeatureManager featureManager,
         ITrnGenerationApiClient trnGenerationApiClient)
     {
         _service = organizationServiceAsync;
         _clock = clock;
         _cache = cache;
-        _featureManager = featureManager;
         _trnGenerationApiClient = trnGenerationApiClient;
     }
 
