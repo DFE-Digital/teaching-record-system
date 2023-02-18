@@ -10,8 +10,8 @@
 
 namespace QualifiedTeachersApi.Properties {
     using System;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace QualifiedTeachersApi.Properties {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class StringResources {
-
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal StringResources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace QualifiedTeachersApi.Properties {
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,7 +59,7 @@ namespace QualifiedTeachersApi.Properties {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Request must contain IttProviderUkprn or IttProviderName or neither..
         /// </summary>
@@ -68,7 +68,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("ErrorMessage.EitherIttProviderNameOrIttProviderUkprn", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Age must be 0-19 inclusive..
         /// </summary>
@@ -77,7 +77,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("ErrorMessages.AgeMustBe0To19Inclusive", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &apos;Age to&apos; cannot be less than &apos;age from&apos;..
         /// </summary>
@@ -86,7 +86,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("ErrorMessages.AgeToCannotBeLessThanAgeFrom", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Birth date is out of expected range..
         /// </summary>
@@ -95,7 +95,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("ErrorMessages.BirthDateIsOutOfRange", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Birth date must be in format yyyy-MM-dd.
         /// </summary>
@@ -104,7 +104,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("ErrorMessages.InvalidBirthDate", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to requestId can only contain characters a-z, digits, underscores and dashes..
         /// </summary>
@@ -113,7 +113,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("ErrorMessages.RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to requestId must be 100 characters or fewer.
         /// </summary>
@@ -122,7 +122,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("ErrorMessages.RequestIdMustBe100CharactersOrFewer", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to TRN must consist of 7 digits.
         /// </summary>
@@ -131,7 +131,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("ErrorMessages.TRNMustBe7Digits", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Teacher with specified TRN not found.
         /// </summary>
@@ -140,16 +140,16 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10001.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Multiple teachers found with specified TRN.
+        ///   Looks up a localized string similar to Multiple teachers found.
         /// </summary>
         public static string Errors_10002_Title {
             get {
                 return ResourceManager.GetString("Errors.10002.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Teacher already has QTS/EYTS date.
         /// </summary>
@@ -158,7 +158,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10003.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Teacher has multiple incomplete ITT records.
         /// </summary>
@@ -167,7 +167,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10004.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Teacher has no incomplete ITT record.
         /// </summary>
@@ -176,7 +176,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10005.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Teacher has no QTS record.
         /// </summary>
@@ -185,7 +185,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10006.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Teacher has multiple QTS records.
         /// </summary>
@@ -194,7 +194,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10007.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Organisation not found.
         /// </summary>
@@ -203,7 +203,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10008.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Subject not found.
         /// </summary>
@@ -212,7 +212,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10009.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Country not found.
         /// </summary>
@@ -221,7 +221,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10010.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to ProgrammeType cannot be change.
         /// </summary>
@@ -230,7 +230,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10011.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to ITT qualification not found.
         /// </summary>
@@ -239,7 +239,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10012.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to HE qualification not found.
         /// </summary>
@@ -248,7 +248,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10013.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Unable to unlock teacher with active sanctions.
         /// </summary>
@@ -257,7 +257,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10014.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Teacher with specified TsPersonId not found.
         /// </summary>
@@ -266,7 +266,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10015.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Another teacher has the specified TsPersonId assigned.
         /// </summary>
@@ -275,7 +275,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10016.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Teacher already has TsPersonId defined.
         /// </summary>
@@ -284,7 +284,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10017.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Husid registered for an existing teacher.
         /// </summary>
@@ -293,7 +293,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10018.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to CompletionDate cannot be in the future.
         /// </summary>
@@ -302,7 +302,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10019.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Multiple qualifications with qualification type..
         /// </summary>
@@ -311,7 +311,7 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10020.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Unable to update npq qualifications not created by API.
         /// </summary>
@@ -320,13 +320,22 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10021.Title", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Completed date cannot be before 1/11/2021.
         /// </summary>
         public static string Errors_10022_Title {
             get {
                 return ResourceManager.GetString("Errors.10022.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User with specified UserId not found.
+        /// </summary>
+        public static string Errors_10023_Title {
+            get {
+                return ResourceManager.GetString("Errors.10023.Title", resourceCulture);
             }
         }
     }

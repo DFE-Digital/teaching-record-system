@@ -15,39 +15,6 @@ public class SetNpqQualificationTests : ApiTestBase
 {
     public SetNpqQualificationTests(ApiFixture apiFixture) : base(apiFixture)
     {
-
-    }
-
-
-    [Fact]
-    public async Task Given_multiple_contacts_for_trn_return_error()
-    {
-        // Arrange
-        Clock.UtcNow = new DateTime(2023, 10, 31);
-        var trn = "1234567";
-        var contacts = new Contact[]
-        {
-            new Contact()
-            {
-                dfeta_TRN=trn
-            },
-            new Contact()
-            {
-                dfeta_TRN = trn
-            }
-        };
-
-        ApiFixture.DataverseAdapter
-           .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), true))
-           .ReturnsAsync(contacts);
-
-        // Act
-        var response = await HttpClientWithApiKey.PutAsync(
-            $"v2/npq-qualifications?trn={trn}",
-            CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
-
-        // Assert
-        await AssertEx.ResponseIsError(response, errorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -72,8 +39,8 @@ public class SetNpqQualificationTests : ApiTestBase
         Clock.UtcNow = new DateTime(2021, 10, 31);
         var trn = "1234567";
         ApiFixture.DataverseAdapter
-           .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), true))
-           .ReturnsAsync(Array.Empty<Contact>());
+           .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+           .ReturnsAsync((Contact)null);
 
         // Act
         var response = await HttpClientWithApiKey.PutAsync(
@@ -94,8 +61,8 @@ public class SetNpqQualificationTests : ApiTestBase
         Clock.UtcNow = new DateTime(2022, 01, 01);
         var trn = "1234567";
         ApiFixture.DataverseAdapter
-           .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), true))
-           .ReturnsAsync(Array.Empty<Contact>());
+           .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+           .ReturnsAsync((Contact)null);
 
         // Act
         var response = await HttpClientWithApiKey.PutAsync(
@@ -113,13 +80,10 @@ public class SetNpqQualificationTests : ApiTestBase
         Clock.UtcNow = new DateTime(2023, 10, 31);
         var trn = "1234567";
         var id = Guid.NewGuid();
-        var contacts = new Contact[]
+        var contact = new Contact()
         {
-            new Contact()
-            {
-                dfeta_TRN=trn,
-                Id = Guid.NewGuid()
-            },
+            dfeta_TRN = trn,
+            Id = Guid.NewGuid()
         };
         var qualifications = new dfeta_qualification[]
         {
@@ -131,8 +95,8 @@ public class SetNpqQualificationTests : ApiTestBase
         };
 
         ApiFixture.DataverseAdapter
-           .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), true))
-           .ReturnsAsync(contacts);
+           .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+           .ReturnsAsync(contact);
 
         ApiFixture.DataverseAdapter
            .Setup(mock => mock.GetQualificationsForTeacher(id, It.IsAny<string[]>()))
@@ -176,17 +140,14 @@ public class SetNpqQualificationTests : ApiTestBase
         Clock.UtcNow = new DateTime(2023, 10, 31);
         var result = SetNpqQualificationResult.Success();
         var trn = "1234567";
-        var contacts = new Contact[]
+        var contact = new Contact()
         {
-            new Contact()
-            {
-                dfeta_TRN=trn
-            },
+            dfeta_TRN = trn
         };
 
         ApiFixture.DataverseAdapter
-           .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), true))
-           .ReturnsAsync(contacts);
+           .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+           .ReturnsAsync(contact);
 
         ApiFixture.DataverseAdapter
            .Setup(mock => mock.SetNpqQualification(It.IsAny<SetNpqQualificationCommand>()))

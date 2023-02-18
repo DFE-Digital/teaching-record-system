@@ -625,7 +625,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return teacher;
     }
 
-    public async Task<Contact[]> GetTeachersByTrn(string trn, string[] columnNames, bool activeOnly = true)
+    public async Task<Contact> GetTeacherByTrn(string trn, string[] columnNames, bool activeOnly = true)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
@@ -642,7 +642,7 @@ public partial class DataverseAdapter : IDataverseAdapter
 
         var result = await _service.RetrieveMultipleAsync(query);
 
-        return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
+        return result.Entities.Select(e => e.ToEntity<Contact>()).SingleOrDefault();
     }
 
     public async Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, string[] columnNames, bool activeOnly = true)

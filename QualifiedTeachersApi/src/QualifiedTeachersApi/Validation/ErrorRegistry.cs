@@ -8,7 +8,7 @@ public static class ErrorRegistry
     private static readonly Dictionary<int, ErrorDescriptor> _all = new ErrorDescriptor[]
     {
         ErrorDescriptor.Create(10001),  // Teacher with specified TRN not found
-        ErrorDescriptor.Create(10002),  // Multiple teachers found with specified TRN
+        ErrorDescriptor.Create(10002),  // Multiple teachers found
         ErrorDescriptor.Create(10003),  // Teacher already has QTS/EYTS date
         ErrorDescriptor.Create(10004),  // Teacher has multiple incomplete ITT records
         ErrorDescriptor.Create(10005),  // Teacher has no incomplete ITT record
@@ -33,7 +33,7 @@ public static class ErrorRegistry
 
     public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);
 
-    public static Error MultipleTeachersFoundWithSpecifiedTrn() => CreateError(10002);
+    public static Error MultipleTeachersFound() => CreateError(10002);
 
     public static Error TeacherAlreadyHasQtsDate() => CreateError(10003);
 
