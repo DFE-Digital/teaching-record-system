@@ -27,7 +27,7 @@ public class GetTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
@@ -42,7 +42,7 @@ public class GetTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsValidationErrorForProperty(response, "birthdate", expectedError: $"The value '{birthDate}' is not valid for BirthDate.");
@@ -62,7 +62,7 @@ public class GetTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
@@ -93,7 +93,7 @@ public class GetTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
@@ -138,7 +138,7 @@ public class GetTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{matchingTrn}?birthdate={birthDate}&nino={nino}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         var responseJson = await AssertEx.JsonResponse(response, expectedStatusCode: StatusCodes.Status200OK);

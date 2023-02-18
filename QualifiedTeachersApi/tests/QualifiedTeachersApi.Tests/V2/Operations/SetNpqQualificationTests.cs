@@ -42,7 +42,7 @@ public class SetNpqQualificationTests : ApiTestBase
            .ReturnsAsync(contacts);
 
         // Act
-        var response = await HttpClient.PutAsync(
+        var response = await HttpClientWithApiKey.PutAsync(
             $"v2/npq-qualifications?trn={trn}",
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
@@ -57,7 +57,7 @@ public class SetNpqQualificationTests : ApiTestBase
         Clock.UtcNow = new DateTime(2021, 12, 04);
 
         // Act
-        var response = await HttpClient.PutAsync(
+        var response = await HttpClientWithApiKey.PutAsync(
             $"v2/npq-qualifications",
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
@@ -76,7 +76,7 @@ public class SetNpqQualificationTests : ApiTestBase
            .ReturnsAsync(Array.Empty<Contact>());
 
         // Act
-        var response = await HttpClient.PutAsync(
+        var response = await HttpClientWithApiKey.PutAsync(
             $"v2/npq-qualifications?trn={trn}",
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
@@ -98,7 +98,7 @@ public class SetNpqQualificationTests : ApiTestBase
            .ReturnsAsync(Array.Empty<Contact>());
 
         // Act
-        var response = await HttpClient.PutAsync(
+        var response = await HttpClientWithApiKey.PutAsync(
             $"v2/npq-qualifications?trn={trn}",
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
@@ -143,7 +143,7 @@ public class SetNpqQualificationTests : ApiTestBase
            .ReturnsAsync(SetNpqQualificationResult.Failed(SetNpqQualificationFailedReasons.NpqQualificationNotCreatedByApi));
 
         // Act
-        var response = await HttpClient.PutAsync(
+        var response = await HttpClientWithApiKey.PutAsync(
             $"v2/npq-qualifications?trn={trn}",
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
@@ -161,7 +161,7 @@ public class SetNpqQualificationTests : ApiTestBase
         var trn = "1234567";
 
         // Act
-        var response = await HttpClient.PutAsync(
+        var response = await HttpClientWithApiKey.PutAsync(
             $"v2/npq-qualifications?trn={trn}",
             CreateRequest(req => req.QualificationType = (QualificationType)(-1)));
 
@@ -193,7 +193,7 @@ public class SetNpqQualificationTests : ApiTestBase
            .ReturnsAsync(result);
 
         // Act
-        var response = await HttpClient.PutAsync(
+        var response = await HttpClientWithApiKey.PutAsync(
             $"v2/npq-qualifications?trn={trn}",
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year - 1, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 

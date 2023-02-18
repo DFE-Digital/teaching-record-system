@@ -1,7 +1,10 @@
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
@@ -11,11 +14,18 @@ namespace QualifiedTeachersApi.Tests;
 
 public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    public ApiFixture()
+    {
+        JwtSigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()), SecurityAlgorithms.RsaSha256);
+    }
+
     public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
 
     public Mock<IDataverseAdapter> DataverseAdapter { get; } = new Mock<IDataverseAdapter>();
 
     public Mock<IGetAnIdentityApiClient> IdentityApiClient { get; } = new Mock<IGetAnIdentityApiClient>();
+
+    public SigningCredentials JwtSigningCredentials { get; }
 
     public async Task InitializeAsync()
     {
@@ -49,6 +59,12 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
                 var configuration = sp.GetRequiredService<IConfiguration>();
                 var connectionString = configuration.GetConnectionString("DefaultConnection");
                 return new DbHelper(connectionString);
+            });
+
+            services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.TokenValidationParameters.ValidateIssuer = false;
+                options.TokenValidationParameters.IssuerSigningKey = JwtSigningCredentials.Key;
             });
         });
     }
