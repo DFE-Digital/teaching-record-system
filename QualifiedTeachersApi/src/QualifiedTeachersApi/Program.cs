@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Security.Claims;
 using AspNetCoreRateLimit;
 using AspNetCoreRateLimit.Redis;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -86,17 +87,32 @@ public class Program
         }
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
-            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { });
+            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
+            .AddJwtBearer(options =>
+            {
+                options.Authority = configuration["GetAnIdentity:Authority"];
+                options.MapInboundClaims = false;
+                options.TokenValidationParameters.ValidateAudience = false;
+            });
 
         services.AddAuthorization(options =>
         {
             options.AddPolicy(
-                "Bearer",
+                AuthorizationPolicies.ApiKey,
                 policy => policy
                     .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
                     .RequireClaim(ClaimTypes.Name));
 
-            options.DefaultPolicy = options.GetPolicy("Bearer");
+            options.AddPolicy(
+                    AuthorizationPolicies.IdentityUserWithTrn,
+                    policy => policy
+                        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                        .RequireAssertion(ctx =>
+                        {
+                            var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                            return scopes.Contains("dqt:read");
+                        })
+                        .RequireClaim("trn"));
         });
 
         services
@@ -104,7 +120,6 @@ public class Program
             {
                 options.AddHybridBodyModelBinderProvider();
 
-                options.Filters.Add(new AuthorizeFilter());
                 options.Filters.Add(new ProducesJsonOrProblemAttribute());
                 options.Filters.Add(new CrmServiceProtectionFaultExceptionFilter());
                 options.Filters.Add(new DefaultErrorExceptionFilter(statusCode: StatusCodes.Status400BadRequest));
@@ -139,6 +154,7 @@ public class Program
         {
             c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
             c.SwaggerDoc("v2", new OpenApiInfo() { Title = "DQT API", Version = "v2" });
+            c.SwaggerDoc("v3", new OpenApiInfo() { Title = "DQT API", Version = "v3" });
 
             c.DocInclusionPredicate((docName, api) => docName.Equals(api.GroupName, StringComparison.OrdinalIgnoreCase));
             c.EnableAnnotations();
@@ -319,6 +335,7 @@ public class Program
             {
                 c.SwaggerEndpoint("v1/swagger.json", "DQT API v1");
                 c.SwaggerEndpoint("v2/swagger.json", "DQT API v2");
+                c.SwaggerEndpoint("v3/swagger.json", "DQT API v3");
                 c.EnablePersistAuthorization();
             });
 

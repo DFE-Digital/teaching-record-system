@@ -24,7 +24,9 @@ public class SetNpqQualificationHandler : IRequestHandler<SetNpqQualificationReq
 
     public async Task<Unit> Handle(SetNpqQualificationRequest request, CancellationToken cancellationToken)
     {
-        var contacts = await _dataverseAdapter.GetTeachersByTrn(request.Trn, columnNames: new[]
+        var contact = await _dataverseAdapter.GetTeacherByTrn(
+            request.Trn,
+            columnNames: new[]
             {
                 Contact.Fields.FirstName,
                 Contact.Fields.LastName,
@@ -37,21 +39,17 @@ public class SetNpqQualificationHandler : IRequestHandler<SetNpqQualificationReq
             },
             activeOnly: true);
 
-        if (contacts.Length == 0)
+        if (contact is null)
         {
             throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
-        }
-        else if (contacts.Length > 1)
-        {
-            throw new ErrorException(ErrorRegistry.MultipleTeachersFoundWithSpecifiedTrn());
         }
 
         var setNpqQualificationResult = await _dataverseAdapter.SetNpqQualification(new SetNpqQualificationCommand()
         {
-            TeacherId = contacts[0].Id,
+            TeacherId = contact.Id,
             CompletionDate = request.CompletionDate.ToDateTime(),
             QualificationType = ((dfeta_qualification_dfeta_Type)(request.QualificationType?.ConvertToQualificationType()))
-        }); ;
+        });
 
         if (!setNpqQualificationResult.Succeeded)
         {

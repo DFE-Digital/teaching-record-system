@@ -44,7 +44,7 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
         }
         else if (teachers.Length > 1)
         {
-            throw new ErrorException(ErrorRegistry.MultipleTeachersFoundWithSpecifiedTrn());
+            throw new ErrorException(ErrorRegistry.MultipleTeachersFound());
         }
 
         var updateTeacherResult = await _dataverseAdapter.UpdateTeacher(new UpdateTeacherCommand()

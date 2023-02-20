@@ -1,8 +1,12 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Json;
 using Xunit;
@@ -16,8 +20,11 @@ public abstract class ApiTestBase : IAsyncLifetime, IDisposable
     {
         ApiFixture = apiFixture;
 
-        HttpClient = apiFixture.CreateClient();
-        HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", ClientId);
+        {
+            var key = apiFixture.Services.GetRequiredService<IConfiguration>()["ApiClients:tests:ApiKey:0"];
+            HttpClientWithApiKey = apiFixture.CreateClient();
+            HttpClientWithApiKey.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
+        }
 
         apiFixture.ResetMocks();
     }
@@ -28,7 +35,7 @@ public abstract class ApiTestBase : IAsyncLifetime, IDisposable
 
     public TestableClock Clock => (TestableClock)ApiFixture.Services.GetRequiredService<IClock>();
 
-    public HttpClient HttpClient { get; }
+    public HttpClient HttpClientWithApiKey { get; }
 
     public DateTime UtcNow
     {
@@ -46,6 +53,32 @@ public abstract class ApiTestBase : IAsyncLifetime, IDisposable
     public virtual Task DisposeAsync() => Task.CompletedTask;
 
     public virtual Task InitializeAsync() => ApiFixture.DbHelper.ClearData();
+
+    public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read")
+    {
+        // The actual access tokens contain many more claims than this but these are the two we care about
+        var subject = new ClaimsIdentity(new[]
+        {
+            new Claim("scope", scope),
+            new Claim("trn", trn)
+        });
+
+        var jwtHandler = new JwtSecurityTokenHandler();
+
+        var tokenDescriptor = new SecurityTokenDescriptor()
+        {
+            Subject = subject,
+            Expires = DateTime.UtcNow.AddDays(1),
+            SigningCredentials = ApiFixture.JwtSigningCredentials
+        };
+
+        var accessToken = jwtHandler.CreateEncodedJwt(tokenDescriptor);
+
+        var httpClient = ApiFixture.CreateClient();
+        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+
+        return httpClient;
+    }
 
     public virtual async Task<T> WithDbContext<T>(Func<DqtContext, Task<T>> action)
     {

@@ -20,7 +20,7 @@ public interface IDataverseAdapter
 
     Task<Contact> GetTeacher(Guid teacherId, string[] columnNames, bool resolveMerges = true);
 
-    Task<Contact[]> GetTeachersByTrn(string trn, string[] columnNames, bool activeOnly = true);
+    Task<Contact> GetTeacherByTrn(string trn, string[] columnNames, bool activeOnly = true);
 
     Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, string[] columnNames, bool activeOnly = true);
 

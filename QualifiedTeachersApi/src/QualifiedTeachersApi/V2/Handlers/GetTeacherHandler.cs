@@ -7,7 +7,6 @@ using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.V2.ApiModels;
 using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
-using QualifiedTeachersApi.Validation;
 
 namespace QualifiedTeachersApi.V2.Handlers;
 
@@ -22,7 +21,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
     public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
-        var teachers = await _dataverseAdapter.GetTeachersByTrn(
+        var teacher = await _dataverseAdapter.GetTeacherByTrn(
             request.Trn,
             columnNames: new[]
             {
@@ -37,16 +36,10 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             },
             activeOnly: true);
 
-        if (teachers.Length == 0)
+        if (teacher is null)
         {
             return null;
         }
-        else if (teachers.Length > 1)
-        {
-            throw new ErrorException(ErrorRegistry.MultipleTeachersFoundWithSpecifiedTrn());
-        }
-
-        var teacher = teachers[0];
 
         var qtsRegistrations = await _dataverseAdapter.GetQtsRegistrationsByTeacher(
             teacher.Id,

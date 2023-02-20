@@ -42,7 +42,7 @@ public class SetIttOutcomeTests : ApiTestBase
         };
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsError(response, errorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
@@ -75,7 +75,7 @@ public class SetIttOutcomeTests : ApiTestBase
         };
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsError(response, errorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
@@ -100,7 +100,7 @@ public class SetIttOutcomeTests : ApiTestBase
         };
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsValidationErrorForProperty(
@@ -130,7 +130,7 @@ public class SetIttOutcomeTests : ApiTestBase
         };
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsValidationErrorForProperty(
@@ -160,7 +160,7 @@ public class SetIttOutcomeTests : ApiTestBase
         };
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsValidationErrorForProperty(
@@ -194,7 +194,7 @@ public class SetIttOutcomeTests : ApiTestBase
         };
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsValidationErrorForProperty(
@@ -224,7 +224,7 @@ public class SetIttOutcomeTests : ApiTestBase
         };
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsValidationErrorForProperty(
@@ -267,7 +267,7 @@ public class SetIttOutcomeTests : ApiTestBase
         };
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsError(response, 10003, expectedStatusCode: StatusCodes.Status400BadRequest);
@@ -314,7 +314,7 @@ public class SetIttOutcomeTests : ApiTestBase
         };
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsError(response, expectedErrorCode, expectedStatusCode: StatusCodes.Status400BadRequest);

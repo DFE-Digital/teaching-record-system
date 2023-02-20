@@ -37,7 +37,7 @@ public class SetIttOutcomeHandler : IRequestHandler<SetIttOutcomeRequest, SetItt
         }
         else if (teachers.Length > 1)
         {
-            throw new ErrorException(ErrorRegistry.MultipleTeachersFoundWithSpecifiedTrn());
+            throw new ErrorException(ErrorRegistry.MultipleTeachersFound());
         }
 
         var teacherId = teachers[0].Id;

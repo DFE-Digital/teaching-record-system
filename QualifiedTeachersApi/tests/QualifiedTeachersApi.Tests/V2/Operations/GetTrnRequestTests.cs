@@ -22,7 +22,7 @@ public class GetTrnRequestTests : ApiTestBase
         var requestId = Guid.NewGuid().ToString();
 
         // Act
-        var response = await HttpClient.GetAsync($"v2/trn-requests/{requestId}");
+        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -49,7 +49,7 @@ public class GetTrnRequestTests : ApiTestBase
         });
 
         // Act
-        var response = await HttpClient.GetAsync($"v2/trn-requests/{requestId}");
+        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -74,7 +74,7 @@ public class GetTrnRequestTests : ApiTestBase
         });
 
         // Act
-        var response = await HttpClient.GetAsync($"v2/trn-requests/{requestId}");
+        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -119,7 +119,7 @@ public class GetTrnRequestTests : ApiTestBase
         });
 
         // Act
-        var response = await HttpClient.GetAsync($"v2/trn-requests/{requestId}");
+        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
         await AssertEx.JsonResponseEquals(

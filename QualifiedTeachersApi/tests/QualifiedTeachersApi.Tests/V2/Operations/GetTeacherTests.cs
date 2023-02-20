@@ -28,7 +28,7 @@ public class GetTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
@@ -42,13 +42,13 @@ public class GetTeacherTests : ApiTestBase
 
 
         ApiFixture.DataverseAdapter
-            .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), true))
-            .ReturnsAsync(Array.Empty<Contact>());
+            .Setup(mock => mock.GetTeacherByTrn(trn, It.IsAny<string[]>(), true))
+            .ReturnsAsync((Contact)null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
@@ -113,8 +113,8 @@ public class GetTeacherTests : ApiTestBase
         itt.Attributes.Add($"establishment.{Account.Fields.dfeta_UKPRN}", new AliasedValue(Account.EntityLogicalName, Account.Fields.dfeta_UKPRN, ittProviderUkprn));
 
         ApiFixture.DataverseAdapter
-            .Setup(mock => mock.GetTeachersByTrn(trn, It.IsAny<string[]>(), /* columnNames: */ true))
-            .ReturnsAsync(new[] { contact });
+            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+            .ReturnsAsync(contact);
 
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(teacherId, /* columnNames: */ It.IsAny<string[]>()))
@@ -134,7 +134,7 @@ public class GetTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(

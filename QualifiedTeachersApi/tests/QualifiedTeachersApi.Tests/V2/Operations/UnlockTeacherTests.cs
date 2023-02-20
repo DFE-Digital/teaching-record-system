@@ -28,7 +28,7 @@ public class UnlockTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -57,7 +57,7 @@ public class UnlockTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -95,7 +95,7 @@ public class UnlockTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -120,7 +120,7 @@ public class UnlockTeacherTests : ApiTestBase
         var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.ResponseIsError(response, errorCode: 10014, expectedStatusCode: StatusCodes.Status400BadRequest);
