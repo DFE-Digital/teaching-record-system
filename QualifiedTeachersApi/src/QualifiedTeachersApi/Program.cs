@@ -90,7 +90,7 @@ public class Program
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
             .AddJwtBearer(options =>
             {
-                options.Authority = configuration["GetAnIdentity:Authority"];
+                options.Authority = configuration["GetAnIdentity:BaseAddress"];
                 options.MapInboundClaims = false;
                 options.TokenValidationParameters.ValidateAudience = false;
             });
