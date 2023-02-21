@@ -57,35 +57,11 @@ public partial class DataverseAdapter
         var findExistingTeacherResult = await (findExistingTeacher ?? helper.FindExistingTeacher)();
         var allocateTrn = findExistingTeacherResult == null;
         string trn = null;
-        bool useTrnGenerationApi = await _featureManager.IsEnabledAsync(FeatureFlags.UseTrnGenerationApi);
 
         if (allocateTrn)
         {
-            if (useTrnGenerationApi)
-            {
-                trn = await _trnGenerationApiClient.GenerateTrn();
-                newContact.dfeta_TRN = trn;
-            }
-            else
-            {
-                // Set the flag to allocate a TRN
-                // N.B. setting this attribute has to be in an Update, setting it in the initial Create doesn't work
-                txnRequest.Requests.Add(new UpdateRequest()
-                {
-                    Target = new Contact()
-                    {
-                        Id = helper.TeacherId,
-                        dfeta_TRNAllocateRequest = _clock.UtcNow
-                    }
-                });
-
-                // Retrieve the generated TRN
-                txnRequest.Requests.Add(new RetrieveRequest()
-                {
-                    Target = helper.TeacherId.ToEntityReference(Contact.EntityLogicalName),
-                    ColumnSet = new ColumnSet(Contact.Fields.dfeta_TRN)
-                });
-            }
+            trn = await _trnGenerationApiClient.GenerateTrn();
+            newContact.dfeta_TRN = trn;
         }
         else
         {
@@ -123,12 +99,6 @@ public partial class DataverseAdapter
         }
 
         var txnResponse = (ExecuteTransactionResponse)await _service.ExecuteAsync(txnRequest);
-
-        // If a TRN was allocated via CRM we have a RetrieveResponse that contains the value otherwise it should already be set from the TRN Generation API
-        if (allocateTrn && !useTrnGenerationApi)
-        {
-            trn = txnResponse.Responses.OfType<RetrieveResponse>().Single().Entity.ToEntity<Contact>().dfeta_TRN;
-        }
 
         return (CreateTeacherResult.Success(helper.TeacherId, trn), txnRequest);
     }
