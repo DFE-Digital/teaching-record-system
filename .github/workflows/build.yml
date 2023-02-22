@@ -29,25 +29,10 @@ permissions:
   pull-requests: write
 
 jobs:
-  generate_postgres_password:
-    name: Generate Postgres password
-    runs-on: ubuntu-latest
-    outputs:
-      POSTGRES_PASSWORD: ${{ steps.generate_password.outputs.POSTGRES_PASSWORD }}
-
-    steps:
-    - id: generate_password
-      run: |
-        chars=abcd1234ABCD
-        for i in {1..8} ; do
-          echo -n "POSTGRES_PASSWORD=${chars:RANDOM%${#chars}:1}" >> $GITHUB_OUTPUT
-        done
-
   build:
     name: Build & test
     runs-on: ubuntu-latest
     concurrency: build
-    needs: [generate_postgres_password]
 
     outputs:
       docker_image: ${{ env.tag }}
@@ -56,8 +41,8 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_PASSWORD: ${{ needs.generate_postgres_password.outputs.POSTGRES_PASSWORD }}
-          POSTGRES_DB: dqt
+          POSTGRES_PASSWORD: qtapi
+          POSTGRES_DB: qtapi
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -135,7 +120,7 @@ jobs:
           -e IntegrationTests_BuildEnvLockBlobSasToken="${{ env.INTEGRATIONTESTS_BUILDENVLOCKBLOBSASTOKEN }}"
           -e IntegrationTests_TrnGenerationApi__BaseAddress="${{ env.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIBASEADDRESS }}"
           -e IntegrationTests_TrnGenerationApi__ApiKey="${{ env.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIAPIKEY }}"
-          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=${{ needs.generate_postgres_password.outputs.POSTGRES_PASSWORD }};Database=dqt"
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
 
     # TODO Use migration bundles when https://github.com/dotnet/efcore/issues/25555 is fixed
     - name: Generate migrations artifact
