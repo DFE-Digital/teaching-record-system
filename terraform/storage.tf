@@ -20,5 +20,5 @@ resource "azurerm_storage_container" "certificates" {
 }
 
 locals {
-  StorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.qualified-teachers-api.name};AccountKey=${azurerm_storage_account.qualified-teachers-api.primary_access_key}",
+  StorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.qualified-teachers-api.name};AccountKey=${azurerm_storage_account.qualified-teachers-api.primary_access_key}"
 }
