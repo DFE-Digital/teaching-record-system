@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using AspNetCoreRateLimit;
 using AspNetCoreRateLimit.Redis;
+using Azure.Storage.Blobs;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -278,6 +280,11 @@ public class Program
         {
             services.AddSingleton<IDistributedLockService, LocalDistributedLockService>();
         }
+
+        services.AddAzureClients(clientBuilder =>
+        {
+            clientBuilder.AddBlobServiceClient(configuration["StorageConnectionString"]);
+        });
 
         services.AddTransient<IHostedService, LinkTrnToIdentityUserService>();
         MetricLabels.ConfigureLabels(builder.Configuration);
