@@ -4,7 +4,7 @@ resource "azurerm_storage_account" "app-storage" {
   resource_group_name               = var.resource_group_name
   account_replication_type          = var.environment_name != "production" ? "LRS" : "GRS"
   account_tier                      = "Standard"
-  account_kind                      = "BlobStorage"
+  account_kind                      = "StorageV2"
   min_tls_version                   = "TLS1_2"
   infrastructure_encryption_enabled = true
 
