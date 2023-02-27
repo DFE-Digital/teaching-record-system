@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -271,6 +272,45 @@ public class SetIttOutcomeTests : ApiTestBase
 
         // Assert
         await AssertEx.ResponseIsError(response, 10003, expectedStatusCode: StatusCodes.Status400BadRequest);
+    }
+
+    [Fact]
+    public async Task Given_teacher_passing_withdrawn_outcome_for_teacher_that_is_withdrawn_do_nothing_without_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var ittProviderUkprn = "1001234";
+        var outcome = IttOutcome.Withdrawn;
+        var assessmentDate = Clock.Today;
+        var dob = new DateOnly(1987, 1, 1);
+
+        var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .ReturnsAsync(new[] { contact });
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), null))
+            .ReturnsAsync(SetIttResultForTeacherResult.Success(null));
+
+        var requestBody = new SetIttOutcomeRequest()
+        {
+            BirthDate = dob,
+            IttProviderUkprn = ittProviderUkprn,
+            Outcome = outcome
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome?birthdate={dob.ToString("yyyy-MM-dd")}")
+        {
+            Content = CreateJsonContent(requestBody)
+        };
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Theory]

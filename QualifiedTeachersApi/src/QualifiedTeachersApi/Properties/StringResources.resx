@@ -129,8 +129,14 @@
   <data name="ErrorMessages.BirthDateIsOutOfRange" xml:space="preserve">
     <value>Birth date is out of expected range.</value>
   </data>
+  <data name="ErrorMessages.InTrainingOutcomeNotValidForAssessmentOnlyRoute" xml:space="preserve">
+    <value>InTraining outcome not permitted for AssessmentOnlyRoute ProgrammeType.</value>
+  </data>
   <data name="ErrorMessages.InvalidBirthDate" xml:space="preserve">
     <value>Birth date must be in format yyyy-MM-dd</value>
+  </data>
+  <data name="ErrorMessages.OutcomeMustBeDeferredInTrainingOrUnderAssessment" xml:space="preserve">
+    <value>Outcome can only be set to Deferred, InTraining or UnderAssessment.</value>
   </data>
   <data name="ErrorMessages.RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes" xml:space="preserve">
     <value>requestId can only contain characters a-z, digits, underscores and dashes.</value>
@@ -140,6 +146,9 @@
   </data>
   <data name="ErrorMessages.TRNMustBe7Digits" xml:space="preserve">
     <value>TRN must consist of 7 digits</value>
+  </data>
+  <data name="ErrorMessages.UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute" xml:space="preserve">
+    <value>UnderAssessment outcome only permitted for AssessmentOnlyRoute ProgrammeType.</value>
   </data>
   <data name="Errors.10001.Title" xml:space="preserve">
     <value>Teacher with specified TRN not found</value>

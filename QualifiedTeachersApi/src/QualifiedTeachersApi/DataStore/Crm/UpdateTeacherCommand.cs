@@ -26,6 +26,7 @@ public class UpdateTeacherCommandInitialTeacherTraining
     public string IttQualificationValue { get; set; }
     public dfeta_ITTQualificationAim? IttQualificationAim { get; set; }
     public string TrainingCountryCode { get; set; }
+    public dfeta_ITTResult? Result { get; set; }
 }
 
 public class UpdateTeacherCommandQualification

@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Linq;
+using FluentValidation;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.Properties;
 using QualifiedTeachersApi.V2.ApiModels;
@@ -50,6 +51,29 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
             .IsInEnum()
             .Must(qt => qt != ApiModels.IttQualificationType.InternationalQualifiedTeacherStatus)
             .When(r => r.InitialTeacherTraining.ProgrammeType != ApiModels.IttProgrammeType.InternationalQualifiedTeacherStatus);
+
+
+        RuleFor(r => new { r.InitialTeacherTraining.Outcome, r.InitialTeacherTraining.ProgrammeType })
+            .Custom((request, ctx) =>
+            {
+                var validOutcomes = new[] { IttOutcome.UnderAssessment, IttOutcome.Deferred, IttOutcome.InTraining };
+                if (!request.Outcome.HasValue)
+                {
+                    return;
+                }
+
+                if (!validOutcomes.Contains(request.Outcome.Value))
+                    ctx.AddFailure(nameof(request.Outcome), StringResources.ErrorMessages_OutcomeMustBeDeferredInTrainingOrUnderAssessment);
+                else
+                {
+                    if (request.ProgrammeType == IttProgrammeType.AssessmentOnlyRoute && request.Outcome.Value == IttOutcome.InTraining)
+                        ctx.AddFailure(nameof(request.Outcome), StringResources.ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute);
+
+                    else if (request.ProgrammeType != IttProgrammeType.AssessmentOnlyRoute && request.Outcome.Value == IttOutcome.UnderAssessment)
+                        ctx.AddFailure(nameof(request.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
+                }
+
+            });
 
         RuleFor(r => r.Qualification.Class)
             .IsInEnum()

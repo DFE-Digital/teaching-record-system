@@ -71,7 +71,7 @@ public partial class DataverseAdapter
             // Create itt record & review task
             txnRequest.Requests.Add(new CreateRequest()
             {
-                Target = helper.CreateInitialTeacherTrainingEntity(referenceData, id: null)
+                Target = helper.CreateInitialTeacherTrainingEntity(referenceData, id: null, null)
             });
 
             var reviewTask = helper.CreateNoMatchIttReviewTask();
@@ -86,7 +86,7 @@ public partial class DataverseAdapter
             Debug.Assert(itt != null);
             txnRequest.Requests.Add(new UpdateRequest()
             {
-                Target = helper.CreateInitialTeacherTrainingEntity(referenceData, itt.Id)
+                Target = helper.CreateInitialTeacherTrainingEntity(referenceData, itt.Id, itt)
             });
         }
 
@@ -158,12 +158,12 @@ public partial class DataverseAdapter
             Guid ittProviderId)
         {
             // Find an ITT record for the specified ITT Provider.
-            // The record should be at the InTraining status unless the programme is 'assessment only',
-            // in which case the status should be UnderAssessment.
+            // The record should be at the InTraining or Deferred status unless the programme is 'assessment only',
+            // in which case the status should be UnderAssessment or Deferred.
 
             var inTrainingForProvider = ittRecords
-                .Where(r => (r.dfeta_ProgrammeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute && r.dfeta_Result == dfeta_ITTResult.InTraining) ||
-                            (r.dfeta_ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute && r.dfeta_Result == dfeta_ITTResult.UnderAssessment))
+                .Where(r => (r.dfeta_ProgrammeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute && (r.dfeta_Result == dfeta_ITTResult.InTraining || r.dfeta_Result == dfeta_ITTResult.Deferred)) ||
+                            (r.dfeta_ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute && (r.dfeta_Result == dfeta_ITTResult.UnderAssessment || r.dfeta_Result == dfeta_ITTResult.Deferred)))
                 .Where(r => r.StateCode == dfeta_initialteachertrainingState.Active && r.dfeta_EstablishmentId.Id == ittProviderId)
                 .ToArray();
 
@@ -298,13 +298,24 @@ public partial class DataverseAdapter
             }
         }
 
-        public dfeta_initialteachertraining CreateInitialTeacherTrainingEntity(UpdateTeacherReferenceLookupResult referenceData, Guid? id)
+        public dfeta_initialteachertraining CreateInitialTeacherTrainingEntity(UpdateTeacherReferenceLookupResult referenceData, Guid? id, dfeta_initialteachertraining existingItt)
         {
             Debug.Assert(referenceData.IttProviderId.HasValue);
             Debug.Assert(referenceData.IttSubject1Id.HasValue);
 
             var cohortYear = _command.InitialTeacherTraining.ProgrammeEndDate?.Year.ToString();
-            var result = _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ? dfeta_ITTResult.UnderAssessment : dfeta_ITTResult.InTraining;
+            var result = (_command.InitialTeacherTraining.Result ?? //update result to request
+                existingItt?.dfeta_Result ??                        //keep existing result
+                (_command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ? dfeta_ITTResult.UnderAssessment : dfeta_ITTResult.InTraining)); //create new itt record
+
+            if (_command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute && _command.InitialTeacherTraining.Result == dfeta_ITTResult.InTraining)
+            {
+                throw new ArgumentException("InTraining not permitted for AsessmentOnlyRoute", nameof(_command.InitialTeacherTraining));
+            }
+            if (_command.InitialTeacherTraining.ProgrammeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute && _command.InitialTeacherTraining.Result == dfeta_ITTResult.UnderAssessment)
+            {
+                throw new ArgumentException("UnderAsessment only permitted for AsessmentOnlyRoute", nameof(_command.InitialTeacherTraining));
+            }
 
             var entity = new dfeta_initialteachertraining()
             {
@@ -320,7 +331,7 @@ public partial class DataverseAdapter
                 dfeta_Subject3Id = referenceData.IttSubject3Id?.ToEntityReference(dfeta_ittsubject.EntityLogicalName),
                 dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
                 dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
-                dfeta_Result = !id.HasValue ? result : null,
+                dfeta_Result = result,
                 dfeta_TraineeID = _command.HusId,
                 dfeta_ITTQualificationId = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName),
                 dfeta_ittqualificationaim = _command.InitialTeacherTraining.IttQualificationAim
@@ -329,11 +340,6 @@ public partial class DataverseAdapter
             if (referenceData.IttCountryId is Guid countryId)
             {
                 entity.dfeta_CountryId = countryId.ToEntityReference(dfeta_country.EntityLogicalName);
-            }
-
-            if (id.HasValue)
-            {
-                entity.Attributes.Remove(dfeta_initialteachertraining.Fields.dfeta_Result);
             }
 
             return entity;

@@ -34,7 +34,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_update_without_providing_qualification_ukprn_returns_success()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -72,7 +72,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_existing_itt_update_programmetype_from_qts_to_another_qts_programmetype_succeeds()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
         var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
         var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
@@ -143,7 +143,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_existing_itt_update_programmetype_from_eyts_to_another_eyts_programmetype_succeeds(dfeta_ITTProgrammeType programmeType)
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
         var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
@@ -205,7 +205,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_updating_existing_teacher_does_not_change_itt_result()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -261,7 +261,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_updating_existing_contact_update_without_subject3_returns_success()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
         var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
@@ -351,7 +351,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_existing_contact_update_itt_and_qualification_returns_success()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
         var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
@@ -469,7 +469,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_update_itt_and_qualification_with_noactive_sanctions_does_not_create_crm_task_and_returns_success()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -513,7 +513,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_qts_itt_cannot_change_qts_programmetype_to_eyts_programmetype(dfeta_ITTProgrammeType programmeType)
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
         // Act
         var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -570,7 +570,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_earlyyears_itt_cannot_change_eyts_programmetype_to_qts(dfeta_ITTProgrammeType programmeType)
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         // Act
         var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -606,10 +606,276 @@ public class UpdateTeacherTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Given_itt_cannot_change_eyts_programmetype_to_qts()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+
+        // Act
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.AssessmentOnlyRoute,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12
+            },
+            Qualification = new UpdateTeacherCommandQualification()
+            {
+                CountryCode = "XK",
+                Subject = "100366",  // computer science
+                Class = dfeta_classdivision.Firstclasshonours,
+                Date = new DateOnly(2022, 01, 28),
+                ProviderUkprn = ittProviderUkprn,
+                Subject2 = "X300",
+                Subject3 = "N400"
+            }
+        });
+
+        // Assert
+        Assert.False(result.Succeeded);
+        Assert.Equal(UpdateTeacherFailedReasons.CannotChangeProgrammeType, result.FailedReasons);
+    }
+
+    [Fact]
+    public async Task Given_deferred_asessmentonlyeroute_itt_update_to_InTraining_fails()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, true, hasActiveSanctions: false);
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new dfeta_initialteachertraining()
+            {
+                Id = ittId,
+                dfeta_Result = dfeta_ITTResult.Deferred,
+            }
+        });
+
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.AssessmentOnlyRoute,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                Result = dfeta_ITTResult.InTraining
+            },
+            Qualification = new UpdateTeacherCommandQualification()
+            {
+                CountryCode = "XK",
+                Subject = "100366",  // computer science
+                Class = dfeta_classdivision.Firstclasshonours,
+                Date = new DateOnly(2022, 01, 28),
+                ProviderUkprn = ittProviderUkprn,
+                Subject2 = "X300",
+                Subject3 = "N400"
+            }
+        }));
+
+        // Assert
+        Assert.Contains("InTraining not permitted for AsessmentOnlyRoute", ex.Message);
+    }
+
+    [Fact]
+    public async Task Given_deferred_asessmentonlyeroute_itt_update_to_UnderAssessment_succeeds()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, true, hasActiveSanctions: false);
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new dfeta_initialteachertraining()
+            {
+                Id = ittId,
+                dfeta_Result = dfeta_ITTResult.Deferred,
+            }
+        });
+
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.AssessmentOnlyRoute,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                Result = dfeta_ITTResult.UnderAssessment
+            },
+            Qualification = new UpdateTeacherCommandQualification()
+            {
+                CountryCode = "XK",
+                Subject = "100366",  // computer science
+                Class = dfeta_classdivision.Firstclasshonours,
+                Date = new DateOnly(2022, 01, 28),
+                ProviderUkprn = ittProviderUkprn,
+                Subject2 = "X300",
+                Subject3 = "N400"
+            }
+        });
+
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        teacherId,
+        columnNames: new[]
+        {
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                    dfeta_initialteachertraining.Fields.StateCode,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+                    dfeta_initialteachertraining.Fields.dfeta_Subject3Id
+        });
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.Equal(UpdateTeacherFailedReasons.None, result.FailedReasons);
+        Assert.Collection(itt,
+            item1 => Assert.Equal(dfeta_ITTResult.UnderAssessment, item1.dfeta_Result)
+        );
+    }
+
+    [Fact]
+    public async Task Given_deferred_non_asessmentonlyeroute_itt_update_to_InTraining_succeeds()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, false, hasActiveSanctions: false);
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new dfeta_initialteachertraining()
+            {
+                Id = ittId,
+                dfeta_Result = dfeta_ITTResult.Deferred,
+            }
+        });
+
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.UndergraduateOptIn,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                Result = dfeta_ITTResult.InTraining
+            },
+            Qualification = new UpdateTeacherCommandQualification()
+            {
+                CountryCode = "XK",
+                Subject = "100366",  // computer science
+                Class = dfeta_classdivision.Firstclasshonours,
+                Date = new DateOnly(2022, 01, 28),
+                ProviderUkprn = ittProviderUkprn,
+                Subject2 = "X300",
+                Subject3 = "N400"
+            }
+        });
+
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        teacherId,
+        columnNames: new[]
+        {
+            dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
+            dfeta_initialteachertraining.Fields.dfeta_Result,
+            dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+            dfeta_initialteachertraining.Fields.StateCode,
+            dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
+            dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+            dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
+            dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
+            dfeta_initialteachertraining.Fields.dfeta_Result,
+            dfeta_initialteachertraining.Fields.dfeta_Subject1Id,
+            dfeta_initialteachertraining.Fields.dfeta_Subject2Id,
+            dfeta_initialteachertraining.Fields.dfeta_Subject3Id
+        });
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.Equal(UpdateTeacherFailedReasons.None, result.FailedReasons);
+        Assert.Collection(itt,
+            item1 => Assert.Equal(dfeta_ITTResult.InTraining, item1.dfeta_Result));
+    }
+
+    [Fact]
+    public async Task Given_deferred_non_asessmentonlyeroute_itt_update_UnderAssessment_fails()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, false, hasActiveSanctions: false);
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new dfeta_initialteachertraining()
+            {
+                Id = ittId,
+                dfeta_Result = dfeta_ITTResult.Deferred,
+            }
+        });
+
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.UndergraduateOptIn,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                Result = dfeta_ITTResult.UnderAssessment
+            },
+            Qualification = new UpdateTeacherCommandQualification()
+            {
+                CountryCode = "XK",
+                Subject = "100366",  // computer science
+                Class = dfeta_classdivision.Firstclasshonours,
+                Date = new DateOnly(2022, 01, 28),
+                ProviderUkprn = ittProviderUkprn,
+                Subject2 = "X300",
+                Subject3 = "N400"
+            }
+        }));
+
+        // Assert
+        Assert.Contains("UnderAsessment only permitted for AsessmentOnlyRoute", ex.Message);
+    }
+
+    [Fact]
     public async Task Given_two_or_more_qualifications_does_not_create_new_qualification_and_creates_warning_crm_task()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         var countryId = await _dataverseAdapter.GetCountry("XK");
         var qualificationSubject1Id = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
@@ -747,7 +1013,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_there_are_no_records_matched_create_new_itt_with_correct_result_and_warning_crm_task(dfeta_ITTProgrammeType programmeType, dfeta_ITTResult ittResult)
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         // mark existing itt record as inactive
         var existingItt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
@@ -818,7 +1084,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_two_or_more_itt_earlyyears_records_match_create_new_itt_and_warning_crm_task()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         var providerId = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn, columnNames: Array.Empty<string>())).Single();
 
@@ -932,7 +1198,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_existing_contact_update_itt_and_qualification_with_existing_active_sanction_returns_success_and_creates_crm_task()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: true);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: true);
 
         var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
         var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
@@ -1039,7 +1305,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_update_with_unknown_itt_provider_request_fails()
     {
         // Arrange
-        var (teacherId, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, _, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         // Act
         var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -1096,7 +1362,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         UpdateTeacherFailedReasons expectedFailedReasons)
     {
         // Arrange
-        var (teacherId, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, _, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         var newIttProviderUkprn = "10045988";
 
@@ -1140,7 +1406,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_existing_itt_and_qualification_create_new_itt_for_new_provider_and_update_existing_qualification_succeeds()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         var newIttProviderUkprn = "10045988";
         var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
@@ -1261,7 +1527,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_update_without_qualification_returns_success()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
         // Act
         var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -1293,7 +1559,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_update_with_changed_husid_updates_contact()
     {
         // Arrange
-        var (teacherId, ittProviderUkprn) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
         var husId = new Random().NextInt64(2000000000000, 2999999999999).ToString();
 
         // Act
@@ -1323,7 +1589,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         Assert.Equal(husId, contact.dfeta_HUSID);
     }
 
-    private async Task<(Guid TeacherId, string IttProviderUkprn)> CreatePerson(
+    private async Task<(Guid TeacherId, string IttProviderUkprn, Guid InitialTeacherTrainingId)> CreatePerson(
         bool earlyYears,
         bool assessmentOnly = false,
         bool hasActiveSanctions = false)
@@ -1334,6 +1600,6 @@ public class UpdateTeacherTests : IAsyncLifetime
             withQualification: true,
             withActiveSanction: hasActiveSanctions);
 
-        return (createPersonResult.TeacherId, createPersonResult.IttProviderUkprn);
+        return (createPersonResult.TeacherId, createPersonResult.IttProviderUkprn, createPersonResult.InitialTeacherTrainingId);
     }
 }

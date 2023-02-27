@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using Xunit;
@@ -322,6 +323,37 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
         transactionRequest.AssertDoesNotContainCreateRequest<CrmTask>();
     }
 
+
+    [Fact]
+    public async Task Given_withdrawn_itt_record_cannot_change_result()
+    {
+        // Arrange
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, withActiveSanction: false);
+        var ittResult = dfeta_ITTResult.Pass;
+        var assessmentDate = _clock.Today;
+        var ittId = createPersonResult.InitialTeacherTrainingId;
+
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new dfeta_initialteachertraining()
+            {
+                Id = ittId,
+                dfeta_Result = dfeta_ITTResult.Withdrawn,
+            }
+        });
+
+        // Act
+        var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        // Assert
+        Assert.False(result.Succeeded);
+        Assert.Equal(SetIttResultForTeacherFailedReason.NoMatchingIttRecord, result.FailedReason);
+    }
+
     public static class SelectIttRecordTestData
     {
         public static readonly Guid TeacherId = Guid.NewGuid();
@@ -392,8 +424,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
         new[]
         {
             SelectIttRecordTestData.DifferentProviderResult,
-            SelectIttRecordTestData.InactiveResult,
-            SelectIttRecordTestData.WithdrawnResult
+            SelectIttRecordTestData.InactiveResult
         },
 
         // UnderAssessment record where the programme type is not 'AssessmentOnlyRoute'

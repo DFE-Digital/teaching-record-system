@@ -46,6 +46,7 @@ public class UpdateTeacherRequestInitialTeacherTraining
     public IttQualificationType? IttQualificationType { get; set; }
     public IttQualificationAim? IttQualificationAim { get; set; }
     public string TrainingCountryCode { get; set; }
+    public IttOutcome? Outcome { get; set; }
 }
 
 public class UpdateTeacherRequestQualification
