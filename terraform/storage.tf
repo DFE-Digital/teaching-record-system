@@ -18,7 +18,3 @@ resource "azurerm_storage_container" "certificates" {
   storage_account_name  = azurerm_storage_account.app-storage.name
   container_access_type = "private"
 }
-
-locals {
-  StorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}"
-}

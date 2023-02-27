@@ -104,7 +104,7 @@ variable "hostnames" {
 }
 
 variable "app_storage_account_name" {
-  default = null
+  type = string
 }
 
 locals {
