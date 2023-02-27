@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
 
 namespace QualifiedTeachersApi.V3.Requests;
 
