@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "app-storage" {
-  name                              = var.qualified_teachers_api_storage_account_name
+  name                              = var.app_storage_account_name
   location                          = "West Europe"
   resource_group_name               = var.resource_group_name
   account_replication_type          = var.environment_name != "production" ? "LRS" : "GRS"
