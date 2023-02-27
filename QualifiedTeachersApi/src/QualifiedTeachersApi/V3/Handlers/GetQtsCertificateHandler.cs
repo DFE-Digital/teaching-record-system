@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.AcroForms;
 using PdfSharpCore.Pdf.IO;
@@ -14,7 +13,7 @@ using QualifiedTeachersApi.V3.Requests;
 
 namespace QualifiedTeachersApi.V3.Handlers;
 
-public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest, FileResult>
+public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest, byte[]>
 {
     private const string QtsFormNameField = "Full Name";
     private const string QtsFormTrnField = "TRN";
@@ -31,7 +30,7 @@ public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest
         _blobServiceClient = blobServiceClient;
     }
 
-    private FileResult GetPdfStream(PdfDocument pdf)
+    private byte[] GetPdfStream(PdfDocument pdf)
     {
         byte[] pdfData;
         using (var stream = new MemoryStream())
@@ -40,13 +39,10 @@ public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest
             pdfData = stream.ToArray();
         }
 
-        return new FileContentResult(pdfData, "application/pdf")
-        {
-            FileDownloadName = "QTS Certificate.pdf"
-        };
+        return pdfData;
     }
 
-    public async Task<FileResult> Handle(GetQtsCertificateRequest request, CancellationToken cancellationToken)
+    public async Task<byte[]> Handle(GetQtsCertificateRequest request, CancellationToken cancellationToken)
     {
         var teacher = await _dataverseAdapter.GetTeacherByTrn(
             request.Trn,

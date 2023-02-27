@@ -103,7 +103,7 @@ variable "hostnames" {
   type    = list(any)
 }
 
-variable "qualified_teachers_api_storage_account_name" {
+variable "app_storage_account_name" {
   default = null
 }
 

@@ -44,7 +44,15 @@ public class CertificatesController : Controller
 
         var response = await _mediator.Send(request);
 
-        return response ?? MissingOrInvalidTrn();
+        if (response is null)
+        {
+            return MissingOrInvalidTrn();
+        }
+
+        return new FileContentResult(response, "application/pdf")
+        {
+            FileDownloadName = "QTS Certificate.pdf"
+        };
 
         IActionResult MissingOrInvalidTrn() => BadRequest();
     }

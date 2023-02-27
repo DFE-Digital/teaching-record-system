@@ -1,4 +1,4 @@
-resource "azurerm_storage_account" "qualified-teachers-api" {
+resource "azurerm_storage_account" "app-storage" {
   name                              = var.qualified_teachers_api_storage_account_name
   location                          = "West Europe"
   resource_group_name               = var.resource_group_name
@@ -15,10 +15,10 @@ resource "azurerm_storage_account" "qualified-teachers-api" {
 
 resource "azurerm_storage_container" "certificates" {
   name                  = "certificates"
-  storage_account_name  = azurerm_storage_account.qualified-teachers-api.name
+  storage_account_name  = azurerm_storage_account.app-storage.name
   container_access_type = "private"
 }
 
 locals {
-  StorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.qualified-teachers-api.name};AccountKey=${azurerm_storage_account.qualified-teachers-api.primary_access_key}"
+  StorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}"
 }
