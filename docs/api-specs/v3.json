@@ -5,6 +5,38 @@
     "version": "v3"
   },
   "paths": {
+    "/v3/certificates/qts": {
+      "get": {
+        "tags": [
+          "Certificates"
+        ],
+        "summary": "QTS Certificate",
+        "description": "Returns a PDF of the QTS Certificate for the provided TRN holder",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v3/teacher": {
       "get": {
         "tags": [

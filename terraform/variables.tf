@@ -103,6 +103,10 @@ variable "hostnames" {
   type    = list(any)
 }
 
+variable "app_storage_account_name" {
+  type = string
+}
+
 locals {
   api_routes = flatten([
     cloudfoundry_route.api_public,

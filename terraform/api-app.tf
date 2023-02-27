@@ -8,8 +8,9 @@ locals {
         }
       }
     )),
-    AppVersion      = var.api_app_version,
-    PaasEnvironment = var.environment_name
+    AppVersion              = var.api_app_version,
+    PaasEnvironment         = var.environment_name,
+    StorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}"
   }
 
   logstash_endpoint = data.azurerm_key_vault_secret.secrets["LOGSTASH-ENDPOINT"].value
