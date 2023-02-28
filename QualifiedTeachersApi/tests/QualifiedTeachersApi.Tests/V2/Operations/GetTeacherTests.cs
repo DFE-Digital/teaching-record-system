@@ -74,6 +74,8 @@ public class GetTeacherTests : ApiTestBase
         var ittProgrammeType = IttProgrammeType.EYITTGraduateEntry;
         var ittResult = IttOutcome.Pass;
         var ittProviderUkprn = "12345";
+        var ittTraineeId = "54321";
+        var husId = "987654";
 
         var contact = new Contact()
         {
@@ -84,7 +86,8 @@ public class GetTeacherTests : ApiTestBase
             dfeta_TRN = trn,
             dfeta_NINumber = nino,
             StateCode = ContactState.Active,
-            dfeta_EYTSDate = eytsDate.ToDateTime()
+            dfeta_EYTSDate = eytsDate.ToDateTime(),
+            dfeta_HUSID = husId
         };
 
         var qtsRegistration = new dfeta_qtsregistration()
@@ -107,7 +110,8 @@ public class GetTeacherTests : ApiTestBase
             dfeta_ProgrammeStartDate = ittStartDate.ToDateTime(),
             dfeta_ProgrammeEndDate = ittEndDate.ToDateTime(),
             dfeta_ProgrammeType = ittProgrammeType.ConvertToIttProgrammeType(),
-            dfeta_Result = ittResult.ConvertToITTResult()
+            dfeta_Result = ittResult.ConvertToITTResult(),
+            dfeta_TraineeID = ittTraineeId
         };
         itt.Attributes.Add($"establishment.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, Guid.NewGuid()));
         itt.Attributes.Add($"establishment.{Account.Fields.dfeta_UKPRN}", new AliasedValue(Account.EntityLogicalName, Account.Fields.dfeta_UKPRN, ittProviderUkprn));
@@ -149,6 +153,7 @@ public class GetTeacherTests : ApiTestBase
                 hasActiveSanctions = false,
                 qtsDate = qtsDate?.ToString("yyyy-MM-dd"),
                 eytsDate = eytsDate?.ToString("yyyy-MM-dd"),
+                husId = husId,
                 earlyYearsStatus = new
                 {
                     name = earlyYearsStatusName,
@@ -165,7 +170,8 @@ public class GetTeacherTests : ApiTestBase
                         provider = new
                         {
                             ukprn = ittProviderUkprn
-                        }
+                        },
+                        husId = ittTraineeId
                     }
                 }
             });

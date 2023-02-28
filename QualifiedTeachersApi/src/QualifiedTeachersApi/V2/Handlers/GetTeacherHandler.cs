@@ -32,7 +32,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Contact.Fields.dfeta_QTSDate,
                 Contact.Fields.dfeta_ActiveSanctions,
                 Contact.Fields.dfeta_NINumber,
-                Contact.Fields.dfeta_TRN
+                Contact.Fields.dfeta_TRN,
+                Contact.Fields.dfeta_HUSID
             },
             activeOnly: true);
 
@@ -65,7 +66,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
                 dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
                 dfeta_initialteachertraining.Fields.dfeta_Result,
-                dfeta_initialteachertraining.Fields.dfeta_EstablishmentId
+                dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                dfeta_initialteachertraining.Fields.dfeta_TraineeID
             },
             establishmentColumnNames: new[]
             {
@@ -83,6 +85,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             Trn = teacher.dfeta_TRN,
             QtsDate = teacher.dfeta_QTSDate.ToDateOnly(),
             EytsDate = teacher.dfeta_EYTSDate.ToDateOnly(),
+            HusId = teacher.dfeta_HUSID,
             EarlyYearsStatus = earlyYearsStatus is not null ?
                 new GetTeacherResponseEarlyYearsStatus()
                 {
@@ -99,7 +102,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Provider = new()
                 {
                     Ukprn = i.Extract<Account>("establishment", Account.PrimaryIdAttribute).dfeta_UKPRN
-                }
+                },
+                HusId = i.dfeta_TraineeID
             })
         };
     }
