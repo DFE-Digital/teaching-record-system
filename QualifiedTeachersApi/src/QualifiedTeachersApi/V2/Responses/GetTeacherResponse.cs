@@ -14,6 +14,7 @@ public class GetTeacherResponse
     public bool HasActiveSanctions { get; set; }
     public DateOnly? QtsDate { get; set; }
     public DateOnly? EytsDate { get; set; }
+    public string HusId { get; set; }
     public GetTeacherResponseEarlyYearsStatus EarlyYearsStatus { get; set; }
     public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; set; }
 }
@@ -31,6 +32,7 @@ public class GetTeacherResponseInitialTeacherTraining
     public IttProgrammeType? ProgrammeType { get; set; }
     public IttOutcome? Result { get; set; }
     public GetTeacherResponseInitialTeacherTrainingProvider Provider { get; set; }
+    public string HusId { get; set; }
 }
 
 public class GetTeacherResponseInitialTeacherTrainingProvider

@@ -938,6 +938,10 @@
             "format": "date",
             "nullable": true
           },
+          "husId": {
+            "type": "string",
+            "nullable": true
+          },
           "earlyYearsStatus": {
             "$ref": "#/components/schemas/GetTeacherResponseEarlyYearsStatus"
           },
@@ -986,6 +990,10 @@
           },
           "provider": {
             "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingProvider"
+          },
+          "husId": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
