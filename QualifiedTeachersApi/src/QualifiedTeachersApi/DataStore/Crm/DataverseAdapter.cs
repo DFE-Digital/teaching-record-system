@@ -158,14 +158,16 @@ public partial class DataverseAdapter : IDataverseAdapter
     public Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
         Guid teacherId,
         string[] columnNames,
-        string[] establishmentColumnNames = null) =>
-        GetInitialTeacherTrainingByTeacher(teacherId, columnNames, establishmentColumnNames, requestBuilder: null);
+        string[] establishmentColumnNames = null,
+        bool activeOnly = true) =>
+        GetInitialTeacherTrainingByTeacher(teacherId, columnNames, establishmentColumnNames, requestBuilder: null, activeOnly);
 
     public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
         Guid teacherId,
         string[] columnNames,
         string[] establishmentColumnNames,
-        RequestBuilder requestBuilder)
+        RequestBuilder requestBuilder,
+        bool activeOnly = true)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -175,7 +177,11 @@ public partial class DataverseAdapter : IDataverseAdapter
         };
 
         query.Criteria.AddCondition(dfeta_initialteachertraining.Fields.dfeta_PersonId, ConditionOperator.Equal, teacherId);
-        query.Criteria.AddCondition(dfeta_initialteachertraining.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_initialteachertrainingState.Active);
+
+        if (activeOnly == true)
+        {
+            query.Criteria.AddCondition(dfeta_initialteachertraining.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_initialteachertrainingState.Active);
+        }
 
         if (establishmentColumnNames?.Length > 0)
         {

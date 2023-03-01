@@ -33,6 +33,7 @@ public class GetTeacherResponseInitialTeacherTraining
     public IttOutcome? Result { get; set; }
     public GetTeacherResponseInitialTeacherTrainingProvider Provider { get; set; }
     public string HusId { get; set; }
+    public bool Active { get; set; }
 }
 
 public class GetTeacherResponseInitialTeacherTrainingProvider
