@@ -67,13 +67,15 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
                 dfeta_initialteachertraining.Fields.dfeta_Result,
                 dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
-                dfeta_initialteachertraining.Fields.dfeta_TraineeID
+                dfeta_initialteachertraining.Fields.dfeta_TraineeID,
+                dfeta_initialteachertraining.Fields.StateCode
             },
             establishmentColumnNames: new[]
             {
                 Account.PrimaryIdAttribute,
                 Account.Fields.dfeta_UKPRN
-            });
+            },
+            request.IncludeInactive != true);
 
         return new GetTeacherResponse()
         {
@@ -103,7 +105,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 {
                     Ukprn = i.Extract<Account>("establishment", Account.PrimaryIdAttribute).dfeta_UKPRN
                 },
-                HusId = i.dfeta_TraineeID
+                HusId = i.dfeta_TraineeID,
+                Active = i.StateCode == dfeta_initialteachertrainingState.Active
             })
         };
     }
