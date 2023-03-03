@@ -64,7 +64,8 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
                 AgeRangeTo = request.InitialTeacherTraining.AgeRangeTo.HasValue ? AgeRange.ConvertFromValue(request.InitialTeacherTraining.AgeRangeTo.Value) : null,
                 IttQualificationValue = request.InitialTeacherTraining.IttQualificationType?.GetIttQualificationValue(),
                 IttQualificationAim = request.InitialTeacherTraining.IttQualificationAim?.ConvertToIttQualficationAim(),
-                TrainingCountryCode = request.InitialTeacherTraining.TrainingCountryCode
+                TrainingCountryCode = request.InitialTeacherTraining.TrainingCountryCode,
+                Result = request.InitialTeacherTraining.Outcome?.ConvertToITTResult()
             },
             Qualification = request.Qualification != null ?
                 new UpdateTeacherCommandQualification()

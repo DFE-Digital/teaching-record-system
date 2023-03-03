@@ -1463,6 +1463,9 @@
           "trainingCountryCode": {
             "type": "string",
             "nullable": true
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/IttOutcome"
           }
         },
         "additionalProperties": false

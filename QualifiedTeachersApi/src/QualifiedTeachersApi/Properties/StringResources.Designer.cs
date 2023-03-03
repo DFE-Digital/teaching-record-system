@@ -97,11 +97,29 @@ namespace QualifiedTeachersApi.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to InTraining outcome not permitted for AssessmentOnlyRoute ProgrammeType..
+        /// </summary>
+        public static string ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute {
+            get {
+                return ResourceManager.GetString("ErrorMessages.InTrainingOutcomeNotValidForAssessmentOnlyRoute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Birth date must be in format yyyy-MM-dd.
         /// </summary>
         public static string ErrorMessages_InvalidBirthDate {
             get {
                 return ResourceManager.GetString("ErrorMessages.InvalidBirthDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outcome can only be set to Deferred, InTraining or UnderAssessment..
+        /// </summary>
+        public static string ErrorMessages_OutcomeMustBeDeferredInTrainingOrUnderAssessment {
+            get {
+                return ResourceManager.GetString("ErrorMessages.OutcomeMustBeDeferredInTrainingOrUnderAssessment", resourceCulture);
             }
         }
         
@@ -129,6 +147,15 @@ namespace QualifiedTeachersApi.Properties {
         public static string ErrorMessages_TRNMustBe7Digits {
             get {
                 return ResourceManager.GetString("ErrorMessages.TRNMustBe7Digits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UnderAssessment outcome only permitted for AssessmentOnlyRoute ProgrammeType..
+        /// </summary>
+        public static string ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute {
+            get {
+                return ResourceManager.GetString("ErrorMessages.UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute", resourceCulture);
             }
         }
         

@@ -535,6 +535,171 @@ public class UpdateTeacherTests : ApiTestBase
     }
 
     [Fact]
+    public async Task Given_invalid_outcome_return_error()
+    {
+        // Arrange
+        var trn = "1000000";
+
+        var contact1 = new Contact();
+        var contactList = new[] { contact1 };
+        var dob = new DateOnly(1987, 01, 01);
+
+        var requestBody = new UpdateTeacherRequest()
+        {
+            InitialTeacherTraining = new UpdateTeacherRequestInitialTeacherTraining()
+            {
+                ProviderUkprn = "123456",
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = IttProgrammeType.EYITTUndergraduate,
+                Subject1 = "Mathematics",
+                Subject2 = "Computer Science",
+                AgeRangeFrom = 1,
+                AgeRangeTo = 10,
+                Outcome = (IttOutcome)(-1)
+            },
+            Qualification = new UpdateTeacherRequestQualification()
+            {
+                ProviderUkprn = "123456",
+                CountryCode = "XK",
+                Subject = "Computer Science",
+                Class = ClassDivision.Pass,
+                Date = new DateOnly(2022, 01, 01)
+            }
+        };
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .ReturnsAsync(contactList);
+
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}")
+        {
+            Content = CreateJsonContent(requestBody)
+        };
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        await AssertEx.ResponseIsValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_OutcomeMustBeDeferredInTrainingOrUnderAssessment);
+    }
+
+
+    [Fact]
+    public async Task Given_asessmentonlyroute_programmetype_then_intraining_outcome_is_not_permitted()
+    {
+        // Arrange
+        var trn = "1000000";
+
+        var contact1 = new Contact();
+        var contactList = new[] { contact1 };
+        var dob = new DateOnly(1987, 01, 01);
+
+        var requestBody = new UpdateTeacherRequest()
+        {
+            InitialTeacherTraining = new UpdateTeacherRequestInitialTeacherTraining()
+            {
+                ProviderUkprn = "123456",
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = IttProgrammeType.AssessmentOnlyRoute,
+                Subject1 = "Mathematics",
+                Subject2 = "Computer Science",
+                AgeRangeFrom = 1,
+                AgeRangeTo = 10,
+                Outcome = IttOutcome.InTraining
+            },
+            Qualification = new UpdateTeacherRequestQualification()
+            {
+                ProviderUkprn = "123456",
+                CountryCode = "XK",
+                Subject = "Computer Science",
+                Class = ClassDivision.Pass,
+                Date = new DateOnly(2022, 01, 01)
+            }
+        };
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .ReturnsAsync(contactList);
+
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}")
+        {
+            Content = CreateJsonContent(requestBody)
+        };
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        await AssertEx.ResponseIsValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute);
+    }
+
+    [Theory]
+    [InlineData(IttProgrammeType.Apprenticeship)]
+    [InlineData(IttProgrammeType.Core)]
+    [InlineData(IttProgrammeType.CoreFlexible)]
+    [InlineData(IttProgrammeType.EYITTGraduateEmploymentBased)]
+    [InlineData(IttProgrammeType.EYITTGraduateEntry)]
+    [InlineData(IttProgrammeType.EYITTSchoolDirectEarlyYears)]
+    [InlineData(IttProgrammeType.HEI)]
+    [InlineData(IttProgrammeType.FutureTeachingScholars)]
+    [InlineData(IttProgrammeType.InternationalQualifiedTeacherStatus)]
+    [InlineData(IttProgrammeType.OverseasTrainedTeacherProgramme)]
+    [InlineData(IttProgrammeType.UndergraduateOptIn)]
+    [InlineData(IttProgrammeType.LicensedTeacherProgramme)]
+    [InlineData(IttProgrammeType.ProviderLedPostgrad)]
+    public async Task Given_non_asessmentonlyroute_programmetypes_then_underassessment_outcome_is_not_permitted(IttProgrammeType programmeType)
+    {
+        // Arrange
+        var trn = "1000000";
+
+        var contact1 = new Contact();
+        var contactList = new[] { contact1 };
+        var dob = new DateOnly(1987, 01, 01);
+
+        var requestBody = new UpdateTeacherRequest()
+        {
+            InitialTeacherTraining = new UpdateTeacherRequestInitialTeacherTraining()
+            {
+                ProviderUkprn = "123456",
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = programmeType,
+                Subject1 = "Mathematics",
+                Subject2 = "Computer Science",
+                AgeRangeFrom = 1,
+                AgeRangeTo = 10,
+                Outcome = IttOutcome.UnderAssessment
+            },
+            Qualification = new UpdateTeacherRequestQualification()
+            {
+                ProviderUkprn = "123456",
+                CountryCode = "XK",
+                Subject = "Computer Science",
+                Class = ClassDivision.Pass,
+                Date = new DateOnly(2022, 01, 01)
+            }
+        };
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .ReturnsAsync(contactList);
+
+        var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}")
+        {
+            Content = CreateJsonContent(requestBody)
+        };
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        await AssertEx.ResponseIsValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
+    }
+
+
+    [Fact]
     public async Task Given_request_with_existing_husid_for_another_teacher_returns_error()
     {
         // Arrange
