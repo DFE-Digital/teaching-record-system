@@ -365,5 +365,41 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10023.Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to InTraining not permitted for AssessmentOnlyRoute programme types..
+        /// </summary>
+        public static string Errors_10024_Title {
+            get {
+                return ResourceManager.GetString("Errors.10024.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UnderAssessment only permitted for AssessmentOnlyRoute programme types..
+        /// </summary>
+        public static string Errors_10025_Title {
+            get {
+                return ResourceManager.GetString("Errors.10025.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Result cannot be unwithdrawn to deferred.
+        /// </summary>
+        public static string Errors_10026_Title {
+            get {
+                return ResourceManager.GetString("Errors.10026.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to change Failed Result..
+        /// </summary>
+        public static string Errors_10027_Title {
+            get {
+                return ResourceManager.GetString("Errors.10027.Title", resourceCulture);
+            }
+        }
     }
 }

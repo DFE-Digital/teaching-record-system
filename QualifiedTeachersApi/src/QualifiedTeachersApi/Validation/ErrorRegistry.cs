@@ -29,6 +29,10 @@ public static class ErrorRegistry
         ErrorDescriptor.Create(10020),  // Multiple npq qualiications for Qualification Type
         ErrorDescriptor.Create(10021),  // Npq Qualification not created by api
         ErrorDescriptor.Create(10022),  // Identity user not found
+        ErrorDescriptor.Create(10024),  // InTraining not permitted for AsessmentOnlyRoute
+        ErrorDescriptor.Create(10025),  // UnderAsessment only permitted for AsessmentOnlyRoute
+        ErrorDescriptor.Create(10026),  // Result cannot be unwithdrawn to deferred
+        ErrorDescriptor.Create(10027),  // Unable to change Failed Result.
     }.ToDictionary(d => d.ErrorCode, d => d);
 
     public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);
@@ -74,6 +78,14 @@ public static class ErrorRegistry
     public static Error NpqQualificationNotCreatedByApi() => CreateError(10021);
 
     public static Error IdentityUserNotFound() => CreateError(10022);
+
+    public static Error InTrainingResultNotPermittedForProgrammeType() => CreateError(10024);
+
+    public static Error UnderAssessmentOnlyPermittedForProgrammeType() => CreateError(10025);
+
+    public static Error UnableToUnwithdrawToDeferredStatus() => CreateError(10026);
+
+    public static Error UnableToChangeFailedResult() => CreateError(10027);
 
     private static Error CreateError(int errorCode)
     {

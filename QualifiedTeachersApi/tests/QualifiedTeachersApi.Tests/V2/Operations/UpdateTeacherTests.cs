@@ -386,6 +386,34 @@ public class UpdateTeacherTests : ApiTestBase
     }
 
     [Fact]
+    public async Task Given_qts_registration_not_matched_return_error()
+    {
+        // Arrange
+        var subject = "xxx";
+        var trn = "123456";
+        var contact = new Contact() { Id = Guid.NewGuid() };
+        var contactList = new[] { contact };
+        var result = UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingQtsRecord);
+        var dob = new DateOnly(1987, 01, 01);
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+                .ReturnsAsync(contactList);
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                .ReturnsAsync(result);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest(req => req.Qualification.Subject = subject));
+
+        // Assert
+        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}", StringResources.Errors_10006_Title);
+    }
+
+    [Fact]
     public async Task Given_valid_update_succeeds_return_nocontent()
     {
         // Arrange
@@ -698,6 +726,41 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.ResponseIsValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
     }
 
+    [Fact]
+    public async Task Given_teacher_has_multiple_incomplete_itt_records_return_error()
+    {
+        // Arrange
+        var trn = "123456";
+        var contact = new Contact() { Id = Guid.NewGuid() };
+        var contactList = new[] { contact };
+        var ittRecords = new[] { new dfeta_initialteachertraining(), new dfeta_initialteachertraining() };
+        var result = UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.MultipleInTrainingIttRecords);
+        var dob = new DateOnly(1987, 01, 01);
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+                .ReturnsAsync(contactList);
+
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(It.IsAny<Guid>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), true))
+                .ReturnsAsync(ittRecords);
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                .ReturnsAsync(result);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest());
+
+        // Assert
+        await AssertEx.ResponseIsValidationErrorForProperty(
+            response,
+            $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}",
+            StringResources.Errors_10004_Title);
+    }
 
     [Fact]
     public async Task Given_request_with_existing_husid_for_another_teacher_returns_error()

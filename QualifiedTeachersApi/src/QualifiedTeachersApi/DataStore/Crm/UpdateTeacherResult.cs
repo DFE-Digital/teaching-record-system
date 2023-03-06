@@ -43,5 +43,11 @@ public enum UpdateTeacherFailedReasons
     QualificationSubject2NotFound = 32768,
     QualificationSubject3NotFound = 65536,
     DuplicateHusId = 131072,
-    TrainingCountryNotFound = 262144
+    TrainingCountryNotFound = 262144,
+    InTrainingResultNotPermittedForProgrammeType = 524288,
+    UnderAssessmentOnlyPermittedForProgrammeType = 1048576,
+    NoMatchingQtsRecord = 2097152,
+    MultipleQtsRecords = 4194304,
+    UnableToUnwithdrawToDeferredStatus = 8388608,
+    UnableToChangeFailedResult = 16777216
 }

@@ -49,6 +49,63 @@ public partial class DataverseAdapter
             return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.CannotChangeProgrammeType), null);
         }
 
+        //only allow result to go to deferred,intraining, underassessment
+        //if dqt hold withdrawn & request is withdrawn - return succeess, without updating
+        if (command.InitialTeacherTraining.Result != null)
+        {
+            switch (command.InitialTeacherTraining.Result)
+            {
+                case dfeta_ITTResult.Withdrawn:
+                    {
+                        if (itt != null && itt.dfeta_Result == dfeta_ITTResult.Withdrawn)
+                        {
+                            return (UpdateTeacherResult.Success(helper.TeacherId, null), null);
+                        }
+                        else
+                        {
+                            throw new ArgumentException($"Invalid ITT outcome: '{command.InitialTeacherTraining.Result}'.", nameof(command.InitialTeacherTraining.Result));
+                        }
+                    }
+                case dfeta_ITTResult.Deferred:
+                case dfeta_ITTResult.InTraining:
+                case dfeta_ITTResult.UnderAssessment:
+                    break;
+                default:
+                    throw new ArgumentException($"Invalid ITT outcome: '{command.InitialTeacherTraining.Result}'.", nameof(command.InitialTeacherTraining.Result));
+            }
+
+            // Unable to transition from failed to deferred,intraining or underassessment
+            if (itt != null && itt.dfeta_Result == dfeta_ITTResult.Fail)
+            {
+                switch (command.InitialTeacherTraining.Result)
+                {
+                    case dfeta_ITTResult.Deferred:
+                    case dfeta_ITTResult.InTraining:
+                    case dfeta_ITTResult.UnderAssessment:
+                        return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.UnableToChangeFailedResult), null);
+                }
+            }
+        }
+
+        if (itt != null && itt.dfeta_Result == dfeta_ITTResult.Withdrawn)
+        {
+            // Do not allow incomming result to be set to deferred if existing result is withdrawn
+            // Do not allow result to be underassessment when programmetype is not assessmentOnlyRoute
+            // Do not allow result to be intraining when programmetype is assessmentonlyroute
+            if (command.InitialTeacherTraining.Result == dfeta_ITTResult.Deferred)
+            {
+                return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.UnableToUnwithdrawToDeferredStatus), null);
+            }
+            else if (itt.dfeta_ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute && command.InitialTeacherTraining.Result != dfeta_ITTResult.UnderAssessment)
+            {
+                return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.InTrainingResultNotPermittedForProgrammeType), null);
+            }
+            else if (itt.dfeta_ProgrammeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute && command.InitialTeacherTraining.Result == dfeta_ITTResult.UnderAssessment)
+            {
+                return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.UnderAssessmentOnlyPermittedForProgrammeType), null);
+            }
+        }
+
         // Send a single Transaction request with all the data changes in.
         // This is important for atomicity; we really do not want torn writes here.
         var txnRequest = new ExecuteTransactionRequest()
@@ -57,28 +114,54 @@ public partial class DataverseAdapter
             Requests = new()
         };
 
+        if (itt != null && itt.dfeta_Result == dfeta_ITTResult.Withdrawn)
+        {
+            //match an existing qts record based on programmetype
+            //if earlyyears programme type then earlyyearsstatusid must be empty
+            //if not earlyyears then teacherstatusid must be empty
+            var (existingQTS, failedQts) = helper.SelectWithdrawnQtsRegistrationRecord(referenceData.QtsRegistrations, itt.dfeta_ProgrammeType.Value);
+
+            if (!failedQts.HasValue)
+            {
+                var qtsUpdate = new dfeta_qtsregistration() { Id = existingQTS.Id };
+                if (isEarlyYears)
+                {
+                    //Withdrawn EYTS programmeType can go to earlyyearsTrainee
+                    qtsUpdate.dfeta_EarlyYearsStatusId = referenceData.EarlyYearsTraineeStatusId.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName);
+                }
+                else
+                {
+                    //Withdrawn AOR programmetype can go to AOR candidate, otherwise go to Trainee teacher
+                    if (itt.dfeta_ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute)
+                    {
+                        qtsUpdate.dfeta_TeacherStatusId = referenceData.AorCandidateTeacherStatusId.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
+                    }
+                    else
+                    {
+                        qtsUpdate.dfeta_TeacherStatusId = referenceData.TraineeTeacherDmsTeacherStatusId.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
+                    }
+                }
+                txnRequest.Requests.Add(new UpdateRequest()
+                {
+                    Target = qtsUpdate
+                });
+            }
+            else
+            {
+                if (failedQts == UpdateTeacherFailedReasons.NoMatchingQtsRecord)
+                {
+                    return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingQtsRecord), null);
+                }
+            }
+        }
+
         if (ittLookupFailedReasons == UpdateTeacherFailedReasons.MultipleInTrainingIttRecords)
         {
-            // unable to determine which itt record to update - create review task.
-            var reviewTask = helper.CreateMultipleMatchIttReviewTask();
-            txnRequest.Requests.Add(new CreateRequest()
-            {
-                Target = reviewTask
-            });
+            return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.MultipleInTrainingIttRecords), null);
         }
         else if (ittLookupFailedReasons == UpdateTeacherFailedReasons.NoMatchingIttRecord)
         {
-            // Create itt record & review task
-            txnRequest.Requests.Add(new CreateRequest()
-            {
-                Target = helper.CreateInitialTeacherTrainingEntity(referenceData, id: null, null)
-            });
-
-            var reviewTask = helper.CreateNoMatchIttReviewTask();
-            txnRequest.Requests.Add(new CreateRequest()
-            {
-                Target = reviewTask
-            });
+            return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingIttRecord), null);
         }
         else
         {
@@ -153,19 +236,63 @@ public partial class DataverseAdapter
 
         public string Trn { get; }
 
+        public (dfeta_qtsregistration, UpdateTeacherFailedReasons? FailedReason) SelectWithdrawnQtsRegistrationRecord(
+            IEnumerable<dfeta_qtsregistration> qtsRecords,
+            dfeta_ITTProgrammeType programmeType)
+        {
+            var matching = new List<dfeta_qtsregistration>();
+
+            foreach (var qts in qtsRecords)
+            {
+                //If early years programmetype and earlyyearsstatusid is empty (i.e. cleared out from an itt record being withdrawn)
+                //else if not early years programmetype and teacherstatusid is empty (i.e. cleared out from itt record being withdrawn)
+                if (programmeType.IsEarlyYears() && qts.dfeta_EarlyYearsStatusId == null)
+                {
+                    matching.Add(qts);
+                }
+                else if (!programmeType.IsEarlyYears() && qts.dfeta_TeacherStatusId == null)
+                {
+                    matching.Add(qts);
+                }
+            }
+
+            if (matching.Count == 0)
+            {
+                return (null, UpdateTeacherFailedReasons.NoMatchingQtsRecord);
+            }
+            else if (matching.Count > 1)
+            {
+                return (null, UpdateTeacherFailedReasons.MultipleQtsRecords);
+            }
+            else
+            {
+                return (matching[0], null);
+            }
+        }
+
         public (dfeta_initialteachertraining Result, UpdateTeacherFailedReasons? FailedReason) SelectIttRecord(
-            IEnumerable<dfeta_initialteachertraining> ittRecords,
-            Guid ittProviderId)
+                IEnumerable<dfeta_initialteachertraining> ittRecords,
+                Guid ittProviderId)
         {
             // Find an active ITT record for the specified ITT Provider.
-            // The record should be at the InTraining or Deferred status unless the programme is 'assessment only',
-            // in which case the status should be UnderAssessment or Deferred.
+            // The record should be at the InTraining or Deferred or Withdrawn status unless the programme is 'assessment only',
+            // in which case the status should be UnderAssessment or Deferred or withdrawn.
 
             List<dfeta_initialteachertraining> matching = new List<dfeta_initialteachertraining>();
             var activeForProvider = ittRecords
                 .Where(r => r.dfeta_EstablishmentId.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
                 .ToArray();
 
+            // All incomplete qts/eyts records, regardless of provider
+            var incompleteEytsOrQts = ittRecords
+                .Where(r => r.StateCode == dfeta_initialteachertrainingState.Active &&
+                 (r.dfeta_Result == dfeta_ITTResult.UnderAssessment ||
+                  r.dfeta_Result == dfeta_ITTResult.Withdrawn ||
+                  r.dfeta_Result == dfeta_ITTResult.Deferred ||
+                  r.dfeta_Result == dfeta_ITTResult.Fail ||
+                  r.dfeta_Result == dfeta_ITTResult.InTraining))
+                .ToArray();
+            var hasMoreThanOneActiveEytsOrQts = incompleteEytsOrQts.Count() > 1;
 
             foreach (var itt in activeForProvider)
             {
@@ -174,7 +301,9 @@ public partial class DataverseAdapter
                     switch (itt.dfeta_Result)
                     {
                         case dfeta_ITTResult.UnderAssessment:
+                        case dfeta_ITTResult.Withdrawn:
                         case dfeta_ITTResult.Deferred:
+                        case dfeta_ITTResult.Fail:
                             {
                                 matching.Add(itt);
                                 break;
@@ -186,7 +315,9 @@ public partial class DataverseAdapter
                     switch (itt.dfeta_Result)
                     {
                         case dfeta_ITTResult.InTraining:
+                        case dfeta_ITTResult.Withdrawn:
                         case dfeta_ITTResult.Deferred:
+                        case dfeta_ITTResult.Fail:
                             {
                                 matching.Add(itt);
                                 break;
@@ -195,11 +326,11 @@ public partial class DataverseAdapter
                 }
             }
 
-            if (matching.Count == 1)
+            if (matching.Count == 1 && !hasMoreThanOneActiveEytsOrQts)
             {
                 return (matching[0], null);
             }
-            else if (matching.Count > 1)
+            else if (matching.Count > 1 || hasMoreThanOneActiveEytsOrQts)
             {
                 return (null, UpdateTeacherFailedReasons.MultipleInTrainingIttRecords);
             }
@@ -533,6 +664,9 @@ public partial class DataverseAdapter
 
             var requestBuilder = _dataverseAdapter.CreateMultipleRequestBuilder();
 
+            var getAllEytsTeacherStatusesTask = _dataverseAdapter.GetAllEarlyYearsStatuses(requestBuilder);
+            var getAllTeacherStatuses = _dataverseAdapter.GetAllTeacherStatuses(requestBuilder);
+
             static TResult Let<T, TResult>(T value, Func<T, TResult> getResult) => getResult(value);
 
             var getIttProviderTask = Let(
@@ -629,24 +763,6 @@ public partial class DataverseAdapter
                         () => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
                 null;
 
-            var getEarlyYearsStatusTask = isEarlyYears ?
-                Let(
-                    "220", // 220 == 'Early Years Trainee'
-                    earlyYearsStatusId => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
-                        CacheKeys.GetEarlyYearsStatusKey(earlyYearsStatusId),
-                        () => _dataverseAdapter.GetEarlyYearsStatus(earlyYearsStatusId, requestBuilder))) :
-                Task.FromResult<dfeta_earlyyearsstatus>(null);
-
-            var getTeacherStatusTask = !isEarlyYears ?
-                Let(
-                    _command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
-                        "212" :  // 212 == 'AOR Candidate'
-                        "211",   // 211 == 'Trainee Teacher'
-                    teacherStatusId => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
-                        CacheKeys.GetTeacherStatusKey(teacherStatusId),
-                        () => _dataverseAdapter.GetTeacherStatus(teacherStatusId, requestBuilder))) :
-                Task.FromResult<dfeta_teacherstatus>(null);
-
             var existingTeachersWithHusIdTask = !string.IsNullOrEmpty(_command.HusId) ? _dataverseAdapter.GetTeachersByHusId(_command.HusId, columnNames: new[]
             {
                 Contact.Fields.dfeta_TRN,
@@ -664,8 +780,6 @@ public partial class DataverseAdapter
                     getQualificationTask,
                     getQualificationCountryTask,
                     getQualificationSubjectTask,
-                    getEarlyYearsStatusTask,
-                    getTeacherStatusTask,
                     getQualificationProviderTask,
                     getTeacherTask,
                     getIttRecordsTask,
@@ -673,15 +787,18 @@ public partial class DataverseAdapter
                     getQualifications,
                     getQualificationSubject2Task,
                     getQualificationSubject3Task,
-                    existingTeachersWithHusIdTask
+                    existingTeachersWithHusIdTask,
+                    getAllEytsTeacherStatusesTask,
+                    getAllTeacherStatuses
                 }
                 .Where(t => t != null);
 
             await requestBuilder.Execute();
             await Task.WhenAll(lookupTasks);
 
-            Debug.Assert(!isEarlyYears || getEarlyYearsStatusTask.Result != null, "Early years status lookup failed.");
-            Debug.Assert(isEarlyYears || getTeacherStatusTask.Result != null, "Teacher status lookup failed.");
+            var getEarlyYearsTraineeStatusId = getAllEytsTeacherStatusesTask.Result.Single(x => x.dfeta_Value == "220");
+            var getAorCandidateTeacherStatusId = getAllTeacherStatuses.Result.Single(x => x.dfeta_Value == "212");
+            var getTraineeTeacherDmsTeacherStatusId = getAllTeacherStatuses.Result.Single(x => x.dfeta_Value == "211");
 
             return new()
             {
@@ -696,15 +813,17 @@ public partial class DataverseAdapter
                 QualificationSubjectId = getQualificationSubjectTask?.Result?.Id,
                 QualificationSubject2Id = getQualificationSubject2Task?.Result?.Id,
                 QualificationSubject3Id = getQualificationSubject3Task?.Result?.Id,
-                EarlyYearsStatusId = getEarlyYearsStatusTask.Result?.Id,
-                TeacherStatusId = getTeacherStatusTask.Result?.Id,
                 QualificationProviderId = getQualificationProviderTask?.Result?.Id,
                 Teacher = getTeacherTask.Result,
                 Itt = getIttRecordsTask.Result,
                 Qualifications = getQualifications.Result,
                 TeacherHasActiveSanctions = getTeacherTask.Result?.dfeta_ActiveSanctions == true,
                 TeacherHusId = getTeacherTask.Result?.dfeta_HUSID,
-                HaveExistingTeacherWithHusId = existingTeachersWithHusIdTask?.Result != null && existingTeachersWithHusIdTask.Result.Count(x => x.Id != _command.TeacherId) > 0
+                HaveExistingTeacherWithHusId = existingTeachersWithHusIdTask?.Result != null && existingTeachersWithHusIdTask.Result.Count(x => x.Id != _command.TeacherId) > 0,
+                QtsRegistrations = getQtsRegistrationsTask?.Result,
+                EarlyYearsTraineeStatusId = getEarlyYearsTraineeStatusId.Id,
+                AorCandidateTeacherStatusId = getAorCandidateTeacherStatusId.Id,
+                TraineeTeacherDmsTeacherStatusId = getTraineeTeacherDmsTeacherStatusId.Id
             };
         }
     }
@@ -721,8 +840,6 @@ public partial class DataverseAdapter
         public Guid? QualificationProviderId { get; set; }
         public Guid? QualificationCountryId { get; set; }
         public Guid? QualificationSubjectId { get; set; }
-        public Guid? TeacherStatusId { get; set; }
-        public Guid? EarlyYearsStatusId { get; set; }
         public Contact Teacher { get; set; }
         public IEnumerable<dfeta_initialteachertraining> Itt { get; set; }
         public IEnumerable<dfeta_qualification> Qualifications { get; set; }
@@ -731,5 +848,10 @@ public partial class DataverseAdapter
         public Guid? QualificationSubject2Id { get; set; }
         public Guid? QualificationSubject3Id { get; set; }
         public bool HaveExistingTeacherWithHusId { get; set; }
+        public IEnumerable<dfeta_qtsregistration> QtsRegistrations { get; set; }
+
+        public Guid EarlyYearsTraineeStatusId { get; set; }
+        public Guid AorCandidateTeacherStatusId { get; set; }
+        public Guid TraineeTeacherDmsTeacherStatusId { get; set; }
     }
 }
