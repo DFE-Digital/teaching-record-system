@@ -699,7 +699,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         {
             req.TeacherType = QualifiedTeachersApi.V2.Requests.CreateTeacherType.OverseasQualifiedTeacher;
             req.InitialTeacherTraining.ProviderUkprn = null;
-            req.InitialTeacherTraining.TrainingCountryCode = "SC";
+            req.InitialTeacherTraining.TrainingCountryCode = "XH";
             req.QtsDate = new DateOnly(2020, 10, 10);
             req.RecognitionRoute = QualifiedTeachersApi.V2.Requests.CreateTeacherRecognitionRoute.Scotland;
             req.InductionRequired = false;

@@ -93,6 +93,5 @@ public enum CreateTeacherRecognitionRoute
 {
     Scotland = 1,
     NorthernIreland = 2,
-    EuropeanEconomicArea = 3,
     OverseasTrainedTeachers = 4
 }

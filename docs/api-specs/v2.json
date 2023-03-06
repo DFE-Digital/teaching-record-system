@@ -625,7 +625,6 @@
         "enum": [
           "Scotland",
           "NorthernIreland",
-          "EuropeanEconomicArea",
           "OverseasTrainedTeachers"
         ],
         "type": "string"
