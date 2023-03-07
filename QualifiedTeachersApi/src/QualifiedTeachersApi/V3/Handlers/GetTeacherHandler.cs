@@ -1,8 +1,12 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
+using QualifiedTeachersApi.V3.ApiModels;
 using QualifiedTeachersApi.V3.Requests;
 using QualifiedTeachersApi.V3.Responses;
 
@@ -33,12 +37,130 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+            teacher.Id,
+            columnNames: new[]
+            {
+                dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
+                dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
+                dfeta_initialteachertraining.Fields.dfeta_Result,
+                dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
+                dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
+                dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                dfeta_initialteachertraining.Fields.dfeta_TraineeID,
+                dfeta_initialteachertraining.Fields.StateCode
+            },
+            establishmentColumnNames: new[]
+            {
+                Account.PrimaryIdAttribute,
+                Account.Fields.dfeta_UKPRN,
+                Account.Fields.Name
+            },
+            subjectColumnNames: new[]
+            {
+                dfeta_ittsubject.PrimaryIdAttribute,
+                dfeta_ittsubject.Fields.dfeta_name,
+                dfeta_ittsubject.Fields.dfeta_Value
+            },
+            qualificationColumnNames: new[]
+            {
+                dfeta_ittqualification.PrimaryIdAttribute,
+                dfeta_ittqualification.Fields.dfeta_name
+            },
+            false);
+
         return new GetTeacherResponse()
         {
             Trn = request.Trn,
             FirstName = teacher.FirstName,
             LastName = teacher.LastName,
-            QtsDate = teacher.dfeta_QTSDate?.ToDateOnly()
+            QtsDate = teacher.dfeta_QTSDate?.ToDateOnly(),
+            InitialTeacherTraining = itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
+            {
+                Qualification = MapQualification(i),
+                ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>(),
+                StartDate = i.dfeta_ProgrammeStartDate.ToDateOnly(),
+                EndDate = i.dfeta_ProgrammeEndDate.ToDateOnly(),
+                Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
+                AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
+                Provider = MapProvider(i),
+                Subjects = MapSubjects(i)
+            })
         };
+    }
+
+    private static GetTeacherResponseInitialTeacherTrainingQualification MapQualification(dfeta_initialteachertraining initialTeacherTraining)
+    {
+        var qualification = initialTeacherTraining.Extract<dfeta_ittqualification>("qualification", dfeta_ittqualification.PrimaryIdAttribute);
+        return
+            qualification != null
+            ? new GetTeacherResponseInitialTeacherTrainingQualification()
+            {
+                Name = qualification.dfeta_name
+            }
+            : null;
+    }
+
+    private static GetTeacherResponseInitialTeacherTrainingAgeRange MapAgeRange(dfeta_AgeRange? ageRangeFrom, dfeta_AgeRange? ageRangeTo)
+    {
+        var ageRangeDescription = new StringBuilder();
+        string ageRangeFromName = ageRangeFrom.HasValue ? ageRangeFrom.Value.GetMetadata().Name : null;
+        string ageRangeToName = ageRangeTo.HasValue ? ageRangeTo.Value.GetMetadata().Name : null;
+
+        if (ageRangeFromName != null)
+        {
+            ageRangeDescription.AppendFormat("{0} ", ageRangeFromName);
+        }
+
+        if (ageRangeToName != null)
+        {
+            ageRangeDescription.AppendFormat("to {0} ", ageRangeToName);
+        }
+
+        if (ageRangeDescription.Length > 0)
+        {
+            ageRangeDescription.Append("years");
+        }
+
+        return
+            ageRangeDescription.Length > 0
+            ? new GetTeacherResponseInitialTeacherTrainingAgeRange()
+            {
+                Description = ageRangeDescription.ToString()
+            }
+            : null;
+    }
+
+    private static GetTeacherResponseInitialTeacherTrainingProvider MapProvider(dfeta_initialteachertraining initialTeacherTraining)
+    {
+        var establishment = initialTeacherTraining.Extract<Account>("establishment", Account.PrimaryIdAttribute);
+        return
+            establishment != null
+            ? new GetTeacherResponseInitialTeacherTrainingProvider()
+            {
+                Name = establishment.Name,
+                Ukprn = establishment.dfeta_UKPRN
+            }
+            : null;
+    }
+
+    private static IEnumerable<GetTeacherResponseInitialTeacherTrainingSubject> MapSubjects(dfeta_initialteachertraining initialTeacherTraining)
+    {
+        var subjects = new List<GetTeacherResponseInitialTeacherTrainingSubject>();
+        for (var index = 1; index <= 3; index++)
+        {
+            var subject = initialTeacherTraining.Extract<dfeta_ittsubject>($"subject{index}", dfeta_ittsubject.PrimaryIdAttribute);
+            if (subject != null)
+            {
+                subjects.Add(new GetTeacherResponseInitialTeacherTrainingSubject()
+                {
+                    Code = subject.dfeta_Value,
+                    Name = subject.dfeta_name
+                });
+            }
+        }
+
+        return subjects;
     }
 }
