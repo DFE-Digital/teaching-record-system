@@ -148,6 +148,8 @@ public class GetTeacherTests : ApiTestBase
                 teacherId,
                 /* columnNames: */ It.IsAny<string[]>(),
                 /*establishmentColumnNames: */It.IsAny<string[]>(),
+                /*subjectColumnNames: */It.IsAny<string[]>(),
+                /*qualificationColumnNames: */It.IsAny<string[]>(),
                 /*activeOnly */ false))
             .ReturnsAsync(new[] { itt, inActiveItt });
 
@@ -288,6 +290,8 @@ public class GetTeacherTests : ApiTestBase
                 teacherId,
                 /* columnNames: */ It.IsAny<string[]>(),
                 /*establishmentColumnNames: */It.IsAny<string[]>(),
+                /*subjectColumnNames: */It.IsAny<string[]>(),
+                /*qualificationColumnNames: */It.IsAny<string[]>(),
                 /*includeinactive */ It.IsAny<bool>()))
             .ReturnsAsync(new[] { itt });
 

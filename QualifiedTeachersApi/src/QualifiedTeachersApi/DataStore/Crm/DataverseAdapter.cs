@@ -187,19 +187,6 @@ public partial class DataverseAdapter : IDataverseAdapter
             query.Criteria.AddCondition(dfeta_initialteachertraining.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_initialteachertrainingState.Active);
         }
 
-        if (qualificationColumnNames?.Length > 0)
-        {
-            var qualificationLink = query.AddLink(
-                dfeta_ittqualification.EntityLogicalName,
-                dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId,
-                dfeta_ittqualification.PrimaryIdAttribute,
-                JoinOperator.LeftOuter);
-
-            qualificationLink.Columns = new ColumnSet(qualificationColumnNames);
-
-            qualificationLink.EntityAlias = "qualification";
-        }
-
         if (establishmentColumnNames?.Length > 0)
         {
             var establishmentLink = query.AddLink(
@@ -222,6 +209,19 @@ public partial class DataverseAdapter : IDataverseAdapter
             AddSubjectLink(query, dfeta_initialteachertraining.Fields.dfeta_Subject1Id, "subject1", subjectColumnNames);
             AddSubjectLink(query, dfeta_initialteachertraining.Fields.dfeta_Subject2Id, "subject2", subjectColumnNames);
             AddSubjectLink(query, dfeta_initialteachertraining.Fields.dfeta_Subject3Id, "subject3", subjectColumnNames);
+        }
+
+        if (qualificationColumnNames?.Length > 0)
+        {
+            var qualificationLink = query.AddLink(
+                dfeta_ittqualification.EntityLogicalName,
+                dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId,
+                dfeta_ittqualification.PrimaryIdAttribute,
+                JoinOperator.LeftOuter);
+
+            qualificationLink.Columns = new ColumnSet(qualificationColumnNames);
+
+            qualificationLink.EntityAlias = "qualification";
         }
 
         var request = new RetrieveMultipleRequest()
