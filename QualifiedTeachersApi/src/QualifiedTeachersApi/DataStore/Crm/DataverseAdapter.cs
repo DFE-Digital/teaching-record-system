@@ -159,13 +159,17 @@ public partial class DataverseAdapter : IDataverseAdapter
         Guid teacherId,
         string[] columnNames,
         string[] establishmentColumnNames = null,
+        string[] subjectColumnNames = null,
+        string[] qualificationColumnNames = null,
         bool activeOnly = true) =>
-        GetInitialTeacherTrainingByTeacher(teacherId, columnNames, establishmentColumnNames, requestBuilder: null, activeOnly);
+        GetInitialTeacherTrainingByTeacher(teacherId, columnNames, establishmentColumnNames, subjectColumnNames, qualificationColumnNames, requestBuilder: null, activeOnly);
 
     public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
         Guid teacherId,
         string[] columnNames,
         string[] establishmentColumnNames,
+        string[] subjectColumnNames,
+        string[] qualificationColumnNames,
         RequestBuilder requestBuilder,
         bool activeOnly = true)
     {
@@ -200,6 +204,26 @@ public partial class DataverseAdapter : IDataverseAdapter
             establishmentLink.LinkCriteria = filter;
         }
 
+        if (subjectColumnNames?.Length > 0)
+        {
+            AddSubjectLink(query, dfeta_initialteachertraining.Fields.dfeta_Subject1Id, "subject1", subjectColumnNames);
+            AddSubjectLink(query, dfeta_initialteachertraining.Fields.dfeta_Subject2Id, "subject2", subjectColumnNames);
+            AddSubjectLink(query, dfeta_initialteachertraining.Fields.dfeta_Subject3Id, "subject3", subjectColumnNames);
+        }
+
+        if (qualificationColumnNames?.Length > 0)
+        {
+            var qualificationLink = query.AddLink(
+                dfeta_ittqualification.EntityLogicalName,
+                dfeta_initialteachertraining.Fields.dfeta_ITTQualificationId,
+                dfeta_ittqualification.PrimaryIdAttribute,
+                JoinOperator.LeftOuter);
+
+            qualificationLink.Columns = new ColumnSet(qualificationColumnNames);
+
+            qualificationLink.EntityAlias = "qualification";
+        }
+
         var request = new RetrieveMultipleRequest()
         {
             Query = query
@@ -208,6 +232,18 @@ public partial class DataverseAdapter : IDataverseAdapter
         var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
 
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>()).ToArray();
+
+        static void AddSubjectLink(QueryExpression query, string subjectIdField, string alias, string[] columnNames)
+        {
+            var subjectLink = query.AddLink(
+                dfeta_ittsubject.EntityLogicalName,
+                subjectIdField,
+                dfeta_ittsubject.PrimaryIdAttribute,
+                JoinOperator.LeftOuter);
+
+            subjectLink.Columns = new ColumnSet(columnNames);
+            subjectLink.EntityAlias = alias;
+        }
     }
 
     public async Task<Account[]> GetIttProviders(bool activeOnly)

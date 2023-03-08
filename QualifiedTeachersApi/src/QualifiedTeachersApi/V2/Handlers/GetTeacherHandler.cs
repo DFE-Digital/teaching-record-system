@@ -75,6 +75,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Account.PrimaryIdAttribute,
                 Account.Fields.dfeta_UKPRN
             },
+            null,
+            null,
             request.IncludeInactive != true);
 
         return new GetTeacherResponse()
