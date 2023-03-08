@@ -87,9 +87,148 @@
             "type": "string",
             "format": "date",
             "nullable": true
+          },
+          "initialTeacherTraining": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTraining"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
+      },
+      "GetTeacherResponseInitialTeacherTraining": {
+        "type": "object",
+        "properties": {
+          "qualification": {
+            "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingQualification"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "programmeType": {
+            "$ref": "#/components/schemas/IttProgrammeType"
+          },
+          "result": {
+            "$ref": "#/components/schemas/IttOutcome"
+          },
+          "ageRange": {
+            "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingAgeRange"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingProvider"
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingSubject"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseInitialTeacherTrainingAgeRange": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseInitialTeacherTrainingProvider": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ukprn": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseInitialTeacherTrainingQualification": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseInitialTeacherTrainingSubject": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "IttOutcome": {
+        "enum": [
+          "Pass",
+          "Fail",
+          "Withdrawn",
+          "Deferred",
+          "DeferredForSkillsTests",
+          "ApplicationReceived",
+          "ApplicationUnsuccessful",
+          "Approved",
+          "Info",
+          "InTraining",
+          "NoResultSubmitted",
+          "UnderAssessment"
+        ],
+        "type": "string"
+      },
+      "IttProgrammeType": {
+        "enum": [
+          "Core",
+          "HEI",
+          "SchoolDirectTrainingProgrammeSelfFunded",
+          "SchoolDirectTrainingProgrammeSalaried",
+          "SchoolDirectTrainingProgramme",
+          "TeachFirstProgrammeCC",
+          "TeachFirstProgramme",
+          "OverseasTrainedTeacherProgramme",
+          "RegisteredTeacherProgramme",
+          "GraduateTeacherProgramme",
+          "AssessmentOnlyRoute",
+          "CoreFlexible",
+          "LicensedTeacherProgramme",
+          "UndergraduateOptIn",
+          "EYITTAssessmentOnly",
+          "EYITTGraduateEntry",
+          "EYITTGraduateEmploymentBased",
+          "EYITTUndergraduate",
+          "EYITTSchoolDirectEarlyYears",
+          "Apprenticeship",
+          "FutureTeachingScholars",
+          "ProviderLedPostgrad",
+          "ProviderLedUndergrad",
+          "InternationalQualifiedTeacherStatus"
+        ],
+        "type": "string"
       },
       "ProblemDetails": {
         "type": "object",
