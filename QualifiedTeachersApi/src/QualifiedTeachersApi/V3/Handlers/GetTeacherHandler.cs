@@ -212,7 +212,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             dfeta_qualification_dfeta_Type.NPQLTD => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQLTD,
             dfeta_qualification_dfeta_Type.NPQML => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQML,
             dfeta_qualification_dfeta_Type.NPQSL => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQSL,
-            _ => (GetTeacherResponseNpqQualificationsQualificationTypeCode?) null
+            _ => (GetTeacherResponseNpqQualificationsQualificationTypeCode?)null
         };
 
         return mapped;

@@ -98,7 +98,7 @@ public class GetTeacherTests : ApiTestBase
             {
                 dfeta_Type = npqQualification1Type,
                 dfeta_CompletionorAwardDate = npqQualification1AwardDate.ToDateTime(),
-                StateCode = npqQualification1Status                
+                StateCode = npqQualification1Status
             },
             new dfeta_qualification()
             {
@@ -136,19 +136,19 @@ public class GetTeacherTests : ApiTestBase
         ApiFixture.DataverseAdapter
              .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
                  teacherId,
-                 /* columnNames: */ It.IsAny<string[]>(),
-                 /*establishmentColumnNames: */It.IsAny<string[]>(),
-                 /*subjectColumnNames: */It.IsAny<string[]>(),
-                 /*qualificationColumnNames: */It.IsAny<string[]>(),
-                 /*activeOnly */ false))
+                 It.IsAny<string[]>(),
+                 It.IsAny<string[]>(),
+                 It.IsAny<string[]>(),
+                 It.IsAny<string[]>(),
+                 false))
              .ReturnsAsync(new[] { itt });
 
         ApiFixture.DataverseAdapter
              .Setup(mock => mock.GetQualificationsForTeacher(
                  teacherId,
-                 /* columnNames: */ It.IsAny<string[]>(),
-                 /*heQualificationColumnNames: */It.IsAny<string[]>(),
-                 /*subjectColumnNames: */It.IsAny<string[]>()))
+                 It.IsAny<string[]>(),
+                 It.IsAny<string[]>(),
+                 It.IsAny<string[]>()))
              .ReturnsAsync(qualifications);
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/teacher");
