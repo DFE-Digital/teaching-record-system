@@ -576,7 +576,11 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_qtsregistration>()).ToArray();
     }
 
-    public async Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, string[] columnNames)
+    public async Task<dfeta_qualification[]> GetQualificationsForTeacher(
+        Guid teacherId,
+        string[] columnNames,
+        string[] heQualificationColumnNames = null,
+        string[] heSubjectColumnNames = null)
     {
         var filter = new FilterExpression();
         filter.AddCondition(dfeta_qualification.Fields.dfeta_PersonId, ConditionOperator.Equal, teacherId);
@@ -588,14 +592,21 @@ public partial class DataverseAdapter : IDataverseAdapter
             Criteria = filter
         };
 
-        AddHeQualificationLink(query);
-        AddSubjectLinks(query);
+        if (heQualificationColumnNames?.Length > 0)
+        {
+            AddHeQualificationLink(query, heQualificationColumnNames);
+        }
+
+        if (heSubjectColumnNames?.Length > 0)
+        {
+            AddSubjectLinks(query, heSubjectColumnNames);
+        }
 
         var result = await _service.RetrieveMultipleAsync(query);
 
         return result.Entities.Select(entity => entity.ToEntity<dfeta_qualification>()).ToArray();
 
-        static void AddHeQualificationLink(QueryExpression query)
+        static void AddHeQualificationLink(QueryExpression query, string[] columnNames)
         {
             var heSubjectLink = query.AddLink(
                 dfeta_hequalification.EntityLogicalName,
@@ -603,21 +614,21 @@ public partial class DataverseAdapter : IDataverseAdapter
                 dfeta_hequalification.Fields.Id,
                 JoinOperator.LeftOuter);
 
-            heSubjectLink.Columns = new ColumnSet(dfeta_hequalification.PrimaryIdAttribute, dfeta_hequalification.Fields.dfeta_name);
+            heSubjectLink.Columns = new ColumnSet(columnNames);
 
             heSubjectLink.EntityAlias = dfeta_hequalification.EntityLogicalName;
         }
 
-        static void AddSubjectLinks(QueryExpression query)
+        static void AddSubjectLinks(QueryExpression query, string[] columnNames)
         {
             var aliasPrefix = dfeta_hesubject.EntityLogicalName;
 
-            AddSubjectLink(query, dfeta_qualification.Fields.dfeta_HE_HESubject1Id, aliasPrefix + 1);
-            AddSubjectLink(query, dfeta_qualification.Fields.dfeta_HE_HESubject2Id, aliasPrefix + 2);
-            AddSubjectLink(query, dfeta_qualification.Fields.dfeta_HE_HESubject3Id, aliasPrefix + 3);
+            AddSubjectLink(query, dfeta_qualification.Fields.dfeta_HE_HESubject1Id, aliasPrefix + 1, columnNames);
+            AddSubjectLink(query, dfeta_qualification.Fields.dfeta_HE_HESubject2Id, aliasPrefix + 2, columnNames);
+            AddSubjectLink(query, dfeta_qualification.Fields.dfeta_HE_HESubject3Id, aliasPrefix + 3, columnNames);
         }
 
-        static void AddSubjectLink(QueryExpression query, string subjectIdField, string alias)
+        static void AddSubjectLink(QueryExpression query, string subjectIdField, string alias, string[] columnNames)
         {
             var subjectLink = query.AddLink(
                 dfeta_hesubject.EntityLogicalName,
@@ -625,10 +636,7 @@ public partial class DataverseAdapter : IDataverseAdapter
                 dfeta_hesubject.PrimaryIdAttribute,
                 JoinOperator.LeftOuter);
 
-            subjectLink.Columns = new ColumnSet(
-                dfeta_hesubject.PrimaryIdAttribute,
-                dfeta_hesubject.Fields.dfeta_name,
-                dfeta_hesubject.Fields.dfeta_Value);
+            subjectLink.Columns = new ColumnSet(columnNames);
 
             subjectLink.EntityAlias = alias;
         }

@@ -60,6 +60,15 @@ public class GetTeacherTests : ApiTestBase
         var ittSubject3Value = "34567";
         var ittSubject3Name = "Subject 3";
         var ittQualificationName = "My test qualification 123";
+        var npqQualification1Type = dfeta_qualification_dfeta_Type.NPQEYL;
+        var npqQualification1AwardDate = new DateOnly(2022, 3, 4);
+        var npqQualification1Status = dfeta_qualificationState.Active;
+        var npqQualification2Type = dfeta_qualification_dfeta_Type.NPQLL;
+        DateOnly? npqQualification2AwardDate = null;
+        var npqQualification2Status = dfeta_qualificationState.Active;
+        var npqQualification3Type = dfeta_qualification_dfeta_Type.NPQSL;
+        var npqQualification3AwardDate = new DateOnly(2022, 3, 4);
+        var npqQualification3Status = dfeta_qualificationState.Inactive;
 
         var contact = new Contact()
         {
@@ -81,6 +90,28 @@ public class GetTeacherTests : ApiTestBase
             dfeta_AgeRangeTo = ittAgeRangeTo,
             dfeta_TraineeID = ittTraineeId,
             StateCode = dfeta_initialteachertrainingState.Active
+        };
+
+        var qualifications = new dfeta_qualification[]
+        {
+            new dfeta_qualification()
+            {
+                dfeta_Type = npqQualification1Type,
+                dfeta_CompletionorAwardDate = npqQualification1AwardDate.ToDateTime(),
+                StateCode = npqQualification1Status                
+            },
+            new dfeta_qualification()
+            {
+                dfeta_Type = npqQualification2Type,
+                dfeta_CompletionorAwardDate = npqQualification2AwardDate?.ToDateTime(),
+                StateCode = npqQualification2Status
+            },
+            new dfeta_qualification()
+            {
+                dfeta_Type = npqQualification3Type,
+                dfeta_CompletionorAwardDate = npqQualification3AwardDate.ToDateTime(),
+                StateCode = npqQualification3Status
+            }
         };
 
         itt.Attributes.Add($"qualification.{dfeta_ittqualification.PrimaryIdAttribute}", new AliasedValue(dfeta_ittqualification.EntityLogicalName, dfeta_ittqualification.PrimaryIdAttribute, Guid.NewGuid()));
@@ -111,6 +142,14 @@ public class GetTeacherTests : ApiTestBase
                  /*qualificationColumnNames: */It.IsAny<string[]>(),
                  /*activeOnly */ false))
              .ReturnsAsync(new[] { itt });
+
+        ApiFixture.DataverseAdapter
+             .Setup(mock => mock.GetQualificationsForTeacher(
+                 teacherId,
+                 /* columnNames: */ It.IsAny<string[]>(),
+                 /*heQualificationColumnNames: */It.IsAny<string[]>(),
+                 /*subjectColumnNames: */It.IsAny<string[]>()))
+             .ReturnsAsync(qualifications);
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/teacher");
 
@@ -164,6 +203,18 @@ public class GetTeacherTests : ApiTestBase
                                 code = ittSubject3Value,
                                 name = ittSubject3Name
                             }
+                        }
+                    }
+                },
+                npqQualifications = new[]
+                {
+                    new
+                    {
+                        awarded = npqQualification1AwardDate.ToString("yyyy-MM-dd"),
+                        type = new
+                        {
+                            code = npqQualification1Type.ToString(),
+                            name = npqQualification1Type.GetName()
                         }
                     }
                 }

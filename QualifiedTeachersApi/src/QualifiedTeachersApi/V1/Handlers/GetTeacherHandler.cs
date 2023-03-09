@@ -47,11 +47,22 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
             teacher.Id,
-            new[]
+            columnNames: new[]
             {
                 dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
                 dfeta_qualification.Fields.dfeta_Type,
                 dfeta_qualification.Fields.dfeta_HE_ClassDivision
+            },
+            heQualificationColumnNames: new[]
+            {
+                dfeta_hequalification.PrimaryIdAttribute,
+                dfeta_hequalification.Fields.dfeta_name
+            },
+            heSubjectColumnNames: new[]
+            {
+                dfeta_hesubject.PrimaryIdAttribute,
+                dfeta_hesubject.Fields.dfeta_name,
+                dfeta_hesubject.Fields.dfeta_Value
             });
 
         if (qualifications.Any())

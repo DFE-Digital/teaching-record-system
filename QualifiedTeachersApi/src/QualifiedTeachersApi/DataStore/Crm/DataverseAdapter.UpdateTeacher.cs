@@ -488,6 +488,17 @@ public partial class DataverseAdapter
                     dfeta_qualification.Fields.dfeta_Type,
                     dfeta_qualification.Fields.dfeta_HE_EstablishmentId,
                     dfeta_qualification.Fields.dfeta_PersonId
+                },
+                heQualificationColumnNames: new[]
+                {
+                    dfeta_hequalification.PrimaryIdAttribute,
+                    dfeta_hequalification.Fields.dfeta_name
+                },
+                heSubjectColumnNames: new[]
+                {
+                    dfeta_hesubject.PrimaryIdAttribute,
+                    dfeta_hesubject.Fields.dfeta_name,
+                    dfeta_hesubject.Fields.dfeta_Value
                 });
 
             var isEarlyYears = _command.InitialTeacherTraining.ProgrammeType.IsEarlyYears();

@@ -22,7 +22,11 @@ public interface IDataverseAdapter
         string[] qualificationColumnNames,
         bool activeOnly = true);
 
-    Task<dfeta_qualification[]> GetQualificationsForTeacher(Guid teacherId, string[] columnNames);
+    Task<dfeta_qualification[]> GetQualificationsForTeacher(
+        Guid teacherId,
+        string[] columnNames,
+        string[] heQualificationColumnNames = null,
+        string[] heSubjectColumnNames = null);
 
     Task<Contact> GetTeacher(Guid teacherId, string[] columnNames, bool resolveMerges = true);
 
