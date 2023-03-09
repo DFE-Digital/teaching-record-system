@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -176,11 +177,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
     private static IEnumerable<GetTeacherResponseNpqQualificationsQualification> MapNpqQualifications(dfeta_qualification[] qualifications)
     {
-        var npqQualifications = new List<GetTeacherResponseNpqQualificationsQualification>();
-        if (qualifications != null)
-        {
-            npqQualifications = qualifications
-                .Where(q => q.dfeta_Type.HasValue
+        return
+            qualifications
+                ?.Where(q => q.dfeta_Type.HasValue
                     && q.dfeta_Type.Value.IsNpq()
                     && q.StateCode == dfeta_qualificationState.Active
                     && q.dfeta_CompletionorAwardDate.HasValue)
@@ -193,26 +192,23 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                         Name = q.dfeta_Type.Value.GetName(),
                     }
                 })
-                .ToList();
-        }
-
-        return npqQualifications;
+                .ToArray() ?? Array.Empty<GetTeacherResponseNpqQualificationsQualification>();
     }
 
-    private static GetTeacherResponseNpqQualificationsQualificationTypeCode? MapNpqQualificationType(dfeta_qualification_dfeta_Type qualificationType)
+    private static NpqQualificationType? MapNpqQualificationType(dfeta_qualification_dfeta_Type qualificationType)
     {
         var mapped = qualificationType switch
         {
-            dfeta_qualification_dfeta_Type.NPQEL => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQEL,
-            dfeta_qualification_dfeta_Type.NPQEYL => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQEYL,
-            dfeta_qualification_dfeta_Type.NPQH => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQH,
-            dfeta_qualification_dfeta_Type.NPQLBC => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQLBC,
-            dfeta_qualification_dfeta_Type.NPQLL => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQLL,
-            dfeta_qualification_dfeta_Type.NPQLT => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQLT,
-            dfeta_qualification_dfeta_Type.NPQLTD => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQLTD,
-            dfeta_qualification_dfeta_Type.NPQML => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQML,
-            dfeta_qualification_dfeta_Type.NPQSL => GetTeacherResponseNpqQualificationsQualificationTypeCode.NPQSL,
-            _ => (GetTeacherResponseNpqQualificationsQualificationTypeCode?)null
+            dfeta_qualification_dfeta_Type.NPQEL => NpqQualificationType.NPQEL,
+            dfeta_qualification_dfeta_Type.NPQEYL => NpqQualificationType.NPQEYL,
+            dfeta_qualification_dfeta_Type.NPQH => NpqQualificationType.NPQH,
+            dfeta_qualification_dfeta_Type.NPQLBC => NpqQualificationType.NPQLBC,
+            dfeta_qualification_dfeta_Type.NPQLL => NpqQualificationType.NPQLL,
+            dfeta_qualification_dfeta_Type.NPQLT => NpqQualificationType.NPQLT,
+            dfeta_qualification_dfeta_Type.NPQLTD => NpqQualificationType.NPQLTD,
+            dfeta_qualification_dfeta_Type.NPQML => NpqQualificationType.NPQML,
+            dfeta_qualification_dfeta_Type.NPQSL => NpqQualificationType.NPQSL,
+            _ => throw new NotImplementedException($"Qualification Type {qualificationType} is not currently supported.")
         };
 
         return mapped;

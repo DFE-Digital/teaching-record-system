@@ -60,19 +60,6 @@ public record GetTeacherResponseNpqQualificationsQualification
 
 public record GetTeacherResponseNpqQualificationsQualificationType
 {
-    public GetTeacherResponseNpqQualificationsQualificationTypeCode Code { get; init; }
+    public NpqQualificationType Code { get; init; }
     public string Name { get; init; }
-}
-
-public enum GetTeacherResponseNpqQualificationsQualificationTypeCode
-{
-    NPQEL = 1,
-    NPQEYL = 2,
-    NPQH = 3,
-    NPQLBC = 4,
-    NPQLL = 5,
-    NPQLT = 6,
-    NPQLTD = 7,
-    NPQML = 8,
-    NPQSL = 9
 }
