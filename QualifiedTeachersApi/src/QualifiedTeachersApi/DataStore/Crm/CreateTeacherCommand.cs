@@ -19,6 +19,7 @@ public class CreateTeacherCommand
     public CreateTeacherRecognitionRoute? RecognitionRoute { get; set; }
     public DateOnly? QtsDate { get; set; }
     public bool? InductionRequired { get; set; }
+    public bool? UnderNewOverseasRegulations { get; set; }
 }
 
 public class CreateTeacherCommandAddress
@@ -69,5 +70,6 @@ public enum CreateTeacherRecognitionRoute
 {
     Scotland = 1,
     NorthernIreland = 2,
+    EuropeanEconomicArea = 3,
     OverseasTrainedTeachers = 4
 }

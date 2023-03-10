@@ -268,6 +268,7 @@ public partial class DataverseAdapter
                     CreateTeacherRecognitionRoute.Scotland => dfeta_InductionExemptionReason.HasoriseligibleforfullregistrationinScotland,
                     CreateTeacherRecognitionRoute.NorthernIreland => dfeta_InductionExemptionReason.SuccessfullycompletedinductioninNorthernIreland,
                     CreateTeacherRecognitionRoute.OverseasTrainedTeachers => dfeta_InductionExemptionReason.OverseasTrainedTeacher,
+                    CreateTeacherRecognitionRoute.EuropeanEconomicArea => dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute,
                     _ => throw new NotImplementedException($"Unknown {nameof(CreateTeacherRecognitionRoute)}: '{_command.RecognitionRoute}'.")
                 };
 
@@ -471,11 +472,13 @@ public partial class DataverseAdapter
                 Debug.Assert(_command.RecognitionRoute.HasValue);
 
                 qtsDateRequired = true;
-                return _command.RecognitionRoute.Value switch
+                return (_command.RecognitionRoute.Value, _command.UnderNewOverseasRegulations.GetValueOrDefault(false)) switch
                 {
-                    CreateTeacherRecognitionRoute.Scotland => "68",
-                    CreateTeacherRecognitionRoute.NorthernIreland => "69",
-                    CreateTeacherRecognitionRoute.OverseasTrainedTeachers => "104",
+                    (CreateTeacherRecognitionRoute.Scotland, _) => "68",
+                    (CreateTeacherRecognitionRoute.NorthernIreland, _) => "69",
+                    (CreateTeacherRecognitionRoute.EuropeanEconomicArea, _) => "223",
+                    (CreateTeacherRecognitionRoute.OverseasTrainedTeachers, false) => "103",
+                    (CreateTeacherRecognitionRoute.OverseasTrainedTeachers, true) => "104",
                     _ => throw new NotImplementedException($"Unknown {nameof(CreateTeacherRecognitionRoute)}: '{_command.RecognitionRoute.Value}'.")
                 };
             }
@@ -495,7 +498,7 @@ public partial class DataverseAdapter
             return _command.RecognitionRoute.Value switch
             {
                 CreateTeacherRecognitionRoute.Scotland or CreateTeacherRecognitionRoute.NorthernIreland => "UK establishment (Scotland/Northern Ireland)",
-                CreateTeacherRecognitionRoute.OverseasTrainedTeachers => "Non-UK establishment",
+                CreateTeacherRecognitionRoute.EuropeanEconomicArea or CreateTeacherRecognitionRoute.OverseasTrainedTeachers => "Non-UK establishment",
                 _ => throw new NotImplementedException($"Unknown {nameof(CreateTeacherRecognitionRoute)}: '{_command.RecognitionRoute.Value}'.")
             };
         }

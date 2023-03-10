@@ -625,6 +625,7 @@
         "enum": [
           "Scotland",
           "NorthernIreland",
+          "EuropeanEconomicArea",
           "OverseasTrainedTeachers"
         ],
         "type": "string"
@@ -776,6 +777,10 @@
           "identityUserId": {
             "type": "string",
             "format": "uuid",
+            "nullable": true
+          },
+          "underNewOverseasRegulations": {
+            "type": "boolean",
             "nullable": true
           }
         },

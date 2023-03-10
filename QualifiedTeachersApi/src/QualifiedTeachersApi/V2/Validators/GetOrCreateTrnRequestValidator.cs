@@ -145,6 +145,7 @@ public class GetOrCreateTrnRequestValidator : AbstractValidator<GetOrCreateTrnRe
             .Custom((countryCode, ctx) =>
             {
                 if (ctx.InstanceToValidate.TeacherType == CreateTeacherType.OverseasQualifiedTeacher &&
+                    ctx.InstanceToValidate.UnderNewOverseasRegulations == true &&
                     !string.IsNullOrEmpty(ctx.InstanceToValidate.InitialTeacherTraining?.TrainingCountryCode))
                 {
                     var route = ctx.InstanceToValidate.RecognitionRoute;
@@ -202,6 +203,11 @@ public class GetOrCreateTrnRequestValidator : AbstractValidator<GetOrCreateTrnRe
             .When(r => r.TeacherType == CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator)
             .Null()
             .When(r => r.TeacherType != CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator);
+
+        RuleFor(r => r.RecognitionRoute)
+            .NotEqual(CreateTeacherRecognitionRoute.EuropeanEconomicArea)
+            .When(r => r.UnderNewOverseasRegulations == true)
+            .WithMessage($"EuropeanEconomicArea is not permitted under new regulations.");
 
         RuleFor(r => r.QtsDate)
             .NotNull()

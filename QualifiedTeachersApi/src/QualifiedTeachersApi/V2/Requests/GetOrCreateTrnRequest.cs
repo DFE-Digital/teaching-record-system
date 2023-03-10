@@ -39,6 +39,7 @@ public class GetOrCreateTrnRequest : IRequest<TrnRequestInfo>
     public DateOnly? QtsDate { get; set; }
     public bool? InductionRequired { get; set; }
     public Guid? IdentityUserId { get; set; }
+    public bool? UnderNewOverseasRegulations { get; set; }
 }
 
 public class GetOrCreateTrnRequestAddress
@@ -93,5 +94,6 @@ public enum CreateTeacherRecognitionRoute
 {
     Scotland = 1,
     NorthernIreland = 2,
+    EuropeanEconomicArea = 3,
     OverseasTrainedTeachers = 4
 }
