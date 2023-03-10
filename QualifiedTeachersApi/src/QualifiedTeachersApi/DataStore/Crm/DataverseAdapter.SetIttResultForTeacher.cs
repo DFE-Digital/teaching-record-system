@@ -79,6 +79,13 @@ public partial class DataverseAdapter
             return (SetIttResultForTeacherResult.Failed(ittLookupFailed.Value), null);
         }
 
+        if (itt.dfeta_Result == dfeta_ITTResult.Fail)
+        {
+            return result == dfeta_ITTResult.Fail ?
+                (SetIttResultForTeacherResult.Success(null), null) :
+                (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.NoMatchingIttRecord), null);
+        }
+
         if (itt.dfeta_Result == dfeta_ITTResult.Withdrawn)
         {
             return result == dfeta_ITTResult.Withdrawn ?
@@ -94,20 +101,25 @@ public partial class DataverseAdapter
             isEarlyYears,
             lookupData.EarlyYearsTraineeStatusId,
             lookupData.AorCandidateTeacherStatusId,
-            lookupData.TraineeTeacherDmsTeacherStatusId);
+            lookupData.TraineeTeacherDmsTeacherStatusId,
+            lookupData.EarlyYearsTeacherStatusId,
+            lookupData.QualifiedTeacherTrainedStatusId,
+            lookupData.QualifiedTeacherAssessmentOnlyRouteId,
+            lookupData.QualifiedTeacherInternationalTeacherStatusId
+            );
 
         if (qtsLookupFailed.HasValue)
         {
             return (SetIttResultForTeacherResult.Failed(qtsLookupFailed.Value), null);
         }
 
-        if (isEarlyYears && lookupData.Teacher.dfeta_EYTSDate.HasValue)
+        if (isEarlyYears && lookupData.Teacher.dfeta_EYTSDate.HasValue && lookupData.Teacher.dfeta_EYTSDate.Value.ToDateOnly() != (assessmentDate.HasValue ? assessmentDate.Value : null))
         {
-            return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.AlreadyHaveEytsDate), null);
+            return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.EytsDateMismatch), null);
         }
-        else if (!isEarlyYears && lookupData.Teacher.dfeta_QTSDate.HasValue)
+        else if (!isEarlyYears && lookupData.Teacher.dfeta_QTSDate.HasValue && lookupData.Teacher.dfeta_QTSDate.Value.ToDateOnly() != (assessmentDate.HasValue ? assessmentDate.Value : null))
         {
-            return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.AlreadyHaveQtsDate), null);
+            return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.QtsDateMismatch), null);
         }
 
         var qtsUpdate = new dfeta_qtsregistration()
@@ -299,13 +311,13 @@ public partial class DataverseAdapter
                 getAllTeacherStatuses
                 );
 
-            var getEarlyYearsTraineeStatusId = getAllEytsTeacherStatusesTask.Result.SingleOrDefault(x => x.dfeta_Value == "220");
-            var getAorCandidateTeacherStatusId = getAllTeacherStatuses.Result.SingleOrDefault(x => x.dfeta_Value == "212");
-            var getTraineeTeacherDmsTeacherStatusId = getAllTeacherStatuses.Result.SingleOrDefault(x => x.dfeta_Value == "211");
-
-            Debug.Assert(getEarlyYearsTraineeStatusId != null, "'Early Years Trainee' early years status lookup failed");
-            Debug.Assert(getAorCandidateTeacherStatusId != null, "'AOR Candidate' teacher status lookup failed");
-            Debug.Assert(getTraineeTeacherDmsTeacherStatusId != null, "'Trainee Teacher:DMS' teacher status lookup failed");
+            var getEarlyYearsTraineeStatusId = getAllEytsTeacherStatusesTask.Result.Single(x => x.dfeta_Value == "220");
+            var getAorCandidateTeacherStatusId = getAllTeacherStatuses.Result.Single(x => x.dfeta_Value == "212");
+            var getTraineeTeacherDmsTeacherStatusId = getAllTeacherStatuses.Result.Single(x => x.dfeta_Value == "211");
+            var earlyYearsTeacherStatusId = getAllEytsTeacherStatusesTask.Result.Single(x => x.dfeta_Value == "221");
+            var qualifiedTeacherTrainedStatusId = getAllTeacherStatuses.Result.Single(x => x.dfeta_Value == "71");
+            var qualifiedTeacherAssessmentOnlyRouteId = getAllTeacherStatuses.Result.Single(x => x.dfeta_Value == "100");
+            var qualifiedTeacherInternationalTeacherStatusId = getAllTeacherStatuses.Result.Single(x => x.dfeta_Value == "90");
 
             return new SetIttResultForTeacherLookupResult()
             {
@@ -315,7 +327,11 @@ public partial class DataverseAdapter
                 QtsRegistrations = getQtsRegistrationsTask.Result,
                 EarlyYearsTraineeStatusId = getEarlyYearsTraineeStatusId.Id,
                 AorCandidateTeacherStatusId = getAorCandidateTeacherStatusId.Id,
-                TraineeTeacherDmsTeacherStatusId = getTraineeTeacherDmsTeacherStatusId.Id
+                TraineeTeacherDmsTeacherStatusId = getTraineeTeacherDmsTeacherStatusId.Id,
+                EarlyYearsTeacherStatusId = earlyYearsTeacherStatusId.Id,
+                QualifiedTeacherTrainedStatusId = qualifiedTeacherTrainedStatusId.Id,
+                QualifiedTeacherAssessmentOnlyRouteId = qualifiedTeacherAssessmentOnlyRouteId.Id,
+                QualifiedTeacherInternationalTeacherStatusId = qualifiedTeacherInternationalTeacherStatusId.Id
             };
         }
 
@@ -341,6 +357,8 @@ public partial class DataverseAdapter
                         case dfeta_ITTResult.UnderAssessment:
                         case dfeta_ITTResult.Withdrawn:
                         case dfeta_ITTResult.Deferred:
+                        case dfeta_ITTResult.Pass:
+                        case dfeta_ITTResult.Fail:
                             {
                                 matching.Add(itt);
                                 break;
@@ -354,6 +372,8 @@ public partial class DataverseAdapter
                         case dfeta_ITTResult.InTraining:
                         case dfeta_ITTResult.Withdrawn:
                         case dfeta_ITTResult.Deferred:
+                        case dfeta_ITTResult.Pass:
+                        case dfeta_ITTResult.Fail:
                             {
                                 matching.Add(itt);
                                 break;
@@ -368,7 +388,7 @@ public partial class DataverseAdapter
             }
             else if (matching.Count > 1)
             {
-                return (null, SetIttResultForTeacherFailedReason.MultipleInTrainingIttRecords);
+                return (null, SetIttResultForTeacherFailedReason.MultipleIttRecords);
             }
             else
             {
@@ -382,18 +402,32 @@ public partial class DataverseAdapter
             bool isEarlyYears,
             Guid earlyYearsTraineeStatusId,
             Guid aorCandidateTeacherStatusId,
-            Guid traineeTeacherDmsTeacherStatusId)
+            Guid traineeTeacherDmsTeacherStatusId,
+            Guid earlyYearsTeacherStatusId,
+            Guid qualifiedTeacherTrainedStatusId,
+            Guid qualifiedTeacherAssessmentOnlyRouteId,
+            Guid qualifiedTeacherInternationalTeacherStatusId)
         {
             // Find an active QTS registration entity where either
             //   programme type is Early Years and the Early Years Status is 220 ('Early Years Trainee') *OR*
             //   programme type is AssessmentOnly and the Teacher Status is 212 ('AOR Candidate') *OR*
-            //   programme type is neither Early Years nor Assessment Only and Teacher Status is 211 ('Trainee Teacher:DMS')
-            var matching = new List<dfeta_qtsregistration>();
+            //   programme type is neither Early Years nor Assessment Only and Teacher Status is 211 ('Trainee Teacher:DMS') *OR*
+            //   has EYTS/QTS Status
 
+            var matching = new List<dfeta_qtsregistration>();
 
             foreach (var qts in qtsRecords)
             {
-                if (isEarlyYears)
+                // has eyts or qts status
+                if (qts.dfeta_EarlyYearsStatusId?.Id == earlyYearsTeacherStatusId ||
+                    qts.dfeta_TeacherStatusId?.Id == qualifiedTeacherTrainedStatusId ||
+                    qts.dfeta_TeacherStatusId?.Id == qualifiedTeacherAssessmentOnlyRouteId ||
+                    qts.dfeta_TeacherStatusId?.Id == qualifiedTeacherInternationalTeacherStatusId)
+                {
+                    matching.Add(qts);
+                }
+
+                else if (isEarlyYears)
                 {
                     //programme type is Early Years and the Early Years Status is 220 ('Early Years Trainee') *OR*
                     if (qts.dfeta_EarlyYearsStatusId?.Id == earlyYearsTraineeStatusId)
@@ -441,5 +475,9 @@ public partial class DataverseAdapter
         public Guid EarlyYearsTraineeStatusId { get; set; }
         public Guid AorCandidateTeacherStatusId { get; set; }
         public Guid TraineeTeacherDmsTeacherStatusId { get; set; }
+        public Guid EarlyYearsTeacherStatusId { get; set; }
+        public Guid QualifiedTeacherTrainedStatusId { get; set; }
+        public Guid QualifiedTeacherAssessmentOnlyRouteId { get; set; }
+        public Guid QualifiedTeacherInternationalTeacherStatusId { get; set; }
     }
 }

@@ -29,6 +29,140 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
     public Task InitializeAsync() => Task.CompletedTask;
 
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
+    [Fact]
+    public async Task Given_existing_eyts_update_with_same_assessment_date_returns_success()
+    {
+        // Arrange
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: true);
+        var ittResult = dfeta_ITTResult.Pass;
+        var assessmentDate = _clock.Today.AddDays(-1);
+
+        // Act
+        var (setPassResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        // Assert
+        Assert.True(setPassResult.Succeeded);
+        Assert.True(result.Succeeded);
+    }
+
+
+    [Fact]
+    public async Task Given_existing_eyts_update_with_different_assessment_date_returns_error()
+    {
+        // Arrange
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: true);
+        var ittResult = dfeta_ITTResult.Pass;
+        var assessmentDate = _clock.Today.AddDays(-1);
+        var amendedAssessmentDate = _clock.Today.AddDays(-5);
+
+        // Act
+        var (setPassResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            amendedAssessmentDate);
+
+        // Assert
+        Assert.True(setPassResult.Succeeded);
+        Assert.False(result.Succeeded);
+        Assert.Equal(SetIttResultForTeacherFailedReason.EytsDateMismatch, result.FailedReason);
+    }
+
+    [Fact]
+    public async Task Given_existing_qts_update_with_same_assessment_date_returns_success()
+    {
+        // Arrange
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, iqts: true);
+        var ittResult = dfeta_ITTResult.Pass;
+        var assessmentDate = _clock.Today.AddDays(-1);
+
+        // Act
+        var (setPassResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        // Assert
+        Assert.True(setPassResult.Succeeded);
+        Assert.True(result.Succeeded);
+    }
+
+    [Fact]
+    public async Task Given_existing_qts_update_with_different_assessment_date_returns_error()
+    {
+        // Arrange
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, iqts: true);
+        var ittResult = dfeta_ITTResult.Pass;
+        var assessmentDate = _clock.Today.AddDays(-1);
+        var amendedAssessmentDate = _clock.Today.AddDays(-5);
+
+        // Act
+        var (setPassResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            amendedAssessmentDate);
+
+        // Assert
+        Assert.True(setPassResult.Succeeded);
+        Assert.False(result.Succeeded);
+        Assert.Equal(SetIttResultForTeacherFailedReason.QtsDateMismatch, result.FailedReason);
+    }
+
+    [Fact]
+    public async Task Given_existing_qts_update_assessment_date_with_same_assessmentdate_succeeds()
+    {
+        // Arrange
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, iqts: true);
+        var ittResult = dfeta_ITTResult.Pass;
+        var assessmentDate = _clock.Today.AddDays(-1);
+
+        // Act
+        var (setPassResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        var (result, failedReasons) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        // Assert
+        Assert.True(setPassResult.Succeeded);
+        Assert.True(result.Succeeded);
+    }
 
     [Fact]
     public async Task Given_valid_request_with_Pass_result_for_early_years_updates_qts_and_does_not_create_induction()
@@ -203,7 +337,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
 
         // Assert
         Assert.Null(record);
-        Assert.Equal(SetIttResultForTeacherFailedReason.MultipleInTrainingIttRecords, failedReason);
+        Assert.Equal(SetIttResultForTeacherFailedReason.MultipleIttRecords, failedReason);
     }
 
     [Theory]
@@ -224,6 +358,87 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
         // Assert
         Assert.Same(expectedResult, record);
         Assert.Null(failedReason);
+    }
+
+    [Theory]
+    [InlineData(dfeta_ITTResult.Withdrawn, null)]
+    [InlineData(dfeta_ITTResult.Deferred, null)]
+    [InlineData(dfeta_ITTResult.DeferredforSkillsTests, null)]
+    public async Task Given_teacher_is_failed_cannot_set_result_to(dfeta_ITTResult newResult, DateOnly? assessmentDate)
+    {
+        // Arrange
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: true);
+        var ittResult = dfeta_ITTResult.Fail;
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        // Act
+        var (result2, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            newResult,
+            assessmentDate);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.False(result2.Succeeded);
+        Assert.Equal(SetIttResultForTeacherFailedReason.NoMatchingIttRecord, result2.FailedReason);
+    }
+
+    [Fact]
+    public async Task Given_teacher_is_failed_cannot_set_result_to_pass()
+    {
+        // Arrange
+        var assessmentDate = _clock.Today;
+        var newResult = dfeta_ITTResult.Pass;
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: true);
+        var ittResult = dfeta_ITTResult.Fail;
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            null);
+
+        // Act
+        var (result2, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            newResult,
+            assessmentDate);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.False(result2.Succeeded);
+        Assert.Equal(SetIttResultForTeacherFailedReason.NoMatchingIttRecord, result2.FailedReason);
+    }
+
+    [Fact]
+    public async Task Given_teacher_is_failed_do_not_error_when_request_result_is_fail()
+    {
+        // Arrange
+        var newResult = dfeta_ITTResult.Fail;
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: true);
+        var ittResult = dfeta_ITTResult.Fail;
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            null);
+
+        // Act
+        var (result2, trxRequest2) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            newResult,
+            null);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.True(result2.Succeeded);
+        Assert.Null(trxRequest2);
     }
 
     [Fact]
