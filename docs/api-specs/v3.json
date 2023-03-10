@@ -94,6 +94,13 @@
               "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTraining"
             },
             "nullable": true
+          },
+          "npqQualifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetTeacherResponseNpqQualificationsQualification"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -184,6 +191,32 @@
         },
         "additionalProperties": false
       },
+      "GetTeacherResponseNpqQualificationsQualification": {
+        "type": "object",
+        "properties": {
+          "awarded": {
+            "type": "string",
+            "format": "date"
+          },
+          "type": {
+            "$ref": "#/components/schemas/GetTeacherResponseNpqQualificationsQualificationType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseNpqQualificationsQualificationType": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/NpqQualificationType"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "IttOutcome": {
         "enum": [
           "Pass",
@@ -227,6 +260,20 @@
           "ProviderLedPostgrad",
           "ProviderLedUndergrad",
           "InternationalQualifiedTeacherStatus"
+        ],
+        "type": "string"
+      },
+      "NpqQualificationType": {
+        "enum": [
+          "NPQEL",
+          "NPQEYL",
+          "NPQH",
+          "NPQLBC",
+          "NPQLL",
+          "NPQLT",
+          "NPQLTD",
+          "NPQML",
+          "NPQSL"
         ],
         "type": "string"
       },

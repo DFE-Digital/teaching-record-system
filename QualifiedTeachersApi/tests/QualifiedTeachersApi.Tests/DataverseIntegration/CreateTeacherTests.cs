@@ -120,7 +120,14 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
 
         // Assert
         Assert.True(result.Succeeded);
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(result.TeacherId, columnNames: Array.Empty<string>());
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+            result.TeacherId,
+            columnNames: Array.Empty<string>(),
+            heQualificationColumnNames: new[]
+            {
+                dfeta_hequalification.PrimaryIdAttribute,
+                dfeta_hequalification.Fields.dfeta_name
+            });
         Assert.Collection(qualifications, qualification => Assert.Equal("Higher Degree", qualification.Extract<dfeta_hequalification>().dfeta_name));
     }
 
@@ -135,7 +142,14 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
 
         // Assert
         Assert.True(result.Succeeded);
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(result.TeacherId, columnNames: Array.Empty<string>());
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+            result.TeacherId,
+            columnNames: Array.Empty<string>(),
+            heQualificationColumnNames: new[]
+            {
+                dfeta_hequalification.PrimaryIdAttribute,
+                dfeta_hequalification.Fields.dfeta_name
+            });
         Assert.Collection(qualifications, qualification => Assert.Equal("First Degree", qualification.Extract<dfeta_hequalification>().dfeta_name));
     }
 

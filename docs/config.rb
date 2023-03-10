@@ -17,6 +17,7 @@ jq_cmd = %s{jq 'walk(if type == "object" and has("application/*+json") then del(
 
 system "cat ./api-specs/v1.json | #{jq_cmd} > tmp/v1.json"
 system "cat ./api-specs/v2.json | #{jq_cmd} > tmp/v2.json"
+system "cat ./api-specs/v3.json | #{jq_cmd} > tmp/v3.json"
 
 system 'npx openapi-merge-cli'
 raise "Cannot run `npx openapi-merge-cli`. Check that Node is installed and matches the version in .nvmrc" if $?.exitstatus != 0

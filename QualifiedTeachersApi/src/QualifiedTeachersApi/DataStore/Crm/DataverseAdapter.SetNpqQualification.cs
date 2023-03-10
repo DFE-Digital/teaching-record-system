@@ -25,11 +25,13 @@ public partial class DataverseAdapter
                 Contact.Fields.dfeta_TRN
             });
 
-        var qualifications = await GetQualificationsForTeacher(command.TeacherId, new[]
-        {
-            dfeta_qualification.Fields.dfeta_Type,
-            dfeta_qualification.Fields.dfeta_createdbyapi
-        });
+        var qualifications = await GetQualificationsForTeacher(
+            command.TeacherId,
+            new[]
+            {
+                dfeta_qualification.Fields.dfeta_Type,
+                dfeta_qualification.Fields.dfeta_createdbyapi
+            });
 
         //existing qualifications for request qualification type
         var existingQualifications = qualifications.Where(x => x.dfeta_Type == command.QualificationType && x.dfeta_createdbyapi == true).ToList();

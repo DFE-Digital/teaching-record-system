@@ -99,7 +99,7 @@ public class SetNpqQualificationTests : ApiTestBase
            .ReturnsAsync(contact);
 
         ApiFixture.DataverseAdapter
-           .Setup(mock => mock.GetQualificationsForTeacher(id, It.IsAny<string[]>()))
+           .Setup(mock => mock.GetQualificationsForTeacher(id, It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>()))
            .ReturnsAsync(qualifications);
 
         ApiFixture.DataverseAdapter

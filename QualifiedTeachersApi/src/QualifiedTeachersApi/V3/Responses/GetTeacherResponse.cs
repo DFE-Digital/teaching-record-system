@@ -14,7 +14,8 @@ public record GetTeacherResponse
     [SwaggerSchema(Nullable = false)]
     public required string LastName { get; init; }
     public required DateOnly? QtsDate { get; init; }
-    public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; set; }
+    public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; init; }
+    public IEnumerable<GetTeacherResponseNpqQualificationsQualification> NpqQualifications { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTraining
@@ -48,5 +49,17 @@ public record GetTeacherResponseInitialTeacherTrainingProvider
 public record GetTeacherResponseInitialTeacherTrainingSubject
 {
     public string Code { get; init; }
+    public string Name { get; init; }
+}
+
+public record GetTeacherResponseNpqQualificationsQualification
+{
+    public DateOnly Awarded { get; init; }
+    public GetTeacherResponseNpqQualificationsQualificationType Type { get; init; }
+}
+
+public record GetTeacherResponseNpqQualificationsQualificationType
+{
+    public NpqQualificationType Code { get; init; }
     public string Name { get; init; }
 }
