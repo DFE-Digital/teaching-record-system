@@ -208,7 +208,7 @@
         "type": "object",
         "properties": {
           "code": {
-            "$ref": "#/components/schemas/GetTeacherResponseNpqQualificationsQualificationTypeCode"
+            "$ref": "#/components/schemas/NpqQualificationType"
           },
           "name": {
             "type": "string",
@@ -216,20 +216,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "GetTeacherResponseNpqQualificationsQualificationTypeCode": {
-        "enum": [
-          "NPQEL",
-          "NPQEYL",
-          "NPQH",
-          "NPQLBC",
-          "NPQLL",
-          "NPQLT",
-          "NPQLTD",
-          "NPQML",
-          "NPQSL"
-        ],
-        "type": "string"
       },
       "IttOutcome": {
         "enum": [
@@ -274,6 +260,20 @@
           "ProviderLedPostgrad",
           "ProviderLedUndergrad",
           "InternationalQualifiedTeacherStatus"
+        ],
+        "type": "string"
+      },
+      "NpqQualificationType": {
+        "enum": [
+          "NPQEL",
+          "NPQEYL",
+          "NPQH",
+          "NPQLBC",
+          "NPQLL",
+          "NPQLT",
+          "NPQLTD",
+          "NPQML",
+          "NPQSL"
         ],
         "type": "string"
       },
