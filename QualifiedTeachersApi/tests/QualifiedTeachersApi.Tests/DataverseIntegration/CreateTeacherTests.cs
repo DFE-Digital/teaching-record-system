@@ -602,15 +602,17 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     }
 
     [Theory]
-    [InlineData(CreateTeacherType.TraineeTeacher, null, dfeta_ITTProgrammeType.AssessmentOnlyRoute, "212")]
-    [InlineData(CreateTeacherType.TraineeTeacher, null, dfeta_ITTProgrammeType.GraduateTeacherProgramme, "211")]
-    [InlineData(CreateTeacherType.OverseasQualifiedTeacher, CreateTeacherRecognitionRoute.Scotland, null, "68")]
-    [InlineData(CreateTeacherType.OverseasQualifiedTeacher, CreateTeacherRecognitionRoute.NorthernIreland, null, "69")]
-    [InlineData(CreateTeacherType.OverseasQualifiedTeacher, CreateTeacherRecognitionRoute.EuropeanEconomicArea, null, "223")]
-    [InlineData(CreateTeacherType.OverseasQualifiedTeacher, CreateTeacherRecognitionRoute.OverseasTrainedTeachers, null, "103")]
+    [InlineData(CreateTeacherType.TraineeTeacher, null, null, dfeta_ITTProgrammeType.AssessmentOnlyRoute, "212")]
+    [InlineData(CreateTeacherType.TraineeTeacher, null, null, dfeta_ITTProgrammeType.GraduateTeacherProgramme, "211")]
+    [InlineData(CreateTeacherType.OverseasQualifiedTeacher, CreateTeacherRecognitionRoute.Scotland, null, null, "68")]
+    [InlineData(CreateTeacherType.OverseasQualifiedTeacher, CreateTeacherRecognitionRoute.NorthernIreland, null, null, "69")]
+    [InlineData(CreateTeacherType.OverseasQualifiedTeacher, CreateTeacherRecognitionRoute.EuropeanEconomicArea, null, null, "223")]
+    [InlineData(CreateTeacherType.OverseasQualifiedTeacher, CreateTeacherRecognitionRoute.OverseasTrainedTeachers, false, null, "103")]
+    [InlineData(CreateTeacherType.OverseasQualifiedTeacher, CreateTeacherRecognitionRoute.OverseasTrainedTeachers, true, null, "104")]
     public void DeriveTeacherStatus(
         CreateTeacherType teacherType,
         CreateTeacherRecognitionRoute? recognitionRoute,
+        bool? underNewOverseasRegulations,
         dfeta_ITTProgrammeType? programmeType,
         string expectedTeacherStatus)
     {
@@ -621,6 +623,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
             {
                 c.InitialTeacherTraining.ProgrammeType = programmeType;
                 c.RecognitionRoute = recognitionRoute;
+                c.UnderNewOverseasRegulations = underNewOverseasRegulations;
             });
 
         var helper = new DataverseAdapter.CreateTeacherHelper(_dataverseAdapter, command);
@@ -636,7 +639,6 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     [InlineData(CreateTeacherRecognitionRoute.Scotland, "UK establishment (Scotland/Northern Ireland)")]
     [InlineData(CreateTeacherRecognitionRoute.NorthernIreland, "UK establishment (Scotland/Northern Ireland)")]
     [InlineData(CreateTeacherRecognitionRoute.OverseasTrainedTeachers, "Non-UK establishment")]
-    [InlineData(CreateTeacherRecognitionRoute.EuropeanEconomicArea, "Non-UK establishment")]
     public void DeriveIttProviderNameForOverseasQualifiedTeacher(
         CreateTeacherRecognitionRoute recognitionRoute,
         string expectedIttProviderName)
@@ -659,11 +661,9 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     [InlineData(true, CreateTeacherRecognitionRoute.Scotland, dfeta_InductionStatus.RequiredtoComplete, null)]
     [InlineData(true, CreateTeacherRecognitionRoute.NorthernIreland, dfeta_InductionStatus.RequiredtoComplete, null)]
     [InlineData(true, CreateTeacherRecognitionRoute.OverseasTrainedTeachers, dfeta_InductionStatus.RequiredtoComplete, null)]
-    [InlineData(true, CreateTeacherRecognitionRoute.EuropeanEconomicArea, dfeta_InductionStatus.RequiredtoComplete, null)]
     [InlineData(false, CreateTeacherRecognitionRoute.Scotland, dfeta_InductionStatus.Exempt, dfeta_InductionExemptionReason.HasoriseligibleforfullregistrationinScotland)]
     [InlineData(false, CreateTeacherRecognitionRoute.NorthernIreland, dfeta_InductionStatus.Exempt, dfeta_InductionExemptionReason.SuccessfullycompletedinductioninNorthernIreland)]
     [InlineData(false, CreateTeacherRecognitionRoute.OverseasTrainedTeachers, dfeta_InductionStatus.Exempt, dfeta_InductionExemptionReason.OverseasTrainedTeacher)]
-    [InlineData(false, CreateTeacherRecognitionRoute.EuropeanEconomicArea, dfeta_InductionStatus.Exempt, dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute)]
     public void CreateInductionEntity(
         bool inductionRequired,
         CreateTeacherRecognitionRoute recognitionRoute,

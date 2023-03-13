@@ -39,6 +39,7 @@ public class GetOrCreateTrnRequest : IRequest<TrnRequestInfo>
     public DateOnly? QtsDate { get; set; }
     public bool? InductionRequired { get; set; }
     public Guid? IdentityUserId { get; set; }
+    public bool? UnderNewOverseasRegulations { get; set; }
 }
 
 public class GetOrCreateTrnRequestAddress

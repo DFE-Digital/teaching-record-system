@@ -19,6 +19,7 @@ public class CreateTeacherCommand
     public CreateTeacherRecognitionRoute? RecognitionRoute { get; set; }
     public DateOnly? QtsDate { get; set; }
     public bool? InductionRequired { get; set; }
+    public bool? UnderNewOverseasRegulations { get; set; }
 }
 
 public class CreateTeacherCommandAddress

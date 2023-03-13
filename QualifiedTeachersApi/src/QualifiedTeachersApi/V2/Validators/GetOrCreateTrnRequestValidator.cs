@@ -141,6 +141,55 @@ public class GetOrCreateTrnRequestValidator : AbstractValidator<GetOrCreateTrnRe
             .When(trainingCountryRequired, ApplyConditionTo.CurrentValidator)
             .When(r => r.InitialTeacherTraining != null, ApplyConditionTo.AllValidators);
 
+        RuleFor(r => r.InitialTeacherTraining.TrainingCountryCode)
+            .Custom((countryCode, ctx) =>
+            {
+                if (ctx.InstanceToValidate.TeacherType == CreateTeacherType.OverseasQualifiedTeacher &&
+                    ctx.InstanceToValidate.UnderNewOverseasRegulations == true &&
+                    !string.IsNullOrEmpty(ctx.InstanceToValidate.InitialTeacherTraining?.TrainingCountryCode))
+                {
+                    var route = ctx.InstanceToValidate.RecognitionRoute;
+                    var countryCodePropertyName = $"{nameof(ctx.InstanceToValidate.InitialTeacherTraining)}.{nameof(ctx.InstanceToValidate.InitialTeacherTraining.TrainingCountryCode)}";
+
+                    if (countryCode == "XK")
+                    {
+                        ctx.AddFailure(
+                            countryCodePropertyName,
+                            $"CountryCode cannot be 'XK' when TeacherType is '{CreateTeacherType.OverseasQualifiedTeacher}'.");
+
+                        return;
+                    }
+
+                    if (route is CreateTeacherRecognitionRoute.Scotland)
+                    {
+                        if (countryCode != "XH")
+                        {
+                            ctx.AddFailure(
+                                countryCodePropertyName,
+                                $"CountryCode must be 'XH' when RecognitionRoute is '{CreateTeacherRecognitionRoute.Scotland}'.");
+                        }
+                    }
+                    else if (route is CreateTeacherRecognitionRoute.NorthernIreland)
+                    {
+                        if (countryCode != "XG")
+                        {
+                            ctx.AddFailure(
+                                countryCodePropertyName,
+                                $"CountryCode must be 'XG' when RecognitionRoute is '{CreateTeacherRecognitionRoute.NorthernIreland}'.");
+                        }
+                    }
+                    else
+                    {
+                        if (countryCode == "XH" || countryCode == "XG")
+                        {
+                            ctx.AddFailure(
+                                countryCodePropertyName,
+                                $"CountryCode cannot be 'XH' or 'XG' when RecognitionRoute is '{CreateTeacherRecognitionRoute.OverseasTrainedTeachers}'.");
+                        }
+                    }
+                }
+            });
+
         RuleFor(r => r.Qualification.Class)
             .IsInEnum()
             .When(r => r.Qualification != null);
@@ -154,6 +203,11 @@ public class GetOrCreateTrnRequestValidator : AbstractValidator<GetOrCreateTrnRe
             .When(r => r.TeacherType == CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator)
             .Null()
             .When(r => r.TeacherType != CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator);
+
+        RuleFor(r => r.RecognitionRoute)
+            .NotEqual(CreateTeacherRecognitionRoute.EuropeanEconomicArea)
+            .When(r => r.UnderNewOverseasRegulations == true)
+            .WithMessage($"EuropeanEconomicArea is not permitted under new regulations.");
 
         RuleFor(r => r.QtsDate)
             .NotNull()

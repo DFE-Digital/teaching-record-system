@@ -140,7 +140,8 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                     EnumHelper.ConvertToEnum<Requests.CreateTeacherRecognitionRoute, DataStore.Crm.CreateTeacherRecognitionRoute>(request.RecognitionRoute.Value) :
                     null,
                 QtsDate = request.QtsDate,
-                InductionRequired = request.InductionRequired
+                InductionRequired = request.InductionRequired,
+                UnderNewOverseasRegulations = request.UnderNewOverseasRegulations
             });
 
             if (!createTeacherResult.Succeeded)

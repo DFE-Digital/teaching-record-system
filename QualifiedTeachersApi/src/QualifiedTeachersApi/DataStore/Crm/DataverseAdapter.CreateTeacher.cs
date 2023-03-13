@@ -83,11 +83,8 @@ public partial class DataverseAdapter
             var inductionEntity = helper.CreateInductionEntity();
             inductionId = inductionEntity.Id;
             txnRequest.Requests.Add(new CreateRequest() { Target = inductionEntity });
-        }
 
-        // Update the QTS record with the induction ID; we can't set it in the Create above as Induction can't be created before QTS
-        if (inductionId.HasValue)
-        {
+            // Update the QTS record with the induction ID; we can't set it in the Create above as Induction can't be created before QTS
             txnRequest.Requests.Add(new UpdateRequest()
             {
                 Target = new dfeta_qtsregistration()
@@ -120,7 +117,7 @@ public partial class DataverseAdapter
 
         public Guid TeacherId { get; }
 
-        public Models.Task CreateDuplicateReviewTaskEntity(CreateTeacherDuplicateTeacherResult duplicate)
+        public CrmTask CreateDuplicateReviewTaskEntity(CreateTeacherDuplicateTeacherResult duplicate)
         {
             var description = GetDescription();
 
@@ -128,7 +125,7 @@ public partial class DataverseAdapter
                 !string.IsNullOrEmpty(_command.HusId) ? "HESAImportTrn" :
                 "DMSImportTrn";
 
-            return new Models.Task()
+            return new CrmTask()
             {
                 RegardingObjectId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_potentialduplicateid = duplicate.TeacherId.ToEntityReference(Contact.EntityLogicalName),
@@ -475,12 +472,13 @@ public partial class DataverseAdapter
                 Debug.Assert(_command.RecognitionRoute.HasValue);
 
                 qtsDateRequired = true;
-                return _command.RecognitionRoute.Value switch
+                return (_command.RecognitionRoute.Value, _command.UnderNewOverseasRegulations.GetValueOrDefault(false)) switch
                 {
-                    CreateTeacherRecognitionRoute.Scotland => "68",
-                    CreateTeacherRecognitionRoute.NorthernIreland => "69",
-                    CreateTeacherRecognitionRoute.EuropeanEconomicArea => "223",
-                    CreateTeacherRecognitionRoute.OverseasTrainedTeachers => "103",
+                    (CreateTeacherRecognitionRoute.Scotland, _) => "68",
+                    (CreateTeacherRecognitionRoute.NorthernIreland, _) => "69",
+                    (CreateTeacherRecognitionRoute.EuropeanEconomicArea, _) => "223",
+                    (CreateTeacherRecognitionRoute.OverseasTrainedTeachers, false) => "103",
+                    (CreateTeacherRecognitionRoute.OverseasTrainedTeachers, true) => "104",
                     _ => throw new NotImplementedException($"Unknown {nameof(CreateTeacherRecognitionRoute)}: '{_command.RecognitionRoute.Value}'.")
                 };
             }
