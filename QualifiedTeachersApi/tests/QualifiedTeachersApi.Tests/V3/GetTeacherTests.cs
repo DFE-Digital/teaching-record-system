@@ -60,12 +60,15 @@ public class GetTeacherTests : ApiTestBase
         var ittSubject3Value = "34567";
         var ittSubject3Name = "Subject 3";
         var ittQualificationName = "My test qualification 123";
+        var npqQualification1Id = Guid.NewGuid();
         var npqQualification1Type = dfeta_qualification_dfeta_Type.NPQEYL;
         var npqQualification1AwardDate = new DateOnly(2022, 3, 4);
         var npqQualification1Status = dfeta_qualificationState.Active;
+        var npqQualification2Id = Guid.NewGuid();
         var npqQualification2Type = dfeta_qualification_dfeta_Type.NPQLL;
         DateOnly? npqQualification2AwardDate = null;
         var npqQualification2Status = dfeta_qualificationState.Active;
+        var npqQualification3Id = Guid.NewGuid();
         var npqQualification3Type = dfeta_qualification_dfeta_Type.NPQSL;
         var npqQualification3AwardDate = new DateOnly(2022, 3, 4);
         var npqQualification3Status = dfeta_qualificationState.Inactive;
@@ -96,18 +99,21 @@ public class GetTeacherTests : ApiTestBase
         {
             new dfeta_qualification()
             {
+                Id = npqQualification1Id,
                 dfeta_Type = npqQualification1Type,
                 dfeta_CompletionorAwardDate = npqQualification1AwardDate.ToDateTime(),
                 StateCode = npqQualification1Status
             },
             new dfeta_qualification()
             {
+                Id = npqQualification2Id,
                 dfeta_Type = npqQualification2Type,
                 dfeta_CompletionorAwardDate = npqQualification2AwardDate?.ToDateTime(),
                 StateCode = npqQualification2Status
             },
             new dfeta_qualification()
             {
+                Id = npqQualification3Id,
                 dfeta_Type = npqQualification3Type,
                 dfeta_CompletionorAwardDate = npqQualification3AwardDate.ToDateTime(),
                 StateCode = npqQualification3Status
@@ -165,6 +171,7 @@ public class GetTeacherTests : ApiTestBase
                 lastName = lastName,
                 trn = trn,
                 qtsDate = qtsDate.ToString("yyyy-MM-dd"),
+                qtsCertificateUrl = "/v3/certificates/qts",
                 initialTeacherTraining = new[]
                 {
                     new
@@ -215,7 +222,8 @@ public class GetTeacherTests : ApiTestBase
                         {
                             code = npqQualification1Type.ToString(),
                             name = npqQualification1Type.GetName()
-                        }
+                        },
+                        certificateUrl = $"/v3/certificates/npq/{npqQualification1Id}"
                     }
                 }
             },
