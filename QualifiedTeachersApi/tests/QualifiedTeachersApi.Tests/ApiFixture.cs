@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -8,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using QualifiedTeachersApi.DataStore.Crm;
+using QualifiedTeachersApi.Services.Certificates;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using Xunit;
 
@@ -26,7 +26,7 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 
     public Mock<IGetAnIdentityApiClient> IdentityApiClient { get; } = new Mock<IGetAnIdentityApiClient>();
 
-    public Mock<BlobServiceClient> BlobServiceClient { get; } = new Mock<BlobServiceClient>();
+    public Mock<ICertificateGenerator> CertificateGenerator { get; } = new Mock<ICertificateGenerator>();
 
     public SigningCredentials JwtSigningCredentials { get; }
 
@@ -55,7 +55,7 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 
             services.AddSingleton(DataverseAdapter.Object);
             services.AddSingleton(IdentityApiClient.Object);
-            services.AddSingleton(BlobServiceClient.Object);
+            services.AddSingleton(CertificateGenerator.Object);
             services.AddSingleton<IClock, TestableClock>();
 
             services.AddSingleton(sp =>

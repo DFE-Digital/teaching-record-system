@@ -584,7 +584,7 @@ public partial class DataverseAdapter : IDataverseAdapter
     {
         var filter = new FilterExpression();
         filter.AddCondition(dfeta_qualification.Fields.dfeta_PersonId, ConditionOperator.Equal, teacherId);
-        filter.AddCondition(dfeta_qtsregistration.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_qualificationState.Active);
+        filter.AddCondition(dfeta_qualification.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_qualificationState.Active);
 
         var query = new QueryExpression(dfeta_qualification.EntityLogicalName)
         {
@@ -639,6 +639,44 @@ public partial class DataverseAdapter : IDataverseAdapter
             subjectLink.Columns = new ColumnSet(columnNames);
 
             subjectLink.EntityAlias = alias;
+        }
+    }
+
+    public async Task<dfeta_qualification> GetQualificationById(
+        Guid qualificationId,
+        string[] columnNames,
+        string[] contactColumnNames = null)
+    {
+        var filter = new FilterExpression();
+        filter.AddCondition(dfeta_qualification.PrimaryIdAttribute, ConditionOperator.Equal, qualificationId);
+        filter.AddCondition(dfeta_qualification.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_qualificationState.Active);
+
+        var query = new QueryExpression(dfeta_qualification.EntityLogicalName)
+        {
+            ColumnSet = new ColumnSet(columnNames),
+            Criteria = filter
+        };
+
+        if (contactColumnNames?.Length > 0)
+        {
+            AddContactLink(query, contactColumnNames);
+        }
+
+        var result = await _service.RetrieveMultipleAsync(query);
+
+        return result.Entities.Select(entity => entity.ToEntity<dfeta_qualification>()).FirstOrDefault();
+
+        static void AddContactLink(QueryExpression query, string[] columnNames)
+        {
+            var contactLink = query.AddLink(
+                Contact.EntityLogicalName,
+                dfeta_qualification.Fields.dfeta_PersonId,
+                Contact.PrimaryIdAttribute,
+                JoinOperator.Inner);
+
+            contactLink.Columns = new ColumnSet(columnNames);
+
+            contactLink.EntityAlias = Contact.EntityLogicalName;
         }
     }
 

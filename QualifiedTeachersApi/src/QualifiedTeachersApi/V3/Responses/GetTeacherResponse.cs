@@ -14,36 +14,37 @@ public record GetTeacherResponse
     [SwaggerSchema(Nullable = false)]
     public required string LastName { get; init; }
     public required DateOnly? QtsDate { get; init; }
+    public string QtsCertificateUrl { get; init; }
     public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; init; }
     public IEnumerable<GetTeacherResponseNpqQualificationsQualification> NpqQualifications { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTraining
 {
-    public GetTeacherResponseInitialTeacherTrainingQualification Qualification { get; set; }
-    public DateOnly? StartDate { get; set; }
-    public DateOnly? EndDate { get; set; }
-    public IttProgrammeType? ProgrammeType { get; set; }
-    public IttOutcome? Result { get; set; }
-    public GetTeacherResponseInitialTeacherTrainingAgeRange AgeRange { get; set; }
-    public GetTeacherResponseInitialTeacherTrainingProvider Provider { get; set; }
-    public IEnumerable<GetTeacherResponseInitialTeacherTrainingSubject> Subjects { get; set; }
+    public GetTeacherResponseInitialTeacherTrainingQualification Qualification { get; init; }
+    public DateOnly? StartDate { get; init; }
+    public DateOnly? EndDate { get; init; }
+    public IttProgrammeType? ProgrammeType { get; init; }
+    public IttOutcome? Result { get; init; }
+    public GetTeacherResponseInitialTeacherTrainingAgeRange AgeRange { get; init; }
+    public GetTeacherResponseInitialTeacherTrainingProvider Provider { get; init; }
+    public IEnumerable<GetTeacherResponseInitialTeacherTrainingSubject> Subjects { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTrainingQualification
 {
-    public string Name { get; set; }
+    public string Name { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTrainingAgeRange
 {
-    public string Description { get; set; }
+    public string Description { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTrainingProvider
 {
-    public string Name { get; set; }
-    public string Ukprn { get; set; }
+    public string Name { get; init; }
+    public string Ukprn { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTrainingSubject
@@ -56,6 +57,7 @@ public record GetTeacherResponseNpqQualificationsQualification
 {
     public DateOnly Awarded { get; init; }
     public GetTeacherResponseNpqQualificationsQualificationType Type { get; init; }
+    public string CertificateUrl { get; init; }
 }
 
 public record GetTeacherResponseNpqQualificationsQualificationType

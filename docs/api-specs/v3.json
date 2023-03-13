@@ -24,6 +24,84 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v3/certificates/npq/{qualificationId}": {
+      "get": {
+        "tags": [
+          "Certificates"
+        ],
+        "summary": "NPQ Certificate",
+        "description": "Returns a PDF of the NPQ Certificate associated with the provided Qualification ID",
+        "parameters": [
+          {
+            "name": "qualificationId",
+            "in": "path",
+            "description": "The ID of the qualification record associated with the certificate",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
           "429": {
             "description": "Too Many Requests",
             "content": {
@@ -86,6 +164,10 @@
           "qtsDate": {
             "type": "string",
             "format": "date",
+            "nullable": true
+          },
+          "qtsCertificateUrl": {
+            "type": "string",
             "nullable": true
           },
           "initialTeacherTraining": {
@@ -200,6 +282,10 @@
           },
           "type": {
             "$ref": "#/components/schemas/GetTeacherResponseNpqQualificationsQualificationType"
+          },
+          "certificateUrl": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

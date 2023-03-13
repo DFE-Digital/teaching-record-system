@@ -1,48 +1,35 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Storage.Blobs;
 using MediatR;
-using PdfSharpCore.Pdf;
-using PdfSharpCore.Pdf.AcroForms;
-using PdfSharpCore.Pdf.IO;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
+using QualifiedTeachersApi.Services.Certificates;
 using QualifiedTeachersApi.V3.Requests;
+using QualifiedTeachersApi.V3.Responses;
 
 namespace QualifiedTeachersApi.V3.Handlers;
 
-public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest, byte[]>
+public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest, GetCertificateResponse>
 {
     private const string QtsFormNameField = "Full Name";
     private const string QtsFormTrnField = "TRN";
     private const string QtsFormDateField = "QTSDate";
 
     private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly BlobServiceClient _blobServiceClient;
+    private readonly ICertificateGenerator _certificateGenerator;
 
     public GetQtsCertificateHandler(
         IDataverseAdapter dataverseAdapter,
-        BlobServiceClient blobServiceClient)
+        ICertificateGenerator certificateGenerator)
     {
         _dataverseAdapter = dataverseAdapter;
-        _blobServiceClient = blobServiceClient;
+        _certificateGenerator = certificateGenerator;
     }
 
-    private byte[] GetPdfStream(PdfDocument pdf)
-    {
-        byte[] pdfData;
-        using (var stream = new MemoryStream())
-        {
-            pdf.Save(stream, false);
-            pdfData = stream.ToArray();
-        }
-
-        return pdfData;
-    }
-
-    public async Task<byte[]> Handle(GetQtsCertificateRequest request, CancellationToken cancellationToken)
+    public async Task<GetCertificateResponse> Handle(GetQtsCertificateRequest request, CancellationToken cancellationToken)
     {
         var teacher = await _dataverseAdapter.GetTeacherByTrn(
             request.Trn,
@@ -50,6 +37,7 @@ public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest
             {
                 Contact.Fields.dfeta_TRN,
                 Contact.Fields.FirstName,
+                Contact.Fields.MiddleName,
                 Contact.Fields.LastName,
                 Contact.Fields.dfeta_QTSDate
             });
@@ -59,69 +47,30 @@ public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest
             return null;
         }
 
-        var qtsPdf = await GenerateQtsPdf(teacher);
-        return GetPdfStream(qtsPdf);
-    }
-
-    private async Task<PdfDocument> GenerateQtsPdf(Contact teacher)
-    {
-        var pdf = await DownloadPdfTemplate();
-
-        SetFormContent(pdf.AcroForm, teacher);
-        SetFormAppearance(pdf.AcroForm);
-        SetDocumentPermissions(pdf);
-
-        return pdf;
-    }
-
-    private async Task<PdfDocument> DownloadPdfTemplate()
-    {
-        var blobClient = _blobServiceClient.GetBlobContainerClient("certificates").GetBlobClient("QTS certificate.pdf");
-
-        MemoryStream stream = new MemoryStream();
-        await blobClient.DownloadToAsync(stream);
-
-        stream.Position = 0;
-
-        return PdfReader.Open(stream, PdfDocumentOpenMode.Modify);
-    }
-
-    private void SetFormContent(PdfAcroForm form, Contact teacher)
-    {
-        form.Fields[QtsFormNameField].Value = new PdfString($"{teacher.FirstName} {teacher.LastName}");
-        form.Fields[QtsFormNameField].ReadOnly = true;
-
-        form.Fields[QtsFormTrnField].Value = new PdfString(teacher.dfeta_TRN);
-        form.Fields[QtsFormTrnField].ReadOnly = true;
-
-        form.Fields[QtsFormDateField].Value = new PdfString(teacher.dfeta_QTSDate!.Value.ToLongDateString());
-        form.Fields[QtsFormDateField].ReadOnly = true;
-    }
-
-    private void SetFormAppearance(PdfAcroForm form)
-    {
-        if (form.Elements.ContainsKey("/NeedAppearances"))
+        var fullName = new StringBuilder();
+        fullName.Append($"{teacher.FirstName} ");
+        if (!string.IsNullOrWhiteSpace(teacher.MiddleName))
         {
-            form.Elements["/NeedAppearances"] = new PdfBoolean(true);
+            fullName.Append($"{teacher.MiddleName} ");
         }
-        else
+
+        fullName.Append(teacher.LastName);
+
+        var fieldValues = new Dictionary<string, string>()
         {
-            form.Elements.Add("/NeedAppearances", new PdfBoolean(true));
-        }
-    }
+            { QtsFormNameField, fullName.ToString() },
+            { QtsFormTrnField, teacher.dfeta_TRN },
+            { QtsFormDateField, teacher.dfeta_QTSDate!.Value.ToLongDateString() }
+        };
 
-    private void SetDocumentPermissions(PdfDocument pdf)
-    {
-        pdf.SecuritySettings.OwnerPassword = Guid.NewGuid().ToString();
+        var pdfStream = await _certificateGenerator.GenerateCertificate("QTS certificate.pdf", fieldValues);
+        using var output = new MemoryStream();
+        pdfStream.CopyTo(output);
 
-        pdf.SecuritySettings.PermitPrint = true;
-        pdf.SecuritySettings.PermitFullQualityPrint = true;
-
-        pdf.SecuritySettings.PermitAnnotations = false;
-        pdf.SecuritySettings.PermitAssembleDocument = false;
-        pdf.SecuritySettings.PermitFormsFill = false;
-        pdf.SecuritySettings.PermitExtractContent = false;
-        pdf.SecuritySettings.PermitAccessibilityExtractContent = false;
-        pdf.SecuritySettings.PermitModifyDocument = false;
+        return new GetCertificateResponse()
+        {
+            FileDownloadName = $"QTSCertificate.pdf",
+            FileContents = output.ToArray()
+        };
     }
 }

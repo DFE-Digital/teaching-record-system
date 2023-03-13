@@ -86,6 +86,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             FirstName = teacher.FirstName,
             LastName = teacher.LastName,
             QtsDate = teacher.dfeta_QTSDate?.ToDateOnly(),
+            QtsCertificateUrl = teacher.dfeta_QTSDate.HasValue ? "/v3/certificates/qts" : null,
             InitialTeacherTraining = itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
             {
                 Qualification = MapIttQualification(i),
@@ -190,7 +191,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     {
                         Code = MapNpqQualificationType(q.dfeta_Type.Value).Value,
                         Name = q.dfeta_Type.Value.GetName(),
-                    }
+                    },
+                    CertificateUrl = $"/v3/certificates/npq/{q.Id}"
                 })
                 .ToArray() ?? Array.Empty<GetTeacherResponseNpqQualificationsQualification>();
     }
