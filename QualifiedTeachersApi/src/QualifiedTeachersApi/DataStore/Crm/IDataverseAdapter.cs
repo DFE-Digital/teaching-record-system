@@ -28,6 +28,11 @@ public interface IDataverseAdapter
         string[] heQualificationColumnNames = null,
         string[] heSubjectColumnNames = null);
 
+    Task<dfeta_qualification> GetQualificationById(
+        Guid qualificationId,
+        string[] columnNames,
+        string[] contactColumnNames = null);
+
     Task<Contact> GetTeacher(Guid teacherId, string[] columnNames, bool resolveMerges = true);
 
     Task<Contact> GetTeacherByTrn(string trn, string[] columnNames, bool activeOnly = true);

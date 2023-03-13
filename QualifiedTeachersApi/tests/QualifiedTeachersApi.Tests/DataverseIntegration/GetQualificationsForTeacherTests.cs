@@ -27,8 +27,8 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
     [InlineData(false, true)]
     [InlineData(true, true)]
     public async Task Given_QualificationsExistForTeacher_ReturnsExpectedColumnValues(
-        bool setHeQualificationNames,
-        bool setHeSubjectsNames
+        bool setHeQualificationColumnNames,
+        bool setHeSubjectColumnNames
         )
     {
         // Arrange
@@ -131,14 +131,14 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
                 dfeta_qualification.Fields.dfeta_Type,
                 dfeta_qualification.Fields.StateCode
             },
-            setHeQualificationNames
+            setHeQualificationColumnNames
             ? new[]
             {
                 dfeta_hequalification.PrimaryIdAttribute,
                 dfeta_hequalification.Fields.dfeta_name
             }
             : null,
-            setHeSubjectsNames
+            setHeSubjectColumnNames
             ? new[]
             {
                 dfeta_hesubject.PrimaryIdAttribute,
@@ -164,7 +164,7 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
                         Assert.Equal(qualification2Status, item2.StateCode);
 
                         var heQualification = item2.Extract<dfeta_hequalification>("dfeta_hequalification", dfeta_hequalification.PrimaryIdAttribute);
-                        if (setHeQualificationNames)
+                        if (setHeQualificationColumnNames)
                         {
                             Assert.NotNull(heQualification);
                             Assert.Equal(heQualificationName, heQualification.dfeta_name);
@@ -178,7 +178,7 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
                         var heSubject1 = item2.Extract<dfeta_hesubject>("dfeta_hesubject1", dfeta_hesubject.PrimaryIdAttribute);
                         var heSubject2 = item2.Extract<dfeta_hesubject>("dfeta_hesubject2", dfeta_hesubject.PrimaryIdAttribute);
                         var heSubject3 = item2.Extract<dfeta_hesubject>("dfeta_hesubject3", dfeta_hesubject.PrimaryIdAttribute);
-                        if (setHeSubjectsNames)
+                        if (setHeSubjectColumnNames)
                         {
                             Assert.NotNull(heSubject1);
                             Assert.Equal(heSubject1Name, heSubject1.dfeta_name);

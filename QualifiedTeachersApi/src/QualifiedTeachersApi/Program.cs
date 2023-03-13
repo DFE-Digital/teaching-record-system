@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -34,6 +33,7 @@ using QualifiedTeachersApi.Logging;
 using QualifiedTeachersApi.ModelBinding;
 using QualifiedTeachersApi.Security;
 using QualifiedTeachersApi.Services;
+using QualifiedTeachersApi.Services.Certificates;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
 using QualifiedTeachersApi.Swagger;
@@ -278,10 +278,7 @@ public class Program
             services.AddSingleton<IDistributedLockService, LocalDistributedLockService>();
         }
 
-        services.AddAzureClients(clientBuilder =>
-        {
-            clientBuilder.AddBlobServiceClient(configuration["StorageConnectionString"]);
-        });
+        services.AddCertificateGeneration(builder.Configuration);
 
         services.AddTransient<IHostedService, LinkTrnToIdentityUserService>();
         MetricLabels.ConfigureLabels(builder.Configuration);

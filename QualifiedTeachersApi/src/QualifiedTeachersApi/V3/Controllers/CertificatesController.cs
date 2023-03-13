@@ -28,13 +28,13 @@ public class CertificatesController : Controller
         summary: "QTS Certificate",
         description: "Returns a PDF of the QTS Certificate for the provided TRN holder")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get()
     {
         var trn = User.FindFirstValue("trn");
-
         if (trn is null)
         {
-            return MissingOrInvalidTrn();
+            return NotFound();
         }
 
         var request = new GetQtsCertificateRequest()
@@ -43,17 +43,35 @@ public class CertificatesController : Controller
         };
 
         var response = await _mediator.Send(request);
-
         if (response is null)
         {
-            return MissingOrInvalidTrn();
+            return NotFound();
         }
 
-        return new FileContentResult(response, "application/pdf")
+        return new FileContentResult(response.FileContents, "application/pdf")
         {
-            FileDownloadName = "QTS Certificate.pdf"
+            FileDownloadName = response.FileDownloadName
         };
+    }
 
-        IActionResult MissingOrInvalidTrn() => BadRequest();
+    [HttpGet]
+    [Route("npq/{qualificationId}")]
+    [SwaggerOperation(
+        summary: "NPQ Certificate",
+        description: "Returns a PDF of the NPQ Certificate associated with the provided Qualification ID")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetNpq(GetNpqCertificateRequest request)
+    {
+        var response = await _mediator.Send(request);
+        if (response is null)
+        {
+            return NotFound();
+        }
+
+        return new FileContentResult(response.FileContents, "application/pdf")
+        {
+            FileDownloadName = response.FileDownloadName
+        };
     }
 }
