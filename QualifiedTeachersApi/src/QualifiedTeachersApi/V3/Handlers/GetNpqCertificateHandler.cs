@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -59,9 +60,18 @@ public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest
             return null;
         }
 
+        var fullName = new StringBuilder();
+        fullName.Append($"{teacher.FirstName} ");
+        if (!string.IsNullOrWhiteSpace(teacher.MiddleName))
+        {
+            fullName.Append($"{teacher.MiddleName} ");
+        }
+
+        fullName.Append(teacher.LastName);
+
         var fieldValues = new Dictionary<string, string>()
         {
-            { FullNameFormField, $"{teacher.FirstName} {teacher.MiddleName} {teacher.LastName}" },
+            { FullNameFormField, fullName.ToString() },
             { PassDateFormField, qualification.dfeta_CompletionorAwardDate.Value.ToLongDateString() }
         };
 

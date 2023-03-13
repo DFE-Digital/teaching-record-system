@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -46,9 +47,18 @@ public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest
             return null;
         }
 
+        var fullName = new StringBuilder();
+        fullName.Append($"{teacher.FirstName} ");
+        if (!string.IsNullOrWhiteSpace(teacher.MiddleName))
+        {
+            fullName.Append($"{teacher.MiddleName} ");
+        }
+
+        fullName.Append(teacher.LastName);
+
         var fieldValues = new Dictionary<string, string>()
         {
-            { QtsFormNameField, $"{teacher.FirstName} {teacher.MiddleName} {teacher.LastName}" },
+            { QtsFormNameField, fullName.ToString() },
             { QtsFormTrnField, teacher.dfeta_TRN },
             { QtsFormDateField, teacher.dfeta_QTSDate!.Value.ToLongDateString() }
         };
