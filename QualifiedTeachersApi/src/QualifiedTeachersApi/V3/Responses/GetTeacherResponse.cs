@@ -13,12 +13,22 @@ public record GetTeacherResponse
     public required string FirstName { get; init; }
     [SwaggerSchema(Nullable = false)]
     public required string LastName { get; init; }
-    public required DateOnly? QtsDate { get; init; }
-    public string QtsCertificateUrl { get; init; }
-    public required DateOnly? EytsDate { get; init; }
-    public string EytsCertificateUrl { get; init; }
+    public GetTeacherResponseQts Qts { get; init; }
+    public GetTeacherResponseEyts Eyts { get; init; }
     public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; init; }
     public IEnumerable<GetTeacherResponseNpqQualificationsQualification> NpqQualifications { get; init; }
+}
+
+public record GetTeacherResponseQts
+{
+    public DateOnly Awarded { get; init; }
+    public string CertificateUrl { get; init; }
+}
+
+public record GetTeacherResponseEyts
+{
+    public DateOnly Awarded { get; init; }
+    public string CertificateUrl { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTraining

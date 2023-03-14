@@ -86,10 +86,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             Trn = request.Trn,
             FirstName = teacher.FirstName,
             LastName = teacher.LastName,
-            QtsDate = teacher.dfeta_QTSDate?.ToDateOnly(),
-            QtsCertificateUrl = teacher.dfeta_QTSDate.HasValue ? "/v3/certificates/qts" : null,
-            EytsDate = teacher.dfeta_EYTSDate?.ToDateOnly(),
-            EytsCertificateUrl = teacher.dfeta_EYTSDate.HasValue ? "/v3/certificates/eyts" : null,
+            Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnly()),
+            Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnly()),
             InitialTeacherTraining = itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
             {
                 Qualification = MapIttQualification(i),
@@ -103,6 +101,30 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             }),
             NpqQualifications = MapNpqQualifications(qualifications)
         };
+    }
+
+    private static GetTeacherResponseQts MapQts(DateOnly? qtsDate)
+    {
+        return
+            qtsDate != null
+            ? new GetTeacherResponseQts()
+            {
+                Awarded = qtsDate.Value,
+                CertificateUrl = "/v3/certificates/qts"
+            }
+            : null;
+    }
+
+    private static GetTeacherResponseEyts MapEyts(DateOnly? eytsDate)
+    {
+        return
+            eytsDate != null
+            ? new GetTeacherResponseEyts()
+            {
+                Awarded = eytsDate.Value,
+                CertificateUrl = "/v3/certificates/eyts"
+            }
+            : null;
     }
 
     private static GetTeacherResponseInitialTeacherTrainingQualification MapIttQualification(dfeta_initialteachertraining initialTeacherTraining)

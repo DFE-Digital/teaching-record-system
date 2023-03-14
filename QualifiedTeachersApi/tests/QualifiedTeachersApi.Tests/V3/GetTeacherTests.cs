@@ -172,10 +172,16 @@ public class GetTeacherTests : ApiTestBase
                 firstName = firstName,
                 lastName = lastName,
                 trn = trn,
-                qtsDate = qtsDate.ToString("yyyy-MM-dd"),
-                qtsCertificateUrl = "/v3/certificates/qts",
-                eytsDate = eytsDate.ToString("yyyy-MM-dd"),
-                eytsCertificateUrl = "/v3/certificates/eyts",
+                qts = new
+                {
+                    awarded = qtsDate.ToString("yyyy-MM-dd"),
+                    certificateUrl = "/v3/certificates/qts"
+                },
+                eyts = new
+                {
+                    awarded = eytsDate.ToString("yyyy-MM-dd"),
+                    certificateUrl = "/v3/certificates/eyts"
+                },
                 initialTeacherTraining = new[]
                 {
                     new
