@@ -54,6 +54,55 @@
         }
       }
     },
+    "/v3/certificates/eyts": {
+      "get": {
+        "tags": [
+          "Certificates"
+        ],
+        "summary": "EYTS Certificate",
+        "description": "Returns a PDF of the EYTS Certificate for the provided TRN holder",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v3/certificates/npq/{qualificationId}": {
       "get": {
         "tags": [
@@ -167,6 +216,15 @@
             "nullable": true
           },
           "qtsCertificateUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "eytsDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "eytsCertificateUrl": {
             "type": "string",
             "nullable": true
           },

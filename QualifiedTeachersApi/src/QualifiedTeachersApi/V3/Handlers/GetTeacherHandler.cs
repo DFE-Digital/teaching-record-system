@@ -30,7 +30,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             {
                 Contact.Fields.FirstName,
                 Contact.Fields.LastName,
-                Contact.Fields.dfeta_QTSDate
+                Contact.Fields.dfeta_QTSDate,
+                Contact.Fields.dfeta_EYTSDate
             });
 
         if (teacher is null)
@@ -87,6 +88,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             LastName = teacher.LastName,
             QtsDate = teacher.dfeta_QTSDate?.ToDateOnly(),
             QtsCertificateUrl = teacher.dfeta_QTSDate.HasValue ? "/v3/certificates/qts" : null,
+            EytsDate = teacher.dfeta_EYTSDate?.ToDateOnly(),
+            EytsCertificateUrl = teacher.dfeta_EYTSDate.HasValue ? "/v3/certificates/eyts" : null,
             InitialTeacherTraining = itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
             {
                 Qualification = MapIttQualification(i),

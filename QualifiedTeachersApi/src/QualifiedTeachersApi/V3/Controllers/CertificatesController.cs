@@ -29,7 +29,7 @@ public class CertificatesController : Controller
         description: "Returns a PDF of the QTS Certificate for the provided TRN holder")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> GetQts()
     {
         var trn = User.FindFirstValue("trn");
         if (trn is null)
@@ -38,6 +38,38 @@ public class CertificatesController : Controller
         }
 
         var request = new GetQtsCertificateRequest()
+        {
+            Trn = trn
+        };
+
+        var response = await _mediator.Send(request);
+        if (response is null)
+        {
+            return NotFound();
+        }
+
+        return new FileContentResult(response.FileContents, "application/pdf")
+        {
+            FileDownloadName = response.FileDownloadName
+        };
+    }
+
+    [HttpGet]
+    [Route("eyts")]
+    [SwaggerOperation(
+    summary: "EYTS Certificate",
+    description: "Returns a PDF of the EYTS Certificate for the provided TRN holder")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetEyts()
+    {
+        var trn = User.FindFirstValue("trn");
+        if (trn is null)
+        {
+            return NotFound();
+        }
+
+        var request = new GetEytsCertificateRequest()
         {
             Trn = trn
         };
