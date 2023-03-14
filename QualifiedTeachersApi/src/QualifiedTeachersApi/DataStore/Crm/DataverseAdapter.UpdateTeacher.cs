@@ -644,7 +644,7 @@ public partial class DataverseAdapter
                         "211",   // 211 == 'Trainee Teacher'
                     teacherStatusId => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetTeacherStatusKey(teacherStatusId),
-                        () => _dataverseAdapter.GetTeacherStatus(teacherStatusId, qtsDateRequired: false, requestBuilder))) :
+                        () => _dataverseAdapter.GetTeacherStatus(teacherStatusId, requestBuilder))) :
                 Task.FromResult<dfeta_teacherstatus>(null);
 
             var existingTeachersWithHusIdTask = !string.IsNullOrEmpty(_command.HusId) ? _dataverseAdapter.GetTeachersByHusId(_command.HusId, columnNames: new[]

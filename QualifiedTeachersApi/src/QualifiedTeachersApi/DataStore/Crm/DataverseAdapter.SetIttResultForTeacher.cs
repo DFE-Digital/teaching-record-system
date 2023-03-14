@@ -202,7 +202,7 @@ public partial class DataverseAdapter
 
             return _cache.GetOrCreateAsync(
                 cacheKey,
-                _ => this.GetEarlyYearsStatus(value));
+                _ => this.GetEarlyYearsStatus(value, null));
         }
 
         Task<dfeta_teacherstatus> GetTeacherStatus(string value)
@@ -211,7 +211,7 @@ public partial class DataverseAdapter
 
             return _cache.GetOrCreateAsync(
                 cacheKey,
-                _ => this.GetTeacherStatus(value, qtsDateRequired: true));
+                _ => this.GetTeacherStatus(value, null));
         }
     }
 
@@ -251,6 +251,10 @@ public partial class DataverseAdapter
 
         public async Task<SetIttResultForTeacherLookupResult> LookupData()
         {
+            var requestBuilder = _dataverseAdapter.CreateMultipleRequestBuilder();
+            var getAllEytsTeacherStatusesTask = _dataverseAdapter.GetAllEarlyYearsStatuses(requestBuilder);
+            var getAllTeacherStatuses = _dataverseAdapter.GetAllTeacherStatuses(requestBuilder);
+
             var getTeacherTask = _dataverseAdapter.GetTeacher(
                 _teacherId,
                 columnNames: new[]
@@ -284,29 +288,21 @@ public partial class DataverseAdapter
                     dfeta_qtsregistration.Fields.StateCode
                 });
 
-            var getEarlyYearsTraineeStatusIdTask = _dataverseAdapter._cache.GetOrCreateAsync(
-                CacheKeys.GetEarlyYearsStatusKey("220"),  // 220 == 'Early Years Trainee'
-                _ => _dataverseAdapter.GetEarlyYearsStatus("220"));
-
-            var getAorCandidateTeacherStatusIdTask = _dataverseAdapter._cache.GetOrCreateAsync(
-                CacheKeys.GetTeacherStatusKey("212"),  // 212 == 'AOR Candidate'
-                _ => _dataverseAdapter.GetTeacherStatus("212", qtsDateRequired: false));
-
-            var getTraineeTeacherDmsTeacherStatusIdTask = _dataverseAdapter._cache.GetOrCreateAsync(
-                CacheKeys.GetTeacherStatusKey("211"),  // 211 == 'Trainee Teacher:DMS'
-                _ => _dataverseAdapter.GetTeacherStatus("211", qtsDateRequired: false));
+            var getEarlyYearsTraineeStatusId = getAllEytsTeacherStatusesTask.Result.SingleOrDefault(x => x.dfeta_Value == "220");
+            var getAorCandidateTeacherStatusId = getAllTeacherStatuses.Result.SingleOrDefault(x => x.dfeta_Value == "212");
+            var getTraineeTeacherDmsTeacherStatusId = getAllTeacherStatuses.Result.SingleOrDefault(x => x.dfeta_Value == "211");
 
             await Task.WhenAll(
                 getTeacherTask,
                 getIttProviderTask,
                 getIttRecordsTask,
                 getQtsRegistrationsTask,
-                getAorCandidateTeacherStatusIdTask,
-                getTraineeTeacherDmsTeacherStatusIdTask);
+                getAllTeacherStatuses,
+                getAllEytsTeacherStatusesTask);
 
-            Debug.Assert(getEarlyYearsTraineeStatusIdTask.Result != null, "'Early Years Trainee' early years status lookup failed");
-            Debug.Assert(getAorCandidateTeacherStatusIdTask.Result != null, "'AOR Candidate' teacher status lookup failed");
-            Debug.Assert(getTraineeTeacherDmsTeacherStatusIdTask.Result != null, "'Trainee Teacher:DMS' teacher status lookup failed");
+            Debug.Assert(getEarlyYearsTraineeStatusId != null, "'Early Years Trainee' early years status lookup failed");
+            Debug.Assert(getAorCandidateTeacherStatusId != null, "'AOR Candidate' teacher status lookup failed");
+            Debug.Assert(getTraineeTeacherDmsTeacherStatusId != null, "'Trainee Teacher:DMS' teacher status lookup failed");
 
             return new SetIttResultForTeacherLookupResult()
             {
@@ -314,9 +310,9 @@ public partial class DataverseAdapter
                 IttProvider = getIttProviderTask.Result,
                 Itt = getIttRecordsTask.Result,
                 QtsRegistrations = getQtsRegistrationsTask.Result,
-                EarlyYearsTraineeStatusId = getEarlyYearsTraineeStatusIdTask.Result.Id,
-                AorCandidateTeacherStatusId = getAorCandidateTeacherStatusIdTask.Result.Id,
-                TraineeTeacherDmsTeacherStatusId = getTraineeTeacherDmsTeacherStatusIdTask.Result.Id
+                EarlyYearsTraineeStatusId = getEarlyYearsTraineeStatusId.Id,
+                AorCandidateTeacherStatusId = getAorCandidateTeacherStatusId.Id,
+                TraineeTeacherDmsTeacherStatusId = getTraineeTeacherDmsTeacherStatusId.Id
             };
         }
 

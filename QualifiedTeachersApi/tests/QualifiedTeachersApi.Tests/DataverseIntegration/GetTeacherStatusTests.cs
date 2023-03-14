@@ -25,7 +25,7 @@ public class GetTeacherStatusTests : IAsyncLifetime
         var value = "211";
 
         // Act
-        var result = await _dataverseAdapter.GetTeacherStatus(value, qtsDateRequired: false);
+        var result = await _dataverseAdapter.GetTeacherStatus(value, null);
 
         // Assert
         Assert.NotNull(result);
@@ -39,7 +39,7 @@ public class GetTeacherStatusTests : IAsyncLifetime
         var value = "XXXX";
 
         // Act
-        var result = await _dataverseAdapter.GetTeacherStatus(value, qtsDateRequired: false);
+        var result = await _dataverseAdapter.GetTeacherStatus(value, null);
 
         // Assert
         Assert.Null(result);
