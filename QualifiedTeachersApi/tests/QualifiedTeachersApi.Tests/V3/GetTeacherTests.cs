@@ -44,6 +44,7 @@ public class GetTeacherTests : ApiTestBase
         var firstName = Faker.Name.First();
         var lastName = Faker.Name.Last();
         var qtsDate = new DateOnly(1997, 4, 23);
+        var eytsDate = new DateOnly(1995, 5, 14);
         var ittStartDate = new DateOnly(2021, 9, 7);
         var ittEndDate = new DateOnly(2022, 7, 29);
         var ittProgrammeType = IttProgrammeType.EYITTGraduateEntry;
@@ -79,7 +80,8 @@ public class GetTeacherTests : ApiTestBase
             dfeta_TRN = trn,
             FirstName = firstName,
             LastName = lastName,
-            dfeta_QTSDate = qtsDate.ToDateTime()
+            dfeta_QTSDate = qtsDate.ToDateTime(),
+            dfeta_EYTSDate = eytsDate.ToDateTime(),
         };
 
         var itt = new dfeta_initialteachertraining()
@@ -172,6 +174,8 @@ public class GetTeacherTests : ApiTestBase
                 trn = trn,
                 qtsDate = qtsDate.ToString("yyyy-MM-dd"),
                 qtsCertificateUrl = "/v3/certificates/qts",
+                eytsDate = eytsDate.ToString("yyyy-MM-dd"),
+                eytsCertificateUrl = "/v3/certificates/eyts",
                 initialTeacherTraining = new[]
                 {
                     new

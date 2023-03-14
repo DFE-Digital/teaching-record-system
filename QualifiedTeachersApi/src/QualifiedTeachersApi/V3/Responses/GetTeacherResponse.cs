@@ -15,6 +15,8 @@ public record GetTeacherResponse
     public required string LastName { get; init; }
     public required DateOnly? QtsDate { get; init; }
     public string QtsCertificateUrl { get; init; }
+    public required DateOnly? EytsDate { get; init; }
+    public string EytsCertificateUrl { get; init; }
     public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; init; }
     public IEnumerable<GetTeacherResponseNpqQualificationsQualification> NpqQualifications { get; init; }
 }
