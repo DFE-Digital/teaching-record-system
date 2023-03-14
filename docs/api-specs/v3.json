@@ -210,23 +210,11 @@
           "lastName": {
             "type": "string"
           },
-          "qtsDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
+          "qts": {
+            "$ref": "#/components/schemas/GetTeacherResponseQts"
           },
-          "qtsCertificateUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "eytsDate": {
-            "type": "string",
-            "format": "date",
-            "nullable": true
-          },
-          "eytsCertificateUrl": {
-            "type": "string",
-            "nullable": true
+          "eyts": {
+            "$ref": "#/components/schemas/GetTeacherResponseEyts"
           },
           "initialTeacherTraining": {
             "type": "array",
@@ -240,6 +228,20 @@
             "items": {
               "$ref": "#/components/schemas/GetTeacherResponseNpqQualificationsQualification"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseEyts": {
+        "type": "object",
+        "properties": {
+          "awarded": {
+            "type": "string",
+            "format": "date"
+          },
+          "certificateUrl": {
+            "type": "string",
             "nullable": true
           }
         },
@@ -355,6 +357,20 @@
             "$ref": "#/components/schemas/NpqQualificationType"
           },
           "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseQts": {
+        "type": "object",
+        "properties": {
+          "awarded": {
+            "type": "string",
+            "format": "date"
+          },
+          "certificateUrl": {
             "type": "string",
             "nullable": true
           }
