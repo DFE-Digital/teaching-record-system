@@ -39,6 +39,29 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
+        var (induction, inductionPeriods) = await _dataverseAdapter.GetInductionByTeacher(
+            teacher.Id,
+            columnNames: new[]
+            {
+                dfeta_induction.PrimaryIdAttribute,
+                dfeta_induction.Fields.dfeta_StartDate,
+                dfeta_induction.Fields.dfeta_CompletionDate,
+                dfeta_induction.Fields.dfeta_InductionStatus
+            },
+            inductionPeriodColumnNames: new[]
+            {
+                dfeta_inductionperiod.Fields.dfeta_InductionId,
+                dfeta_inductionperiod.Fields.dfeta_StartDate,
+                dfeta_inductionperiod.Fields.dfeta_EndDate,
+                dfeta_inductionperiod.Fields.dfeta_Numberofterms,
+                dfeta_inductionperiod.Fields.dfeta_AppropriateBodyId
+            },
+            appropriateBodyColumnNames: new[]
+            {
+                Account.PrimaryIdAttribute,
+                Account.Fields.Name
+            });
+
         var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
             teacher.Id,
             columnNames: new[]
@@ -88,6 +111,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             LastName = teacher.LastName,
             Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnly()),
             Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnly()),
+            Induction = MapInduction(induction, inductionPeriods),
             InitialTeacherTraining = itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
             {
                 Qualification = MapIttQualification(i),
@@ -125,6 +149,55 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 CertificateUrl = "/v3/certificates/eyts"
             }
             : null;
+    }
+
+    private static GetTeacherResponseInduction MapInduction(dfeta_induction induction, dfeta_inductionperiod[] inductionperiods)
+    {
+        return
+            induction != null
+            ? new GetTeacherResponseInduction()
+            {
+                StartDate = induction.dfeta_StartDate.ToDateOnly(),
+                EndDate = induction.dfeta_CompletionDate.ToDateOnly(),
+                Status = MapInductionStatus(induction.dfeta_InductionStatus),
+                Periods = inductionperiods.Select(p => MapInductionPeriod(p)).ToArray()
+            }
+            : null;
+    }
+
+    private static GetTeacherResponseInductionPeriod MapInductionPeriod(dfeta_inductionperiod inductionPeriod)
+    {
+        var appropriateBody = inductionPeriod.Extract<Account>("appropriatebody", Account.PrimaryIdAttribute);
+        return new GetTeacherResponseInductionPeriod()
+        {
+            StartDate = inductionPeriod.dfeta_StartDate.ToDateOnly(),
+            EndDate = inductionPeriod.dfeta_EndDate.ToDateOnly(),
+            Terms = inductionPeriod.dfeta_Numberofterms,
+            AppropriateBody = new GetTeacherResponseInductionPeriodAppropriateBody()
+            {
+                Name = appropriateBody.Name
+            }
+        };
+    }
+
+    private static InductionStatus? MapInductionStatus(dfeta_InductionStatus? inductionStatus)
+    {
+        var mapped = inductionStatus switch
+        {
+            dfeta_InductionStatus.Exempt => InductionStatus.Exempt,
+            dfeta_InductionStatus.Fail => InductionStatus.Fail,
+            dfeta_InductionStatus.FailedinWales => InductionStatus.FailedinWales,
+            dfeta_InductionStatus.InductionExtended => InductionStatus.InductionExtended,
+            dfeta_InductionStatus.InProgress => InductionStatus.InProgress,
+            dfeta_InductionStatus.NotYetCompleted => InductionStatus.NotYetCompleted,
+            dfeta_InductionStatus.Pass => InductionStatus.Pass,
+            dfeta_InductionStatus.PassedinWales => InductionStatus.PassedinWales,
+            dfeta_InductionStatus.RequiredtoComplete => InductionStatus.RequiredtoComplete,
+            null => (InductionStatus?)null,
+            _ => throw new NotImplementedException($"{nameof(InductionStatus)}: {inductionStatus} is not currently supported.")
+        };
+
+        return mapped;
     }
 
     private static GetTeacherResponseInitialTeacherTrainingQualification MapIttQualification(dfeta_initialteachertraining initialTeacherTraining)

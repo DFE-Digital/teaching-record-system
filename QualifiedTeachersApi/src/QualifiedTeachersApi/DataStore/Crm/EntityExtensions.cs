@@ -16,7 +16,12 @@ public static class EntityExtensions
         where T : Entity, new()
     {
         var attributes = source.Attributes
-            .MapCollection<object, AttributeCollection>(attribute => source.GetAttributeValue<AliasedValue>(attribute.Key).Value, prefix);
+            .MapCollection<object, AttributeCollection>(attribute =>
+                // If the nested attribute is itself a nested attribute then leave it as an AliasedValue
+                (attribute.Key.Remove(0, prefix.Length + 1).IndexOf(".") >= 0)
+                ? source.GetAttributeValue<AliasedValue>(attribute.Key)
+                : source.GetAttributeValue<AliasedValue>(attribute.Key).Value
+                ,prefix);
 
         if (!attributes.ContainsKey(idAttribute))
         {

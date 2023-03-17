@@ -60,6 +60,15 @@
     "dfeta_inductionstatus",
     "dfeta_personid",
     "dfeta_startdate",
+    "statecode",
+    "CreatedOn"
+  ],
+  "dfeta_inductionperiod": [
+    "dfeta_startdate",
+    "dfeta_enddate",
+    "dfeta_inductionid",
+    "dfeta_numberofterms",
+    "dfeta_appropriatebodyid",
     "statecode"
   ],
   "dfeta_initialteachertraining": [

@@ -15,6 +15,7 @@ public record GetTeacherResponse
     public required string LastName { get; init; }
     public GetTeacherResponseQts Qts { get; init; }
     public GetTeacherResponseEyts Eyts { get; init; }
+    public GetTeacherResponseInduction Induction { get; init; }
     public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; init; }
     public IEnumerable<GetTeacherResponseNpqQualificationsQualification> NpqQualifications { get; init; }
 }
@@ -29,6 +30,28 @@ public record GetTeacherResponseEyts
 {
     public DateOnly Awarded { get; init; }
     public string CertificateUrl { get; init; }
+}
+
+public record GetTeacherResponseInduction
+{
+    public DateOnly? StartDate { get; init; }
+    public DateOnly? EndDate { get; init; }
+    public InductionStatus? Status { get; init; }
+    public IEnumerable<GetTeacherResponseInductionPeriod> Periods { get; init; }
+
+}
+
+public record GetTeacherResponseInductionPeriod
+{
+    public DateOnly? StartDate { get; init; }
+    public DateOnly? EndDate { get; init; }
+    public int? Terms { get; init; }
+    public GetTeacherResponseInductionPeriodAppropriateBody AppropriateBody { get; init; }
+}
+
+public record GetTeacherResponseInductionPeriodAppropriateBody
+{
+    public string Name { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTraining

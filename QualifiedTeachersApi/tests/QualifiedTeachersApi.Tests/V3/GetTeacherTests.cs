@@ -45,6 +45,13 @@ public class GetTeacherTests : ApiTestBase
         var lastName = Faker.Name.Last();
         var qtsDate = new DateOnly(1997, 4, 23);
         var eytsDate = new DateOnly(1995, 5, 14);
+        var inductionStartDate = new DateOnly(1996, 2, 3);
+        var inductionEndDate = new DateOnly(1996, 6, 7);
+        var inductionStatus = dfeta_InductionStatus.Pass;
+        var inductionPeriodStartDate = new DateOnly(1996, 2, 3);
+        var inductionPeriodEndDate = new DateOnly(1996, 6, 7);
+        var inductionPeriodTerms = 3;
+        var inductionPeriodAppropriateBodyName = "My appropriate body";
         var ittStartDate = new DateOnly(2021, 9, 7);
         var ittEndDate = new DateOnly(2022, 7, 29);
         var ittProgrammeType = IttProgrammeType.EYITTGraduateEntry;
@@ -82,6 +89,28 @@ public class GetTeacherTests : ApiTestBase
             LastName = lastName,
             dfeta_QTSDate = qtsDate.ToDateTime(),
             dfeta_EYTSDate = eytsDate.ToDateTime(),
+        };
+
+        var inductionPeriod = new dfeta_inductionperiod()
+        {
+            dfeta_StartDate = inductionPeriodStartDate.ToDateTime(),
+            dfeta_EndDate = inductionPeriodEndDate.ToDateTime(),
+            dfeta_Numberofterms = inductionPeriodTerms
+        };
+
+        inductionPeriod.Attributes.Add($"appropriatebody.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, Guid.NewGuid()));
+        inductionPeriod.Attributes.Add($"appropriatebody.{Account.Fields.Name}", new AliasedValue(Account.EntityLogicalName, Account.Fields.Name, inductionPeriodAppropriateBodyName));
+
+        var induction = new dfeta_induction()
+        {
+            dfeta_StartDate = inductionStartDate.ToDateTime(),
+            dfeta_CompletionDate = inductionEndDate.ToDateTime(),
+            dfeta_InductionStatus = inductionStatus
+        };
+
+        var inductionPeriods = new []
+        {
+            inductionPeriod
         };
 
         var itt = new dfeta_initialteachertraining()
@@ -142,6 +171,14 @@ public class GetTeacherTests : ApiTestBase
             .ReturnsAsync(contact);
 
         ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetInductionByTeacher(
+                teacherId,
+                It.IsAny<string[]>(),
+                It.IsAny<string[]>(),
+                It.IsAny<string[]>()))
+            .ReturnsAsync((induction, inductionPeriods));
+
+        ApiFixture.DataverseAdapter
              .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
                  teacherId,
                  It.IsAny<string[]>(),
@@ -181,6 +218,25 @@ public class GetTeacherTests : ApiTestBase
                 {
                     awarded = eytsDate.ToString("yyyy-MM-dd"),
                     certificateUrl = "/v3/certificates/eyts"
+                },
+                induction = new
+                {
+                    startDate = inductionStartDate.ToString("yyyy-MM-dd"),
+                    endDate = inductionEndDate.ToString("yyyy-MM-dd"),
+                    status = inductionStatus.ToString(),
+                    periods = new[]
+                    {
+                        new
+                        {
+                            startDate = inductionPeriodStartDate.ToString("yyyy-MM-dd"),
+                            endDate = inductionPeriodEndDate.ToString("yyyy-MM-dd"),
+                            terms = inductionPeriodTerms,
+                            appropriateBody = new
+                            {
+                                name = inductionPeriodAppropriateBodyName
+                            }
+                        }
+                    }
                 },
                 initialTeacherTraining = new[]
                 {
