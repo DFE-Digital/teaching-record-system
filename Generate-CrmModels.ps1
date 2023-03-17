@@ -6,7 +6,7 @@ param (
 
 $ErrorActionPreference = "Stop"
 
-$userSecretsId = "DqtApi"
+$userSecretsId = "QualifiedTeachersApi"
 
 function Get-UserSecret {
     [CmdletBinding()]

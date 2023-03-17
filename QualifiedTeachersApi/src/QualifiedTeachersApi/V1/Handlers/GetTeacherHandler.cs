@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.Xrm.Sdk;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.V1.Requests;
@@ -133,9 +132,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 return null;
             }
 
-            var subject1 = ExtractSubject(1);
-            var subject2 = ExtractSubject(2);
-            var subject3 = ExtractSubject(3);
+            var subject1 = itt.Extract<dfeta_ittsubject>($"{nameof(dfeta_ittsubject)}1", dfeta_ittsubject.PrimaryIdAttribute);
+            var subject2 = itt.Extract<dfeta_ittsubject>($"{nameof(dfeta_ittsubject)}2", dfeta_ittsubject.PrimaryIdAttribute);
+            var subject3 = itt.Extract<dfeta_ittsubject>($"{nameof(dfeta_ittsubject)}3", dfeta_ittsubject.PrimaryIdAttribute);
 
             return new InitialTeacherTraining()
             {
@@ -153,15 +152,6 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Subject2Code = subject2?.dfeta_Value,
                 Subject3Code = subject3?.dfeta_Value
             };
-
-            dfeta_ittsubject ExtractSubject(int index)
-            {
-                var prefix = nameof(dfeta_ittsubject) + index;
-
-                var attributes = itt.Attributes.MapCollection<object, AttributeCollection>(attribute => attribute.Value, prefix);
-
-                return new dfeta_ittsubject { Attributes = attributes };
-            }
         }
 
         Qualification[] MapQualifications() =>

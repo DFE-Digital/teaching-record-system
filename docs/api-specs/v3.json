@@ -216,6 +216,9 @@
           "eyts": {
             "$ref": "#/components/schemas/GetTeacherResponseEyts"
           },
+          "induction": {
+            "$ref": "#/components/schemas/GetTeacherResponseInduction"
+          },
           "initialTeacherTraining": {
             "type": "array",
             "items": {
@@ -241,6 +244,66 @@
             "format": "date"
           },
           "certificateUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseInduction": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/InductionStatus"
+          },
+          "periods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetTeacherResponseInductionPeriod"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseInductionPeriod": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "terms": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "appropriateBody": {
+            "$ref": "#/components/schemas/GetTeacherResponseInductionPeriodAppropriateBody"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseInductionPeriodAppropriateBody": {
+        "type": "object",
+        "properties": {
+          "name": {
             "type": "string",
             "nullable": true
           }
@@ -376,6 +439,20 @@
           }
         },
         "additionalProperties": false
+      },
+      "InductionStatus": {
+        "enum": [
+          "Exempt",
+          "Fail",
+          "FailedinWales",
+          "InductionExtended",
+          "InProgress",
+          "NotYetCompleted",
+          "Pass",
+          "PassedinWales",
+          "RequiredtoComplete"
+        ],
+        "type": "string"
       },
       "IttOutcome": {
         "enum": [

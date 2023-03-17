@@ -33,6 +33,12 @@ public interface IDataverseAdapter
         string[] columnNames,
         string[] contactColumnNames = null);
 
+    Task<(dfeta_induction, dfeta_inductionperiod[])> GetInductionByTeacher(
+        Guid teacherId,
+        string[] columnNames,
+        string[] inductionPeriodColumnNames = null,
+        string[] appropriateBodyColumnNames = null);
+
     Task<Contact> GetTeacher(Guid teacherId, string[] columnNames, bool resolveMerges = true);
 
     Task<Contact> GetTeacherByTrn(string trn, string[] columnNames, bool activeOnly = true);
