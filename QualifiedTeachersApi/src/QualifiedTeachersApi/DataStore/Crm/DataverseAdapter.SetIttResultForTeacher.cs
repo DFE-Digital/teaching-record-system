@@ -325,28 +325,55 @@ public partial class DataverseAdapter
             Guid ittProviderId)
         {
             // Find an ITT record for the specified ITT Provider.
-            // The record should be at the InTraining,WithDrawn or Deferred status unless the programme is 'assessment only',
-            // in which case the status should be UnderAssessment, WithDrawn or Deferred.
+            // if ProgrammeType is AssessmentOnlyRoute, result should be UnderAssessment,Withdrawn or Deferrred otherwise
+            // record should be InTraining,WithDrawn or Deferred
+            List<dfeta_initialteachertraining> matching = new List<dfeta_initialteachertraining>();
 
-            var inTrainingForProvider = ittRecords
-                .Where(r => (r.dfeta_ProgrammeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute && (r.dfeta_Result == dfeta_ITTResult.InTraining || r.dfeta_Result == dfeta_ITTResult.Withdrawn || r.dfeta_Result == dfeta_ITTResult.Deferred) ||
-                            (r.dfeta_ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute && (r.dfeta_Result == dfeta_ITTResult.UnderAssessment || r.dfeta_Result == dfeta_ITTResult.Withdrawn || r.dfeta_Result == dfeta_ITTResult.Deferred))))
-
-                .Where(r => r.dfeta_EstablishmentId.Id == ittProviderId)
-                .Where(r => r.StateCode == dfeta_initialteachertrainingState.Active)
+            var activeForProvider = ittRecords
+                .Where(r => r.dfeta_EstablishmentId.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
                 .ToArray();
 
-            if (inTrainingForProvider.Length == 0)
+            foreach (var itt in activeForProvider)
+            {
+                if (itt.dfeta_ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute)
+                {
+                    switch (itt.dfeta_Result)
+                    {
+                        case dfeta_ITTResult.UnderAssessment:
+                        case dfeta_ITTResult.Withdrawn:
+                        case dfeta_ITTResult.Deferred:
+                            {
+                                matching.Add(itt);
+                                break;
+                            }
+                    }
+                }
+                else
+                {
+                    switch (itt.dfeta_Result)
+                    {
+                        case dfeta_ITTResult.InTraining:
+                        case dfeta_ITTResult.Withdrawn:
+                        case dfeta_ITTResult.Deferred:
+                            {
+                                matching.Add(itt);
+                                break;
+                            }
+                    }
+                }
+            }
+
+            if (matching.Count == 0)
             {
                 return (null, SetIttResultForTeacherFailedReason.NoMatchingIttRecord);
             }
-            else if (inTrainingForProvider.Length > 1)
+            else if (matching.Count > 1)
             {
                 return (null, SetIttResultForTeacherFailedReason.MultipleInTrainingIttRecords);
             }
             else
             {
-                return (inTrainingForProvider[0], null);
+                return (matching[0], null);
             }
         }
 
@@ -362,20 +389,40 @@ public partial class DataverseAdapter
             //   programme type is Early Years and the Early Years Status is 220 ('Early Years Trainee') *OR*
             //   programme type is AssessmentOnly and the Teacher Status is 212 ('AOR Candidate') *OR*
             //   programme type is neither Early Years nor Assessment Only and Teacher Status is 211 ('Trainee Teacher:DMS')
+            var matching = new List<dfeta_qtsregistration>();
 
-            var matching = qtsRecords
-                .Where(r =>
-                    (isEarlyYears && r.dfeta_EarlyYearsStatusId?.Id == earlyYearsTraineeStatusId) ||
-                    (programmeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute && r.dfeta_TeacherStatusId?.Id == aorCandidateTeacherStatusId) ||
-                    (!isEarlyYears && programmeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute && r.dfeta_TeacherStatusId?.Id == traineeTeacherDmsTeacherStatusId))
-                .Where(r => r.StateCode == dfeta_qtsregistrationState.Active)
-                .ToArray();
 
-            if (matching.Length == 0)
+            foreach (var qts in qtsRecords)
+            {
+                if (isEarlyYears)
+                {
+                    //programme type is Early Years and the Early Years Status is 220 ('Early Years Trainee') *OR*
+                    if (qts.dfeta_EarlyYearsStatusId?.Id == earlyYearsTraineeStatusId)
+                    {
+                        matching.Add(qts);
+                    }
+                }
+                else
+                {
+                    //programme type is AssessmentOnly and the Teacher Status is 212('AOR Candidate') * OR *
+                    if (programmeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute && qts.dfeta_TeacherStatusId?.Id == aorCandidateTeacherStatusId)
+                    {
+                        matching.Add(qts);
+                    }
+
+                    //programme type is neither Early Years nor Assessment Only and Teacher Status is 211 ('Trainee Teacher:DMS')
+                    else if ((programmeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute && qts.dfeta_TeacherStatusId?.Id == traineeTeacherDmsTeacherStatusId))
+                    {
+                        matching.Add(qts);
+                    }
+                }
+            }
+
+            if (matching.Count == 0)
             {
                 return (null, SetIttResultForTeacherFailedReason.NoMatchingQtsRecord);
             }
-            else if (matching.Length > 1)
+            else if (matching.Count > 1)
             {
                 return (null, SetIttResultForTeacherFailedReason.MultipleQtsRecords);
             }
