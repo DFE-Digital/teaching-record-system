@@ -410,7 +410,9 @@ public partial class DataverseAdapter : IDataverseAdapter
                 dfeta_ittsubject.PrimaryIdAttribute,
                 JoinOperator.LeftOuter);
 
-            subjectLink.Columns = new ColumnSet(dfeta_ittsubject.Fields.dfeta_Value);
+            subjectLink.Columns = new ColumnSet(
+                dfeta_ittsubject.PrimaryIdAttribute,
+                dfeta_ittsubject.Fields.dfeta_Value);
 
             subjectLink.EntityAlias = alias;
         }
