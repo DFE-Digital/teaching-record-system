@@ -54,7 +54,7 @@ public class GetInductionByTeacherTests : IAsyncLifetime
             FirstName = firstName,
             LastName = lastName,
             BirthDate = dateOfBirth.ToDateTime(),
-            dfeta_QTSDate = qtsDate.ToDateTime()            
+            dfeta_QTSDate = qtsDate.ToDateTime()
         });
 
         await _organizationService.ExecuteAsync(new UpdateRequest()
@@ -64,13 +64,13 @@ public class GetInductionByTeacherTests : IAsyncLifetime
                 Id = teacherId,
                 dfeta_TRNAllocateRequest = DateTime.UtcNow
             }
-        }); 
+        });
 
         // Teacher needs TRN + DOB + ITT pass in order to get QTS registration records into CRM due to plugin validation
         await _organizationService.CreateAsync(new dfeta_initialteachertraining()
         {
-            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),            
-            dfeta_Result = dfeta_ITTResult.Pass,           
+            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+            dfeta_Result = dfeta_ITTResult.Pass,
         });
 
         // Need QTS to be able to get induction records into CRM due to plugin validation

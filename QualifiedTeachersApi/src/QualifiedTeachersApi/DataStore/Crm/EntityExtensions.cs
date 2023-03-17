@@ -21,7 +21,7 @@ public static class EntityExtensions
                 (attribute.Key.Remove(0, prefix.Length + 1).IndexOf(".") >= 0)
                 ? source.GetAttributeValue<AliasedValue>(attribute.Key)
                 : source.GetAttributeValue<AliasedValue>(attribute.Key).Value
-                ,prefix);
+                , prefix);
 
         if (!attributes.ContainsKey(idAttribute))
         {

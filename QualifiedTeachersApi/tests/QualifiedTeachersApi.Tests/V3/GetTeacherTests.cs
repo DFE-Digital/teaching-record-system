@@ -108,7 +108,7 @@ public class GetTeacherTests : ApiTestBase
             dfeta_InductionStatus = inductionStatus
         };
 
-        var inductionPeriods = new []
+        var inductionPeriods = new[]
         {
             inductionPeriod
         };
