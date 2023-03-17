@@ -157,21 +157,49 @@ public partial class DataverseAdapter
             IEnumerable<dfeta_initialteachertraining> ittRecords,
             Guid ittProviderId)
         {
-            // Find an ITT record for the specified ITT Provider.
+            // Find an active ITT record for the specified ITT Provider.
             // The record should be at the InTraining or Deferred status unless the programme is 'assessment only',
             // in which case the status should be UnderAssessment or Deferred.
 
-            var inTrainingForProvider = ittRecords
-                .Where(r => (r.dfeta_ProgrammeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute && (r.dfeta_Result == dfeta_ITTResult.InTraining || r.dfeta_Result == dfeta_ITTResult.Deferred)) ||
-                            (r.dfeta_ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute && (r.dfeta_Result == dfeta_ITTResult.UnderAssessment || r.dfeta_Result == dfeta_ITTResult.Deferred)))
-                .Where(r => r.StateCode == dfeta_initialteachertrainingState.Active && r.dfeta_EstablishmentId.Id == ittProviderId)
+            List<dfeta_initialteachertraining> matching = new List<dfeta_initialteachertraining>();
+            var activeForProvider = ittRecords
+                .Where(r => r.dfeta_EstablishmentId.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
                 .ToArray();
 
-            if (inTrainingForProvider.Length == 1)
+
+            foreach (var itt in activeForProvider)
             {
-                return (inTrainingForProvider[0], null);
+                if (itt.dfeta_ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute)
+                {
+                    switch (itt.dfeta_Result)
+                    {
+                        case dfeta_ITTResult.UnderAssessment:
+                        case dfeta_ITTResult.Deferred:
+                            {
+                                matching.Add(itt);
+                                break;
+                            }
+                    }
+                }
+                else if (itt.dfeta_ProgrammeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute)
+                {
+                    switch (itt.dfeta_Result)
+                    {
+                        case dfeta_ITTResult.InTraining:
+                        case dfeta_ITTResult.Deferred:
+                            {
+                                matching.Add(itt);
+                                break;
+                            }
+                    }
+                }
             }
-            else if (inTrainingForProvider.Length > 1)
+
+            if (matching.Count == 1)
+            {
+                return (matching[0], null);
+            }
+            else if (matching.Count > 1)
             {
                 return (null, UpdateTeacherFailedReasons.MultipleInTrainingIttRecords);
             }
