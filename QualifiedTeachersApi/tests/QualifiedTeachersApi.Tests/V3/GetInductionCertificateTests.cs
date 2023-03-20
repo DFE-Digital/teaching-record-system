@@ -102,6 +102,50 @@ public class GetInductionCertificateTests : ApiTestBase
     }
 
     [Fact]
+    public async Task Get_InductionCertificateWhenInductionHasNoCompletionDate_ReturnsNotFound()
+    {
+        // Arrange
+        var trn = "1234567";
+        var teacherId = Guid.NewGuid();
+        var inductionStartDate = new DateOnly(2000, 5, 6);
+        var inductionStatus = dfeta_InductionStatus.Pass;
+
+        ApiFixture.DataverseAdapter
+            .Setup(d => d.GetTeacherByTrn(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Contact()
+            {
+                Id = teacherId,
+                dfeta_TRN = trn
+            });
+
+        ApiFixture.DataverseAdapter
+            .Setup(d => d.GetInductionByTeacher(
+                teacherId,
+                It.IsAny<string[]>(),
+                It.IsAny<string[]>(),
+                It.IsAny<string[]>(),
+                It.IsAny<string[]>()))
+            .ReturnsAsync(
+            (new dfeta_induction()
+            {
+                Id = Guid.NewGuid(),
+                dfeta_StartDate = inductionStartDate.ToDateTime(),
+                dfeta_InductionStatus = inductionStatus
+            },
+            new dfeta_inductionperiod[] { }
+            ));
+
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+
+        // Act        
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/induction");
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    [Fact]
     public async Task Get_ValidRequest_ReturnsExpectedResponse()
     {
         // Arrange

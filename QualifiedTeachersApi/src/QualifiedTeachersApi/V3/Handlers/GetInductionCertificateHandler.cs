@@ -60,8 +60,9 @@ public class GetInductionCertificateHandler : IRequestHandler<GetInductionCertif
                 Contact.Fields.LastName
             });
 
-        if (induction?.dfeta_InductionStatus != dfeta_InductionStatus.Pass
+        if ((induction?.dfeta_InductionStatus != dfeta_InductionStatus.Pass
             && induction?.dfeta_InductionStatus != dfeta_InductionStatus.PassedinWales)
+            || induction?.dfeta_CompletionDate == null)
         {
             return null;
         }
