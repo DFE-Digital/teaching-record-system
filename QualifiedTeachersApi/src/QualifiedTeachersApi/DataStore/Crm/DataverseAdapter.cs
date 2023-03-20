@@ -685,7 +685,8 @@ public partial class DataverseAdapter : IDataverseAdapter
         Guid teacherId,
         string[] columnNames,
         string[] inductionPeriodColumnNames = null,
-        string[] appropriateBodyColumnNames = null)
+        string[] appropriateBodyColumnNames = null,
+        string[] contactColumnNames = null)
     {
         var filter = new FilterExpression();
         filter.AddCondition(dfeta_induction.Fields.dfeta_PersonId, ConditionOperator.Equal, teacherId);
@@ -719,6 +720,18 @@ public partial class DataverseAdapter : IDataverseAdapter
                 appropriateBodyLink.Columns = new ColumnSet(appropriateBodyColumnNames);
                 appropriateBodyLink.EntityAlias = $"{dfeta_inductionperiod.EntityLogicalName}.appropriatebody";
             }
+        }
+
+        if (contactColumnNames?.Length > 0)
+        {
+            var contactLink = query.AddLink(
+                Contact.EntityLogicalName,
+                dfeta_induction.Fields.dfeta_PersonId,
+                Contact.PrimaryIdAttribute,
+                JoinOperator.Inner);
+
+            contactLink.Columns = new ColumnSet(contactColumnNames);
+            contactLink.EntityAlias = Contact.EntityLogicalName;
         }
 
         var result = await _service.RetrieveMultipleAsync(query);

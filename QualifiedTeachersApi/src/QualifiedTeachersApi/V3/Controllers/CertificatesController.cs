@@ -87,6 +87,38 @@ public class CertificatesController : Controller
     }
 
     [HttpGet]
+    [Route("induction")]
+    [SwaggerOperation(
+    summary: "Induction Certificate",
+    description: "Returns a PDF of the Induction Certificate for the provided TRN holder")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetInduction()
+    {
+        var trn = User.FindFirstValue("trn");
+        if (trn is null)
+        {
+            return NotFound();
+        }
+
+        var request = new GetInductionCertificateRequest()
+        {
+            Trn = trn
+        };
+
+        var response = await _mediator.Send(request);
+        if (response is null)
+        {
+            return NotFound();
+        }
+
+        return new FileContentResult(response.FileContents, "application/pdf")
+        {
+            FileDownloadName = response.FileDownloadName
+        };
+    }
+
+    [HttpGet]
     [Route("npq/{qualificationId}")]
     [SwaggerOperation(
         summary: "NPQ Certificate",
