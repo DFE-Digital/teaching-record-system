@@ -160,6 +160,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 StartDate = induction.dfeta_StartDate.ToDateOnly(),
                 EndDate = induction.dfeta_CompletionDate.ToDateOnly(),
                 Status = MapInductionStatus(induction.dfeta_InductionStatus),
+                CertificateUrl = induction.dfeta_InductionStatus == dfeta_InductionStatus.Pass || induction.dfeta_InductionStatus == dfeta_InductionStatus.PassedinWales
+                ? "/v3/certificates/induction"
+                : null,
                 Periods = inductionperiods.Select(p => MapInductionPeriod(p)).ToArray()
             }
             : null;

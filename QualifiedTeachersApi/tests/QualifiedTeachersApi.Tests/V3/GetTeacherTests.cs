@@ -175,6 +175,7 @@ public class GetTeacherTests : ApiTestBase
                 teacherId,
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
+                It.IsAny<string[]>(),
                 It.IsAny<string[]>()))
             .ReturnsAsync((induction, inductionPeriods));
 
@@ -224,6 +225,7 @@ public class GetTeacherTests : ApiTestBase
                     startDate = inductionStartDate.ToString("yyyy-MM-dd"),
                     endDate = inductionEndDate.ToString("yyyy-MM-dd"),
                     status = inductionStatus.ToString(),
+                    certificateUrl = "/v3/certificates/induction",
                     periods = new[]
                     {
                         new

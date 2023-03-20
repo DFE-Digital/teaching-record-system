@@ -37,6 +37,7 @@ public record GetTeacherResponseInduction
     public DateOnly? StartDate { get; init; }
     public DateOnly? EndDate { get; init; }
     public InductionStatus? Status { get; init; }
+    public string CertificateUrl { get; init; }
     public IEnumerable<GetTeacherResponseInductionPeriod> Periods { get; init; }
 
 }

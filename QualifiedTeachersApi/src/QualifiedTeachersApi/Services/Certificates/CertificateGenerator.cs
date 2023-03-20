@@ -33,6 +33,13 @@ public class CertificateGenerator : ICertificateGenerator
 
     private void ApplyContentToTemplate(PdfDocument pdfDocument, IReadOnlyDictionary<string, string> fieldValues)
     {
+        // Remove any template specific metadata (some of which is misleading in current templates)
+        pdfDocument.Info.Author = string.Empty;
+        pdfDocument.Info.Title = string.Empty;
+        pdfDocument.Info.Subject = string.Empty;
+        pdfDocument.Info.Creator = string.Empty;
+        pdfDocument.Info.CreationDate = pdfDocument.Info.ModificationDate;
+
         foreach (var kvp in fieldValues)
         {
             pdfDocument.AcroForm.Fields[kvp.Key].Value = new PdfString(kvp.Value);

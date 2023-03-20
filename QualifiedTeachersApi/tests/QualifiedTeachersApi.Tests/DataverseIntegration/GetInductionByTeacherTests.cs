@@ -33,6 +33,7 @@ public class GetInductionByTeacherTests : IAsyncLifetime
 
         // Arrange
         var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
         var lastName = Faker.Name.Last();
         var teacherStatusValue = "100"; // Qualified Teacher: Assessment Only Route 
         var qtsDate = new DateOnly(1997, 4, 23);
@@ -52,6 +53,7 @@ public class GetInductionByTeacherTests : IAsyncLifetime
         var teacherId = await _organizationService.CreateAsync(new Contact()
         {
             FirstName = firstName,
+            MiddleName = middleName,
             LastName = lastName,
             BirthDate = dateOfBirth.ToDateTime(),
             dfeta_QTSDate = qtsDate.ToDateTime()
@@ -146,6 +148,13 @@ public class GetInductionByTeacherTests : IAsyncLifetime
             {
                 Account.PrimaryIdAttribute,
                 Account.Fields.Name
+            },
+            contactColumnNames: new[]
+            {
+                Contact.PrimaryIdAttribute,
+                Contact.Fields.FirstName,
+                Contact.Fields.MiddleName,
+                Contact.Fields.LastName
             });
 
         // Assert
@@ -154,6 +163,13 @@ public class GetInductionByTeacherTests : IAsyncLifetime
         Assert.Equal(inductionStartDate.ToDateTime(), induction.dfeta_StartDate);
         Assert.Equal(inductionEndDate.ToDateTime(), induction.dfeta_CompletionDate);
         Assert.Equal(inductionStatus, induction.dfeta_InductionStatus);
+
+        var teacher = induction.Extract<Contact>(Contact.EntityLogicalName, Contact.PrimaryIdAttribute);
+        Assert.NotNull(teacher);
+        Assert.Equal(firstName, teacher.FirstName);
+        Assert.Equal(middleName, teacher.MiddleName);
+        Assert.Equal(lastName, teacher.LastName);
+
         Assert.NotNull(inductionPeriods);
 
         if (numberOfInductionPeriods > 0)

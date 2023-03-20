@@ -37,7 +37,8 @@ public interface IDataverseAdapter
         Guid teacherId,
         string[] columnNames,
         string[] inductionPeriodColumnNames = null,
-        string[] appropriateBodyColumnNames = null);
+        string[] appropriateBodyColumnNames = null,
+        string[] contactColumnNames = null);
 
     Task<Contact> GetTeacher(Guid teacherId, string[] columnNames, bool resolveMerges = true);
 
