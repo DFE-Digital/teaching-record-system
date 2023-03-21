@@ -68,18 +68,9 @@ public class GetTeacherTests : ApiTestBase
         var ittSubject3Value = "34567";
         var ittSubject3Name = "Subject 3";
         var ittQualificationName = "My test qualification 123";
-        var npqQualification1Id = Guid.NewGuid();
-        var npqQualification1Type = dfeta_qualification_dfeta_Type.NPQEYL;
-        var npqQualification1AwardDate = new DateOnly(2022, 3, 4);
-        var npqQualification1Status = dfeta_qualificationState.Active;
-        var npqQualification2Id = Guid.NewGuid();
-        var npqQualification2Type = dfeta_qualification_dfeta_Type.NPQLL;
-        DateOnly? npqQualification2AwardDate = null;
-        var npqQualification2Status = dfeta_qualificationState.Active;
-        var npqQualification3Id = Guid.NewGuid();
-        var npqQualification3Type = dfeta_qualification_dfeta_Type.NPQSL;
-        var npqQualification3AwardDate = new DateOnly(2022, 3, 4);
-        var npqQualification3Status = dfeta_qualificationState.Inactive;
+        var mandatoryQualificationValidSpecialismName = "Hearing";
+        var mandatoryQualificationNoAwardDateSpecialismName = "Visual Impairment";
+        var mandatoryQualificationInactiveSpecialismName = "Mutli Sensory Impairment";
 
         var contact = new Contact()
         {
@@ -126,29 +117,80 @@ public class GetTeacherTests : ApiTestBase
             StateCode = dfeta_initialteachertrainingState.Active
         };
 
+        var npqQualificationNoAwardDate = new dfeta_qualification()
+        {
+            Id = Guid.NewGuid(),
+            dfeta_Type = dfeta_qualification_dfeta_Type.NPQLL,
+            dfeta_CompletionorAwardDate = null,
+            StateCode = dfeta_qualificationState.Active
+        };
+
+        var npqQualificationInactive = new dfeta_qualification()
+        {
+            Id = Guid.NewGuid(),
+            dfeta_Type = dfeta_qualification_dfeta_Type.NPQSL,
+            dfeta_CompletionorAwardDate = new DateTime(2022, 5, 6),
+            StateCode = dfeta_qualificationState.Inactive
+        };
+
+        var npqQualificationValid = new dfeta_qualification()
+        {
+            Id = Guid.NewGuid(),
+            dfeta_Type = dfeta_qualification_dfeta_Type.NPQEYL,
+            dfeta_CompletionorAwardDate = new DateTime(2022, 3, 4),
+            StateCode = dfeta_qualificationState.Active
+        };
+
+        var mandatoryQualificationNoAwardDate = new dfeta_qualification
+        {
+            Id = Guid.NewGuid(),
+            dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
+            dfeta_MQ_Date = null,
+            StateCode = dfeta_qualificationState.Active
+        };
+
+        mandatoryQualificationNoAwardDate.Attributes.Add($"{dfeta_specialism.EntityLogicalName}.{dfeta_specialism.PrimaryIdAttribute}", new AliasedValue(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute, Guid.NewGuid()));
+        mandatoryQualificationNoAwardDate.Attributes.Add($"{dfeta_specialism.EntityLogicalName}.{dfeta_specialism.Fields.dfeta_name}", new AliasedValue(dfeta_specialism.EntityLogicalName, dfeta_specialism.Fields.dfeta_name, mandatoryQualificationNoAwardDateSpecialismName));
+
+        var mandatoryQualificationNoSpecialism = new dfeta_qualification
+        {
+            Id = Guid.NewGuid(),
+            dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
+            dfeta_MQ_Date = new DateTime(2023, 2, 3),
+            StateCode = dfeta_qualificationState.Active
+        };
+
+        var mandatoryQualificationValid = new dfeta_qualification
+        {
+            Id = Guid.NewGuid(),
+            dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
+            dfeta_MQ_Date = new DateTime(2022, 4, 6),
+            StateCode = dfeta_qualificationState.Active
+        };
+
+        mandatoryQualificationValid.Attributes.Add($"{dfeta_specialism.EntityLogicalName}.{dfeta_specialism.PrimaryIdAttribute}", new AliasedValue(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute, Guid.NewGuid()));
+        mandatoryQualificationValid.Attributes.Add($"{dfeta_specialism.EntityLogicalName}.{dfeta_specialism.Fields.dfeta_name}", new AliasedValue(dfeta_specialism.EntityLogicalName, dfeta_specialism.Fields.dfeta_name, mandatoryQualificationValidSpecialismName));
+
+        var mandatoryQualificationInactive = new dfeta_qualification
+        {
+            Id = Guid.NewGuid(),
+            dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
+            dfeta_MQ_Date = new DateTime(2022, 4, 8),
+            StateCode = dfeta_qualificationState.Inactive
+        };
+
+        mandatoryQualificationInactive.Attributes.Add($"{dfeta_specialism.EntityLogicalName}.{dfeta_specialism.PrimaryIdAttribute}", new AliasedValue(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute, Guid.NewGuid()));
+        mandatoryQualificationInactive.Attributes.Add($"{dfeta_specialism.EntityLogicalName}.{dfeta_specialism.Fields.dfeta_name}", new AliasedValue(dfeta_specialism.EntityLogicalName, dfeta_specialism.Fields.dfeta_name, mandatoryQualificationInactiveSpecialismName));
+
         var qualifications = new dfeta_qualification[]
         {
-            new dfeta_qualification()
-            {
-                Id = npqQualification1Id,
-                dfeta_Type = npqQualification1Type,
-                dfeta_CompletionorAwardDate = npqQualification1AwardDate.ToDateTime(),
-                StateCode = npqQualification1Status
-            },
-            new dfeta_qualification()
-            {
-                Id = npqQualification2Id,
-                dfeta_Type = npqQualification2Type,
-                dfeta_CompletionorAwardDate = npqQualification2AwardDate?.ToDateTime(),
-                StateCode = npqQualification2Status
-            },
-            new dfeta_qualification()
-            {
-                Id = npqQualification3Id,
-                dfeta_Type = npqQualification3Type,
-                dfeta_CompletionorAwardDate = npqQualification3AwardDate.ToDateTime(),
-                StateCode = npqQualification3Status
-            }
+            npqQualificationNoAwardDate,
+            npqQualificationInactive,
+            npqQualificationValid,
+            mandatoryQualificationNoAwardDate,
+            mandatoryQualificationNoSpecialism,
+            mandatoryQualificationValid,
+            mandatoryQualificationInactive
         };
 
         itt.Attributes.Add($"qualification.{dfeta_ittqualification.PrimaryIdAttribute}", new AliasedValue(dfeta_ittqualification.EntityLogicalName, dfeta_ittqualification.PrimaryIdAttribute, Guid.NewGuid()));
@@ -192,6 +234,7 @@ public class GetTeacherTests : ApiTestBase
         ApiFixture.DataverseAdapter
              .Setup(mock => mock.GetQualificationsForTeacher(
                  teacherId,
+                 It.IsAny<string[]>(),
                  It.IsAny<string[]>(),
                  It.IsAny<string[]>(),
                  It.IsAny<string[]>()))
@@ -285,13 +328,21 @@ public class GetTeacherTests : ApiTestBase
                 {
                     new
                     {
-                        awarded = npqQualification1AwardDate.ToString("yyyy-MM-dd"),
+                        awarded = npqQualificationValid.dfeta_CompletionorAwardDate.Value.ToString("yyyy-MM-dd"),
                         type = new
                         {
-                            code = npqQualification1Type.ToString(),
-                            name = npqQualification1Type.GetName()
+                            code = npqQualificationValid.dfeta_Type.ToString(),
+                            name = npqQualificationValid.dfeta_Type.Value.GetName()
                         },
-                        certificateUrl = $"/v3/certificates/npq/{npqQualification1Id}"
+                        certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.Id}"
+                    }
+                },
+                mandatoryQualifications = new[]
+                {
+                    new
+                    {
+                        awarded = mandatoryQualificationValid.dfeta_MQ_Date.Value.ToString("yyyy-MM-dd"),
+                        specialism = mandatoryQualificationValidSpecialismName
                     }
                 }
             },

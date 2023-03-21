@@ -22,18 +22,27 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
     }
 
     [Theory]
-    [InlineData(false, false)]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    [InlineData(true, true)]
+    [InlineData(false, false, false)]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
+    [InlineData(true, true, false)]
+    [InlineData(true, true, true)]
+    [InlineData(false, false, true)]
+    [InlineData(true, false, true)]
+    [InlineData(false, true, true)]
     public async Task Given_QualificationsExistForTeacher_ReturnsExpectedColumnValues(
         bool setHeQualificationColumnNames,
-        bool setHeSubjectColumnNames
+        bool setHeSubjectColumnNames,
+        bool setSpecialismColumnNames
         )
     {
         // Arrange
         var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
         var lastName = Faker.Name.Last();
+        var teacherStatusValue = "100"; // Qualified Teacher: Assessment Only Route 
+        var qtsDate = new DateOnly(1997, 4, 23);
+        var dateOfBirth = new DateOnly(1975, 4, 5);
         var qualification1Type = dfeta_qualification_dfeta_Type.NPQEYL;
         var qualification1AwardDate = new DateOnly(2022, 3, 4);
         var qualification1Status = dfeta_qualificationState.Active;
@@ -49,11 +58,41 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
         var heSubject2Name = "Subject 2";
         var heSubject3Value = "34567";
         var heSubject3Name = "Subject 3";
+        var mqSpecialismName = "My MQ Specialism Name";
+        var mqSpecialismValue = "My MQ Specialism Value";
 
         var teacherId = await _organizationService.CreateAsync(new Contact()
         {
             FirstName = firstName,
-            LastName = lastName
+            MiddleName = middleName,
+            LastName = lastName,
+            BirthDate = dateOfBirth.ToDateTime(),
+            dfeta_QTSDate = qtsDate.ToDateTime()
+        });
+
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new Contact()
+            {
+                Id = teacherId,
+                dfeta_TRNAllocateRequest = DateTime.UtcNow
+            }
+        });
+
+        // Teacher needs TRN + DOB + ITT pass in order to get QTS registration records into CRM due to plugin validation
+        await _organizationService.CreateAsync(new dfeta_initialteachertraining()
+        {
+            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+            dfeta_Result = dfeta_ITTResult.Pass,
+        });
+
+        // Need QTS to be able to get MQ quals into CRM due to plugin validation
+        var teacherStatus = await _dataverseAdapter.GetTeacherStatus(teacherStatusValue, true);
+        await _organizationService.CreateAsync(new dfeta_qtsregistration()
+        {
+            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+            dfeta_TeacherStatusId = new EntityReference(dfeta_teacherstatus.EntityLogicalName, teacherStatus.Id),
+            dfeta_QTSDate = qtsDate.ToDateTime()
         });
 
         var qualification1Id = await _organizationService.CreateAsync(new dfeta_qualification()
@@ -122,6 +161,20 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
             }
         });
 
+        var mqSpecialismId = await _organizationService.CreateAsync(new dfeta_specialism()
+        {
+            dfeta_name = mqSpecialismName,
+            dfeta_Value = mqSpecialismValue
+        });
+
+        var mqQualificationId = await _organizationService.CreateAsync(new dfeta_qualification()
+        {
+            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
+            dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
+            StateCode = dfeta_qualificationState.Active,
+            dfeta_MQ_SpecialismId = new EntityReference(dfeta_specialism.EntityLogicalName, mqSpecialismId)
+        });
+
         // Act
         var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
             teacherId,
@@ -144,6 +197,13 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
                 dfeta_hesubject.PrimaryIdAttribute,
                 dfeta_hesubject.Fields.dfeta_name,
                 dfeta_hesubject.Fields.dfeta_Value
+            }
+            : null,
+            setSpecialismColumnNames
+            ? new[]
+            {
+                dfeta_specialism.PrimaryIdAttribute,
+                dfeta_specialism.Fields.dfeta_name
             }
             : null);
 
@@ -195,6 +255,22 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
                             Assert.Null(heSubject1);
                             Assert.Null(heSubject2);
                             Assert.Null(heSubject3);
+                        }
+                    },
+                    item3 =>
+                    {
+                        Assert.Equal(mqQualificationId, item3.Id);
+                        Assert.Equal(dfeta_qualification_dfeta_Type.MandatoryQualification, item3.dfeta_Type);
+                        Assert.Equal(dfeta_qualificationState.Active, item3.StateCode);
+
+                        var mqSpecialism = item3.Extract<dfeta_specialism>(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute);
+                        if (setSpecialismColumnNames)
+                        {
+                            Assert.NotNull(mqSpecialism);
+                        }
+                        else
+                        {
+                            Assert.Null(mqSpecialism);
                         }
                     }
                 );

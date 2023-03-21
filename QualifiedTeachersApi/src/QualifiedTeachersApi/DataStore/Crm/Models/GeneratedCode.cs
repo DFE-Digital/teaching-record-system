@@ -4292,6 +4292,8 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_HE_HESubject1Id = "dfeta_he_hesubject1id";
 			public const string dfeta_HE_HESubject2Id = "dfeta_he_hesubject2id";
 			public const string dfeta_HE_HESubject3Id = "dfeta_he_hesubject3id";
+			public const string dfeta_MQ_Date = "dfeta_mq_date";
+			public const string dfeta_MQ_SpecialismId = "dfeta_mq_specialismid";
 			public const string dfeta_NPQEL_Awarded = "dfeta_npqel_awarded";
 			public const string dfeta_NPQEL_Date = "dfeta_npqel_date";
 			public const string dfeta_npqeyl_awarded = "dfeta_npqeyl_awarded";
@@ -4320,6 +4322,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_dfeta_hesubject_dfeta_qualification1 = "dfeta_dfeta_hesubject_dfeta_qualification1";
 			public const string dfeta_dfeta_hesubject_dfeta_qualification2 = "dfeta_dfeta_hesubject_dfeta_qualification2";
 			public const string dfeta_dfeta_hesubject_dfeta_qualification3 = "dfeta_dfeta_hesubject_dfeta_qualification3";
+			public const string dfeta_dfeta_specialism_dfeta_qualification_mq = "dfeta_dfeta_specialism_dfeta_qualification_mq";
 		}
 		
 		/// <summary>
@@ -4562,6 +4565,46 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_HE_HESubject3Id");
 				this.SetAttributeValue("dfeta_he_hesubject3id", value);
 				this.OnPropertyChanged("dfeta_HE_HESubject3Id");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mq_date")]
+		public System.Nullable<System.DateTime> dfeta_MQ_Date
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_mq_date");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_MQ_Date");
+				this.SetAttributeValue("dfeta_mq_date", value);
+				this.OnPropertyChanged("dfeta_MQ_Date");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for Specialism associated with Qualification.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mq_specialismid")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_MQ_SpecialismId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_mq_specialismid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_MQ_SpecialismId");
+				this.SetAttributeValue("dfeta_mq_specialismid", value);
+				this.OnPropertyChanged("dfeta_MQ_SpecialismId");
 			}
 		}
 		
@@ -5146,6 +5189,27 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanged("dfeta_dfeta_hesubject_dfeta_qualification3");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 dfeta_dfeta_specialism_dfeta_qualification_mq
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mq_specialismid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_specialism_dfeta_qualification_mq")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.dfeta_specialism dfeta_dfeta_specialism_dfeta_qualification_mq
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_specialism>("dfeta_dfeta_specialism_dfeta_qualification_mq", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_specialism_dfeta_qualification_mq");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_specialism>("dfeta_dfeta_specialism_dfeta_qualification_mq", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_specialism_dfeta_qualification_mq");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -5553,6 +5617,175 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_dfeta_sanctioncode_dfeta_sanction");
 				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_sanction>("dfeta_dfeta_sanctioncode_dfeta_sanction", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_sanctioncode_dfeta_sanction");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_specialismState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_specialism")]
+	public partial class dfeta_specialism : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_specialism entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string dfeta_name = "dfeta_name";
+			public const string dfeta_Value = "dfeta_value";
+			public const string StateCode = "statecode";
+			public const string dfeta_dfeta_specialism_dfeta_qualification_mq = "dfeta_dfeta_specialism_dfeta_qualification_mq";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_specialism() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "dfeta_specialism";
+		
+		public const string PrimaryIdAttribute = "dfeta_specialismid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_specialism";
+		
+		public const string EntityLogicalCollectionName = "dfeta_specialisms";
+		
+		public const string EntitySetName = "dfeta_specialisms";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// The name of the custom entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
+		public string dfeta_name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_name");
+				this.SetAttributeValue("dfeta_name", value);
+				this.OnPropertyChanged("dfeta_name");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
+		public string dfeta_Value
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_value");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Value");
+				this.SetAttributeValue("dfeta_value", value);
+				this.OnPropertyChanged("dfeta_Value");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the Specialism
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_specialismState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((QualifiedTeachersApi.DataStore.Crm.Models.dfeta_specialismState)(System.Enum.ToObject(typeof(QualifiedTeachersApi.DataStore.Crm.Models.dfeta_specialismState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_dfeta_specialism_dfeta_qualification_mq
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_specialism_dfeta_qualification_mq")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_qualification> dfeta_dfeta_specialism_dfeta_qualification_mq
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_qualification>("dfeta_dfeta_specialism_dfeta_qualification_mq", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_specialism_dfeta_qualification_mq");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_qualification>("dfeta_dfeta_specialism_dfeta_qualification_mq", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_specialism_dfeta_qualification_mq");
 			}
 		}
 	}
@@ -6240,6 +6473,18 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			get
 			{
 				return this.CreateQuery<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_sanctioncode>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="QualifiedTeachersApi.DataStore.Crm.Models.dfeta_specialism"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_specialism> dfeta_specialismSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_specialism>();
 			}
 		}
 		
