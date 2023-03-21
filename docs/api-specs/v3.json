@@ -281,6 +281,13 @@
               "$ref": "#/components/schemas/GetTeacherResponseNpqQualificationsQualification"
             },
             "nullable": true
+          },
+          "mandatoryQualifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetTeacherResponseMandatoryQualificationsQualification"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -443,6 +450,20 @@
             "nullable": true
           },
           "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetTeacherResponseMandatoryQualificationsQualification": {
+        "type": "object",
+        "properties": {
+          "awarded": {
+            "type": "string",
+            "format": "date"
+          },
+          "specialism": {
             "type": "string",
             "nullable": true
           }

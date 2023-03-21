@@ -141,7 +141,14 @@
     "dfeta_npqltd_awarded",
     "dfeta_npqml_awarded",
     "dfeta_npqsl_awarded",
-    "dfeta_createdbyapi"
+    "dfeta_createdbyapi",
+    "dfeta_mq_specialismid",
+    "dfeta_mq_date"
+  ],
+  "dfeta_specialism": [
+    "dfeta_name",
+    "dfeta_value",
+    "statecode"
   ],
   "dfeta_teacherstatus": [
     "dfeta_name",

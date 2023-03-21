@@ -582,7 +582,8 @@ public partial class DataverseAdapter : IDataverseAdapter
         Guid teacherId,
         string[] columnNames,
         string[] heQualificationColumnNames = null,
-        string[] heSubjectColumnNames = null)
+        string[] heSubjectColumnNames = null,
+        string[] specialismColumnNames = null)
     {
         var filter = new FilterExpression();
         filter.AddCondition(dfeta_qualification.Fields.dfeta_PersonId, ConditionOperator.Equal, teacherId);
@@ -604,6 +605,11 @@ public partial class DataverseAdapter : IDataverseAdapter
             AddSubjectLinks(query, heSubjectColumnNames);
         }
 
+        if (specialismColumnNames?.Length > 0)
+        {
+            AddSpecialismLink(query, specialismColumnNames);
+        }
+
         var result = await _service.RetrieveMultipleAsync(query);
 
         return result.Entities.Select(entity => entity.ToEntity<dfeta_qualification>()).ToArray();
@@ -617,7 +623,6 @@ public partial class DataverseAdapter : IDataverseAdapter
                 JoinOperator.LeftOuter);
 
             heSubjectLink.Columns = new ColumnSet(columnNames);
-
             heSubjectLink.EntityAlias = dfeta_hequalification.EntityLogicalName;
         }
 
@@ -639,8 +644,19 @@ public partial class DataverseAdapter : IDataverseAdapter
                 JoinOperator.LeftOuter);
 
             subjectLink.Columns = new ColumnSet(columnNames);
-
             subjectLink.EntityAlias = alias;
+        }
+
+        static void AddSpecialismLink(QueryExpression query, string[] columnNames)
+        {
+            var specialismLink = query.AddLink(
+                dfeta_specialism.EntityLogicalName,
+                dfeta_qualification.Fields.dfeta_MQ_SpecialismId,
+                dfeta_specialism.PrimaryIdAttribute,
+                JoinOperator.LeftOuter);
+
+            specialismLink.Columns = new ColumnSet(columnNames);
+            specialismLink.EntityAlias = dfeta_specialism.EntityLogicalName;
         }
     }
 

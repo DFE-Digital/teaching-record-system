@@ -18,6 +18,7 @@ public record GetTeacherResponse
     public GetTeacherResponseInduction Induction { get; init; }
     public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; init; }
     public IEnumerable<GetTeacherResponseNpqQualificationsQualification> NpqQualifications { get; init; }
+    public IEnumerable<GetTeacherResponseMandatoryQualificationsQualification> MandatoryQualifications { get; init; }
 }
 
 public record GetTeacherResponseQts
@@ -100,4 +101,10 @@ public record GetTeacherResponseNpqQualificationsQualificationType
 {
     public NpqQualificationType Code { get; init; }
     public string Name { get; init; }
+}
+
+public record GetTeacherResponseMandatoryQualificationsQualification
+{
+    public DateOnly Awarded { get; init; }
+    public string Specialism { get; init; }
 }

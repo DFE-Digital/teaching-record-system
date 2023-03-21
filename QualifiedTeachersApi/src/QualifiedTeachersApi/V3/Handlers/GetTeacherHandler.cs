@@ -101,7 +101,14 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             {
                 dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
                 dfeta_qualification.Fields.dfeta_Type,
-                dfeta_qualification.Fields.StateCode
+                dfeta_qualification.Fields.StateCode,
+                dfeta_qualification.Fields.dfeta_MQ_Date,
+                dfeta_qualification.Fields.dfeta_MQ_SpecialismId
+            },
+            specialismColumnNames: new[]
+            {
+                dfeta_specialism.PrimaryIdAttribute,
+                dfeta_specialism.Fields.dfeta_name
             });
 
         return new GetTeacherResponse()
@@ -123,7 +130,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Provider = MapProvider(i),
                 Subjects = MapSubjects(i)
             }),
-            NpqQualifications = MapNpqQualifications(qualifications)
+            NpqQualifications = MapNpqQualifications(qualifications),
+            MandatoryQualifications = MapMandatoryQualifications(qualifications)
         };
     }
 
@@ -315,5 +323,27 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         };
 
         return mapped;
+    }
+
+    private static IEnumerable<GetTeacherResponseMandatoryQualificationsQualification> MapMandatoryQualifications(dfeta_qualification[] qualifications)
+    {
+        return
+            qualifications
+                ?.Where(q => q.dfeta_Type.HasValue
+                    && q.dfeta_Type.Value == dfeta_qualification_dfeta_Type.MandatoryQualification
+                    && q.StateCode == dfeta_qualificationState.Active
+                    && q.dfeta_MQ_Date.HasValue)
+                .Select(mq => new
+                {
+                    Awarded = mq.dfeta_MQ_Date.Value.ToDateOnly(),
+                    Specialism = mq.Extract<dfeta_specialism>(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute)
+                })
+                .Where(mq => mq.Specialism != null)
+                .Select(mq => new GetTeacherResponseMandatoryQualificationsQualification()
+                {
+                    Awarded = mq.Awarded,
+                    Specialism = mq.Specialism.dfeta_name
+                })
+                .ToArray() ?? Array.Empty<GetTeacherResponseMandatoryQualificationsQualification>();
     }
 }
