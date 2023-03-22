@@ -288,17 +288,19 @@ public partial class DataverseAdapter
                     dfeta_qtsregistration.Fields.StateCode
                 });
 
-            var getEarlyYearsTraineeStatusId = getAllEytsTeacherStatusesTask.Result.SingleOrDefault(x => x.dfeta_Value == "220");
-            var getAorCandidateTeacherStatusId = getAllTeacherStatuses.Result.SingleOrDefault(x => x.dfeta_Value == "212");
-            var getTraineeTeacherDmsTeacherStatusId = getAllTeacherStatuses.Result.SingleOrDefault(x => x.dfeta_Value == "211");
-
+            await requestBuilder.Execute();
             await Task.WhenAll(
                 getTeacherTask,
                 getIttProviderTask,
                 getIttRecordsTask,
                 getQtsRegistrationsTask,
-                getAllTeacherStatuses,
-                getAllEytsTeacherStatusesTask);
+                getAllEytsTeacherStatusesTask,
+                getAllTeacherStatuses
+                );
+
+            var getEarlyYearsTraineeStatusId = getAllEytsTeacherStatusesTask.Result.SingleOrDefault(x => x.dfeta_Value == "220");
+            var getAorCandidateTeacherStatusId = getAllTeacherStatuses.Result.SingleOrDefault(x => x.dfeta_Value == "212");
+            var getTraineeTeacherDmsTeacherStatusId = getAllTeacherStatuses.Result.SingleOrDefault(x => x.dfeta_Value == "211");
 
             Debug.Assert(getEarlyYearsTraineeStatusId != null, "'Early Years Trainee' early years status lookup failed");
             Debug.Assert(getAorCandidateTeacherStatusId != null, "'AOR Candidate' teacher status lookup failed");
