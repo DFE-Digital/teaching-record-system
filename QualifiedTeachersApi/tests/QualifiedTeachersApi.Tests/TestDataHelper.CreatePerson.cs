@@ -59,7 +59,7 @@ public partial class TestDataHelper
         var getTeacherStatusTask = !earlyYears ?
             _globalCache.GetOrCreateAsync(
                 CacheKeys.GetTeacherStatusKey(teacherStatus),
-                _ => _dataverseAdapter.GetTeacherStatus(teacherStatus, qtsDateRequired: false, lookupRequestBuilder)) :
+                _ => _dataverseAdapter.GetTeacherStatus(teacherStatus, lookupRequestBuilder)) :
             Task.FromResult<dfeta_teacherstatus>(null);
 
         var country = "XK";

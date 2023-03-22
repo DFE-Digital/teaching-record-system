@@ -21,4 +21,8 @@ public static class CacheKeys
     public static object GetOrganizationByUkprnKey(string ukprn) => $"organization:{ukprn}";
 
     public static object GetTeacherStatusKey(string code) => $"teacher_status:{code}";
+
+    public static object GetAllTeacherStatuses() => "all_teacher_statuses";
+
+    public static object GetAllEytsStatuses() => "all_eyts_statuses";
 }

@@ -37,7 +37,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
         var ittResult = dfeta_ITTResult.Pass;
         var assessmentDate = _clock.Today;
 
-        var earlyYearsTeacherStatusId = (await _dataverseAdapter.GetEarlyYearsStatus("221")).Id;
+        var earlyYearsTeacherStatusId = (await _dataverseAdapter.GetEarlyYearsStatus("221", null)).Id;
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(
@@ -80,7 +80,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
 
         var ittResult = dfeta_ITTResult.Pass;
         var assessmentDate = _clock.Today;
-        var teacherStatusId = (await _dataverseAdapter.GetTeacherStatus(expectedTeacherStatus, qtsDateRequired: true)).Id;
+        var teacherStatusId = (await _dataverseAdapter.GetTeacherStatus(expectedTeacherStatus, null)).Id;
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.SetIttResultForTeacherImpl(

@@ -25,7 +25,7 @@ public class GetEarlyYearsStatusTests : IAsyncLifetime
         var value = "220";
 
         // Act
-        var result = await _dataverseAdapter.GetEarlyYearsStatus(value);
+        var result = await _dataverseAdapter.GetEarlyYearsStatus(value, null);
 
         // Assert
         Assert.NotNull(result);
@@ -39,7 +39,7 @@ public class GetEarlyYearsStatusTests : IAsyncLifetime
         var countryCode = "XXXX";
 
         // Act
-        var result = await _dataverseAdapter.GetEarlyYearsStatus(countryCode);
+        var result = await _dataverseAdapter.GetEarlyYearsStatus(countryCode, null);
 
         // Assert
         Assert.Null(result);

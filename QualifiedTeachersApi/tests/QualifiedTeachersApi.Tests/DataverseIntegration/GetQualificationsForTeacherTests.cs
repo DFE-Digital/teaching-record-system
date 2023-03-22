@@ -79,7 +79,6 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
             }
         });
 
-        // Teacher needs TRN + DOB + ITT pass in order to get QTS registration records into CRM due to plugin validation
         await _organizationService.CreateAsync(new dfeta_initialteachertraining()
         {
             dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
@@ -87,7 +86,7 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
         });
 
         // Need QTS to be able to get MQ quals into CRM due to plugin validation
-        var teacherStatus = await _dataverseAdapter.GetTeacherStatus(teacherStatusValue, true);
+        var teacherStatus = await _dataverseAdapter.GetTeacherStatus(teacherStatusValue, null);
         await _organizationService.CreateAsync(new dfeta_qtsregistration()
         {
             dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),

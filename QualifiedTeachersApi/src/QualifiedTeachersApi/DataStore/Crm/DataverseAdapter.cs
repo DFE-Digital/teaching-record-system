@@ -83,28 +83,33 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_earlyyearsstatus>()).FirstOrDefault();
     }
 
-    public Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value) => GetEarlyYearsStatus(value, requestBuilder: null);
-
     public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value, RequestBuilder requestBuilder)
     {
-        requestBuilder ??= RequestBuilder.CreateSingle(_service);
+        var all = await GetAllEarlyYearsStatuses(requestBuilder);
+        return all.SingleOrDefault(x => x.dfeta_Value == value);
+    }
 
-        var query = new QueryByAttribute(dfeta_earlyyearsstatus.EntityLogicalName)
+    public async Task<List<dfeta_earlyyearsstatus>> GetAllEarlyYearsStatuses(RequestBuilder requestBuilder)
+    {
+        return await _cache.GetOrCreate(CacheKeys.GetAllEytsStatuses(), async _ =>
         {
-            ColumnSet = new() { AllColumns = true }
-        };
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
-        query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.dfeta_Value, value);
-        query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.StateCode, (int)dfeta_earlyyearsStatusState.Active);
+            var query = new QueryByAttribute(dfeta_earlyyearsstatus.EntityLogicalName)
+            {
+                ColumnSet = new() { AllColumns = true }
+            };
+            query.AddAttributeValue(dfeta_earlyyearsstatus.Fields.StateCode, (int)dfeta_earlyyearsStatusState.Active);
 
-        var request = new RetrieveMultipleRequest()
-        {
-            Query = query
-        };
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-        var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
 
-        return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_earlyyearsstatus>()).FirstOrDefault();
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_earlyyearsstatus>()).ToList();
+        });
     }
 
     public Task<dfeta_hequalification> GetHeQualificationByCode(string value) => GetHeQualificationByCode(value, requestBuilder: null);
@@ -874,40 +879,38 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
     }
 
-    public Task<dfeta_teacherstatus> GetTeacherStatus(
-        string value,
-        bool qtsDateRequired) =>
-        GetTeacherStatus(value, qtsDateRequired, requestBuilder: null);
+    public async Task<dfeta_teacherstatus> GetTeacherStatus(string value, RequestBuilder requestBuilder)
+    {
+        var result = await GetAllTeacherStatuses(requestBuilder);
 
-    public async Task<dfeta_teacherstatus> GetTeacherStatus(
-        string value,
-        bool qtsDateRequired,
+        return result.SingleOrDefault(x => x.dfeta_Value == value);
+    }
+
+    public Task<List<dfeta_teacherstatus>> GetAllTeacherStatuses() => GetAllTeacherStatuses(requestBuilder: null);
+
+    public async Task<List<dfeta_teacherstatus>> GetAllTeacherStatuses(
         RequestBuilder requestBuilder)
     {
-        // TECH DEBT Some junk reference data in the build environment means we have teacher statuses duplicated.
-        // In some cases the duplicate records vary by 'dfeta_qtsdaterequired' - we need to ensure we get the correct
-        // one as a workflow will prevent us allocating a qtsregistration for a status where dfeta_qtsdaterequired is true
-        // without a QTS Date.
-
-        requestBuilder ??= RequestBuilder.CreateSingle(_service);
-
-        var query = new QueryByAttribute(dfeta_teacherstatus.EntityLogicalName)
+        return await _cache.GetOrCreate(CacheKeys.GetAllTeacherStatuses(), async _ =>
         {
-            ColumnSet = new() { AllColumns = true }
-        };
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
-        query.AddAttributeValue(dfeta_teacherstatus.Fields.dfeta_Value, value);
-        query.AddAttributeValue(dfeta_teacherstatus.Fields.StateCode, (int)dfeta_teacherStatusState.Active);
-        query.AddAttributeValue(dfeta_teacherstatus.Fields.dfeta_QTSDateRequired, qtsDateRequired);
+            var query = new QueryByAttribute(dfeta_teacherstatus.EntityLogicalName)
+            {
+                ColumnSet = new() { AllColumns = true }
+            };
 
-        var request = new RetrieveMultipleRequest()
-        {
-            Query = query
-        };
+            query.AddAttributeValue(dfeta_teacherstatus.Fields.StateCode, (int)dfeta_teacherStatusState.Active);
 
-        var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-        return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_teacherstatus>()).FirstOrDefault();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+            return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_teacherstatus>()).ToList();
+        });
     }
 
     public async Task<bool> UnlockTeacherRecord(Guid teacherId)
