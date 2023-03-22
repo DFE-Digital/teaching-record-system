@@ -13,98 +13,114 @@ public record GetTeacherResponse
     public required string FirstName { get; init; }
     [SwaggerSchema(Nullable = false)]
     public required string LastName { get; init; }
-    public GetTeacherResponseQts Qts { get; init; }
-    public GetTeacherResponseEyts Eyts { get; init; }
-    public GetTeacherResponseInduction Induction { get; init; }
-    public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; init; }
-    public IEnumerable<GetTeacherResponseNpqQualificationsQualification> NpqQualifications { get; init; }
-    public IEnumerable<GetTeacherResponseMandatoryQualificationsQualification> MandatoryQualifications { get; init; }
+    public required GetTeacherResponseQts Qts { get; init; }
+    public required GetTeacherResponseEyts Eyts { get; init; }
+    public required GetTeacherResponseInduction Induction { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required IEnumerable<GetTeacherResponseNpqQualificationsQualification> NpqQualifications { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required IEnumerable<GetTeacherResponseMandatoryQualificationsQualification> MandatoryQualifications { get; init; }
 }
 
 public record GetTeacherResponseQts
 {
-    public DateOnly Awarded { get; init; }
-    public string CertificateUrl { get; init; }
+    public required DateOnly Awarded { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string CertificateUrl { get; init; }
 }
 
 public record GetTeacherResponseEyts
 {
-    public DateOnly Awarded { get; init; }
-    public string CertificateUrl { get; init; }
+    public required DateOnly Awarded { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string CertificateUrl { get; init; }
 }
 
 public record GetTeacherResponseInduction
 {
-    public DateOnly? StartDate { get; init; }
-    public DateOnly? EndDate { get; init; }
-    public InductionStatus? Status { get; init; }
-    public string CertificateUrl { get; init; }
-    public IEnumerable<GetTeacherResponseInductionPeriod> Periods { get; init; }
-
+    public required DateOnly? StartDate { get; init; }
+    public required DateOnly? EndDate { get; init; }
+    public required InductionStatus? Status { get; init; }
+    public required string CertificateUrl { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required IEnumerable<GetTeacherResponseInductionPeriod> Periods { get; init; }
 }
 
 public record GetTeacherResponseInductionPeriod
 {
-    public DateOnly? StartDate { get; init; }
-    public DateOnly? EndDate { get; init; }
-    public int? Terms { get; init; }
-    public GetTeacherResponseInductionPeriodAppropriateBody AppropriateBody { get; init; }
+    public required DateOnly? StartDate { get; init; }
+    public required DateOnly? EndDate { get; init; }
+    public required int? Terms { get; init; }
+    public required GetTeacherResponseInductionPeriodAppropriateBody AppropriateBody { get; init; }
 }
 
 public record GetTeacherResponseInductionPeriodAppropriateBody
 {
-    public string Name { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string Name { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTraining
 {
-    public GetTeacherResponseInitialTeacherTrainingQualification Qualification { get; init; }
-    public DateOnly? StartDate { get; init; }
-    public DateOnly? EndDate { get; init; }
-    public IttProgrammeType? ProgrammeType { get; init; }
-    public IttOutcome? Result { get; init; }
-    public GetTeacherResponseInitialTeacherTrainingAgeRange AgeRange { get; init; }
-    public GetTeacherResponseInitialTeacherTrainingProvider Provider { get; init; }
-    public IEnumerable<GetTeacherResponseInitialTeacherTrainingSubject> Subjects { get; init; }
+    public required GetTeacherResponseInitialTeacherTrainingQualification Qualification { get; init; }
+    public required DateOnly? StartDate { get; init; }
+    public required DateOnly? EndDate { get; init; }
+    public required IttProgrammeType? ProgrammeType { get; init; }
+    public required IttOutcome? Result { get; init; }
+    public required GetTeacherResponseInitialTeacherTrainingAgeRange AgeRange { get; init; }
+    public required GetTeacherResponseInitialTeacherTrainingProvider Provider { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required IEnumerable<GetTeacherResponseInitialTeacherTrainingSubject> Subjects { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTrainingQualification
 {
-    public string Name { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string Name { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTrainingAgeRange
 {
-    public string Description { get; init; }
+    public required string Description { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTrainingProvider
 {
-    public string Name { get; init; }
-    public string Ukprn { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string Name { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string Ukprn { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTrainingSubject
 {
-    public string Code { get; init; }
-    public string Name { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string Code { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string Name { get; init; }
 }
 
 public record GetTeacherResponseNpqQualificationsQualification
 {
-    public DateOnly Awarded { get; init; }
-    public GetTeacherResponseNpqQualificationsQualificationType Type { get; init; }
-    public string CertificateUrl { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required DateOnly Awarded { get; init; }
+    public required GetTeacherResponseNpqQualificationsQualificationType Type { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string CertificateUrl { get; init; }
 }
 
 public record GetTeacherResponseNpqQualificationsQualificationType
 {
-    public NpqQualificationType Code { get; init; }
-    public string Name { get; init; }
+    public required NpqQualificationType Code { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string Name { get; init; }
 }
 
 public record GetTeacherResponseMandatoryQualificationsQualification
 {
-    public DateOnly Awarded { get; init; }
-    public string Specialism { get; init; }
+    public required DateOnly Awarded { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    public required string Specialism { get; init; }
 }

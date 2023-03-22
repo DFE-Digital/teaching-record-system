@@ -2,6 +2,6 @@ namespace QualifiedTeachersApi.V3.Responses;
 
 public record GetCertificateResponse
 {
-    public string FileDownloadName { get; init; }
-    public byte[] FileContents { get; init; }
+    public required string FileDownloadName { get; init; }
+    public required byte[] FileContents { get; init; }
 }
