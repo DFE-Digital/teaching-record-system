@@ -259,6 +259,10 @@
           "lastName": {
             "type": "string"
           },
+          "middleName": {
+            "type": "string",
+            "nullable": true
+          },
           "qts": {
             "$ref": "#/components/schemas/GetTeacherResponseQts"
           },
