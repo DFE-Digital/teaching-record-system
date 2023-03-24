@@ -27,6 +27,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             {
                 Contact.Fields.FirstName,
                 Contact.Fields.LastName,
+                Contact.Fields.MiddleName,
                 Contact.Fields.BirthDate,
                 Contact.Fields.dfeta_EYTSDate,
                 Contact.Fields.dfeta_QTSDate,
@@ -85,6 +86,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             FirstName = teacher.FirstName,
             HasActiveSanctions = teacher.dfeta_ActiveSanctions == true,
             LastName = teacher.LastName,
+            MiddleName = teacher.MiddleName,
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             Trn = teacher.dfeta_TRN,
             QtsDate = teacher.dfeta_QTSDate.ToDateOnly(),

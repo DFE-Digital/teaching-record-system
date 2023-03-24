@@ -927,6 +927,10 @@
             "type": "string",
             "nullable": true
           },
+          "middleName": {
+            "type": "string",
+            "nullable": true
+          },
           "dateOfBirth": {
             "type": "string",
             "format": "date",

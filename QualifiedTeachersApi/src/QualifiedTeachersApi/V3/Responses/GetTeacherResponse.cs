@@ -13,6 +13,7 @@ public record GetTeacherResponse
     public required string FirstName { get; init; }
     [SwaggerSchema(Nullable = false)]
     public required string LastName { get; init; }
+    public required string MiddleName { get; init; }
     public required GetTeacherResponseQts Qts { get; init; }
     public required GetTeacherResponseEyts Eyts { get; init; }
     public required GetTeacherResponseInduction Induction { get; init; }

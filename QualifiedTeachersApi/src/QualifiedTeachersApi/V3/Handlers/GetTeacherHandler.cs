@@ -29,6 +29,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             columnNames: new[]
             {
                 Contact.Fields.FirstName,
+                Contact.Fields.MiddleName,
                 Contact.Fields.LastName,
                 Contact.Fields.dfeta_QTSDate,
                 Contact.Fields.dfeta_EYTSDate
@@ -116,6 +117,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             Trn = request.Trn,
             FirstName = teacher.FirstName,
             LastName = teacher.LastName,
+            MiddleName = teacher.MiddleName,
             Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnly()),
             Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnly()),
             Induction = MapInduction(induction, inductionPeriods),

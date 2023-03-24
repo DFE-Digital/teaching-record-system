@@ -43,6 +43,8 @@ public class GetTeacherTests : ApiTestBase
         var teacherId = Guid.NewGuid();
         var firstName = Faker.Name.First();
         var lastName = Faker.Name.Last();
+        var middleName = Faker.Name.Middle();
+
         var qtsDate = new DateOnly(1997, 4, 23);
         var eytsDate = new DateOnly(1995, 5, 14);
         var inductionStartDate = new DateOnly(1996, 2, 3);
@@ -78,6 +80,7 @@ public class GetTeacherTests : ApiTestBase
             dfeta_TRN = trn,
             FirstName = firstName,
             LastName = lastName,
+            MiddleName = middleName,
             dfeta_QTSDate = qtsDate.ToDateTime(),
             dfeta_EYTSDate = eytsDate.ToDateTime(),
         };
@@ -252,6 +255,7 @@ public class GetTeacherTests : ApiTestBase
             {
                 firstName = firstName,
                 lastName = lastName,
+                middleName = middleName,
                 trn = trn,
                 qts = new
                 {
