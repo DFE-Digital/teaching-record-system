@@ -218,6 +218,7 @@ public class GetTeacherTests : ApiTestBase
         var birthDate = "1990-04-01";
         var firstName = Faker.Name.First();
         var lastName = Faker.Name.Last();
+        var middleName = Faker.Name.Middle();
         var nino = Faker.Identification.UkNationalInsuranceNumber();
         var qtsDate = (DateOnly?)null;
         var eytsDate = (DateOnly?)new DateOnly(2022, 7, 7);
@@ -239,6 +240,7 @@ public class GetTeacherTests : ApiTestBase
             BirthDate = DateTime.Parse(birthDate),
             FirstName = firstName,
             LastName = lastName,
+            MiddleName = middleName,
             dfeta_TRN = trn,
             dfeta_NINumber = nino,
             StateCode = ContactState.Active,
@@ -308,6 +310,7 @@ public class GetTeacherTests : ApiTestBase
                 trn = trn,
                 firstName = firstName,
                 lastName = lastName,
+                middleName = middleName,
                 dateOfBirth = birthDate,
                 nationalInsuranceNumber = nino,
                 hasActiveSanctions = false,
