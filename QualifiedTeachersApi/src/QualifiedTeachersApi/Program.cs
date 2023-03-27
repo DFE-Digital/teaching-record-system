@@ -325,16 +325,6 @@ public class Program
             endpoints.MapControllers();
         });
 
-        ////app.MapPost("/webhook/identity", async context =>
-        ////{
-        ////    var loggerFactory = context.RequestServices.GetRequiredService<ILoggerFactory>();
-        ////    var logger = loggerFactory.CreateLogger("WebHookDebug");
-
-        ////    using var sr = new StreamReader(context.Request.Body);
-        ////    var body = await sr.ReadToEndAsync();
-        ////    logger.LogInformation("Received web hook: {Payload}", body);
-        ////});
-
         app.UseSwagger(options =>
         {
             options.PreSerializeFilters.Add((_, request) =>
