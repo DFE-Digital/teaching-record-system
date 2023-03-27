@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using QualifiedTeachersApi.Json;
@@ -10,23 +11,36 @@ namespace QualifiedTeachersApi.Services.GetAnIdentityApi;
 public class GetAnIdentityApiClient : IGetAnIdentityApiClient
 {
     private readonly HttpClient _httpClient;
-    private System.Text.Json.JsonSerializerOptions _jsonOptions { get; set; }
+    private readonly JsonSerializerOptions _jsonOptions;
 
     public GetAnIdentityApiClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _jsonOptions = new System.Text.Json.JsonSerializerOptions().AddConverters();
+
+        _jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        }
+        .AddConverters();
     }
 
     public async Task<GetAnIdentityApiUser> GetUserById(Guid userId)
     {
         var response = await _httpClient.GetAsync($"api/v1/users/{userId}");
-        if (response.IsSuccessStatusCode)
+
+        switch ((int)response.StatusCode)
         {
-            var user = await response.Content.ReadFromJsonAsync<GetAnIdentityApiUser>();
-            return user;
+            case StatusCodes.Status200OK:
+                break;
+            case StatusCodes.Status404NotFound:
+                return null;
+            default:
+                response.EnsureSuccessStatusCode();
+                break;
         }
-        return null;
+
+        var user = await response.Content.ReadFromJsonAsync<GetAnIdentityApiUser>();
+        return user;
     }
 
     public async Task SetTeacherTrn(Guid userId, string trn)
