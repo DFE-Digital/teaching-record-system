@@ -1130,13 +1130,24 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(e => e.ToEntity<Contact>()).SingleOrDefault();
     }
 
-
     public Task SetTsPersonId(Guid teacherId, string tsPersonId)
     {
         return _service.UpdateAsync(new Contact()
         {
             Id = teacherId,
             dfeta_TSPersonID = tsPersonId
+        });
+    }
+
+    public Task UpdateTeacherIdentityInfo(UpdateTeacherIdentityInfoCommand command)
+    {
+        return _service.UpdateAsync(new Contact()
+        {
+            Id = command.TeacherId,
+            dfeta_TSPersonID = command.IdentityUserId.ToString(),
+            EMailAddress1 = command.EmailAddress,
+            MobilePhone = command.MobilePhone,
+            dfeta_LastIdentityUpdate = command.UpdateTimeUtc
         });
     }
 

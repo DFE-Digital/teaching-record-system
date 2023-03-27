@@ -55,6 +55,8 @@ public interface IDataverseAdapter
 
     Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);
 
+    Task UpdateTeacherIdentityInfo(UpdateTeacherIdentityInfoCommand command);
+
     Task<Account[]> GetIttProviderOrganizationsByName(string ukprn, string[] columnNames, bool activeOnly);
 
     Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, string[] columnNames, bool activeOnly);

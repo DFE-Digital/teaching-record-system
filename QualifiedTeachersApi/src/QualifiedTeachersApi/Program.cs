@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using AspNetCoreRateLimit;
@@ -317,10 +318,22 @@ public class Program
                 await context.Response.WriteAsync("OK");
             });
 
+            endpoints.MapWebHookEndpoints();
+
             endpoints.MapMetrics();
 
             endpoints.MapControllers();
         });
+
+        ////app.MapPost("/webhook/identity", async context =>
+        ////{
+        ////    var loggerFactory = context.RequestServices.GetRequiredService<ILoggerFactory>();
+        ////    var logger = loggerFactory.CreateLogger("WebHookDebug");
+
+        ////    using var sr = new StreamReader(context.Request.Body);
+        ////    var body = await sr.ReadToEndAsync();
+        ////    logger.LogInformation("Received web hook: {Payload}", body);
+        ////});
 
         app.UseSwagger(options =>
         {

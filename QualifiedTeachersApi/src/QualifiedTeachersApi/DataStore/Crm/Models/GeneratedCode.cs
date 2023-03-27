@@ -432,6 +432,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_HUSID = "dfeta_husid";
+			public const string dfeta_LastIdentityUpdate = "dfeta_lastidentityupdate";
 			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
 			public const string dfeta_NINumber = "dfeta_ninumber";
 			public const string dfeta_QTSDate = "dfeta_qtsdate";
@@ -447,7 +448,9 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string MasterId = "masterid";
 			public const string Merged = "merged";
 			public const string MiddleName = "middlename";
+			public const string MobilePhone = "mobilephone";
 			public const string StateCode = "statecode";
+			public const string Telephone1 = "telephone1";
 			public const string account_primary_contact = "account_primary_contact";
 			public const string Referencedcontact_customer_contacts = "Referencedcontact_customer_contacts";
 			public const string Referencedcontact_master_contact = "Referencedcontact_master_contact";
@@ -711,6 +714,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_HUSID");
 				this.SetAttributeValue("dfeta_husid", value);
 				this.OnPropertyChanged("dfeta_HUSID");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_lastidentityupdate")]
+		public System.Nullable<System.DateTime> dfeta_LastIdentityUpdate
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_lastidentityupdate");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_LastIdentityUpdate");
+				this.SetAttributeValue("dfeta_lastidentityupdate", value);
+				this.OnPropertyChanged("dfeta_LastIdentityUpdate");
 			}
 		}
 		
@@ -1015,6 +1038,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		}
 		
 		/// <summary>
+		/// Mobile phone number for the contact.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("mobilephone")]
+		public string MobilePhone
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("mobilephone");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("MobilePhone");
+				this.SetAttributeValue("mobilephone", value);
+				this.OnPropertyChanged("MobilePhone");
+			}
+		}
+		
+		/// <summary>
 		/// Status of the contact.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
@@ -1046,6 +1089,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
 				}
 				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// First telephone number for the contact.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("telephone1")]
+		public string Telephone1
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("telephone1");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Telephone1");
+				this.SetAttributeValue("telephone1", value);
+				this.OnPropertyChanged("Telephone1");
 			}
 		}
 		

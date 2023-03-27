@@ -2,7 +2,7 @@
 
 namespace QualifiedTeachersApi.Services.GetAnIdentityApi;
 
-public class GetAnIdentityApiOptions
+public class GetAnIdentityOptions
 {
     [Required]
     public string TokenEndpoint { get; set; }
@@ -15,4 +15,7 @@ public class GetAnIdentityApiOptions
 
     [Required]
     public string BaseAddress { get; init; }
+
+    [Required]
+    public string WebHookClientSecret { get; init; }
 }

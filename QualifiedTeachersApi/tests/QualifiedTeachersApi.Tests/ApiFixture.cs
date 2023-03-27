@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using QualifiedTeachersApi.DataStore.Crm;
@@ -26,6 +27,8 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 
     public Mock<IGetAnIdentityApiClient> IdentityApiClient { get; } = new Mock<IGetAnIdentityApiClient>();
 
+    public Mock<IOptions<GetAnIdentityOptions>> GetAnIdentityOptions { get; } = new Mock<IOptions<GetAnIdentityOptions>>();
+
     public Mock<ICertificateGenerator> CertificateGenerator { get; } = new Mock<ICertificateGenerator>();
 
     public SigningCredentials JwtSigningCredentials { get; }
@@ -38,6 +41,7 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
     public void ResetMocks()
     {
         DataverseAdapter.Reset();
+        GetAnIdentityOptions.Reset();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -55,6 +59,7 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 
             services.AddSingleton(DataverseAdapter.Object);
             services.AddSingleton(IdentityApiClient.Object);
+            services.AddSingleton(GetAnIdentityOptions.Object);
             services.AddSingleton(CertificateGenerator.Object);
             services.AddSingleton<IClock, TestableClock>();
 
