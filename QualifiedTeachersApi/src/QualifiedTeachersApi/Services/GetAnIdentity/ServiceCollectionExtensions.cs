@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
     {
         if (!environment.IsUnitTests() && !environment.IsEndToEndTests())
         {
-            services.AddOptions<GetAnIdentityApiOptions>()
+            services.AddOptions<GetAnIdentityOptions>()
                 .Bind(configuration.GetSection("GetAnIdentity"))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
                 .AddTransient<ClientCredentialsBearerTokenDelegatingHandler>()
                 .AddHttpClient<IGetAnIdentityApiClient, GetAnIdentityApiClient>((sp, httpClient) =>
                 {
-                    var options = sp.GetRequiredService<IOptions<GetAnIdentityApiOptions>>();
+                    var options = sp.GetRequiredService<IOptions<GetAnIdentityOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.BaseAddress);
                 })
                 .AddHttpMessageHandler<ClientCredentialsBearerTokenDelegatingHandler>(); ;

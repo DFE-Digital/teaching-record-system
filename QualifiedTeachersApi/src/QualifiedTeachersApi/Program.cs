@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using AspNetCoreRateLimit;
@@ -316,6 +317,8 @@ public class Program
             {
                 await context.Response.WriteAsync("OK");
             });
+
+            endpoints.MapWebHookEndpoints();
 
             endpoints.MapMetrics();
 

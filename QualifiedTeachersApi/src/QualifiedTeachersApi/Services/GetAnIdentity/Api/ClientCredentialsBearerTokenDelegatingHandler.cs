@@ -11,10 +11,10 @@ public class ClientCredentialsBearerTokenDelegatingHandler : DelegatingHandler
 {
     private TokenResponse _accessToken { get; set; }
     private DateTime _expiryTime { get; set; }
-    private GetAnIdentityApiOptions _options { get; set; }
+    private GetAnIdentityOptions _options { get; set; }
     private IClock _clock;
 
-    public ClientCredentialsBearerTokenDelegatingHandler(IOptions<GetAnIdentityApiOptions> options, IClock clock)
+    public ClientCredentialsBearerTokenDelegatingHandler(IOptions<GetAnIdentityOptions> options, IClock clock)
     {
         _options = options.Value;
         _clock = clock;
