@@ -218,7 +218,7 @@
         "tags": [
           "Teacher"
         ],
-        "summary": "Teacher",
+        "summary": "Get teacher details",
         "description": "Gets the details of the currently authenticated teacher",
         "responses": {
           "200": {
@@ -227,6 +227,98 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetTeacherResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v3/teacher/{Trn}": {
+      "get": {
+        "tags": [
+          "Teacher"
+        ],
+        "summary": "Get teacher details by TRN",
+        "description": "Gets the details of the teacher corresponding to the given TRN",
+        "parameters": [
+          {
+            "name": "Trn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^\\d{7}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTeacherResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }

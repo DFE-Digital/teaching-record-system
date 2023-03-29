@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Xrm.Sdk;
@@ -10,35 +10,64 @@ using Xunit;
 
 namespace QualifiedTeachersApi.Tests.V3;
 
-public class GetTeacherTests : ApiTestBase
+public class GetTeacherByTrnTests : ApiTestBase
 {
-    public GetTeacherTests(ApiFixture apiFixture)
+    public GetTeacherByTrnTests(ApiFixture apiFixture)
         : base(apiFixture)
     {
     }
 
     [Fact]
-    public async Task Get_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
+    public async Task Get_UnauthenticatedRequest_Returns401()
     {
         // Arrange
         var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/teacher");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teacher/{trn}");
 
         // Act
-        var response = await httpClient.SendAsync(request);
+        var response = await ApiFixture.CreateClient().SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_InvalidTrn_Returns400()
+    {
+        // Arrange
+        var trn = "invalid";
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teacher/{trn}");
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
     [Fact]
+    public async Task Get_TrnNotFound_Returns404()
+    {
+        // Arrange
+        var trn = "1234567";
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teacher/{trn}");
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+
+    [Fact]
     public async Task Get_ValidRequest_ReturnsExpectedResponse()
     {
         // Arrange
         var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
 
         var teacher = GenerateTeacher(trn);
         var itt = GenerateItt(teacher);
@@ -83,10 +112,10 @@ public class GetTeacherTests : ApiTestBase
                  It.IsAny<string[]>()))
              .ReturnsAsync(qualifications);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teacher");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teacher/{trn}");
 
         // Act
-        var response = await httpClient.SendAsync(request);
+        var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
