@@ -12,7 +12,6 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace QualifiedTeachersApi.V3.Controllers;
 
 [ApiController]
-[Route("teacher")]
 public class TeacherController : Controller
 {
     private readonly IMediator _mediator;
@@ -24,7 +23,7 @@ public class TeacherController : Controller
 
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     [HttpGet]
-    [Route("")]
+    [Route("teacher")]
     [SwaggerOperation(
         summary: "Get teacher details",
         description: "Gets the details of the currently authenticated teacher")]
@@ -57,7 +56,7 @@ public class TeacherController : Controller
     }
 
     [Authorize(AuthorizationPolicies.ApiKey)]
-    [HttpGet("{Trn}")]
+    [HttpGet("teachers/{Trn}")]
     [SwaggerOperation(
         summary: "Get teacher details by TRN",
         description: "Gets the details of the teacher corresponding to the given TRN")]

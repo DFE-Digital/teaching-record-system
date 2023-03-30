@@ -23,7 +23,7 @@ public class GetTeacherByTrnTests : ApiTestBase
         // Arrange
         var trn = "1234567";
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teacher/{trn}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
 
         // Act
         var response = await ApiFixture.CreateClient().SendAsync(request);
@@ -38,7 +38,7 @@ public class GetTeacherByTrnTests : ApiTestBase
         // Arrange
         var trn = "invalid";
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teacher/{trn}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
 
         // Act
         var response = await HttpClientWithApiKey.SendAsync(request);
@@ -53,7 +53,7 @@ public class GetTeacherByTrnTests : ApiTestBase
         // Arrange
         var trn = "1234567";
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teacher/{trn}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
 
         // Act
         var response = await HttpClientWithApiKey.SendAsync(request);
@@ -112,7 +112,7 @@ public class GetTeacherByTrnTests : ApiTestBase
                  It.IsAny<string[]>()))
              .ReturnsAsync(qualifications);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teacher/{trn}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
 
         // Act
         var response = await HttpClientWithApiKey.SendAsync(request);
