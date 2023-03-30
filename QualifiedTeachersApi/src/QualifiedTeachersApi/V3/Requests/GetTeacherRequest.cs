@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using MediatR;
+﻿using MediatR;
 using QualifiedTeachersApi.V3.Responses;
 
 namespace QualifiedTeachersApi.V3.Requests;
