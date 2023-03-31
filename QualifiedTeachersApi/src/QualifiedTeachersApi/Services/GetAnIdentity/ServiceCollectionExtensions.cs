@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace QualifiedTeachersApi.Services.GetAnIdentityApi;
@@ -20,6 +21,8 @@ public static class ServiceCollectionExtensions
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
+            services.AddTransient<IHostedService, LinkTrnToIdentityUserService>();
+
             services
                 .AddTransient<ClientCredentialsBearerTokenDelegatingHandler>()
                 .AddHttpClient<IGetAnIdentityApiClient, GetAnIdentityApiClient>((sp, httpClient) =>
@@ -29,6 +32,7 @@ public static class ServiceCollectionExtensions
                 })
                 .AddHttpMessageHandler<ClientCredentialsBearerTokenDelegatingHandler>(); ;
         }
+
         return services;
     }
 }

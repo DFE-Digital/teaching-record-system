@@ -243,6 +243,7 @@ public class Program
 
         services.AddTrnGenerationApi(configuration);
         services.AddIdentityApi(configuration, env);
+        services.AddCertificateGeneration(builder.Configuration);
 
         if (env.EnvironmentName != "Testing")
         {
@@ -281,9 +282,6 @@ public class Program
             services.AddSingleton<IDistributedLockService, LocalDistributedLockService>();
         }
 
-        services.AddCertificateGeneration(builder.Configuration);
-
-        services.AddTransient<IHostedService, LinkTrnToIdentityUserService>();
         MetricLabels.ConfigureLabels(builder.Configuration);
 
         var app = builder.Build();

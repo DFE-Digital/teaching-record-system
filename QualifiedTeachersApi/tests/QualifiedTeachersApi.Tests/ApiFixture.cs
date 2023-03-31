@@ -42,6 +42,7 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
     {
         DataverseAdapter.Reset();
         GetAnIdentityOptions.Reset();
+        IdentityApiClient.Reset();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
