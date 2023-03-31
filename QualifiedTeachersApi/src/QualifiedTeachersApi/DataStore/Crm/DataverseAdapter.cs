@@ -1151,6 +1151,22 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
     }
 
+    public async Task<Subject> GetSubjectByTitle(string title, string[] columnNames)
+    {
+        var filter = new FilterExpression(LogicalOperator.And);
+        filter.AddCondition(Subject.Fields.Title, ConditionOperator.Equal, title);
+
+        var query = new QueryExpression(Subject.EntityLogicalName)
+        {
+            ColumnSet = new(columnNames),
+            Criteria = filter
+        };
+
+        var result = await _service.RetrieveMultipleAsync(query);
+
+        return result.Entities.Select(e => e.ToEntity<Subject>()).SingleOrDefault();
+    }
+
     public RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);
 
     public RequestBuilder CreateSingleRequestBuilder() => RequestBuilder.CreateSingle(_service);

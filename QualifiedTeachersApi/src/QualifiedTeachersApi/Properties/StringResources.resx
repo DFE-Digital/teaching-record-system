@@ -231,4 +231,7 @@
   <data name="Errors.10027.Title" xml:space="preserve">
     <value>Unable to change Failed Result.</value>
   </data>
+  <data name="Errors.10028.Title" xml:space="preserve">
+    <value>The specified URL does not exist.</value>
+  </data>
 </root>

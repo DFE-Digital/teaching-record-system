@@ -401,5 +401,14 @@ namespace QualifiedTeachersApi.Properties {
                 return ResourceManager.GetString("Errors.10027.Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified URL does not exist..
+        /// </summary>
+        public static string Errors_10028_Title {
+            get {
+                return ResourceManager.GetString("Errors.10028.Title", resourceCulture);
+            }
+        }
     }
 }

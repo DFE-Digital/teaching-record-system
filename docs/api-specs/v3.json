@@ -243,10 +243,87 @@
           }
         }
       }
+    },
+    "/v3/teachers/name-changes": {
+      "post": {
+        "tags": [
+          "Teachers"
+        ],
+        "summary": "Set NPQ qualification for a teacher",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNameChangeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNameChangeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNameChangeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "CreateNameChangeRequest": {
+        "type": "object",
+        "properties": {
+          "trn": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "middleName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "evidenceFileName": {
+            "type": "string"
+          },
+          "evidenceFileUrl": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "GetTeacherResponse": {
         "type": "object",
         "properties": {
