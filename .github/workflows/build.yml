@@ -107,6 +107,22 @@ jobs:
         SECRETS_JSON: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
       shell: bash
 
+    - name: Determine test filter
+      id: get_test_filter
+      run: |
+        # If no CRM integration files (or their tests) have been changed then skip Dataverse tests
+        if [ "$EVENT_NAME" == "pull_request" ]; then
+          git fetch origin main --quiet --depth=1
+          CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
+          if [[ $(echo "$CHANGED_FILES" | grep -EL "DataStore/Crm|Tests/DataverseIntegration") ]]; then
+            echo "::warning::Skipping DataverseAdapter tests"
+            echo filter_arg='--filter "FullyQualifiedName!~QualifiedTeachersApi.Tests.DataverseIntegration"' >> $GITHUB_OUTPUT
+          fi
+        fi
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+      shell: bash
+
     - name: Tests
       uses: ./.github/workflows/actions/test
       with:
@@ -121,6 +137,7 @@ jobs:
           -e IntegrationTests_TrnGenerationApi__BaseAddress="${{ env.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIBASEADDRESS }}"
           -e IntegrationTests_TrnGenerationApi__ApiKey="${{ env.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIAPIKEY }}"
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
+          ${{ steps.get_test_filter.outputs.filter_arg }}
 
     # TODO Use migration bundles when https://github.com/dotnet/efcore/issues/25555 is fixed
     - name: Generate migrations artifact
