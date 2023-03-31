@@ -219,4 +219,16 @@
   <data name="Errors.10023.Title" xml:space="preserve">
     <value>User with specified UserId not found</value>
   </data>
+  <data name="Errors.10024.Title" xml:space="preserve">
+    <value>InTraining not permitted for AssessmentOnlyRoute programme types.</value>
+  </data>
+  <data name="Errors.10025.Title" xml:space="preserve">
+    <value>UnderAssessment only permitted for AssessmentOnlyRoute programme types.</value>
+  </data>
+  <data name="Errors.10026.Title" xml:space="preserve">
+    <value>Result cannot be unwithdrawn to deferred</value>
+  </data>
+  <data name="Errors.10027.Title" xml:space="preserve">
+    <value>Unable to change Failed Result.</value>
+  </data>
 </root>

@@ -170,6 +170,41 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
             $"{nameof(UpdateTeacherRequest.HusId)}.{nameof(UpdateTeacherRequest.HusId)}",
             ErrorRegistry.ExistingTeacherAlreadyHasHusId().Title);
 
+        ConsumeReason(
+            UpdateTeacherFailedReasons.InTrainingResultNotPermittedForProgrammeType,
+            $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}",
+            ErrorRegistry.InTrainingResultNotPermittedForProgrammeType().Title);
+
+        ConsumeReason(
+            UpdateTeacherFailedReasons.UnderAssessmentOnlyPermittedForProgrammeType,
+            $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}",
+            ErrorRegistry.UnderAssessmentOnlyPermittedForProgrammeType().Title);
+
+        ConsumeReason(
+            UpdateTeacherFailedReasons.NoMatchingQtsRecord,
+            $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}",
+            ErrorRegistry.TeacherHasNoQtsRecord().Title);
+
+        ConsumeReason(
+            UpdateTeacherFailedReasons.MultipleQtsRecords,
+            $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}",
+            ErrorRegistry.TeacherHasMultipleQtsRecords().Title);
+
+        ConsumeReason(
+            UpdateTeacherFailedReasons.UnableToUnwithdrawToDeferredStatus,
+            $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}",
+            ErrorRegistry.UnableToUnwithdrawToDeferredStatus().Title);
+
+        ConsumeReason(
+            UpdateTeacherFailedReasons.UnableToChangeFailedResult,
+            $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}",
+            ErrorRegistry.UnableToChangeFailedResult().Title);
+
+        ConsumeReason(
+            UpdateTeacherFailedReasons.MultipleInTrainingIttRecords,
+            $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}",
+            ErrorRegistry.TeacherAlreadyMultipleIncompleteIttRecords().Title);
+
         if (failedReasons != UpdateTeacherFailedReasons.None)
         {
             throw new NotImplementedException($"Unknown {nameof(UpdateTeacherFailedReasons)}: '{failedReasons}.");
