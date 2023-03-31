@@ -254,7 +254,7 @@
         }
       }
     },
-    "/v3/teacher/{Trn}": {
+    "/v3/teachers/{Trn}": {
       "get": {
         "tags": [
           "Teacher"
@@ -267,7 +267,6 @@
             "in": "path",
             "required": true,
             "schema": {
-              "pattern": "^\\d{7}$",
               "type": "string"
             }
           }
