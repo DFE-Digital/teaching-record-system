@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using QualifiedTeachersApi.V2.Requests;
+using QualifiedTeachersApi.V3.Requests;
 
 namespace QualifiedTeachersApi.V3.Validators;
 
