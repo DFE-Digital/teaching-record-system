@@ -29,6 +29,7 @@ using QualifiedTeachersApi.Configuration;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Filters;
+using QualifiedTeachersApi.Infrastructure.ApplicationModel;
 using QualifiedTeachersApi.Json;
 using QualifiedTeachersApi.Logging;
 using QualifiedTeachersApi.ModelBinding;
@@ -126,6 +127,7 @@ public class Program
                 options.Filters.Add(new ValidationExceptionFilter());
 
                 options.Conventions.Add(new ApiVersionConvention());
+                options.Conventions.Add(new AuthorizationPolicyConvention());
             })
             .ConfigureApiBehaviorOptions(options =>
             {
