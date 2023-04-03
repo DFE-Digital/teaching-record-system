@@ -33,6 +33,7 @@ public static class ErrorRegistry
         ErrorDescriptor.Create(10025),  // UnderAsessment only permitted for AsessmentOnlyRoute
         ErrorDescriptor.Create(10026),  // Result cannot be unwithdrawn to deferred
         ErrorDescriptor.Create(10027),  // Unable to change Failed Result.
+        ErrorDescriptor.Create(10028),  // The specified URL does not exist
     }.ToDictionary(d => d.ErrorCode, d => d);
 
     public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);
@@ -86,6 +87,8 @@ public static class ErrorRegistry
     public static Error UnableToUnwithdrawToDeferredStatus() => CreateError(10026);
 
     public static Error UnableToChangeFailedResult() => CreateError(10027);
+
+    public static Error SpecifiedUrlDoesNotExist() => CreateError(10028);
 
     private static Error CreateError(int errorCode)
     {

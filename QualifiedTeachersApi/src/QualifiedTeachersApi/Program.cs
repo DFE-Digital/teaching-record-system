@@ -234,6 +234,12 @@ public class Program
         services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
         services.AddSingleton<IWebApiAdapter, WebApiAdapter>();
 
+        services.AddHttpClient("EvidenceFiles", client =>
+        {
+            client.MaxResponseContentBufferSize = 5 * 1024 * 1024;  // 5MB
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+
         services.AddDbContext<DqtContext>(options =>
         {
             DqtContext.ConfigureOptions(options, pgConnectionString);

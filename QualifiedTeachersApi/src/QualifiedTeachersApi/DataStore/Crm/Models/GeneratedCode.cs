@@ -44,13 +44,16 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_UKPRN = "dfeta_ukprn";
 			public const string Name = "name";
 			public const string StateCode = "statecode";
+			public const string Account_Annotation = "Account_Annotation";
 			public const string Referencedaccount_master_account = "Referencedaccount_master_account";
 			public const string Referencedaccount_parent_account = "Referencedaccount_parent_account";
 			public const string Account_Tasks = "Account_Tasks";
 			public const string contact_customer_accounts = "contact_customer_accounts";
+			public const string dfeta_account_dfeta_document = "dfeta_account_dfeta_document";
 			public const string dfeta_account_dfeta_inductionperiod = "dfeta_account_dfeta_inductionperiod";
 			public const string dfeta_account_dfeta_initialteachertraining = "dfeta_account_dfeta_initialteachertraining";
 			public const string dfeta_account_dfeta_qualification_he = "dfeta_account_dfeta_qualification_he";
+			public const string incident_customer_accounts = "incident_customer_accounts";
 			public const string Referencingaccount_master_account = "account_master_account";
 			public const string Referencingaccount_parent_account = "account_parent_account";
 			public const string account_primary_contact = "account_primary_contact";
@@ -195,6 +198,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		}
 		
 		/// <summary>
+		/// 1:N Account_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Account_Annotation")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Annotation> Account_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("Account_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Account_Annotation");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("Account_Annotation", null, value);
+				this.OnPropertyChanged("Account_Annotation");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N account_master_account
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("account_master_account", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
@@ -275,6 +298,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		}
 		
 		/// <summary>
+		/// 1:N dfeta_account_dfeta_document
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_account_dfeta_document")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document> dfeta_account_dfeta_document
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>("dfeta_account_dfeta_document", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_account_dfeta_document");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>("dfeta_account_dfeta_document", null, value);
+				this.OnPropertyChanged("dfeta_account_dfeta_document");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N dfeta_account_dfeta_inductionperiod
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_account_dfeta_inductionperiod")]
@@ -331,6 +374,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_account_dfeta_qualification_he");
 				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_qualification>("dfeta_account_dfeta_qualification_he", null, value);
 				this.OnPropertyChanged("dfeta_account_dfeta_qualification_he");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N incident_customer_accounts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("incident_customer_accounts")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Incident> incident_customer_accounts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_customer_accounts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("incident_customer_accounts");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_customer_accounts", null, value);
+				this.OnPropertyChanged("incident_customer_accounts");
 			}
 		}
 		
@@ -398,6 +461,344 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		}
 	}
 	
+	/// <summary>
+	/// Note that is attached to one or more objects, including other notes.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("annotation")]
+	public partial class Annotation : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the annotation entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string DocumentBody = "documentbody";
+			public const string FileName = "filename";
+			public const string MimeType = "mimetype";
+			public const string NoteText = "notetext";
+			public const string ObjectId = "objectid";
+			public const string ObjectTypeCode = "objecttypecode";
+			public const string Subject = "subject";
+			public const string Account_Annotation = "Account_Annotation";
+			public const string Contact_Annotation = "Contact_Annotation";
+			public const string dfeta_document_Annotations = "dfeta_document_Annotations";
+			public const string dfeta_sanction_Annotations = "dfeta_sanction_Annotations";
+			public const string Incident_Annotation = "Incident_Annotation";
+			public const string Task_Annotation = "Task_Annotation";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public Annotation() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "Annotation";
+		
+		public const string PrimaryIdAttribute = "annotationid";
+		
+		public const string PrimaryNameAttribute = "subject";
+		
+		public const string EntityLogicalName = "annotation";
+		
+		public const string EntityLogicalCollectionName = "annotations";
+		
+		public const string EntitySetName = "annotations";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Contents of the note's attachment.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("documentbody")]
+		public string DocumentBody
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("documentbody");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("DocumentBody");
+				this.SetAttributeValue("documentbody", value);
+				this.OnPropertyChanged("DocumentBody");
+			}
+		}
+		
+		/// <summary>
+		/// File name of the note.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("filename")]
+		public string FileName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("filename");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("FileName");
+				this.SetAttributeValue("filename", value);
+				this.OnPropertyChanged("FileName");
+			}
+		}
+		
+		/// <summary>
+		/// MIME type of the note's attachment.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("mimetype")]
+		public string MimeType
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("mimetype");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("MimeType");
+				this.SetAttributeValue("mimetype", value);
+				this.OnPropertyChanged("MimeType");
+			}
+		}
+		
+		/// <summary>
+		/// Text of the note.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("notetext")]
+		public string NoteText
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("notetext");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("NoteText");
+				this.SetAttributeValue("notetext", value);
+				this.OnPropertyChanged("NoteText");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the object with which the note is associated.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objectid")]
+		public Microsoft.Xrm.Sdk.EntityReference ObjectId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("objectid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ObjectId");
+				this.SetAttributeValue("objectid", value);
+				this.OnPropertyChanged("ObjectId");
+			}
+		}
+		
+		/// <summary>
+		/// Type of entity with which the note is associated.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objecttypecode")]
+		public string ObjectTypeCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("objecttypecode");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ObjectTypeCode");
+				this.SetAttributeValue("objecttypecode", value);
+				this.OnPropertyChanged("ObjectTypeCode");
+			}
+		}
+		
+		/// <summary>
+		/// Subject associated with the note.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subject")]
+		public string Subject
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("subject");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Subject");
+				this.SetAttributeValue("subject", value);
+				this.OnPropertyChanged("Subject");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 Account_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Account_Annotation")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Account Account_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Account>("Account_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Account_Annotation");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Account>("Account_Annotation", null, value);
+				this.OnPropertyChanged("Account_Annotation");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 Contact_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Contact_Annotation")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Contact Contact_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("Contact_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Contact_Annotation");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("Contact_Annotation", null, value);
+				this.OnPropertyChanged("Contact_Annotation");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_document_Annotations
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_document_Annotations")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document dfeta_document_Annotations
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>("dfeta_document_Annotations", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_document_Annotations");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>("dfeta_document_Annotations", null, value);
+				this.OnPropertyChanged("dfeta_document_Annotations");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_sanction_Annotations
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_sanction_Annotations")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.dfeta_sanction dfeta_sanction_Annotations
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_sanction>("dfeta_sanction_Annotations", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_sanction_Annotations");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_sanction>("dfeta_sanction_Annotations", null, value);
+				this.OnPropertyChanged("dfeta_sanction_Annotations");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 Incident_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Incident_Annotation")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Incident Incident_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("Incident_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Incident_Annotation");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("Incident_Annotation", null, value);
+				this.OnPropertyChanged("Incident_Annotation");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 Task_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Task_Annotation")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Task Task_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Task>("Task_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Task_Annotation");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Task>("Task_Annotation", null, value);
+				this.OnPropertyChanged("Task_Annotation");
+			}
+		}
+	}
+	
 	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum ContactState
 	{
@@ -452,10 +853,14 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string StateCode = "statecode";
 			public const string Telephone1 = "telephone1";
 			public const string account_primary_contact = "account_primary_contact";
+			public const string Contact_Annotation = "Contact_Annotation";
+			public const string contact_as_primary_contact = "contact_as_primary_contact";
+			public const string contact_as_responsible_contact = "contact_as_responsible_contact";
 			public const string Referencedcontact_customer_contacts = "Referencedcontact_customer_contacts";
 			public const string Referencedcontact_master_contact = "Referencedcontact_master_contact";
 			public const string Referencedcontact_parent_contact = "Referencedcontact_parent_contact";
 			public const string Contact_Tasks = "Contact_Tasks";
+			public const string dfeta_contact_dfeta_document = "dfeta_contact_dfeta_document";
 			public const string dfeta_contact_dfeta_induction = "dfeta_contact_dfeta_induction";
 			public const string dfeta_contact_dfeta_induction1 = "dfeta_contact_dfeta_induction1";
 			public const string dfeta_contact_dfeta_inductionperiod = "dfeta_contact_dfeta_inductionperiod";
@@ -466,6 +871,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_contact_dfeta_qualification = "dfeta_contact_dfeta_qualification";
 			public const string dfeta_contact_dfeta_sanction = "dfeta_contact_dfeta_sanction";
 			public const string dfeta_contact_task_potentialduplicateid = "dfeta_contact_task_potentialduplicateid";
+			public const string incident_customer_contacts = "incident_customer_contacts";
 			public const string contact_customer_accounts = "contact_customer_accounts";
 			public const string Referencingcontact_customer_contacts = "contact_customer_contacts";
 			public const string Referencingcontact_master_contact = "contact_master_contact";
@@ -1133,6 +1539,66 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		}
 		
 		/// <summary>
+		/// 1:N Contact_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Contact_Annotation")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Annotation> Contact_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("Contact_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Contact_Annotation");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("Contact_Annotation", null, value);
+				this.OnPropertyChanged("Contact_Annotation");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N contact_as_primary_contact
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_as_primary_contact")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Incident> contact_as_primary_contact
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("contact_as_primary_contact", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("contact_as_primary_contact");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("contact_as_primary_contact", null, value);
+				this.OnPropertyChanged("contact_as_primary_contact");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N contact_as_responsible_contact
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_as_responsible_contact")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Incident> contact_as_responsible_contact
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("contact_as_responsible_contact", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("contact_as_responsible_contact");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("contact_as_responsible_contact", null, value);
+				this.OnPropertyChanged("contact_as_responsible_contact");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N contact_customer_contacts
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_customer_contacts", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
@@ -1209,6 +1675,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("Contact_Tasks");
 				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Task>("Contact_Tasks", null, value);
 				this.OnPropertyChanged("Contact_Tasks");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_contact_dfeta_document
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_document")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document> dfeta_contact_dfeta_document
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>("dfeta_contact_dfeta_document", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_contact_dfeta_document");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>("dfeta_contact_dfeta_document", null, value);
+				this.OnPropertyChanged("dfeta_contact_dfeta_document");
 			}
 		}
 		
@@ -1409,6 +1895,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_contact_task_potentialduplicateid");
 				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Task>("dfeta_contact_task_potentialduplicateid", null, value);
 				this.OnPropertyChanged("dfeta_contact_task_potentialduplicateid");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N incident_customer_contacts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("incident_customer_contacts")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Incident> incident_customer_contacts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_customer_contacts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("incident_customer_contacts");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_customer_contacts", null, value);
+				this.OnPropertyChanged("incident_customer_contacts");
 			}
 		}
 		
@@ -1746,6 +2252,325 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_dfeta_country_dfeta_qualification_he");
 				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_qualification>("dfeta_dfeta_country_dfeta_qualification_he", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_country_dfeta_qualification_he");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_documentState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_document")]
+	public partial class dfeta_document : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_document entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string dfeta_CaseId = "dfeta_caseid";
+			public const string dfeta_name = "dfeta_name";
+			public const string dfeta_PersonId = "dfeta_personid";
+			public const string dfeta_Type = "dfeta_type";
+			public const string StateCode = "statecode";
+			public const string StatusCode = "statuscode";
+			public const string dfeta_document_Annotations = "dfeta_document_Annotations";
+			public const string dfeta_document_Tasks = "dfeta_document_Tasks";
+			public const string dfeta_account_dfeta_document = "dfeta_account_dfeta_document";
+			public const string dfeta_contact_dfeta_document = "dfeta_contact_dfeta_document";
+			public const string dfeta_incident_dfeta_document = "dfeta_incident_dfeta_document";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_document() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "dfeta_document";
+		
+		public const string PrimaryIdAttribute = "dfeta_documentid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_document";
+		
+		public const string EntityLogicalCollectionName = "dfeta_documents";
+		
+		public const string EntitySetName = "dfeta_documents";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for Case associated with Document.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_caseid")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_CaseId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_caseid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_CaseId");
+				this.SetAttributeValue("dfeta_caseid", value);
+				this.OnPropertyChanged("dfeta_CaseId");
+			}
+		}
+		
+		/// <summary>
+		/// The name of the custom entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
+		public string dfeta_name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_name");
+				this.SetAttributeValue("dfeta_name", value);
+				this.OnPropertyChanged("dfeta_name");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for Person associated with Document.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_PersonId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_personid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_PersonId");
+				this.SetAttributeValue("dfeta_personid", value);
+				this.OnPropertyChanged("dfeta_PersonId");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_type")]
+		public virtual dfeta_DocumentType? dfeta_Type
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_DocumentType?)(EntityOptionSetEnum.GetEnum(this, "dfeta_type")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Type");
+				this.SetAttributeValue("dfeta_type", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("dfeta_Type");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the Document
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_documentState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((QualifiedTeachersApi.DataStore.Crm.Models.dfeta_documentState)(System.Enum.ToObject(typeof(QualifiedTeachersApi.DataStore.Crm.Models.dfeta_documentState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// Reason for the status of the Document
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
+		public virtual dfeta_document_StatusCode? StatusCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_document_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StatusCode");
+				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("StatusCode");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_document_Annotations
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_document_Annotations")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Annotation> dfeta_document_Annotations
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("dfeta_document_Annotations", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_document_Annotations");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("dfeta_document_Annotations", null, value);
+				this.OnPropertyChanged("dfeta_document_Annotations");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_document_Tasks
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_document_Tasks")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Task> dfeta_document_Tasks
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Task>("dfeta_document_Tasks", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_document_Tasks");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Task>("dfeta_document_Tasks", null, value);
+				this.OnPropertyChanged("dfeta_document_Tasks");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_account_dfeta_document
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_appropriatebodyid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_account_dfeta_document")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Account dfeta_account_dfeta_document
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Account>("dfeta_account_dfeta_document", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_account_dfeta_document");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Account>("dfeta_account_dfeta_document", null, value);
+				this.OnPropertyChanged("dfeta_account_dfeta_document");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_contact_dfeta_document
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_document")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Contact dfeta_contact_dfeta_document
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("dfeta_contact_dfeta_document", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_contact_dfeta_document");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("dfeta_contact_dfeta_document", null, value);
+				this.OnPropertyChanged("dfeta_contact_dfeta_document");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_incident_dfeta_document
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_caseid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_incident_dfeta_document")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Incident dfeta_incident_dfeta_document
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("dfeta_incident_dfeta_document", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_incident_dfeta_document");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("dfeta_incident_dfeta_document", null, value);
+				this.OnPropertyChanged("dfeta_incident_dfeta_document");
 			}
 		}
 	}
@@ -5304,6 +6129,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_sanctionId = "dfeta_sanctionid";
 			public const string Id = "dfeta_sanctionid";
 			public const string StateCode = "statecode";
+			public const string dfeta_sanction_Annotations = "dfeta_sanction_Annotations";
 			public const string dfeta_contact_dfeta_sanction = "dfeta_contact_dfeta_sanction";
 			public const string dfeta_dfeta_sanctioncode_dfeta_sanction = "dfeta_dfeta_sanctioncode_dfeta_sanction";
 		}
@@ -5466,6 +6292,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
 				}
 				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_sanction_Annotations
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_sanction_Annotations")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Annotation> dfeta_sanction_Annotations
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("dfeta_sanction_Annotations", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_sanction_Annotations");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("dfeta_sanction_Annotations", null, value);
+				this.OnPropertyChanged("dfeta_sanction_Annotations");
 			}
 		}
 		
@@ -6044,6 +6890,729 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum IncidentState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Resolved = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Canceled = 2,
+	}
+	
+	/// <summary>
+	/// Service request case associated with a contract.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("incident")]
+	public partial class Incident : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the incident entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string CustomerId = "customerid";
+			public const string Description = "description";
+			public const string dfeta_NewFirstName = "dfeta_newfirstname";
+			public const string dfeta_NewLastName = "dfeta_newlastname";
+			public const string dfeta_NewMiddleName = "dfeta_newmiddlename";
+			public const string StateCode = "statecode";
+			public const string SubjectId = "subjectid";
+			public const string Title = "title";
+			public const string dfeta_incident_dfeta_document = "dfeta_incident_dfeta_document";
+			public const string Incident_Annotation = "Incident_Annotation";
+			public const string Referencedincident_existingcase = "Referencedincident_existingcase";
+			public const string Referencedincident_master_incident = "Referencedincident_master_incident";
+			public const string Referencedincident_parent_incident = "Referencedincident_parent_incident";
+			public const string Incident_Tasks = "Incident_Tasks";
+			public const string contact_as_primary_contact = "contact_as_primary_contact";
+			public const string contact_as_responsible_contact = "contact_as_responsible_contact";
+			public const string incident_customer_accounts = "incident_customer_accounts";
+			public const string incident_customer_contacts = "incident_customer_contacts";
+			public const string Referencingincident_existingcase = "incident_existingcase";
+			public const string Referencingincident_master_incident = "incident_master_incident";
+			public const string Referencingincident_parent_incident = "incident_parent_incident";
+			public const string subject_incidents = "subject_incidents";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public Incident() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "Incident";
+		
+		public const string PrimaryIdAttribute = "incidentid";
+		
+		public const string PrimaryNameAttribute = "title";
+		
+		public const string EntityLogicalName = "incident";
+		
+		public const string EntityLogicalCollectionName = "incidents";
+		
+		public const string EntitySetName = "incidents";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Select the customer account or contact to provide a quick link to additional customer details, such as account information, activities, and opportunities.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customerid")]
+		public Microsoft.Xrm.Sdk.EntityReference CustomerId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("customerid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CustomerId");
+				this.SetAttributeValue("customerid", value);
+				this.OnPropertyChanged("CustomerId");
+			}
+		}
+		
+		/// <summary>
+		/// Type additional information to describe the case to assist the service team in reaching a resolution.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("description")]
+		public string Description
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("description");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Description");
+				this.SetAttributeValue("description", value);
+				this.OnPropertyChanged("Description");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_newfirstname")]
+		public string dfeta_NewFirstName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_newfirstname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_NewFirstName");
+				this.SetAttributeValue("dfeta_newfirstname", value);
+				this.OnPropertyChanged("dfeta_NewFirstName");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_newlastname")]
+		public string dfeta_NewLastName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_newlastname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_NewLastName");
+				this.SetAttributeValue("dfeta_newlastname", value);
+				this.OnPropertyChanged("dfeta_NewLastName");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_newmiddlename")]
+		public string dfeta_NewMiddleName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_newmiddlename");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_NewMiddleName");
+				this.SetAttributeValue("dfeta_newmiddlename", value);
+				this.OnPropertyChanged("dfeta_NewMiddleName");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the case.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<QualifiedTeachersApi.DataStore.Crm.Models.IncidentState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((QualifiedTeachersApi.DataStore.Crm.Models.IncidentState)(System.Enum.ToObject(typeof(QualifiedTeachersApi.DataStore.Crm.Models.IncidentState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// Choose the subject for the case, such as catalog request or product complaint, so customer service managers can identify frequent requests or problem areas. Administrators can configure subjects under Business Management in the Settings area.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subjectid")]
+		public Microsoft.Xrm.Sdk.EntityReference SubjectId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("subjectid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SubjectId");
+				this.SetAttributeValue("subjectid", value);
+				this.OnPropertyChanged("SubjectId");
+			}
+		}
+		
+		/// <summary>
+		/// Type a subject or descriptive name, such as the request, issue, or company name, to identify the case in Microsoft Dynamics 365 views.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("title")]
+		public string Title
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("title");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Title");
+				this.SetAttributeValue("title", value);
+				this.OnPropertyChanged("Title");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_incident_dfeta_document
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_incident_dfeta_document")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document> dfeta_incident_dfeta_document
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>("dfeta_incident_dfeta_document", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_incident_dfeta_document");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>("dfeta_incident_dfeta_document", null, value);
+				this.OnPropertyChanged("dfeta_incident_dfeta_document");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N Incident_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Incident_Annotation")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Annotation> Incident_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("Incident_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Incident_Annotation");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("Incident_Annotation", null, value);
+				this.OnPropertyChanged("Incident_Annotation");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N incident_existingcase
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("incident_existingcase", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Incident> Referencedincident_existingcase
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_existingcase", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedincident_existingcase");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_existingcase", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedincident_existingcase");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N incident_master_incident
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("incident_master_incident", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Incident> Referencedincident_master_incident
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_master_incident", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedincident_master_incident");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_master_incident", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedincident_master_incident");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N incident_parent_incident
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("incident_parent_incident", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Incident> Referencedincident_parent_incident
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_parent_incident", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedincident_parent_incident");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_parent_incident", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedincident_parent_incident");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N Incident_Tasks
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Incident_Tasks")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Task> Incident_Tasks
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Task>("Incident_Tasks", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Incident_Tasks");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Task>("Incident_Tasks", null, value);
+				this.OnPropertyChanged("Incident_Tasks");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 contact_as_primary_contact
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("primarycontactid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_as_primary_contact")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Contact contact_as_primary_contact
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("contact_as_primary_contact", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("contact_as_primary_contact");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("contact_as_primary_contact", null, value);
+				this.OnPropertyChanged("contact_as_primary_contact");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 contact_as_responsible_contact
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("responsiblecontactid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_as_responsible_contact")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Contact contact_as_responsible_contact
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("contact_as_responsible_contact", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("contact_as_responsible_contact");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("contact_as_responsible_contact", null, value);
+				this.OnPropertyChanged("contact_as_responsible_contact");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 incident_customer_accounts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customerid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("incident_customer_accounts")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Account incident_customer_accounts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Account>("incident_customer_accounts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("incident_customer_accounts");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Account>("incident_customer_accounts", null, value);
+				this.OnPropertyChanged("incident_customer_accounts");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 incident_customer_contacts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customerid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("incident_customer_contacts")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Contact incident_customer_contacts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("incident_customer_contacts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("incident_customer_contacts");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("incident_customer_contacts", null, value);
+				this.OnPropertyChanged("incident_customer_contacts");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 incident_existingcase
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("existingcase")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("incident_existingcase", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Incident Referencingincident_existingcase
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_existingcase", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingincident_existingcase");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_existingcase", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingincident_existingcase");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 incident_master_incident
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("masterid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("incident_master_incident", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Incident Referencingincident_master_incident
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_master_incident", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingincident_master_incident");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_master_incident", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingincident_master_incident");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 incident_parent_incident
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentcaseid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("incident_parent_incident", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Incident Referencingincident_parent_incident
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_parent_incident", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingincident_parent_incident");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("incident_parent_incident", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingincident_parent_incident");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 subject_incidents
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subjectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("subject_incidents")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Subject subject_incidents
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Subject>("subject_incidents", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("subject_incidents");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Subject>("subject_incidents", null, value);
+				this.OnPropertyChanged("subject_incidents");
+			}
+		}
+	}
+	
+	/// <summary>
+	/// Information regarding subjects available in the system.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("subject")]
+	public partial class Subject : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the subject entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string Description = "description";
+			public const string Title = "title";
+			public const string subject_incidents = "subject_incidents";
+			public const string Referencedsubject_parent_subject = "Referencedsubject_parent_subject";
+			public const string Referencingsubject_parent_subject = "subject_parent_subject";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public Subject() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "Subject";
+		
+		public const string PrimaryIdAttribute = "subjectid";
+		
+		public const string PrimaryNameAttribute = "title";
+		
+		public const string EntityLogicalName = "subject";
+		
+		public const string EntityLogicalCollectionName = "subjects";
+		
+		public const string EntitySetName = "subjects";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Description of the subject.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("description")]
+		public string Description
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("description");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Description");
+				this.SetAttributeValue("description", value);
+				this.OnPropertyChanged("Description");
+			}
+		}
+		
+		/// <summary>
+		/// Title of the subject.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("title")]
+		public string Title
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("title");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Title");
+				this.SetAttributeValue("title", value);
+				this.OnPropertyChanged("Title");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N subject_incidents
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("subject_incidents")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Incident> subject_incidents
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("subject_incidents", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("subject_incidents");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("subject_incidents", null, value);
+				this.OnPropertyChanged("subject_incidents");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N subject_parent_subject
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("subject_parent_subject", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Subject> Referencedsubject_parent_subject
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Subject>("subject_parent_subject", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedsubject_parent_subject");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Subject>("subject_parent_subject", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedsubject_parent_subject");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 subject_parent_subject
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentsubject")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("subject_parent_subject", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Subject Referencingsubject_parent_subject
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Subject>("subject_parent_subject", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingsubject_parent_subject");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Subject>("subject_parent_subject", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingsubject_parent_subject");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum TaskState
 	{
 		
@@ -6077,9 +7646,12 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string ScheduledEnd = "scheduledend";
 			public const string StateCode = "statecode";
 			public const string Subject = "subject";
+			public const string Task_Annotation = "Task_Annotation";
 			public const string Account_Tasks = "Account_Tasks";
 			public const string Contact_Tasks = "Contact_Tasks";
 			public const string dfeta_contact_task_potentialduplicateid = "dfeta_contact_task_potentialduplicateid";
+			public const string dfeta_document_Tasks = "dfeta_document_Tasks";
+			public const string Incident_Tasks = "Incident_Tasks";
 		}
 		
 		/// <summary>
@@ -6281,6 +7853,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		}
 		
 		/// <summary>
+		/// 1:N Task_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Task_Annotation")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.Annotation> Task_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("Task_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Task_Annotation");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>("Task_Annotation", null, value);
+				this.OnPropertyChanged("Task_Annotation");
+			}
+		}
+		
+		/// <summary>
 		/// N:1 Account_Tasks
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("regardingobjectid")]
@@ -6342,6 +7934,48 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanged("dfeta_contact_task_potentialduplicateid");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 dfeta_document_Tasks
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("regardingobjectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_document_Tasks")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document dfeta_document_Tasks
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>("dfeta_document_Tasks", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_document_Tasks");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>("dfeta_document_Tasks", null, value);
+				this.OnPropertyChanged("dfeta_document_Tasks");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 Incident_Tasks
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("regardingobjectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Incident_Tasks")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Incident Incident_Tasks
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("Incident_Tasks", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Incident_Tasks");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Incident>("Incident_Tasks", null, value);
+				this.OnPropertyChanged("Incident_Tasks");
+			}
+		}
 	}
 	
 	/// <summary>
@@ -6372,6 +8006,18 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		}
 		
 		/// <summary>
+		/// Gets a binding to the set of all <see cref="QualifiedTeachersApi.DataStore.Crm.Models.Annotation"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<QualifiedTeachersApi.DataStore.Crm.Models.Annotation> AnnotationSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<QualifiedTeachersApi.DataStore.Crm.Models.Annotation>();
+			}
+		}
+		
+		/// <summary>
 		/// Gets a binding to the set of all <see cref="QualifiedTeachersApi.DataStore.Crm.Models.Contact"/> entities.
 		/// </summary>
 		public System.Linq.IQueryable<QualifiedTeachersApi.DataStore.Crm.Models.Contact> ContactSet
@@ -6392,6 +8038,18 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			get
 			{
 				return this.CreateQuery<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_country>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document> dfeta_documentSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_document>();
 			}
 		}
 		
@@ -6560,6 +8218,30 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			get
 			{
 				return this.CreateQuery<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_teacherstatus>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="QualifiedTeachersApi.DataStore.Crm.Models.Incident"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<QualifiedTeachersApi.DataStore.Crm.Models.Incident> IncidentSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<QualifiedTeachersApi.DataStore.Crm.Models.Incident>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="QualifiedTeachersApi.DataStore.Crm.Models.Subject"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<QualifiedTeachersApi.DataStore.Crm.Models.Subject> SubjectSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<QualifiedTeachersApi.DataStore.Crm.Models.Subject>();
 			}
 		}
 		

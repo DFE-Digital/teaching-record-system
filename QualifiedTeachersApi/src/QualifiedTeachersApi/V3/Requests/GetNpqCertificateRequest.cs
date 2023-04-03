@@ -10,5 +10,5 @@ public record GetNpqCertificateRequest : IRequest<GetCertificateResponse>
 {
     [FromRoute(Name = "qualificationId")]
     [SwaggerParameter(description: "The ID of the qualification record associated with the certificate")]
-    public Guid QualificationId { get; set; }
+    public required Guid QualificationId { get; set; }
 }

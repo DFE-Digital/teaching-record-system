@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 
 namespace QualifiedTeachersApi.Tests;
@@ -127,6 +128,12 @@ public partial class TestDataHelper
                 }
             });
 
+        var getTrnTask = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
+        {
+            ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(Contact.Fields.dfeta_TRN),
+            Target = teacherId.ToEntityReference(Contact.EntityLogicalName)
+        });
+
         var createIttTask = txnRequestBuilder.AddRequest<CreateResponse>(new CreateRequest()
         {
             Target = new dfeta_initialteachertraining()
@@ -179,16 +186,19 @@ public partial class TestDataHelper
                 }
             });
         }
+
         await txnRequestBuilder.Execute();
 
+        var trn = getTrnTask.GetResponse().Entity.ToEntity<Contact>().dfeta_TRN;
         var ittId = createIttTask.GetResponse().id;
         var qtsId = createQtsTask.GetResponse().id;
 
-        return new CreatePersonResult(teacherId, firstName, lastName, DateOnly.FromDateTime(birthDate), nino, ittId, qtsId, ittProvider.Id, ittProviderUkprn);
+        return new CreatePersonResult(teacherId, trn, firstName, lastName, DateOnly.FromDateTime(birthDate), nino, ittId, qtsId, ittProvider.Id, ittProviderUkprn);
     }
 
     public record CreatePersonResult(
         Guid TeacherId,
+        string Trn,
         string FirstName,
         string LastName,
         DateOnly BirthDate,

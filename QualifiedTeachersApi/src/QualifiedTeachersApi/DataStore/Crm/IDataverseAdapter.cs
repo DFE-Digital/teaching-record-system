@@ -78,5 +78,8 @@ public interface IDataverseAdapter
     Task<bool> UnlockTeacherRecord(Guid teacherId);
 
     Task<SetNpqQualificationResult> SetNpqQualification(SetNpqQualificationCommand command);
+
     Task<Contact[]> GetTeachersByHusId(string husId, string[] columnNames);
+
+    Task<Guid> CreateNameChangeIncident(CreateNameChangeIncidentCommand command);
 }

@@ -5,6 +5,16 @@
     "name",
     "statecode"
   ],
+  "annotation": [
+    "documentbody",
+    "filename",
+    "mimetype",
+    "notetext",
+    "objectid",
+    "objecttypecode",
+    "subject",
+    "statecode"
+  ],
   "contact": [
     "address1_city",
     "address1_country",
@@ -40,6 +50,14 @@
     "dfeta_name",
     "dfeta_value",
     "statecode"
+  ],
+  "dfeta_document": [
+    "dfeta_caseid",
+    "dfeta_name",
+    "dfeta_type",
+    "dfeta_personid",
+    "statecode",
+    "statuscode"
   ],
   "dfeta_earlyyearsstatus": [
     "dfeta_name",
@@ -167,6 +185,21 @@
     "dfeta_personid",
     "dfeta_sanctionid",
     "dfeta_sanctioncodeid",
+    "statecode"
+  ],
+  "incident": [
+    "customerid",
+    "description",
+    "dfeta_newfirstname",
+    "dfeta_newmiddlename",
+    "dfeta_newlastname",
+    "title",
+    "subjectid",
+    "statecode"
+  ],
+  "subject": [
+    "description",
+    "title",
     "statecode"
   ],
   "task": [

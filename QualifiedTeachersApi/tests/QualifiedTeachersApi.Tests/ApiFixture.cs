@@ -1,4 +1,9 @@
+using System;
+using System.Net.Http;
 using System.Security.Cryptography;
+using System.Threading;
+using System.Threading.Tasks;
+using JustEat.HttpClientInterception;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -16,6 +21,8 @@ namespace QualifiedTeachersApi.Tests;
 
 public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    private readonly HttpClientInterceptorOptions _evidenceFilesHttpClientInterceptorOptions = new();
+
     public ApiFixture()
     {
         JwtSigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()), SecurityAlgorithms.RsaSha256);
@@ -33,6 +40,9 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 
     public SigningCredentials JwtSigningCredentials { get; }
 
+    public void ConfigureEvidenceFilesHttpClient(Action<HttpClientInterceptorOptions> configure) =>
+        configure(_evidenceFilesHttpClientInterceptorOptions);
+
     public async Task InitializeAsync()
     {
         await DbHelper.ResetSchema();
@@ -40,6 +50,7 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 
     public void ResetMocks()
     {
+        _evidenceFilesHttpClientInterceptorOptions.Clear();
         DataverseAdapter.Reset();
         GetAnIdentityOptions.Reset();
         IdentityApiClient.Reset();
@@ -64,6 +75,10 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
             services.AddSingleton(CertificateGenerator.Object);
             services.AddSingleton<IClock, TestableClock>();
 
+            services.AddHttpClient("EvidenceFiles")
+                .AddHttpMessageHandler(_ => _evidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())
+                .ConfigurePrimaryHttpMessageHandler(_ => new NotFoundHandler());
+
             services.AddSingleton(sp =>
             {
                 var configuration = sp.GetRequiredService<IConfiguration>();
@@ -83,4 +98,12 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 
     private static IConfiguration GetTestConfiguration() =>
         new ConfigurationBuilder().AddUserSecrets<ApiFixture>(optional: true).Build();
+
+    private class NotFoundHandler : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
+        }
+    }
 }
