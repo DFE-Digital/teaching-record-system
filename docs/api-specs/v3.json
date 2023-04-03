@@ -257,7 +257,7 @@
     "/v3/teachers/{Trn}": {
       "get": {
         "tags": [
-          "Teacher"
+          "Teachers"
         ],
         "summary": "Get teacher details by TRN",
         "description": "Gets the details of the teacher corresponding to the given TRN",
@@ -428,6 +428,14 @@
             "type": "string"
           },
           "middleName": {
+            "type": "string",
+            "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "nationalInsuranceNumber": {
             "type": "string",
             "nullable": true
           },

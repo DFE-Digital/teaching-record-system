@@ -126,6 +126,8 @@ public class GetTeacherByTrnTests : ApiTestBase
                 lastName = teacher.LastName,
                 middleName = teacher.MiddleName,
                 trn = trn,
+                dateOfBirth = teacher.BirthDate?.ToString("yyyy-MM-dd"),
+                nationalInsuranceNumber = teacher.dfeta_NINumber,
                 qts = new
                 {
                     awarded = teacher.dfeta_QTSDate?.ToString("yyyy-MM-dd"),
@@ -228,6 +230,8 @@ public class GetTeacherByTrnTests : ApiTestBase
         var firstName = Faker.Name.First();
         var lastName = Faker.Name.Last();
         var middleName = Faker.Name.Middle();
+        var dateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
+        var nino = Faker.Identification.UkNationalInsuranceNumber();
 
         var qtsDate = new DateOnly(1997, 4, 23);
         var eytsDate = new DateOnly(1995, 5, 14);
@@ -237,8 +241,10 @@ public class GetTeacherByTrnTests : ApiTestBase
             Id = teacherId,
             dfeta_TRN = trn,
             FirstName = firstName,
-            LastName = lastName,
             MiddleName = middleName,
+            LastName = lastName,
+            BirthDate = dateOfBirth.ToDateTime(),
+            dfeta_NINumber = nino,
             dfeta_QTSDate = qtsDate.ToDateTime(),
             dfeta_EYTSDate = eytsDate.ToDateTime(),
         };
@@ -340,7 +346,6 @@ public class GetTeacherByTrnTests : ApiTestBase
 
         inductionPeriod.Attributes.Add($"appropriatebody.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, Guid.NewGuid()));
         inductionPeriod.Attributes.Add($"appropriatebody.{Account.Fields.Name}", new AliasedValue(Account.EntityLogicalName, Account.Fields.Name, inductionPeriodAppropriateBodyName));
-
 
         return new[]
         {
