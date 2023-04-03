@@ -64,7 +64,7 @@ public partial class DataverseAdapter
 
             if (_requestType == RequestType.Single)
             {
-                Execute();
+                _ = Execute();
             }
 
             return new InnerRequestHandle<TResponse>(this, request);
@@ -78,17 +78,20 @@ public partial class DataverseAdapter
             }
         }
 
-        public Task Execute()
+        public async Task Execute()
         {
             ThrowIfCompleted();
 
-            return _requestType switch
+            var executeTask = _requestType switch
             {
                 RequestType.Single => ExecuteSingleRequest(),
                 RequestType.Multiple => ExecuteMultipleRequest(),
                 RequestType.Transaction => ExecuteTransactionRequest(),
                 _ => throw new NotSupportedException($"Unknown {nameof(RequestType)}: '{_requestType}'.")
             };
+
+            await executeTask;
+            await _completedTcs.Task;
 
             async Task ExecuteSingleRequest()
             {

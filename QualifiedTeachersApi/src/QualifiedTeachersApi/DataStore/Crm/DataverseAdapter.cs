@@ -1153,10 +1153,34 @@ public partial class DataverseAdapter : IDataverseAdapter
 
     public async Task<Subject> GetSubjectByTitle(string title, string[] columnNames)
     {
-        var filter = new FilterExpression(LogicalOperator.And);
-        filter.AddCondition(Subject.Fields.Title, ConditionOperator.Equal, title);
+        return await _cache.GetOrCreateAsync(CacheKeys.GetSubjectTitleKey(title), async _ =>
+        {
+            var filter = new FilterExpression(LogicalOperator.And);
+            filter.AddCondition(Subject.Fields.Title, ConditionOperator.Equal, title);
 
-        var query = new QueryExpression(Subject.EntityLogicalName)
+            var query = new QueryExpression(Subject.EntityLogicalName)
+            {
+                ColumnSet = new(columnNames),
+                Criteria = filter
+            };
+
+            var result = await _service.RetrieveMultipleAsync(query);
+
+            return result.Entities.Select(e => e.ToEntity<Subject>()).SingleOrDefault();
+        });
+    }
+
+    public async Task<Incident[]> GetIncidentsByContactId(Guid contactId, IncidentState? state, string[] columnNames)
+    {
+        var filter = new FilterExpression(LogicalOperator.And);
+        filter.AddCondition(Incident.Fields.CustomerId, ConditionOperator.Equal, contactId);
+
+        if (state is not null)
+        {
+            filter.AddCondition(Incident.Fields.StateCode, ConditionOperator.Equal, (int)state);
+        }
+
+        var query = new QueryExpression(Incident.EntityLogicalName)
         {
             ColumnSet = new(columnNames),
             Criteria = filter
@@ -1164,7 +1188,7 @@ public partial class DataverseAdapter : IDataverseAdapter
 
         var result = await _service.RetrieveMultipleAsync(query);
 
-        return result.Entities.Select(e => e.ToEntity<Subject>()).SingleOrDefault();
+        return result.Entities.Select(e => e.ToEntity<Incident>()).ToArray();
     }
 
     public RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);

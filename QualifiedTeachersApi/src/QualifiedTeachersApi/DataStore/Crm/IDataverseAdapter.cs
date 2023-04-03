@@ -65,7 +65,7 @@ public interface IDataverseAdapter
 
     Task<Account[]> GetOrganizationsByUkprn(string ukprn, string[] columnNames);
 
-    Task<Models.Task[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames);
+    Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames);
 
     Task<SetIttResultForTeacherResult> SetIttResultForTeacher(
         Guid teacherId,
@@ -82,4 +82,8 @@ public interface IDataverseAdapter
     Task<Contact[]> GetTeachersByHusId(string husId, string[] columnNames);
 
     Task<Guid> CreateNameChangeIncident(CreateNameChangeIncidentCommand command);
+
+    Task<Subject> GetSubjectByTitle(string title, string[] columnNames);
+
+    Task<Incident[]> GetIncidentsByContactId(Guid contactId, IncidentState? state, string[] columnNames);
 }

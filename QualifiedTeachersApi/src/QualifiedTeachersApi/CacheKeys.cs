@@ -25,4 +25,6 @@ public static class CacheKeys
     public static object GetAllTeacherStatuses() => "all_teacher_statuses";
 
     public static object GetAllEytsStatuses() => "all_eyts_statuses";
+
+    public static object GetSubjectTitleKey(string title) => $"subjects_{title}";
 }
