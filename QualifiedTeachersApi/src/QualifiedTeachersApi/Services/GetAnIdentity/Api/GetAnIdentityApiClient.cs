@@ -19,9 +19,12 @@ public class GetAnIdentityApiClient : IGetAnIdentityApiClient
 
         _jsonOptions = new JsonSerializerOptions()
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        }
-        .AddConverters();
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters =
+            {
+                new DateOnlyConverter()
+            }
+        };
     }
 
     public async Task<GetAnIdentityApiUser> GetUserById(Guid userId)

@@ -42,91 +42,113 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
-        var (induction, inductionPeriods) = await _dataverseAdapter.GetInductionByTeacher(
-            teacher.Id,
-            columnNames: new[]
-            {
-                dfeta_induction.PrimaryIdAttribute,
-                dfeta_induction.Fields.dfeta_StartDate,
-                dfeta_induction.Fields.dfeta_CompletionDate,
-                dfeta_induction.Fields.dfeta_InductionStatus
-            },
-            inductionPeriodColumnNames: new[]
-            {
-                dfeta_inductionperiod.Fields.dfeta_InductionId,
-                dfeta_inductionperiod.Fields.dfeta_StartDate,
-                dfeta_inductionperiod.Fields.dfeta_EndDate,
-                dfeta_inductionperiod.Fields.dfeta_Numberofterms,
-                dfeta_inductionperiod.Fields.dfeta_AppropriateBodyId
-            },
-            appropriateBodyColumnNames: new[]
-            {
-                Account.PrimaryIdAttribute,
-                Account.Fields.Name
-            });
+        dfeta_induction induction = default;
+        dfeta_inductionperiod[] inductionPeriods = default;
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
-            teacher.Id,
-            columnNames: new[]
-            {
-                dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
-                dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
-                dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
-                dfeta_initialteachertraining.Fields.dfeta_Result,
-                dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
-                dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
-                dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
-                dfeta_initialteachertraining.Fields.dfeta_TraineeID,
-                dfeta_initialteachertraining.Fields.StateCode
-            },
-            establishmentColumnNames: new[]
-            {
-                Account.PrimaryIdAttribute,
-                Account.Fields.dfeta_UKPRN,
-                Account.Fields.Name
-            },
-            subjectColumnNames: new[]
-            {
-                dfeta_ittsubject.PrimaryIdAttribute,
-                dfeta_ittsubject.Fields.dfeta_name,
-                dfeta_ittsubject.Fields.dfeta_Value
-            },
-            qualificationColumnNames: new[]
-            {
-                dfeta_ittqualification.PrimaryIdAttribute,
-                dfeta_ittqualification.Fields.dfeta_name
-            },
-            false);
+        if (request.Include.HasFlag(GetTeacherRequestIncludes.Induction))
+        {
+            (induction, inductionPeriods) = await _dataverseAdapter.GetInductionByTeacher(
+                teacher.Id,
+                columnNames: new[]
+                {
+                    dfeta_induction.PrimaryIdAttribute,
+                    dfeta_induction.Fields.dfeta_StartDate,
+                    dfeta_induction.Fields.dfeta_CompletionDate,
+                    dfeta_induction.Fields.dfeta_InductionStatus
+                },
+                inductionPeriodColumnNames: new[]
+                {
+                    dfeta_inductionperiod.Fields.dfeta_InductionId,
+                    dfeta_inductionperiod.Fields.dfeta_StartDate,
+                    dfeta_inductionperiod.Fields.dfeta_EndDate,
+                    dfeta_inductionperiod.Fields.dfeta_Numberofterms,
+                    dfeta_inductionperiod.Fields.dfeta_AppropriateBodyId
+                },
+                appropriateBodyColumnNames: new[]
+                {
+                    Account.PrimaryIdAttribute,
+                    Account.Fields.Name
+                });
+        }
 
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
-            teacher.Id,
-            columnNames: new[]
-            {
-                dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
-                dfeta_qualification.Fields.dfeta_Type,
-                dfeta_qualification.Fields.StateCode,
-                dfeta_qualification.Fields.dfeta_MQ_Date,
-                dfeta_qualification.Fields.dfeta_MQ_SpecialismId
-            },
-            specialismColumnNames: new[]
-            {
-                dfeta_specialism.PrimaryIdAttribute,
-                dfeta_specialism.Fields.dfeta_name
-            });
+        dfeta_initialteachertraining[] itt = default;
 
-        var nameChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Name", columnNames: Array.Empty<string>());
-        var dateOfBirthChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Date of Birth", columnNames: Array.Empty<string>());
+        if (request.Include.HasFlag(GetTeacherRequestIncludes.InitialTeacherTraining))
+        {
+            itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+                teacher.Id,
+                columnNames: new[]
+                {
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeEndDate,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeStartDate,
+                    dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
+                    dfeta_initialteachertraining.Fields.dfeta_Result,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeFrom,
+                    dfeta_initialteachertraining.Fields.dfeta_AgeRangeTo,
+                    dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
+                    dfeta_initialteachertraining.Fields.dfeta_TraineeID,
+                    dfeta_initialteachertraining.Fields.StateCode
+                },
+                establishmentColumnNames: new[]
+                {
+                    Account.PrimaryIdAttribute,
+                    Account.Fields.dfeta_UKPRN,
+                    Account.Fields.Name
+                },
+                subjectColumnNames: new[]
+                {
+                    dfeta_ittsubject.PrimaryIdAttribute,
+                    dfeta_ittsubject.Fields.dfeta_name,
+                    dfeta_ittsubject.Fields.dfeta_Value
+                },
+                qualificationColumnNames: new[]
+                {
+                    dfeta_ittqualification.PrimaryIdAttribute,
+                    dfeta_ittqualification.Fields.dfeta_name
+                },
+                false);
+        }
 
-        var incidents = await _dataverseAdapter.GetIncidentsByContactId(
-            teacher.Id,
-            IncidentState.Active,
-            columnNames: new[] { Incident.Fields.SubjectId, Incident.Fields.StateCode });
+        dfeta_qualification[] qualifications = default;
 
-        var pendingNameChange = incidents.Any(i => i.SubjectId.Id == nameChangeSubject.Id);
-        var pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
+        if ((request.Include & (GetTeacherRequestIncludes.MandatoryQualifications | GetTeacherRequestIncludes.NpqQualifications)) != 0)
+        {
+            qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+                teacher.Id,
+                columnNames: new[]
+                {
+                    dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
+                    dfeta_qualification.Fields.dfeta_Type,
+                    dfeta_qualification.Fields.StateCode,
+                    dfeta_qualification.Fields.dfeta_MQ_Date,
+                    dfeta_qualification.Fields.dfeta_MQ_SpecialismId
+                },
+                specialismColumnNames: new[]
+                {
+                    dfeta_specialism.PrimaryIdAttribute,
+                    dfeta_specialism.Fields.dfeta_name
+                });
+        }
+
+        bool pendingNameChange = default, pendingDateOfBirthChange = default;
+
+        if (request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges))
+        {
+            var nameChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Name", columnNames: Array.Empty<string>());
+            var dateOfBirthChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Date of Birth", columnNames: Array.Empty<string>());
+
+            var incidents = await _dataverseAdapter.GetIncidentsByContactId(
+                teacher.Id,
+                IncidentState.Active,
+                columnNames: new[] { Incident.Fields.SubjectId, Incident.Fields.StateCode });
+
+            pendingNameChange = incidents.Any(i => i.SubjectId.Id == nameChangeSubject.Id);
+            pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
+        }
 
         return new GetTeacherResponse()
         {
+            Include = request.Include,
             Trn = request.Trn,
             FirstName = teacher.FirstName,
             MiddleName = teacher.MiddleName,
@@ -137,20 +159,22 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             PendingDateOfBirthChange = pendingDateOfBirthChange,
             Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnly()),
             Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnly()),
-            Induction = MapInduction(induction, inductionPeriods),
-            InitialTeacherTraining = itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
-            {
-                Qualification = MapIttQualification(i),
-                ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>(),
-                StartDate = i.dfeta_ProgrammeStartDate.ToDateOnly(),
-                EndDate = i.dfeta_ProgrammeEndDate.ToDateOnly(),
-                Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
-                AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
-                Provider = MapProvider(i),
-                Subjects = MapSubjects(i)
-            }),
-            NpqQualifications = MapNpqQualifications(qualifications),
-            MandatoryQualifications = MapMandatoryQualifications(qualifications)
+            Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ? MapInduction(induction, inductionPeriods) : null,
+            InitialTeacherTraining = request.Include.HasFlag(GetTeacherRequestIncludes.InitialTeacherTraining) ?
+                itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
+                {
+                    Qualification = MapIttQualification(i),
+                    ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>(),
+                    StartDate = i.dfeta_ProgrammeStartDate.ToDateOnly(),
+                    EndDate = i.dfeta_ProgrammeEndDate.ToDateOnly(),
+                    Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
+                    AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
+                    Provider = MapProvider(i),
+                    Subjects = MapSubjects(i)
+                }) :
+                null,
+            NpqQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.NpqQualifications) ? MapNpqQualifications(qualifications) : null,
+            MandatoryQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.MandatoryQualifications) ? MapMandatoryQualifications(qualifications) : null
         };
     }
 

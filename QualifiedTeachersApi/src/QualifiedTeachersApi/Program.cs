@@ -147,7 +147,7 @@ public class Program
         services.AddControllers()
             .AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.AddConverters();
+                options.JsonSerializerOptions.Configure();
             });
 
         services.Decorate<Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory, CamelCaseErrorKeysProblemDetailsFactory>();
