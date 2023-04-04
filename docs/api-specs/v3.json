@@ -424,10 +424,10 @@
           "firstName": {
             "type": "string"
           },
-          "lastName": {
+          "middleName": {
             "type": "string"
           },
-          "middleName": {
+          "lastName": {
             "type": "string",
             "nullable": true
           },
@@ -438,6 +438,12 @@
           "nationalInsuranceNumber": {
             "type": "string",
             "nullable": true
+          },
+          "pendingNameChange": {
+            "type": "boolean"
+          },
+          "pendingDateOfBirthChange": {
+            "type": "boolean"
           },
           "qts": {
             "$ref": "#/components/schemas/GetTeacherResponseQts"

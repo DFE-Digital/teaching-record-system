@@ -114,6 +114,17 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 dfeta_specialism.Fields.dfeta_name
             });
 
+        var nameChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Name", columnNames: Array.Empty<string>());
+        var dateOfBirthChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Date of Birth", columnNames: Array.Empty<string>());
+
+        var incidents = await _dataverseAdapter.GetIncidentsByContactId(
+            teacher.Id,
+            IncidentState.Active,
+            columnNames: new[] { Incident.Fields.SubjectId, Incident.Fields.StateCode });
+
+        var pendingNameChange = incidents.Any(i => i.SubjectId.Id == nameChangeSubject.Id);
+        var pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
+
         return new GetTeacherResponse()
         {
             Trn = request.Trn,
@@ -122,6 +133,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             LastName = teacher.LastName,
             DateOfBirth = teacher.BirthDate.Value.ToDateOnly(),
             NationalInsuranceNumber = teacher.dfeta_NINumber,
+            PendingNameChange = pendingNameChange,
+            PendingDateOfBirthChange = pendingDateOfBirthChange,
             Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnly()),
             Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnly()),
             Induction = MapInduction(induction, inductionPeriods),
