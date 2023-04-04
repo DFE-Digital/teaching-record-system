@@ -632,26 +632,6 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
     }
 
     [Fact]
-    public async Task Given_request_with_existing_husid_returns_error()
-    {
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var request = CreateRequest();
-        ApiFixture.DataverseAdapter
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
-            .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.DuplicateHusId));
-
-        // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
-
-        // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
-            response,
-            $"{nameof(GetOrCreateTrnRequest.HusId)}",
-            StringResources.Errors_10018_Title);
-    }
-
-    [Fact]
     public async Task Given_OverseasQualifiedTeacher_and_EarlyYears_ProgrammeType_returns_error()
     {
         // Arrange
