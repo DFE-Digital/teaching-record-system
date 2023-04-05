@@ -74,6 +74,14 @@ public partial class DataverseAdapter
             });
         }
 
+        if (referenceData.HaveExistingTeacherWithHusId == true)
+        {
+            txnRequest.Requests.Add(new CreateRequest()
+            {
+                Target = helper.CreateDuplicateHusIdReviewTaskEntity(command.HusId)
+            });
+        }
+
         var qtsEntity = helper.CreateQtsRegistrationEntity(referenceData);
         txnRequest.Requests.Add(new CreateRequest() { Target = qtsEntity });
 
@@ -116,6 +124,32 @@ public partial class DataverseAdapter
         }
 
         public Guid TeacherId { get; }
+
+        public CrmTask CreateDuplicateHusIdReviewTaskEntity(string duplicateHusId)
+        {
+            var description = GetDescription();
+            var category = _command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher ? "ApplyForQts" :
+                !string.IsNullOrEmpty(_command.HusId) ? "HESAImportTrn" :
+                "DMSImportTrn";
+
+            return new CrmTask()
+            {
+                RegardingObjectId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
+                Category = category,
+                Subject = "Notification for QTS Unit Team",
+                Description = description,
+                ScheduledEnd = _dataverseAdapter._clock.UtcNow
+            };
+
+            string GetDescription()
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("Potential duplicate");
+                sb.AppendLine("Matched on");
+                sb.AppendLine($"HusId - {duplicateHusId}");
+                return sb.ToString();
+            }
+        }
 
         public CrmTask CreateDuplicateReviewTaskEntity(CreateTeacherDuplicateTeacherResult duplicate)
         {
@@ -753,11 +787,6 @@ public partial class DataverseAdapter
             if (referenceData.QualificationId == null)
             {
                 failedReasons |= CreateTeacherFailedReasons.QualificationNotFound;
-            }
-
-            if (referenceData.HaveExistingTeacherWithHusId == true)
-            {
-                failedReasons |= CreateTeacherFailedReasons.DuplicateHusId;
             }
 
             if (referenceData.IttCountryId == null)
