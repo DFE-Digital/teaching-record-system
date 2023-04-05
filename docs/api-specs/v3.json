@@ -534,8 +534,7 @@
             "$ref": "#/components/schemas/InductionStatus"
           },
           "certificateUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "periods": {
             "type": "array",

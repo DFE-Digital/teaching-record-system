@@ -24,7 +24,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestForTeacher_ReturnsExpectedContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        string trn,
+        bool expectCertificateUrls)
     {
         // Arrange
         var contact = CreateContact(trn);
@@ -37,34 +38,43 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
+        var expectedJson = JObject.FromObject(new
+        {
+            firstName = contact.FirstName,
+            lastName = contact.LastName,
+            middleName = contact.MiddleName,
+            trn = trn,
+            dateOfBirth = contact.BirthDate?.ToString("yyyy-MM-dd"),
+            nationalInsuranceNumber = contact.dfeta_NINumber,
+            qts = new
+            {
+                awarded = contact.dfeta_QTSDate?.ToString("yyyy-MM-dd"),
+                certificateUrl = "/v3/certificates/qts"
+            },
+            eyts = new
+            {
+                awarded = contact.dfeta_EYTSDate?.ToString("yyyy-MM-dd"),
+                certificateUrl = "/v3/certificates/eyts"
+            }
+        });
+
+        if (!expectCertificateUrls)
+        {
+            ((JObject)expectedJson["qts"]).Property("certificateUrl").Remove();
+            ((JObject)expectedJson["eyts"]).Property("certificateUrl").Remove();
+        }
+
         await AssertEx.JsonResponseEquals(
             response,
-            new
-            {
-                firstName = contact.FirstName,
-                lastName = contact.LastName,
-                middleName = contact.MiddleName,
-                trn = trn,
-                dateOfBirth = contact.BirthDate?.ToString("yyyy-MM-dd"),
-                nationalInsuranceNumber = contact.dfeta_NINumber,
-                qts = new
-                {
-                    awarded = contact.dfeta_QTSDate?.ToString("yyyy-MM-dd"),
-                    certificateUrl = "/v3/certificates/qts"
-                },
-                eyts = new
-                {
-                    awarded = contact.dfeta_EYTSDate?.ToString("yyyy-MM-dd"),
-                    certificateUrl = "/v3/certificates/eyts"
-                }
-            },
+            expectedJson,
             StatusCodes.Status200OK);
     }
 
     protected async Task ValidRequestWithInduction_ReturnsExpectedInductionContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        string trn,
+        bool expectCertificateUrls)
     {
         // Arrange
         var contact = CreateContact(trn);
@@ -79,31 +89,36 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
+        var expectedJson = JObject.FromObject(new
+        {
+            startDate = induction.dfeta_StartDate?.ToString("yyyy-MM-dd"),
+            endDate = induction.dfeta_CompletionDate?.ToString("yyyy-MM-dd"),
+            status = induction.dfeta_InductionStatus.ToString(),
+            certificateUrl = "/v3/certificates/induction",
+            periods = new[]
+            {
+                new
+                {
+                    startDate = inductionPeriods[0].dfeta_StartDate?.ToString("yyyy-MM-dd"),
+                    endDate = inductionPeriods[0].dfeta_EndDate?.ToString("yyyy-MM-dd"),
+                    terms = inductionPeriods[0].dfeta_Numberofterms,
+                    appropriateBody = new
+                    {
+                        name = inductionPeriods[0].GetAttributeValue<AliasedValue>($"appropriatebody.{Account.Fields.Name}").Value
+                    }
+                }
+            }
+        });
+
+        if (!expectCertificateUrls)
+        {
+            expectedJson.Property("certificateUrl").Remove();
+        }
+
         var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
         var responseInduction = jsonResponse["induction"];
 
-        AssertEx.JsonObjectEquals(
-            responseInduction,
-            new
-            {
-                startDate = induction.dfeta_StartDate?.ToString("yyyy-MM-dd"),
-                endDate = induction.dfeta_CompletionDate?.ToString("yyyy-MM-dd"),
-                status = induction.dfeta_InductionStatus.ToString(),
-                certificateUrl = "/v3/certificates/induction",
-                periods = new[]
-                {
-                    new
-                    {
-                        startDate = inductionPeriods[0].dfeta_StartDate?.ToString("yyyy-MM-dd"),
-                        endDate = inductionPeriods[0].dfeta_EndDate?.ToString("yyyy-MM-dd"),
-                        terms = inductionPeriods[0].dfeta_Numberofterms,
-                        appropriateBody = new
-                        {
-                            name = inductionPeriods[0].GetAttributeValue<AliasedValue>($"appropriatebody.{Account.Fields.Name}").Value
-                        }
-                    }
-                }
-            });
+        AssertEx.JsonObjectEquals(responseInduction, expectedJson);
     }
 
     protected async Task ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent(
@@ -174,7 +189,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        string trn,
+        bool expectCertificateUrls)
     {
         // Arrange
         var contact = CreateContact(trn);
@@ -198,24 +214,29 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
+        var expectedJson = JArray.FromObject(new[]
+        {
+            new
+            {
+                awarded = npqQualificationValid.dfeta_CompletionorAwardDate?.ToString("yyyy-MM-dd"),
+                type = new
+                {
+                    code = npqQualificationValid.dfeta_Type.ToString(),
+                    name = npqQualificationValid.dfeta_Type?.GetName()
+                },
+                certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.Id}"
+            }
+        });
+
+        if (!expectCertificateUrls)
+        {
+            ((JObject)expectedJson[0]).Property("certificateUrl").Remove();
+        }
+
         var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
         var responseNpqQualifications = jsonResponse["npqQualifications"];
 
-        AssertEx.JsonObjectEquals(
-            responseNpqQualifications,
-            new[]
-            {
-                new
-                {
-                    awarded = npqQualificationValid.dfeta_CompletionorAwardDate?.ToString("yyyy-MM-dd"),
-                    type = new
-                    {
-                        code = npqQualificationValid.dfeta_Type.ToString(),
-                        name = npqQualificationValid.dfeta_Type?.GetName()
-                    },
-                    certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.Id}"
-                }
-            });
+        AssertEx.JsonObjectEquals(responseNpqQualifications, expectedJson);
     }
 
     protected async Task ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent(

@@ -40,7 +40,8 @@ public class TeachersController : ControllerBase
         var request = new GetTeacherRequest()
         {
             Trn = trn,
-            Include = include ?? GetTeacherRequestIncludes.None
+            Include = include ?? GetTeacherRequestIncludes.None,
+            AccessMode = AccessMode.ApiKey
         };
 
         var response = await _mediator.Send(request);
