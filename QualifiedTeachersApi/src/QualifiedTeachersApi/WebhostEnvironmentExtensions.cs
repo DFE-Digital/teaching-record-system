@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿#nullable disable
+using Microsoft.AspNetCore.Hosting;
 
 namespace QualifiedTeachersApi;
 

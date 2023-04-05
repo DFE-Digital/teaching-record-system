@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using Microsoft.AspNetCore.Mvc;
 
 namespace QualifiedTeachersApi.Validation;

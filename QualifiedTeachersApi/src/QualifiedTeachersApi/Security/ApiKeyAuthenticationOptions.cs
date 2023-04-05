@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿#nullable disable
+using Microsoft.AspNetCore.Authentication;
 
 namespace QualifiedTeachersApi.Security;
 

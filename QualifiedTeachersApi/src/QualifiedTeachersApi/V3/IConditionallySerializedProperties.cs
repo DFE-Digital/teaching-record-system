@@ -1,4 +1,5 @@
-﻿namespace QualifiedTeachersApi.V3;
+﻿#nullable disable
+namespace QualifiedTeachersApi.V3;
 
 public interface IConditionallySerializedProperties
 {

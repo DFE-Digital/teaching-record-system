@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿#nullable disable
+using Microsoft.Extensions.Configuration;
 using Prometheus;
 
 namespace QualifiedTeachersApi.Configuration;

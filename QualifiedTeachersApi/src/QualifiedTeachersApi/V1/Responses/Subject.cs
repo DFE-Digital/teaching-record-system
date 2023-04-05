@@ -1,4 +1,5 @@
-﻿namespace QualifiedTeachersApi.V1.Responses;
+﻿#nullable disable
+namespace QualifiedTeachersApi.V1.Responses;
 
 public class Subject
 {

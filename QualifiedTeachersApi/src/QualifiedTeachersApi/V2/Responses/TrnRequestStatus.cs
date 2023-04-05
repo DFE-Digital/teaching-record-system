@@ -1,4 +1,5 @@
-﻿namespace QualifiedTeachersApi.V2.Responses;
+﻿#nullable disable
+namespace QualifiedTeachersApi.V2.Responses;
 
 public enum TrnRequestStatus
 {

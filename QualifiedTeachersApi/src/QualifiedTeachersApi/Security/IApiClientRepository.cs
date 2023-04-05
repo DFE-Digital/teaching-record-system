@@ -1,4 +1,5 @@
-﻿namespace QualifiedTeachersApi.Security;
+﻿#nullable disable
+namespace QualifiedTeachersApi.Security;
 
 public interface IApiClientRepository
 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using Microsoft.Xrm.Sdk;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.V1.Handlers;

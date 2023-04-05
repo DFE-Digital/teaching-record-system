@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿#nullable disable
+using System.ServiceModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Xrm.Sdk;

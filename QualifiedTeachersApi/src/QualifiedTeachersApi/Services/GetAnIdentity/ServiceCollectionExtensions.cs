@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

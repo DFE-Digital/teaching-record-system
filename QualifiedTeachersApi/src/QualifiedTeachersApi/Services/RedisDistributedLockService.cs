@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using RedLockNet.SERedis;
 
 namespace QualifiedTeachersApi.Services;

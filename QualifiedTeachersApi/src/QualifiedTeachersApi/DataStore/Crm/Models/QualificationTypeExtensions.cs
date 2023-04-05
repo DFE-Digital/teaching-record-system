@@ -1,3 +1,4 @@
+#nullable disable
 namespace QualifiedTeachersApi.DataStore.Crm.Models;
 
 public static class QualificationTypeExtensions

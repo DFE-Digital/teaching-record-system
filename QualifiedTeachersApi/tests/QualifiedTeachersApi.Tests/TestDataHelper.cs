@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿#nullable disable
+using Microsoft.Extensions.Caching.Memory;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.Tests.DataverseIntegration;
 

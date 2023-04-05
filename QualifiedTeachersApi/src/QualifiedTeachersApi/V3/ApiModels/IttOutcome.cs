@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 
 namespace QualifiedTeachersApi.V3.ApiModels;

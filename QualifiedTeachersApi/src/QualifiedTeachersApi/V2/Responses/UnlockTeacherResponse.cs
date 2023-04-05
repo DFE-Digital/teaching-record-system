@@ -1,4 +1,5 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
+﻿#nullable disable
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V2.Responses;
 

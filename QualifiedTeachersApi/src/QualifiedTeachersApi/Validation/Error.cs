@@ -1,4 +1,5 @@
-﻿namespace QualifiedTeachersApi.Validation;
+﻿#nullable disable
+namespace QualifiedTeachersApi.Validation;
 
 public sealed class Error
 {

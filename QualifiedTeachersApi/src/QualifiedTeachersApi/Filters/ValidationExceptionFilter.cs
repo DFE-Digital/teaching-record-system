@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿#nullable disable
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
