@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QualifiedTeachersApi.ModelBinding;
 using QualifiedTeachersApi.Security;
 using QualifiedTeachersApi.V3.Requests;
 using QualifiedTeachersApi.V3.Responses;
@@ -25,11 +26,12 @@ public class TeacherController : Controller
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     [HttpGet]
     [SwaggerOperation(
-        summary: "Get teacher details",
-        description: "Gets the details of the currently authenticated teacher")]
+        summary: "Get the current teacher's details",
+        description: "Gets the details of the currently authenticated teacher.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get(
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
     {
         var trn = User.FindFirstValue("trn");
 
@@ -40,7 +42,8 @@ public class TeacherController : Controller
 
         var request = new GetTeacherRequest()
         {
-            Trn = trn
+            Trn = trn,
+            Include = include ?? GetTeacherRequestIncludes.None
         };
 
         var response = await _mediator.Send(request);

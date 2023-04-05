@@ -32,9 +32,49 @@ public class GetTeacherTests : GetTeacherTestBase
     {
         var trn = "1234567";
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
-        var request = new HttpRequestMessage(HttpMethod.Get, "v3/teacher");
+        var baseUrl = "/v3/teacher";
 
-        return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, request, trn);
+        return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, trn);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
+    {
+        var trn = "1234567";
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var baseUrl = "/v3/teacher";
+
+        return ValidRequestWithInduction_ReturnsExpectedInductionContent(httpClient, baseUrl, trn);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent()
+    {
+        var trn = "1234567";
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var baseUrl = "/v3/teacher";
+
+        return ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent(httpClient, baseUrl, trn);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent()
+    {
+        var trn = "1234567";
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var baseUrl = "/v3/teacher";
+
+        return ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(httpClient, baseUrl, trn);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent()
+    {
+        var trn = "1234567";
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var baseUrl = "/v3/teacher";
+
+        return ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent(httpClient, baseUrl, trn);
     }
 
     [Fact]
@@ -42,9 +82,9 @@ public class GetTeacherTests : GetTeacherTestBase
     {
         var trn = "1234567";
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
-        var request = new HttpRequestMessage(HttpMethod.Get, "v3/teacher");
+        var baseUrl = "v3/teacher";
 
-        return ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(httpClient, request, trn);
+        return ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(httpClient, baseUrl, trn);
     }
 
     [Fact]
@@ -52,8 +92,8 @@ public class GetTeacherTests : GetTeacherTestBase
     {
         var trn = "1234567";
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
-        var request = new HttpRequestMessage(HttpMethod.Get, "v3/teacher");
+        var baseUrl = "v3/teacher";
 
-        return ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(httpClient, request, trn);
+        return ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(httpClient, baseUrl, trn);
     }
 }

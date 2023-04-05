@@ -218,8 +218,18 @@
         "tags": [
           "Teacher"
         ],
-        "summary": "Get teacher details",
-        "description": "Gets the details of the currently authenticated teacher",
+        "summary": "Get the current teacher's details",
+        "description": "Gets the details of the currently authenticated teacher.",
+        "parameters": [
+          {
+            "name": "include",
+            "in": "query",
+            "description": "The additional properties to include in the response.",
+            "schema": {
+              "$ref": "#/components/schemas/GetTeacherRequestIncludes"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -254,20 +264,28 @@
         }
       }
     },
-    "/v3/teachers/{Trn}": {
+    "/v3/teachers/{trn}": {
       "get": {
         "tags": [
           "Teachers"
         ],
         "summary": "Get teacher details by TRN",
-        "description": "Gets the details of the teacher corresponding to the given TRN",
+        "description": "Gets the details of the teacher corresponding to the given TRN.",
         "parameters": [
           {
-            "name": "Trn",
+            "name": "trn",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "The additional properties to include in the response.",
+            "schema": {
+              "$ref": "#/components/schemas/GetTeacherRequestIncludes"
             }
           }
         ],
@@ -340,7 +358,7 @@
         "tags": [
           "Teachers"
         ],
-        "summary": "Set NPQ qualification for a teacher",
+        "summary": "Creates a name change for the teacher with the given TRN",
         "requestBody": {
           "content": {
             "application/json": {
@@ -414,6 +432,17 @@
           }
         },
         "additionalProperties": false
+      },
+      "GetTeacherRequestIncludes": {
+        "enum": [
+          "Induction",
+          "InitialTeacherTraining",
+          "NpqQualifications",
+          "MandatoryQualifications",
+          "PendingDetailChanges"
+        ],
+        "type": "string",
+        "description": "Comma-separated list"
       },
       "GetTeacherResponse": {
         "type": "object",

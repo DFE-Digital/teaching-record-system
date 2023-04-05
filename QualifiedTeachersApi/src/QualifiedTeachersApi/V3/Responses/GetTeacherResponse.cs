@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using QualifiedTeachersApi.V3.ApiModels;
+using QualifiedTeachersApi.V3.Requests;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V3.Responses;
 
-public record GetTeacherResponse
+public record GetTeacherResponse : IConditionallySerializedProperties
 {
+    [JsonIgnore]
+    public GetTeacherRequestIncludes Include { get; init; }
+
     [SwaggerSchema(Nullable = false)]
     public required string Trn { get; init; }
     [SwaggerSchema(Nullable = false)]
@@ -27,6 +32,25 @@ public record GetTeacherResponse
     public required IEnumerable<GetTeacherResponseNpqQualificationsQualification> NpqQualifications { get; init; }
     [SwaggerSchema(Nullable = false)]
     public required IEnumerable<GetTeacherResponseMandatoryQualificationsQualification> MandatoryQualifications { get; init; }
+
+    public bool ShouldSerializeProperty(string propertyName)
+    {
+        if (Include == GetTeacherRequestIncludes.All)
+        {
+            return true;
+        }
+
+        return propertyName switch
+        {
+            nameof(Induction) => Include.HasFlag(GetTeacherRequestIncludes.Induction),
+            nameof(InitialTeacherTraining) => Include.HasFlag(GetTeacherRequestIncludes.InitialTeacherTraining),
+            nameof(NpqQualifications) => Include.HasFlag(GetTeacherRequestIncludes.NpqQualifications),
+            nameof(MandatoryQualifications) => Include.HasFlag(GetTeacherRequestIncludes.MandatoryQualifications),
+            nameof(PendingNameChange) => Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges),
+            nameof(PendingDateOfBirthChange) => Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges),
+            _ => true
+        };
+    }
 }
 
 public record GetTeacherResponseQts

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QualifiedTeachersApi.Filters;
+using QualifiedTeachersApi.ModelBinding;
 using QualifiedTeachersApi.Security;
 using QualifiedTeachersApi.V3.Requests;
 using QualifiedTeachersApi.V3.Responses;
@@ -24,16 +25,24 @@ public class TeachersController : ControllerBase
     }
 
     [Authorize(AuthorizationPolicies.ApiKey)]
-    [HttpGet("{Trn}")]
+    [HttpGet("{trn}")]
     [SwaggerOperation(
         summary: "Get teacher details by TRN",
-        description: "Gets the details of the teacher corresponding to the given TRN")]
+        description: "Gets the details of the teacher corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Get([FromRoute] GetTeacherRequest request)
+    public async Task<IActionResult> Get(
+        [FromRoute] string trn,
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
     {
+        var request = new GetTeacherRequest()
+        {
+            Trn = trn,
+            Include = include ?? GetTeacherRequestIncludes.None
+        };
+
         var response = await _mediator.Send(request);
 
         if (response is null)
@@ -45,7 +54,7 @@ public class TeachersController : ControllerBase
     }
 
     [HttpPost("name-changes")]
-    [SwaggerOperation(summary: "Set NPQ qualification for a teacher")]
+    [SwaggerOperation(summary: "Creates a name change for the teacher with the given TRN")]
     [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

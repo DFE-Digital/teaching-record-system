@@ -27,21 +27,6 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     }
 
     [Fact]
-    public async Task Get_InvalidTrn_ReturnsBadRequest()
-    {
-        // Arrange
-        var trn = "invalid";
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
-
-        // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-    }
-
-    [Fact]
     public async Task Get_TrnNotFound_ReturnsNotFound()
     {
         // Arrange
@@ -60,26 +45,62 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     public Task Get_ValidRequest_ReturnsExpectedResponse()
     {
         var trn = "1234567";
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
+        var baseUrl = $"/v3/teachers/{trn}";
 
-        return ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, request, trn);
+        return ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, trn);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
+    {
+        var trn = "1234567";
+        var baseUrl = $"/v3/teachers/{trn}";
+
+        return ValidRequestWithInduction_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent()
+    {
+        var trn = "1234567";
+        var baseUrl = $"/v3/teachers/{trn}";
+
+        return ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent()
+    {
+        var trn = "1234567";
+        var baseUrl = $"/v3/teachers/{trn}";
+
+        return ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent()
+    {
+        var trn = "1234567";
+        var baseUrl = $"/v3/teachers/{trn}";
+
+        return ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn);
     }
 
     [Fact]
     public Task Get_ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue()
     {
         var trn = "1234567";
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
+        var baseUrl = $"/v3/teachers/{trn}";
 
-        return ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(HttpClientWithApiKey, request, trn);
+        return ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(HttpClientWithApiKey, baseUrl, trn);
     }
 
     [Fact]
     public Task Get_ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue()
     {
         var trn = "1234567";
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
+        var baseUrl = $"/v3/teachers/{trn}";
 
-        return ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(HttpClientWithApiKey, request, trn);
+        return ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(HttpClientWithApiKey, baseUrl, trn);
     }
 }

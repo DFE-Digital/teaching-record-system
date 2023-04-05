@@ -23,37 +23,15 @@ public abstract class GetTeacherTestBase : ApiTestBase
 
     protected async Task ValidRequestForTeacher_ReturnsExpectedContent(
         HttpClient httpClient,
-        HttpRequestMessage request,
+        string baseUrl,
         string trn)
     {
         // Arrange
         var contact = CreateContact(trn);
-        var itt = CreateItt(contact);
-        var induction = CreateInduction();
-        var inductionPeriods = CreateInductionPeriods();
 
-        var npqQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.NPQLL, null, dfeta_qualificationState.Active, null);
-        var npqQualificationInactive = CreateQualification(dfeta_qualification_dfeta_Type.NPQSL, new DateTime(2022, 5, 6), dfeta_qualificationState.Inactive, null);
-        var npqQualificationValid = CreateQualification(dfeta_qualification_dfeta_Type.NPQEYL, new DateTime(2022, 3, 4), dfeta_qualificationState.Active, null);
-        var mandatoryQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, null, dfeta_qualificationState.Active, "Visual Impairment");
-        var mandatoryQualificationNoSpecialism = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 2, 3), dfeta_qualificationState.Active, null);
-        var mandatoryQualificationValid = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 4, 6), dfeta_qualificationState.Active, "Hearing");
-        var mandatoryQualificationInactive = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 4, 8), dfeta_qualificationState.Inactive, "Mutli Sensory Impairment");
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications: null, incidents: null);
 
-        var qualifications = new dfeta_qualification[]
-        {
-            npqQualificationNoAwardDate,
-            npqQualificationInactive,
-            npqQualificationValid,
-            mandatoryQualificationNoAwardDate,
-            mandatoryQualificationNoSpecialism,
-            mandatoryQualificationValid,
-            mandatoryQualificationInactive
-        };
-
-        var incidents = Array.Empty<Incident>();
-
-        ConfigureDataverseApiMock(trn, contact, itt, induction, inductionPeriods, qualifications, incidents);
+        var request = new HttpRequestMessage(HttpMethod.Get, baseUrl);
 
         // Act
         var response = await httpClient.SendAsync(request);
@@ -67,8 +45,6 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 lastName = contact.LastName,
                 middleName = contact.MiddleName,
                 trn = trn,
-                pendingNameChange = false,
-                pendingDateOfBirthChange = false,
                 dateOfBirth = contact.BirthDate?.ToString("yyyy-MM-dd"),
                 nationalInsuranceNumber = contact.dfeta_NINumber,
                 qts = new
@@ -80,96 +56,215 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 {
                     awarded = contact.dfeta_EYTSDate?.ToString("yyyy-MM-dd"),
                     certificateUrl = "/v3/certificates/eyts"
-                },
-                induction = new
-                {
-                    startDate = induction.dfeta_StartDate?.ToString("yyyy-MM-dd"),
-                    endDate = induction.dfeta_CompletionDate?.ToString("yyyy-MM-dd"),
-                    status = induction.dfeta_InductionStatus.ToString(),
-                    certificateUrl = "/v3/certificates/induction",
-                    periods = new[]
-                    {
-                        new
-                        {
-                            startDate = inductionPeriods[0].dfeta_StartDate?.ToString("yyyy-MM-dd"),
-                            endDate = inductionPeriods[0].dfeta_EndDate?.ToString("yyyy-MM-dd"),
-                            terms = inductionPeriods[0].dfeta_Numberofterms,
-                            appropriateBody = new
-                            {
-                                name = inductionPeriods[0].GetAttributeValue<AliasedValue>($"appropriatebody.{Account.Fields.Name}").Value
-                            }
-                        }
-                    }
-                },
-                initialTeacherTraining = new[]
-                {
-                    new
-                    {
-                        qualification = new
-                        {
-                            name = itt.GetAttributeValue<AliasedValue>($"qualification.{dfeta_ittqualification.Fields.dfeta_name}").Value
-                        },
-                        programmeType = itt.dfeta_ProgrammeType.ToString(),
-                        startDate = itt.dfeta_ProgrammeStartDate?.ToString("yyyy-MM-dd"),
-                        endDate = itt.dfeta_ProgrammeEndDate?.ToString("yyyy-MM-dd"),
-                        result = itt.dfeta_Result?.ToString(),
-                        ageRange = new
-                        {
-                            description = "11 to 16 years"
-                        },
-                        provider = new
-                        {
-                            name = itt.GetAttributeValue<AliasedValue>($"establishment.{Account.Fields.Name}").Value,
-                            ukprn = itt.GetAttributeValue<AliasedValue>($"establishment.{Account.Fields.dfeta_UKPRN}").Value
-                        },
-                        subjects = new[]
-                        {
-                            new
-                            {
-                                code = itt.GetAttributeValue<AliasedValue>($"subject1.{dfeta_ittsubject.Fields.dfeta_Value}").Value,
-                                name = itt.GetAttributeValue<AliasedValue>($"subject1.{dfeta_ittsubject.Fields.dfeta_name}").Value
-                            },
-                            new
-                            {
-                                code = itt.GetAttributeValue<AliasedValue>($"subject2.{dfeta_ittsubject.Fields.dfeta_Value}").Value,
-                                name = itt.GetAttributeValue<AliasedValue>($"subject2.{dfeta_ittsubject.Fields.dfeta_name}").Value
-                            },
-                            new
-                            {
-                                code = itt.GetAttributeValue<AliasedValue>($"subject3.{dfeta_ittsubject.Fields.dfeta_Value}").Value,
-                                name = itt.GetAttributeValue<AliasedValue>($"subject3.{dfeta_ittsubject.Fields.dfeta_name}").Value
-                            }
-                        }
-                    }
-                },
-                npqQualifications = new[]
-                {
-                    new
-                    {
-                        awarded = npqQualificationValid.dfeta_CompletionorAwardDate?.ToString("yyyy-MM-dd"),
-                        type = new
-                        {
-                            code = npqQualificationValid.dfeta_Type.ToString(),
-                            name = npqQualificationValid.dfeta_Type?.GetName()
-                        },
-                        certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.Id}"
-                    }
-                },
-                mandatoryQualifications = new[]
-                {
-                    new
-                    {
-                        awarded = mandatoryQualificationValid.dfeta_MQ_Date?.ToString("yyyy-MM-dd"),
-                        specialism = mandatoryQualificationValid.GetAttributeValue<AliasedValue>($"{dfeta_specialism.EntityLogicalName}.{dfeta_specialism.Fields.dfeta_name}").Value
-                    }
                 }
             },
             StatusCodes.Status200OK);
     }
 
+    protected async Task ValidRequestWithInduction_ReturnsExpectedInductionContent(
+        HttpClient httpClient,
+        string baseUrl,
+        string trn)
+    {
+        // Arrange
+        var contact = CreateContact(trn);
+        var induction = CreateInduction();
+        var inductionPeriods = CreateInductionPeriods();
+
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction, inductionPeriods, qualifications: null, incidents: null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Induction");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
+        var responseInduction = jsonResponse["induction"];
+
+        AssertEx.JsonObjectEquals(
+            responseInduction,
+            new
+            {
+                startDate = induction.dfeta_StartDate?.ToString("yyyy-MM-dd"),
+                endDate = induction.dfeta_CompletionDate?.ToString("yyyy-MM-dd"),
+                status = induction.dfeta_InductionStatus.ToString(),
+                certificateUrl = "/v3/certificates/induction",
+                periods = new[]
+                {
+                    new
+                    {
+                        startDate = inductionPeriods[0].dfeta_StartDate?.ToString("yyyy-MM-dd"),
+                        endDate = inductionPeriods[0].dfeta_EndDate?.ToString("yyyy-MM-dd"),
+                        terms = inductionPeriods[0].dfeta_Numberofterms,
+                        appropriateBody = new
+                        {
+                            name = inductionPeriods[0].GetAttributeValue<AliasedValue>($"appropriatebody.{Account.Fields.Name}").Value
+                        }
+                    }
+                }
+            });
+    }
+
+    protected async Task ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent(
+        HttpClient httpClient,
+        string baseUrl,
+        string trn)
+    {
+        // Arrange
+        var contact = CreateContact(trn);
+        var itt = CreateItt(contact);
+
+        ConfigureDataverseApiMock(trn, contact, itt, induction: null, inductionPeriods: null, qualifications: null, incidents: null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=InitialTeacherTraining");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
+        var responseItt = jsonResponse["initialTeacherTraining"];
+
+        AssertEx.JsonObjectEquals(
+            responseItt,
+            new[]
+            {
+                new
+                {
+                    qualification = new
+                    {
+                        name = itt.GetAttributeValue<AliasedValue>($"qualification.{dfeta_ittqualification.Fields.dfeta_name}").Value
+                    },
+                    programmeType = itt.dfeta_ProgrammeType.ToString(),
+                    startDate = itt.dfeta_ProgrammeStartDate?.ToString("yyyy-MM-dd"),
+                    endDate = itt.dfeta_ProgrammeEndDate?.ToString("yyyy-MM-dd"),
+                    result = itt.dfeta_Result?.ToString(),
+                    ageRange = new
+                    {
+                        description = "11 to 16 years"
+                    },
+                    provider = new
+                    {
+                        name = itt.GetAttributeValue<AliasedValue>($"establishment.{Account.Fields.Name}").Value,
+                        ukprn = itt.GetAttributeValue<AliasedValue>($"establishment.{Account.Fields.dfeta_UKPRN}").Value
+                    },
+                    subjects = new[]
+                    {
+                        new
+                        {
+                            code = itt.GetAttributeValue<AliasedValue>($"subject1.{dfeta_ittsubject.Fields.dfeta_Value}").Value,
+                            name = itt.GetAttributeValue<AliasedValue>($"subject1.{dfeta_ittsubject.Fields.dfeta_name}").Value
+                        },
+                        new
+                        {
+                            code = itt.GetAttributeValue<AliasedValue>($"subject2.{dfeta_ittsubject.Fields.dfeta_Value}").Value,
+                            name = itt.GetAttributeValue<AliasedValue>($"subject2.{dfeta_ittsubject.Fields.dfeta_name}").Value
+                        },
+                        new
+                        {
+                            code = itt.GetAttributeValue<AliasedValue>($"subject3.{dfeta_ittsubject.Fields.dfeta_Value}").Value,
+                            name = itt.GetAttributeValue<AliasedValue>($"subject3.{dfeta_ittsubject.Fields.dfeta_name}").Value
+                        }
+                    }
+                }
+            });
+    }
+
+    protected async Task ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(
+        HttpClient httpClient,
+        string baseUrl,
+        string trn)
+    {
+        // Arrange
+        var contact = CreateContact(trn);
+
+        var npqQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.NPQLL, null, dfeta_qualificationState.Active, null);
+        var npqQualificationInactive = CreateQualification(dfeta_qualification_dfeta_Type.NPQSL, new DateTime(2022, 5, 6), dfeta_qualificationState.Inactive, null);
+        var npqQualificationValid = CreateQualification(dfeta_qualification_dfeta_Type.NPQEYL, new DateTime(2022, 3, 4), dfeta_qualificationState.Active, null);
+
+        var qualifications = new dfeta_qualification[]
+        {
+            npqQualificationNoAwardDate,
+            npqQualificationInactive,
+            npqQualificationValid
+        };
+
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications, incidents: null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=NpqQualifications");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
+        var responseNpqQualifications = jsonResponse["npqQualifications"];
+
+        AssertEx.JsonObjectEquals(
+            responseNpqQualifications,
+            new[]
+            {
+                new
+                {
+                    awarded = npqQualificationValid.dfeta_CompletionorAwardDate?.ToString("yyyy-MM-dd"),
+                    type = new
+                    {
+                        code = npqQualificationValid.dfeta_Type.ToString(),
+                        name = npqQualificationValid.dfeta_Type?.GetName()
+                    },
+                    certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.Id}"
+                }
+            });
+    }
+
+    protected async Task ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent(
+        HttpClient httpClient,
+        string baseUrl,
+        string trn)
+    {
+        // Arrange
+        var contact = CreateContact(trn);
+
+        var mandatoryQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, null, dfeta_qualificationState.Active, "Visual Impairment");
+        var mandatoryQualificationNoSpecialism = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 2, 3), dfeta_qualificationState.Active, null);
+        var mandatoryQualificationValid = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 4, 6), dfeta_qualificationState.Active, "Hearing");
+        var mandatoryQualificationInactive = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 4, 8), dfeta_qualificationState.Inactive, "Multi Sensory Impairment");
+
+        var qualifications = new dfeta_qualification[]
+        {
+            mandatoryQualificationNoAwardDate,
+            mandatoryQualificationNoSpecialism,
+            mandatoryQualificationValid,
+            mandatoryQualificationInactive
+        };
+
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications, incidents: null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=MandatoryQualifications");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
+        var responseMandatoryQualifications = jsonResponse["mandatoryQualifications"];
+
+        AssertEx.JsonObjectEquals(
+            responseMandatoryQualifications,
+            new[]
+            {
+                new
+                {
+                    awarded = mandatoryQualificationValid.dfeta_MQ_Date?.ToString("yyyy-MM-dd"),
+                    specialism = mandatoryQualificationValid.GetAttributeValue<AliasedValue>($"{dfeta_specialism.EntityLogicalName}.{dfeta_specialism.Fields.dfeta_name}").Value
+                }
+            });
+    }
+
     protected async Task ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(
         HttpClient httpClient,
-        HttpRequestMessage request,
+        string baseUrl,
         string trn)
     {
         // Arrange
@@ -181,7 +276,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             {
                 CustomerId = contact.Id.ToEntityReference(Contact.EntityLogicalName),
                 Title = "Name change request",
-                SubjectId = _changeOfNameSubjectId.ToEntityReference(DataStore.Crm.Models.Subject.EntityLogicalName)
+                SubjectId = _changeOfNameSubjectId.ToEntityReference(Subject.EntityLogicalName)
             }
         };
 
@@ -193,6 +288,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
             inductionPeriods: null,
             qualifications: Array.Empty<dfeta_qualification>(),
             incidents);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=PendingDetailChanges");
 
         // Act
         var response = await httpClient.SendAsync(request);
@@ -204,7 +301,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
 
     protected async Task ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(
         HttpClient httpClient,
-        HttpRequestMessage request,
+        string baseUrl,
         string trn)
     {
         // Arrange
@@ -216,7 +313,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             {
                 CustomerId = contact.Id.ToEntityReference(Contact.EntityLogicalName),
                 Title = "DOB change request",
-                SubjectId = _changeOfDateOfBirthSubjectId.ToEntityReference(DataStore.Crm.Models.Subject.EntityLogicalName)
+                SubjectId = _changeOfDateOfBirthSubjectId.ToEntityReference(Subject.EntityLogicalName)
             }
         };
 
@@ -228,6 +325,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
             inductionPeriods: null,
             qualifications: Array.Empty<dfeta_qualification>(),
             incidents);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=PendingDetailChanges");
 
         // Act
         var response = await httpClient.SendAsync(request);
@@ -248,7 +347,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
     {
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.GetSubjectByTitle("Change of Name", It.IsAny<string[]>()))
-            .ReturnsAsync(new DataStore.Crm.Models.Subject()
+            .ReturnsAsync(new Subject()
             {
                 Id = _changeOfNameSubjectId,
                 Title = "Change of Name"
@@ -256,7 +355,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
 
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.GetSubjectByTitle("Change of Date of Birth", It.IsAny<string[]>()))
-            .ReturnsAsync(new DataStore.Crm.Models.Subject()
+            .ReturnsAsync(new Subject()
             {
                 Id = _changeOfDateOfBirthSubjectId,
                 Title = "Change of Date of Birth"
@@ -292,11 +391,11 @@ public abstract class GetTeacherTestBase : ApiTestBase
                  It.IsAny<string[]>(),
                  It.IsAny<string[]>(),
                  It.IsAny<string[]>()))
-             .ReturnsAsync(qualifications);
+             .ReturnsAsync(qualifications ?? Array.Empty<dfeta_qualification>());
 
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.GetIncidentsByContactId(contact.Id, IncidentState.Active, It.IsAny<string[]>()))
-            .ReturnsAsync(incidents);
+            .ReturnsAsync(incidents ?? Array.Empty<Incident>());
     }
 
     private static Contact CreateContact(string trn)
