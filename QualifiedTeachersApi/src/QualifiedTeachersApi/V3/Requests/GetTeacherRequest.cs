@@ -10,6 +10,7 @@ public record GetTeacherRequest : IRequest<GetTeacherResponse>
 {
     public required string Trn { get; init; }
     public required GetTeacherRequestIncludes Include { get; init; } = GetTeacherRequestIncludes.All;
+    public required AccessMode AccessMode { get; init; }
 }
 
 [Flags]

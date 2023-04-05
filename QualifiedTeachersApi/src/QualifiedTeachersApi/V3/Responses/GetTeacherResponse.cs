@@ -57,6 +57,7 @@ public record GetTeacherResponseQts
 {
     public required DateOnly Awarded { get; init; }
     [SwaggerSchema(Nullable = false)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string CertificateUrl { get; init; }
 }
 
@@ -64,6 +65,7 @@ public record GetTeacherResponseEyts
 {
     public required DateOnly Awarded { get; init; }
     [SwaggerSchema(Nullable = false)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string CertificateUrl { get; init; }
 }
 
@@ -72,6 +74,8 @@ public record GetTeacherResponseInduction
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
     public required InductionStatus? Status { get; init; }
+    [SwaggerSchema(Nullable = false)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string CertificateUrl { get; init; }
     [SwaggerSchema(Nullable = false)]
     public required IEnumerable<GetTeacherResponseInductionPeriod> Periods { get; init; }
@@ -137,6 +141,7 @@ public record GetTeacherResponseNpqQualificationsQualification
     public required DateOnly Awarded { get; init; }
     public required GetTeacherResponseNpqQualificationsQualificationType Type { get; init; }
     [SwaggerSchema(Nullable = false)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string CertificateUrl { get; init; }
 }
 

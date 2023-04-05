@@ -34,7 +34,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, trn);
+        return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestWithInduction_ReturnsExpectedInductionContent(httpClient, baseUrl, trn);
+        return ValidRequestWithInduction_ReturnsExpectedInductionContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(httpClient, baseUrl, trn);
+        return ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
     }
 
     [Fact]

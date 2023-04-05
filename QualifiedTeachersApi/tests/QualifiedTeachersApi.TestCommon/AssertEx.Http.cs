@@ -32,7 +32,7 @@ public static partial class AssertEx
     public static async Task JsonResponseEquals(HttpResponseMessage response, object expected, int expectedStatusCode = StatusCodes.Status200OK)
     {
         var jsonResponse = await JsonResponse<JObject>(response, expectedStatusCode);
-        JsonObjectEquals(jsonResponse, JToken.FromObject(expected));
+        JsonObjectEquals(jsonResponse, expected is JToken expectedJToken ? expectedJToken : JToken.FromObject(expected));
     }
 
     public static async Task ResponseIsError(HttpResponseMessage response, int errorCode, int expectedStatusCode)

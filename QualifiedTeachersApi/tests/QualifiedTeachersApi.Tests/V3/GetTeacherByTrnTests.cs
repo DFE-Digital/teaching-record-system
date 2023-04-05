@@ -47,7 +47,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var trn = "1234567";
         var baseUrl = $"/v3/teachers/{trn}";
 
-        return ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, trn);
+        return ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, trn, expectCertificateUrls: false);
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var trn = "1234567";
         var baseUrl = $"/v3/teachers/{trn}";
 
-        return ValidRequestWithInduction_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn);
+        return ValidRequestWithInduction_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn, expectCertificateUrls: false);
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var trn = "1234567";
         var baseUrl = $"/v3/teachers/{trn}";
 
-        return ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn);
+        return ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn, expectCertificateUrls: false);
     }
 
     [Fact]
