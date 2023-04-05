@@ -1,4 +1,5 @@
-﻿using AspNetCoreRateLimit;
+﻿#nullable disable
+using AspNetCoreRateLimit;
 using Microsoft.Extensions.Options;
 using BaseRateLimitConfiguration = AspNetCoreRateLimit.RateLimitConfiguration;
 

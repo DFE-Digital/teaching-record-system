@@ -1,4 +1,5 @@
-﻿namespace QualifiedTeachersApi.ModelBinding;
+﻿#nullable disable
+namespace QualifiedTeachersApi.ModelBinding;
 
 public static class Constants
 {

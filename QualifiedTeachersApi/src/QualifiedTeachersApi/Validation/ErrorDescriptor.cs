@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using QualifiedTeachersApi.Properties;
 
 namespace QualifiedTeachersApi.Validation;

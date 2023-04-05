@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Configuration;

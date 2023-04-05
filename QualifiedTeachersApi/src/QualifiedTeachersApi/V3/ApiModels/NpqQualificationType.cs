@@ -1,4 +1,5 @@
-﻿namespace QualifiedTeachersApi.V3.ApiModels;
+﻿#nullable disable
+namespace QualifiedTeachersApi.V3.ApiModels;
 
 public enum NpqQualificationType
 {

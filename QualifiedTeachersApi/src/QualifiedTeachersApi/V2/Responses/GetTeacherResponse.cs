@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Collections.Generic;
 using QualifiedTeachersApi.V2.ApiModels;

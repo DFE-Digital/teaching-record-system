@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿#nullable disable
+using Microsoft.Extensions.DependencyInjection;
 using QualifiedTeachersApi.Tests.DataverseIntegration;
 
 namespace QualifiedTeachersApi.Tests;

@@ -1,3 +1,4 @@
+#nullable disable
 using Xunit;
 
 namespace QualifiedTeachersApi.Tests;

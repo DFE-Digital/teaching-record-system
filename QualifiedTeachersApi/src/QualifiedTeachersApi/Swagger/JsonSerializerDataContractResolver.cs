@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using System.Text.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WrappedResolver = Swashbuckle.AspNetCore.SwaggerGen.JsonSerializerDataContractResolver;

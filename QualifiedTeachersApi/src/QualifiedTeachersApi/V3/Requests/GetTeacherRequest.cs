@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using MediatR;
 using QualifiedTeachersApi.Swagger;
 using QualifiedTeachersApi.V3.Responses;

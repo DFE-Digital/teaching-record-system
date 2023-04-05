@@ -1,4 +1,5 @@
-﻿using QualifiedTeachersApi.DataStore.Crm;
+﻿#nullable disable
+using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using Xunit;
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Moq;

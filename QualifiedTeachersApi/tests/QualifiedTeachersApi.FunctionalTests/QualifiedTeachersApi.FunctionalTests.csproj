@@ -6,6 +6,7 @@
     <IsPackable>false</IsPackable>
     <RunSettingsFilePath>$(MSBuildProjectDirectory)\dev.runsettings</RunSettingsFilePath>
     <UserSecretsId>QualifiedTeachersApiFunctionalTests</UserSecretsId>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

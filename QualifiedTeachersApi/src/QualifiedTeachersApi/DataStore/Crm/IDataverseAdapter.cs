@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Threading.Tasks;
 using QualifiedTeachersApi.DataStore.Crm.Models;

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xrm.Sdk;
+﻿#nullable disable
+using Microsoft.Xrm.Sdk;
 
 namespace QualifiedTeachersApi.DataStore.Crm;
 

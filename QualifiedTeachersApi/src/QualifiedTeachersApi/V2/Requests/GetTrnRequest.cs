@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿#nullable disable
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using QualifiedTeachersApi.V2.Responses;
 using Swashbuckle.AspNetCore.Annotations;

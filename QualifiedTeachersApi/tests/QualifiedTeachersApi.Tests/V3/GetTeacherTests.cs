@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿#nullable disable
+using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Xunit;
 

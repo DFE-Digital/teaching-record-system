@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿#nullable disable
+using Microsoft.AspNetCore.Http;
 using Sentry;
 using Sentry.Extensibility;
 

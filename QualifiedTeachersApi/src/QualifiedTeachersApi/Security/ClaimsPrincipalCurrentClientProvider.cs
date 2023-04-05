@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿#nullable disable
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
 namespace QualifiedTeachersApi.Security;

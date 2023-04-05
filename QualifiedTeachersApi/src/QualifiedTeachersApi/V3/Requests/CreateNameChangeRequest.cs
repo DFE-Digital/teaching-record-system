@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿#nullable disable
+using MediatR;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V3.Requests;

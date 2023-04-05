@@ -1,4 +1,5 @@
-﻿namespace QualifiedTeachersApi.DataStore.Crm.Models;
+﻿#nullable disable
+namespace QualifiedTeachersApi.DataStore.Crm.Models;
 
 public static class AttributeConstraints
 {

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿#nullable disable
+using Microsoft.EntityFrameworkCore;
 using QualifiedTeachersApi.DataStore.Sql;
 using Respawn;
 

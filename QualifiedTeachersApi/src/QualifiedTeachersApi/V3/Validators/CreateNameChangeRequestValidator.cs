@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿#nullable disable
+using FluentValidation;
 using QualifiedTeachersApi.V3.Requests;
 
 namespace QualifiedTeachersApi.V3.Validators;
