@@ -49,6 +49,14 @@ public static class ExecuteTransactionRequestExtensions
             request => request is CreateRequest createRequest && createRequest.Target is TEntity);
     }
 
+    public static void AssertDoesNotContainCreateRequest<TEntity>(this ExecuteTransactionRequest request, Predicate<TEntity> predicate)
+        where TEntity : Entity
+    {
+        Assert.DoesNotContain(
+            request.Requests,
+            request => request is CreateRequest createRequest && createRequest.Target is TEntity createTarget && predicate(createTarget));
+    }
+
     public static TEntity AssertSingleUpdateRequest<TEntity>(this ExecuteTransactionRequest request)
         where TEntity : Entity
     {
