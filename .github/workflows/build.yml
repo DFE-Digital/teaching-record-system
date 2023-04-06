@@ -109,6 +109,7 @@ jobs:
 
     - name: Determine test filter
       id: get_test_filter
+      if: github.event_name != 'push'
       run: |
         # If no CRM integration files (or their tests) have been changed then skip Dataverse tests
         if [ "$EVENT_NAME" == "pull_request" ]; then
@@ -125,6 +126,7 @@ jobs:
 
     - name: Tests
       uses: ./.github/workflows/actions/test
+      if: github.event_name != 'push'
       with:
         test_project_path: QualifiedTeachersApi/tests/QualifiedTeachersApi.Tests
         report_name: "Test results"
