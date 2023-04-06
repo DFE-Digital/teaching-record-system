@@ -12,36 +12,34 @@ using Xunit;
 
 namespace QualifiedTeachersApi.Tests.V3;
 
-public class CreateNameChangeTests : ApiTestBase
+public class CreateDateOfBirthChangeTests : ApiTestBase
 {
-    public CreateNameChangeTests(ApiFixture apiFixture)
+    public CreateDateOfBirthChangeTests(ApiFixture apiFixture)
         : base(apiFixture)
     {
     }
 
     [Theory]
-    [InlineData(null, "First", "Middle", "Last", "evidence.jpg", "https://place.com/evidence.jpg")]
-    [InlineData("1234567", null, "Middle", "Last", "evidence.jpg", "https://place.com/evidence.jpg")]
-    [InlineData("1234567", "First", "Middle", null, "evidence.jpg", "https://place.com/evidence.jpg")]
-    [InlineData("1234567", "First", "Middle", "Last", null, "https://place.com/evidence.jpg")]
-    [InlineData("1234567", "First", "Middle", "Last", "evidence.jpg", null)]
+    [InlineData(null, "1990-07-01", "evidence.jpg", "https://place.com/evidence.jpg")]
+    [InlineData("1234567", null, "evidence.jpg", "https://place.com/evidence.jpg")]
+    [InlineData("1234567", "1990-07-01", "evidence.jpg", "https://place.com/evidence.jpg")]
+    [InlineData("1234567", "1990-07-01", null, "https://place.com/evidence.jpg")]
+    [InlineData("1234567", "1990-07-01", "evidence.jpg", null)]
     public async Task Post_InvalidRequest_ReturnsBadRequest(
         string? trn,
-        string? newFirstName,
-        string? newMiddleName,
-        string? newLastName,
+        string? newDateOfBirthString,
         string? evidenceFileName,
         string? evidenceFileUrl)
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/name-changes")
+        var newDateOfBirth = newDateOfBirthString is not null ? DateOnly.ParseExact(newDateOfBirthString, "yyyy-MM-dd") : (DateOnly?)null;
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/date-of-birth-changes")
         {
             Content = CreateJsonContent(new
             {
                 trn,
-                firstName = newFirstName,
-                middleName = newMiddleName,
-                lastName = newLastName,
+                dateOfBirth = newDateOfBirth,
                 evidenceFileName,
                 evidenceFileUrl
             })
@@ -60,9 +58,7 @@ public class CreateNameChangeTests : ApiTestBase
         // Arrange
         var trn = "1234567";
         var contactId = Guid.NewGuid();
-        var newFirstName = Faker.Name.First();
-        var newMiddleName = Faker.Name.Middle();
-        var newLastName = Faker.Name.Last();
+        var newDateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
 
         var evidenceFileName = "evidence.txt";
         var evidenceFileUrl = Faker.Internet.SecureUrl();
@@ -72,14 +68,12 @@ public class CreateNameChangeTests : ApiTestBase
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync((Contact?)null);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/name-changes")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/date-of-birth-changes")
         {
             Content = CreateJsonContent(new
             {
                 trn,
-                firstName = newFirstName,
-                middleName = newMiddleName,
-                lastName = newLastName,
+                dateOfBirth = newDateOfBirth,
                 evidenceFileName,
                 evidenceFileUrl
             })
@@ -98,9 +92,7 @@ public class CreateNameChangeTests : ApiTestBase
         // Arrange
         var trn = "1234567";
         var contactId = Guid.NewGuid();
-        var newFirstName = Faker.Name.First();
-        var newMiddleName = Faker.Name.Middle();
-        var newLastName = Faker.Name.Last();
+        var newDateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
 
         var evidenceFileName = "evidence.txt";
         var evidenceFileUrl = Faker.Internet.SecureUrl();
@@ -114,14 +106,12 @@ public class CreateNameChangeTests : ApiTestBase
                 dfeta_TRN = trn
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/name-changes")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/date-of-birth-changes")
         {
             Content = CreateJsonContent(new
             {
                 trn,
-                firstName = newFirstName,
-                middleName = newMiddleName,
-                lastName = newLastName,
+                dateOfBirth = newDateOfBirth,
                 evidenceFileName,
                 evidenceFileUrl
             })
@@ -140,9 +130,7 @@ public class CreateNameChangeTests : ApiTestBase
         // Arrange
         var trn = "1234567";
         var contactId = Guid.NewGuid();
-        var newFirstName = Faker.Name.First();
-        var newMiddleName = Faker.Name.Middle();
-        var newLastName = Faker.Name.Last();
+        var newDateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
 
         var evidenceFileName = "evidence.txt";
         var evidenceFileUrl = Faker.Internet.SecureUrl();
@@ -173,14 +161,12 @@ public class CreateNameChangeTests : ApiTestBase
                 .RegisterWith(options);
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/name-changes")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/date-of-birth-changes")
         {
             Content = CreateJsonContent(new
             {
                 trn,
-                firstName = newFirstName,
-                middleName = newMiddleName,
-                lastName = newLastName,
+                dateOfBirth = newDateOfBirth,
                 evidenceFileName,
                 evidenceFileUrl
             })
@@ -193,12 +179,10 @@ public class CreateNameChangeTests : ApiTestBase
         Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode);
 
         ApiFixture.DataverseAdapter
-            .Verify(mock => mock.CreateNameChangeIncident(It.Is<CreateNameChangeIncidentCommand>(cmd =>
+            .Verify(mock => mock.CreateDateOfBirthChangeIncident(It.Is<CreateDateOfBirthChangeIncidentCommand>(cmd =>
                 cmd.Trn == trn &&
                 cmd.ContactId == contactId &&
-                cmd.FirstName == newFirstName &&
-                cmd.MiddleName == newMiddleName &&
-                cmd.LastName == newLastName &&
+                cmd.DateOfBirth == newDateOfBirth &&
                 cmd.EvidenceFileName == evidenceFileName &&
                 cmd.EvidenceFileMimeType == "text/plain")));
     }

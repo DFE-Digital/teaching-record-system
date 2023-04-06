@@ -84,6 +84,8 @@ public interface IDataverseAdapter
 
     Task<Guid> CreateNameChangeIncident(CreateNameChangeIncidentCommand command);
 
+    Task<Guid> CreateDateOfBirthChangeIncident(CreateDateOfBirthChangeIncidentCommand command);
+
     Task<Subject> GetSubjectByTitle(string title, string[] columnNames);
 
     Task<Incident[]> GetIncidentsByContactId(Guid contactId, IncidentState? state, string[] columnNames);

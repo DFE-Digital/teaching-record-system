@@ -5,7 +5,6 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using QualifiedTeachersApi.Json;
 
 namespace QualifiedTeachersApi.Services.GetAnIdentityApi;
 
@@ -20,11 +19,7 @@ public class GetAnIdentityApiClient : IGetAnIdentityApiClient
 
         _jsonOptions = new JsonSerializerOptions()
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters =
-            {
-                new DateOnlyConverter()
-            }
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
     }
 
