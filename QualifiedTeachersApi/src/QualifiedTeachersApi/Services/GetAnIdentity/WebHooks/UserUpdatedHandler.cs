@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Threading;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -28,6 +27,11 @@ public class UserUpdatedHandler : IRequestHandler<UserUpdatedRequest>
 
     public async Task Handle(UserUpdatedRequest request, CancellationToken cancellationToken)
     {
+        if (request.Trn is null)
+        {
+            return;
+        }
+
         await using var trnLock = await _distributedLockService.AcquireLock(request.Trn, _lockTimeout);
 
         var teacher = await _dataverseAdapter.GetTeacherByTrn(
