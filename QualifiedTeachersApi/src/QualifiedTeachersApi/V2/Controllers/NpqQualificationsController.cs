@@ -28,7 +28,7 @@ public class NpqQualificationsController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SetNpqQualification([FromBody] SetNpqQualificationRequest request)
     {
-        var response = await _mediator.Send(request);
+        await _mediator.Send(request);
         return NoContent();
     }
 }

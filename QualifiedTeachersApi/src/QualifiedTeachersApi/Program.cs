@@ -9,7 +9,6 @@ using AspNetCoreRateLimit;
 using AspNetCoreRateLimit.Redis;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -221,7 +220,7 @@ public class Program
         var healthCheckBuilder = services.AddHealthChecks()
             .AddNpgSql(pgConnectionString);
 
-        services.AddMediatR(typeof(Program));
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
         services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
         services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
         services.AddSwaggerExamplesFromAssemblyOf<Program>();

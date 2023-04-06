@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
@@ -23,7 +22,7 @@ public class SetNpqQualificationHandler : IRequestHandler<SetNpqQualificationReq
         _dataverseAdapter = dataverseAdapter;
     }
 
-    public async Task<Unit> Handle(SetNpqQualificationRequest request, CancellationToken cancellationToken)
+    public async Task Handle(SetNpqQualificationRequest request, CancellationToken cancellationToken)
     {
         var contact = await _dataverseAdapter.GetTeacherByTrn(
             request.Trn,
@@ -56,8 +55,6 @@ public class SetNpqQualificationHandler : IRequestHandler<SetNpqQualificationReq
         {
             throw CreateValidationExceptionFromFailedReasons(setNpqQualificationResult.FailedReasons);
         }
-
-        return Unit.Value;
     }
 
     private ValidationException CreateValidationExceptionFromFailedReasons(SetNpqQualificationFailedReasons failedReasons)

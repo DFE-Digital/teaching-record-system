@@ -77,7 +77,7 @@ public static class GetAnIdentityEndpoints
                         UpdateTimeUtc = notification.TimeUtc
                     };
 
-                    _ = await mediator.Send(request);
+                    await mediator.Send(request);
                 }
 
                 return Results.NoContent();

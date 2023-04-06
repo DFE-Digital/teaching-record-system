@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
@@ -29,7 +28,7 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
         _distributedLockService = distributedLockService;
     }
 
-    public async Task<Unit> Handle(UpdateTeacherRequest request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateTeacherRequest request, CancellationToken cancellationToken)
     {
         await using var trnLock = await _distributedLockService.AcquireLock(request.Trn, _lockTimeout);
 
@@ -88,8 +87,6 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
         {
             throw CreateValidationExceptionFromFailedReasons(updateTeacherResult.FailedReasons);
         }
-
-        return Unit.Value;
     }
 
     private ValidationException CreateValidationExceptionFromFailedReasons(UpdateTeacherFailedReasons failedReasons)

@@ -2,7 +2,6 @@
 using System;
 using System.Net.Http;
 using System.Threading;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.StaticFiles;
 using QualifiedTeachersApi.DataStore.Crm;
@@ -24,7 +23,7 @@ public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
         _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
     }
 
-    public async Task<Unit> Handle(CreateNameChangeRequest request, CancellationToken cancellationToken)
+    public async Task Handle(CreateNameChangeRequest request, CancellationToken cancellationToken)
     {
         var person = await _dataverseAdapter.GetTeacherByTrn(request.Trn, columnNames: Array.Empty<string>());
 
@@ -62,7 +61,5 @@ public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
         };
 
         await _dataverseAdapter.CreateNameChangeIncident(command);
-
-        return Unit.Value;
     }
 }
