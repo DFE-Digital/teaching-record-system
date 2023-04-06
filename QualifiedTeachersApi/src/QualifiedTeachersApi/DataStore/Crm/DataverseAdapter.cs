@@ -3,12 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using Microsoft.PowerPlatform.Dataverse.Client.Utils;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
@@ -924,8 +922,8 @@ public partial class DataverseAdapter : IDataverseAdapter
             await _service.UpdateAsync(update);
             return true;
         }
-        catch (DataverseOperationException ex)
-            when (ex.InnerException is Microsoft.Rest.HttpOperationException httpException && httpException.Response.StatusCode == HttpStatusCode.NotFound)
+        catch (FaultException<OrganizationServiceFault> fault)
+            when (fault.Message.Contains(" does not exist", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
