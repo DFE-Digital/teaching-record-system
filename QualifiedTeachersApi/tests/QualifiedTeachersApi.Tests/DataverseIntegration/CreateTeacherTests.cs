@@ -110,66 +110,6 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     }
 
     [Fact]
-    public async Task Given_husid_does_not_exist_request_succeeds_and_does_not_creates_review_task()
-    {
-        // Arrange
-        var husid = Guid.NewGuid().ToString();
-        var command = new CreateTeacherCommand()
-        {
-            FirstName = "Minsnie",
-            LastName = "Rydser",
-            BirthDate = new(1990, 5, 23),
-            GenderCode = Contact_GenderCode.Female,
-            InitialTeacherTraining = new()
-            {
-                ProviderUkprn = "10044534",  // ARK Teacher Training
-                ProgrammeStartDate = new(2020, 4, 1),
-                ProgrammeEndDate = new(2020, 10, 10),
-                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
-                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
-            },
-            HusId = husid
-        };
-
-        // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
-
-        // Assert
-        Assert.True(result.Succeeded);
-        transactionRequest.AssertDoesNotContainCreateRequest<CrmTask>(x => x.Description.Contains($"HusId - {husid}"));
-    }
-
-    [Fact]
-    public async Task Given_husid_exists_request_succeeds_and_creates_review_task()
-    {
-        // Arrange
-        var husid = "123456";  //teacher with husid already exists because of CreateTeacherFixture initialize
-        var command = new CreateTeacherCommand()
-        {
-            FirstName = "Minnie",
-            LastName = "Ryder",
-            BirthDate = new(1990, 5, 23),
-            GenderCode = Contact_GenderCode.Female,
-            InitialTeacherTraining = new()
-            {
-                ProviderUkprn = "10044534",  // ARK Teacher Training
-                ProgrammeStartDate = new(2020, 4, 1),
-                ProgrammeEndDate = new(2020, 10, 10),
-                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
-                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
-            },
-            HusId = husid
-        };
-
-        // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
-
-        // Assert
-        Assert.True(result.Succeeded);
-        transactionRequest.AssertContainsCreateRequest<CrmTask>(x => x.Description.Contains($"HusId - {husid}"));
-    }
-
-    [Fact]
     public async Task Given_specified_qualification_type_creates_qualification_with_type()
     {
         // Arrange
@@ -825,7 +765,6 @@ public class CreateTeacherFixture : IAsyncLifetime
     public string ExistingTeacherFirstName => "Joe";
     public string ExistingTeacherFirstNameMiddleName => "X";
     public string ExistingTeacherFirstNameLastName => "Bloggs";
-    public string ExistingTeacherHusId => "123456";
     public DateTime ExistingTeacherFirstNameBirthDate => new DateTime(1990, 5, 23);
 
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
@@ -837,8 +776,7 @@ public class CreateTeacherFixture : IAsyncLifetime
             FirstName = ExistingTeacherFirstName,
             MiddleName = ExistingTeacherFirstNameMiddleName,
             LastName = ExistingTeacherFirstNameLastName,
-            BirthDate = ExistingTeacherFirstNameBirthDate,
-            dfeta_HUSID = ExistingTeacherHusId
+            BirthDate = ExistingTeacherFirstNameBirthDate
         });
     }
 }

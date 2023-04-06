@@ -235,6 +235,11 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             ErrorRegistry.OrganisationNotFound().Title);
 
         ConsumeReason(
+            CreateTeacherFailedReasons.DuplicateHusId,
+            $"{nameof(GetOrCreateTrnRequest.HusId)}",
+            ErrorRegistry.ExistingTeacherAlreadyHasHusId().Title);
+
+        ConsumeReason(
             CreateTeacherFailedReasons.TrainingCountryNotFound,
             $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.TrainingCountryCode)}",
             ErrorRegistry.CountryNotFound().Title);
