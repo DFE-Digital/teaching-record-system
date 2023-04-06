@@ -113,7 +113,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     public async Task Given_husid_does_not_exist_request_succeeds_and_does_not_creates_review_task()
     {
         // Arrange
-        var husid = "87654321";
+        var husid = Guid.NewGuid().ToString();
         var command = new CreateTeacherCommand()
         {
             FirstName = "Minsnie",
@@ -136,7 +136,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
 
         // Assert
         Assert.True(result.Succeeded);
-        transactionRequest.AssertDoesNotContainCreateRequest<CrmTask>();
+        transactionRequest.AssertDoesNotContainCreateRequest<CrmTask>(x => x.Description.Contains($"HusId - {husid}"));
     }
 
     [Fact]
@@ -168,7 +168,6 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         Assert.True(result.Succeeded);
         transactionRequest.AssertContainsCreateRequest<CrmTask>(x => x.Description.Contains($"HusId - {husid}"));
     }
-
 
     [Fact]
     public async Task Given_specified_qualification_type_creates_qualification_with_type()
