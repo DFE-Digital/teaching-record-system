@@ -45,7 +45,7 @@ public abstract class ApiTestBase : IAsyncLifetime, IDisposable
     }
 
     public JsonContent CreateJsonContent(object requestBody) =>
-        JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().Configure());
+        JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().AddConverters());
 
     public virtual void Dispose()
     {

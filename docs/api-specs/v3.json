@@ -404,10 +404,81 @@
           }
         }
       }
+    },
+    "/v3/teachers/date-of-birth-changes": {
+      "post": {
+        "tags": [
+          "Teachers"
+        ],
+        "summary": "Creates a date of birth change for the teacher with the given TRN",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDateOfBirthChangeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDateOfBirthChangeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDateOfBirthChangeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "CreateDateOfBirthChangeRequest": {
+        "type": "object",
+        "properties": {
+          "trn": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidenceFileName": {
+            "type": "string"
+          },
+          "evidenceFileUrl": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateNameChangeRequest": {
         "type": "object",
         "properties": {

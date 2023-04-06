@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -9,10 +8,16 @@ namespace QualifiedTeachersApi.Json;
 
 public static class JsonSerializerOptionsExtensions
 {
-    public static JsonSerializerOptions Configure(this JsonSerializerOptions options)
+    public static JsonSerializerOptions AddConverters(this JsonSerializerOptions options)
     {
         options.Converters.Add(new JsonStringEnumConverter());
-        options.Converters.Add(new DateOnlyConverter());
+
+        return options;
+    }
+
+    internal static JsonSerializerOptions Configure(this JsonSerializerOptions options)
+    {
+        options.AddConverters();
 
         options.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         {
@@ -37,7 +42,7 @@ public static class JsonSerializerOptionsExtensions
                 {
                     propertyInfo.ShouldSerialize = (obj, prop) =>
                         ((IConditionallySerializedProperties)obj).ShouldSerializeProperty(
-                            ((PropertyInfo)propertyInfo.AttributeProvider).Name);
+                            ((PropertyInfo)propertyInfo.AttributeProvider!).Name);
                 }
             }
         }

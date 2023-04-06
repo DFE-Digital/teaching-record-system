@@ -3,15 +3,12 @@ using QualifiedTeachersApi.V3.Requests;
 
 namespace QualifiedTeachersApi.V3.Validators;
 
-public class CreateNameChangeRequestValidator : AbstractValidator<CreateNameChangeRequest>
+public class CreateDateOfBirthChangeRequestValidator : AbstractValidator<CreateDateOfBirthChangeRequest>
 {
-    public CreateNameChangeRequestValidator()
+    public CreateDateOfBirthChangeRequestValidator()
     {
-        RuleFor(r => r.FirstName)
-            .NotEmpty();
-
-        RuleFor(r => r.LastName)
-            .NotEmpty();
+        RuleFor(r => r.DateOfBirth)
+            .NotNull();
 
         RuleFor(r => r.EvidenceFileName)
             .NotEmpty();

@@ -9,12 +9,12 @@ using QualifiedTeachersApi.Validation;
 
 namespace QualifiedTeachersApi.V3.Handlers;
 
-public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
+public class CreateDateOfBirthChangeHandler : IRequestHandler<CreateDateOfBirthChangeRequest>
 {
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly HttpClient _downloadEvidenceFileHttpClient;
 
-    public CreateNameChangeHandler(
+    public CreateDateOfBirthChangeHandler(
         IDataverseAdapter dataverseAdapter,
         IHttpClientFactory httpClientFactory)
     {
@@ -22,7 +22,7 @@ public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
         _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
     }
 
-    public async Task Handle(CreateNameChangeRequest request, CancellationToken cancellationToken)
+    public async Task Handle(CreateDateOfBirthChangeRequest request, CancellationToken cancellationToken)
     {
         var person = await _dataverseAdapter.GetTeacherByTrn(request.Trn, columnNames: Array.Empty<string>());
 
@@ -47,18 +47,16 @@ public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
             evidenceFileMimeType = "application/octet-stream";
         }
 
-        var command = new CreateNameChangeIncidentCommand()
+        var command = new CreateDateOfBirthChangeIncidentCommand()
         {
             ContactId = person.Id,
             Trn = request.Trn,
-            FirstName = request.FirstName,
-            MiddleName = request.MiddleName,
-            LastName = request.LastName,
+            DateOfBirth = request.DateOfBirth,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileContent = await evidenceFileResponse.Content.ReadAsStreamAsync(),
             EvidenceFileMimeType = evidenceFileMimeType
         };
 
-        await _dataverseAdapter.CreateNameChangeIncident(command);
+        await _dataverseAdapter.CreateDateOfBirthChangeIncident(command);
     }
 }

@@ -190,6 +190,7 @@
   "incident": [
     "customerid",
     "description",
+    "dfeta_newdateofbirth",
     "dfeta_newfirstname",
     "dfeta_newmiddlename",
     "dfeta_newlastname",

@@ -1,10 +1,8 @@
-﻿#nullable disable
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.ModelBinding;
 using QualifiedTeachersApi.Security;
 using QualifiedTeachersApi.V3.Requests;
@@ -57,10 +55,19 @@ public class TeachersController : ControllerBase
 
     [HttpPost("name-changes")]
     [SwaggerOperation(summary: "Creates a name change for the teacher with the given TRN")]
-    [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateNameChange([FromBody] CreateNameChangeRequest request)
+    {
+        await _mediator.Send(request);
+        return NoContent();
+    }
+
+    [HttpPost("date-of-birth-changes")]
+    [SwaggerOperation(summary: "Creates a date of birth change for the teacher with the given TRN")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateDateOfBirthChange([FromBody] CreateDateOfBirthChangeRequest request)
     {
         await _mediator.Send(request);
         return NoContent();

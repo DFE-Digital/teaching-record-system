@@ -8,12 +8,12 @@ using Xunit;
 
 namespace QualifiedTeachersApi.Tests.DataverseIntegration;
 
-public class CreateNameChangeIncidentTests : IAsyncLifetime
+public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
 {
     private readonly CrmClientFixture.TestDataScope _dataScope;
     private readonly DataverseAdapter _dataverseAdapter;
 
-    public CreateNameChangeIncidentTests(CrmClientFixture crmClientFixture)
+    public CreateDateOfBirthChangeIncidentTests(CrmClientFixture crmClientFixture)
     {
         _dataScope = crmClientFixture.CreateTestDataScope();
         _dataverseAdapter = _dataScope.CreateDataverseAdapter();
@@ -24,32 +24,28 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
     [Fact]
-    public async Task CreateNameChangeIncident_ExecutesSuccessfully()
+    public async Task CreateDateOfBirthChangeIncident_ExecutesSuccessfully()
     {
         // Arrange
         var createPersonResult = await _dataScope.CreateTestDataHelper().CreatePerson();
 
-        var newFirstName = Faker.Name.First();
-        var newMiddleName = Faker.Name.Middle();
-        var newLastName = Faker.Name.Last();
+        var newDateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
         var evidenceFileName = "evidence.txt";
         var evidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
         var evidenceFileMimeType = "text/plain";
 
-        var command = new CreateNameChangeIncidentCommand()
+        var command = new CreateDateOfBirthChangeIncidentCommand()
         {
             ContactId = createPersonResult.TeacherId,
             Trn = createPersonResult.Trn,
-            FirstName = newFirstName,
-            MiddleName = newMiddleName,
-            LastName = newLastName,
+            DateOfBirth = newDateOfBirth,
             EvidenceFileName = evidenceFileName,
             EvidenceFileContent = evidenceFileContent,
             EvidenceFileMimeType = evidenceFileMimeType
         };
 
         // Act
-        var incidentId = await _dataverseAdapter.CreateNameChangeIncident(command);
+        var incidentId = await _dataverseAdapter.CreateDateOfBirthChangeIncident(command);
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
@@ -57,9 +53,7 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         var createdIncident = ctx.IncidentSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(Incident.PrimaryIdAttribute) == incidentId);
         Assert.NotNull(createdIncident);
         Assert.Equal(createPersonResult.TeacherId, createdIncident.CustomerId.Id);
-        Assert.Equal("Request to change name", createdIncident.Title);
-        Assert.Equal(newFirstName, createdIncident.dfeta_NewFirstName);
-        Assert.Equal(newMiddleName, createdIncident.dfeta_NewMiddleName);
-        Assert.Equal(newLastName, createdIncident.dfeta_NewLastName);
+        Assert.Equal("Request to change date of birth", createdIncident.Title);
+        Assert.Equal(newDateOfBirth, createdIncident.dfeta_NewDateofBirth?.ToDateOnly());
     }
 }
