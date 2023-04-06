@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace QualifiedTeachersApi.Services.GetAnIdentity.WebHooks;
+﻿namespace QualifiedTeachersApi.Services.GetAnIdentity.WebHooks;
 
 public record UserUpdatedMessage
 {

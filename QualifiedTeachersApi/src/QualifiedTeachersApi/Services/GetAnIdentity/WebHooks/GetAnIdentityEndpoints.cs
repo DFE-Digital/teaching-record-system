@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -39,10 +38,10 @@ public static class GetAnIdentityEndpoints
 
                 var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
-                NotificationEnvelope notification = null;
+                NotificationEnvelope notification;
                 try
                 {
-                    notification = JsonSerializer.Deserialize<NotificationEnvelope>(body, serializerOptions);
+                    notification = JsonSerializer.Deserialize<NotificationEnvelope>(body, serializerOptions)!;
                 }
                 catch (Exception)
                 {
@@ -57,11 +56,11 @@ public static class GetAnIdentityEndpoints
                         return Results.BadRequest();
                     }
 
-                    UserUpdatedMessage userUpdatedMessage = null;
+                    UserUpdatedMessage userUpdatedMessage;
 
                     try
                     {
-                        userUpdatedMessage = JsonSerializer.Deserialize<UserUpdatedMessage>(jsonPayload.Value, serializerOptions);
+                        userUpdatedMessage = JsonSerializer.Deserialize<UserUpdatedMessage>(jsonPayload.Value, serializerOptions)!;
                     }
                     catch (Exception)
                     {
