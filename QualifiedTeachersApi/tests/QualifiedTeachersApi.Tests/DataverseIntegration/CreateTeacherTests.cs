@@ -406,6 +406,87 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     }
 
     [Fact]
+    public async Task Given_husid_does_not_exist_request_succeeds_and_does_not_creates_review_task()
+    {
+        // Arrange
+        var husid = Guid.NewGuid().ToString();
+        var command = new CreateTeacherCommand()
+        {
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            BirthDate = Faker.Identification.DateOfBirth(),
+            GenderCode = Contact_GenderCode.Female,
+            InitialTeacherTraining = new()
+            {
+                ProviderUkprn = "10044534",  // ARK Teacher Training
+                ProgrammeStartDate = new(2020, 4, 1),
+                ProgrammeEndDate = new(2020, 10, 10),
+                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
+            },
+            HusId = husid
+        };
+
+        // Act
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        transactionRequest.AssertDoesNotContainCreateRequest<CrmTask>();
+    }
+
+    [Fact]
+    public async Task Given_husid_exists_request_succeeds_and_creates_review_task()
+    {
+        // Arrange
+        var husid = Guid.NewGuid().ToString();
+        var teachercommand1 = new CreateTeacherCommand()
+        {
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            BirthDate = Faker.Identification.DateOfBirth(),
+            GenderCode = Contact_GenderCode.Female,
+            InitialTeacherTraining = new()
+            {
+                ProviderUkprn = "10044534",  // ARK Teacher Training
+                ProgrammeStartDate = new(2020, 4, 1),
+                ProgrammeEndDate = new(2020, 10, 10),
+                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
+            },
+            HusId = husid
+        };
+
+        //teacher with husid already exists because it was created above
+        var teachercommand2 = new CreateTeacherCommand()
+        {
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            BirthDate = Faker.Identification.DateOfBirth(),
+            GenderCode = Contact_GenderCode.Female,
+            InitialTeacherTraining = new()
+            {
+                ProviderUkprn = "10044534",  // ARK Teacher Training
+                ProgrammeStartDate = new(2020, 4, 1),
+                ProgrammeEndDate = new(2020, 10, 10),
+                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
+            },
+            HusId = husid
+        };
+        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImpl(teachercommand1);
+
+        // Act
+        var (result2, transactionRequest2) = await _dataverseAdapter.CreateTeacherImpl(teachercommand2);
+
+        // Assert
+        Assert.True(result1.Succeeded);
+        transactionRequest1.AssertDoesNotContainCreateRequest<CrmTask>();
+        Assert.True(result2.Succeeded);
+        transactionRequest2.AssertContainsCreateRequest<CrmTask>(x => x.Description.Contains($"- HusId: '{husid}'"));
+    }
+
+    [Fact]
     public void CreateQualificationEntity()
     {
         // Arrange
