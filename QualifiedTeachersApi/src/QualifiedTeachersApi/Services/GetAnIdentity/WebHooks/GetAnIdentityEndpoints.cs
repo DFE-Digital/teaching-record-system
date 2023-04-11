@@ -31,7 +31,7 @@ public static class GetAnIdentityEndpoints
                 var bodyBytes = Encoding.UTF8.GetBytes(body);
                 var calculatedSignature = Convert.ToHexString(HMACSHA256.HashData(secretBytes, bodyBytes));
 
-                if (!calculatedSignature.Equals(signature))
+                if (!calculatedSignature.Equals(signature, StringComparison.OrdinalIgnoreCase))
                 {
                     return Results.Unauthorized();
                 }
