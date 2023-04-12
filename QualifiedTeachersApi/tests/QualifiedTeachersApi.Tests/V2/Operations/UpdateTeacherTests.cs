@@ -111,6 +111,25 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
+
+    [Fact]
+    public async Task Given_InitialTeacherTraining_is_empty_return_error()
+    {
+        // Arrange
+        var trn = "12345";
+        var contact = new Contact() { Id = Guid.NewGuid() };
+        var contactList = new[] { contact };
+        var dob = new DateOnly(1987, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest(req => req.InitialTeacherTraining = null));
+
+        // Assert
+        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}", $"'Initial Teacher Training' must not be empty.");
+    }
+
     [Fact]
     public async Task Given_invalid_itt_provider_returns_error()
     {

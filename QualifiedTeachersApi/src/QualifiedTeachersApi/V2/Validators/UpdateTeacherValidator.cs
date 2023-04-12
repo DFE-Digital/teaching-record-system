@@ -12,20 +12,27 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
 {
     public UpdateTeacherValidator()
     {
-        RuleFor(r => r.InitialTeacherTraining.ProgrammeStartDate)
+        RuleFor(r => r.InitialTeacherTraining)
             .NotNull();
 
+        RuleFor(r => r.InitialTeacherTraining.ProgrammeStartDate)
+            .NotNull()
+            .When(r => r.InitialTeacherTraining != null);
+
         RuleFor(r => r.InitialTeacherTraining.ProgrammeEndDate)
-            .NotNull();
+            .NotNull()
+            .When(r => r.InitialTeacherTraining != null);
 
         RuleFor(r => r.InitialTeacherTraining.ProgrammeType)
             .NotNull()
-            .IsInEnum();
+            .IsInEnum()
+            .When(r => r.InitialTeacherTraining != null);
 
         RuleFor(r => r.InitialTeacherTraining.AgeRangeFrom)
             .Must(v => AgeRange.TryConvertFromValue(v.Value, out _))
             .When(r => r.InitialTeacherTraining.AgeRangeFrom.HasValue)
-            .WithMessage(StringResources.ErrorMessages_AgeMustBe0To19Inclusive);
+            .WithMessage(StringResources.ErrorMessages_AgeMustBe0To19Inclusive)
+            .When(r => r.InitialTeacherTraining != null);
 
         RuleFor(r => r.InitialTeacherTraining.AgeRangeTo)
             .Custom((value, ctx) =>
@@ -46,12 +53,13 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
                 {
                     ctx.AddFailure(ctx.PropertyName, StringResources.ErrorMessages_AgeToCannotBeLessThanAgeFrom);
                 }
-            });
+            }).When(r => r.InitialTeacherTraining != null);
 
         RuleFor(r => r.InitialTeacherTraining.IttQualificationType)
             .IsInEnum()
             .Must(qt => qt != ApiModels.IttQualificationType.InternationalQualifiedTeacherStatus)
-            .When(r => r.InitialTeacherTraining.ProgrammeType != ApiModels.IttProgrammeType.InternationalQualifiedTeacherStatus);
+            .When(r => r.InitialTeacherTraining.ProgrammeType != ApiModels.IttProgrammeType.InternationalQualifiedTeacherStatus)
+            .When(r => r.InitialTeacherTraining != null);
 
 
         RuleFor(r => new { r.InitialTeacherTraining.Outcome, r.InitialTeacherTraining.ProgrammeType })
@@ -74,7 +82,7 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
                         ctx.AddFailure(nameof(request.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
                 }
 
-            });
+            }).When(r => r.InitialTeacherTraining != null); ;
 
         RuleFor(r => r.Qualification.Class)
             .IsInEnum()
@@ -82,7 +90,8 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
 
         RuleFor(r => r.InitialTeacherTraining.ProviderUkprn)
             .NotEmpty()
-            .WithMessage("Initial TeacherTraining ProviderUkprn is required.");
+            .WithMessage("Initial TeacherTraining ProviderUkprn is required.")
+            .When(r => r.InitialTeacherTraining != null); ;
 
         RuleFor(x => x.BirthDate)
             .NotEmpty()
@@ -93,11 +102,13 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
             .When(r => r.Qualification != null);
 
         RuleFor(r => r.InitialTeacherTraining.IttQualificationAim)
-            .IsInEnum();
+            .IsInEnum()
+            .When(r => r.InitialTeacherTraining != null); ;
 
         RuleFor(r => r.InitialTeacherTraining.TrainingCountryCode)
             .Empty()
             .When(r => r.InitialTeacherTraining.ProgrammeType != IttProgrammeType.InternationalQualifiedTeacherStatus, ApplyConditionTo.CurrentValidator)
-            .When(r => r.InitialTeacherTraining != null, ApplyConditionTo.AllValidators);
+            .When(r => r.InitialTeacherTraining != null, ApplyConditionTo.AllValidators)
+            .When(r => r.InitialTeacherTraining != null);
     }
 }
