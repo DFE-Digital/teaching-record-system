@@ -152,7 +152,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             Include = request.Include,
             Trn = request.Trn,
             FirstName = teacher.FirstName,
-            MiddleName = teacher.MiddleName,
+            MiddleName = teacher.MiddleName ?? "",
             LastName = teacher.LastName,
             DateOfBirth = teacher.BirthDate.Value.ToDateOnly(),
             NationalInsuranceNumber = teacher.dfeta_NINumber,
