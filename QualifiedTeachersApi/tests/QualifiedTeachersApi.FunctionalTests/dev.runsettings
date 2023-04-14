@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RunSettings>
-  <RunConfiguration>
-    <EnvironmentVariables>
-      <DOTNET_ENVIRONMENT>Development</DOTNET_ENVIRONMENT>
-      <FunctionalTestsConfig>{}</FunctionalTestsConfig>
-    </EnvironmentVariables>
-  </RunConfiguration>
-</RunSettings>

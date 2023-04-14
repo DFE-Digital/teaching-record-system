@@ -109,5 +109,4 @@ By default the script runs read-only; it calculates the new JSON configuration a
 ## More information
 
 - [Environment setup](docs/environment-setup.md)
-- [Running functional tests](docs/running-functional-tests.md)
 - [Running load tests](docs/running-load-tests.md)
