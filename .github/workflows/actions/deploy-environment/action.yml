@@ -16,8 +16,6 @@ inputs:
   terraform_backend_vars:
     description: 'Path to the backend tfvars file for the environment'
     required: true
-  skip_functional_tests:
-    default: false
 
 outputs:
   environment_url:
@@ -130,11 +128,3 @@ runs:
         TF_VAR_api_app_version: ${{ env.api_version }}
         TF_VAR_migrations_file: ${{ env.MIGRATIONS_FILE }}
       shell: bash
-
-    - uses: ./.github/workflows/actions/functional-tests
-      if: inputs.skip_functional_tests != 'true'
-      with:
-        environment_name: ${{ inputs.environment_name }}
-        azure_credentials: ${{ inputs.azure_credentials }}
-        base_url: ${{ steps.terraform.outputs.url }}
-        key_vault_name: ${{ env.key_vault_name }}

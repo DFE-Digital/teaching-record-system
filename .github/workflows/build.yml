@@ -368,4 +368,3 @@ jobs:
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
         terraform_vars: production.tfvars.json
         terraform_backend_vars: production.backend.tfvars
-        skip_functional_tests: true
