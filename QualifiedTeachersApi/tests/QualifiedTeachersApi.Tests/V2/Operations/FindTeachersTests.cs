@@ -1,6 +1,5 @@
 ﻿#nullable disable
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
@@ -46,7 +45,15 @@ public class FindTeachersTests : ApiTestBase
     public async Task Given_search_returns_a_result_returns_expected_response()
     {
         // Arrange
-        var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference" };
+        var contact1 = new Contact()
+        {
+            FirstName = "test",
+            LastName = "testing",
+            Id = Guid.NewGuid(),
+            dfeta_NINumber = "1111",
+            BirthDate = new DateTime(1988, 2, 1),
+            dfeta_TRN = "someReference"
+        };
 
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
@@ -67,7 +74,7 @@ public class FindTeachersTests : ApiTestBase
                     new
                     {
                          trn = contact1.dfeta_TRN,
-                         emailAddresses = default(List<string>),
+                         emailAddresses = Array.Empty<string>(),
                          firstName = contact1.FirstName,
                          lastName = contact1.LastName,
                          dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
@@ -111,7 +118,15 @@ public class FindTeachersTests : ApiTestBase
         // Arrange
         var account = new Account() { Name = "someProvider" };
 
-        var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 1, 1), dfeta_TRN = "someReference" };
+        var contact1 = new Contact()
+        {
+            FirstName = "test",
+            LastName = "testing",
+            Id = Guid.NewGuid(),
+            dfeta_NINumber = "1111",
+            BirthDate = new DateTime(1988, 1, 1),
+            dfeta_TRN = "someReference"
+        };
 
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.GetIttProviderOrganizationsByName(It.IsAny<string>(), It.IsAny<string[]>(), /*activeOnly: */false))
@@ -125,7 +140,9 @@ public class FindTeachersTests : ApiTestBase
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn={providerUkprn}&IttProviderName={providerName}");
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn={providerUkprn}&IttProviderName={providerName}");
 
         // Act
         var response = await HttpClientWithApiKey.SendAsync(request);
@@ -140,7 +157,7 @@ public class FindTeachersTests : ApiTestBase
                     new
                     {
                          trn = contact1.dfeta_TRN,
-                         emailAddresses = default(List<string>),
+                         emailAddresses = Array.Empty<string>(),
                          firstName = contact1.FirstName,
                          lastName = contact1.LastName,
                          dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
@@ -157,13 +174,23 @@ public class FindTeachersTests : ApiTestBase
     public async Task Given_both_ukprn_and_provider_name_are_specified_returns_error()
     {
         // Arrange
-        var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 1, 1), dfeta_TRN = "someReference" };
+        var contact1 = new Contact()
+        {
+            FirstName = "test",
+            LastName = "testing",
+            Id = Guid.NewGuid(),
+            dfeta_NINumber = "1111",
+            BirthDate = new DateTime(1988, 1, 1),
+            dfeta_TRN = "someReference"
+        };
 
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn=12345678910&IttProviderName=provider");
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn=12345678910&IttProviderName=provider");
 
         // Act
         var response = await HttpClientWithApiKey.SendAsync(request);
@@ -196,7 +223,7 @@ public class FindTeachersTests : ApiTestBase
                     new
                     {
                          trn = contact1.dfeta_TRN,
-                         emailAddresses = default(List<string>),
+                         emailAddresses = Array.Empty<string>(),
                          firstName = contact1.FirstName,
                          lastName = contact1.LastName,
                          dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
@@ -215,7 +242,17 @@ public class FindTeachersTests : ApiTestBase
     public async Task Given_search_returns_a_result_with_activesanctions_set_returns_expected_response(bool? activeSanctions)
     {
         // Arrange
-        var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference", dfeta_ActiveSanctions = activeSanctions };
+        var contact1 = new Contact()
+        {
+            FirstName = "test",
+            LastName = "testing",
+            Id = Guid.NewGuid(),
+            dfeta_NINumber = "1111",
+            BirthDate = new DateTime(1988, 2, 1),
+            dfeta_TRN = "someReference",
+            dfeta_ActiveSanctions = activeSanctions
+        };
+
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
@@ -235,7 +272,7 @@ public class FindTeachersTests : ApiTestBase
                     new
                     {
                          trn = contact1.dfeta_TRN,
-                         emailAddresses = default(List<string>),
+                         emailAddresses = Array.Empty<string>(),
                          firstName = contact1.FirstName,
                          lastName = contact1.LastName,
                          dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),

@@ -1,5 +1,6 @@
 ﻿#nullable disable
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -34,7 +35,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ""));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}",
             expectedError: "Initial TeacherTraining ProviderUkprn is required.");
@@ -53,7 +54,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: "Birthdate",
             expectedError: "Birthdate is required.");
@@ -82,7 +83,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject2 = "some invalid subject"));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
     [Fact]
@@ -108,7 +109,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject3 = "some invalid"));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
 
@@ -127,7 +128,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.InitialTeacherTraining = null));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}", $"'Initial Teacher Training' must not be empty.");
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}", $"'Initial Teacher Training' must not be empty.");
     }
 
     [Fact]
@@ -154,7 +155,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}", ErrorRegistry.TeacherHasNoIncompleteIttRecord().Title);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}", ErrorRegistry.TeacherHasNoIncompleteIttRecord().Title);
     }
 
     [Fact]
@@ -181,7 +182,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.InitialTeacherTraining.Subject1 = subject));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject1)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject1)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
     [Fact]
@@ -208,7 +209,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.InitialTeacherTraining.Subject2 = subject));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
     [Fact]
@@ -235,7 +236,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.InitialTeacherTraining.Subject3 = subject));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
     [Fact]
@@ -291,7 +292,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.Qualification.CountryCode = country));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.CountryCode)}", ErrorRegistry.CountryNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.CountryCode)}", ErrorRegistry.CountryNotFound().Title);
     }
 
     [Fact]
@@ -345,8 +346,13 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}", ErrorRegistry.SubjectNotFound().Title);
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorsForProperties(
+            response,
+            new Dictionary<string, string>()
+            {
+                { $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}", ErrorRegistry.SubjectNotFound().Title },
+                { $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}", ErrorRegistry.SubjectNotFound().Title }
+            });
     }
 
     [Fact]
@@ -373,7 +379,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
     [Fact]
@@ -430,7 +436,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}", StringResources.Errors_10006_Title);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}", StringResources.Errors_10006_Title);
     }
 
     [Fact]
@@ -483,7 +489,7 @@ public class UpdateTeacherTests : ApiTestBase
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}", request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             expectedErrorPropertyName,
             expectedErrorMessage);
@@ -579,7 +585,7 @@ public class UpdateTeacherTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsError(response, errorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
+        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -629,7 +635,7 @@ public class UpdateTeacherTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_OutcomeMustBeDeferredInTrainingOrUnderAssessment);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_OutcomeMustBeDeferredInTrainingOrUnderAssessment);
     }
 
 
@@ -680,7 +686,7 @@ public class UpdateTeacherTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute);
     }
 
     [Theory]
@@ -743,7 +749,7 @@ public class UpdateTeacherTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
     }
 
     [Fact]
@@ -776,7 +782,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest());
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}",
             StringResources.Errors_10004_Title);
@@ -806,7 +812,7 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest());
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             $"{nameof(GetOrCreateTrnRequest.HusId)}.{nameof(GetOrCreateTrnRequest.HusId)}",
             StringResources.Errors_10018_Title);

@@ -83,7 +83,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsError(response, 10001, StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsError(response, 10001, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -121,7 +121,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsError(response, 10028, StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsError(response, 10028, StatusCodes.Status400BadRequest);
     }
 
     [Fact]

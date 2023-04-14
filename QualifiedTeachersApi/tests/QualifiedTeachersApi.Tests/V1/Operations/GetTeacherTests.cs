@@ -31,7 +31,7 @@ public class GetTeacherTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
     }
 
     [Theory]
@@ -46,7 +46,7 @@ public class GetTeacherTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(response, "birthdate", expectedError: $"The value '{birthDate}' is not valid for BirthDate.");
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, "birthdate", expectedError: $"The value '{birthDate}' is not valid for BirthDate.");
     }
 
     [Fact]
@@ -143,6 +143,6 @@ public class GetTeacherTests : ApiTestBase
 
         // Assert
         var responseJson = await AssertEx.JsonResponse(response, expectedStatusCode: StatusCodes.Status200OK);
-        Assert.Equal(matchingTrn, (string)responseJson.trn);
+        Assert.Equal(matchingTrn, responseJson.RootElement.GetProperty("trn").GetString());
     }
 }

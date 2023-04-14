@@ -1,17 +1,15 @@
-﻿#nullable disable
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace QualifiedTeachersApi.V2.Responses;
 
-public class FindTeacherResult
+public record FindTeacherResult
 {
-    public string Trn { get; set; }
-    public List<string> EmailAddresses { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public DateOnly? DateOfBirth { get; set; }
-    public string NationalInsuranceNumber { get; set; }
-    public string Uid { get; set; }
-    public bool HasActiveSanctions { get; set; }
+    public required string Trn { get; set; }
+    public required string[] EmailAddresses { get; set; }
+    public required string FirstName { get; set; }
+    public required string LastName { get; set; }
+    public required DateOnly? DateOfBirth { get; set; }
+    public required string? NationalInsuranceNumber { get; set; }
+    public required string Uid { get; set; }
+    public required bool HasActiveSanctions { get; set; }
 }

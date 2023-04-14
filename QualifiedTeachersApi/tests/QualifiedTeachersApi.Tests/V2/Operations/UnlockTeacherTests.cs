@@ -124,6 +124,6 @@ public class UnlockTeacherTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsError(response, errorCode: 10014, expectedStatusCode: StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10014, expectedStatusCode: StatusCodes.Status400BadRequest);
     }
 }
