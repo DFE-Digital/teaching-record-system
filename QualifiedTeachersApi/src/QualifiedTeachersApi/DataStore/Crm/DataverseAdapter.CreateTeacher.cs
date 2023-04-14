@@ -150,6 +150,7 @@ public partial class DataverseAdapter
                         Contact.Fields.MiddleName => $"  - Middle name: '{_command.MiddleName}'",
                         Contact.Fields.LastName => $"  - Last name: '{_command.LastName}'",
                         Contact.Fields.BirthDate => $"  - Date of birth: '{_command.BirthDate:dd/MM/yyyy}'",
+                        Contact.Fields.dfeta_HUSID => $"  - HusId: '{_command.HusId}'",
                         _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
                     });
                 }
@@ -374,7 +375,8 @@ public partial class DataverseAdapter
                         Contact.Fields.FirstName,
                         Contact.Fields.MiddleName,
                         Contact.Fields.LastName,
-                        Contact.Fields.BirthDate
+                        Contact.Fields.BirthDate,
+                        Contact.Fields.dfeta_HUSID
                     }
                 },
                 Criteria = filter
@@ -410,6 +412,11 @@ public partial class DataverseAdapter
                 )
             };
 
+            if (!string.IsNullOrEmpty(_command.HusId))
+            {
+                attributeMatches = attributeMatches.Concat(new[] { (Contact.Fields.dfeta_HUSID, _command.HusId.Equals(match.dfeta_HUSID)) }).ToArray();
+            }
+
             var matchedAttributeNames = attributeMatches.Where(m => m.Matches).Select(m => m.Attribute).ToArray();
 
             return new CreateTeacherDuplicateTeacherResult()
@@ -418,7 +425,8 @@ public partial class DataverseAdapter
                 MatchedAttributes = matchedAttributeNames,
                 HasActiveSanctions = match.dfeta_ActiveSanctions == true,
                 HasQtsDate = match.dfeta_QTSDate.HasValue,
-                HasEytsDate = match.dfeta_EYTSDate.HasValue
+                HasEytsDate = match.dfeta_EYTSDate.HasValue,
+                HusId = match.dfeta_HUSID
             };
 
             bool TryGetMatchCombinationsFilter(out FilterExpression filter)
@@ -445,6 +453,14 @@ public partial class DataverseAdapter
                 }
 
                 var combinationsFilter = new FilterExpression(LogicalOperator.Or);
+
+                // HusId overrides at least 3 matches so needs to be in its own block
+                if (!string.IsNullOrEmpty(_command.HusId))
+                {
+                    var husIdFilter = new FilterExpression(LogicalOperator.Or);
+                    husIdFilter.AddCondition(Contact.Fields.dfeta_HUSID, ConditionOperator.Equal, _command.HusId);
+                    combinationsFilter.AddFilter(husIdFilter);
+                }
 
                 foreach (var combination in combinations)
                 {
@@ -756,11 +772,6 @@ public partial class DataverseAdapter
                 failedReasons |= CreateTeacherFailedReasons.QualificationNotFound;
             }
 
-            if (referenceData.HaveExistingTeacherWithHusId == true)
-            {
-                failedReasons |= CreateTeacherFailedReasons.DuplicateHusId;
-            }
-
             if (referenceData.IttCountryId == null)
             {
                 failedReasons |= CreateTeacherFailedReasons.TrainingCountryNotFound;
@@ -796,5 +807,6 @@ public partial class DataverseAdapter
         public bool HasActiveSanctions { get; set; }
         public bool HasQtsDate { get; set; }
         public bool HasEytsDate { get; set; }
+        public string HusId { get; set; }
     }
 }
