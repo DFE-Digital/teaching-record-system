@@ -22,6 +22,9 @@ public partial class DataverseAdapter
             dfeta_NewFirstName = command.FirstName,
             dfeta_NewMiddleName = command.MiddleName,
             dfeta_NewLastName = command.LastName,
+            dfeta_StatedFirstName = command.StatedFirstName,
+            dfeta_StatedMiddleName = command.StatedMiddleName,
+            dfeta_StatedLastName = command.StatedLastName
         };
 
         var document = new dfeta_document()

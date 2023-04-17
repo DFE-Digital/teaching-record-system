@@ -33,6 +33,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Contact.Fields.FirstName,
                 Contact.Fields.MiddleName,
                 Contact.Fields.LastName,
+                Contact.Fields.dfeta_StatedFirstName,
+                Contact.Fields.dfeta_StatedMiddleName,
+                Contact.Fields.dfeta_StatedLastName,
                 Contact.Fields.BirthDate,
                 Contact.Fields.dfeta_NINumber,
                 Contact.Fields.dfeta_QTSDate,
@@ -148,12 +151,22 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
         }
 
+        var firstName = teacher.FirstName;
+        var middleName = teacher.MiddleName ?? string.Empty;
+        var lastName = teacher.LastName;
+        if (!string.IsNullOrEmpty(teacher.dfeta_StatedFirstName) && !string.IsNullOrEmpty(teacher.dfeta_StatedLastName))
+        {
+            firstName = teacher.dfeta_StatedFirstName;
+            middleName = teacher.dfeta_StatedMiddleName ?? string.Empty;
+            lastName = teacher.dfeta_StatedLastName;
+        }
+
         return new GetTeacherResponse()
         {
             Trn = request.Trn,
-            FirstName = teacher.FirstName,
-            MiddleName = teacher.MiddleName ?? "",
-            LastName = teacher.LastName,
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
             DateOfBirth = teacher.BirthDate.Value.ToDateOnly(),
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             PendingNameChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingNameChange) : default,

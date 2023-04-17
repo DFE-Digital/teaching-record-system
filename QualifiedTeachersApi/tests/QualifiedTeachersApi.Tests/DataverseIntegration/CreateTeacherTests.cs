@@ -776,11 +776,19 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         CreateTeacherType type = CreateTeacherType.TraineeTeacher,
         Action<CreateTeacherCommand> configureCommand = null)
     {
+        var firstName1 = Faker.Name.First();
+        var firstName2 = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+
         var command = new CreateTeacherCommand()
         {
-            FirstName = Faker.Name.First(),
-            MiddleName = Faker.Name.Middle(),
-            LastName = Faker.Name.Last(),
+            FirstName = firstName1,
+            MiddleName = $"{firstName2} {middleName}",
+            LastName = lastName,
+            StatedFirstName = $"{firstName1} {firstName2}",
+            StatedMiddleName = middleName,
+            StatedLastName = lastName,
             BirthDate = Faker.Identification.DateOfBirth(),
             EmailAddress = Faker.Internet.Email(),
             Address = new()
