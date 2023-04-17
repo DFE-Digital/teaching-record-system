@@ -47,7 +47,7 @@ public class SetIttOutcomeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsError(response, errorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
+        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class SetIttOutcomeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsError(response, errorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
+        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public class SetIttOutcomeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(requestBody.BirthDate),
             expectedError: "Birthdate is required.");
@@ -135,7 +135,7 @@ public class SetIttOutcomeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(requestBody.IttProviderUkprn),
             expectedError: "ITT provider UKPRN is required.");
@@ -165,7 +165,7 @@ public class SetIttOutcomeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(requestBody.AssessmentDate),
             expectedError: "Assessment date must be specified when outcome is Pass.");
@@ -199,7 +199,7 @@ public class SetIttOutcomeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(requestBody.AssessmentDate),
             expectedError: "Assessment date cannot be specified unless outcome is Pass.");
@@ -229,7 +229,7 @@ public class SetIttOutcomeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(requestBody.AssessmentDate),
             expectedError: "QTS date cannot be in the future.");
@@ -272,7 +272,7 @@ public class SetIttOutcomeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsError(response, 10003, expectedStatusCode: StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsError(response, 10003, expectedStatusCode: StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -358,6 +358,6 @@ public class SetIttOutcomeTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.ResponseIsError(response, expectedErrorCode, expectedStatusCode: StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsError(response, expectedErrorCode, expectedStatusCode: StatusCodes.Status400BadRequest);
     }
 }

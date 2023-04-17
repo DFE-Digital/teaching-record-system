@@ -1,10 +1,9 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Net.Http;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Xrm.Sdk;
 using Moq;
-using Newtonsoft.Json.Linq;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.TestCommon;
@@ -39,7 +38,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var expectedJson = JObject.FromObject(new
+        var expectedJson = JsonSerializer.SerializeToNode(new
         {
             firstName = contact.FirstName,
             lastName = contact.LastName,
@@ -57,12 +56,12 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 awarded = contact.dfeta_EYTSDate?.ToString("yyyy-MM-dd"),
                 certificateUrl = "/v3/certificates/eyts"
             }
-        });
+        })!;
 
         if (!expectCertificateUrls)
         {
-            ((JObject)expectedJson["qts"]).Property("certificateUrl").Remove();
-            ((JObject)expectedJson["eyts"]).Property("certificateUrl").Remove();
+            expectedJson["qts"]?.AsObject().Remove("certificateUrl");
+            expectedJson["eyts"]?.AsObject().Remove("certificateUrl");
         }
 
         await AssertEx.JsonResponseEquals(
@@ -90,7 +89,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var expectedJson = JObject.FromObject(new
+        var expectedJson = JsonSerializer.SerializeToNode(new
         {
             startDate = induction.dfeta_StartDate?.ToString("yyyy-MM-dd"),
             endDate = induction.dfeta_CompletionDate?.ToString("yyyy-MM-dd"),
@@ -109,15 +108,15 @@ public abstract class GetTeacherTestBase : ApiTestBase
                     }
                 }
             }
-        });
+        })!;
 
         if (!expectCertificateUrls)
         {
-            expectedJson.Property("certificateUrl").Remove();
+            expectedJson.AsObject().Remove("certificateUrl");
         }
 
-        var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
-        var responseInduction = jsonResponse["induction"];
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responseInduction = jsonResponse.RootElement.GetProperty("induction");
 
         AssertEx.JsonObjectEquals(responseInduction, expectedJson);
     }
@@ -139,8 +138,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
-        var responseItt = jsonResponse["initialTeacherTraining"];
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responseItt = jsonResponse.RootElement.GetProperty("initialTeacherTraining");
 
         AssertEx.JsonObjectEquals(
             responseItt,
@@ -215,7 +214,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var expectedJson = JArray.FromObject(new[]
+        var expectedJson = JsonSerializer.SerializeToNode(new[]
         {
             new
             {
@@ -227,15 +226,15 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 },
                 certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.Id}"
             }
-        });
+        })!;
 
         if (!expectCertificateUrls)
         {
-            ((JObject)expectedJson[0]).Property("certificateUrl").Remove();
+            expectedJson[0]?.AsObject().Remove("certificateUrl");
         }
 
-        var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
-        var responseNpqQualifications = jsonResponse["npqQualifications"];
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responseNpqQualifications = jsonResponse.RootElement.GetProperty("npqQualifications");
 
         AssertEx.JsonObjectEquals(responseNpqQualifications, expectedJson);
     }
@@ -269,8 +268,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
-        var responseMandatoryQualifications = jsonResponse["mandatoryQualifications"];
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responseMandatoryQualifications = jsonResponse.RootElement.GetProperty("mandatoryQualifications");
 
         AssertEx.JsonObjectEquals(
             responseMandatoryQualifications,
@@ -317,8 +316,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
-        Assert.True(jsonResponse["pendingNameChange"].ToObject<bool>());
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        Assert.True(jsonResponse.RootElement.GetProperty("pendingNameChange").GetBoolean());
     }
 
     protected async Task ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(
@@ -354,18 +353,18 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse<JObject>(response);
-        Assert.True(jsonResponse["pendingDateOfBirthChange"].ToObject<bool>());
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        Assert.True(jsonResponse.RootElement.GetProperty("pendingDateOfBirthChange").GetBoolean());
     }
 
     private void ConfigureDataverseApiMock(
         string trn,
         Contact contact,
-        dfeta_initialteachertraining itt,
-        dfeta_induction induction,
-        dfeta_inductionperiod[] inductionPeriods,
-        dfeta_qualification[] qualifications,
-        Incident[] incidents)
+        dfeta_initialteachertraining? itt,
+        dfeta_induction? induction,
+        dfeta_inductionperiod[]? inductionPeriods,
+        dfeta_qualification[]? qualifications,
+        Incident[]? incidents)
     {
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.GetSubjectByTitle("Change of Name", It.IsAny<string[]>()))
@@ -539,7 +538,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         dfeta_qualification_dfeta_Type type,
         DateTime? date,
         dfeta_qualificationState state,
-        string specialismName)
+        string? specialismName)
     {
         var qualification = new dfeta_qualification
         {

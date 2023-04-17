@@ -1,6 +1,4 @@
-﻿#nullable disable
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,7 +71,7 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
             Results = result?.Select(a => new FindTeacherResult()
             {
                 Trn = a.dfeta_TRN,
-                EmailAddresses = !string.IsNullOrEmpty(a.EMailAddress1) ? new List<string> { a.EMailAddress1 } : null,
+                EmailAddresses = !string.IsNullOrEmpty(a.EMailAddress1) ? new[] { a.EMailAddress1 } : Array.Empty<string>(),
                 FirstName = a.FirstName,
                 LastName = a.LastName,
                 DateOfBirth = a.BirthDate.HasValue ? DateOnly.FromDateTime(a.BirthDate.Value) : null,

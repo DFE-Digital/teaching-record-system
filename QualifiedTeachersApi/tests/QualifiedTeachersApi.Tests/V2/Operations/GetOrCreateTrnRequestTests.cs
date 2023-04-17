@@ -111,7 +111,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(GetOrCreateTrnRequest.RequestId),
             expectedError: Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
@@ -127,7 +127,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(GetOrCreateTrnRequest.RequestId),
             expectedError: Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
@@ -220,7 +220,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
 
         // Assert
         Assert.False(response.IsSuccessStatusCode);
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(GetOrCreateTrnRequest.IdentityUserId),
             expectedError: Properties.StringResources.Errors_10022_Title);
@@ -319,7 +319,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject2 = "some invalid subject"));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.Subject2)}",
             expectedError: Properties.StringResources.Errors_10009_Title);
@@ -341,7 +341,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject3 = "some invalid subject"));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.Subject3)}",
             expectedError: Properties.StringResources.Errors_10009_Title);
@@ -364,7 +364,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.ProviderUkprn)}",
             expectedError: Properties.StringResources.Errors_10008_Title);
@@ -387,7 +387,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             CreateRequest(req => req.InitialTeacherTraining.Subject1 = subject));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject1)}",
             expectedError: Properties.StringResources.Errors_10009_Title);
@@ -410,7 +410,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             CreateRequest(req => req.InitialTeacherTraining.Subject2 = subject));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject2)}",
             expectedError: Properties.StringResources.Errors_10009_Title);
@@ -453,7 +453,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             CreateRequest(req => req.Qualification.CountryCode = country));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.CountryCode)}",
             expectedError: Properties.StringResources.Errors_10010_Title);
@@ -476,7 +476,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.Subject)}",
             expectedError: Properties.StringResources.Errors_10009_Title);
@@ -499,7 +499,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             CreateRequest(req => req.Qualification.ProviderUkprn = ukprn));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.ProviderUkprn)}",
             expectedError: Properties.StringResources.Errors_10008_Title);
@@ -543,7 +543,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             "Birthdate",
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
@@ -567,7 +567,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             "Birthdate",
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
@@ -594,7 +594,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             expectedErrorPropertyName,
             expectedErrorMessage);

@@ -1,50 +1,50 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace QualifiedTeachersApi.TestCommon;
 
 public static partial class AssertEx
 {
-    public static async Task<T> JsonResponse<T>(HttpResponseMessage response, int expectedStatusCode = StatusCodes.Status200OK)
+    public static async Task<JsonDocument> JsonResponse(HttpResponseMessage response, int expectedStatusCode = StatusCodes.Status200OK)
     {
-        if (response is null)
-        {
-            throw new ArgumentNullException(nameof(response));
-        }
+        ArgumentNullException.ThrowIfNull(response);
 
         Assert.Equal(expectedStatusCode, (int)response.StatusCode);
-        Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
 
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<T>(json);
+        var result = await response.Content.ReadFromJsonAsync<JsonDocument>(SerializerOptions);
+        Assert.NotNull(result);
+        return result!;
     }
-
-    public static Task<dynamic> JsonResponse(HttpResponseMessage response, int expectedStatusCode = StatusCodes.Status200OK) =>
-        JsonResponse<dynamic>(response, expectedStatusCode);
 
     public static async Task JsonResponseEquals(HttpResponseMessage response, object expected, int expectedStatusCode = StatusCodes.Status200OK)
     {
-        var jsonResponse = await JsonResponse<JObject>(response, expectedStatusCode);
-        JsonObjectEquals(jsonResponse, expected is JToken expectedJToken ? expectedJToken : JToken.FromObject(expected));
+        ArgumentNullException.ThrowIfNull(response);
+        ArgumentNullException.ThrowIfNull(expected);
+
+        var jsonDocument = await JsonResponse(response, expectedStatusCode);
+
+        JsonObjectEquals(expected, jsonDocument);
     }
 
-    public static async Task ResponseIsError(HttpResponseMessage response, int errorCode, int expectedStatusCode)
+    public static async Task JsonResponseIsError(HttpResponseMessage response, int expectedErrorCode, int expectedStatusCode)
     {
         var problemDetails = await ResponseIsProblemDetails(response, expectedStatusCode);
 
+        Assert.NotNull(problemDetails.Extensions);
         Assert.Contains(problemDetails.Extensions, kvp => kvp.Key == "errorCode");
-        Assert.Equal(errorCode, problemDetails.Extensions["errorCode"].ToObject<int>());
+        Assert.Equal(expectedErrorCode, problemDetails.Extensions?["errorCode"].GetInt32());
     }
 
-    public static async Task ResponseIsValidationErrorForProperty(
+    public static async Task JsonResponseHasValidationErrorForProperty(
         HttpResponseMessage response,
         string propertyName,
         string expectedError,
@@ -52,54 +52,58 @@ public static partial class AssertEx
     {
         var problemDetails = await ResponseIsProblemDetails(response, expectedStatusCode);
 
-        Assert.Equal(expectedError, problemDetails.Errors[propertyName].Single());
+        Assert.NotNull(problemDetails.Extensions);
+        Assert.Equal(expectedError, problemDetails.Errors?[propertyName].Single());
+    }
+
+    public static async Task JsonResponseHasValidationErrorsForProperties(
+        HttpResponseMessage response,
+        IReadOnlyDictionary<string, string> expectedErrors,
+        int expectedStatusCode = 400)
+    {
+        var problemDetails = await ResponseIsProblemDetails(response, expectedStatusCode);
+
+        Assert.NotNull(problemDetails.Extensions);
+
+        foreach (var e in expectedErrors)
+        {
+            Assert.Equal(e.Value, problemDetails.Errors?[e.Key].Single());
+        }
     }
 
     private static async Task<ProblemDetails> ResponseIsProblemDetails(HttpResponseMessage response, int expectedStatusCode)
     {
-        if (response is null)
-        {
-            throw new ArgumentNullException(nameof(response));
-        }
+        ArgumentNullException.ThrowIfNull(response);
 
         Assert.Equal(expectedStatusCode, (int)response.StatusCode);
-        Assert.Equal("application/problem+json", response.Content.Headers.ContentType.MediaType);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
 
-        var json = await response.Content.ReadAsStringAsync();
-        var problemDetails = JsonConvert.DeserializeObject<ProblemDetails>(json);
-        Assert.Equal(expectedStatusCode, problemDetails.Status);
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        Assert.NotNull(problemDetails);
+        Assert.Equal(expectedStatusCode, problemDetails!.Status);
 
         return problemDetails;
     }
 
     private class ProblemDetails
     {
-        public string Title { get; set; }
+        public string? Title { get; set; }
         public int Status { get; set; }
-        [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<string[]>))]
-        public Dictionary<string, string[]> Errors { get; set; }
+        [JsonConverter(typeof(ProblemDetailsErrorJsonConverter))]
+        public IDictionary<string, string[]>? Errors { get; set; }
         [JsonExtensionData]
-        public IDictionary<string, JToken> Extensions { get; set; }
+        public IDictionary<string, JsonElement>? Extensions { get; set; }
     }
 
-    private class CaseInsensitiveDictionaryConverter<T> : JsonConverter
+    private class ProblemDetailsErrorJsonConverter : JsonConverter<IDictionary<string, string[]>>
     {
-        public override bool CanConvert(Type objectType) =>
-            objectType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<string, T>));
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override IDictionary<string, string[]>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (reader.TokenType == JsonToken.Null)
-            {
-                return null;
-            }
-
-            var dictionary = new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
-            serializer.Populate(reader, dictionary);
-            return dictionary;
+            var dic = (Dictionary<string, string[]>)JsonSerializer.Deserialize(ref reader, typeToConvert, options)!;
+            return new Dictionary<string, string[]>(dic, StringComparer.OrdinalIgnoreCase);
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, IDictionary<string, string[]> value, JsonSerializerOptions options)
         {
             throw new NotSupportedException();
         }

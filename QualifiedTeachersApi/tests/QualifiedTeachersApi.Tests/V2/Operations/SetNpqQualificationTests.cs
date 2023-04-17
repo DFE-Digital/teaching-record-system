@@ -49,7 +49,7 @@ public class SetNpqQualificationTests : ApiTestBase
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(SetNpqQualificationRequest.CompletionDate)}",
             expectedError: Properties.StringResources.Errors_10022_Title);
@@ -71,7 +71,7 @@ public class SetNpqQualificationTests : ApiTestBase
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
         // Assert
-        await AssertEx.ResponseIsError(response, errorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
+        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public class SetNpqQualificationTests : ApiTestBase
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
         // Assert
-        await AssertEx.ResponseIsValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: $"{nameof(SetNpqQualificationRequest.QualificationType)}",
             expectedError: Properties.StringResources.Errors_10021_Title);
