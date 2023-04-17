@@ -52,6 +52,15 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     }
 
     [Fact]
+    public Task Get_ValidRequestForContactWithMultiWordFirstName_ReturnsExpectedResponse()
+    {
+        var trn = "1234567";        
+        var baseUrl = $"/v3/teacher/{trn}";
+
+        return ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, trn);
+    }
+
+    [Fact]
     public Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
     {
         var trn = "1234567";

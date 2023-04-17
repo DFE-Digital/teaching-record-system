@@ -29,9 +29,10 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         // Arrange
         var createPersonResult = await _dataScope.CreateTestDataHelper().CreatePerson();
 
-        var newFirstName = Faker.Name.First();
+        var newFirstName1 = Faker.Name.First();
+        var newFirstName2 = Faker.Name.First();
         var newMiddleName = Faker.Name.Middle();
-        var newLastName = Faker.Name.Last();
+        var newLastName = Faker.Name.Last();        
         var evidenceFileName = "evidence.txt";
         var evidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
         var evidenceFileMimeType = "text/plain";
@@ -40,9 +41,12 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         {
             ContactId = createPersonResult.TeacherId,
             Trn = createPersonResult.Trn,
-            FirstName = newFirstName,
-            MiddleName = newMiddleName,
+            FirstName = newFirstName1,
+            MiddleName = $"{newFirstName2} {newMiddleName}",
             LastName = newLastName,
+            StatedFirstName = $"{newFirstName1} {newFirstName2}",
+            StatedMiddleName = newMiddleName,
+            StatedLastName = newLastName,
             EvidenceFileName = evidenceFileName,
             EvidenceFileContent = evidenceFileContent,
             EvidenceFileMimeType = evidenceFileMimeType
@@ -58,8 +62,11 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         Assert.NotNull(createdIncident);
         Assert.Equal(createPersonResult.TeacherId, createdIncident.CustomerId.Id);
         Assert.Equal("Request to change name", createdIncident.Title);
-        Assert.Equal(newFirstName, createdIncident.dfeta_NewFirstName);
-        Assert.Equal(newMiddleName, createdIncident.dfeta_NewMiddleName);
-        Assert.Equal(newLastName, createdIncident.dfeta_NewLastName);
+        Assert.Equal(command.FirstName, createdIncident.dfeta_NewFirstName);
+        Assert.Equal(command.MiddleName, createdIncident.dfeta_NewMiddleName);
+        Assert.Equal(command.LastName, createdIncident.dfeta_NewLastName);
+        Assert.Equal(command.StatedFirstName, createdIncident.dfeta_StatedFirstName);
+        Assert.Equal(command.StatedMiddleName, createdIncident.dfeta_StatedMiddleName);
+        Assert.Equal(command.StatedLastName, createdIncident.dfeta_StatedLastName);
     }
 }

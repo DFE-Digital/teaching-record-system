@@ -95,6 +95,9 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 FirstName = firstName,
                 MiddleName = middleName,
                 LastName = lastName,
+                StatedFirstName = request.FirstName,
+                StatedMiddleName = request.MiddleName,
+                StatedLastName = request.LastName,
                 BirthDate = request.BirthDate.ToDateTime(),
                 EmailAddress = request.EmailAddress,
                 Address = new CreateTeacherCommandAddress()
