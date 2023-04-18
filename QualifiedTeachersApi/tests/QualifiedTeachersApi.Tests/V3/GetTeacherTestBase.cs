@@ -73,7 +73,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        string trn,
+        bool expectCertificateUrls)
     {
         // Arrange
         var contact = CreateContact(trn, hasMultiWordFirstName: true);
@@ -105,6 +106,12 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 certificateUrl = "/v3/certificates/eyts"
             }
         })!;
+
+        if (!expectCertificateUrls)
+        {
+            expectedJson["qts"]?.AsObject().Remove("certificateUrl");
+            expectedJson["eyts"]?.AsObject().Remove("certificateUrl");
+        }
 
         await AssertEx.JsonResponseEquals(
             response,
