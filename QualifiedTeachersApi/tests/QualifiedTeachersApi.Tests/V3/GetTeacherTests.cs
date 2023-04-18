@@ -45,7 +45,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(httpClient, baseUrl, trn);
+        return ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
     }
 
     [Fact]
