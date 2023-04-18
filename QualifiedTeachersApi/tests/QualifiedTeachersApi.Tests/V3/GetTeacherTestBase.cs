@@ -86,7 +86,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var expectedJson = JObject.FromObject(new
+        var expectedJson = JsonSerializer.SerializeToNode(new
         {
             firstName = contact.dfeta_StatedFirstName,
             lastName = contact.dfeta_StatedLastName,
@@ -104,7 +104,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 awarded = contact.dfeta_EYTSDate?.ToString("yyyy-MM-dd"),
                 certificateUrl = "/v3/certificates/eyts"
             }
-        });
+        })!;
 
         await AssertEx.JsonResponseEquals(
             response,
