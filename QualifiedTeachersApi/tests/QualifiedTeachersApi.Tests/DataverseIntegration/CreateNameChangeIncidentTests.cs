@@ -32,7 +32,7 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         var newFirstName1 = Faker.Name.First();
         var newFirstName2 = Faker.Name.First();
         var newMiddleName = Faker.Name.Middle();
-        var newLastName = Faker.Name.Last();        
+        var newLastName = Faker.Name.Last();
         var evidenceFileName = "evidence.txt";
         var evidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
         var evidenceFileMimeType = "text/plain";

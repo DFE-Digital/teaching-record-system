@@ -472,7 +472,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var nino = Faker.Identification.UkNationalInsuranceNumber();
 
         var qtsDate = new DateOnly(1997, 4, 23);
-        var eytsDate = new DateOnly(1995, 5, 14);        
+        var eytsDate = new DateOnly(1995, 5, 14);
 
         var teacher = new Contact()
         {
