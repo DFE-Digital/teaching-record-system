@@ -65,7 +65,8 @@ public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
             StatedLastName = request.LastName,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileContent = await evidenceFileResponse.Content.ReadAsStreamAsync(),
-            EvidenceFileMimeType = evidenceFileMimeType
+            EvidenceFileMimeType = evidenceFileMimeType,
+            FromIdentity = true
         };
 
         await _dataverseAdapter.CreateNameChangeIncident(command);

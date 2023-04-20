@@ -54,7 +54,8 @@ public class CreateDateOfBirthChangeHandler : IRequestHandler<CreateDateOfBirthC
             DateOfBirth = request.DateOfBirth,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileContent = await evidenceFileResponse.Content.ReadAsStreamAsync(),
-            EvidenceFileMimeType = evidenceFileMimeType
+            EvidenceFileMimeType = evidenceFileMimeType,
+            FromIdentity = true
         };
 
         await _dataverseAdapter.CreateDateOfBirthChangeIncident(command);
