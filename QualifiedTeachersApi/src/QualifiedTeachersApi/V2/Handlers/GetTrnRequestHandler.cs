@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.DataStore.Sql;
-using QualifiedTeachersApi.Security;
+using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
 

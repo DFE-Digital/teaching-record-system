@@ -4,7 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QualifiedTeachersApi.Filters;
-using QualifiedTeachersApi.Logging;
+using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
 using Swashbuckle.AspNetCore.Annotations;

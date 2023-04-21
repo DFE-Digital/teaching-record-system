@@ -1,7 +1,7 @@
 ﻿#nullable disable
 using System;
 using MediatR;
-using QualifiedTeachersApi.Swagger;
+using QualifiedTeachersApi.Infrastructure.Swagger;
 using QualifiedTeachersApi.V3.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 

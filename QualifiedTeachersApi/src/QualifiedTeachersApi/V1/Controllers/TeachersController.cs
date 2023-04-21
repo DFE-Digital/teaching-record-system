@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using QualifiedTeachersApi.Logging;
+using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.V1.Requests;
 using QualifiedTeachersApi.V1.Responses;
 using Swashbuckle.AspNetCore.Annotations;
