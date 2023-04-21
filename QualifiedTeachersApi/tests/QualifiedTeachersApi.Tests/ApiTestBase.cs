@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using QualifiedTeachersApi.DataStore.Sql;
-using QualifiedTeachersApi.Json;
+using QualifiedTeachersApi.Infrastructure.Json;
 using Xunit;
 
 namespace QualifiedTeachersApi.Tests;

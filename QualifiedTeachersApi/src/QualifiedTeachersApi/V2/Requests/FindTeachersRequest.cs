@@ -2,6 +2,7 @@
 using System;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using QualifiedTeachersApi.Infrastructure.ModelBinding;
 using QualifiedTeachersApi.V2.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -27,7 +28,7 @@ public class FindTeachersRequest : IRequest<FindTeachersResponse>
 
     [FromQuery(Name = "dateOfBirth")]
     [SwaggerParameter(Description = "Date of birth of person")]
-    [ModelBinder(typeof(ModelBinding.DateModelBinder))]
+    [ModelBinder(typeof(DateModelBinder))]
     public DateOnly? DateOfBirth { get; set; }
 
     [SwaggerParameter(Description = "National insurance number of person")]

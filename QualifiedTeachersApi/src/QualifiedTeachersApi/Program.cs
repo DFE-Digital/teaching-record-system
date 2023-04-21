@@ -25,20 +25,20 @@ using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Npgsql;
 using Prometheus;
-using QualifiedTeachersApi.Configuration;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.ApplicationModel;
-using QualifiedTeachersApi.Json;
-using QualifiedTeachersApi.Logging;
-using QualifiedTeachersApi.ModelBinding;
-using QualifiedTeachersApi.Security;
+using QualifiedTeachersApi.Infrastructure.Configuration;
+using QualifiedTeachersApi.Infrastructure.Json;
+using QualifiedTeachersApi.Infrastructure.Logging;
+using QualifiedTeachersApi.Infrastructure.ModelBinding;
+using QualifiedTeachersApi.Infrastructure.Security;
+using QualifiedTeachersApi.Infrastructure.Swagger;
 using QualifiedTeachersApi.Services;
 using QualifiedTeachersApi.Services.Certificates;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
-using QualifiedTeachersApi.Swagger;
 using QualifiedTeachersApi.Validation;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
@@ -227,7 +227,7 @@ public class Program
         services.AddTransient<ISerializerDataContractResolver>(sp =>
         {
             var serializerOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions;
-            return new Swagger.JsonSerializerDataContractResolver(serializerOptions);
+            return new Infrastructure.Swagger.JsonSerializerDataContractResolver(serializerOptions);
         });
         services.AddSingleton<IClock, Clock>();
         services.AddMemoryCache();
@@ -404,7 +404,7 @@ public class Program
 
             services.AddSingleton<IClientPolicyStore, DistributedCacheClientPolicyStore>();
             services.AddSingleton<IRateLimitCounterStore, DistributedCacheRateLimitCounterStore>();
-            services.AddSingleton<IRateLimitConfiguration, Security.RateLimitConfiguration>();
+            services.AddSingleton<IRateLimitConfiguration, Infrastructure.Security.RateLimitConfiguration>();
         }
 
         void ConfigureRedisServices()

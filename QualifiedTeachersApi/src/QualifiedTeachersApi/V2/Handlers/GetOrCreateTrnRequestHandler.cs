@@ -12,7 +12,7 @@ using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.DataStore.Sql.Models;
-using QualifiedTeachersApi.Security;
+using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.Services;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using QualifiedTeachersApi.V2.ApiModels;

@@ -5,7 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using QualifiedTeachersApi.Security;
+using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.V3.Requests;
 using Swashbuckle.AspNetCore.Annotations;
 
