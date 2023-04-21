@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using QualifiedTeachersApi;
 
 namespace QualifiedTeachersApi.Infrastructure.Security;
 
