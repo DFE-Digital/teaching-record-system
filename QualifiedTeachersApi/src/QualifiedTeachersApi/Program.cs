@@ -229,6 +229,7 @@ public class Program
             var serializerOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions;
             return new Infrastructure.Swagger.JsonSerializerDataContractResolver(serializerOptions);
         });
+        services.AddSingleton<ISchemaGenerator, Infrastructure.Swagger.SchemaGenerator>();
         services.AddSingleton<IClock, Clock>();
         services.AddMemoryCache();
         services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
