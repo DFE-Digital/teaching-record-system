@@ -46,7 +46,7 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await DbHelper.ResetSchema();
+        await DbHelper.EnsureSchema();
     }
 
     public void ResetMocks()
