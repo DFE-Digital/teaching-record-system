@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Optional;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.V3.ApiModels;
@@ -149,20 +150,21 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         return new GetTeacherResponse()
         {
-            Include = request.Include,
             Trn = request.Trn,
             FirstName = teacher.FirstName,
             MiddleName = teacher.MiddleName ?? "",
             LastName = teacher.LastName,
             DateOfBirth = teacher.BirthDate.Value.ToDateOnly(),
             NationalInsuranceNumber = teacher.dfeta_NINumber,
-            PendingNameChange = pendingNameChange,
-            PendingDateOfBirthChange = pendingDateOfBirthChange,
+            PendingNameChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingNameChange) : default,
+            PendingDateOfBirthChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingDateOfBirthChange) : default,
             Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnly(), request.AccessMode),
             Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnly(), request.AccessMode),
-            Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ? MapInduction(induction, inductionPeriods, request.AccessMode) : null,
+            Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ?
+                Option.Some(MapInduction(induction, inductionPeriods, request.AccessMode)) :
+                default,
             InitialTeacherTraining = request.Include.HasFlag(GetTeacherRequestIncludes.InitialTeacherTraining) ?
-                itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
+                Option.Some(itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
                 {
                     Qualification = MapIttQualification(i),
                     ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>(),
@@ -172,10 +174,14 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
                     Provider = MapProvider(i),
                     Subjects = MapSubjects(i)
-                }) :
-                null,
-            NpqQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.NpqQualifications) ? MapNpqQualifications(qualifications, request.AccessMode) : null,
-            MandatoryQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.MandatoryQualifications) ? MapMandatoryQualifications(qualifications) : null
+                })) :
+                default,
+            NpqQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.NpqQualifications) ?
+                Option.Some(MapNpqQualifications(qualifications, request.AccessMode)) :
+                default,
+            MandatoryQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.MandatoryQualifications) ?
+                Option.Some(MapMandatoryQualifications(qualifications)) :
+                default
         };
     }
 

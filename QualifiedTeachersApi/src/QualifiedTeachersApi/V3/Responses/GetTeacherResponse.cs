@@ -1,18 +1,14 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Optional;
 using QualifiedTeachersApi.V3.ApiModels;
-using QualifiedTeachersApi.V3.Requests;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V3.Responses;
 
-public record GetTeacherResponse : IConditionallySerializedProperties
+public record GetTeacherResponse
 {
-    [JsonIgnore]
-    public GetTeacherRequestIncludes Include { get; init; }
-
     [SwaggerSchema(Nullable = false)]
     public required string Trn { get; init; }
     [SwaggerSchema(Nullable = false)]
@@ -22,36 +18,17 @@ public record GetTeacherResponse : IConditionallySerializedProperties
     public required string LastName { get; init; }
     public required DateOnly DateOfBirth { get; init; }
     public required string NationalInsuranceNumber { get; init; }
-    public required bool PendingNameChange { get; init; }
-    public required bool PendingDateOfBirthChange { get; init; }
+    public required Option<bool> PendingNameChange { get; init; }
+    public required Option<bool> PendingDateOfBirthChange { get; init; }
     public required GetTeacherResponseQts Qts { get; init; }
     public required GetTeacherResponseEyts Eyts { get; init; }
-    public required GetTeacherResponseInduction Induction { get; init; }
+    public required Option<GetTeacherResponseInduction> Induction { get; init; }
     [SwaggerSchema(Nullable = false)]
-    public required IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; init; }
+    public required Option<IEnumerable<GetTeacherResponseInitialTeacherTraining>> InitialTeacherTraining { get; init; }
     [SwaggerSchema(Nullable = false)]
-    public required IEnumerable<GetTeacherResponseNpqQualificationsQualification> NpqQualifications { get; init; }
+    public required Option<IEnumerable<GetTeacherResponseNpqQualificationsQualification>> NpqQualifications { get; init; }
     [SwaggerSchema(Nullable = false)]
-    public required IEnumerable<GetTeacherResponseMandatoryQualificationsQualification> MandatoryQualifications { get; init; }
-
-    public bool ShouldSerializeProperty(string propertyName)
-    {
-        if (Include == GetTeacherRequestIncludes.All)
-        {
-            return true;
-        }
-
-        return propertyName switch
-        {
-            nameof(Induction) => Include.HasFlag(GetTeacherRequestIncludes.Induction),
-            nameof(InitialTeacherTraining) => Include.HasFlag(GetTeacherRequestIncludes.InitialTeacherTraining),
-            nameof(NpqQualifications) => Include.HasFlag(GetTeacherRequestIncludes.NpqQualifications),
-            nameof(MandatoryQualifications) => Include.HasFlag(GetTeacherRequestIncludes.MandatoryQualifications),
-            nameof(PendingNameChange) => Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges),
-            nameof(PendingDateOfBirthChange) => Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges),
-            _ => true
-        };
-    }
+    public required Option<IEnumerable<GetTeacherResponseMandatoryQualificationsQualification>> MandatoryQualifications { get; init; }
 }
 
 public record GetTeacherResponseQts

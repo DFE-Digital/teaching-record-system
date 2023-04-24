@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using QualifiedTeachersApi;
 using Serilog.Events;
 
 namespace QualifiedTeachersApi.Infrastructure.Logging;
