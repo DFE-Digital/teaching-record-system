@@ -49,7 +49,8 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
             StatedLastName = newLastName,
             EvidenceFileName = evidenceFileName,
             EvidenceFileContent = evidenceFileContent,
-            EvidenceFileMimeType = evidenceFileMimeType
+            EvidenceFileMimeType = evidenceFileMimeType,
+            FromIdentity = true
         };
 
         // Act
@@ -68,5 +69,6 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         Assert.Equal(command.StatedFirstName, createdIncident.dfeta_StatedFirstName);
         Assert.Equal(command.StatedMiddleName, createdIncident.dfeta_StatedMiddleName);
         Assert.Equal(command.StatedLastName, createdIncident.dfeta_StatedLastName);
+        Assert.Equal(command.FromIdentity, createdIncident.dfeta_FromIdentity);
     }
 }

@@ -184,6 +184,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
                 cmd.ContactId == contactId &&
                 cmd.DateOfBirth == newDateOfBirth &&
                 cmd.EvidenceFileName == evidenceFileName &&
-                cmd.EvidenceFileMimeType == "text/plain")));
+                cmd.EvidenceFileMimeType == "text/plain" &&
+                cmd.FromIdentity == true)));
     }
 }

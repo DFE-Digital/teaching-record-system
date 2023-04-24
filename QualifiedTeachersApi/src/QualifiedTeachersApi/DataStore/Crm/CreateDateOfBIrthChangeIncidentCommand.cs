@@ -11,4 +11,5 @@ public record CreateDateOfBirthChangeIncidentCommand
     public required string EvidenceFileName { get; init; }
     public required Stream EvidenceFileContent { get; init; }
     public required string EvidenceFileMimeType { get; init; }
+    public required bool FromIdentity { get; init; }
 }

@@ -6981,6 +6981,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		{
 			public const string CustomerId = "customerid";
 			public const string Description = "description";
+			public const string dfeta_FromIdentity = "dfeta_fromidentity";
 			public const string dfeta_NewDateofBirth = "dfeta_newdateofbirth";
 			public const string dfeta_NewFirstName = "dfeta_newfirstname";
 			public const string dfeta_NewLastName = "dfeta_newlastname";
@@ -7087,6 +7088,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("Description");
 				this.SetAttributeValue("description", value);
 				this.OnPropertyChanged("Description");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_fromidentity")]
+		public System.Nullable<bool> dfeta_FromIdentity
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_fromidentity");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_FromIdentity");
+				this.SetAttributeValue("dfeta_fromidentity", value);
+				this.OnPropertyChanged("dfeta_FromIdentity");
 			}
 		}
 		

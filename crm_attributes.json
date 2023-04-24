@@ -193,6 +193,7 @@
   "incident": [
     "customerid",
     "description",
+    "dfeta_fromidentity",
     "dfeta_newdateofbirth",
     "dfeta_newfirstname",
     "dfeta_newmiddlename",
