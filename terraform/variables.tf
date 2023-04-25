@@ -89,11 +89,6 @@ variable "redis_service_plan" {
   default = "tiny-6_x"
 }
 
-variable "migrations_file" {
-  type    = string
-  default = ""
-}
-
 variable "statuscake_alerts" {
   type = map(any)
 }

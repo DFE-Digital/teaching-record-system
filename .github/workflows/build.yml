@@ -35,7 +35,7 @@ jobs:
     concurrency: build
 
     outputs:
-      docker_image: ${{ env.tag }}
+      api_docker_image: ${{ steps.image_tags.outputs.api_tag }}
 
     services:
       postgres:
@@ -163,36 +163,16 @@ jobs:
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
           ${{ steps.get_test_filter.outputs.filter_arg }}
 
-    # TODO Use migration bundles when https://github.com/dotnet/efcore/issues/25555 is fixed
-    - name: Generate migrations artifact
-      run: |
-        mkdir migrations
-        migrations_file=migrations/script.sql
-
-        dotnet tool install --global dotnet-ef
-        dotnet ef migrations script --idempotent --output $migrations_file --configuration Release --project src/QualifiedTeachersApi/QualifiedTeachersApi.csproj --no-build
-
-        # Remove the BOM
-        sed -i $'1s/^\uFEFF//' $migrations_file
-
-        # Ensure any errors return a non-zero exit code when migrations are applied
-        echo "$(echo "\set ON_ERROR_STOP true"; echo ""; cat $migrations_file)" > $migrations_file
-      working-directory: QualifiedTeachersApi
-
-    - name: Publish migrations
-      uses: actions/upload-artifact@v3
-      with:
-        name: migrations
-        path: QualifiedTeachersApi/migrations
-
     - name: Publish
-      run: dotnet publish --configuration Release --no-build src/QualifiedTeachersApi/QualifiedTeachersApi.csproj
+      run: |
+        dotnet publish --configuration Release --no-build src/QualifiedTeachersApi/QualifiedTeachersApi.csproj
+        dotnet publish --configuration Release --no-build src/QtCli/QtCli.csproj
       working-directory: QualifiedTeachersApi
 
-    - name: Docker image tag
-      id: image
+    - name: Get Docker image tags
+      id: image_tags
       run: |
-        echo "tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):$GITHUB_SHA"  >> $GITHUB_ENV
+        echo "api_tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):api-$GITHUB_SHA" >> $GITHUB_OUTPUT
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
@@ -201,12 +181,13 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Docker build & push
+    - name: API Docker build & push
       uses: docker/build-push-action@v4
       with:
-        context: QualifiedTeachersApi/src/QualifiedTeachersApi
+        context: QualifiedTeachersApi/
+        file: QualifiedTeachersApi/src/QualifiedTeachersApi/Dockerfile
         push: true
-        tags: ${{ env.tag }}
+        tags: ${{ steps.image_tags.outputs.api_tag }}
         build-args: |
           GIT_SHA=${{ github.sha }}
 
@@ -259,7 +240,7 @@ jobs:
       id: deploy
       with:
         environment_name: dev
-        docker_image: ${{ needs.build.outputs.docker_image }}
+        api_docker_image: ${{ needs.build.outputs.api_docker_image }}
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
         terraform_vars: dev.tfvars.json
         terraform_backend_vars: dev.backend.tfvars
@@ -335,7 +316,7 @@ jobs:
       id: deploy
       with:
         environment_name: test
-        docker_image: ${{ needs.build.outputs.docker_image }}
+        api_docker_image: ${{ needs.build.outputs.api_docker_image }}
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
         terraform_vars: test.tfvars.json
         terraform_backend_vars: test.backend.tfvars
@@ -360,7 +341,7 @@ jobs:
       id: deploy
       with:
         environment_name: pre-production
-        docker_image: ${{ needs.build.outputs.docker_image }}
+        api_docker_image: ${{ needs.build.outputs.api_docker_image }}
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
         terraform_vars: pre-production.tfvars.json
         terraform_backend_vars: pre-production.backend.tfvars
@@ -385,7 +366,7 @@ jobs:
       id: deploy
       with:
         environment_name: production
-        docker_image: ${{ needs.build.outputs.docker_image }}
+        api_docker_image: ${{ needs.build.outputs.api_docker_image }}
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
         terraform_vars: production.tfvars.json
         terraform_backend_vars: production.backend.tfvars
