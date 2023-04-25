@@ -63,4 +63,10 @@
     <Using Include="QualifiedTeachersApi.DataStore.Crm.Models.Task" Alias="CrmTask" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="entrypoint.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

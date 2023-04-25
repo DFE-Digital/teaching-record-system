@@ -4,8 +4,8 @@ inputs:
   environment_name:
     description: 'The name of the environment'
     required: true
-  docker_image:
-    description: 'The Docker image to deploy to the environment'
+  api_docker_image:
+    description: 'The API Docker image to deploy to the environment'
     required: true
   azure_credentials:
     description: 'JSON object containing a service principal that can read from Azure Key Vault'
@@ -79,7 +79,6 @@ runs:
       with:
         creds: ${{ inputs.azure_credentials }}
 
-    # get TFSTATE-CONTAINER-ACCESS-KEY
     - run: |
         TFSTATE_CONTAINER_ACCESS_KEY="$(az storage account keys list -g ${{ env.resource_group_name }} -n ${{ env.storage_account_name }} | jq -r '.[0].value')"
         echo "::add-mask::$TFSTATE_CONTAINER_ACCESS_KEY"
@@ -97,23 +96,12 @@ runs:
         terraform_version: 1.0.10
         terraform_wrapper: false
 
-    - name: Download migrations
-      uses: actions/download-artifact@v2
-      with:
-        name: migrations
-        path: migrations
-
     - uses: DFE-Digital/github-actions/setup-cf-cli@master
       with:
         CF_USERNAME: ${{ steps.get_secrets.outputs.PAAS-USER }}
         CF_PASSWORD: ${{ steps.get_secrets.outputs.PAAS-PASSWORD }}
         CF_SPACE_NAME: ${{ env.paas_space }}
         INSTALL_CONDUIT: true
-
-    - name: Set environment variables
-      shell: bash
-      run: |
-        echo "MIGRATIONS_FILE=$(realpath ./migrations/script.sql)" >> $GITHUB_ENV
 
     - name: Terraform
       id: terraform
@@ -124,7 +112,6 @@ runs:
       env:
         ARM_ACCESS_KEY: ${{ env.TFSTATE_CONTAINER_ACCESS_KEY }}
         TF_VAR_azure_sp_credentials_json: ${{ inputs.azure_credentials }}
-        TF_VAR_api_docker_image: ${{ inputs.docker_image }}
+        TF_VAR_api_docker_image: ${{ inputs.api_docker_image }}
         TF_VAR_api_app_version: ${{ env.api_version }}
-        TF_VAR_migrations_file: ${{ env.MIGRATIONS_FILE }}
       shell: bash

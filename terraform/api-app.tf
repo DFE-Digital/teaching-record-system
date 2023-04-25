@@ -60,21 +60,6 @@ resource "azurerm_application_insights" "api_app_insights" {
   application_type    = "web"
 }
 
-resource "null_resource" "migrations" {
-  count = var.migrations_file == "" ? 0 : 1
-  triggers = {
-    migrations = "${sha1(file(var.migrations_file))}"
-  }
-
-  provisioner "local-exec" {
-    command = "cf target -s ${var.paas_space} && cf conduit ${cloudfoundry_service_instance.postgres.name} -- psql -f ${var.migrations_file}"
-  }
-
-  depends_on = [
-    cloudfoundry_service_instance.postgres
-  ]
-}
-
 resource "cloudfoundry_service_instance" "redis" {
   name         = var.redis_name
   space        = data.cloudfoundry_space.space.id
@@ -112,7 +97,6 @@ resource "cloudfoundry_app" "api" {
   }
 
   depends_on = [
-    null_resource.migrations,
     azurerm_application_insights.api_app_insights
   ]
 }
