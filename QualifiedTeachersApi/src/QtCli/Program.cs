@@ -1,7 +1,6 @@
-﻿using System.CommandLine;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using QualifiedTeachersApi.DataStore.Sql;
+﻿global using System.CommandLine;
+global using Microsoft.Extensions.Configuration;
+using QtCli;
 
 var configuration = new ConfigurationBuilder()
     .AddUserSecrets("QualifiedTeachersApi")
@@ -9,36 +8,9 @@ var configuration = new ConfigurationBuilder()
 
 var rootCommand = new RootCommand("Development tools for the Qualified Teachers API.")
 {
-    CreateMigrateDbCommand()
+    Commands.CreateMigrateDbCommand(configuration),
+    Commands.CreateMigrateReportingDbCommand(configuration),
+    Commands.CreateResetReportingDbJournalCommand(configuration),
 };
 
 return await rootCommand.InvokeAsync(args);
-
-Command CreateMigrateDbCommand()
-{
-    var connectionStringOption = new Option<string>("--connection-string")
-    {
-        IsRequired = true
-    };
-
-    var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
-    if (configuredConnectionString is not null)
-    {
-        connectionStringOption.SetDefaultValue(configuredConnectionString);
-    }
-
-    var migrateDbCommand = new Command("migrate-db", "Migrate the database to the latest version.")
-    {
-        connectionStringOption
-    };
-
-    migrateDbCommand.SetHandler(
-        async (string connectionString) =>
-        {
-            using var dbContext = new DqtContext(connectionString);
-            await dbContext.Database.MigrateAsync();
-        },
-        connectionStringOption);
-
-    return migrateDbCommand;
-}
