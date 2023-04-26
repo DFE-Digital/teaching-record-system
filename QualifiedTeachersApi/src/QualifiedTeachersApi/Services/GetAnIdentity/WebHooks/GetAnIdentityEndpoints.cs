@@ -3,8 +3,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
-using System.Text.Json.Serialization;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +15,8 @@ namespace QualifiedTeachersApi.Services.GetAnIdentity.WebHooks;
 
 public static class GetAnIdentityEndpoints
 {
+    private static JsonSerializerOptions SerializerOptions { get; } = new JsonSerializerOptions(JsonSerializerDefaults.Web).AddConverters();
+
     public static IEndpointConventionBuilder MapIdentityEndpoints(this IEndpointRouteBuilder builder)
     {
         return builder.MapGroup("/identity")
@@ -39,19 +39,10 @@ public static class GetAnIdentityEndpoints
                     return Results.Unauthorized();
                 }
 
-                NotificationEnvelope notification;
-                try
-                {
-                    notification = JsonSerializer.Deserialize<NotificationEnvelope>(body, SerializerOptions)!;
-                }
-                catch (Exception)
-                {
-                    return Results.BadRequest();
-                }
+                var notification = JsonSerializer.Deserialize<NotificationEnvelope>(body, SerializerOptions)!;
 
-                if (notification.Message is UserUpdatedMessage)
-                {                    
-                    var userUpdatedMessage = (UserUpdatedMessage) notification.Message;
+                if (notification.Message is UserUpdatedMessage userUpdatedMessage)
+                {
                     var request = new UserUpdatedRequest()
                     {
                         UserId = userUpdatedMessage.User.UserId,
@@ -63,9 +54,8 @@ public static class GetAnIdentityEndpoints
 
                     await mediator.Send(request);
                 }
-                else if (notification.Message is UserCreatedMessage)
+                else if (notification.Message is UserCreatedMessage userCreatedMessage)
                 {
-                    var userCreatedMessage = (UserCreatedMessage)notification.Message;
                     var request = new UserCreatedRequest()
                     {
                         UserId = userCreatedMessage.User.UserId,
@@ -81,6 +71,4 @@ public static class GetAnIdentityEndpoints
                 return Results.NoContent();
             });
     }
-
-    static JsonSerializerOptions SerializerOptions { get; } = new JsonSerializerOptions(JsonSerializerDefaults.Web).AddConverters();
 }

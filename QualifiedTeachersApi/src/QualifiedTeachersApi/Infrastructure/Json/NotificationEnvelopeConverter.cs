@@ -62,7 +62,7 @@ public class NotificationEnvelopeConverter : JsonConverter<NotificationEnvelope>
 
                 reader.Read();
 
-                var caseInsensitive = options.PropertyNameCaseInsensitive;          
+                var caseInsensitive = options.PropertyNameCaseInsensitive;
 
                 if (propertyName.Equals(nameof(NotificationEnvelope.NotificationId), caseInsensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture))
                 {
@@ -73,7 +73,7 @@ public class NotificationEnvelopeConverter : JsonConverter<NotificationEnvelope>
                     else
                     {
                         throw new JsonException($"Value for {nameof(NotificationEnvelope.NotificationId)} cannot be deserialized to a {typeof(System.Guid).FullName}");
-                    }                    
+                    }
                 }
                 else if (propertyName.Equals(nameof(NotificationEnvelope.TimeUtc), caseInsensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture))
                 {
