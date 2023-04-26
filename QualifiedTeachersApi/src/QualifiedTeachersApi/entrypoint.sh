@@ -14,6 +14,12 @@ if [ "$CF_INSTANCE_INDEX" == "0" ]; then
   echo "Applying database migrations..."
   dotnet /QtCli/QtCli.dll migrate-db --connection-string "$CONNECTION_STRING"
   echo "Done applying database migrations"
+
+  if [ ! -z "$ReportingDbConnectionString" ]; then
+    echo "Applying reporting database migrations..."
+    dotnet /QtCli/QtCli.dll migrate-reporting-db --connection-string "$ReportingDbConnectionString"
+    echo "Done applying reporting database migrations"
+  fi
 fi
 
 dotnet /App/QualifiedTeachersApi.dll

@@ -21,9 +21,6 @@ outputs:
   environment_url:
     description: 'The base URL for the deployed environment'
     value: ${{ steps.terraform.outputs.url }}
-  test_user_api_key:
-    description: 'An API key of a client for running tests'
-    value: ${{ steps.get_secrets.outputs.TEST-API-KEY }}
 
 runs:
   using: composite
@@ -32,20 +29,8 @@ runs:
     - name: Extract configuration from tfvars
       id: config
       run: |
-        KEY_VAULT_NAME=$(jq -r '.key_vault_name' $TFVARS)
-        PAAS_SPACE=$(jq -r '.paas_space' $TFVARS)
         RESOURCE_GROUP_NAME=$(jq -r '.resource_group_name' $TFVARS)
         STORAGE_ACCOUNT_NAME=$(jq -r '.storage_account_name' $TFVARS)
-
-        if [ -z "$KEY_VAULT_NAME" ]; then
-          echo "::error ::Failed to extract key_vault_name from $TFVARS"
-          exit 1
-        fi
-
-        if [ -z "$PAAS_SPACE" ]; then
-          echo "::error ::Failed to extract paas_space from $TFVARS"
-          exit 1
-        fi
 
         if [ -z "$RESOURCE_GROUP_NAME" ]; then
           echo "::error ::Failed to extract resource_group_name from $TFVARS"
@@ -57,8 +42,6 @@ runs:
           exit 1
         fi
 
-        echo "key_vault_name=$KEY_VAULT_NAME" >> $GITHUB_ENV
-        echo "paas_space=$PAAS_SPACE" >> $GITHUB_ENV
         echo "resource_group_name=$RESOURCE_GROUP_NAME" >> $GITHUB_ENV
         echo "storage_account_name=$STORAGE_ACCOUNT_NAME" >> $GITHUB_ENV
       shell: bash
@@ -85,23 +68,10 @@ runs:
         echo "TFSTATE_CONTAINER_ACCESS_KEY=$TFSTATE_CONTAINER_ACCESS_KEY" >> $GITHUB_ENV
       shell: bash
 
-    - uses: Azure/get-keyvault-secrets@v1
-      id: get_secrets
-      with:
-        keyvault: ${{ env.key_vault_name }}
-        secrets: 'TEST-API-KEY,PAAS-USER,PAAS-PASSWORD'
-
     - uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 1.0.10
         terraform_wrapper: false
-
-    - uses: DFE-Digital/github-actions/setup-cf-cli@master
-      with:
-        CF_USERNAME: ${{ steps.get_secrets.outputs.PAAS-USER }}
-        CF_PASSWORD: ${{ steps.get_secrets.outputs.PAAS-PASSWORD }}
-        CF_SPACE_NAME: ${{ env.paas_space }}
-        INSTALL_CONDUIT: true
 
     - name: Terraform
       id: terraform

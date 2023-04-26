@@ -37,3 +37,11 @@ data "cloudfoundry_service" "postgres" {
 data "cloudfoundry_service" "redis" {
   name = "redis"
 }
+
+locals {
+  paas_egress_ips = [
+    "35.178.62.180",
+    "18.130.41.69",
+    "35.177.73.214"
+  ]
+}
