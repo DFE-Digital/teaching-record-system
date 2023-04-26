@@ -13,9 +13,9 @@ using Xunit;
 
 namespace QualifiedTeachersApi.Tests.Services.GetAnIdentity.WebHooks;
 
-public class UserUpdatedTests : ApiTestBase
+public class GetAnIdentityEndpointsTests : ApiTestBase
 {
-    public UserUpdatedTests(ApiFixture apiFixture)
+    public GetAnIdentityEndpointsTests(ApiFixture apiFixture)
        : base(apiFixture)
     {
     }
@@ -64,7 +64,7 @@ public class UserUpdatedTests : ApiTestBase
     }
 
     [Fact]
-    public async Task Post_WithInvalidContent_ReturnsBadRequest()
+    public async Task Post_WithInvalidContent_ThrowsJsonException()
     {
         // Arrange
         var clientSecret = "MySecret";
@@ -92,15 +92,12 @@ public class UserUpdatedTests : ApiTestBase
             Content = CreateJsonContent(content)
         };
 
-        // Act
-        var response = await httpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        // Act / Assert
+        await Assert.ThrowsAsync<JsonException>(() => httpClient.SendAsync(request));
     }
 
     [Fact]
-    public async Task Post_WithMessageTypeWeAreNotInterestedIn_ReturnsNoContent()
+    public async Task Post_WithMessageTypeWeAreNotInterestedIn_ThrowsJsonException()
     {
         // Arrange
         var clientSecret = "MySecret";
@@ -134,15 +131,12 @@ public class UserUpdatedTests : ApiTestBase
             Content = CreateJsonContent(content)
         };
 
-        // Act
-        var response = await httpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode);
+        // Act / Assert
+        await Assert.ThrowsAsync<JsonException>(() => httpClient.SendAsync(request));
     }
 
     [Fact]
-    public async Task Post_WithNonJsonMessage_ReturnsBadRequest()
+    public async Task Post_WithNonJsonMessage_ThrowsJsonException()
     {
         // Arrange
         var clientSecret = "MySecret";
@@ -173,15 +167,12 @@ public class UserUpdatedTests : ApiTestBase
             Content = CreateJsonContent(content)
         };
 
-        // Act
-        var response = await httpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        // Act / Assert
+        await Assert.ThrowsAsync<JsonException>(() => httpClient.SendAsync(request));
     }
 
     [Fact]
-    public async Task Post_WithInvalidMessageFormat_ReturnsBadRequest()
+    public async Task Post_WithInvalidMessageFormat_ThrowsJsonException()
     {
         // Arrange
         var clientSecret = "MySecret";
@@ -215,15 +206,12 @@ public class UserUpdatedTests : ApiTestBase
             Content = CreateJsonContent(content)
         };
 
-        // Act
-        var response = await httpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        // Act / Assert
+        await Assert.ThrowsAsync<JsonException>(() => httpClient.SendAsync(request));
     }
 
     [Fact]
-    public async Task Post_WithValidMessage_ReturnsNoContent()
+    public async Task Post_WithValidUserUpdatedMessage_ReturnsNoContent()
     {
         // Arrange
         var clientSecret = "MySecret";
@@ -333,6 +321,67 @@ public class UserUpdatedTests : ApiTestBase
 
         // Assert
         ApiFixture.DataverseAdapter.Verify(mock => mock.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Post_WithValidUserCreatedMessage_ReturnsNoContent()
+    {
+        // Arrange
+        var clientSecret = "MySecret";
+        var identityOptions = new GetAnIdentityOptions()
+        {
+            WebHookClientSecret = clientSecret
+        };
+
+        ApiFixture.GetAnIdentityOptions
+            .Setup(o => o.Value)
+            .Returns(identityOptions);
+
+        var content = new
+        {
+            NotificationId = Guid.NewGuid(),
+            TimeUtc = DateTime.UtcNow,
+            MessageType = UserCreatedMessage.MessageTypeName,
+            Message = new
+            {
+                User = new
+                {
+                    UserId = Guid.NewGuid(),
+                    EmailAddress = Faker.Internet.Email(),
+                    Trn = "7654321",
+                    MobileNumber = "07968987654"
+                }
+            }
+        };
+
+        UpdateTeacherIdentityInfoCommand? actualCommand = null;
+        ApiFixture.DataverseAdapter
+            .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Contact());
+        ApiFixture.DataverseAdapter
+            .Setup(d => d.UpdateTeacherIdentityInfo(It.IsAny<UpdateTeacherIdentityInfoCommand>()))
+            .Returns(Task.CompletedTask)
+            .Callback<UpdateTeacherIdentityInfoCommand>(c => actualCommand = c);
+
+        var jsonContent = JsonSerializer.Serialize(content);
+        var signature = GenerateSignature(clientSecret, jsonContent);
+        var httpClient = ApiFixture.CreateClient();
+        httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
+        {
+            Content = CreateJsonContent(content)
+        };
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode);
+        Assert.Equal(content.Message.User.UserId, actualCommand?.IdentityUserId);
+        Assert.Equal(content.Message.User.EmailAddress, actualCommand?.EmailAddress);
+        Assert.Equal(content.Message.User.MobileNumber, actualCommand?.MobilePhone);
+        Assert.Equal(content.TimeUtc, actualCommand?.UpdateTimeUtc);
     }
 
     private static string GenerateSignature(string secret, string content)

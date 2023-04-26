@@ -1,8 +1,8 @@
 ﻿namespace QualifiedTeachersApi.Services.GetAnIdentity.WebHooks;
 
-public record UserUpdatedMessage : INotificationMessage
+public record UserCreatedMessage : INotificationMessage
 {
-    public const string MessageTypeName = "UserUpdated";
+    public const string MessageTypeName = "UserCreated";
 
     public required User User { get; init; }
 }

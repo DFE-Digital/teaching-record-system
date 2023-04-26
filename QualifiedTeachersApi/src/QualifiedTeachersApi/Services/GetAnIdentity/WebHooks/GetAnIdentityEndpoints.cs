@@ -8,12 +8,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using QualifiedTeachersApi.Infrastructure.Json;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 
 namespace QualifiedTeachersApi.Services.GetAnIdentity.WebHooks;
 
 public static class GetAnIdentityEndpoints
 {
+    private static JsonSerializerOptions SerializerOptions { get; } = new JsonSerializerOptions(JsonSerializerDefaults.Web).AddConverters();
+
     public static IEndpointConventionBuilder MapIdentityEndpoints(this IEndpointRouteBuilder builder)
     {
         return builder.MapGroup("/identity")
@@ -36,43 +39,29 @@ public static class GetAnIdentityEndpoints
                     return Results.Unauthorized();
                 }
 
-                var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+                var notification = JsonSerializer.Deserialize<NotificationEnvelope>(body, SerializerOptions)!;
 
-                NotificationEnvelope notification;
-                try
+                if (notification.Message is UserUpdatedMessage userUpdatedMessage)
                 {
-                    notification = JsonSerializer.Deserialize<NotificationEnvelope>(body, serializerOptions)!;
-                }
-                catch (Exception)
-                {
-                    return Results.BadRequest();
-                }
-
-                if (notification.MessageType == UserUpdatedMessage.MessageTypeName)
-                {
-                    var jsonPayload = notification.Message as JsonElement?;
-                    if (jsonPayload == null)
-                    {
-                        return Results.BadRequest();
-                    }
-
-                    UserUpdatedMessage userUpdatedMessage;
-
-                    try
-                    {
-                        userUpdatedMessage = JsonSerializer.Deserialize<UserUpdatedMessage>(jsonPayload.Value, serializerOptions)!;
-                    }
-                    catch (Exception)
-                    {
-                        return Results.BadRequest();
-                    }
-
                     var request = new UserUpdatedRequest()
                     {
                         UserId = userUpdatedMessage.User.UserId,
                         Trn = userUpdatedMessage.User.Trn,
                         EmailAddress = userUpdatedMessage.User.EmailAddress,
                         MobileNumber = userUpdatedMessage.User.MobileNumber,
+                        UpdateTimeUtc = notification.TimeUtc
+                    };
+
+                    await mediator.Send(request);
+                }
+                else if (notification.Message is UserCreatedMessage userCreatedMessage)
+                {
+                    var request = new UserCreatedRequest()
+                    {
+                        UserId = userCreatedMessage.User.UserId,
+                        Trn = userCreatedMessage.User.Trn,
+                        EmailAddress = userCreatedMessage.User.EmailAddress,
+                        MobileNumber = userCreatedMessage.User.MobileNumber,
                         UpdateTimeUtc = notification.TimeUtc
                     };
 
