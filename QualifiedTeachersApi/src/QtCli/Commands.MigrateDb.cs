@@ -1,0 +1,36 @@
+﻿using Microsoft.EntityFrameworkCore;
+using QualifiedTeachersApi.DataStore.Sql;
+
+namespace QtCli;
+
+public static partial class Commands
+{
+    public static Command CreateMigrateDbCommand(IConfiguration configuration)
+    {
+        var connectionStringOption = new Option<string>("--connection-string")
+        {
+            IsRequired = true
+        };
+
+        var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
+        if (configuredConnectionString is not null)
+        {
+            connectionStringOption.SetDefaultValue(configuredConnectionString);
+        }
+
+        var migrateDbCommand = new Command("migrate-db", "Migrate the database to the latest version.")
+        {
+            connectionStringOption
+        };
+
+        migrateDbCommand.SetHandler(
+            async (string connectionString) =>
+            {
+                using var dbContext = new DqtContext(connectionString);
+                await dbContext.Database.MigrateAsync();
+            },
+            connectionStringOption);
+
+        return migrateDbCommand;
+    }
+}
