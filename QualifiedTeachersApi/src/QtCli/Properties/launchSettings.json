@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "migrate-db": {
+      "commandName": "Project",
+      "commandLineArgs": "migrate-db"
+    },
+    "migrate-reporting-db": {
+      "commandName": "Project",
+      "commandLineArgs": "migrate-reporting-db"
+    },
+    "reset-reporting-db-journal": {
+      "commandName": "Project",
+      "commandLineArgs": "reset-reporting-db-journal"
+    }
+  }
+}
