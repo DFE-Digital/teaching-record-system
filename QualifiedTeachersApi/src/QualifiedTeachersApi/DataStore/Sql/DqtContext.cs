@@ -10,12 +10,12 @@ public class DqtContext : DbContext
     {
     }
 
-    public DqtContext(string connectionString)
-        : this(CreateOptions(connectionString))
-    {
-    }
+    public static DqtContext Create(string connectionString) =>
+        new DqtContext(CreateOptions(connectionString));
 
-    public DbSet<TrnRequest> TrnRequests { get; set; }
+    public DbSet<TrnRequest> TrnRequests => Set<TrnRequest>();
+
+    public DbSet<EntityChangesJournal> EntityChangesJournals => Set<EntityChangesJournal>();
 
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
     {

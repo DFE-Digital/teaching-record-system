@@ -1,4 +1,4 @@
-﻿#nullable disable
+﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +13,8 @@ public class DqtDesignTimeDbContextFactory : IDesignTimeDbContextFactory<DqtCont
             .AddUserSecrets<DqtDesignTimeDbContextFactory>(optional: true)  // Optional for CI
             .Build();
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ??
+            throw new Exception("Connection string DefaultConnection is missing.");
 
         var optionsBuilder = new DbContextOptionsBuilder<DqtContext>();
         DqtContext.ConfigureOptions(optionsBuilder, connectionString);

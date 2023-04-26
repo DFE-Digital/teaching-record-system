@@ -24,7 +24,7 @@ public class DbHelper
 
     public async Task ClearData()
     {
-        using var dbContext = new DqtContext(_connectionString);
+        using var dbContext = DqtContext.Create(_connectionString);
         await dbContext.Database.OpenConnectionAsync();
         var connection = dbContext.Database.GetDbConnection();
         await EnsureRespawner(connection);
@@ -51,7 +51,7 @@ public class DbHelper
 
     public async Task ResetSchema()
     {
-        using var dbContext = new DqtContext(_connectionString);
+        using var dbContext = DqtContext.Create(_connectionString);
 
         var connection = dbContext.Database.GetDbConnection();
         var dbName = connection.Database;

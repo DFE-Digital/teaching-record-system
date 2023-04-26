@@ -26,7 +26,7 @@ public static partial class Commands
         migrateDbCommand.SetHandler(
             async (string connectionString) =>
             {
-                using var dbContext = new DqtContext(connectionString);
+                using var dbContext = DqtContext.Create(connectionString);
                 await dbContext.Database.MigrateAsync();
             },
             connectionStringOption);
