@@ -14,6 +14,10 @@ on:
         type: boolean
         description: 'Deploy to production'
         default: false
+      skip_dataverse_tests:
+        type: boolean
+        description: 'Skip the CRM Dataverse tests'
+        default: false
 
 env:
   CONTAINER_REGISTRY: ghcr.io
@@ -133,17 +137,22 @@ jobs:
       id: get_test_filter
       if: github.event_name != 'push'
       run: |
-        # If no CRM integration files (or their tests) have been changed then skip Dataverse tests
+        # If no CRM integration files (or their tests) have been changed in this PR then skip Dataverse tests
         if [ "$EVENT_NAME" == "pull_request" ]; then
           git fetch origin main --quiet --depth=1
           CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
           if [[ $(echo "$CHANGED_FILES" | grep -EL "DataStore/Crm|Tests/DataverseIntegration") ]]; then
-            echo "::warning::Skipping DataverseAdapter tests"
-            echo filter_arg='--filter "FullyQualifiedName!~QualifiedTeachersApi.Tests.DataverseIntegration"' >> $GITHUB_OUTPUT
+            SKIP_DATAVERSE_TESTS="true"
           fi
+        fi
+
+        if [ "$SKIP_DATAVERSE_TESTS" == "true" ]; then
+          echo "::warning::Skipping DataverseAdapter tests"
+          echo filter_arg='--filter "FullyQualifiedName!~QualifiedTeachersApi.Tests.DataverseIntegration"' >> $GITHUB_OUTPUT
         fi
       env:
         EVENT_NAME: ${{ github.event_name }}
+        SKIP_DATAVERSE_TESTS: ${{ github.event.inputs.skip_dataverse_tests }}
       shell: bash
 
     - name: Tests
