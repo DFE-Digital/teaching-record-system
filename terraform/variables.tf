@@ -102,6 +102,16 @@ variable "app_storage_account_name" {
   type = string
 }
 
+variable "reporting_db_server_name" {
+  type    = string
+  default = ""
+}
+
+variable "reporting_db_name" {
+  type    = string
+  default = ""
+}
+
 locals {
   api_routes = flatten([
     cloudfoundry_route.api_public,
