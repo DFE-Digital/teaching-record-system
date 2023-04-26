@@ -37,6 +37,7 @@ using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.Infrastructure.Swagger;
 using QualifiedTeachersApi.Services;
 using QualifiedTeachersApi.Services.Certificates;
+using QualifiedTeachersApi.Services.CrmEntityChanges;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
 using QualifiedTeachersApi.Validation;
@@ -241,16 +242,19 @@ public class Program
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
-        services.AddDbContext<DqtContext>(options =>
-        {
-            DqtContext.ConfigureOptions(options, pgConnectionString);
-        });
+        services.AddDbContext<DqtContext>(
+            options => DqtContext.ConfigureOptions(options, pgConnectionString),
+            contextLifetime: ServiceLifetime.Transient,
+            optionsLifetime: ServiceLifetime.Singleton);
+
+        services.AddDbContextFactory<DqtContext>(options => DqtContext.ConfigureOptions(options, pgConnectionString));
 
         services.AddDatabaseDeveloperPageExceptionFilter();
 
         services.AddTrnGenerationApi(configuration);
         services.AddIdentityApi(configuration, env);
         services.AddCertificateGeneration(builder.Configuration);
+        services.AddCrmEntityChanges();
 
         if (env.EnvironmentName != "Testing")
         {
