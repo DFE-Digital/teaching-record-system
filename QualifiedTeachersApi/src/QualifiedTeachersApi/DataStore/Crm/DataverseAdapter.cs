@@ -9,6 +9,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
@@ -1188,6 +1189,17 @@ public partial class DataverseAdapter : IDataverseAdapter
         var result = await _service.RetrieveMultipleAsync(query);
 
         return result.Entities.Select(e => e.ToEntity<Incident>()).ToArray();
+    }
+
+    public async Task<EntityMetadata> GetEntityMetadata(string entityLogicalName, EntityFilters entityFilters = EntityFilters.Default)
+    {
+        var entityResponse = (RetrieveEntityResponse)await _service.ExecuteAsync(new RetrieveEntityRequest()
+        {
+            LogicalName = entityLogicalName,
+            EntityFilters = entityFilters
+        });
+
+        return entityResponse.EntityMetadata;
     }
 
     public RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);
