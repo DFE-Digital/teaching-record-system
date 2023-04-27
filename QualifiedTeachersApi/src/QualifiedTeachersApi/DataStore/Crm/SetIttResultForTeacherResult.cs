@@ -24,10 +24,10 @@ public sealed class SetIttResultForTeacherResult
 
 public enum SetIttResultForTeacherFailedReason
 {
-    AlreadyHaveQtsDate,
-    AlreadyHaveEytsDate,
+    QtsDateMismatch,
+    EytsDateMismatch,
     NoMatchingIttRecord,
-    MultipleInTrainingIttRecords,
+    MultipleIttRecords,
     NoMatchingQtsRecord,
     MultipleQtsRecords,
 }

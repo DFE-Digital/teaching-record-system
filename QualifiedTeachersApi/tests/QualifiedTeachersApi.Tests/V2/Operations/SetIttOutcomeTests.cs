@@ -236,7 +236,7 @@ public class SetIttOutcomeTests : ApiTestBase
     }
 
     [Fact]
-    public async Task Given_teacher_already_has_QTS_date_returns_error()
+    public async Task Given_teacher_already_has_different_QTS_date_returns_error()
     {
         // Arrange
         var trn = "1234567";
@@ -253,7 +253,7 @@ public class SetIttOutcomeTests : ApiTestBase
 
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate))
-            .ReturnsAsync(SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.AlreadyHaveQtsDate));
+            .ReturnsAsync(SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.QtsDateMismatch));
 
         var requestBody = new SetIttOutcomeRequest()
         {
@@ -315,9 +315,9 @@ public class SetIttOutcomeTests : ApiTestBase
     }
 
     [Theory]
-    [InlineData(SetIttResultForTeacherFailedReason.AlreadyHaveEytsDate, 10003)]
-    [InlineData(SetIttResultForTeacherFailedReason.AlreadyHaveQtsDate, 10003)]
-    [InlineData(SetIttResultForTeacherFailedReason.MultipleInTrainingIttRecords, 10004)]
+    [InlineData(SetIttResultForTeacherFailedReason.EytsDateMismatch, 10003)]
+    [InlineData(SetIttResultForTeacherFailedReason.QtsDateMismatch, 10003)]
+    [InlineData(SetIttResultForTeacherFailedReason.MultipleIttRecords, 10004)]
     [InlineData(SetIttResultForTeacherFailedReason.NoMatchingIttRecord, 10005)]
     [InlineData(SetIttResultForTeacherFailedReason.NoMatchingQtsRecord, 10006)]
     [InlineData(SetIttResultForTeacherFailedReason.MultipleQtsRecords, 10007)]

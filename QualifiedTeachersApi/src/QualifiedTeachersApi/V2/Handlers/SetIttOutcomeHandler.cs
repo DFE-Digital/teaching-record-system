@@ -54,10 +54,10 @@ public class SetIttOutcomeHandler : IRequestHandler<SetIttOutcomeRequest, SetItt
         {
             switch (result.FailedReason)
             {
-                case SetIttResultForTeacherFailedReason.AlreadyHaveEytsDate:
-                case SetIttResultForTeacherFailedReason.AlreadyHaveQtsDate:
+                case SetIttResultForTeacherFailedReason.QtsDateMismatch:
+                case SetIttResultForTeacherFailedReason.EytsDateMismatch:
                     throw new ErrorException(ErrorRegistry.TeacherAlreadyHasQtsDate());
-                case SetIttResultForTeacherFailedReason.MultipleInTrainingIttRecords:
+                case SetIttResultForTeacherFailedReason.MultipleIttRecords:
                     throw new ErrorException(ErrorRegistry.TeacherAlreadyMultipleIncompleteIttRecords());
                 case SetIttResultForTeacherFailedReason.NoMatchingIttRecord:
                     throw new ErrorException(ErrorRegistry.TeacherHasNoIncompleteIttRecord());
