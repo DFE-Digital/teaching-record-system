@@ -281,7 +281,7 @@ public partial class DataverseAdapter
 
             List<dfeta_initialteachertraining> matching = new List<dfeta_initialteachertraining>();
             var activeForProvider = ittRecords
-                .Where(r => r.dfeta_EstablishmentId.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
+                .Where(r => r.dfeta_EstablishmentId?.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
                 .ToArray();
 
             // All incomplete qts/eyts records, regardless of provider
