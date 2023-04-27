@@ -7,6 +7,7 @@ using DbUp.Engine;
 using DbUp.Engine.Output;
 using DbUp.Engine.Transactions;
 using DbUp.ScriptProviders;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
 namespace QualifiedTeachersApi.Services.DqtReporting;
@@ -14,6 +15,7 @@ namespace QualifiedTeachersApi.Services.DqtReporting;
 public class Migrator
 {
     private readonly UpgradeEngine _upgradeEngine;
+    private readonly string _connectionString;
 
     public Migrator(string connectionString, ILogger? logger = null)
     {
@@ -34,6 +36,18 @@ public class Migrator
         }
 
         _upgradeEngine = builder.Build();
+        _connectionString = connectionString;
+    }
+
+    public void DropAllTables()
+    {
+        using var conn = new SqlConnection(_connectionString);
+        conn.Open();
+
+        var cmd = new SqlCommand("sp_MSforeachtable", conn);
+        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+        cmd.Parameters.Add(new SqlParameter("@command1", "DROP TABLE ?"));
+        cmd.ExecuteNonQuery();
     }
 
     public void MigrateDb()

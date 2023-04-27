@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
+using QualifiedTeachersApi.Tests.Infrastructure;
 
 namespace QualifiedTeachersApi.Tests.DataverseIntegration;
 
@@ -24,11 +25,11 @@ public sealed class CrmClientFixture : IDisposable
     private readonly IMemoryCache _memoryCache;
     private readonly ITrnGenerationApiClient _trnGenerationApiClient;
 
-    public CrmClientFixture(IMemoryCache memoryCache)
+    public CrmClientFixture(ServiceClient serviceClient, TestConfiguration testConfiguration, IMemoryCache memoryCache)
     {
         Clock = new();
-        Configuration = GetConfiguration();
-        _baseServiceClient = GetCrmServiceClient();
+        Configuration = testConfiguration.Configuration;
+        _baseServiceClient = serviceClient;
         _completedCts = new CancellationTokenSource();
         _lockManager = new EnvironmentLockManager(Configuration);
         _lockManager.AcquireLock(_completedCts.Token);
@@ -54,21 +55,6 @@ public sealed class CrmClientFixture : IDisposable
         _baseServiceClient.Dispose();
         _completedCts.Cancel();
     }
-
-    private static IConfiguration GetConfiguration() =>
-        new ConfigurationBuilder()
-            .AddUserSecrets<CrmClientFixture>(optional: true)
-            .AddEnvironmentVariables("IntegrationTests_")
-            .Build();
-
-    // This is wrapped up in Task.Run because the ServiceClient constructor can deadlock in some environments (e.g. CI).
-    // InitServiceAsync().Result within Microsoft.PowerPlatform.Dataverse.Client.ConnectionService.GetCachedService() looks to be the culprit
-    private ServiceClient GetCrmServiceClient() => Task.Run(() =>
-        new ServiceClient(
-            new Uri(Configuration["CrmUrl"]),
-            Configuration["CrmClientId"],
-            Configuration["CrmClientSecret"],
-            useUniqueInstance: true)).Result;
 
     private ITrnGenerationApiClient GetTrnGenerationApiClient()
     {

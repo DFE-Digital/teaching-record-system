@@ -9,12 +9,12 @@ using QualifiedTeachersApi.DataStore.Sql;
 
 namespace QualifiedTeachersApi.Services.CrmEntityChanges;
 
-public class CrmEntityChangesService : ICrmEntityChangesService
+public class DataverseCrmEntityChangesService : ICrmEntityChangesService
 {
     private readonly IDbContextFactory<DqtContext> _dbContextFactory;
     private readonly IOrganizationServiceAsync _organizationService;
 
-    public CrmEntityChangesService(IDbContextFactory<DqtContext> dbContextFactory, IOrganizationServiceAsync organizationService)
+    public DataverseCrmEntityChangesService(IDbContextFactory<DqtContext> dbContextFactory, IOrganizationServiceAsync organizationService)
     {
         _dbContextFactory = dbContextFactory;
         _organizationService = organizationService;
@@ -23,7 +23,7 @@ public class CrmEntityChangesService : ICrmEntityChangesService
     public async IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
         string key,
         string entityLogicalName,
-        int pageSize = 1000,
+        int pageSize,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);

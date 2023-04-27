@@ -1,4 +1,3 @@
-#nullable disable
 using System;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -16,20 +15,23 @@ using Moq;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.Services.Certificates;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
-using Xunit;
+using QualifiedTeachersApi.Tests.Infrastructure;
 
 namespace QualifiedTeachersApi.Tests;
 
-public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
+public class ApiFixture : WebApplicationFactory<Program>
 {
     private readonly HttpClientInterceptorOptions _evidenceFilesHttpClientInterceptorOptions = new();
+    private readonly TestConfiguration _testConfiguration;
 
-    public ApiFixture()
+    public ApiFixture(TestConfiguration testConfiguration, DbHelper dbHelper)
     {
+        _testConfiguration = testConfiguration;
+        DbHelper = dbHelper;
         JwtSigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()), SecurityAlgorithms.RsaSha256);
     }
 
-    public DbHelper DbHelper => Services.GetRequiredService<DbHelper>();
+    public DbHelper DbHelper { get; }
 
     public Mock<IDataverseAdapter> DataverseAdapter { get; } = new Mock<IDataverseAdapter>();
 
@@ -44,7 +46,7 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
     public void ConfigureEvidenceFilesHttpClient(Action<HttpClientInterceptorOptions> configure) =>
         configure(_evidenceFilesHttpClientInterceptorOptions);
 
-    public async Task InitializeAsync()
+    public async Task Initialize()
     {
         await DbHelper.EnsureSchema();
     }
@@ -63,7 +65,7 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
 
         // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
         // i.e. Program.cs and that has a dependency on IConfiguration
-        builder.UseConfiguration(GetTestConfiguration());
+        builder.UseConfiguration(_testConfiguration.Configuration);
 
         builder.ConfigureServices(services =>
         {
@@ -80,13 +82,6 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
                 .AddHttpMessageHandler(_ => _evidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())
                 .ConfigurePrimaryHttpMessageHandler(_ => new NotFoundHandler());
 
-            services.AddSingleton(sp =>
-            {
-                var configuration = sp.GetRequiredService<IConfiguration>();
-                var connectionString = configuration.GetConnectionString("DefaultConnection");
-                return new DbHelper(connectionString);
-            });
-
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.TokenValidationParameters.ValidateIssuer = false;
@@ -94,8 +89,6 @@ public class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
             });
         });
     }
-
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 
     private static IConfiguration GetTestConfiguration() =>
         new ConfigurationBuilder().AddUserSecrets<ApiFixture>(optional: true).Build();

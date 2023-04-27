@@ -1,6 +1,7 @@
 #nullable disable
 using System;
 using System.Threading.Tasks;
+using Microsoft.Xrm.Sdk.Metadata;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 
 namespace QualifiedTeachersApi.DataStore.Crm;
@@ -89,4 +90,6 @@ public interface IDataverseAdapter
     Task<Subject> GetSubjectByTitle(string title, string[] columnNames);
 
     Task<Incident[]> GetIncidentsByContactId(Guid contactId, IncidentState? state, string[] columnNames);
+
+    Task<EntityMetadata> GetEntityMetadata(string entityLogicalName, EntityFilters entityFilters = EntityFilters.Default);
 }

@@ -38,6 +38,7 @@ using QualifiedTeachersApi.Infrastructure.Swagger;
 using QualifiedTeachersApi.Services;
 using QualifiedTeachersApi.Services.Certificates;
 using QualifiedTeachersApi.Services.CrmEntityChanges;
+using QualifiedTeachersApi.Services.DqtReporting;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
 using QualifiedTeachersApi.Validation;
@@ -255,6 +256,7 @@ public class Program
         services.AddIdentityApi(configuration, env);
         services.AddCertificateGeneration(builder.Configuration);
         services.AddCrmEntityChanges();
+        services.AddDqtReporting(builder.Configuration, env);
 
         if (env.EnvironmentName != "Testing")
         {
