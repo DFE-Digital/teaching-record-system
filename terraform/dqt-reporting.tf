@@ -6,6 +6,12 @@ resource "azurerm_mssql_server" "reporting_server" {
   version                      = "12.0"
   administrator_login          = yamldecode(data.azurerm_key_vault_secret.secrets["REPORTING-DB"].value)["USERNAME"]
   administrator_login_password = yamldecode(data.azurerm_key_vault_secret.secrets["REPORTING-DB"].value)["PASSWORD"]
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_mssql_firewall_rule" "reporting_server_paas_access" {
@@ -23,4 +29,10 @@ resource "azurerm_mssql_database" "reporting_db" {
   collation   = "SQL_Latin1_General_CP1_CI_AS"
   max_size_gb = 10
   sku_name    = "S0"
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
