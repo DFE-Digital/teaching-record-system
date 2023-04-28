@@ -59,6 +59,12 @@ resource "azurerm_application_insights" "api_app_insights" {
   resource_group_name = var.resource_group_name
   location            = "West Europe"
   application_type    = "web"
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "cloudfoundry_service_instance" "redis" {

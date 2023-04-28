@@ -11,6 +11,12 @@ resource "azurerm_storage_account" "app-storage" {
   blob_properties {
     last_access_time_enabled = true
   }
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_storage_container" "certificates" {
