@@ -8,10 +8,10 @@ locals {
         }
       }
     )),
-    AppVersion                  = var.api_app_version,
-    PaasEnvironment             = var.environment_name,
-    StorageConnectionString     = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}",
-    ReportingDbConnectionString = length(azurerm_mssql_server.reporting_server) == 1 ? "Data Source=tcp:${azurerm_mssql_server.reporting_server[0].fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.reporting_db[0].name};Persist Security Info=False;User ID=${azurerm_mssql_server.reporting_server[0].administrator_login};Password=${yamldecode(data.azurerm_key_vault_secret.secrets["REPORTING-DB"].value)["PASSWORD"]};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" : ""
+    AppVersion                                = var.api_app_version,
+    PaasEnvironment                           = var.environment_name,
+    StorageConnectionString                   = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}",
+    DqtReporting__ReportingDbConnectionString = length(azurerm_mssql_server.reporting_server) == 1 ? "Data Source=tcp:${azurerm_mssql_server.reporting_server[0].fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.reporting_db[0].name};Persist Security Info=False;User ID=${azurerm_mssql_server.reporting_server[0].administrator_login};Password=${yamldecode(data.azurerm_key_vault_secret.secrets["REPORTING-DB"].value)["PASSWORD"]};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" : ""
   }
 
   logstash_endpoint = data.azurerm_key_vault_secret.secrets["LOGSTASH-ENDPOINT"].value
