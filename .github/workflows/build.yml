@@ -107,7 +107,7 @@ jobs:
         INCLUDE_ARG=""
         if [ "$EVENT_NAME" == "pull_request" ]; then
           git fetch origin main --quiet --depth=1
-          CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA | { grep '^QualifiedTeachersApi.*\.cs$' || true; })
+          CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA | { grep -oP '^QualifiedTeachersApi\/\K.*\.cs$' || true; })
 
           if [ "$CHANGED_FILES" == "" ]; then
             echo "::warning::No changes to lint"
