@@ -1086,7 +1086,8 @@ public partial class DataverseAdapter : IDataverseAdapter
             {
                 Conditions =
                 {
-                    new ConditionExpression(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active)
+                    new ConditionExpression(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active),
+                    new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull)
                 },
                 Filters =
                 {
