@@ -20,6 +20,9 @@ public static class ServiceCollectionExtensions
                 .ValidateOnStart();
 
             services.AddSingleton<IHostedService, DqtReportingService>();
+
+            services.AddApplicationInsightsTelemetry()
+                .AddApplicationInsightsTelemetryProcessor<IgnoreDependencyTelemetryProcessor>();
         }
 
         return services;
