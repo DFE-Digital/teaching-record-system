@@ -210,6 +210,7 @@ public class DqtReportingService : BackgroundService
         {
             OptionSetValue optionSetValue => optionSetValue.Value,
             EntityReference entityReference => entityReference.Id,
+            Money money => money.Value,
             _ => value
         };
     }
