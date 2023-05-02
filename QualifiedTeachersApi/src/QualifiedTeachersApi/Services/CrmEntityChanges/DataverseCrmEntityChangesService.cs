@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Query;
 using QualifiedTeachersApi.DataStore.Sql;
 
 namespace QualifiedTeachersApi.Services.CrmEntityChanges;
@@ -23,6 +24,7 @@ public class DataverseCrmEntityChangesService : ICrmEntityChangesService
     public async IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
         string key,
         string entityLogicalName,
+        ColumnSet columns,
         int pageSize,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
@@ -33,7 +35,7 @@ public class DataverseCrmEntityChangesService : ICrmEntityChangesService
 
         var request = new RetrieveEntityChangesRequest()
         {
-            Columns = new Microsoft.Xrm.Sdk.Query.ColumnSet(allColumns: true),
+            Columns = columns,
             EntityName = entityLogicalName,
             PageInfo = new()
             {
@@ -53,26 +55,26 @@ public class DataverseCrmEntityChangesService : ICrmEntityChangesService
 
             gotData &= response.EntityChanges.Changes.Count > 0;
 
-            yield return response.EntityChanges.Changes.ToArray();
+            if (response.EntityChanges.Changes.Count > 0)
+            {
+                yield return response.EntityChanges.Changes.ToArray();
+            }
 
             if (!response.EntityChanges.MoreRecords)
             {
-                if (gotData)
+                if (gotData && entityChangesJournal is not null)
                 {
-                    if (entityChangesJournal is not null)
+                    entityChangesJournal.DataToken = response.EntityChanges.DataToken;
+                    await dbContext.SaveChangesAsync();
+                }
+                else if (entityChangesJournal is null)
+                {
+                    dbContext.EntityChangesJournals.Add(new()
                     {
-                        entityChangesJournal.DataToken = response.EntityChanges.DataToken;
-                    }
-                    else
-                    {
-                        dbContext.EntityChangesJournals.Add(new()
-                        {
-                            Key = key,
-                            EntityLogicalName = entityLogicalName,
-                            DataToken = response.EntityChanges.DataToken
-                        });
-                    }
-
+                        Key = key,
+                        EntityLogicalName = entityLogicalName,
+                        DataToken = response.EntityChanges.DataToken
+                    });
                     await dbContext.SaveChangesAsync();
                 }
 

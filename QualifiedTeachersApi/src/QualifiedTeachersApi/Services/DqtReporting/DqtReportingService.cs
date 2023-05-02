@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
+using Microsoft.Xrm.Sdk.Query;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.Services.CrmEntityChanges;
 
@@ -17,7 +18,8 @@ namespace QualifiedTeachersApi.Services.DqtReporting;
 
 public class DqtReportingService : BackgroundService
 {
-    private const string ChangesKey = "DqtReporting";
+    public const string ChangesKey = "DqtReporting";
+
     private const string IdColumnName = "Id";
 
     private readonly DqtReportingOptions _options;
@@ -87,7 +89,9 @@ public class DqtReportingService : BackgroundService
 
     internal async Task ProcessChangesForEntityType(string entityLogicalName, CancellationToken cancellationToken)
     {
-        await foreach (var changes in _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName).WithCancellation(cancellationToken))
+        var columns = new ColumnSet(allColumns: true);
+
+        await foreach (var changes in _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns).WithCancellation(cancellationToken))
         {
             var newOrUpdatedItems = new List<NewOrUpdatedItem>();
             var removedOrDeletedItems = new List<RemovedOrDeletedItem>();
