@@ -7,10 +7,7 @@ public static partial class Commands
 {
     public static Command CreateMigrateDbCommand(IConfiguration configuration)
     {
-        var connectionStringOption = new Option<string>("--connection-string")
-        {
-            IsRequired = true
-        };
+        var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
 
         var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
         if (configuredConnectionString is not null)

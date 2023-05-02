@@ -11,6 +11,7 @@ var rootCommand = new RootCommand("Development tools for the Qualified Teachers 
     Commands.CreateMigrateDbCommand(configuration),
     Commands.CreateMigrateReportingDbCommand(configuration),
     Commands.CreateResetReportingDbJournalCommand(configuration),
+    Commands.CreateResetReportingDbChangeCursorCommand(configuration)
 };
 
 return await rootCommand.InvokeAsync(args);

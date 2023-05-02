@@ -6,10 +6,7 @@ public static partial class Commands
 {
     public static Command CreateResetReportingDbJournalCommand(IConfiguration configuration)
     {
-        var connectionStringOption = new Option<string>("--connection-string")
-        {
-            IsRequired = true
-        };
+        var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
 
         var configuredConnectionString = configuration["DqtReporting:ReportingDbConnectionString"];
         if (configuredConnectionString is not null)

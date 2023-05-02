@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 using Moq;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
@@ -111,6 +112,7 @@ public class DqtReportingFixture
         public IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
             string key,
             string entityLogicalName,
+            ColumnSet columns,
             int pageSize = 1000,
             CancellationToken cancellationToken = default)
         {
