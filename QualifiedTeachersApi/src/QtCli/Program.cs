@@ -1,5 +1,6 @@
 ﻿global using System.CommandLine;
 global using Microsoft.Extensions.Configuration;
+global using Microsoft.PowerPlatform.Dataverse.Client;
 using QtCli;
 
 var configuration = new ConfigurationBuilder()
@@ -11,7 +12,8 @@ var rootCommand = new RootCommand("Development tools for the Qualified Teachers 
     Commands.CreateMigrateDbCommand(configuration),
     Commands.CreateMigrateReportingDbCommand(configuration),
     Commands.CreateResetReportingDbJournalCommand(configuration),
-    Commands.CreateResetReportingDbChangeCursorCommand(configuration)
+    Commands.CreateResetReportingDbChangeCursorCommand(configuration),
+    Commands.CreateGenerateReportingDbTableCommand(configuration)
 };
 
 return await rootCommand.InvokeAsync(args);

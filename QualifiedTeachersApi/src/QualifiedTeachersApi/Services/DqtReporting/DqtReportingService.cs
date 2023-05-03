@@ -20,12 +20,11 @@ using QualifiedTeachersApi.Services.CrmEntityChanges;
 
 namespace QualifiedTeachersApi.Services.DqtReporting;
 
-public class DqtReportingService : BackgroundService
+public partial class DqtReportingService : BackgroundService
 {
     public const string ChangesKey = "DqtReporting";
     public const string ProcessChangesOperationName = "DqtReporting: process changes";
 
-    private const string IdColumnName = "Id";
     private const int MaxParameters = 1024;
     private const int MaxUpsertBatchSize = 500;
     private const string MetricPrefix = "DqtReporting: ";
@@ -92,7 +91,7 @@ public class DqtReportingService : BackgroundService
                 throw new Exception($"Entity '{entity}' does not have change tracking enabled.");
             }
 
-            var entityTableMapping = GetEntityTableMapping(entityMetadata);
+            var entityTableMapping = EntityTableMapping.Create(entityMetadata);
 
             _entityMetadata[entity] = (entityMetadata, entityTableMapping);
         }
@@ -407,7 +406,7 @@ public class DqtReportingService : BackgroundService
             var idParameters = ids.Select((id, i) => new SqlParameter($"@id{i}", id)).ToArray();
 
             var command = new SqlCommand(
-                $"delete from [{tableName}] where [{IdColumnName}] in ({string.Join(", ", idParameters.Select(p => $"{p.ParameterName}"))})");
+                $"delete from [{tableName}] where [{EntityTableMapping.IdColumnName}] in ({string.Join(", ", idParameters.Select(p => $"{p.ParameterName}"))})");
 
             command.Connection = conn;
             command.Parameters.AddRange(idParameters);
@@ -416,170 +415,5 @@ public class DqtReportingService : BackgroundService
         }
 
         return removedOrDeletedItems.Count;
-    }
-
-    private EntityTableMapping GetEntityTableMapping(EntityMetadata entityMetadata)
-    {
-        var entityLogicalName = entityMetadata.LogicalName;
-
-        var attributes = entityMetadata.Attributes
-            .OrderBy(a => a.ColumnNumber)
-            .Where(a => a.AttributeType != AttributeTypeCode.Virtual)
-            .Select(attr =>
-            {
-                return attr switch
-                {
-                    _ when attr.LogicalName == entityMetadata.PrimaryIdAttribute => CreateIdMapping(),
-                    { AttributeType: AttributeTypeCode.Boolean } => CreateOneToOneMapping(typeof(bool), "bit"),
-                    { AttributeType: AttributeTypeCode.DateTime } => CreateOneToOneMapping(typeof(DateTime), "datetime"),
-                    { AttributeType: AttributeTypeCode.Decimal } => CreateOneToOneMapping(typeof(decimal), "decimal"),
-                    { AttributeType: AttributeTypeCode.Double } => CreateOneToOneMapping(typeof(double), "float"),
-                    { AttributeType: AttributeTypeCode.Integer } => CreateOneToOneMapping(typeof(string), "int"),
-                    { AttributeType: AttributeTypeCode.Money } => CreateOneToOneMapping(typeof(decimal), "decimal", attrValue => ((Money)attrValue).Value),
-                    { AttributeType: AttributeTypeCode.State } => CreateOneToOneMappingForOptionSetValue(),
-                    { AttributeType: AttributeTypeCode.Status } => CreateOneToOneMappingForOptionSetValue(),
-                    { AttributeType: AttributeTypeCode.Uniqueidentifier } => CreateOneToOneMapping(typeof(Guid), "uniqueidentifier"),
-                    { AttributeType: AttributeTypeCode.BigInt } => CreateOneToOneMapping(typeof(long), "bigint"),
-                    { AttributeType: AttributeTypeCode.Picklist } => CreateOneToOneMappingForOptionSetValue(),
-                    { AttributeType: AttributeTypeCode.Memo } => CreateOneToOneMapping(typeof(string), "nvarchar(max)"),
-                    { AttributeType: AttributeTypeCode.String } => CreateStringMapping(),
-                    { AttributeType: AttributeTypeCode.Lookup } => CreateLookupMapping(),
-                    { AttributeType: AttributeTypeCode.Owner } => CreateLookupMapping(),
-                    { AttributeType: AttributeTypeCode.Customer } => CreateLookupMapping(),
-                    { AttributeType: AttributeTypeCode.EntityName } => CreateEntityNameMapping(),
-                    { AttributeType: AttributeTypeCode.PartyList } => CreateOneToOneMapping(typeof(Guid), "uniqueidentifier"),
-                    _ => throw new NotSupportedException($"Cannot derive table mapping for '{attr.LogicalName}' attribute.")
-                };
-
-                AttributeColumnMapping CreateOneToOneMappingForOptionSetValue() =>
-                    CreateOneToOneMapping(typeof(int), "int", attrValue => ((OptionSetValue)attrValue).Value);
-
-                AttributeColumnMapping CreateOneToOneMapping(Type type, string columnDefinition, Func<object, object>? getColumnValueFromAttribute = null) =>
-                    new AttributeColumnMapping()
-                    {
-                        AttributeName = attr.LogicalName,
-                        ColumnDefinitions = new[]
-                        {
-                            new AttributeColumnDefinition()
-                            {
-                                ColumnName = attr.LogicalName,
-                                Type = type,
-                                ColumnDefinition = columnDefinition,
-                                GetColumnValueFromAttribute = getColumnValueFromAttribute ?? (attrValue => attrValue)
-                            }
-                        }
-                    };
-
-                AttributeColumnMapping CreateIdMapping() => new AttributeColumnMapping()
-                {
-                    AttributeName = attr.LogicalName,
-                    ColumnDefinitions = new[]
-                    {
-                        new AttributeColumnDefinition()
-                        {
-                            ColumnName = IdColumnName,
-                            Type = typeof(Guid),
-                            ColumnDefinition = "uniqueidentifier",
-                            GetColumnValueFromAttribute = attrValue => attrValue
-                        }
-                    }
-                };
-
-                AttributeColumnMapping CreateStringMapping()
-                {
-                    var maxLength = ((StringAttributeMetadata)attr).MaxLength;
-                    var lengthDefinition = maxLength == 1073741823 ? "max" : maxLength.ToString();
-                    return CreateOneToOneMapping(typeof(string), $"nvarchar({lengthDefinition})");
-                }
-
-                AttributeColumnMapping CreateLookupMapping() => new AttributeColumnMapping()
-                {
-                    AttributeName = attr.LogicalName,
-                    ColumnDefinitions = new[]
-                    {
-                        new AttributeColumnDefinition()
-                        {
-                            ColumnName = attr.LogicalName,
-                            Type = typeof(Guid),
-                            ColumnDefinition = "uniqueidentifier",
-                            GetColumnValueFromAttribute = attrValue => ((EntityReference)attrValue).Id
-                        },
-                        new AttributeColumnDefinition()
-                        {
-                            ColumnName = $"{attr.LogicalName}_entitytype",
-                            Type = typeof(string),
-                            ColumnDefinition = "nvarchar(128)",
-                            GetColumnValueFromAttribute = attrValue => ((EntityReference)attrValue).LogicalName
-                        }
-                    }
-                };
-
-                AttributeColumnMapping CreateEntityNameMapping() => new AttributeColumnMapping()
-                {
-                    AttributeName = attr.LogicalName,
-                    ColumnDefinitions = new[]
-                    {
-                        new AttributeColumnDefinition()
-                        {
-                            ColumnName = attr.LogicalName,
-                            Type = typeof(string),
-                            ColumnDefinition = "nvarchar(4000)",
-                            GetColumnValueFromAttribute = attrValue => attrValue
-                        }
-                    }
-                };
-            })
-            .ToArray();
-
-        return new EntityTableMapping()
-        {
-            EntityLogicalName = entityLogicalName,
-            TableName = entityLogicalName,
-            Attributes = attributes
-        };
-    }
-
-    private class EntityTableMapping
-    {
-        public required string EntityLogicalName { get; init; }
-        public required string TableName { get; init; }
-        public required AttributeColumnMapping[] Attributes { get; init; }
-
-        public int ColumnCount => Attributes.SelectMany(a => a.ColumnDefinitions).Count();
-
-        public string GetMergeSql(string sourceTableName)
-        {
-            var allColumns = Attributes.SelectMany(a => a.ColumnDefinitions).ToArray();
-
-            var sqlBuilder = new StringBuilder();
-            sqlBuilder.AppendLine($"merge into [{TableName}] as target");
-            sqlBuilder.AppendLine("using (select");
-            sqlBuilder.AppendJoin(",\n", allColumns.Select(c => $"\t[{c.ColumnName}]"));
-            sqlBuilder.AppendLine($"\n from [{sourceTableName}]) as source");
-            sqlBuilder.AppendLine($"on source.[{IdColumnName}] = target.[{IdColumnName}]");
-            sqlBuilder.AppendLine("when matched then update set");
-            sqlBuilder.AppendJoin(",\n", allColumns.Where(c => c.ColumnName != IdColumnName).Select(p => $"\t[{p.ColumnName}] = source.[{p.ColumnName}]"));
-            sqlBuilder.AppendLine("\nwhen not matched then insert (");
-            sqlBuilder.AppendJoin(",\n", allColumns.Select(c => $"\t[{c.ColumnName}]"));
-            sqlBuilder.AppendLine("\n) values (");
-            sqlBuilder.AppendJoin(",\n", allColumns.Select(c => $"\tsource.[{c.ColumnName}]"));
-            sqlBuilder.AppendLine("\n)\noutput $action;");
-
-            return sqlBuilder.ToString();
-        }
-    }
-
-    private class AttributeColumnMapping
-    {
-        public required string AttributeName { get; init; }
-        public required AttributeColumnDefinition[] ColumnDefinitions { get; init; }
-    }
-
-    private class AttributeColumnDefinition
-    {
-        public required string ColumnName { get; init; }
-        public required Type Type { get; init; }
-        public required string ColumnDefinition { get; init; }
-        public required Func<object, object> GetColumnValueFromAttribute { get; init; }
     }
 }

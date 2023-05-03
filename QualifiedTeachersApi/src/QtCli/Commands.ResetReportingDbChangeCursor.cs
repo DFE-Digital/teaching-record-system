@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Services.CrmEntityChanges;
