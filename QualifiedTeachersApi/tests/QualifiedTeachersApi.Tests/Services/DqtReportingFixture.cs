@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -68,12 +69,15 @@ public class DqtReportingFixture
 
         var dataverseAdapter = new DataverseAdapter(_serviceClient, new TestableClock(), _memoryCache, trnGenerationApiClient);
 
+        var telemetryClient = new TelemetryClient(new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration());
+
         var logger = new NullLogger<DqtReportingService>();
 
         var service = new DqtReportingService(
             options,
             crmEntityChangesService,
             dataverseAdapter,
+            telemetryClient,
             logger);
 
         await action(service, changesObserver);

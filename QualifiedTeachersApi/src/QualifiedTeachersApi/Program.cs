@@ -28,6 +28,7 @@ using Prometheus;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Filters;
+using QualifiedTeachersApi.Infrastructure.ApplicationInsights;
 using QualifiedTeachersApi.Infrastructure.ApplicationModel;
 using QualifiedTeachersApi.Infrastructure.Configuration;
 using QualifiedTeachersApi.Infrastructure.Json;

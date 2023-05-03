@@ -1,11 +1,10 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
 
-namespace QualifiedTeachersApi.Infrastructure.Logging;
+namespace QualifiedTeachersApi.Infrastructure.ApplicationInsights;
 
 public class RedactedUrlTelemetryProcessor : ITelemetryProcessor
 {
@@ -22,7 +21,7 @@ public class RedactedUrlTelemetryProcessor : ITelemetryProcessor
     {
         if (item is RequestTelemetry requestTelemetry)
         {
-            requestTelemetry.Url = new Uri(_httpContextAccessor.HttpContext.Request.GetScrubbedRequestUrl());
+            requestTelemetry.Url = new Uri(_httpContextAccessor.HttpContext!.Request.GetScrubbedRequestUrl());
         }
 
         _next.Process(item);

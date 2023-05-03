@@ -53,7 +53,7 @@ public class DataverseCrmEntityChangesService : ICrmEntityChangesService
 
             var response = (RetrieveEntityChangesResponse)await _organizationService.ExecuteAsync(request);
 
-            gotData &= response.EntityChanges.Changes.Count > 0;
+            gotData |= response.EntityChanges.Changes.Count > 0;
 
             if (response.EntityChanges.Changes.Count > 0)
             {

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,12 +22,16 @@ namespace QualifiedTeachersApi.Services.DqtReporting;
 public class DqtReportingService : BackgroundService
 {
     public const string ChangesKey = "DqtReporting";
+    public const string ProcessChangesOperationName = "DqtReporting: process changes";
 
     private const string IdColumnName = "Id";
+    private const int MaxParameters = 1024;
+    private const string MetricPrefix = "DqtReporting: ";
 
     private readonly DqtReportingOptions _options;
     private readonly ICrmEntityChangesService _crmEntityChangesService;
     private readonly IDataverseAdapter _dataverseAdapter;
+    private readonly TelemetryClient _telemetryClient;
     private readonly ILogger<DqtReportingService> _logger;
     private readonly Dictionary<string, EntityMetadata> _entityMetadata = new();
 
@@ -32,11 +39,13 @@ public class DqtReportingService : BackgroundService
         IOptions<DqtReportingOptions> optionsAccessor,
         ICrmEntityChangesService crmEntityChangesService,
         IDataverseAdapter dataverseAdapter,
+        TelemetryClient telemetryClient,
         ILogger<DqtReportingService> logger)
     {
         _options = optionsAccessor.Value;
         _crmEntityChangesService = crmEntityChangesService;
         _dataverseAdapter = dataverseAdapter;
+        _telemetryClient = telemetryClient;
         _logger = logger;
     }
 
@@ -57,7 +66,15 @@ public class DqtReportingService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed polling for entity changes.");
+                _logger.LogError(ex, "Failed processing entity changes.");
+
+                // We assume non-transient SqlExceptions are bugs; log the error, and stop the service gracefully.
+                if (ex is SqlException sqlException && !sqlException.IsTransient)
+                {
+                    return;
+                }
+
+                throw;
             }
         }
     }
@@ -77,22 +94,74 @@ public class DqtReportingService : BackgroundService
         }
     }
 
-    internal Task ProcessChanges(CancellationToken cancellationToken) =>
-        Parallel.ForEachAsync(
+    internal async Task ProcessChanges(CancellationToken cancellationToken)
+    {
+        using var operation = _telemetryClient.StartOperation<DependencyTelemetry>(ProcessChangesOperationName);
+
+        var metricsGate = new object();
+        var totalUpdates = 0;
+
+        await Parallel.ForEachAsync(
             _options.Entities,
             new ParallelOptions()
             {
                 MaxDegreeOfParallelism = _options.ProcessAllEntityTypesConcurrently ? _options.Entities.Length : 1,
                 CancellationToken = cancellationToken
             },
-            (entityType, ct) => new ValueTask(ProcessChangesForEntityType(entityType, ct)));
+            async (entityType, ct) =>
+            {
+                try
+                {
+                    var stopwatch = Stopwatch.StartNew();
+                    var updatesForEntityType = await ProcessChangesForEntityType(entityType, ct);
+                    stopwatch.Stop();
 
-    internal async Task ProcessChangesForEntityType(string entityLogicalName, CancellationToken cancellationToken)
+                    _telemetryClient.TrackMetric(new MetricTelemetry()
+                    {
+                        Name = $"{MetricPrefix}Batch processing time - {entityType}",
+                        Sum = stopwatch.Elapsed.TotalSeconds
+                    });
+
+                    lock (metricsGate)
+                    {
+                        totalUpdates += updatesForEntityType;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _telemetryClient.TrackException(new ExceptionTelemetry()
+                    {
+                        Exception = ex,
+                        Properties =
+                        {
+                            { "Entity type", entityType }
+                        }
+                    });
+
+                    throw;
+                }
+            });
+
+        _telemetryClient.TrackMetric(new MetricTelemetry()
+        {
+            Name = $"{MetricPrefix}Total updates processed",
+            Sum = totalUpdates
+        });
+    }
+
+    internal async Task<int> ProcessChangesForEntityType(string entityLogicalName, CancellationToken cancellationToken)
     {
+        var totalUpdates = 0;
+        var insertedCount = 0;
+        var updatedCount = 0;
+        var deletedCount = 0;
+
         var columns = new ColumnSet(allColumns: true);
 
         await foreach (var changes in _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns).WithCancellation(cancellationToken))
         {
+            totalUpdates += changes.Length;
+
             var newOrUpdatedItems = new List<NewOrUpdatedItem>();
             var removedOrDeletedItems = new List<RemovedOrDeletedItem>();
 
@@ -112,12 +181,44 @@ public class DqtReportingService : BackgroundService
                 }
             }
 
-            await HandleNewOrUpdatedItems(newOrUpdatedItems, cancellationToken);
-            await HandleRemovedOrDeletedItems(removedOrDeletedItems, cancellationToken);
+            var batchNewOrUpdatedCount = await HandleNewOrUpdatedItems(newOrUpdatedItems, cancellationToken);
+            insertedCount += batchNewOrUpdatedCount.InsertedCount;
+            updatedCount += batchNewOrUpdatedCount.UpdatedCount;
+
+            // It's important deleted items are processed *after* upserts, otherwise we may resurrect a deleted record
+            deletedCount += await HandleRemovedOrDeletedItems(removedOrDeletedItems, cancellationToken);
         }
+
+        Debug.Assert(totalUpdates == insertedCount + updatedCount + deletedCount);
+
+        _telemetryClient.TrackMetric(new MetricTelemetry()
+        {
+            Name = $"{MetricPrefix}Updates processed - {entityLogicalName}",
+            Sum = totalUpdates
+        });
+
+        _telemetryClient.TrackMetric(new MetricTelemetry()
+        {
+            Name = $"{MetricPrefix}Records added - {entityLogicalName}",
+            Sum = insertedCount
+        });
+
+        _telemetryClient.TrackMetric(new MetricTelemetry()
+        {
+            Name = $"{MetricPrefix}Records updated - {entityLogicalName}",
+            Sum = updatedCount
+        });
+
+        _telemetryClient.TrackMetric(new MetricTelemetry()
+        {
+            Name = $"{MetricPrefix}Records deleted - {entityLogicalName}",
+            Sum = deletedCount
+        });
+
+        return totalUpdates;
     }
 
-    private async Task HandleNewOrUpdatedItems(
+    private async Task<(int InsertedCount, int UpdatedCount)> HandleNewOrUpdatedItems(
         IReadOnlyCollection<NewOrUpdatedItem> newOrUpdatedItems,
         CancellationToken cancellationToken)
     {
@@ -125,46 +226,72 @@ public class DqtReportingService : BackgroundService
 
         if (newOrUpdatedItems.Count == 0)
         {
-            return;
+            return (0, 0);
         }
+
+        var insertedCount = 0;
+        var updatedCount = 0;
 
         var entityLogicalName = newOrUpdatedItems.First().NewOrUpdatedEntity.LogicalName;
         var entities = newOrUpdatedItems.Select(e => e.NewOrUpdatedEntity);
 
+        using var conn = new SqlConnection(_options.ReportingDbConnectionString);
+        await conn.OpenAsync();
+
         foreach (var entity in entities)
         {
             var command = CreateUpsertRowCommand(entity);
-            await ExecuteCommand(command, cancellationToken);
+            command.Connection = conn;
+
+            using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            await reader.ReadAsync(cancellationToken);
+            var action = reader.GetString(0);
+
+            if (action == "UPDATE")
+            {
+                updatedCount++;
+            }
+            else
+            {
+                Debug.Assert(action == "INSERT");
+                insertedCount++;
+            }
         }
+
+        Debug.Assert(newOrUpdatedItems.Count == insertedCount + updatedCount);
+
+        return (insertedCount, updatedCount);
     }
 
-    private async Task HandleRemovedOrDeletedItems(
+    private async Task<int> HandleRemovedOrDeletedItems(
         IReadOnlyCollection<RemovedOrDeletedItem> removedOrDeletedItems,
         CancellationToken cancellationToken)
     {
         if (removedOrDeletedItems.Count == 0)
         {
-            return;
+            return removedOrDeletedItems.Count;
         }
 
         var entityLogicalName = removedOrDeletedItems.First().RemovedItem.LogicalName;
         var ids = removedOrDeletedItems.Select(e => e.RemovedItem.Id).ToArray();
 
-        var command = CreateDeleteRowsCommand(entityLogicalName, ids);
-        await ExecuteCommand(command, cancellationToken);
-    }
-
-    private async Task ExecuteCommand(SqlCommand command, CancellationToken cancellationToken)
-    {
         using var conn = new SqlConnection(_options.ReportingDbConnectionString);
         await conn.OpenAsync();
 
-        command.Connection = conn;
-        await command.ExecuteNonQueryAsync(cancellationToken);
+        foreach (var chunk in ids.Chunk(MaxParameters))
+        {
+            var command = CreateDeleteRowsCommand(entityLogicalName, chunk);
+            command.Connection = conn;
+            await command.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        return removedOrDeletedItems.Count;
     }
 
     private SqlCommand CreateDeleteRowsCommand(string entityLogicalName, IReadOnlyCollection<Guid> ids)
     {
+        Debug.Assert(ids.Count <= MaxParameters);
+
         var tableName = entityLogicalName;
         var idParameters = ids.Select((id, i) => new SqlParameter($"@id{i}", id)).ToArray();
 
@@ -203,7 +330,7 @@ public class DqtReportingService : BackgroundService
         sqlBuilder.AppendJoin(",\n", parametersAndColumns.Select(p => $"\t{p.ColumnName}"));
         sqlBuilder.AppendLine("\n) values (");
         sqlBuilder.AppendJoin(",\n", parametersAndColumns.Select(p => $"\t{p.Parameter.ParameterName}"));
-        sqlBuilder.AppendLine("\n);");
+        sqlBuilder.AppendLine("\n)\noutput $action;");
 
         var command = new SqlCommand(sqlBuilder.ToString());
         command.Parameters.AddRange(parametersAndColumns.Select(p => p.Parameter).ToArray());
