@@ -22,6 +22,10 @@ public partial class DataverseAdapter
             dfeta_NewFirstName = command.FirstName,
             dfeta_NewMiddleName = command.MiddleName,
             dfeta_NewLastName = command.LastName,
+            dfeta_StatedFirstName = command.StatedFirstName,
+            dfeta_StatedMiddleName = command.StatedMiddleName,
+            dfeta_StatedLastName = command.StatedLastName,
+            dfeta_FromIdentity = command.FromIdentity
         };
 
         var document = new dfeta_document()
@@ -66,7 +70,8 @@ public partial class DataverseAdapter
             Title = "Request to change date of birth",
             SubjectId = subject.Id.ToEntityReference(Subject.EntityLogicalName),
             CustomerId = command.ContactId.ToEntityReference(Contact.EntityLogicalName),
-            dfeta_NewDateofBirth = command.DateOfBirth.ToDateTime()
+            dfeta_NewDateofBirth = command.DateOfBirth.ToDateTime(),
+            dfeta_FromIdentity = command.FromIdentity
         };
 
         var document = new dfeta_document()

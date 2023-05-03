@@ -39,6 +39,16 @@ public class GetTeacherTests : GetTeacherTestBase
     }
 
     [Fact]
+    public Task Get_ValidRequestForContactWithMultiWordFirstName_ReturnsExpectedResponse()
+    {
+        var trn = "1234567";
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var baseUrl = "/v3/teacher";
+
+        return ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
+    }
+
+    [Fact]
     public Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
     {
         var trn = "1234567";

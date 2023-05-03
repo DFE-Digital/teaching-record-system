@@ -70,6 +70,55 @@ public abstract class GetTeacherTestBase : ApiTestBase
             StatusCodes.Status200OK);
     }
 
+    protected async Task ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(
+        HttpClient httpClient,
+        string baseUrl,
+        string trn,
+        bool expectCertificateUrls)
+    {
+        // Arrange
+        var contact = CreateContact(trn, hasMultiWordFirstName: true);
+
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications: null, incidents: null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, baseUrl);
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var expectedJson = JsonSerializer.SerializeToNode(new
+        {
+            firstName = contact.dfeta_StatedFirstName,
+            lastName = contact.dfeta_StatedLastName,
+            middleName = contact.dfeta_StatedMiddleName,
+            trn = trn,
+            dateOfBirth = contact.BirthDate?.ToString("yyyy-MM-dd"),
+            nationalInsuranceNumber = contact.dfeta_NINumber,
+            qts = new
+            {
+                awarded = contact.dfeta_QTSDate?.ToString("yyyy-MM-dd"),
+                certificateUrl = "/v3/certificates/qts"
+            },
+            eyts = new
+            {
+                awarded = contact.dfeta_EYTSDate?.ToString("yyyy-MM-dd"),
+                certificateUrl = "/v3/certificates/eyts"
+            }
+        })!;
+
+        if (!expectCertificateUrls)
+        {
+            expectedJson["qts"]?.AsObject().Remove("certificateUrl");
+            expectedJson["eyts"]?.AsObject().Remove("certificateUrl");
+        }
+
+        await AssertEx.JsonResponseEquals(
+            response,
+            expectedJson,
+            StatusCodes.Status200OK);
+    }
+
     protected async Task ValidRequestWithInduction_ReturnsExpectedInductionContent(
         HttpClient httpClient,
         string baseUrl,
@@ -419,10 +468,11 @@ public abstract class GetTeacherTestBase : ApiTestBase
             .ReturnsAsync(incidents ?? Array.Empty<Incident>());
     }
 
-    private static Contact CreateContact(string trn)
+    private static Contact CreateContact(string trn, bool hasMultiWordFirstName = false)
     {
         var contactId = Guid.NewGuid();
-        var firstName = Faker.Name.First();
+        var firstName1 = Faker.Name.First();
+        var firstName2 = Faker.Name.First();
         var lastName = Faker.Name.Last();
         var middleName = Faker.Name.Middle();
         var dateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
@@ -435,17 +485,21 @@ public abstract class GetTeacherTestBase : ApiTestBase
         {
             Id = contactId,
             dfeta_TRN = trn,
-            FirstName = firstName,
-            MiddleName = middleName,
+            FirstName = firstName1,
+            MiddleName = hasMultiWordFirstName ? $"{firstName2} {middleName}" : middleName,
             LastName = lastName,
+            dfeta_StatedFirstName = hasMultiWordFirstName ? $"{firstName1} {firstName2}" : firstName1,
+            dfeta_StatedMiddleName = middleName,
+            dfeta_StatedLastName = lastName,
             BirthDate = dateOfBirth.ToDateTime(),
             dfeta_NINumber = nino,
             dfeta_QTSDate = qtsDate.ToDateTime(),
-            dfeta_EYTSDate = eytsDate.ToDateTime(),
+            dfeta_EYTSDate = eytsDate.ToDateTime()
         };
 
         return teacher;
     }
+
 
     private static dfeta_initialteachertraining CreateItt(Contact teacher)
     {

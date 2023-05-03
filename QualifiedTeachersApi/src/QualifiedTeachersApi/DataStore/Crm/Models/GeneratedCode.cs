@@ -837,6 +837,9 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
 			public const string dfeta_NINumber = "dfeta_ninumber";
 			public const string dfeta_QTSDate = "dfeta_qtsdate";
+			public const string dfeta_StatedFirstName = "dfeta_statedfirstname";
+			public const string dfeta_StatedLastName = "dfeta_statedlastname";
+			public const string dfeta_StatedMiddleName = "dfeta_statedmiddlename";
 			public const string dfeta_TRN = "dfeta_trn";
 			public const string dfeta_TRNAllocateRequest = "dfeta_trnallocaterequest";
 			public const string dfeta_trnrequired = "dfeta_trnrequired";
@@ -1200,6 +1203,66 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_QTSDate");
 				this.SetAttributeValue("dfeta_qtsdate", value);
 				this.OnPropertyChanged("dfeta_QTSDate");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedfirstname")]
+		public string dfeta_StatedFirstName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_statedfirstname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_StatedFirstName");
+				this.SetAttributeValue("dfeta_statedfirstname", value);
+				this.OnPropertyChanged("dfeta_StatedFirstName");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedlastname")]
+		public string dfeta_StatedLastName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_statedlastname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_StatedLastName");
+				this.SetAttributeValue("dfeta_statedlastname", value);
+				this.OnPropertyChanged("dfeta_StatedLastName");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedmiddlename")]
+		public string dfeta_StatedMiddleName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_statedmiddlename");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_StatedMiddleName");
+				this.SetAttributeValue("dfeta_statedmiddlename", value);
+				this.OnPropertyChanged("dfeta_StatedMiddleName");
 			}
 		}
 		
@@ -6918,10 +6981,14 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		{
 			public const string CustomerId = "customerid";
 			public const string Description = "description";
+			public const string dfeta_FromIdentity = "dfeta_fromidentity";
 			public const string dfeta_NewDateofBirth = "dfeta_newdateofbirth";
 			public const string dfeta_NewFirstName = "dfeta_newfirstname";
 			public const string dfeta_NewLastName = "dfeta_newlastname";
 			public const string dfeta_NewMiddleName = "dfeta_newmiddlename";
+			public const string dfeta_StatedFirstName = "dfeta_statedfirstname";
+			public const string dfeta_StatedLastName = "dfeta_statedlastname";
+			public const string dfeta_StatedMiddleName = "dfeta_statedmiddlename";
 			public const string StateCode = "statecode";
 			public const string SubjectId = "subjectid";
 			public const string Title = "title";
@@ -7027,6 +7094,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		/// <summary>
 		/// 
 		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_fromidentity")]
+		public System.Nullable<bool> dfeta_FromIdentity
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_fromidentity");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_FromIdentity");
+				this.SetAttributeValue("dfeta_fromidentity", value);
+				this.OnPropertyChanged("dfeta_FromIdentity");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_newdateofbirth")]
 		public System.Nullable<System.DateTime> dfeta_NewDateofBirth
 		{
@@ -7101,6 +7188,66 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_NewMiddleName");
 				this.SetAttributeValue("dfeta_newmiddlename", value);
 				this.OnPropertyChanged("dfeta_NewMiddleName");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedfirstname")]
+		public string dfeta_StatedFirstName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_statedfirstname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_StatedFirstName");
+				this.SetAttributeValue("dfeta_statedfirstname", value);
+				this.OnPropertyChanged("dfeta_StatedFirstName");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedlastname")]
+		public string dfeta_StatedLastName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_statedlastname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_StatedLastName");
+				this.SetAttributeValue("dfeta_statedlastname", value);
+				this.OnPropertyChanged("dfeta_StatedLastName");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_statedmiddlename")]
+		public string dfeta_StatedMiddleName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_statedmiddlename");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_StatedMiddleName");
+				this.SetAttributeValue("dfeta_statedmiddlename", value);
+				this.OnPropertyChanged("dfeta_StatedMiddleName");
 			}
 		}
 		

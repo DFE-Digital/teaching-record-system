@@ -41,7 +41,8 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
             DateOfBirth = newDateOfBirth,
             EvidenceFileName = evidenceFileName,
             EvidenceFileContent = evidenceFileContent,
-            EvidenceFileMimeType = evidenceFileMimeType
+            EvidenceFileMimeType = evidenceFileMimeType,
+            FromIdentity = true
         };
 
         // Act
@@ -55,5 +56,6 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
         Assert.Equal(createPersonResult.TeacherId, createdIncident.CustomerId.Id);
         Assert.Equal("Request to change date of birth", createdIncident.Title);
         Assert.Equal(newDateOfBirth, createdIncident.dfeta_NewDateofBirth?.ToDateOnly());
+        Assert.Equal(command.FromIdentity, createdIncident.dfeta_FromIdentity);
     }
 }

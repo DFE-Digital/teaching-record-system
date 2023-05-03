@@ -200,6 +200,7 @@ public class CreateNameChangeTests : ApiTestBase
                 cmd.MiddleName == newMiddleName &&
                 cmd.LastName == newLastName &&
                 cmd.EvidenceFileName == evidenceFileName &&
-                cmd.EvidenceFileMimeType == "text/plain")));
+                cmd.EvidenceFileMimeType == "text/plain" &&
+                cmd.FromIdentity == true)));
     }
 }

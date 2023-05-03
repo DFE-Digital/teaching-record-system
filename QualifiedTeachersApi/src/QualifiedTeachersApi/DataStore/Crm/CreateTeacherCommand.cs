@@ -9,6 +9,9 @@ public class CreateTeacherCommand
     public string FirstName { get; set; }
     public string MiddleName { get; set; }
     public string LastName { get; set; }
+    public string StatedFirstName { get; set; }
+    public string StatedMiddleName { get; set; }
+    public string StatedLastName { get; set; }
     public DateTime BirthDate { get; set; }
     public string EmailAddress { get; set; }
     public CreateTeacherCommandAddress Address { get; set; }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using MediatR;
@@ -47,16 +48,25 @@ public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
             evidenceFileMimeType = "application/octet-stream";
         }
 
+        var lastName = request.LastName;
+        var firstAndMiddleNames = $"{request.FirstName} {request.MiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var firstName = firstAndMiddleNames[0];
+        var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
+
         var command = new CreateNameChangeIncidentCommand()
         {
             ContactId = person.Id,
             Trn = request.Trn,
-            FirstName = request.FirstName,
-            MiddleName = request.MiddleName,
-            LastName = request.LastName,
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            StatedFirstName = request.FirstName,
+            StatedMiddleName = request.MiddleName,
+            StatedLastName = request.LastName,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileContent = await evidenceFileResponse.Content.ReadAsStreamAsync(),
-            EvidenceFileMimeType = evidenceFileMimeType
+            EvidenceFileMimeType = evidenceFileMimeType,
+            FromIdentity = true
         };
 
         await _dataverseAdapter.CreateNameChangeIncident(command);
