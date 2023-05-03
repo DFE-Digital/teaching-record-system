@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,7 @@ public class DqtReportingService : BackgroundService
 
     private const string IdColumnName = "Id";
     private const int MaxParameters = 1024;
+    private const int MaxUpsertBatchSize = 500;
     private const string MetricPrefix = "DqtReporting: ";
 
     private readonly DqtReportingOptions _options;
@@ -33,7 +35,7 @@ public class DqtReportingService : BackgroundService
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly TelemetryClient _telemetryClient;
     private readonly ILogger<DqtReportingService> _logger;
-    private readonly Dictionary<string, EntityMetadata> _entityMetadata = new();
+    private readonly Dictionary<string, (EntityMetadata EntityMetadata, EntityTableMapping EntityTableMapping)> _entityMetadata = new();
 
     public DqtReportingService(
         IOptions<DqtReportingOptions> optionsAccessor,
@@ -90,7 +92,9 @@ public class DqtReportingService : BackgroundService
                 throw new Exception($"Entity '{entity}' does not have change tracking enabled.");
             }
 
-            _entityMetadata[entity] = entityMetadata;
+            var entityTableMapping = GetEntityTableMapping(entityMetadata);
+
+            _entityMetadata[entity] = (entityMetadata, entityTableMapping);
         }
     }
 
@@ -232,35 +236,154 @@ public class DqtReportingService : BackgroundService
         var insertedCount = 0;
         var updatedCount = 0;
 
-        var entityLogicalName = newOrUpdatedItems.First().NewOrUpdatedEntity.LogicalName;
         var entities = newOrUpdatedItems.Select(e => e.NewOrUpdatedEntity);
+        var entityLogicalName = entities.First().LogicalName;
+        var entityTableMapping = _entityMetadata[entityLogicalName].EntityTableMapping;
+        string tempTableName = $"#import-{entityLogicalName}";
+
+        var dataTable = CreateDataTable();
 
         using var conn = new SqlConnection(_options.ReportingDbConnectionString);
         await conn.OpenAsync();
 
-        foreach (var entity in entities)
+        await CreateTempTable();
+
+        foreach (var chunk in entities.Chunk(MaxUpsertBatchSize))
         {
-            var command = CreateUpsertRowCommand(entity);
-            command.Connection = conn;
-
-            using var reader = await command.ExecuteReaderAsync(cancellationToken);
-            await reader.ReadAsync(cancellationToken);
-            var action = reader.GetString(0);
-
-            if (action == "UPDATE")
-            {
-                updatedCount++;
-            }
-            else
-            {
-                Debug.Assert(action == "INSERT");
-                insertedCount++;
-            }
+            await UpsertRows(chunk);
         }
 
         Debug.Assert(newOrUpdatedItems.Count == insertedCount + updatedCount);
 
+        await DropTempTable();
+
         return (insertedCount, updatedCount);
+
+        DataTable CreateDataTable()
+        {
+            var dataTable = new DataTable();
+
+            foreach (var attr in entityTableMapping.Attributes)
+            {
+                foreach (var column in attr.ColumnDefinitions)
+                {
+                    dataTable.Columns.Add(column.ColumnName, column.Type);
+                }
+            }
+
+            return dataTable;
+        }
+
+        async Task CreateTempTable()
+        {
+            var sqlBuilder = new StringBuilder();
+            sqlBuilder.AppendFormat("create table [{0}] (\n", tempTableName);
+            int columnIndex = 0;
+
+            foreach (var attr in entityTableMapping.Attributes)
+            {
+                foreach (var column in attr.ColumnDefinitions)
+                {
+                    AddColumn($"[{column.ColumnName}] {column.ColumnDefinition}");
+                }
+            }
+
+            sqlBuilder.Append("\n)");
+            var sql = sqlBuilder.ToString();
+
+            var command = new SqlCommand(sql);
+            command.Connection = conn;
+
+            await command.ExecuteNonQueryAsync();
+
+            void AddColumn(string definition)
+            {
+                if (columnIndex > 0)
+                {
+                    sqlBuilder.Append(",\n");
+                }
+
+                sqlBuilder.AppendFormat("\t{0}", definition);
+
+                columnIndex++;
+            }
+        }
+
+        async Task UpsertRows(Entity[] entities)
+        {
+            dataTable.Rows.Clear();
+
+            foreach (var entity in entities)
+            {
+                var rowData = new object?[entityTableMapping.ColumnCount];
+                var i = 0;
+
+                foreach (var attr in entityTableMapping.Attributes)
+                {
+                    foreach (var column in attr.ColumnDefinitions)
+                    {
+                        rowData[i++] = entity.Attributes.TryGetValue(attr.AttributeName, out var attrValue) ?
+                            column.GetColumnValueFromAttribute(attrValue) :
+                            null;
+                    }
+                }
+
+                dataTable.Rows.Add(rowData);
+            }
+
+            using var txn = conn.BeginTransaction();
+
+            using (var sqlBulkCopy = new SqlBulkCopy(conn, new SqlBulkCopyOptions(), txn))
+            {
+                foreach (DataColumn column in dataTable.Columns)
+                {
+                    sqlBulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
+                }
+
+                sqlBulkCopy.BulkCopyTimeout = 0;
+                sqlBulkCopy.DestinationTableName = tempTableName;
+
+                await sqlBulkCopy.WriteToServerAsync(dataTable);
+            }
+
+            var mergeSql = entityTableMapping.GetMergeSql(tempTableName);
+
+            var mergeCommand = new SqlCommand(mergeSql)
+            {
+                Connection = conn,
+                Transaction = txn
+            };
+
+            using (var reader = await mergeCommand.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    var action = reader.GetString(0);
+
+                    if (action == "UPDATE")
+                    {
+                        updatedCount++;
+                    }
+                    else
+                    {
+                        Debug.Assert(action == "INSERT");
+                        insertedCount++;
+                    }
+                }
+            }
+
+            await txn.CommitAsync();
+        }
+
+        async Task DropTempTable()
+        {
+            var sql = $"drop table [{tempTableName}]";
+
+            var command = new SqlCommand(sql);
+            command.Connection = conn;
+
+            await command.ExecuteNonQueryAsync();
+        }
     }
 
     private async Task<int> HandleRemovedOrDeletedItems(
@@ -280,69 +403,183 @@ public class DqtReportingService : BackgroundService
 
         foreach (var chunk in ids.Chunk(MaxParameters))
         {
-            var command = CreateDeleteRowsCommand(entityLogicalName, chunk);
+            var tableName = entityLogicalName;
+            var idParameters = ids.Select((id, i) => new SqlParameter($"@id{i}", id)).ToArray();
+
+            var command = new SqlCommand(
+                $"delete from [{tableName}] where [{IdColumnName}] in ({string.Join(", ", idParameters.Select(p => $"{p.ParameterName}"))})");
+
             command.Connection = conn;
+            command.Parameters.AddRange(idParameters);
+
             await command.ExecuteNonQueryAsync(cancellationToken);
         }
 
         return removedOrDeletedItems.Count;
     }
 
-    private SqlCommand CreateDeleteRowsCommand(string entityLogicalName, IReadOnlyCollection<Guid> ids)
+    private EntityTableMapping GetEntityTableMapping(EntityMetadata entityMetadata)
     {
-        Debug.Assert(ids.Count <= MaxParameters);
+        var entityLogicalName = entityMetadata.LogicalName;
 
-        var tableName = entityLogicalName;
-        var idParameters = ids.Select((id, i) => new SqlParameter($"@id{i}", id)).ToArray();
+        var attributes = entityMetadata.Attributes
+            .OrderBy(a => a.ColumnNumber)
+            .Where(a => a.AttributeType != AttributeTypeCode.Virtual)
+            .Select(attr =>
+            {
+                return attr switch
+                {
+                    _ when attr.LogicalName == entityMetadata.PrimaryIdAttribute => CreateIdMapping(),
+                    { AttributeType: AttributeTypeCode.Boolean } => CreateOneToOneMapping(typeof(bool), "bit"),
+                    { AttributeType: AttributeTypeCode.DateTime } => CreateOneToOneMapping(typeof(DateTime), "datetime"),
+                    { AttributeType: AttributeTypeCode.Decimal } => CreateOneToOneMapping(typeof(decimal), "decimal"),
+                    { AttributeType: AttributeTypeCode.Double } => CreateOneToOneMapping(typeof(double), "float"),
+                    { AttributeType: AttributeTypeCode.Integer } => CreateOneToOneMapping(typeof(string), "int"),
+                    { AttributeType: AttributeTypeCode.Money } => CreateOneToOneMapping(typeof(decimal), "decimal", attrValue => ((Money)attrValue).Value),
+                    { AttributeType: AttributeTypeCode.State } => CreateOneToOneMappingForOptionSetValue(),
+                    { AttributeType: AttributeTypeCode.Status } => CreateOneToOneMappingForOptionSetValue(),
+                    { AttributeType: AttributeTypeCode.Uniqueidentifier } => CreateOneToOneMapping(typeof(Guid), "uniqueidentifier"),
+                    { AttributeType: AttributeTypeCode.BigInt } => CreateOneToOneMapping(typeof(long), "bigint"),
+                    { AttributeType: AttributeTypeCode.Picklist } => CreateOneToOneMappingForOptionSetValue(),
+                    { AttributeType: AttributeTypeCode.Memo } => CreateOneToOneMapping(typeof(string), "nvarchar(max)"),
+                    { AttributeType: AttributeTypeCode.String } => CreateStringMapping(),
+                    { AttributeType: AttributeTypeCode.Lookup } => CreateLookupMapping(),
+                    { AttributeType: AttributeTypeCode.Owner } => CreateLookupMapping(),
+                    { AttributeType: AttributeTypeCode.Customer } => CreateLookupMapping(),
+                    { AttributeType: AttributeTypeCode.EntityName } => CreateEntityNameMapping(),
+                    { AttributeType: AttributeTypeCode.PartyList } => CreateOneToOneMapping(typeof(Guid), "uniqueidentifier"),
+                    _ => throw new NotSupportedException($"Cannot derive table mapping for '{attr.LogicalName}' attribute.")
+                };
 
-        var command = new SqlCommand(
-            $"delete from [{tableName}] where [{IdColumnName}] in ({string.Join(", ", idParameters.Select(p => $"{p.ParameterName}"))})");
+                AttributeColumnMapping CreateOneToOneMappingForOptionSetValue() =>
+                    CreateOneToOneMapping(typeof(int), "int", attrValue => ((OptionSetValue)attrValue).Value);
 
-        command.Parameters.AddRange(idParameters);
+                AttributeColumnMapping CreateOneToOneMapping(Type type, string columnDefinition, Func<object, object>? getColumnValueFromAttribute = null) =>
+                    new AttributeColumnMapping()
+                    {
+                        AttributeName = attr.LogicalName,
+                        ColumnDefinitions = new[]
+                        {
+                            new AttributeColumnDefinition()
+                            {
+                                ColumnName = attr.LogicalName,
+                                Type = type,
+                                ColumnDefinition = columnDefinition,
+                                GetColumnValueFromAttribute = getColumnValueFromAttribute ?? (attrValue => attrValue)
+                            }
+                        }
+                    };
 
-        return command;
-    }
+                AttributeColumnMapping CreateIdMapping() => new AttributeColumnMapping()
+                {
+                    AttributeName = attr.LogicalName,
+                    ColumnDefinitions = new[]
+                    {
+                        new AttributeColumnDefinition()
+                        {
+                            ColumnName = IdColumnName,
+                            Type = typeof(Guid),
+                            ColumnDefinition = "uniqueidentifier",
+                            GetColumnValueFromAttribute = attrValue => attrValue
+                        }
+                    }
+                };
 
-    private SqlCommand CreateUpsertRowCommand(Entity entity)
-    {
-        var entityMetadata = _entityMetadata[entity.LogicalName];
-        var tableName = entityMetadata.LogicalName;
-        var primaryKeyColumnName = entityMetadata.PrimaryIdAttribute;
+                AttributeColumnMapping CreateStringMapping()
+                {
+                    var maxLength = ((StringAttributeMetadata)attr).MaxLength;
+                    var lengthDefinition = maxLength == 1073741823 ? "max" : maxLength.ToString();
+                    return CreateOneToOneMapping(typeof(string), $"nvarchar({lengthDefinition})");
+                }
 
-        var sortedAttrs = entityMetadata.Attributes.OrderBy(a => a.ColumnNumber).Select(a => a.LogicalName).ToArray();
+                AttributeColumnMapping CreateLookupMapping() => new AttributeColumnMapping()
+                {
+                    AttributeName = attr.LogicalName,
+                    ColumnDefinitions = new[]
+                    {
+                        new AttributeColumnDefinition()
+                        {
+                            ColumnName = attr.LogicalName,
+                            Type = typeof(Guid),
+                            ColumnDefinition = "uniqueidentifier",
+                            GetColumnValueFromAttribute = attrValue => ((EntityReference)attrValue).Id
+                        },
+                        new AttributeColumnDefinition()
+                        {
+                            ColumnName = $"{attr.LogicalName}_entitytype",
+                            Type = typeof(string),
+                            ColumnDefinition = "nvarchar(128)",
+                            GetColumnValueFromAttribute = attrValue => ((EntityReference)attrValue).LogicalName
+                        }
+                    }
+                };
 
-        var parametersAndColumns = entity.Attributes
-            .OrderBy(a => Array.IndexOf(sortedAttrs, a.Key))
-            .Select((a, i) => (
-                ColumnName: a.Key == primaryKeyColumnName ? IdColumnName : a.Key,
-                Parameter: new SqlParameter($"@p{i}", MapCrmAttributeValueToParameterValue(a.Value))))
+                AttributeColumnMapping CreateEntityNameMapping() => new AttributeColumnMapping()
+                {
+                    AttributeName = attr.LogicalName,
+                    ColumnDefinitions = new[]
+                    {
+                        new AttributeColumnDefinition()
+                        {
+                            ColumnName = attr.LogicalName,
+                            Type = typeof(string),
+                            ColumnDefinition = "nvarchar(4000)",
+                            GetColumnValueFromAttribute = attrValue => attrValue
+                        }
+                    }
+                };
+            })
             .ToArray();
 
-        var sqlBuilder = new StringBuilder();
-        sqlBuilder.AppendLine($"merge into [{tableName}] as target");
-        sqlBuilder.AppendLine("using (select");
-        sqlBuilder.AppendJoin(",\n", parametersAndColumns.Select(a => $"\t{a.Parameter.ParameterName} as [{a.ColumnName}]"));
-        sqlBuilder.AppendLine("\n)as source");
-        sqlBuilder.AppendLine($"on source.[{IdColumnName}] = target.[{IdColumnName}]");
-        sqlBuilder.AppendLine("when matched then update set");
-        sqlBuilder.AppendJoin(",\n", parametersAndColumns.Where(p => p.ColumnName != IdColumnName).Select(p => $"\t[{p.ColumnName}] = {p.Parameter.ParameterName}"));
-        sqlBuilder.AppendLine("\nwhen not matched then insert (");
-        sqlBuilder.AppendJoin(",\n", parametersAndColumns.Select(p => $"\t{p.ColumnName}"));
-        sqlBuilder.AppendLine("\n) values (");
-        sqlBuilder.AppendJoin(",\n", parametersAndColumns.Select(p => $"\t{p.Parameter.ParameterName}"));
-        sqlBuilder.AppendLine("\n)\noutput $action;");
-
-        var command = new SqlCommand(sqlBuilder.ToString());
-        command.Parameters.AddRange(parametersAndColumns.Select(p => p.Parameter).ToArray());
-
-        return command;
-
-        static object MapCrmAttributeValueToParameterValue(object value) => value switch
+        return new EntityTableMapping()
         {
-            OptionSetValue optionSetValue => optionSetValue.Value,
-            EntityReference entityReference => entityReference.Id,
-            Money money => money.Value,
-            _ => value
+            EntityLogicalName = entityLogicalName,
+            TableName = entityLogicalName,
+            Attributes = attributes
         };
+    }
+
+    private class EntityTableMapping
+    {
+        public required string EntityLogicalName { get; init; }
+        public required string TableName { get; init; }
+        public required AttributeColumnMapping[] Attributes { get; init; }
+
+        public int ColumnCount => Attributes.SelectMany(a => a.ColumnDefinitions).Count();
+
+        public string GetMergeSql(string sourceTableName)
+        {
+            var allColumns = Attributes.SelectMany(a => a.ColumnDefinitions).ToArray();
+
+            var sqlBuilder = new StringBuilder();
+            sqlBuilder.AppendLine($"merge into [{TableName}] as target");
+            sqlBuilder.AppendLine("using (select");
+            sqlBuilder.AppendJoin(",\n", allColumns.Select(c => $"\t[{c.ColumnName}]"));
+            sqlBuilder.AppendLine($"\n from [{sourceTableName}]) as source");
+            sqlBuilder.AppendLine($"on source.[{IdColumnName}] = target.[{IdColumnName}]");
+            sqlBuilder.AppendLine("when matched then update set");
+            sqlBuilder.AppendJoin(",\n", allColumns.Where(c => c.ColumnName != IdColumnName).Select(p => $"\t[{p.ColumnName}] = source.[{p.ColumnName}]"));
+            sqlBuilder.AppendLine("\nwhen not matched then insert (");
+            sqlBuilder.AppendJoin(",\n", allColumns.Select(c => $"\t[{c.ColumnName}]"));
+            sqlBuilder.AppendLine("\n) values (");
+            sqlBuilder.AppendJoin(",\n", allColumns.Select(c => $"\tsource.[{c.ColumnName}]"));
+            sqlBuilder.AppendLine("\n)\noutput $action;");
+
+            return sqlBuilder.ToString();
+        }
+    }
+
+    private class AttributeColumnMapping
+    {
+        public required string AttributeName { get; init; }
+        public required AttributeColumnDefinition[] ColumnDefinitions { get; init; }
+    }
+
+    private class AttributeColumnDefinition
+    {
+        public required string ColumnName { get; init; }
+        public required Type Type { get; init; }
+        public required string ColumnDefinition { get; init; }
+        public required Func<object, object> GetColumnValueFromAttribute { get; init; }
     }
 }
