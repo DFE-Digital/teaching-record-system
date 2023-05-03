@@ -1192,9 +1192,15 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(e => e.ToEntity<Incident>()).ToArray();
     }
 
-    public async Task<EntityMetadata> GetEntityMetadata(string entityLogicalName, EntityFilters entityFilters = EntityFilters.Default)
+    public Task<EntityMetadata> GetEntityMetadata(string entityLogicalName, EntityFilters entityFilters = EntityFilters.Default) =>
+        GetEntityMetadata(_service, entityLogicalName, entityFilters);
+
+    public static async Task<EntityMetadata> GetEntityMetadata(
+        IOrganizationServiceAsync organizationService,
+        string entityLogicalName,
+        EntityFilters entityFilters = EntityFilters.Default)
     {
-        var entityResponse = (RetrieveEntityResponse)await _service.ExecuteAsync(new RetrieveEntityRequest()
+        var entityResponse = (RetrieveEntityResponse)await organizationService.ExecuteAsync(new RetrieveEntityRequest()
         {
             LogicalName = entityLogicalName,
             EntityFilters = entityFilters
