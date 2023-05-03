@@ -29,10 +29,10 @@ public class EntityTableMapping
                     _ when attr.LogicalName == entityMetadata.PrimaryIdAttribute => CreateIdMapping(),
                     { AttributeType: AttributeTypeCode.Boolean } => CreateOneToOneMapping(typeof(bool), "bit"),
                     { AttributeType: AttributeTypeCode.DateTime } => CreateOneToOneMapping(typeof(DateTime), "datetime"),
-                    { AttributeType: AttributeTypeCode.Decimal } => CreateOneToOneMapping(typeof(decimal), "decimal"),
-                    { AttributeType: AttributeTypeCode.Double } => CreateOneToOneMapping(typeof(double), "float"),
-                    { AttributeType: AttributeTypeCode.Integer } => CreateOneToOneMapping(typeof(string), "int"),
-                    { AttributeType: AttributeTypeCode.Money } => CreateOneToOneMapping(typeof(decimal), "decimal", attrValue => ((Money)attrValue).Value),
+                    { AttributeType: AttributeTypeCode.Decimal } => CreateDecimalMapping(),
+                    { AttributeType: AttributeTypeCode.Double } => CreateDoubleMapping(),
+                    { AttributeType: AttributeTypeCode.Integer } => CreateOneToOneMapping(typeof(int), "int"),
+                    { AttributeType: AttributeTypeCode.Money } => CreateMoneyMapping(),
                     { AttributeType: AttributeTypeCode.State } => CreateOneToOneMappingForOptionSetValue(),
                     { AttributeType: AttributeTypeCode.Status } => CreateOneToOneMappingForOptionSetValue(),
                     { AttributeType: AttributeTypeCode.Uniqueidentifier } => CreateOneToOneMapping(typeof(Guid), "uniqueidentifier"),
@@ -125,6 +125,24 @@ public class EntityTableMapping
                         }
                     }
                 };
+
+                AttributeColumnMapping CreateDoubleMapping()
+                {
+                    var precision = ((DoubleAttributeMetadata)attr).Precision;
+                    return CreateOneToOneMapping(typeof(decimal), $"decimal(38, {precision})");
+                }
+
+                AttributeColumnMapping CreateDecimalMapping()
+                {
+                    var precision = ((DecimalAttributeMetadata)attr).Precision;
+                    return CreateOneToOneMapping(typeof(decimal), $"decimal(38, {precision})");
+                }
+
+                AttributeColumnMapping CreateMoneyMapping()
+                {
+                    var precision = ((MoneyAttributeMetadata)attr).Precision;
+                    return CreateOneToOneMapping(typeof(decimal), $"decimal(38, {precision})", attrValue => ((Money)attrValue).Value);
+                }
             })
             .ToArray();
 
