@@ -46,7 +46,7 @@ public class DqtReportingFixture
             await service.LoadEntityMetadata();
 
             changesObserver.OnNext(new IChangedItem[] { changedItem });
-            var processTask = service.ProcessChangesForEntityType(Contact.EntityLogicalName, CancellationToken.None);
+            var processTask = service.ProcessChangesForEntityType(Contact.EntityLogicalName, _ => { }, CancellationToken.None);
             changesObserver.OnCompleted();
             await processTask;
         });
