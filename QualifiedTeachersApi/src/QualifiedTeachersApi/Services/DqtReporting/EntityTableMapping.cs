@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Data.SqlClient;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 
@@ -8,7 +10,11 @@ namespace QualifiedTeachersApi.Services.DqtReporting;
 
 public class EntityTableMapping
 {
-    public const string IdColumnName = "Id";
+    private const string IdColumnName = "Id";
+    private const string DeleteLogTableName = "__DeleteLog";
+    private const string InsertedColumnName = "__Inserted";
+    private const string UpdatedColumnName = "__Updated";
+
     public required string EntityLogicalName { get; init; }
     public required string TableName { get; init; }
     public required AttributeColumnMapping[] Attributes { get; init; }
@@ -160,6 +166,7 @@ public class EntityTableMapping
 
         var sqlBuilder = new StringBuilder();
         sqlBuilder.AppendLine($"create table [{TableName}] (");
+
         sqlBuilder.AppendJoin(",\n", allColumns.Select(c =>
         {
             var line = $"\t[{c.ColumnName}] {c.ColumnDefinition}";
@@ -171,12 +178,32 @@ public class EntityTableMapping
 
             return line;
         }));
-        sqlBuilder.AppendLine("\n)");
+
+        sqlBuilder.AppendFormat(",\n\t[{0}] datetime,\n", InsertedColumnName);
+        sqlBuilder.AppendFormat("\t[__{0}] datetime\n", UpdatedColumnName);
+        sqlBuilder.AppendLine(")");
 
         return sqlBuilder.ToString();
     }
 
-    public string GetMergeSql(string sourceTableName)
+    public SqlCommand GetDeleteSqlCommand(IEnumerable<Guid> ids, IClock clock)
+    {
+        var idParameters = ids.Select((id, i) => new SqlParameter($"@id{i}", id)).ToArray();
+
+        var sqlBuilder = new StringBuilder();
+        sqlBuilder.AppendFormat("delete from [{0}]\n", TableName);
+        sqlBuilder.AppendFormat("output deleted.[{0}], @EntityType, @UtcNow into [{1}]\n", IdColumnName, DeleteLogTableName);
+        sqlBuilder.AppendFormat("where [{0}] in ({1})\n", IdColumnName, string.Join(", ", idParameters.Select(p => $"{p.ParameterName}")));
+
+        var command = new SqlCommand(sqlBuilder.ToString());
+        command.Parameters.Add(new SqlParameter("@UtcNow", clock.UtcNow));
+        command.Parameters.Add(new SqlParameter("@EntityType", EntityLogicalName));
+        command.Parameters.AddRange(idParameters);
+
+        return command;
+    }
+
+    public SqlCommand GetMergeSqlCommand(string sourceTableName, IClock clock)
     {
         var allColumns = Attributes.SelectMany(a => a.ColumnDefinitions).ToArray();
 
@@ -187,14 +214,20 @@ public class EntityTableMapping
         sqlBuilder.AppendLine($"\n from [{sourceTableName}]) as source");
         sqlBuilder.AppendLine($"on source.[{IdColumnName}] = target.[{IdColumnName}]");
         sqlBuilder.AppendLine("when matched then update set");
+        sqlBuilder.AppendFormat("\t[{0}] = @UtcNow,\n", UpdatedColumnName);
         sqlBuilder.AppendJoin(",\n", allColumns.Where(c => c.ColumnName != IdColumnName).Select(p => $"\t[{p.ColumnName}] = source.[{p.ColumnName}]"));
         sqlBuilder.AppendLine("\nwhen not matched then insert (");
+        sqlBuilder.AppendFormat("\t[{0}],\n\t[{1}],\n", InsertedColumnName, UpdatedColumnName);
         sqlBuilder.AppendJoin(",\n", allColumns.Select(c => $"\t[{c.ColumnName}]"));
         sqlBuilder.AppendLine("\n) values (");
+        sqlBuilder.AppendFormat("\t@UtcNow,\n\t@UtcNow,\n");
         sqlBuilder.AppendJoin(",\n", allColumns.Select(c => $"\tsource.[{c.ColumnName}]"));
         sqlBuilder.AppendLine("\n)\noutput $action;");
 
-        return sqlBuilder.ToString();
+        var command = new SqlCommand(sqlBuilder.ToString());
+        command.Parameters.Add(new SqlParameter("@UtcNow", clock.UtcNow));
+
+        return command;
     }
 }
 

@@ -32,6 +32,7 @@ public partial class DqtReportingService : BackgroundService
     private readonly DqtReportingOptions _options;
     private readonly ICrmEntityChangesService _crmEntityChangesService;
     private readonly IDataverseAdapter _dataverseAdapter;
+    private readonly IClock _clock;
     private readonly TelemetryClient _telemetryClient;
     private readonly ILogger<DqtReportingService> _logger;
     private readonly Dictionary<string, (EntityMetadata EntityMetadata, EntityTableMapping EntityTableMapping)> _entityMetadata = new();
@@ -40,12 +41,14 @@ public partial class DqtReportingService : BackgroundService
         IOptions<DqtReportingOptions> optionsAccessor,
         ICrmEntityChangesService crmEntityChangesService,
         IDataverseAdapter dataverseAdapter,
+        IClock clock,
         TelemetryClient telemetryClient,
         ILogger<DqtReportingService> logger)
     {
         _options = optionsAccessor.Value;
         _crmEntityChangesService = crmEntityChangesService;
         _dataverseAdapter = dataverseAdapter;
+        _clock = clock;
         _telemetryClient = telemetryClient;
         _logger = logger;
     }
@@ -357,13 +360,9 @@ public partial class DqtReportingService : BackgroundService
                 await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);
             }
 
-            var mergeSql = entityTableMapping.GetMergeSql(tempTableName);
-
-            var mergeCommand = new SqlCommand(mergeSql)
-            {
-                Connection = conn,
-                Transaction = txn
-            };
+            var mergeCommand = entityTableMapping.GetMergeSqlCommand(tempTableName, _clock);
+            mergeCommand.Connection = conn;
+            mergeCommand.Transaction = txn;
 
             using (var reader = await mergeCommand.ExecuteReaderAsync(cancellationToken))
             {
@@ -411,6 +410,7 @@ public partial class DqtReportingService : BackgroundService
         }
 
         var entityLogicalName = removedOrDeletedItems.First().RemovedItem.LogicalName;
+        var entityTableMapping = _entityMetadata[entityLogicalName].EntityTableMapping;
         var ids = removedOrDeletedItems.Select(e => e.RemovedItem.Id).ToArray();
 
         using var conn = new SqlConnection(_options.ReportingDbConnectionString);
@@ -418,18 +418,12 @@ public partial class DqtReportingService : BackgroundService
 
         foreach (var chunk in ids.Chunk(MaxParameters))
         {
-            var tableName = entityLogicalName;
-            var idParameters = ids.Select((id, i) => new SqlParameter($"@id{i}", id)).ToArray();
-
-            var command = new SqlCommand(
-                $"delete from [{tableName}] where [{EntityTableMapping.IdColumnName}] in ({string.Join(", ", idParameters.Select(p => $"{p.ParameterName}"))})");
-
+            var command = entityTableMapping.GetDeleteSqlCommand(chunk, _clock);
             command.Connection = conn;
-            command.Parameters.AddRange(idParameters);
 
-            await command.ExecuteNonQueryAsync(cancellationToken);
+            var deleted = await command.ExecuteNonQueryAsync(cancellationToken);
 
-            onDeletedCounterUpdated(chunk.Length);
+            onDeletedCounterUpdated(deleted);
         }
     }
 }
