@@ -12,11 +12,17 @@ locals {
     PaasEnvironment                           = var.environment_name,
     StorageConnectionString                   = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}",
     DqtReporting__ReportingDbConnectionString = length(azurerm_mssql_server.reporting_server) == 1 ? "Data Source=tcp:${azurerm_mssql_server.reporting_server[0].fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.reporting_db[0].name};Persist Security Info=False;User ID=${azurerm_mssql_server.reporting_server[0].administrator_login};Password=${yamldecode(data.azurerm_key_vault_secret.secrets["REPORTING-DB"].value)["PASSWORD"]};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" : "",
-    DistributedLockContainerName              = local.distributed_lock_container_name
+    DistributedLockContainerName              = local.distributed_lock_container_name,
+    ConnectionStrings__DefaultConnection      = local.pg_connection_string,
+    ConnectionStrings__Redis                  = local.redis_connection_string
   }
 
   logstash_endpoint               = data.azurerm_key_vault_secret.secrets["LOGSTASH-ENDPOINT"].value
   distributed_lock_container_name = "locks"
+  pg_credentials                  = cloudfoundry_service_key.postgres-key.credentials
+  pg_connection_string            = "Host=${local.pg_credentials.host};Database=${local.pg_credentials.name};Username=${local.pg_credentials.username};Password='${local.pg_credentials.password}';Port=${local.pg_credentials.port};SslMode=Require;TrustServerCertificate=true"
+  redis_credentials               = cloudfoundry_service_key.redis-key.credentials
+  redis_connection_string         = "${local.redis_credentials.host}:${local.redis_credentials.port},password=${local.redis_credentials.password},ssl=True"
 }
 
 resource "cloudfoundry_route" "api_public" {
@@ -56,6 +62,11 @@ resource "cloudfoundry_service_instance" "postgres" {
   }
 }
 
+resource "cloudfoundry_service_key" "postgres-key" {
+  name             = "${var.postgres_database_name}-key"
+  service_instance = cloudfoundry_service_instance.postgres.id
+}
+
 resource "azurerm_application_insights" "api_app_insights" {
   name                = var.api_app_insights_name
   resource_group_name = var.resource_group_name
@@ -73,6 +84,11 @@ resource "cloudfoundry_service_instance" "redis" {
   name         = var.redis_name
   space        = data.cloudfoundry_space.space.id
   service_plan = data.cloudfoundry_service.redis.service_plans[var.redis_service_plan]
+}
+
+resource "cloudfoundry_service_key" "redis-key" {
+  name             = "${var.redis_name}-key"
+  service_instance = cloudfoundry_service_instance.redis.id
 }
 
 resource "cloudfoundry_app" "api" {
@@ -96,14 +112,6 @@ resource "cloudfoundry_app" "api" {
 
   service_binding {
     service_instance = cloudfoundry_user_provided_service.logging.id
-  }
-
-  service_binding {
-    service_instance = cloudfoundry_service_instance.postgres.id
-  }
-
-  service_binding {
-    service_instance = cloudfoundry_service_instance.redis.id
   }
 
   depends_on = [

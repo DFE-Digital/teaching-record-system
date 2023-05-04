@@ -28,7 +28,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using Npgsql;
 using Prometheus;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Sql;
@@ -221,7 +220,7 @@ public class Program
             }
         });
 
-        var pgConnectionString = GetPostgresConnectionString();
+        var pgConnectionString = configuration.GetConnectionString("DefaultConnection");
 
         var healthCheckBuilder = services.AddHealthChecks()
             .AddNpgSql(pgConnectionString);
@@ -429,51 +428,12 @@ public class Program
 
         void ConfigureRedisServices()
         {
-            var connectionString = configuration.GetConnectionString("Redis") ?? GetConnectionStringForPaasService();
+            var connectionString = configuration.GetConnectionString("Redis");
 
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(connectionString));
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);
 
             healthCheckBuilder.AddRedis(connectionString);
-
-            string GetConnectionStringForPaasService()
-            {
-                var options = new ConfigurationOptions()
-                {
-                    EndPoints =
-                    {
-                        {
-                            configuration.GetValue<string>("VCAP_SERVICES:redis:0:credentials:host"),
-                            configuration.GetValue<int>("VCAP_SERVICES:redis:0:credentials:port")
-                        }
-                    },
-                    Password = configuration.GetValue<string>("VCAP_SERVICES:redis:0:credentials:password"),
-                    Ssl = configuration.GetValue<bool>("VCAP_SERVICES:redis:0:credentials:tls_enabled")
-                };
-
-                return options.ToString();
-            }
-        }
-
-        string GetPostgresConnectionString()
-        {
-            return configuration.GetConnectionString("DefaultConnection") ?? GetConnectionStringForPaasService();
-
-            string GetConnectionStringForPaasService()
-            {
-                var builder = new NpgsqlConnectionStringBuilder()
-                {
-                    Host = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:host"),
-                    Database = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:name"),
-                    Username = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:username"),
-                    Password = configuration.GetValue<string>("VCAP_SERVICES:postgres:0:credentials:password"),
-                    Port = configuration.GetValue<int>("VCAP_SERVICES:postgres:0:credentials:port"),
-                    SslMode = SslMode.Require,
-                    TrustServerCertificate = true
-                };
-
-                return builder.ConnectionString;
-            }
         }
     }
 }
