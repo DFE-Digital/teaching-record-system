@@ -573,7 +573,7 @@ public partial class DataverseAdapter
                 failedReasons |= UpdateTeacherFailedReasons.QualificationNotFound;
             }
 
-            if (referenceData.QualificationCountryId == null && _command.Qualification != null)
+            if (referenceData.QualificationCountryId == null && !string.IsNullOrEmpty(_command.Qualification?.CountryCode))
             {
                 failedReasons |= UpdateTeacherFailedReasons.QualificationCountryNotFound;
             }
