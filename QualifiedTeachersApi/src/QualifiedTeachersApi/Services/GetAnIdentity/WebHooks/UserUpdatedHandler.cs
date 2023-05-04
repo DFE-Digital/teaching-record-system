@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Medallion.Threading;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using QualifiedTeachersApi.DataStore.Crm;
@@ -12,16 +13,16 @@ public class UserUpdatedHandler : IRequestHandler<UserUpdatedRequest>
     private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 
     private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly IDistributedLockService _distributedLockService;
+    private readonly IDistributedLockProvider _distributedLockProvider;
     private readonly ILogger<UserUpdatedHandler> _logger;
 
     public UserUpdatedHandler(
         IDataverseAdapter dataverseAdapter,
-        IDistributedLockService distributedLockService,
+        IDistributedLockProvider distributedLockProvider,
         ILogger<UserUpdatedHandler> logger)
     {
         _dataverseAdapter = dataverseAdapter;
-        _distributedLockService = distributedLockService;
+        _distributedLockProvider = distributedLockProvider;
         _logger = logger;
     }
 
@@ -32,7 +33,7 @@ public class UserUpdatedHandler : IRequestHandler<UserUpdatedRequest>
             return;
         }
 
-        await using var trnLock = await _distributedLockService.AcquireLock(request.Trn, _lockTimeout);
+        await using var trnLock = await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Trn(request.Trn), _lockTimeout);
 
         var teacher = await _dataverseAdapter.GetTeacherByTrn(
             request.Trn,

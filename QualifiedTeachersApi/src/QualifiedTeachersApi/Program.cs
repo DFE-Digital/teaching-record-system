@@ -7,14 +7,19 @@ using System.Linq;
 using System.Security.Claims;
 using AspNetCoreRateLimit;
 using AspNetCoreRateLimit.Redis;
+using Azure.Storage.Blobs;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Medallion.Threading;
+using Medallion.Threading.Azure;
+using Medallion.Threading.FileSystem;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -43,8 +48,6 @@ using QualifiedTeachersApi.Services.DqtReporting;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
 using QualifiedTeachersApi.Validation;
-using RedLockNet.SERedis;
-using RedLockNet.SERedis.Configuration;
 using Sentry.AspNetCore;
 using Sentry.Extensibility;
 using Serilog;
@@ -253,9 +256,32 @@ public class Program
 
         services.AddDatabaseDeveloperPageExceptionFilter();
 
+        services.AddAzureClients(clientBuilder =>
+        {
+            clientBuilder.AddBlobServiceClient(configuration["StorageConnectionString"]);
+        });
+
+        if (env.IsProduction())
+        {
+            var containerName = configuration["DistributedLockContainerName"] ??
+                throw new Exception("DistributedLockContainerName configuration key is missing.");
+
+            services.AddSingleton<IDistributedLockProvider>(sp =>
+            {
+                var blobServiceClient = sp.GetRequiredService<BlobServiceClient>();
+                var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+                return new AzureBlobLeaseDistributedSynchronizationProvider(blobContainerClient);
+            });
+        }
+        else
+        {
+            var lockFileDirectory = Path.Combine(Path.GetTempPath(), "qtlocks");
+            services.AddSingleton<IDistributedLockProvider>(new FileDistributedSynchronizationProvider(new DirectoryInfo(lockFileDirectory)));
+        }
+
         services.AddTrnGenerationApi(configuration);
         services.AddIdentityApi(configuration, env);
-        services.AddCertificateGeneration(builder.Configuration);
+        services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
         services.AddDqtReporting(builder.Configuration, env);
 
@@ -280,20 +306,6 @@ public class Program
             }
 
             services.AddSingleton<IHostedService, CrmKeepAliveService>();
-        }
-
-        if (env.IsProduction())
-        {
-            services.AddSingleton<IDistributedLockService, RedisDistributedLockService>();
-            services.AddSingleton<RedLockFactory>(sp =>
-            {
-                var connectionMultiplexer = new RedLockMultiplexer(sp.GetRequiredService<IConnectionMultiplexer>());
-                return RedLockFactory.Create(new List<RedLockMultiplexer>() { connectionMultiplexer });
-            });
-        }
-        else
-        {
-            services.AddSingleton<IDistributedLockService, LocalDistributedLockService>();
         }
 
         MetricLabels.ConfigureLabels(builder.Configuration);
