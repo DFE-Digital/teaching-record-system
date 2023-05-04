@@ -210,31 +210,34 @@ public partial class DqtReportingService : BackgroundService
         }
         finally
         {
-            _telemetryClient.TrackMetric(new MetricTelemetry()
+            if (totalProcessed > 0)
             {
-                Name = $"{MetricPrefix}Updates processed - {entityLogicalName}",
-                Sum = totalProcessed
-            });
+                _telemetryClient.TrackMetric(new MetricTelemetry()
+                {
+                    Name = $"{MetricPrefix}Updates processed - {entityLogicalName}",
+                    Sum = totalProcessed
+                });
 
-            _telemetryClient.TrackMetric(new MetricTelemetry()
-            {
-                Name = $"{MetricPrefix}Records added - {entityLogicalName}",
-                Sum = insertedCount
-            });
+                _telemetryClient.TrackMetric(new MetricTelemetry()
+                {
+                    Name = $"{MetricPrefix}Records added - {entityLogicalName}",
+                    Sum = insertedCount
+                });
 
-            _telemetryClient.TrackMetric(new MetricTelemetry()
-            {
-                Name = $"{MetricPrefix}Records updated - {entityLogicalName}",
-                Sum = updatedCount
-            });
+                _telemetryClient.TrackMetric(new MetricTelemetry()
+                {
+                    Name = $"{MetricPrefix}Records updated - {entityLogicalName}",
+                    Sum = updatedCount
+                });
 
-            _telemetryClient.TrackMetric(new MetricTelemetry()
-            {
-                Name = $"{MetricPrefix}Records deleted - {entityLogicalName}",
-                Sum = deletedCount
-            });
+                _telemetryClient.TrackMetric(new MetricTelemetry()
+                {
+                    Name = $"{MetricPrefix}Records deleted - {entityLogicalName}",
+                    Sum = deletedCount
+                });
 
-            onProcessedCountUpdated(totalProcessed);
+                onProcessedCountUpdated(totalProcessed);
+            }
         }
     }
 

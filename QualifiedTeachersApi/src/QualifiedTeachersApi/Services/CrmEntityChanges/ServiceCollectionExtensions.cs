@@ -6,7 +6,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddCrmEntityChanges(this IServiceCollection services)
     {
-        services.AddSingleton<ICrmEntityChangesService, DataverseCrmEntityChangesService>();
+        services.AddSingleton<ICrmEntityChangesService, CrmEntityChangesService>();
 
         return services;
     }
