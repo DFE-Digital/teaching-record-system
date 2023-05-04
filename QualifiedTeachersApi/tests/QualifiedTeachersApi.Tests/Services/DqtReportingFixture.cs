@@ -38,6 +38,8 @@ public class DqtReportingFixture
         migrator.MigrateDb();
     }
 
+    public IClock Clock { get; } = new TestableClock();
+
     public string ReportingDbConnectionString { get; }
 
     public Task PublishChangedItemAndConsume(IChangedItem changedItem) =>
@@ -67,7 +69,7 @@ public class DqtReportingFixture
 
         var trnGenerationApiClient = Mock.Of<ITrnGenerationApiClient>();
 
-        var dataverseAdapter = new DataverseAdapter(_serviceClient, new TestableClock(), _memoryCache, trnGenerationApiClient);
+        var dataverseAdapter = new DataverseAdapter(_serviceClient, Clock, _memoryCache, trnGenerationApiClient);
 
         var telemetryClient = new TelemetryClient(new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration());
 
@@ -77,6 +79,7 @@ public class DqtReportingFixture
             options,
             crmEntityChangesService,
             dataverseAdapter,
+            Clock,
             telemetryClient,
             logger);
 
