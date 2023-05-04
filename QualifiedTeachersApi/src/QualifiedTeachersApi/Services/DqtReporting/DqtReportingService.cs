@@ -59,7 +59,7 @@ public partial class DqtReportingService : BackgroundService
 
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(_options.PollIntervalSeconds));
 
-        while (await timer.WaitForNextTickAsync(stoppingToken))
+        do
         {
             try
             {
@@ -81,6 +81,7 @@ public partial class DqtReportingService : BackgroundService
                 throw;
             }
         }
+        while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
     internal async Task LoadEntityMetadata()
