@@ -3,9 +3,9 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Medallion.Threading;
 using MediatR;
 using QualifiedTeachersApi.DataStore.Crm;
-using QualifiedTeachersApi.Services;
 using QualifiedTeachersApi.V2.ApiModels;
 using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
@@ -18,17 +18,17 @@ public class SetIttOutcomeHandler : IRequestHandler<SetIttOutcomeRequest, SetItt
     private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 
     private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly IDistributedLockService _distributedLockService;
+    private readonly IDistributedLockProvider _distributedLockProvider;
 
-    public SetIttOutcomeHandler(IDataverseAdapter dataverseAdapter, IDistributedLockService distributedLockService)
+    public SetIttOutcomeHandler(IDataverseAdapter dataverseAdapter, IDistributedLockProvider distributedLockProvider)
     {
         _dataverseAdapter = dataverseAdapter;
-        _distributedLockService = distributedLockService;
+        _distributedLockProvider = distributedLockProvider;
     }
 
     public async Task<SetIttOutcomeResponse> Handle(SetIttOutcomeRequest request, CancellationToken cancellationToken)
     {
-        await using var trnLock = await _distributedLockService.AcquireLock(request.Trn, _lockTimeout);
+        await using var trnLock = await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Trn(request.Trn), _lockTimeout);
 
         var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
 

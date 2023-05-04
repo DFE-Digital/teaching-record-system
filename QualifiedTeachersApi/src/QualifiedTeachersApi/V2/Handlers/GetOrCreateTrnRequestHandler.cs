@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
+using Medallion.Threading;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using QualifiedTeachersApi.DataStore.Crm;
@@ -13,7 +14,6 @@ using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.DataStore.Sql.Models;
 using QualifiedTeachersApi.Infrastructure.Security;
-using QualifiedTeachersApi.Services;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using QualifiedTeachersApi.V2.ApiModels;
 using QualifiedTeachersApi.V2.Requests;
@@ -29,20 +29,20 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
     private readonly DqtContext _dqtContext;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICurrentClientProvider _currentClientProvider;
-    private readonly IDistributedLockService _distributedLockService;
+    private readonly IDistributedLockProvider _distributedLockProvider;
     private readonly IGetAnIdentityApiClient _identityApiClient;
 
     public GetOrCreateTrnRequestHandler(
         DqtContext dqtContext,
         IDataverseAdapter dataverseAdapter,
         ICurrentClientProvider currentClientProvider,
-        IDistributedLockService distributedLockService,
+        IDistributedLockProvider distributedLockProvider,
         IGetAnIdentityApiClient identityApiClient)
     {
         _dqtContext = dqtContext;
         _dataverseAdapter = dataverseAdapter;
         _currentClientProvider = currentClientProvider;
-        _distributedLockService = distributedLockService;
+        _distributedLockProvider = distributedLockProvider;
         _identityApiClient = identityApiClient;
     }
 
@@ -50,10 +50,12 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
     {
         var currentClientId = _currentClientProvider.GetCurrentClientId();
 
-        await using var requestIdLock = await _distributedLockService.AcquireLock(key: $"{currentClientId}:{request.RequestId}", _lockTimeout);
+        await using var requestIdLock = await _distributedLockProvider.AcquireLockAsync(
+            DistributedLockKeys.TrnRequestId(currentClientId, request.RequestId),
+            _lockTimeout);
 
         await using var husidLock = !string.IsNullOrEmpty(request.HusId) ?
-            await _distributedLockService.AcquireLock(request.HusId, _lockTimeout) :
+            (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId), _lockTimeout) :
             NoopAsyncDisposable.Instance;
 
         var trnRequest = await _dqtContext.TrnRequests
