@@ -104,136 +104,149 @@ public partial class DqtReportingService : BackgroundService
         var metricsGate = new object();
         var totalUpdates = 0;
 
-        await Parallel.ForEachAsync(
-            _options.Entities,
-            new ParallelOptions()
-            {
-                MaxDegreeOfParallelism = _options.ProcessAllEntityTypesConcurrently ? _options.Entities.Length : 1,
-                CancellationToken = cancellationToken
-            },
-            async (entityType, ct) =>
-            {
-                try
+        try
+        {
+            await Parallel.ForEachAsync(
+                _options.Entities,
+                new ParallelOptions()
+                {
+                    MaxDegreeOfParallelism = _options.ProcessAllEntityTypesConcurrently ? _options.Entities.Length : 1,
+                    CancellationToken = cancellationToken
+                },
+                async (entityType, ct) =>
                 {
                     var stopwatch = Stopwatch.StartNew();
-                    var updatesForEntityType = await ProcessChangesForEntityType(entityType, ct);
-                    stopwatch.Stop();
+                    int processedForEntityType = 0;
 
-                    _telemetryClient.TrackMetric(new MetricTelemetry()
+                    try
                     {
-                        Name = $"{MetricPrefix}Batch processing time - {entityType}",
-                        Sum = stopwatch.Elapsed.TotalSeconds
-                    });
-
-                    lock (metricsGate)
-                    {
-                        totalUpdates += updatesForEntityType;
+                        await ProcessChangesForEntityType(entityType, processedCount => processedForEntityType = processedCount, ct);
                     }
-                }
-                catch (Exception ex)
-                {
-                    _telemetryClient.TrackException(new ExceptionTelemetry()
+                    catch (Exception ex)
                     {
-                        Exception = ex,
-                        Properties =
+                        if (!(ex is OperationCanceledException && ct.IsCancellationRequested))
                         {
-                            { "Entity type", entityType }
+                            _telemetryClient.TrackException(new ExceptionTelemetry()
+                            {
+                                Exception = ex,
+                                Properties =
+                                {
+                                    { "Entity type", entityType }
+                                }
+                            });
                         }
-                    });
 
-                    throw;
-                }
-            });
+                        throw;
+                    }
+                    finally
+                    {
+                        stopwatch.Stop();
 
-        _telemetryClient.TrackMetric(new MetricTelemetry()
+                        _telemetryClient.TrackMetric(new MetricTelemetry()
+                        {
+                            Name = $"{MetricPrefix}Batch processing time - {entityType}",
+                            Sum = stopwatch.Elapsed.TotalSeconds
+                        });
+
+                        lock (metricsGate)
+                        {
+                            totalUpdates += processedForEntityType;
+                        }
+                    }
+                });
+        }
+        finally
         {
-            Name = $"{MetricPrefix}Total updates processed",
-            Sum = totalUpdates
-        });
+            _telemetryClient.TrackMetric(new MetricTelemetry()
+            {
+                Name = $"{MetricPrefix}Total updates processed",
+                Sum = totalUpdates
+            });
+        }
     }
 
-    internal async Task<int> ProcessChangesForEntityType(string entityLogicalName, CancellationToken cancellationToken)
+    internal async Task ProcessChangesForEntityType(string entityLogicalName, Action<int> onProcessedCountUpdated, CancellationToken cancellationToken)
     {
-        var totalUpdates = 0;
+        var totalProcessed = 0;
         var insertedCount = 0;
         var updatedCount = 0;
         var deletedCount = 0;
 
         var columns = new ColumnSet(allColumns: true);
 
-        await foreach (var changes in _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns).WithCancellation(cancellationToken))
+        try
         {
-            totalUpdates += changes.Length;
-
-            var newOrUpdatedItems = new List<NewOrUpdatedItem>();
-            var removedOrDeletedItems = new List<RemovedOrDeletedItem>();
-
-            foreach (var change in changes)
+            await foreach (var changes in _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns).WithCancellation(cancellationToken))
             {
-                if (change is NewOrUpdatedItem newOrUpdatedItem)
+                totalProcessed += changes.Length;
+
+                var newOrUpdatedItems = new List<NewOrUpdatedItem>();
+                var removedOrDeletedItems = new List<RemovedOrDeletedItem>();
+
+                foreach (var change in changes)
                 {
-                    newOrUpdatedItems.Add(newOrUpdatedItem);
+                    if (change is NewOrUpdatedItem newOrUpdatedItem)
+                    {
+                        newOrUpdatedItems.Add(newOrUpdatedItem);
+                    }
+                    else if (change is RemovedOrDeletedItem removedOrDeletedItem)
+                    {
+                        removedOrDeletedItems.Add(removedOrDeletedItem);
+                    }
+                    else
+                    {
+                        throw new Exception($"Received unknown change type: '{change.GetType().Name}'.");
+                    }
                 }
-                else if (change is RemovedOrDeletedItem removedOrDeletedItem)
-                {
-                    removedOrDeletedItems.Add(removedOrDeletedItem);
-                }
-                else
-                {
-                    throw new Exception($"Received unknown change type: '{change.GetType().Name}'.");
-                }
+
+                await HandleNewOrUpdatedItems(newOrUpdatedItems, c => insertedCount += c, c => updatedCount += c, cancellationToken);
+
+                // It's important deleted items are processed *after* upserts, otherwise we may resurrect a deleted record
+                await HandleRemovedOrDeletedItems(removedOrDeletedItems, c => deletedCount += c, cancellationToken);
             }
-
-            var batchNewOrUpdatedCount = await HandleNewOrUpdatedItems(newOrUpdatedItems, cancellationToken);
-            insertedCount += batchNewOrUpdatedCount.InsertedCount;
-            updatedCount += batchNewOrUpdatedCount.UpdatedCount;
-
-            // It's important deleted items are processed *after* upserts, otherwise we may resurrect a deleted record
-            deletedCount += await HandleRemovedOrDeletedItems(removedOrDeletedItems, cancellationToken);
         }
-
-        Debug.Assert(totalUpdates == insertedCount + updatedCount + deletedCount);
-
-        _telemetryClient.TrackMetric(new MetricTelemetry()
+        finally
         {
-            Name = $"{MetricPrefix}Updates processed - {entityLogicalName}",
-            Sum = totalUpdates
-        });
+            _telemetryClient.TrackMetric(new MetricTelemetry()
+            {
+                Name = $"{MetricPrefix}Updates processed - {entityLogicalName}",
+                Sum = totalProcessed
+            });
 
-        _telemetryClient.TrackMetric(new MetricTelemetry()
-        {
-            Name = $"{MetricPrefix}Records added - {entityLogicalName}",
-            Sum = insertedCount
-        });
+            _telemetryClient.TrackMetric(new MetricTelemetry()
+            {
+                Name = $"{MetricPrefix}Records added - {entityLogicalName}",
+                Sum = insertedCount
+            });
 
-        _telemetryClient.TrackMetric(new MetricTelemetry()
-        {
-            Name = $"{MetricPrefix}Records updated - {entityLogicalName}",
-            Sum = updatedCount
-        });
+            _telemetryClient.TrackMetric(new MetricTelemetry()
+            {
+                Name = $"{MetricPrefix}Records updated - {entityLogicalName}",
+                Sum = updatedCount
+            });
 
-        _telemetryClient.TrackMetric(new MetricTelemetry()
-        {
-            Name = $"{MetricPrefix}Records deleted - {entityLogicalName}",
-            Sum = deletedCount
-        });
+            _telemetryClient.TrackMetric(new MetricTelemetry()
+            {
+                Name = $"{MetricPrefix}Records deleted - {entityLogicalName}",
+                Sum = deletedCount
+            });
 
-        return totalUpdates;
+            onProcessedCountUpdated(totalProcessed);
+        }
     }
 
-    private async Task<(int InsertedCount, int UpdatedCount)> HandleNewOrUpdatedItems(
+    private async Task HandleNewOrUpdatedItems(
         IReadOnlyCollection<NewOrUpdatedItem> newOrUpdatedItems,
+        Action<int> onInsertedCounterUpdated,
+        Action<int> onUpdatedCounterUpdated,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         if (newOrUpdatedItems.Count == 0)
         {
-            return (0, 0);
+            return;
         }
-
-        var insertedCount = 0;
-        var updatedCount = 0;
 
         var entities = newOrUpdatedItems.Select(e => e.NewOrUpdatedEntity);
         var entityLogicalName = entities.First().LogicalName;
@@ -252,11 +265,7 @@ public partial class DqtReportingService : BackgroundService
             await UpsertRows(chunk);
         }
 
-        Debug.Assert(newOrUpdatedItems.Count == insertedCount + updatedCount);
-
         await DropTempTable();
-
-        return (insertedCount, updatedCount);
 
         DataTable CreateDataTable()
         {
@@ -312,6 +321,9 @@ public partial class DqtReportingService : BackgroundService
         {
             dataTable.Rows.Clear();
 
+            var insertedCount = 0;
+            var updatedCount = 0;
+
             foreach (var entity in entities)
             {
                 var rowData = new object?[entityTableMapping.ColumnCount];
@@ -342,7 +354,7 @@ public partial class DqtReportingService : BackgroundService
                 sqlBulkCopy.BulkCopyTimeout = 0;
                 sqlBulkCopy.DestinationTableName = tempTableName;
 
-                await sqlBulkCopy.WriteToServerAsync(dataTable);
+                await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);
             }
 
             var mergeSql = entityTableMapping.GetMergeSql(tempTableName);
@@ -353,9 +365,9 @@ public partial class DqtReportingService : BackgroundService
                 Transaction = txn
             };
 
-            using (var reader = await mergeCommand.ExecuteReaderAsync())
+            using (var reader = await mergeCommand.ExecuteReaderAsync(cancellationToken))
             {
-                while (await reader.ReadAsync())
+                while (await reader.ReadAsync(cancellationToken))
                 {
                     var action = reader.GetString(0);
 
@@ -371,7 +383,10 @@ public partial class DqtReportingService : BackgroundService
                 }
             }
 
-            await txn.CommitAsync();
+            await txn.CommitAsync(cancellationToken);
+
+            onInsertedCounterUpdated(insertedCount);
+            onUpdatedCounterUpdated(updatedCount);
         }
 
         async Task DropTempTable()
@@ -385,13 +400,14 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    private async Task<int> HandleRemovedOrDeletedItems(
+    private async Task HandleRemovedOrDeletedItems(
         IReadOnlyCollection<RemovedOrDeletedItem> removedOrDeletedItems,
+        Action<int> onDeletedCounterUpdated,
         CancellationToken cancellationToken)
     {
         if (removedOrDeletedItems.Count == 0)
         {
-            return removedOrDeletedItems.Count;
+            return;
         }
 
         var entityLogicalName = removedOrDeletedItems.First().RemovedItem.LogicalName;
@@ -412,8 +428,8 @@ public partial class DqtReportingService : BackgroundService
             command.Parameters.AddRange(idParameters);
 
             await command.ExecuteNonQueryAsync(cancellationToken);
-        }
 
-        return removedOrDeletedItems.Count;
+            onDeletedCounterUpdated(chunk.Length);
+        }
     }
 }
