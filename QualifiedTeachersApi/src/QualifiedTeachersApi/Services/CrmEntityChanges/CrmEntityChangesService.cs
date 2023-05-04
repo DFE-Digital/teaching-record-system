@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Medallion.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
@@ -10,15 +11,20 @@ using QualifiedTeachersApi.DataStore.Sql;
 
 namespace QualifiedTeachersApi.Services.CrmEntityChanges;
 
-public class DataverseCrmEntityChangesService : ICrmEntityChangesService
+public class CrmEntityChangesService : ICrmEntityChangesService
 {
     private readonly IDbContextFactory<DqtContext> _dbContextFactory;
     private readonly IOrganizationServiceAsync _organizationService;
+    private readonly IDistributedLockProvider _distributedLockProvider;
 
-    public DataverseCrmEntityChangesService(IDbContextFactory<DqtContext> dbContextFactory, IOrganizationServiceAsync organizationService)
+    public CrmEntityChangesService(
+        IDbContextFactory<DqtContext> dbContextFactory,
+        IOrganizationServiceAsync organizationService,
+        IDistributedLockProvider distributedLockProvider)
     {
         _dbContextFactory = dbContextFactory;
         _organizationService = organizationService;
+        _distributedLockProvider = distributedLockProvider;
     }
 
     public async IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
@@ -29,6 +35,20 @@ public class DataverseCrmEntityChangesService : ICrmEntityChangesService
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        // Ensure only one node is processing changes for this key and entity type at a time
+        var @lock = await _distributedLockProvider.TryAcquireLockAsync(
+            DistributedLockKeys.EntityChanges(key, entityLogicalName),
+            cancellationToken: cancellationToken);
+
+        if (@lock is null)
+        {
+            yield break;
+        }
+
+#pragma warning disable CS0642 // Possible mistaken empty statement
+        await using (@lock) ;
+#pragma warning restore CS0642 // Possible mistaken empty statement
 
         var entityChangesJournal = await dbContext.EntityChangesJournals
             .SingleOrDefaultAsync(t => t.Key == key && t.EntityLogicalName == entityLogicalName);

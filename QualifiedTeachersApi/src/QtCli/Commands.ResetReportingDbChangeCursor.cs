@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Medallion.Threading.FileSystem;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xrm.Sdk.Query;
 using QualifiedTeachersApi.DataStore.Sql;
@@ -42,7 +43,11 @@ public static partial class Commands
 
                 var serviceClient = new ServiceClient(new Uri(crmUrl), crmClientId, crmClientSecret, useUniqueInstance: true);
 
-                var entityChangesService = new DataverseCrmEntityChangesService(dbContextFactory, serviceClient);
+                // We assume that no other processing is going on while this command is running so a local lock is ok
+                var lockFileDirectory = Path.Combine(Path.GetTempPath(), "qtlocks");
+                var distributedLockProvider = new FileDistributedSynchronizationProvider(new DirectoryInfo(lockFileDirectory));
+
+                var entityChangesService = new CrmEntityChangesService(dbContextFactory, serviceClient, distributedLockProvider);
                 var emptyColumnSet = new ColumnSet();
 
                 await Task.WhenAll(entityTypes.Select(ProcessChangesForEntityType));
