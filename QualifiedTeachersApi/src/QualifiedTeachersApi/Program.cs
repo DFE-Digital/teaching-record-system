@@ -238,7 +238,6 @@ public class Program
         services.AddSingleton<IClock, Clock>();
         services.AddMemoryCache();
         services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
-        services.AddSingleton<IWebApiAdapter, WebApiAdapter>();
 
         services.AddHttpClient("EvidenceFiles", client =>
         {
@@ -298,13 +297,6 @@ public class Program
         {
             ConfigureRateLimitServices();
             ConfigureRedisServices();
-
-            if (Environment.GetEnvironmentVariable("CF_INSTANCE_INDEX") == "0")
-            {
-                services.AddSingleton<IHostedService, LogRemainingCrmLimitsService>();
-            }
-
-            services.AddSingleton<IHostedService, CrmKeepAliveService>();
         }
 
         MetricLabels.ConfigureLabels(builder.Configuration);
