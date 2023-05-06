@@ -31,10 +31,10 @@ $crmClientSecret = Get-UserSecret "CrmClientSecret"
 
 $connectionString = "AuthType=ClientSecret;url=${crmUrl};ClientId=${crmClientId};ClientSecret=${crmClientSecret}"
 
-$coreToolsFolder = (Join-Path $PSScriptRoot tools coretools)
+$coreToolsFolder = (Join-Path $PSScriptRoot .. tools coretools)
 
 function Set-Configuration {
-    $entitiesConfiguration = Get-Content (Join-Path $PSScriptRoot "crm_attributes.json") | ConvertFrom-Json -AsHashtable
+    $entitiesConfiguration = Get-Content (Join-Path $PSScriptRoot .. "crm_attributes.json") | ConvertFrom-Json -AsHashtable
 
     $entitiesWhitelist = ($entitiesConfiguration.Keys | Sort-Object) -join "|"
 
@@ -55,8 +55,8 @@ function Set-Configuration {
 Set-Configuration
 
 $namespace = "QualifiedTeachersApi.DataStore.Crm.Models"
-$entitiesOutput = Join-Path -Path $PSScriptRoot -ChildPath QualifiedTeachersApi src QualifiedTeachersApi DataStore Crm Models GeneratedCode.cs
-$optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath QualifiedTeachersApi src QualifiedTeachersApi DataStore Crm Models GeneratedOptionSets.cs
+$entitiesOutput = Join-Path -Path $PSScriptRoot -ChildPath ".." QualifiedTeachersApi src QualifiedTeachersApi DataStore Crm Models GeneratedCode.cs
+$optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath ".." QualifiedTeachersApi src QualifiedTeachersApi DataStore Crm Models GeneratedOptionSets.cs
 mkdir (Split-Path $entitiesOutput) -Force | Out-Null
 
 $crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"

@@ -286,7 +286,7 @@ jobs:
 
     - name: Generate specs
       shell: pwsh
-      run: ./Sync-ApiSpecs.ps1 ${{ needs.deploy_dev.outputs.environment_url }}
+      run: ./scripts/Sync-ApiSpecs.ps1 ${{ needs.deploy_dev.outputs.environment_url }}
 
     - name: Verify specs
       run: |
