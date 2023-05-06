@@ -5,7 +5,6 @@ on:
     branches:
     - main
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
     branches:
     - main
   workflow_dispatch:
@@ -252,28 +251,11 @@ jobs:
 
   deploy_dev:
     name: Deploy to dev environment
-    needs: [build, validate_terraform]
-    runs-on: ubuntu-latest
-    if: (github.event_name == 'pull_request' && github.event.pull_request.draft == false) || github.event_name == 'workflow_dispatch'
-    environment:
-      name: dev
-      url: ${{ steps.deploy.outputs.environment_url }}
-    concurrency: deploy_dev
-
-    outputs:
-      environment_url: ${{ steps.deploy.outputs.environment_url }}
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: ./.github/workflows/actions/deploy-environment
-      id: deploy
+    uses: ./.github/workflows/deploy-dev
       with:
-        environment_name: dev
         api_docker_image: ${{ needs.build.outputs.api_docker_image }}
-        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-        terraform_vars: dev.tfvars.json
-        terraform_backend_vars: dev.backend.tfvars
+    needs: [build, validate_terraform]
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
 
   sync_api_specs:
     name: Sync API specs

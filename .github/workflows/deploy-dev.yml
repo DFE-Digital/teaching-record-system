@@ -1,0 +1,31 @@
+name: Deploy dev environment
+
+on:
+  workflow_call:
+    inputs:
+      api_docker_image:
+        type: string
+    outputs:
+      environment_url: ${{ steps.deploy.outputs.environment_url }}
+
+environment:
+  name: dev
+  url: ${{ steps.deploy.outputs.environment_url }}
+concurrency: deploy_dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - run: echo ${{ github.event.inputs.api_docker_image }}
+
+    - uses: ./.github/workflows/actions/deploy-environment
+      id: deploy
+      with:
+        environment_name: dev
+        api_docker_image: ${{ github.event.inputs.api_docker_image }}
+        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+        terraform_vars: dev.tfvars.json
+        terraform_backend_vars: dev.backend.tfvars
