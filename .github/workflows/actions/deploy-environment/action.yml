@@ -68,7 +68,7 @@ runs:
         echo "TFSTATE_CONTAINER_ACCESS_KEY=$TFSTATE_CONTAINER_ACCESS_KEY" >> $GITHUB_ENV
       shell: bash
 
-    - uses: hashicorp/setup-terraform@v1
+    - uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.0.10
         terraform_wrapper: false

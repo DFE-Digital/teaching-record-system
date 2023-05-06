@@ -50,10 +50,10 @@ watch-api:
   @cd {{solution-root / "src" / "QualifiedTeachersApi"}} && dotnet watch
 
 # Build the API Docker image
-docker-build:
+docker-build *ARGS:
   @cd {{solution-root / "src" / "QualifiedTeachersApi"}} && dotnet publish -c Release
   @cd {{solution-root / "src" / "QtCli"}} && dotnet publish -c Release
-  @cd {{solution-root}} && docker build . -f {{"src" / "QualifiedTeachersApi" / "Dockerfile"}}
+  @cd {{solution-root}} && docker build . -f {{"src" / "QualifiedTeachersApi" / "Dockerfile"}} {{ARGS}}
 
 # Set a configuration entry in user secrets for the API project
 set-api-secret key value:

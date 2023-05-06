@@ -1,0 +1,43 @@
+name: Build & deploy main
+
+on:
+  push:
+    branches:
+    - main
+  workflow_dispatch:
+
+permissions:
+  checks: write
+  deployments: write
+  packages: write
+  pull-requests: write
+
+jobs:
+  package:
+    name: Package application
+    uses: ./.github/workflows/package.yml
+    secrets: inherit
+
+  deploy_test:
+    name: Deploy test environment
+    needs: [package]
+    uses: ./.github/workflows/deploy-test.yml
+    with:
+      api_docker_image: ${{ needs.package.outputs.api_docker_image }}
+    secrets: inherit
+
+  deploy_preprod:
+    name: Deploy pre-production environment
+    needs: [package, deploy_test]
+    uses: ./.github/workflows/deploy-preprod.yml
+    with:
+      api_docker_image: ${{ needs.package.outputs.api_docker_image }}
+    secrets: inherit
+
+  deploy_prod:
+    name: Deploy production environment
+    needs: [package, deploy_preprod]
+    uses: ./.github/workflows/deploy-prod.yml
+    with:
+      api_docker_image: ${{ needs.package.outputs.api_docker_image }}
+    secrets: inherit
