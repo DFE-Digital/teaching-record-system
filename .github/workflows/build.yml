@@ -5,7 +5,6 @@ on:
     branches:
     - main
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
     branches:
     - main
   workflow_dispatch:
@@ -253,27 +252,11 @@ jobs:
   deploy_dev:
     name: Deploy to dev environment
     needs: [build, validate_terraform]
-    runs-on: ubuntu-latest
-    if: (github.event_name == 'pull_request' && github.event.pull_request.draft == false) || github.event_name == 'workflow_dispatch'
-    environment:
-      name: dev
-      url: ${{ steps.deploy.outputs.environment_url }}
-    concurrency: deploy_dev
-
-    outputs:
-      environment_url: ${{ steps.deploy.outputs.environment_url }}
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: ./.github/workflows/actions/deploy-environment
-      id: deploy
-      with:
-        environment_name: dev
-        api_docker_image: ${{ needs.build.outputs.api_docker_image }}
-        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-        terraform_vars: dev.tfvars.json
-        terraform_backend_vars: dev.backend.tfvars
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/deploy-dev.yml
+    with:
+      api_docker_image: ${{ needs.build.outputs.api_docker_image }}
+    secrets: inherit
 
   sync_api_specs:
     name: Sync API specs
@@ -286,7 +269,7 @@ jobs:
 
     - name: Generate specs
       shell: pwsh
-      run: ./scripts/Sync-ApiSpecs.ps1 ${{ needs.deploy_dev.outputs.environment_url }}
+      run: ./scripts/Sync-ApiSpecs.ps1 ${{ needs.deploy_dev.outputs.api_url }}
 
     - name: Verify specs
       run: |
@@ -296,107 +279,29 @@ jobs:
           exit 1
         )
 
-#  zap_scan:
-#    name: OWASP ZAP API scan
-#    needs: deploy_dev
-#    runs-on: ubuntu-latest
-#    concurrency: deploy_dev
-#    strategy:
-#      matrix:
-#        version: [v1, v2]
-#
-#    steps:
-#    - uses: actions/checkout@v3
-#
-#    - name: Create config file
-#      run: |
-#        echo "replacer.full_list(0).description=auth1" >> options.prop
-#        echo "replacer.full_list(0).enabled=true" >> options.prop
-#        echo "replacer.full_list(0).matchtype=REQ_HEADER" >> options.prop
-#        echo "replacer.full_list(0).matchstr=Authorization" >> options.prop
-#        echo "replacer.full_list(0).regex=false" >> options.prop
-#        echo "replacer.full_list(0).replacement=Bearer ${{ needs.deploy_dev.outputs.test_user_api_key }}" >> options.prop
-#
-#    - uses: zaproxy/action-api-scan@v0.1.1
-#      with:
-#        target: ${{ needs.deploy_dev.outputs.environment_url }}swagger/${{ matrix.version }}/swagger.json
-#        format: openapi
-#        allow_issue_writing: false
-#        fail_action: true
-#        rules_file_name: '.zap/rules.tsv'
-#        cmd_options: '-z "-configFile /zap/wrk/options.prop"'
-
   deploy_test:
     name: Deploy to test environment
     needs: [build, validate_terraform]
-    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    environment:
-      name: test
-      url: ${{ steps.deploy.outputs.environment_url }}
-    concurrency: deploy_test
-
-    outputs:
-      environment_url: ${{ steps.deploy.outputs.environment_url }}
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: ./.github/workflows/actions/deploy-environment
-      id: deploy
-      with:
-        environment_name: test
-        api_docker_image: ${{ needs.build.outputs.api_docker_image }}
-        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-        terraform_vars: test.tfvars.json
-        terraform_backend_vars: test.backend.tfvars
+    uses: ./.github/workflows/deploy-test.yml
+    with:
+      api_docker_image: ${{ needs.build.outputs.api_docker_image }}
+    secrets: inherit
 
   deploy_preprod:
     name: Deploy to pre-production environment
     needs: [build, deploy_test]
-    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    environment:
-      name: pre-production
-      url: ${{ steps.deploy.outputs.environment_url }}
-    concurrency: deploy_preprod
-
-    outputs:
-      environment_url: ${{ steps.deploy.outputs.environment_url }}
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: ./.github/workflows/actions/deploy-environment
-      id: deploy
-      with:
-        environment_name: pre-production
-        api_docker_image: ${{ needs.build.outputs.api_docker_image }}
-        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-        terraform_vars: pre-production.tfvars.json
-        terraform_backend_vars: pre-production.backend.tfvars
+    uses: ./.github/workflows/deploy-preprod.yml
+    with:
+      api_docker_image: ${{ needs.build.outputs.api_docker_image }}
+    secrets: inherit
 
   deploy_prod:
     name: Deploy to production environment
     needs: [build, deploy_preprod]
-    runs-on: ubuntu-latest
     if: (github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch') || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_production == 'true')
-    environment:
-      name: production
-      url: ${{ steps.deploy.outputs.environment_url }}
-    concurrency: deploy_prod
-
-    outputs:
-      environment_url: ${{ steps.deploy.outputs.environment_url }}
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: ./.github/workflows/actions/deploy-environment
-      id: deploy
-      with:
-        environment_name: production
-        api_docker_image: ${{ needs.build.outputs.api_docker_image }}
-        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-        terraform_vars: production.tfvars.json
-        terraform_backend_vars: production.backend.tfvars
+    uses: ./.github/workflows/deploy-prod.yml
+    with:
+      api_docker_image: ${{ needs.build.outputs.api_docker_image }}
+    secrets: inherit
