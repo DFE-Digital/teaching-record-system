@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 1)]
-    [String]$BaseUrl = "http://localhost:30473"
+    [String]$BaseUrl = "https://localhost:5001"
 )
 
 $ErrorActionPreference = "Stop"
@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 $BaseUrl = $BaseUrl.TrimEnd("/")
 
 $versions = @("v1", "v2", "v3")
-$output = Join-Path $PSScriptRoot "docs" "api-specs"
+$output = Join-Path $PSScriptRoot ".." "docs" "api-specs"
 
 New-Item $output -ItemType Directory -ErrorAction SilentlyContinue
 
