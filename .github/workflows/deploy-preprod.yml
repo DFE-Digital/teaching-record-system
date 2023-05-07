@@ -1,0 +1,48 @@
+name: Deploy pre-production environment
+
+on:
+  workflow_call:
+    inputs:
+      api_docker_image:
+        type: string
+        required: true
+    outputs:
+      api_url:
+        value: ${{ jobs.deploy.outputs.api_url }}
+  workflow_dispatch:
+
+jobs:
+  package:
+    name: Package application
+    if: inputs.api_docker_image == ''
+    uses: ./.github/workflows/package.yml
+    secrets: inherit
+
+  deploy:
+    name: Deploy
+    needs: package
+    if: always() && (needs.package.result == 'success' || needs.package.result == 'skipped')
+    runs-on: ubuntu-latest
+    concurrency: deploy_preprod
+
+    outputs:
+      api_url: ${{ steps.deploy.outputs.api_url }}
+
+    environment:
+      name: pre-production
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - run: echo $PACKAGE_RESULT
+      env:
+        PACKAGE_RESULT: ${{ needs.package.result }}
+
+    - uses: ./.github/workflows/actions/deploy-environment
+      id: deploy
+      with:
+        environment_name: pre-production
+        api_docker_image: ${{ inputs.api_docker_image || needs.package.outputs.api_docker_image }}
+        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+        terraform_vars: pre-production.tfvars.json
+        terraform_backend_vars: pre-production.backend.tfvars

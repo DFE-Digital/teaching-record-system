@@ -1,0 +1,76 @@
+name: Build & deploy main
+
+on:
+  push:
+    branches:
+    - main
+  workflow_dispatch:
+
+permissions:
+  checks: write
+  deployments: write
+  packages: write
+  pull-requests: write
+
+jobs:
+  package:
+    name: Package application
+    uses: ./.github/workflows/package.yml
+    secrets: inherit
+
+  check_environments:
+    name: Check environment deployments
+    runs-on: ubuntu-latest
+    outputs:
+      deploy_preprod: ${{ steps.check_preprod_deployment.outputs.deploy_preprod}}
+    steps:
+      - uses: actions/github-script@v6
+        id: check_preprod_deployment
+        with:
+          script: |
+            // If the current pre-prod deployment is not main then we don't want to overwrite it
+
+            const { owner, repo } = context.repo;
+            const preprodEnvironmentName = "pre-production";
+
+            const deployments = await github.rest.repos.listDeployments({ owner, repo, environment: preprodEnvironmentName, per_page: 1 });
+            const lastDeploymentBranch = deployments.data[0].ref;
+
+            let deployPreprod = true;
+
+            if (lastDeploymentBranch !== "main") {
+              const branches = await github.rest.repos.listBranches({ owner, repo });
+
+              if (branches.data.map(b => b.name).includes(lastDeploymentBranch)) {
+                deployPreprod = false;
+                core.info(`${preprodEnvironmentName} has a non-main branch deployed`);
+              }
+            }
+
+            core.setOutput("deploy_preprod", deployPreprod);
+
+  deploy_test:
+    name: Deploy test environment
+    needs: [package]
+    uses: ./.github/workflows/deploy-test.yml
+    with:
+      api_docker_image: ${{ needs.package.outputs.api_docker_image }}
+    secrets: inherit
+
+  deploy_preprod:
+    name: Deploy pre-production environment
+    needs: [package, deploy_test, check_environments]
+    if: needs.check_environments.outputs.deploy_preprod == 'true'
+    uses: ./.github/workflows/deploy-preprod.yml
+    with:
+      api_docker_image: ${{ needs.package.outputs.api_docker_image }}
+    secrets: inherit
+
+  deploy_prod:
+    name: Deploy production environment
+    needs: [package, deploy_preprod]
+    if: always() && (needs.deploy_preprod.result == 'success' || needs.deploy_preprod.result == 'skipped')
+    uses: ./.github/workflows/deploy-prod.yml
+    with:
+      api_docker_image: ${{ needs.package.outputs.api_docker_image }}
+    secrets: inherit
