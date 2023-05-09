@@ -10,6 +10,9 @@ inputs:
   dotnet_test_args:
     description: 'Additional arguments to pass to dotnet test'
     required: false
+  config_json:
+    description: 'JSON configuration'
+    required: false
 
 runs:
   using: composite
@@ -26,6 +29,7 @@ runs:
       shell: bash
       env:
         PROJECT_PATH: ${{ inputs.test_project_path }}
+        TEST_CONFIG_JSON: ${{ inputs.config_json }}
 
     - uses: dorny/test-reporter@v1
       if: always()
