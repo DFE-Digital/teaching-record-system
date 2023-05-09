@@ -18,7 +18,9 @@ jobs:
   build:
     name: Build & test
     runs-on: ubuntu-latest
-    concurrency: build
+
+    outputs:
+      run_crm_integration_tests: ${{ steps.check_changed_files.outputs.run_crm_integration_tests }}
 
     env:
       MSSQL_DB: dqtreports
@@ -66,31 +68,18 @@ jobs:
           echo "::error ::Failed to extract key_vault_name from $TFVARS"
           exit 1
         fi
-        echo "key_vault_name=$KEY_VAULT_NAME" >> $GITHUB_ENV
+        echo "key_vault_name=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
       env:
         TFVARS: dev.tfvars.json
       shell: bash
       working-directory: terraform
 
     - uses: Azure/get-keyvault-secrets@v1
+      name: Get secrets
       id: get_secrets
       with:
-        keyvault: ${{ env.key_vault_name }}
-        secrets: 'INTEGRATION-TEST-CONFIG'
-
-    - name: Set secret environment variables
-      id: set_outputs
-      run: |
-        SECRET_KEYS=($(jq -r <<< "$SECRETS_JSON" | jq -r 'keys | @sh' | tr -d \'))
-        for s in "${SECRET_KEYS[@]}"
-        do
-          SECRET=$(jq -r .${s} <<< "$SECRETS_JSON")
-          echo "::add-mask::$SECRET"
-          echo ${s}=$SECRET >> $GITHUB_ENV
-        done
-      env:
-        SECRETS_JSON: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
-      shell: bash
+        keyvault: ${{ steps.config.outputs.key_vault_name }}
+        secrets: INTEGRATION-TEST-CONFIG
 
     - name: Install tools
       run: |
@@ -109,7 +98,7 @@ jobs:
         CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA | { grep -oP '^QualifiedTeachersApi\/\K.*\.cs$' || true; })
 
         if [ "$CHANGED_FILES" == "" ]; then
-          echo "::warning::No changes to lint"
+          echo "::notice::No changes to lint"
           exit 0
         fi
 
@@ -123,16 +112,18 @@ jobs:
       run: dotnet build --configuration Release --no-restore
       working-directory: QualifiedTeachersApi
 
-    - name: Determine test filter
-      id: get_test_filter
+    - name: Check changed files
+      id: check_changed_files
       run: |
-        # If no CRM integration files (or their tests) have been changed in this PR then skip Dataverse tests
+        # If no CRM integration files (or their tests) have been changed in this PR then skip CRM integration tests
+        RUN_CRM_INTEGRATION_TESTS=true
         git fetch origin main --quiet --depth=1
         CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
         if [[ $(echo "$CHANGED_FILES" | grep -EL "DataStore/Crm|Tests/DataverseIntegration") ]]; then
-          echo "::warning::Skipping DataverseAdapter tests"
-          echo filter_arg='--filter "FullyQualifiedName!~QualifiedTeachersApi.Tests.DataverseIntegration"' >> $GITHUB_OUTPUT
+          RUN_CRM_INTEGRATION_TESTS=false
         fi
+
+        echo run_crm_integration_tests=$RUN_CRM_INTEGRATION_TESTS >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Tests
@@ -141,16 +132,24 @@ jobs:
         test_project_path: QualifiedTeachersApi/tests/QualifiedTeachersApi.Tests
         report_name: "Test results"
         dotnet_test_args: >-
-          -e CrmUrl="${{ env.INTEGRATIONTESTS_CRMURL }}"
-          -e CrmClientId="${{ env.INTEGRATIONTESTS_CRMCLIENTID }}"
-          -e CrmClientSecret="${{ env.INTEGRATIONTESTS_CRMCLIENTSECRET }}"
-          -e BuildEnvLockBlobUri="${{ env.INTEGRATIONTESTS_BUILDENVLOCKBLOBURI }}"
-          -e BuildEnvLockBlobSasToken="${{ env.INTEGRATIONTESTS_BUILDENVLOCKBLOBSASTOKEN }}"
-          -e TrnGenerationApi__BaseAddress="${{ env.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIBASEADDRESS }}"
-          -e TrnGenerationApi__ApiKey="${{ env.INTEGRATIONTESTS_BUILDENVTRNGENERATIONAPIAPIKEY }}"
+          --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
           -e DqtReporting__ReportingDbConnectionString="Data Source=(local); Initial Catalog=${{ env.MSSQL_DB }}; User=sa; Password=${{ env.MSSQL_PASSWORD }}; TrustServerCertificate=True"
-          ${{ steps.get_test_filter.outputs.filter_arg }}
+          --filter "FullyQualifiedName!~QualifiedTeachersApi.Tests.DataverseIntegration"
+        config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
+
+    - name: CRM integration tests
+      if: steps.check_changed_files.outputs.run_crm_integration_tests == 'true'
+      uses: ./.github/workflows/actions/test
+      with:
+        test_project_path: QualifiedTeachersApi/tests/QualifiedTeachersApi.Tests
+        report_name: "CRM integration test results"
+        dotnet_test_args: >-
+          --no-build
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
+          -e DqtReporting__ReportingDbConnectionString="Data Source=(local); Initial Catalog=${{ env.MSSQL_DB }}; User=sa; Password=${{ env.MSSQL_PASSWORD }}; TrustServerCertificate=True"
+          --filter "FullyQualifiedName~QualifiedTeachersApi.Tests.DataverseIntegration"
+        config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
 
   validate_terraform:
     name: Validate Terraform

@@ -7,7 +7,6 @@ using JustEat.HttpClientInterception;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -89,9 +88,6 @@ public class ApiFixture : WebApplicationFactory<Program>
             });
         });
     }
-
-    private static IConfiguration GetTestConfiguration() =>
-        new ConfigurationBuilder().AddUserSecrets<ApiFixture>(optional: true).Build();
 
     private class NotFoundHandler : HttpMessageHandler
     {
