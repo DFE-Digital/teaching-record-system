@@ -1,0 +1,35 @@
+name: Deploy test environment
+
+on:
+  workflow_call:
+    inputs:
+      api_docker_image:
+        type: string
+        required: true
+    outputs:
+      api_url:
+        value: ${{ jobs.deploy.outputs.api_url }}
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    concurrency: deploy_test
+
+    outputs:
+      api_url: ${{ steps.deploy.outputs.api_url }}
+
+    environment:
+      name: test
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: ./.github/workflows/actions/deploy-environment
+      id: deploy
+      with:
+        environment_name: test
+        api_docker_image: ${{ inputs.api_docker_image }}
+        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+        terraform_vars: test.tfvars.json
+        terraform_backend_vars: test.backend.tfvars

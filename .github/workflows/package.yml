@@ -1,0 +1,41 @@
+name: Package application
+
+on:
+  workflow_call:
+    outputs:
+      api_docker_image:
+        value: ${{ jobs.package.outputs.api_image_tag }}
+
+jobs:
+  package:
+    name: Build & package
+    runs-on: ubuntu-latest
+    env:
+      CONTAINER_REGISTRY: ghcr.io
+
+    outputs:
+      api_image_tag: ${{ steps.image_tags.outputs.api_tag }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: extractions/setup-just@v1
+
+      - name: Get Docker image tags
+        id: image_tags
+        run: |
+          echo "api_tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):api-$GITHUB_SHA" >> $GITHUB_OUTPUT
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker build & push
+        run: |
+          just docker-build --build-arg GIT_SHA=$GITHUB_SHA --tag $TAG
+          docker push $TAG
+        env:
+          TAG: ${{ steps.image_tags.outputs.api_tag }}

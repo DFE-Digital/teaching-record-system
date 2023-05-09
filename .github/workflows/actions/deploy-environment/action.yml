@@ -18,9 +18,9 @@ inputs:
     required: true
 
 outputs:
-  environment_url:
+  api_url:
     description: 'The base URL for the deployed environment'
-    value: ${{ steps.terraform.outputs.url }}
+    value: ${{ steps.terraform.outputs.api_url }}
 
 runs:
   using: composite
@@ -68,7 +68,7 @@ runs:
         echo "TFSTATE_CONTAINER_ACCESS_KEY=$TFSTATE_CONTAINER_ACCESS_KEY" >> $GITHUB_ENV
       shell: bash
 
-    - uses: hashicorp/setup-terraform@v1
+    - uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.0.10
         terraform_wrapper: false
@@ -78,7 +78,7 @@ runs:
       run: |
         make ci ${{ inputs.environment_name }} terraform-apply
         cd terraform
-        echo "url=https://$(terraform output -raw api_fqdn)/" >> $GITHUB_OUTPUT
+        echo "api_url=https://$(terraform output -raw api_fqdn)/" >> $GITHUB_OUTPUT
       env:
         ARM_ACCESS_KEY: ${{ env.TFSTATE_CONTAINER_ACCESS_KEY }}
         TF_VAR_azure_sp_credentials_json: ${{ inputs.azure_credentials }}
