@@ -597,7 +597,11 @@ public partial class DataverseAdapter : IDataverseAdapter
         var query = new QueryExpression(dfeta_qualification.EntityLogicalName)
         {
             ColumnSet = new ColumnSet(columnNames),
-            Criteria = filter
+            Criteria = filter,
+            Orders =
+            {
+                new OrderExpression(dfeta_qualification.Fields.CreatedOn, OrderType.Ascending)
+            }
         };
 
         if (heQualificationColumnNames?.Length > 0)
