@@ -13,6 +13,9 @@ indent_style = tab
 [*.ps1]
 indent_size = 4
 
+[*.sql]
+indent_size = 4
+
 [*.cs]
 indent_size = 4
 dotnet_diagnostic.IDE0005.severity = error
