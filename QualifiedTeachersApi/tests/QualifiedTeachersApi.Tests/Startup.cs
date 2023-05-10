@@ -29,9 +29,7 @@ public class Startup
         // InitServiceAsync().Result within Microsoft.PowerPlatform.Dataverse.Client.ConnectionService.GetCachedService() looks to be the culprit
         static ServiceClient GetCrmServiceClient(IConfiguration configuration) => Task.Run(() =>
             new ServiceClient(
-                new Uri(configuration["CrmUrl"] ?? throw new Exception("CrmUrl configuration key is missing.")),
-                configuration["CrmClientId"] ?? throw new Exception("CrmClientId configuration key is missing."),
-                configuration["CrmClientSecret"] ?? throw new Exception("CrmClientSecret configuration key is missing."),
-                useUniqueInstance: true)).Result;
+                configuration.GetConnectionString("Crm") ?? throw new Exception("Crm connection string is missing.")))
+            .Result;
     }
 }

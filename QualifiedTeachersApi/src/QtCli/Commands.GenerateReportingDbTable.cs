@@ -8,35 +8,27 @@ public partial class Commands
 {
     public static Command CreateGenerateReportingDbTableCommand(IConfiguration configuration)
     {
-        var crmUrlOption = new Option<string>("--crm-url") { IsRequired = true };
-        var crmClientIdOption = new Option<string>("--crm-client-id") { IsRequired = true };
-        var crmClientSecretOption = new Option<string>("--crm-client-secret") { IsRequired = true };
+        var crmConnectionStringOption = new Option<string>("--crm-connection-string") { IsRequired = true };
         var entityTypeOption = new Option<string>("--entity-type") { IsRequired = true };
 
-        PopulateOptionDefaultValueIfConfigured("CrmUrl", crmUrlOption);
-        PopulateOptionDefaultValueIfConfigured("CrmClientId", crmClientIdOption);
-        PopulateOptionDefaultValueIfConfigured("CrmClientSecret", crmClientSecretOption);
+        PopulateOptionDefaultValueIfConfigured("ConnectionStrings:Crm", crmConnectionStringOption);
 
         var command = new Command("generate-reporting-db-table", "Returns a T-SQL create statement for the specified entity type.")
         {
-            crmUrlOption,
-            crmClientIdOption,
-            crmClientSecretOption,
+            crmConnectionStringOption,
             entityTypeOption
         };
 
         command.SetHandler(
-            async (string crmUrl, string crmClientId, string crmClientSecret, string entityType) =>
+            async (string crmConnectionString, string entityType) =>
             {
-                var serviceClient = new ServiceClient(new Uri(crmUrl), crmClientId, crmClientSecret, useUniqueInstance: true);
+                var serviceClient = new ServiceClient(crmConnectionString);
                 var entityMetadata = await DataverseAdapter.GetEntityMetadata(serviceClient, entityType, EntityFilters.Default | EntityFilters.Attributes);
                 var entityTableMapping = EntityTableMapping.Create(entityMetadata);
                 var sql = entityTableMapping.GetCreateTableSql();
                 await Console.Out.WriteLineAsync(sql);
             },
-            crmUrlOption,
-            crmClientIdOption,
-            crmClientSecretOption,
+            crmConnectionStringOption,
             entityTypeOption);
 
         return command;

@@ -25,11 +25,7 @@ function Get-UserSecret {
     return $value
 }
 
-$crmUrl = Get-UserSecret "CrmUrl"
-$crmClientId = Get-UserSecret "CrmClientId"
-$crmClientSecret = Get-UserSecret "CrmClientSecret"
-
-$connectionString = "AuthType=ClientSecret;url=${crmUrl};ClientId=${crmClientId};ClientSecret=${crmClientSecret}"
+$connectionString = Get-UserSecret "ConnectionStrings:Crm"
 
 $coreToolsFolder = (Join-Path $PSScriptRoot .. tools coretools)
 

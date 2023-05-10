@@ -12,36 +12,30 @@ public static partial class Commands
 {
     public static Command CreateResetReportingDbChangeCursorCommand(IConfiguration configuration)
     {
-        var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
-        var crmUrlOption = new Option<string>("--crm-url") { IsRequired = true };
-        var crmClientIdOption = new Option<string>("--crm-client-id") { IsRequired = true };
-        var crmClientSecretOption = new Option<string>("--crm-client-secret") { IsRequired = true };
+        var dbConnectionStringOption = new Option<string>("--db-connection-string") { IsRequired = true };
+        var crmConnectionStringOption = new Option<string>("--crm-connection-string") { IsRequired = true };
         var entityTypesOption = new Option<IEnumerable<string>>("--entity-types") { IsRequired = true, AllowMultipleArgumentsPerToken = true };
 
-        PopulateOptionDefaultValueIfConfigured("ConnectionStrings:DefaultConnection", connectionStringOption);
-        PopulateOptionDefaultValueIfConfigured("CrmUrl", crmUrlOption);
-        PopulateOptionDefaultValueIfConfigured("CrmClientId", crmClientIdOption);
-        PopulateOptionDefaultValueIfConfigured("CrmClientSecret", crmClientSecretOption);
+        PopulateOptionDefaultValueIfConfigured("ConnectionStrings:DefaultConnection", dbConnectionStringOption);
+        PopulateOptionDefaultValueIfConfigured("ConnectionStrings:Crm", crmConnectionStringOption);
 
         var command = new Command("reset-reporting-db-change-cursor", "Resets the entity changes cursor to the current change token for the DqtReporting service.")
         {
-            connectionStringOption,
-            crmUrlOption,
-            crmClientIdOption,
-            crmClientSecretOption,
+            dbConnectionStringOption,
+            crmConnectionStringOption,
             entityTypesOption
         };
 
         command.SetHandler(
-            async (string connectionString, string crmUrl, string crmClientId, string crmClientSecret, IEnumerable<string> entityTypes) =>
+            async (string dbConnectionString, string crmConnectionString, IEnumerable<string> entityTypes) =>
             {
                 var serviceProvider = new ServiceCollection()
-                    .AddDbContextFactory<DqtContext>(options => DqtContext.ConfigureOptions(options, connectionString))
+                    .AddDbContextFactory<DqtContext>(options => DqtContext.ConfigureOptions(options, dbConnectionString))
                     .BuildServiceProvider();
 
                 var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<DqtContext>>();
 
-                var serviceClient = new ServiceClient(new Uri(crmUrl), crmClientId, crmClientSecret, useUniqueInstance: true);
+                var serviceClient = new ServiceClient(crmConnectionString);
 
                 // We assume that no other processing is going on while this command is running so a local lock is ok
                 var lockFileDirectory = Path.Combine(Path.GetTempPath(), "qtlocks");
@@ -59,10 +53,8 @@ public static partial class Commands
                     }
                 }
             },
-            connectionStringOption,
-            crmUrlOption,
-            crmClientIdOption,
-            crmClientSecretOption,
+            dbConnectionStringOption,
+            crmConnectionStringOption,
             entityTypesOption);
 
         return command;
