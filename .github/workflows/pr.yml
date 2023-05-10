@@ -40,7 +40,7 @@ jobs:
         ports:
           - 5432:5432
       mssql:
-        image: mcr.microsoft.com/mssql/server:2019-latest
+        image: mcr.microsoft.com/mssql/server:2022-latest
         env:
           ACCEPT_EULA: Y
           SA_PASSWORD: ${{ env.MSSQL_PASSWORD }}
