@@ -5233,6 +5233,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string CreatedOn = "createdon";
 			public const string dfeta_CompletionorAwardDate = "dfeta_completionorawarddate";
 			public const string dfeta_createdbyapi = "dfeta_createdbyapi";
 			public const string dfeta_HE_ClassDivision = "dfeta_he_classdivision";
@@ -5316,6 +5317,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the record was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 		

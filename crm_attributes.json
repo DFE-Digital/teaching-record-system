@@ -167,7 +167,8 @@
     "dfeta_npqsl_awarded",
     "dfeta_createdbyapi",
     "dfeta_mq_specialismid",
-    "dfeta_mq_date"
+    "dfeta_mq_date",
+    "CreatedOn"
   ],
   "dfeta_specialism": [
     "dfeta_name",

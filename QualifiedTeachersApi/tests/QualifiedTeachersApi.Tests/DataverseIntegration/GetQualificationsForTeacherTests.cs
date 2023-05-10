@@ -34,8 +34,7 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
     public async Task Given_QualificationsExistForTeacher_ReturnsExpectedColumnValues(
         bool setHeQualificationColumnNames,
         bool setHeSubjectColumnNames,
-        bool setSpecialismColumnNames
-        )
+        bool setSpecialismColumnNames)
     {
         // Arrange
         var firstName = Faker.Name.First();
@@ -184,96 +183,95 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
                 dfeta_qualification.Fields.dfeta_Type,
                 dfeta_qualification.Fields.StateCode
             },
-            setHeQualificationColumnNames
-            ? new[]
-            {
-                dfeta_hequalification.PrimaryIdAttribute,
-                dfeta_hequalification.Fields.dfeta_name
-            }
-            : null,
-            setHeSubjectColumnNames
-            ? new[]
-            {
-                dfeta_hesubject.PrimaryIdAttribute,
-                dfeta_hesubject.Fields.dfeta_name,
-                dfeta_hesubject.Fields.dfeta_Value
-            }
-            : null,
-            setSpecialismColumnNames
-            ? new[]
-            {
-                dfeta_specialism.PrimaryIdAttribute,
-                dfeta_specialism.Fields.dfeta_name
-            }
-            : null);
+            setHeQualificationColumnNames ?
+                new[]
+                {
+                    dfeta_hequalification.PrimaryIdAttribute,
+                    dfeta_hequalification.Fields.dfeta_name
+                }
+                : null,
+            setHeSubjectColumnNames ?
+                new[]
+                {
+                    dfeta_hesubject.PrimaryIdAttribute,
+                    dfeta_hesubject.Fields.dfeta_name,
+                    dfeta_hesubject.Fields.dfeta_Value
+                } :
+                null,
+            setSpecialismColumnNames ?
+                new[]
+                {
+                    dfeta_specialism.PrimaryIdAttribute,
+                    dfeta_specialism.Fields.dfeta_name
+                }
+                : null);
 
         // Assert
         Assert.Collection(
-                    qualifications,
-                    item1 =>
-                    {
-                        Assert.Equal(qualification1Id, item1.Id);
-                        Assert.Equal(qualification1Type, item1.dfeta_Type);
-                        Assert.Equal(qualification1AwardDate.ToDateTime(), item1.dfeta_CompletionorAwardDate);
-                        Assert.Equal(qualification1Status, item1.StateCode);
-                    },
-                    item2 =>
-                    {
-                        Assert.Equal(qualification2Id, item2.Id);
-                        Assert.Equal(qualification2Type, item2.dfeta_Type);
-                        Assert.Equal(qualification2Status, item2.StateCode);
+            qualifications,
+            item1 =>
+            {
+                Assert.Equal(qualification1Id, item1.Id);
+                Assert.Equal(qualification1Type, item1.dfeta_Type);
+                Assert.Equal(qualification1AwardDate.ToDateTime(), item1.dfeta_CompletionorAwardDate);
+                Assert.Equal(qualification1Status, item1.StateCode);
+            },
+            item2 =>
+            {
+                Assert.Equal(qualification2Id, item2.Id);
+                Assert.Equal(qualification2Type, item2.dfeta_Type);
+                Assert.Equal(qualification2Status, item2.StateCode);
 
-                        var heQualification = item2.Extract<dfeta_hequalification>("dfeta_hequalification", dfeta_hequalification.PrimaryIdAttribute);
-                        if (setHeQualificationColumnNames)
-                        {
-                            Assert.NotNull(heQualification);
-                            Assert.Equal(heQualificationName, heQualification.dfeta_name);
+                var heQualification = item2.Extract<dfeta_hequalification>("dfeta_hequalification", dfeta_hequalification.PrimaryIdAttribute);
+                if (setHeQualificationColumnNames)
+                {
+                    Assert.NotNull(heQualification);
+                    Assert.Equal(heQualificationName, heQualification.dfeta_name);
+                }
+                else
+                {
+                    Assert.Null(heQualification);
+                }
 
-                        }
-                        else
-                        {
-                            Assert.Null(heQualification);
-                        }
+                var heSubject1 = item2.Extract<dfeta_hesubject>("dfeta_hesubject1", dfeta_hesubject.PrimaryIdAttribute);
+                var heSubject2 = item2.Extract<dfeta_hesubject>("dfeta_hesubject2", dfeta_hesubject.PrimaryIdAttribute);
+                var heSubject3 = item2.Extract<dfeta_hesubject>("dfeta_hesubject3", dfeta_hesubject.PrimaryIdAttribute);
+                if (setHeSubjectColumnNames)
+                {
+                    Assert.NotNull(heSubject1);
+                    Assert.Equal(heSubject1Name, heSubject1.dfeta_name);
+                    Assert.Equal(heSubject1Value, heSubject1.dfeta_Value);
+                    Assert.NotNull(heSubject2);
+                    Assert.Equal(heSubject2Name, heSubject2.dfeta_name);
+                    Assert.Equal(heSubject2Value, heSubject2.dfeta_Value);
+                    Assert.NotNull(heSubject3);
+                    Assert.Equal(heSubject3Name, heSubject3.dfeta_name);
+                    Assert.Equal(heSubject3Value, heSubject3.dfeta_Value);
+                }
+                else
+                {
+                    Assert.Null(heSubject1);
+                    Assert.Null(heSubject2);
+                    Assert.Null(heSubject3);
+                }
+            },
+            item3 =>
+            {
+                Assert.Equal(mqQualificationId, item3.Id);
+                Assert.Equal(dfeta_qualification_dfeta_Type.MandatoryQualification, item3.dfeta_Type);
+                Assert.Equal(dfeta_qualificationState.Active, item3.StateCode);
 
-                        var heSubject1 = item2.Extract<dfeta_hesubject>("dfeta_hesubject1", dfeta_hesubject.PrimaryIdAttribute);
-                        var heSubject2 = item2.Extract<dfeta_hesubject>("dfeta_hesubject2", dfeta_hesubject.PrimaryIdAttribute);
-                        var heSubject3 = item2.Extract<dfeta_hesubject>("dfeta_hesubject3", dfeta_hesubject.PrimaryIdAttribute);
-                        if (setHeSubjectColumnNames)
-                        {
-                            Assert.NotNull(heSubject1);
-                            Assert.Equal(heSubject1Name, heSubject1.dfeta_name);
-                            Assert.Equal(heSubject1Value, heSubject1.dfeta_Value);
-                            Assert.NotNull(heSubject2);
-                            Assert.Equal(heSubject2Name, heSubject2.dfeta_name);
-                            Assert.Equal(heSubject2Value, heSubject2.dfeta_Value);
-                            Assert.NotNull(heSubject3);
-                            Assert.Equal(heSubject3Name, heSubject3.dfeta_name);
-                            Assert.Equal(heSubject3Value, heSubject3.dfeta_Value);
-                        }
-                        else
-                        {
-                            Assert.Null(heSubject1);
-                            Assert.Null(heSubject2);
-                            Assert.Null(heSubject3);
-                        }
-                    },
-                    item3 =>
-                    {
-                        Assert.Equal(mqQualificationId, item3.Id);
-                        Assert.Equal(dfeta_qualification_dfeta_Type.MandatoryQualification, item3.dfeta_Type);
-                        Assert.Equal(dfeta_qualificationState.Active, item3.StateCode);
-
-                        var mqSpecialism = item3.Extract<dfeta_specialism>(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute);
-                        if (setSpecialismColumnNames)
-                        {
-                            Assert.NotNull(mqSpecialism);
-                        }
-                        else
-                        {
-                            Assert.Null(mqSpecialism);
-                        }
-                    }
-                );
+                var mqSpecialism = item3.Extract<dfeta_specialism>(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute);
+                if (setSpecialismColumnNames)
+                {
+                    Assert.NotNull(mqSpecialism);
+                }
+                else
+                {
+                    Assert.Null(mqSpecialism);
+                }
+            }
+        );
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
