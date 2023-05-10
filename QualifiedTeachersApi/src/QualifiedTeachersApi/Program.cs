@@ -281,7 +281,7 @@ public class Program
         services.AddIdentityApi(configuration, env);
         services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
-        services.AddDqtReporting(builder.Configuration, env);
+        services.AddDqtReporting(builder.Configuration);
 
         if (env.EnvironmentName != "Testing")
         {

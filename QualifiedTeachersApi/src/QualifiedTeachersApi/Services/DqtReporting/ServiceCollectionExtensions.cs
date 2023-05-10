@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Microsoft.PowerPlatform.Dataverse.Client;
+using QualifiedTeachersApi.DataStore.Crm;
 
 namespace QualifiedTeachersApi.Services.DqtReporting;
 
@@ -9,8 +11,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDqtReporting(
         this IServiceCollection services,
-        IConfiguration configuration,
-        IWebHostEnvironment environment)
+        IConfiguration configuration)
     {
         if (configuration.GetValue<bool>("DqtReporting:RunService"))
         {
@@ -23,6 +24,10 @@ public static class ServiceCollectionExtensions
 
             services.AddApplicationInsightsTelemetry()
                 .AddApplicationInsightsTelemetryProcessor<IgnoreDependencyTelemetryProcessor>();
+
+            services.AddServiceClient(
+                DqtReportingService.ChangesKey,
+                sp => new ServiceClient(sp.GetRequiredService<IOptions<DqtReportingOptions>>().Value.CrmConnectionString));
         }
 
         return services;

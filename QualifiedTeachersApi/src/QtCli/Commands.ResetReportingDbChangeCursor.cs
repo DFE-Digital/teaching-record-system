@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xrm.Sdk.Query;
+using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Services.CrmEntityChanges;
 using QualifiedTeachersApi.Services.DqtReporting;
@@ -31,17 +32,18 @@ public static partial class Commands
             {
                 var serviceProvider = new ServiceCollection()
                     .AddDbContextFactory<DqtContext>(options => DqtContext.ConfigureOptions(options, dbConnectionString))
+                    .AddServiceClient(DqtReportingService.ChangesKey, _ => new ServiceClient(crmConnectionString))
                     .BuildServiceProvider();
 
                 var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<DqtContext>>();
 
-                var serviceClient = new ServiceClient(crmConnectionString);
+                var serviceClientProvider = serviceProvider.GetRequiredService<ICrmServiceClientProvider>();
 
                 // We assume that no other processing is going on while this command is running so a local lock is ok
                 var lockFileDirectory = Path.Combine(Path.GetTempPath(), "qtlocks");
                 var distributedLockProvider = new FileDistributedSynchronizationProvider(new DirectoryInfo(lockFileDirectory));
 
-                var entityChangesService = new CrmEntityChangesService(dbContextFactory, serviceClient, distributedLockProvider);
+                var entityChangesService = new CrmEntityChangesService(dbContextFactory, serviceClientProvider, distributedLockProvider);
                 var emptyColumnSet = new ColumnSet();
 
                 await Task.WhenAll(entityTypes.Select(ProcessChangesForEntityType));
