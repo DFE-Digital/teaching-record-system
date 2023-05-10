@@ -10,6 +10,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: dev
+    concurrency: deploy-doc-site
 
     steps:
     - name: Install jq for pre-processing the OpenAPI JSON
