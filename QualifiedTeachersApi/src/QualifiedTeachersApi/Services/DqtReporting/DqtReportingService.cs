@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,15 +71,25 @@ public partial class DqtReportingService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed processing entity changes.");
-
-                // We assume non-transient SqlExceptions are bugs; log the error, and stop the service gracefully.
-                if (ex is SqlException sqlException && !sqlException.IsTransient)
+                if (ex is SqlException sqlException && sqlException.IsTransient)
                 {
-                    return;
+                    _logger.LogWarning(ex, "Transient SQL exception thrown.");
+                    continue;
                 }
 
-                throw;
+                // If we've hit CRM API limits, back off and retry later
+                if (ex is FaultException<OrganizationServiceFault> fault &&
+                    fault.Detail.ErrorDetails.TryGetValue("Retry-After", out var retryAfterObj) &&
+                    retryAfterObj is TimeSpan retryAfter)
+                {
+                    _logger.LogWarning(ex, "Hit CRM rate limit error.");
+
+                    await Task.Delay(retryAfter, stoppingToken);
+                    continue;
+                }
+
+                _logger.LogError(ex, "Failed processing entity changes.");
+                return;
             }
         }
         while (await timer.WaitForNextTickAsync(stoppingToken));

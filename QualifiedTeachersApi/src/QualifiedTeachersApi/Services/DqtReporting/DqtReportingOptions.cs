@@ -11,6 +11,9 @@ public class DqtReportingOptions
     public required string[] Entities { get; set; }
 
     [Required]
+    public required string CrmConnectionString { get; set; }
+
+    [Required]
     public required string ReportingDbConnectionString { get; set; }
 
     [Required]

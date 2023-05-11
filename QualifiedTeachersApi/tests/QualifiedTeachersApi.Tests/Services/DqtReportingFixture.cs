@@ -57,6 +57,7 @@ public class DqtReportingFixture
     {
         var options = Options.Create(new DqtReportingOptions()
         {
+            CrmConnectionString = "dummy",
             Entities = new[] { Contact.EntityLogicalName },
             PollIntervalSeconds = 60,
             ProcessAllEntityTypesConcurrently = false,

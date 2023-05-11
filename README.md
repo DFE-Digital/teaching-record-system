@@ -31,14 +31,10 @@ The databases will be created automatically when running the API or tests in dev
 
 #### Dynamics CRM
 
-The `build` CRM environment is used for local development and automated tests. Connection information should be stored in user secrets in the `CrmUrl`, `CrmClientId` and `CrmClientSecret` keys. Secrets must be added for both the API project and the API tests project. Secrets can be added set a `just` recipe e.g.
+The `build` CRM environment is used for local development and automated tests. Connection information should be stored in user secrets in the `ConnectionStrings:Crm` key. Secrets must be added for both the API project and the API tests project. Secrets can be added set a `just` recipe e.g.
 ```shell
-just set-api-secret CrmUrl "https://the-crm-environment-url"
-just set-api-secret CrmClientId "the-client-id"
-just set-api-secret CrmClientSecret "the-client-secret"
-just set-api-tests-secret CrmUrl "https://the-crm-environment-url"
-just set-api-tests-secret CrmClientId "the-client-id"
-just set-api-tests-secret CrmClientSecret "the-client-secret"
+just set-api-secret ConnectionStrings:Crm "the_connection_string"
+just set-api-tests-secret ConnectionStrings:Crm "the_connection_string"
 ```
 Ask a developer on the team for the user secrets for this environment.
 

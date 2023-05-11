@@ -3,10 +3,10 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Medallion.Threading;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Sql;
 
 namespace QualifiedTeachersApi.Services.CrmEntityChanges;
@@ -14,16 +14,16 @@ namespace QualifiedTeachersApi.Services.CrmEntityChanges;
 public class CrmEntityChangesService : ICrmEntityChangesService
 {
     private readonly IDbContextFactory<DqtContext> _dbContextFactory;
-    private readonly IOrganizationServiceAsync _organizationService;
+    private readonly ICrmServiceClientProvider _crmServiceClientProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
 
     public CrmEntityChangesService(
         IDbContextFactory<DqtContext> dbContextFactory,
-        IOrganizationServiceAsync organizationService,
+        ICrmServiceClientProvider crmServiceClientProvider,
         IDistributedLockProvider distributedLockProvider)
     {
         _dbContextFactory = dbContextFactory;
-        _organizationService = organizationService;
+        _crmServiceClientProvider = crmServiceClientProvider;
         _distributedLockProvider = distributedLockProvider;
     }
 
@@ -53,6 +53,8 @@ public class CrmEntityChangesService : ICrmEntityChangesService
         var entityChangesJournal = await dbContext.EntityChangesJournals
             .SingleOrDefaultAsync(t => t.Key == key && t.EntityLogicalName == entityLogicalName);
 
+        var organizationService = _crmServiceClientProvider.GetClient(key);
+
         var request = new RetrieveEntityChangesRequest()
         {
             Columns = columns,
@@ -71,7 +73,7 @@ public class CrmEntityChangesService : ICrmEntityChangesService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var response = (RetrieveEntityChangesResponse)await _organizationService.ExecuteAsync(request);
+            var response = (RetrieveEntityChangesResponse)await organizationService.ExecuteAsync(request);
 
             gotData |= response.EntityChanges.Changes.Count > 0;
 

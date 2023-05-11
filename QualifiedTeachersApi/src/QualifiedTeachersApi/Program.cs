@@ -281,7 +281,7 @@ public class Program
         services.AddIdentityApi(configuration, env);
         services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
-        services.AddDqtReporting(builder.Configuration, env);
+        services.AddDqtReporting(builder.Configuration);
 
         if (env.EnvironmentName != "Testing")
         {
@@ -391,11 +391,9 @@ public class Program
             // fires, even though the operation in CRM is still going on.
             ServiceClient.MaxConnectionTimeout = TimeSpan.FromMinutes(5);
 
-            return new ServiceClient(
-                new Uri(configuration["CrmUrl"]),
-                configuration["CrmClientId"],
-                configuration["CrmClientSecret"],
-                useUniqueInstance: true)
+            var connectionString = configuration.GetConnectionString("Crm") ?? throw new Exception("Crm connection string is missing.");
+
+            return new ServiceClient(connectionString)
             {
                 DisableCrossThreadSafeties = true,
                 EnableAffinityCookie = true,
