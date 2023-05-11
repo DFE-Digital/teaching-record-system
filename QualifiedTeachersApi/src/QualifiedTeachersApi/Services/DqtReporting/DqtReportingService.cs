@@ -71,11 +71,10 @@ public partial class DqtReportingService : BackgroundService
             }
             catch (Exception ex)
             {
-                // We assume non-transient SqlExceptions are bugs; log the error, and stop the service gracefully.
-                if (ex is SqlException sqlException && !sqlException.IsTransient)
+                if (ex is SqlException sqlException && sqlException.IsTransient)
                 {
                     _logger.LogWarning(ex, "Transient SQL exception thrown.");
-                    return;
+                    continue;
                 }
 
                 // If we've hit CRM API limits, back off and retry later
@@ -90,8 +89,7 @@ public partial class DqtReportingService : BackgroundService
                 }
 
                 _logger.LogError(ex, "Failed processing entity changes.");
-
-                throw;
+                return;
             }
         }
         while (await timer.WaitForNextTickAsync(stoppingToken));
