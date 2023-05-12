@@ -1,5 +1,4 @@
-﻿#nullable disable
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Serilog.Core;
 using Serilog.Events;
 

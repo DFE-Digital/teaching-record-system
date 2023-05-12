@@ -1,4 +1,3 @@
-#nullable disable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,6 +23,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
@@ -32,7 +32,6 @@ using Prometheus;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Filters;
-using QualifiedTeachersApi.Infrastructure.ApplicationInsights;
 using QualifiedTeachersApi.Infrastructure.ApplicationModel;
 using QualifiedTeachersApi.Infrastructure.Configuration;
 using QualifiedTeachersApi.Infrastructure.Json;
@@ -47,8 +46,6 @@ using QualifiedTeachersApi.Services.DqtReporting;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
 using QualifiedTeachersApi.Validation;
-using Sentry.AspNetCore;
-using Sentry.Extensibility;
 using Serilog;
 using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Filters;
@@ -72,17 +69,9 @@ public class Program
 
         var paasEnvironmentName = configuration["PaasEnvironment"];
 
-        builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
-
-        builder.Services.AddApplicationInsightsTelemetry()
-            .AddApplicationInsightsTelemetryProcessor<RedactedUrlTelemetryProcessor>();
+        WebApplicationBuilderExtensions.ConfigureLogging(builder, paasEnvironmentName);
 
         builder.Services.AddFeatureManagement();
-
-        if (env.IsProduction())
-        {
-            builder.WebHost.UseSentry();
-        }
 
         if (builder.Environment.IsProduction())
         {
@@ -206,21 +195,8 @@ public class Program
             });
         });
 
-        services.Configure<SentryAspNetCoreOptions>(options =>
-        {
-            if (!string.IsNullOrEmpty(paasEnvironmentName))
-            {
-                options.Environment = paasEnvironmentName;
-            }
-
-            var gitSha = configuration["GitSha"];
-            if (!string.IsNullOrEmpty(gitSha))
-            {
-                options.Release = gitSha;
-            }
-        });
-
-        var pgConnectionString = configuration.GetConnectionString("DefaultConnection");
+        var pgConnectionString = configuration.GetConnectionString("DefaultConnection") ??
+            throw new Exception("Missing DefaultConnection connection string.");
 
         var healthCheckBuilder = services.AddHealthChecks()
             .AddNpgSql(pgConnectionString);
@@ -237,7 +213,6 @@ public class Program
         services.AddSingleton<ISchemaGenerator, Infrastructure.Swagger.SchemaGenerator>();
         services.AddSingleton<IClock, Clock>();
         services.AddMemoryCache();
-        services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
 
         services.AddHttpClient("EvidenceFiles", client =>
         {
@@ -303,7 +278,7 @@ public class Program
 
         var app = builder.Build();
 
-        app.UseRequestLogging(logRequestBody: paasEnvironmentName != "prod");
+        app.UseSerilogRequestLogging();
 
         app.UseRouting();
 
@@ -418,7 +393,8 @@ public class Program
 
         void ConfigureRedisServices()
         {
-            var connectionString = configuration.GetConnectionString("Redis");
+            var connectionString = configuration.GetConnectionString("Redis") ??
+                throw new Exception("Missing Redis connection string.");
 
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(connectionString));
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);
