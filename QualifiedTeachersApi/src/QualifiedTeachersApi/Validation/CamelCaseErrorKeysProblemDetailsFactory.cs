@@ -1,11 +1,10 @@
-﻿#nullable disable
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace QualifiedTeachersApi;
+namespace QualifiedTeachersApi.Validation;
 
 public class CamelCaseErrorKeysProblemDetailsFactory : ProblemDetailsFactory
 {
@@ -19,10 +18,10 @@ public class CamelCaseErrorKeysProblemDetailsFactory : ProblemDetailsFactory
     public override ProblemDetails CreateProblemDetails(
         HttpContext httpContext,
         int? statusCode = null,
-        string title = null,
-        string type = null,
-        string detail = null,
-        string instance = null)
+        string? title = null,
+        string? type = null,
+        string? detail = null,
+        string? instance = null)
     {
         return _innerFactory.CreateProblemDetails(httpContext, statusCode, title, type, detail, instance);
     }
@@ -31,10 +30,10 @@ public class CamelCaseErrorKeysProblemDetailsFactory : ProblemDetailsFactory
         HttpContext httpContext,
         ModelStateDictionary modelStateDictionary,
         int? statusCode = null,
-        string title = null,
-        string type = null,
-        string detail = null,
-        string instance = null)
+        string? title = null,
+        string? type = null,
+        string? detail = null,
+        string? instance = null)
     {
         var problemDetails = _innerFactory.CreateValidationProblemDetails(httpContext, modelStateDictionary, statusCode, title, type, detail, instance);
 

@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,13 +9,18 @@ namespace QualifiedTeachersApi.Services.GetAnIdentityApi;
 
 public class ClientCredentialsBearerTokenDelegatingHandler : DelegatingHandler
 {
-    private TokenResponse _accessToken { get; set; }
-    private DateTime _expiryTime { get; set; }
-    private GetAnIdentityOptions _options { get; set; }
-    private IClock _clock;
+    private readonly HttpClient _tokenHttpClient;
+    private readonly GetAnIdentityOptions _options;
+    private readonly IClock _clock;
+    private string? _accessToken;
+    private DateTime _expiryTime;
 
-    public ClientCredentialsBearerTokenDelegatingHandler(IOptions<GetAnIdentityOptions> options, IClock clock)
+    public ClientCredentialsBearerTokenDelegatingHandler(
+        HttpClient tokenHttpClient,
+        IOptions<GetAnIdentityOptions> options,
+        IClock clock)
     {
+        _tokenHttpClient = tokenHttpClient;
         _options = options.Value;
         _clock = clock;
     }
@@ -24,9 +28,9 @@ public class ClientCredentialsBearerTokenDelegatingHandler : DelegatingHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         await EnsureToken();
-        request.SetBearerToken(_accessToken.AccessToken);
-        var response = await base.SendAsync(request, cancellationToken);
-        return response;
+
+        request.SetBearerToken(_accessToken!);
+        return await base.SendAsync(request, cancellationToken);
     }
 
     private async Task EnsureToken()
@@ -36,14 +40,15 @@ public class ClientCredentialsBearerTokenDelegatingHandler : DelegatingHandler
             return;
         }
 
-        var tokenClient = new HttpClient();
-        _accessToken = await tokenClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
+        var tokenResponse = await _tokenHttpClient.RequestClientCredentialsTokenAsync(new()
         {
             Address = _options.TokenEndpoint,
             ClientId = _options.ClientId,
             ClientSecret = _options.ClientSecret,
             Scope = "user:write user:read"
         });
-        _expiryTime = _clock.UtcNow.AddSeconds(_accessToken.ExpiresIn);
+
+        _accessToken = tokenResponse.AccessToken;
+        _expiryTime = _clock.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
     }
 }

@@ -528,8 +528,7 @@
             "type": "string"
           },
           "lastName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "dateOfBirth": {
             "type": "string",
@@ -690,8 +689,7 @@
         "type": "object",
         "properties": {
           "description": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false

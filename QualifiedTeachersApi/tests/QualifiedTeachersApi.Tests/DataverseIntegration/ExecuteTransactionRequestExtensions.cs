@@ -1,11 +1,10 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Linq;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Xunit;
 
-namespace QualifiedTeachersApi.Tests;
+namespace QualifiedTeachersApi.Tests.DataverseIntegration;
 
 public static class ExecuteTransactionRequestExtensions
 {
@@ -91,6 +90,6 @@ public static class ExecuteTransactionRequestExtensions
 
     public static void AssertContainsCreateRequest<TEntity>(this ExecuteTransactionRequest request, Predicate<TEntity> filter)
     {
-        AssertContainsRequest<CreateRequest>(request, request => request.Target is TEntity entity && filter(entity));
+        request.AssertContainsRequest<CreateRequest>(request => request.Target is TEntity entity && filter(entity));
     }
 }

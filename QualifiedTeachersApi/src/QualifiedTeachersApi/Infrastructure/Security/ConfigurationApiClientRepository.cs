@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 
@@ -16,7 +15,7 @@ public class ConfigurationApiClientRepository : IApiClientRepository
         _clients = GetClientsFromConfiguration(configuration);
     }
 
-    public ApiClient GetClientByKey(string apiKey) => _clients.SingleOrDefault(c => c.ApiKey.Any(x => x == apiKey));
+    public ApiClient? GetClientByKey(string apiKey) => _clients.SingleOrDefault(c => c.ApiKey.Any(x => x == apiKey));
 
     private static ApiClient[] GetClientsFromConfiguration(IConfiguration configuration)
     {

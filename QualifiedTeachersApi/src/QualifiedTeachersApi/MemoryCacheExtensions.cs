@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -7,10 +6,10 @@ namespace QualifiedTeachersApi;
 
 public static class MemoryCacheExtensions
 {
-    public static async Task<TItem> GetOrCreateUnlessNullAsync<TItem>(this IMemoryCache cache, object key, Func<Task<TItem>> factory)
+    public static async Task<TItem?> GetOrCreateUnlessNullAsync<TItem>(this IMemoryCache cache, object key, Func<Task<TItem>> factory)
         where TItem : class
     {
-        if (!cache.TryGetValue(key, out object result))
+        if (!cache.TryGetValue(key, out var result))
         {
             result = await factory().ConfigureAwait(false);
 
@@ -21,6 +20,6 @@ public static class MemoryCacheExtensions
             }
         }
 
-        return (TItem)result;
+        return (TItem?)result;
     }
 }

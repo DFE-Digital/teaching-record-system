@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Authorization;
 
@@ -14,7 +13,7 @@ public class AuthorizationPolicyConvention : IActionModelConvention
 
         if (!action.Controller.Properties.TryGetValue("Version", out var versionObj) || versionObj is not int version)
         {
-            if (action.Controller.ControllerType.Namespace.Contains("Tests"))
+            if (action.Controller.ControllerType.Namespace?.Contains("Tests") == true)
             {
                 return;
             }

@@ -1,4 +1,3 @@
-#nullable disable
 using System.ComponentModel.DataAnnotations;
 
 namespace QualifiedTeachersApi.Services.TrnGenerationApi;
@@ -6,8 +5,8 @@ namespace QualifiedTeachersApi.Services.TrnGenerationApi;
 public class TrnGenerationApiOptions
 {
     [Required]
-    public string ApiKey { get; init; }
+    public required string ApiKey { get; init; }
 
     [Required]
-    public string BaseAddress { get; init; }
+    public required string BaseAddress { get; init; }
 }

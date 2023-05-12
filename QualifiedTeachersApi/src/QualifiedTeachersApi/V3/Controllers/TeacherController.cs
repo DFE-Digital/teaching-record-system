@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

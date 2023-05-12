@@ -1,4 +1,3 @@
-#nullable disable
 using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -26,12 +25,15 @@ public static class ServiceCollectionExtensions
 
             services
                 .AddTransient<ClientCredentialsBearerTokenDelegatingHandler>()
+                .AddHttpClient<ClientCredentialsBearerTokenDelegatingHandler>();
+
+            services
                 .AddHttpClient<IGetAnIdentityApiClient, GetAnIdentityApiClient>((sp, httpClient) =>
                 {
                     var options = sp.GetRequiredService<IOptions<GetAnIdentityOptions>>();
                     httpClient.BaseAddress = new Uri(options.Value.BaseAddress);
                 })
-                .AddHttpMessageHandler<ClientCredentialsBearerTokenDelegatingHandler>(); ;
+                .AddHttpMessageHandler<ClientCredentialsBearerTokenDelegatingHandler>();
         }
 
         return services;

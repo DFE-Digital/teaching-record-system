@@ -67,9 +67,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
 
         if (trnRequest != null)
         {
-            var teacher = trnRequest.TeacherId.HasValue ?
-                await _dataverseAdapter.GetTeacher(trnRequest.TeacherId.Value, columnNames: new[] { Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_QTSDate }) :
-                null;
+            var teacher = await _dataverseAdapter.GetTeacher(trnRequest.TeacherId, columnNames: new[] { Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_QTSDate });
 
             wasCreated = false;
             trn = teacher?.dfeta_TRN;
@@ -90,7 +88,6 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                     throw CreateValidationExceptionFromFailedReasons(CreateTeacherFailedReasons.IdentityUserNotFound);
                 }
             }
-
 
             var createTeacherResult = await _dataverseAdapter.CreateTeacher(new CreateTeacherCommand()
             {
@@ -182,7 +179,6 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             QtsDate = qtsDate,
             PotentialDuplicate = status == TrnRequestStatus.Pending
         };
-
     }
 
     private ValidationException CreateValidationExceptionFromFailedReasons(CreateTeacherFailedReasons failedReasons)

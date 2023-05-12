@@ -1,11 +1,10 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using QualifiedTeachersApi.DataStore.Crm.Models;
+using QualifiedTeachersApi.Tests.Services.Certificates;
 using Xunit;
 
 namespace QualifiedTeachersApi.Tests.V3;
@@ -86,9 +85,8 @@ public class GetEytsCertificateTests : ApiTestBase
                 dfeta_EYTSDate = eytsDate.ToDateTime()
             });
 
-        string projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
-        var pdfPath = Path.Combine(projectDirectory!, "Resources", "TestCertificate.pdf");
-        var pdfStream = File.OpenRead(pdfPath);
+        using var pdfStream = typeof(CertificateGeneratorTests).Assembly.GetManifestResourceStream("QualifiedTeachersApi.Tests.Resources.TestCertificate.pdf") ??
+            throw new Exception("Failed to find TestCertificate.pdf.");
 
         ApiFixture.CertificateGenerator
             .Setup(g => g.GenerateCertificate(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))

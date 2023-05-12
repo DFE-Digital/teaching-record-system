@@ -1,22 +1,21 @@
-﻿#nullable disable
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace QualifiedTeachersApi.Services.GetAnIdentityApi;
 
 public class GetAnIdentityOptions
 {
     [Required]
-    public string TokenEndpoint { get; set; }
+    public required string TokenEndpoint { get; set; }
 
     [Required]
-    public string ClientSecret { get; init; }
+    public required string ClientSecret { get; init; }
 
     [Required]
-    public string ClientId { get; init; }
+    public required string ClientId { get; init; }
 
     [Required]
-    public string BaseAddress { get; init; }
+    public required string BaseAddress { get; init; }
 
     [Required]
-    public string WebHookClientSecret { get; init; }
+    public required string WebHookClientSecret { get; init; }
 }

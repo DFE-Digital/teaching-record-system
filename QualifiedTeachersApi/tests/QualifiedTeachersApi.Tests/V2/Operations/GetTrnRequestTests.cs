@@ -34,6 +34,7 @@ public class GetTrnRequestTests : ApiTestBase
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
+        var teacherId = Guid.NewGuid();
 
         var anotherClientId = "ANOTHER-CLIENT";
         Assert.NotEqual(ClientId, anotherClientId);
@@ -43,7 +44,8 @@ public class GetTrnRequestTests : ApiTestBase
             dbContext.Add(new TrnRequest()
             {
                 ClientId = anotherClientId,
-                RequestId = requestId
+                RequestId = requestId,
+                TeacherId = teacherId
             });
 
             await dbContext.SaveChangesAsync();
@@ -61,6 +63,15 @@ public class GetTrnRequestTests : ApiTestBase
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
+        var teacherId = Guid.NewGuid();
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
+            .ReturnsAsync(new Contact()
+            {
+                Id = teacherId,
+                dfeta_TRN = null
+            });
 
         await WithDbContext(async dbContext =>
         {
@@ -68,7 +79,7 @@ public class GetTrnRequestTests : ApiTestBase
             {
                 ClientId = ClientId,
                 RequestId = requestId,
-                TeacherId = null
+                TeacherId = teacherId
             });
 
             await dbContext.SaveChangesAsync();

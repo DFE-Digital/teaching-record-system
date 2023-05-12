@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -13,7 +12,7 @@ using QualifiedTeachersApi.V3.Responses;
 
 namespace QualifiedTeachersApi.V3.Handlers;
 
-public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest, GetCertificateResponse>
+public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest, GetCertificateResponse?>
 {
     private const string FullNameFormField = "Full Name";
     private const string PassDateFormField = "Pass Date";
@@ -28,7 +27,7 @@ public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest
         _certificateGenerator = certificateGenerator;
     }
 
-    public async Task<GetCertificateResponse> Handle(GetNpqCertificateRequest request, CancellationToken cancellationToken)
+    public async Task<GetCertificateResponse?> Handle(GetNpqCertificateRequest request, CancellationToken cancellationToken)
     {
         var qualification = await _dataverseAdapter.GetQualificationById(
             request.QualificationId,
@@ -49,7 +48,7 @@ public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest
 
         if (qualification == null
             || !qualification.dfeta_CompletionorAwardDate.HasValue
-            || !qualification.dfeta_Type.Value.IsNpq()
+            || !qualification.dfeta_Type!.Value.IsNpq()
             || qualification.StateCode != dfeta_qualificationState.Active)
         {
             return null;

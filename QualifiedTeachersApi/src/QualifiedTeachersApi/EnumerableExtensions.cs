@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -54,17 +53,11 @@ public static class EnumerableExtensions
 
         var valuesArray = values.ToArray();
 
-        if (valuesArray.Length == 0)
+        return valuesArray switch
         {
-            return string.Empty;
-        }
-        else if (valuesArray.Length == 1)
-        {
-            return valuesArray[0];
-        }
-        else
-        {
-            return string.Join(", ", valuesArray[0..^2].Append(string.Join($" {finalValuesConjunction} ", valuesArray[^2..])));
-        }
+            [] => string.Empty,
+            [var only] => only,
+            _ => string.Join(", ", valuesArray[0..^2].Append(string.Join($" {finalValuesConjunction} ", valuesArray[^2..])))
+        };
     }
 }

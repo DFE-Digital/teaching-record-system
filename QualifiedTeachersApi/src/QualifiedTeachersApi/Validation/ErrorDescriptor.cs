@@ -1,12 +1,11 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using QualifiedTeachersApi.Properties;
 
 namespace QualifiedTeachersApi.Validation;
 
 public class ErrorDescriptor
 {
-    private ErrorDescriptor(int errorCode, string title, string detail)
+    private ErrorDescriptor(int errorCode, string title, string? detail)
     {
         ErrorCode = errorCode;
         Title = title;
@@ -15,7 +14,7 @@ public class ErrorDescriptor
 
     public int ErrorCode { get; }
     public string Title { get; }
-    public string Detail { get; }
+    public string? Detail { get; }
 
     public static ErrorDescriptor Create(int errorCode)
     {
