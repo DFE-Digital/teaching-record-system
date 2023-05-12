@@ -1,5 +1,4 @@
-﻿#nullable disable
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Sentry;
 using Sentry.Extensibility;
 
@@ -16,7 +15,7 @@ public class RemoveRedactedUrlParametersEventProcessor : ISentryEventProcessor
 
     public SentryEvent Process(SentryEvent @event)
     {
-        var httpContext = _httpContextAccessor.HttpContext;
+        var httpContext = _httpContextAccessor.HttpContext ?? throw new System.Exception("No HttpContext.");
         @event.Request.QueryString = httpContext.Request.GetScrubbedQueryString();
         return @event;
     }
