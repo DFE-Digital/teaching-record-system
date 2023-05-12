@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using AspNetCoreRateLimit;
-using Microsoft.AspNetCore.Http;
+﻿using AspNetCoreRateLimit;
 
 namespace QualifiedTeachersApi.Infrastructure.Security;
 

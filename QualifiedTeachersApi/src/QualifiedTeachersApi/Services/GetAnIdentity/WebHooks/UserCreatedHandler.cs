@@ -1,8 +1,5 @@
-﻿using System;
-using System.Threading;
-using Medallion.Threading;
+﻿using Medallion.Threading;
 using MediatR;
-using Microsoft.Extensions.Logging;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 

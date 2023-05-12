@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using Microsoft.AspNetCore.Http;
-using Moq;
+﻿using Moq;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.Tests.Services.Certificates;
 using Xunit;

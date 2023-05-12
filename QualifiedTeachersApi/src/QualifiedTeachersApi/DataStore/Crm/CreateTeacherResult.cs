@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using System;
 
 namespace QualifiedTeachersApi.DataStore.Crm;
 

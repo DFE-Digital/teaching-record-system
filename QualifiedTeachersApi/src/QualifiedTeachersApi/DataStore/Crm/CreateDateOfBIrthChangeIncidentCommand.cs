@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace QualifiedTeachersApi.DataStore.Crm;
+﻿namespace QualifiedTeachersApi.DataStore.Crm;
 
 public record CreateDateOfBirthChangeIncidentCommand
 {

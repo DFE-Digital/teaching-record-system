@@ -1,5 +1,4 @@
-﻿using System;
-using MediatR;
+﻿using MediatR;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V3.Requests;

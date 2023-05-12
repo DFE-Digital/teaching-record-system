@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace QualifiedTeachersApi;
+﻿namespace QualifiedTeachersApi;
 
 public static class DateOnlyExtensions
 {

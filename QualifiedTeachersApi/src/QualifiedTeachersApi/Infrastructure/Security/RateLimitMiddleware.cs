@@ -1,7 +1,5 @@
 ﻿using AspNetCoreRateLimit;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace QualifiedTeachersApi.Infrastructure.Security;

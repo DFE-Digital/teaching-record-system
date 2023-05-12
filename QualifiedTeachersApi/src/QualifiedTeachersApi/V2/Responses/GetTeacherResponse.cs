@@ -1,6 +1,4 @@
 #nullable disable
-using System;
-using System.Collections.Generic;
 using QualifiedTeachersApi.V2.ApiModels;
 
 namespace QualifiedTeachersApi.V2.Responses;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace QualifiedTeachersApi.Services.GetAnIdentity.WebHooks;
+﻿namespace QualifiedTeachersApi.Services.GetAnIdentity.WebHooks;
 
 public record NotificationEnvelope
 {

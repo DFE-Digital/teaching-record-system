@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading;
+﻿using System.Runtime.CompilerServices;
 using Medallion.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Xrm.Sdk;

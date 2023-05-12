@@ -1,6 +1,4 @@
 ﻿#nullable disable
-using System;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using QualifiedTeachersApi.Infrastructure.Logging;
 

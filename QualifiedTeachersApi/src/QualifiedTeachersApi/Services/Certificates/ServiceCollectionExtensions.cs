@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace QualifiedTeachersApi.Services.Certificates;
 
 public static class ServiceCollectionExtensions

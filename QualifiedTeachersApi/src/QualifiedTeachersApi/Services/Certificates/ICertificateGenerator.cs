@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace QualifiedTeachersApi.Services.Certificates;
+﻿namespace QualifiedTeachersApi.Services.Certificates;
 
 public interface ICertificateGenerator
 {

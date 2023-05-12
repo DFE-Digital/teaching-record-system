@@ -1,5 +1,4 @@
-﻿using System;
-using QualifiedTeachersApi.Properties;
+﻿using QualifiedTeachersApi.Properties;
 
 namespace QualifiedTeachersApi.Validation;
 

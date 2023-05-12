@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using System.Linq;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using QualifiedTeachersApi.DataStore.Crm.Models;

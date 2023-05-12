@@ -1,8 +1,6 @@
 ﻿using System.Security.Claims;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QualifiedTeachersApi.Infrastructure.ModelBinding;
 using QualifiedTeachersApi.Infrastructure.Security;

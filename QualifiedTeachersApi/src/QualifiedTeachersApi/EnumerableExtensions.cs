@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace QualifiedTeachersApi;
+﻿namespace QualifiedTeachersApi;
 
 public static class EnumerableExtensions
 {

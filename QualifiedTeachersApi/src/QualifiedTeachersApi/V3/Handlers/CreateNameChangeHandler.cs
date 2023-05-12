@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.StaticFiles;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.V3.Requests;

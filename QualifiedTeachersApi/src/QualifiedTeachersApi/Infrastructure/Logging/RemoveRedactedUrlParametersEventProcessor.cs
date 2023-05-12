@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Sentry;
+﻿using Sentry;
 using Sentry.Extensibility;
 
 namespace QualifiedTeachersApi.Infrastructure.Logging;

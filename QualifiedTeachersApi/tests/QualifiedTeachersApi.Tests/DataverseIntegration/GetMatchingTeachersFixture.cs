@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using System;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
 using QualifiedTeachersApi.DataStore.Crm.Models;

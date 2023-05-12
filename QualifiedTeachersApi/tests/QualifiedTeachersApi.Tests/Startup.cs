@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.PowerPlatform.Dataverse.Client;
+﻿using Microsoft.PowerPlatform.Dataverse.Client;
 using QualifiedTeachersApi.Tests.DataverseIntegration;
 using QualifiedTeachersApi.Tests.Infrastructure;
 

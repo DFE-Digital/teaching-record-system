@@ -1,7 +1,5 @@
 ﻿#nullable disable
-using System;
 using System.Net;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.DataStore.Sql.Models;

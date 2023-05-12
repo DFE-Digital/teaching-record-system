@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Serilog.Core;
+﻿using Serilog.Core;
 using Serilog.Events;
 
 namespace QualifiedTeachersApi.Infrastructure.Logging;

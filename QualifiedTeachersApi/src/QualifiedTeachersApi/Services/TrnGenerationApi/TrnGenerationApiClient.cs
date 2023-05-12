@@ -1,8 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-
-namespace QualifiedTeachersApi.Services.TrnGenerationApi;
+﻿namespace QualifiedTeachersApi.Services.TrnGenerationApi;
 
 public class TrnGenerationApiClient : ITrnGenerationApiClient
 {

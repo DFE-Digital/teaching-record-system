@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using QualifiedTeachersApi.Infrastructure.Configuration;
+﻿using QualifiedTeachersApi.Infrastructure.Configuration;
 
 namespace QualifiedTeachersApi.Tests.Infrastructure;
 

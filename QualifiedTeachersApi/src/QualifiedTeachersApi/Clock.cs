@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace QualifiedTeachersApi;
+﻿namespace QualifiedTeachersApi;
 
 public sealed class Clock : IClock
 {

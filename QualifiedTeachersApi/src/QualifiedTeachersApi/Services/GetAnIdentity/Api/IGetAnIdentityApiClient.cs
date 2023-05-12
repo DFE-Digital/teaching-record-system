@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using QualifiedTeachersApi.Services.GetAnIdentity.Api.Models;
+﻿using QualifiedTeachersApi.Services.GetAnIdentity.Api.Models;
 
 namespace QualifiedTeachersApi.Services.GetAnIdentityApi;
 
