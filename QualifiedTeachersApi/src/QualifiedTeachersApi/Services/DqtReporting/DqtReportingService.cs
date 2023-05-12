@@ -29,6 +29,7 @@ public partial class DqtReportingService : BackgroundService
     private const int MaxParameters = 1024;
     private const int MaxUpsertBatchSize = 500;
     private const string MetricPrefix = "DqtReporting: ";
+    private const int MaxEntityTypesToProcessConcurrently = 10;
 
     private readonly DqtReportingOptions _options;
     private readonly ICrmEntityChangesService _crmEntityChangesService;
@@ -125,7 +126,7 @@ public partial class DqtReportingService : BackgroundService
                 _options.Entities,
                 new ParallelOptions()
                 {
-                    MaxDegreeOfParallelism = _options.ProcessAllEntityTypesConcurrently ? _options.Entities.Length : 1,
+                    MaxDegreeOfParallelism = _options.ProcessAllEntityTypesConcurrently ? MaxEntityTypesToProcessConcurrently : 1,
                     CancellationToken = cancellationToken
                 },
                 async (entityType, ct) =>
