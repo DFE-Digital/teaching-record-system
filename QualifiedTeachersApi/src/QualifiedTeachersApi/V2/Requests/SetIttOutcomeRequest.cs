@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using QualifiedTeachersApi.Infrastructure.ModelBinding;
 using QualifiedTeachersApi.V2.ApiModels;
 using QualifiedTeachersApi.V2.Responses;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,7 +29,7 @@ public class SetIttOutcomeRequest : IRequest<SetIttOutcomeResponse>
     public DateOnly? AssessmentDate { get; set; }
 
     [Required]
-    [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true, Description = "DoB of teacher"), SwaggerSchema(Format = "date"), ModelBinder(typeof(DateModelBinder))]
+    [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true, Description = "DoB of teacher"), SwaggerSchema(Format = "date")]
     [JsonIgnore]
     public DateOnly? BirthDate { get; set; }
 }
