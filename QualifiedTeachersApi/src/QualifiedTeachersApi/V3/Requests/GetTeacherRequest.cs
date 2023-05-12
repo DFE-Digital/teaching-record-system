@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using MediatR;
 using QualifiedTeachersApi.Infrastructure.Swagger;
 using QualifiedTeachersApi.V3.Responses;
@@ -7,7 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V3.Requests;
 
-public record GetTeacherRequest : IRequest<GetTeacherResponse>
+public record GetTeacherRequest : IRequest<GetTeacherResponse?>
 {
     public required string Trn { get; init; }
     public required GetTeacherRequestIncludes Include { get; init; } = GetTeacherRequestIncludes.All;

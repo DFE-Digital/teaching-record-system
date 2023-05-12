@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace QualifiedTeachersApi;
+﻿namespace QualifiedTeachersApi;
 
 public static class CacheKeys
 {

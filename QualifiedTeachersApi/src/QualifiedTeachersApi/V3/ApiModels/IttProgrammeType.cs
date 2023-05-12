@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 
 namespace QualifiedTeachersApi.V3.ApiModels;

@@ -1,7 +1,5 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -40,9 +38,8 @@ public class CertificateGeneratorTests : ApiTestBase
             { field3Name, field3Value }
         };
 
-        string projectDirectory = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
-        var pdfPath = Path.Combine(projectDirectory!, "Resources", "TestCertificate.pdf");
-        using var pdfStream = File.OpenRead(pdfPath);
+        using var pdfStream = typeof(CertificateGeneratorTests).Assembly.GetManifestResourceStream("QualifiedTeachersApi.Tests.Resources.TestCertificate.pdf") ??
+            throw new Exception("Failed to find TestCertificate.pdf.");
 
         Mock.Get(blobClient)
             .Setup(b => b.OpenReadAsync(It.IsAny<long>(), It.IsAny<int?>(), It.IsAny<BlobRequestConditions>(), It.IsAny<CancellationToken>()))

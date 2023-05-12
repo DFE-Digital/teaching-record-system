@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
@@ -34,10 +33,11 @@ public class LinkTrnToIdentityUserService : BackgroundService
             var identityApiClient = scope.ServiceProvider.GetRequiredService<IGetAnIdentityApiClient>();
 
             var trnsNotLinkedToIndentities = await dqtContext.TrnRequests.Where(x => x.LinkedToIdentity == false && x.IdentityUserId.HasValue).ToListAsync();
+
             foreach (var trnRequest in trnsNotLinkedToIndentities)
             {
                 var teacher = await dataverseAdapter.GetTeacher(
-                    trnRequest.TeacherId.Value,
+                    trnRequest.TeacherId,
                     columnNames: new[]
                     {
                         Contact.Fields.dfeta_TRN
@@ -48,7 +48,7 @@ public class LinkTrnToIdentityUserService : BackgroundService
                     try
                     {
                         //call api to link account to trn
-                        await identityApiClient.SetTeacherTrn(trnRequest.IdentityUserId.Value, teacher.dfeta_TRN);
+                        await identityApiClient.SetTeacherTrn(trnRequest.IdentityUserId!.Value, teacher.dfeta_TRN);
                         trnRequest.LinkedToIdentity = true;
                         await dqtContext.SaveChangesAsync();
 
@@ -60,7 +60,7 @@ public class LinkTrnToIdentityUserService : BackgroundService
                 }
                 else
                 {
-                    _logger.LogError($"{trnRequest.TeacherId.Value} teacher not found!");
+                    _logger.LogError($"{trnRequest.TeacherId} teacher not found!");
                 }
             }
         }

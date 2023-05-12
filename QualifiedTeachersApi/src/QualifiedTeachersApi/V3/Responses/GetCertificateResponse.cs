@@ -1,4 +1,3 @@
-#nullable disable
 namespace QualifiedTeachersApi.V3.Responses;
 
 public record GetCertificateResponse

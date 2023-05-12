@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -13,7 +12,7 @@ using QualifiedTeachersApi.V3.Responses;
 
 namespace QualifiedTeachersApi.V3.Handlers;
 
-public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest, GetCertificateResponse>
+public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest, GetCertificateResponse?>
 {
     private const string QtsFormNameField = "Full Name";
     private const string QtsFormTrnField = "TRN";
@@ -30,7 +29,7 @@ public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest
         _certificateGenerator = certificateGenerator;
     }
 
-    public async Task<GetCertificateResponse> Handle(GetQtsCertificateRequest request, CancellationToken cancellationToken)
+    public async Task<GetCertificateResponse?> Handle(GetQtsCertificateRequest request, CancellationToken cancellationToken)
     {
         var teacher = await _dataverseAdapter.GetTeacherByTrn(
             request.Trn,

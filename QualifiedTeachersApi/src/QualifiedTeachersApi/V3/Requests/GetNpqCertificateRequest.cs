@@ -1,4 +1,3 @@
-#nullable disable
 using System;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V3.Requests;
 
-public record GetNpqCertificateRequest : IRequest<GetCertificateResponse>
+public record GetNpqCertificateRequest : IRequest<GetCertificateResponse?>
 {
     [FromRoute(Name = "qualificationId")]
     [SwaggerParameter(description: "The ID of the qualification record associated with the certificate")]

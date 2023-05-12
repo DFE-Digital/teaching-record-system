@@ -1,8 +1,6 @@
-﻿#nullable disable
-
-namespace QualifiedTeachersApi.Infrastructure.Security;
+﻿namespace QualifiedTeachersApi.Infrastructure.Security;
 
 public interface IApiClientRepository
 {
-    ApiClient GetClientByKey(string apiKey);
+    ApiClient? GetClientByKey(string apiKey);
 }

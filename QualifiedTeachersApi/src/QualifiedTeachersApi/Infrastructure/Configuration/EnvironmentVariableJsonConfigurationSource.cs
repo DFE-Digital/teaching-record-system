@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,12 +15,12 @@ public class EnvironmentVariableJsonConfigurationSource : IConfigurationSource
     /// <summary>
     /// The prefix to add to configuration keys.
     /// </summary>
-    public string ConfigurationKeyPrefix { get; set; }
+    public string? ConfigurationKeyPrefix { get; set; }
 
     /// <summary>
     /// The environment variable to read JSON from.
     /// </summary>
-    public string EnvironmentVariableName { get; set; }
+    public required string EnvironmentVariableName { get; set; }
 
     /// <inheritdoc/>
     public IConfigurationProvider Build(IConfigurationBuilder builder)
@@ -47,7 +46,7 @@ public class EnvironmentVariableJsonConfigurationSource : IConfigurationSource
             ConfigurationKeyPrefix = source.ConfigurationKeyPrefix?.TrimEnd(':');  // ':' == ConfigurationPath.KeyDelimiter
         }
 
-        public string ConfigurationKeyPrefix { get; }
+        public string? ConfigurationKeyPrefix { get; }
 
         public override IConfigurationProvider Build(IConfigurationBuilder builder) => new WrapperProvider(this);
     }

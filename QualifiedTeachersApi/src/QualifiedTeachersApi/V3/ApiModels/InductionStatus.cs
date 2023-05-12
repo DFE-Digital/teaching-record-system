@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace QualifiedTeachersApi.V3.ApiModels;
+﻿namespace QualifiedTeachersApi.V3.ApiModels;
 
 public enum InductionStatus
 {

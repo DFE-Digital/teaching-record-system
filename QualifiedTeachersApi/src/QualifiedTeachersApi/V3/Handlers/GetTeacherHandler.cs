@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +14,7 @@ using QualifiedTeachersApi.V3.Responses;
 
 namespace QualifiedTeachersApi.V3.Handlers;
 
-public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherResponse>
+public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherResponse?>
 {
     private readonly IDataverseAdapter _dataverseAdapter;
 
@@ -24,7 +23,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         _dataverseAdapter = dataverseAdapter;
     }
 
-    public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
+    public async Task<GetTeacherResponse?> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
         var teacher = await _dataverseAdapter.GetTeacherByTrn(
             request.Trn,
@@ -47,8 +46,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
-        dfeta_induction induction = default;
-        dfeta_inductionperiod[] inductionPeriods = default;
+        dfeta_induction? induction = default;
+        dfeta_inductionperiod[]? inductionPeriods = default;
 
         if (request.Include.HasFlag(GetTeacherRequestIncludes.Induction))
         {
@@ -76,7 +75,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 });
         }
 
-        dfeta_initialteachertraining[] itt = default;
+        dfeta_initialteachertraining[]? itt = default;
 
         if (request.Include.HasFlag(GetTeacherRequestIncludes.InitialTeacherTraining))
         {
@@ -114,7 +113,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 false);
         }
 
-        dfeta_qualification[] qualifications = default;
+        dfeta_qualification[]? qualifications = default;
 
         if ((request.Include & (GetTeacherRequestIncludes.MandatoryQualifications | GetTeacherRequestIncludes.NpqQualifications)) != 0)
         {
@@ -167,17 +166,17 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
-            DateOfBirth = teacher.BirthDate.Value.ToDateOnly(),
+            DateOfBirth = teacher.BirthDate!.Value.ToDateOnly(),
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             PendingNameChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingNameChange) : default,
             PendingDateOfBirthChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingDateOfBirthChange) : default,
             Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnly(), request.AccessMode),
             Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnly(), request.AccessMode),
             Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ?
-                Option.Some(MapInduction(induction, inductionPeriods, request.AccessMode)) :
+                Option.Some(MapInduction(induction!, inductionPeriods!, request.AccessMode)) :
                 default,
             InitialTeacherTraining = request.Include.HasFlag(GetTeacherRequestIncludes.InitialTeacherTraining) ?
-                Option.Some(itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
+                Option.Some(itt!.Select(i => new GetTeacherResponseInitialTeacherTraining()
                 {
                     Qualification = MapIttQualification(i),
                     ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>(),
@@ -185,20 +184,20 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     EndDate = i.dfeta_ProgrammeEndDate.ToDateOnly(),
                     Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
                     AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
-                    Provider = MapProvider(i),
+                    Provider = MapIttProvider(i),
                     Subjects = MapSubjects(i)
                 })) :
                 default,
             NpqQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.NpqQualifications) ?
-                Option.Some(MapNpqQualifications(qualifications, request.AccessMode)) :
+                Option.Some(MapNpqQualifications(qualifications!, request.AccessMode)) :
                 default,
             MandatoryQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.MandatoryQualifications) ?
-                Option.Some(MapMandatoryQualifications(qualifications)) :
+                Option.Some(MapMandatoryQualifications(qualifications!)) :
                 default
         };
     }
 
-    private static GetTeacherResponseQts MapQts(DateOnly? qtsDate, AccessMode accessMode) =>
+    private static GetTeacherResponseQts? MapQts(DateOnly? qtsDate, AccessMode accessMode) =>
         qtsDate != null ?
             new GetTeacherResponseQts()
             {
@@ -207,7 +206,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             } :
             null;
 
-    private static GetTeacherResponseEyts MapEyts(DateOnly? eytsDate, AccessMode accessMode) =>
+    private static GetTeacherResponseEyts? MapEyts(DateOnly? eytsDate, AccessMode accessMode) =>
         eytsDate != null ?
             new GetTeacherResponseEyts()
             {
@@ -216,7 +215,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             } :
             null;
 
-    private static GetTeacherResponseInduction MapInduction(dfeta_induction induction, dfeta_inductionperiod[] inductionperiods, AccessMode accessMode) =>
+    private static GetTeacherResponseInduction? MapInduction(dfeta_induction induction, dfeta_inductionperiod[] inductionperiods, AccessMode accessMode) =>
         induction != null ?
             new GetTeacherResponseInduction()
             {
@@ -264,7 +263,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             _ => throw new NotImplementedException($"{nameof(InductionStatus)}: {inductionStatus} is not currently supported.")
         };
 
-    private static GetTeacherResponseInitialTeacherTrainingQualification MapIttQualification(dfeta_initialteachertraining initialTeacherTraining)
+    private static GetTeacherResponseInitialTeacherTrainingQualification? MapIttQualification(dfeta_initialteachertraining initialTeacherTraining)
     {
         var qualification = initialTeacherTraining.Extract<dfeta_ittqualification>("qualification", dfeta_ittqualification.PrimaryIdAttribute);
 
@@ -276,11 +275,11 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             null;
     }
 
-    private static GetTeacherResponseInitialTeacherTrainingAgeRange MapAgeRange(dfeta_AgeRange? ageRangeFrom, dfeta_AgeRange? ageRangeTo)
+    private static GetTeacherResponseInitialTeacherTrainingAgeRange? MapAgeRange(dfeta_AgeRange? ageRangeFrom, dfeta_AgeRange? ageRangeTo)
     {
         var ageRangeDescription = new StringBuilder();
-        string ageRangeFromName = ageRangeFrom.HasValue ? ageRangeFrom.Value.GetMetadata().Name : null;
-        string ageRangeToName = ageRangeTo.HasValue ? ageRangeTo.Value.GetMetadata().Name : null;
+        var ageRangeFromName = ageRangeFrom.HasValue ? ageRangeFrom.Value.GetMetadata().Name : null;
+        var ageRangeToName = ageRangeTo.HasValue ? ageRangeTo.Value.GetMetadata().Name : null;
 
         if (ageRangeFromName != null)
         {
@@ -305,7 +304,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             null;
     }
 
-    private static GetTeacherResponseInitialTeacherTrainingProvider MapProvider(dfeta_initialteachertraining initialTeacherTraining)
+    private static GetTeacherResponseInitialTeacherTrainingProvider? MapIttProvider(dfeta_initialteachertraining initialTeacherTraining)
     {
         var establishment = initialTeacherTraining.Extract<Account>("establishment", Account.PrimaryIdAttribute);
 
@@ -346,17 +345,17 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 && q.dfeta_CompletionorAwardDate.HasValue)
             .Select(q => new GetTeacherResponseNpqQualificationsQualification()
             {
-                Awarded = q.dfeta_CompletionorAwardDate.Value.ToDateOnly(),
+                Awarded = q.dfeta_CompletionorAwardDate!.Value.ToDateOnly(),
                 Type = new GetTeacherResponseNpqQualificationsQualificationType()
                 {
-                    Code = MapNpqQualificationType(q.dfeta_Type.Value).Value,
+                    Code = MapNpqQualificationType(q.dfeta_Type!.Value),
                     Name = q.dfeta_Type.Value.GetName(),
                 },
                 CertificateUrl = accessMode == AccessMode.IdentityAccessToken ? $"/v3/certificates/npq/{q.Id}" : null
             })
             .ToArray() ?? Array.Empty<GetTeacherResponseNpqQualificationsQualification>();
 
-    private static NpqQualificationType? MapNpqQualificationType(dfeta_qualification_dfeta_Type qualificationType) =>
+    private static NpqQualificationType MapNpqQualificationType(dfeta_qualification_dfeta_Type qualificationType) =>
         qualificationType switch
         {
             dfeta_qualification_dfeta_Type.NPQEL => NpqQualificationType.NPQEL,
@@ -379,7 +378,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 && q.dfeta_MQ_Date.HasValue)
             .Select(mq => new
             {
-                Awarded = mq.dfeta_MQ_Date.Value.ToDateOnly(),
+                Awarded = mq.dfeta_MQ_Date!.Value.ToDateOnly(),
                 Specialism = mq.Extract<dfeta_specialism>(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute)
             })
             .Where(mq => mq.Specialism != null)

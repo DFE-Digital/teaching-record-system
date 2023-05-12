@@ -1,4 +1,4 @@
-﻿#nullable disable
+﻿using System;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
@@ -13,15 +13,15 @@ public class ClaimsPrincipalCurrentClientProvider : ICurrentClientProvider
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public static string GetCurrentClientIdFromHttpContext(HttpContext httpContext)
+    public static string? GetCurrentClientIdFromHttpContext(HttpContext httpContext)
     {
-        var principal = httpContext?.User;
-        return principal?.FindFirst(ClaimTypes.Name)?.Value;
+        var principal = httpContext.User;
+        return principal.FindFirstValue(ClaimTypes.Name);
     }
 
     public string GetCurrentClientId()
     {
-        var httpContext = _httpContextAccessor.HttpContext;
-        return GetCurrentClientIdFromHttpContext(httpContext);
+        var httpContext = _httpContextAccessor.HttpContext ?? throw new Exception("No HttpContext.");
+        return GetCurrentClientIdFromHttpContext(httpContext) ?? throw new Exception("Current user has no Name claim.");
     }
 }

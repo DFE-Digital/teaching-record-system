@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.ServiceModel;
+﻿using System.ServiceModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

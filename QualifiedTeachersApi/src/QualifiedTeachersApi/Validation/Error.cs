@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace QualifiedTeachersApi.Validation;
+﻿namespace QualifiedTeachersApi.Validation;
 
 public sealed class Error
 {
@@ -14,5 +13,5 @@ public sealed class Error
 
     public string Title => _descriptor.Title;
 
-    public string Detail => _descriptor.Detail;
+    public string? Detail => _descriptor.Detail;
 }

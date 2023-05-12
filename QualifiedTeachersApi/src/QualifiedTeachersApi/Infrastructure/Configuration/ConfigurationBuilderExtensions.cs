@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using Microsoft.Extensions.Configuration;
 
 namespace QualifiedTeachersApi.Infrastructure.Configuration;
@@ -9,7 +8,7 @@ public static class ConfigurationBuilderExtensions
     public static IConfigurationBuilder AddJsonEnvironmentVariable(
         this IConfigurationBuilder builder,
         string environmentVariableName,
-        string configurationKeyPrefix = null)
+        string? configurationKeyPrefix = null)
     {
         if (builder is null)
         {

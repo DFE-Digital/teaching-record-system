@@ -7,7 +7,7 @@ using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.DataStore.Sql.Models;
 using QualifiedTeachersApi.Properties;
-using QualifiedTeachersApi.Services.GetAnIdentityApi;
+using QualifiedTeachersApi.Services.GetAnIdentity.Api.Models;
 using QualifiedTeachersApi.TestCommon;
 using QualifiedTeachersApi.V2.ApiModels;
 using QualifiedTeachersApi.V2.Requests;
@@ -71,6 +71,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
+        var teacherId = Guid.NewGuid();
 
         await WithDbContext(async dbContext =>
         {
@@ -78,7 +79,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             {
                 ClientId = ClientId,
                 RequestId = requestId,
-                TeacherId = null
+                TeacherId = teacherId
             });
 
             await dbContext.SaveChangesAsync();
@@ -206,7 +207,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
 
         ApiFixture.IdentityApiClient
             .Setup(mock => mock.GetUserById(It.IsAny<Guid>()))
-            .ReturnsAsync(default(GetAnIdentityApiUser))
+            .ReturnsAsync(default(User))
             .Verifiable();
 
         var request = CreateRequest(req =>
@@ -242,7 +243,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
 
         ApiFixture.IdentityApiClient
             .Setup(mock => mock.GetUserById(It.IsAny<Guid>()))
-            .ReturnsAsync(new GetAnIdentityApiUser() { UserId = identityUserId })
+            .ReturnsAsync(new User() { UserId = identityUserId, FirstName = Faker.Name.First(), LastName = Faker.Name.Last() })
             .Verifiable();
 
         var request = CreateRequest(req =>

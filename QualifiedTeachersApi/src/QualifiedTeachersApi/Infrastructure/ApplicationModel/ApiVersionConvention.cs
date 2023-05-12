@@ -1,5 +1,4 @@
-﻿#nullable disable
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace QualifiedTeachersApi.Infrastructure.ApplicationModel;
@@ -9,9 +8,9 @@ public class ApiVersionConvention : IControllerModelConvention
     public void Apply(ControllerModel controller)
     {
         var controllerNamespace = controller.ControllerType.Namespace;
-        var namespaceVersion = controllerNamespace.Split('.')[1];
+        var namespaceVersion = controllerNamespace?.Split('.')[1];
 
-        if (namespaceVersion[0] == 'V' && int.TryParse(namespaceVersion.TrimStart('V'), out var version))
+        if (namespaceVersion is not null && namespaceVersion[0] == 'V' && int.TryParse(namespaceVersion.TrimStart('V'), out var version))
         {
             ApplyGroupName();
             ApplyMetadata();

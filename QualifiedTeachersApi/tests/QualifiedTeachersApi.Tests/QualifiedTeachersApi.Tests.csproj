@@ -7,8 +7,15 @@
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
     <UserSecretsId>QualifiedTeachersApiTests</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\TestCertificate.pdf" />
+  </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\TestCertificate.pdf" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.16.0" />

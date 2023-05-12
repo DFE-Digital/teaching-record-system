@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -13,7 +12,7 @@ using QualifiedTeachersApi.V3.Responses;
 
 namespace QualifiedTeachersApi.V3.Handlers;
 
-public class GetEytsCertificateHandler : IRequestHandler<GetEytsCertificateRequest, GetCertificateResponse>
+public class GetEytsCertificateHandler : IRequestHandler<GetEytsCertificateRequest, GetCertificateResponse?>
 {
     private const string FullNameFormField = "Full Name";
     private const string TrnFormField = "TRN";
@@ -30,7 +29,7 @@ public class GetEytsCertificateHandler : IRequestHandler<GetEytsCertificateReque
         _certificateGenerator = certificateGenerator;
     }
 
-    public async Task<GetCertificateResponse> Handle(GetEytsCertificateRequest request, CancellationToken cancellationToken)
+    public async Task<GetCertificateResponse?> Handle(GetEytsCertificateRequest request, CancellationToken cancellationToken)
     {
         var teacher = await _dataverseAdapter.GetTeacherByTrn(
             request.Trn,

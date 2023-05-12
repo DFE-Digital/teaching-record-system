@@ -41,10 +41,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
     {
         // Arrange
         var clientSecret = "MySecret";
-        var identityOptions = new GetAnIdentityOptions()
-        {
-            WebHookClientSecret = clientSecret
-        };
+        var identityOptions = CreateOptions(clientSecret);
 
         ApiFixture.GetAnIdentityOptions
             .Setup(o => o.Value)
@@ -68,10 +65,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
     {
         // Arrange
         var clientSecret = "MySecret";
-        var identityOptions = new GetAnIdentityOptions()
-        {
-            WebHookClientSecret = clientSecret
-        };
+        var identityOptions = CreateOptions(clientSecret);
 
         ApiFixture.GetAnIdentityOptions
             .Setup(o => o.Value)
@@ -101,10 +95,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
     {
         // Arrange
         var clientSecret = "MySecret";
-        var identityOptions = new GetAnIdentityOptions()
-        {
-            WebHookClientSecret = clientSecret
-        };
+        var identityOptions = CreateOptions(clientSecret);
 
         ApiFixture.GetAnIdentityOptions
             .Setup(o => o.Value)
@@ -140,10 +131,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
     {
         // Arrange
         var clientSecret = "MySecret";
-        var identityOptions = new GetAnIdentityOptions()
-        {
-            WebHookClientSecret = clientSecret
-        };
+        var identityOptions = CreateOptions(clientSecret);
 
         ApiFixture.GetAnIdentityOptions
             .Setup(o => o.Value)
@@ -176,10 +164,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
     {
         // Arrange
         var clientSecret = "MySecret";
-        var identityOptions = new GetAnIdentityOptions()
-        {
-            WebHookClientSecret = clientSecret
-        };
+        var identityOptions = CreateOptions(clientSecret);
 
         ApiFixture.GetAnIdentityOptions
             .Setup(o => o.Value)
@@ -215,10 +200,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
     {
         // Arrange
         var clientSecret = "MySecret";
-        var identityOptions = new GetAnIdentityOptions()
-        {
-            WebHookClientSecret = clientSecret
-        };
+        var identityOptions = CreateOptions(clientSecret);
 
         ApiFixture.GetAnIdentityOptions
             .Setup(o => o.Value)
@@ -276,10 +258,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
     {
         // Arrange
         var clientSecret = "MySecret";
-        var identityOptions = new GetAnIdentityOptions()
-        {
-            WebHookClientSecret = clientSecret
-        };
+        var identityOptions = CreateOptions(clientSecret);
 
         ApiFixture.GetAnIdentityOptions
             .Setup(o => o.Value)
@@ -328,10 +307,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
     {
         // Arrange
         var clientSecret = "MySecret";
-        var identityOptions = new GetAnIdentityOptions()
-        {
-            WebHookClientSecret = clientSecret
-        };
+        var identityOptions = CreateOptions(clientSecret);
 
         ApiFixture.GetAnIdentityOptions
             .Setup(o => o.Value)
@@ -383,6 +359,15 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         Assert.Equal(content.Message.User.MobileNumber, actualCommand?.MobilePhone);
         Assert.Equal(content.TimeUtc, actualCommand?.UpdateTimeUtc);
     }
+
+    private static GetAnIdentityOptions CreateOptions(string clientSecret) => new()
+    {
+        WebHookClientSecret = clientSecret,
+        BaseAddress = "dummy",
+        ClientId = "dummy",
+        ClientSecret = "dummy",
+        TokenEndpoint = "dummy"
+    };
 
     private static string GenerateSignature(string secret, string content)
     {

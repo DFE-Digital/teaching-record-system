@@ -1,10 +1,10 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using QualifiedTeachersApi.Services.GetAnIdentity.Api.Models;
 
 namespace QualifiedTeachersApi.Services.GetAnIdentityApi;
 
@@ -23,7 +23,7 @@ public class GetAnIdentityApiClient : IGetAnIdentityApiClient
         };
     }
 
-    public async Task<GetAnIdentityApiUser> GetUserById(Guid userId)
+    public async Task<User?> GetUserById(Guid userId)
     {
         var response = await _httpClient.GetAsync($"api/v1/users/{userId}");
 
@@ -38,7 +38,7 @@ public class GetAnIdentityApiClient : IGetAnIdentityApiClient
                 break;
         }
 
-        var user = await response.Content.ReadFromJsonAsync<GetAnIdentityApiUser>();
+        var user = await response.Content.ReadFromJsonAsync<User>();
         return user;
     }
 
@@ -52,7 +52,7 @@ public class GetAnIdentityApiClient : IGetAnIdentityApiClient
 
     private class SetTeacherTrnRequestBody
     {
-        public string Trn { get; set; }
+        public required string Trn { get; set; }
     }
 }
 

@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using Microsoft.Extensions.Logging;
 using Moq;
 using QualifiedTeachersApi.DataStore.Crm;
@@ -56,7 +55,7 @@ public class LinkTrnToIdentityUserServiceTests : ApiTestBase
                           It.IsAny<EventId>(),
                           It.Is<It.IsAnyType>((o, t) => string.Equals($"{teacherId} teacher not found!", o.ToString(), StringComparison.InvariantCultureIgnoreCase)),
                           It.IsAny<Exception>(),
-                          (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()),
+                          (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()),
                       Times.Once);
     }
 
@@ -100,7 +99,7 @@ public class LinkTrnToIdentityUserServiceTests : ApiTestBase
                           It.IsAny<EventId>(),
                           It.Is<It.IsAnyType>((o, t) => string.Equals($"Error occurred while linking an identity {identityUserId} to {contact.dfeta_TRN}", o.ToString(), StringComparison.InvariantCultureIgnoreCase)),
                           It.IsAny<Exception>(),
-                          (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()),
+                          (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()),
                       Times.Once);
     }
 

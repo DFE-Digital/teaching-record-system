@@ -1,6 +1,4 @@
-﻿#nullable disable
-
-namespace QualifiedTeachersApi.Infrastructure.Security;
+﻿namespace QualifiedTeachersApi.Infrastructure.Security;
 
 public static class AuthorizationPolicies
 {

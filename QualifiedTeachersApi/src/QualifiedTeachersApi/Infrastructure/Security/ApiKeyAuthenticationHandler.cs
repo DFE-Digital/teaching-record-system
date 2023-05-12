@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -30,7 +29,7 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthentic
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        string authorizationHeader = Request.Headers["Authorization"];
+        string? authorizationHeader = Request.Headers["Authorization"];
 
         if (string.IsNullOrEmpty(authorizationHeader))
         {

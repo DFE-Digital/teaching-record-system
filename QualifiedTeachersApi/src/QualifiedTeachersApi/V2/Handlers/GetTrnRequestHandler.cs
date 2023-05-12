@@ -41,28 +41,21 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
             return null;
         }
 
-        string trn = null;
-        DateOnly? qtsDate = null;
-
-        if (trnRequest.TeacherId.HasValue)
-        {
-            var teacher = await _dataverseAdapter.GetTeacher(
-                trnRequest.TeacherId.Value,
-                columnNames: new[]
-                {
-                    Contact.Fields.dfeta_TRN,
-                    Contact.Fields.dfeta_QTSDate
-                });
-
-            if (teacher is null)
+        var teacher = await _dataverseAdapter.GetTeacher(
+            trnRequest.TeacherId,
+            columnNames: new[]
             {
-                throw new Exception($"Failed retrieving contact '{trnRequest.TeacherId.Value}' for request ID '{request.RequestId}'.");
-            }
+                Contact.Fields.dfeta_TRN,
+                Contact.Fields.dfeta_QTSDate
+            });
 
-            trn = teacher.dfeta_TRN;
-            qtsDate = teacher.dfeta_QTSDate.ToDateOnly();
+        if (teacher is null)
+        {
+            throw new Exception($"Failed retrieving contact '{trnRequest.TeacherId}' for request ID '{request.RequestId}'.");
         }
 
+        var trn = teacher.dfeta_TRN;
+        var qtsDate = teacher.dfeta_QTSDate.ToDateOnly();
         var status = trn != null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
 
         return new TrnRequestInfo()
