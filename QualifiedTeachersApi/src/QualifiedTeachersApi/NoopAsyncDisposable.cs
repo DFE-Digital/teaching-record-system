@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace QualifiedTeachersApi;
+﻿namespace QualifiedTeachersApi;
 
 public sealed class NoopAsyncDisposable : IAsyncDisposable
 {

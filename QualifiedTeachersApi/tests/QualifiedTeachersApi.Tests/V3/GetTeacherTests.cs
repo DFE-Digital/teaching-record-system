@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-using Microsoft.AspNetCore.Http;
-using Xunit;
+﻿using Xunit;
 
 namespace QualifiedTeachersApi.Tests.V3;
 

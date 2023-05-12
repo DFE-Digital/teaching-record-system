@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace QualifiedTeachersApi.Infrastructure.Security;
+﻿namespace QualifiedTeachersApi.Infrastructure.Security;
 
 public class ApiClient
 {

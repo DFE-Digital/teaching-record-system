@@ -1,5 +1,4 @@
 #nullable disable
-using System;
 using System.Text.Json.Serialization;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 

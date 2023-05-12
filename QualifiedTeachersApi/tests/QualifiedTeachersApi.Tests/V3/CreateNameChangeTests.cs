@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using System.Text;
+﻿using System.Text;
 using JustEat.HttpClientInterception;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;

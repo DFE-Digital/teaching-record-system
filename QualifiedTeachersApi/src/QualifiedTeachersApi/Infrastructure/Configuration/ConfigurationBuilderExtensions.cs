@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
-
-namespace QualifiedTeachersApi.Infrastructure.Configuration;
+﻿namespace QualifiedTeachersApi.Infrastructure.Configuration;
 
 public static class ConfigurationBuilderExtensions
 {

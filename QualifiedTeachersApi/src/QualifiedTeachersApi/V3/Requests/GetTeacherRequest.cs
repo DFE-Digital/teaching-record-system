@@ -1,5 +1,4 @@
-﻿using System;
-using MediatR;
+﻿using MediatR;
 using QualifiedTeachersApi.Infrastructure.Swagger;
 using QualifiedTeachersApi.V3.Responses;
 using Swashbuckle.AspNetCore.Annotations;

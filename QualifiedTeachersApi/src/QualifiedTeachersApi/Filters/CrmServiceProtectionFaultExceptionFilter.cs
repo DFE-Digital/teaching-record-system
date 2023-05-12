@@ -1,9 +1,6 @@
 ﻿using System.ServiceModel;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Xrm.Sdk;
 
 namespace QualifiedTeachersApi.Filters;

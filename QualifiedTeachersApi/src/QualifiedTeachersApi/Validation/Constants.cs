@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace QualifiedTeachersApi.Validation;
+﻿namespace QualifiedTeachersApi.Validation;
 
 public static class Constants
 {

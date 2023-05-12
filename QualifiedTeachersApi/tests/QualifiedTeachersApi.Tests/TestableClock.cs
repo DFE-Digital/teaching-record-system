@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace QualifiedTeachersApi.Tests;
+﻿namespace QualifiedTeachersApi.Tests;
 
 public class TestableClock : IClock
 {

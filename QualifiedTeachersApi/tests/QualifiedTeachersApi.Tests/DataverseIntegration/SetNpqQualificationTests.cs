@@ -1,6 +1,4 @@
 ﻿#nullable disable
-using System;
-using System.Threading.Tasks;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;

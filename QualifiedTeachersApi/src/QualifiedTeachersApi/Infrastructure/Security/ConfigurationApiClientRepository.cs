@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
-
-namespace QualifiedTeachersApi.Infrastructure.Security;
+﻿namespace QualifiedTeachersApi.Infrastructure.Security;
 
 public class ConfigurationApiClientRepository : IApiClientRepository
 {

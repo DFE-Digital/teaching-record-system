@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using System.Linq;
 using FluentValidation;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.Properties;

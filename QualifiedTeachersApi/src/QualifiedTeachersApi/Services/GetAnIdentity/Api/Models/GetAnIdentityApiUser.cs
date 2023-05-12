@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace QualifiedTeachersApi.Services.GetAnIdentity.Api.Models;
+﻿namespace QualifiedTeachersApi.Services.GetAnIdentity.Api.Models;
 
 public class User
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace QualifiedTeachersApi.V2.Responses;
+﻿namespace QualifiedTeachersApi.V2.Responses;
 
 public record FindTeacherResult
 {

@@ -1,11 +1,5 @@
-using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Infrastructure.Json;

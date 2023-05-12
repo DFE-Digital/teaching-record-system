@@ -1,7 +1,5 @@
 #nullable disable
-using System.Threading.Tasks;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.V1.Requests;

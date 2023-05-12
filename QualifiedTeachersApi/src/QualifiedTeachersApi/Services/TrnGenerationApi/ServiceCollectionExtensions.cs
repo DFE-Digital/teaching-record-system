@@ -1,7 +1,4 @@
-using System;
 using System.Net.Http.Headers;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace QualifiedTeachersApi.Services.TrnGenerationApi;

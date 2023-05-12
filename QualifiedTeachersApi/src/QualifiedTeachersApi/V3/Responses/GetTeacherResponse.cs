@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Optional;
 using QualifiedTeachersApi.V3.ApiModels;
 using Swashbuckle.AspNetCore.Annotations;

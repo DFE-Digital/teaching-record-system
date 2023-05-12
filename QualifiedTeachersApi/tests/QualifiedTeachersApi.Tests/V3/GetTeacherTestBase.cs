@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Text.Json;
-using Microsoft.AspNetCore.Http;
+﻿using System.Text.Json;
 using Microsoft.Xrm.Sdk;
 using Moq;
 using QualifiedTeachersApi.DataStore.Crm;

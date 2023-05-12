@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Microsoft.Xrm.Sdk.Messages;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 

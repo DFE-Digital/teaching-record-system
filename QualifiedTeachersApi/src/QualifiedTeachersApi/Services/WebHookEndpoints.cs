@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
-using QualifiedTeachersApi.Services.GetAnIdentity.WebHooks;
+﻿using QualifiedTeachersApi.Services.GetAnIdentity.WebHooks;
 
 namespace QualifiedTeachersApi.Services;
 

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace QualifiedTeachersApi.Validation;
+﻿namespace QualifiedTeachersApi.Validation;
 
 public static class ErrorRegistry
 {

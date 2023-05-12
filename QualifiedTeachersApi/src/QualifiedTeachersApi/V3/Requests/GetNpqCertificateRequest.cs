@@ -1,4 +1,3 @@
-using System;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using QualifiedTeachersApi.V3.Responses;

@@ -1,7 +1,4 @@
 ﻿#nullable disable
-using System;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using QualifiedTeachersApi.DataStore.Crm;
 using QualifiedTeachersApi.DataStore.Crm.Models;

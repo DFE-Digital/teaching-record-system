@@ -1,6 +1,4 @@
 #nullable disable
-using System;
-using System.Threading.Tasks;
 using Microsoft.Xrm.Sdk.Metadata;
 using QualifiedTeachersApi.DataStore.Crm.Models;
 

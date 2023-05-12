@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using System;
 using FluentValidation;
 using QualifiedTeachersApi.Properties;
 using QualifiedTeachersApi.V2.Requests;

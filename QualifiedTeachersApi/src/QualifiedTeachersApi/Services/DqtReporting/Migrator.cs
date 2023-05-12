@@ -1,14 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using DbUp;
 using DbUp.Engine;
 using DbUp.Engine.Output;
 using DbUp.Engine.Transactions;
 using DbUp.ScriptProviders;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
 
 namespace QualifiedTeachersApi.Services.DqtReporting;
 
