@@ -9,14 +9,20 @@ if [ "$CF_INSTANCE_INDEX" == "0" ]; then
   dotnet /QtCli/QtCli.dll migrate-db --connection-string "$ConnectionStrings__DefaultConnection"
   echo "Done applying database migrations"
 
-  if [ ! -z "$DqtReporting__ReportingDbConnectionString" ]; then
+  REPORTING_DB_CONNSTR="$DqtReporting__ReportingDbConnectionString"
+
+  if [ -z "$REPORTING_DB_CONNSTR" ]; then
+    REPORTING_DB_CONNSTR=$(echo "$AppConfig" | jq -r '.DqtReporting.ReportingDbConnectionString')
+  fi
+
+  if [ ! -z "$REPORTING_DB_CONNSTR" ]; then
    echo "Applying reporting database migrations..."
-   dotnet /QtCli/QtCli.dll migrate-reporting-db --connection-string "$DqtReporting__ReportingDbConnectionString"
+   dotnet /QtCli/QtCli.dll migrate-reporting-db --connection-string "$REPORTING_DB_CONNSTR"
    echo "Done applying reporting database migrations"
  fi
 fi
 
-if [ -z "$DqtReporting__ReportingDbConnectionString" ]; then
+if [ -z "$REPORTING_DB_CONNSTR" ]; then
   echo "Disabling DqtReportingService"
   export DqtReporting__RunService="false"
 fi
