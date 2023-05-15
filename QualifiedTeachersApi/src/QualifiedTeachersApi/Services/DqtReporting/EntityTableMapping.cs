@@ -1,10 +1,12 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using Microsoft.Data.SqlClient;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 
 namespace QualifiedTeachersApi.Services.DqtReporting;
 
+[DebuggerDisplay("{EntityLogicalName,nq}")]
 public class EntityTableMapping
 {
     private const string IdColumnName = "Id";
@@ -24,7 +26,7 @@ public class EntityTableMapping
 
         var attributes = entityMetadata.Attributes
             .OrderBy(a => a.ColumnNumber)
-            .Where(a => a.AttributeType != AttributeTypeCode.Virtual)
+            .Where(a => a.AttributeType != AttributeTypeCode.Virtual && a.LogicalName != "msft_datastate")
             .Select(attr =>
             {
                 return attr switch
@@ -228,12 +230,14 @@ public class EntityTableMapping
     }
 }
 
+[DebuggerDisplay("{AttributeName,nq}")]
 public class AttributeColumnMapping
 {
     public required string AttributeName { get; init; }
     public required AttributeColumnDefinition[] ColumnDefinitions { get; init; }
 }
 
+[DebuggerDisplay("{ColumnName,nq}")]
 public class AttributeColumnDefinition
 {
     public required string ColumnName { get; init; }
