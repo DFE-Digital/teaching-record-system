@@ -179,7 +179,7 @@ public class EntityTableMapping
         }));
 
         sqlBuilder.AppendFormat(",\n\t[{0}] datetime,\n", InsertedColumnName);
-        sqlBuilder.AppendFormat("\t[__{0}] datetime\n", UpdatedColumnName);
+        sqlBuilder.AppendFormat("\t[{0}] datetime\n", UpdatedColumnName);
         sqlBuilder.AppendLine(")");
 
         return sqlBuilder.ToString();
