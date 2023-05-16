@@ -173,7 +173,7 @@ Function ConvertTo-OrderedDictionary {
 
 } #EndFunction ConvertTo-OrderedDictionary
 
-$envConfigFile = Join-Path $PSScriptRoot "terraform" "${EnvironmentName}.tfvars.json"
+$envConfigFile = Join-Path $PSScriptRoot ".." "terraform" "${EnvironmentName}.tfvars.json"
 
 if (!(Test-Path $envConfigFile)) {
     throw "Cannot find environment config file at '$envConfigFile'."
