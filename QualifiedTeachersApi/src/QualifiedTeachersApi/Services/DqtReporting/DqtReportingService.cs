@@ -20,7 +20,8 @@ public partial class DqtReportingService : BackgroundService
     public const string ProcessChangesOperationName = "DqtReporting: process changes";
 
     private const int MaxParameters = 1024;
-    private const int MaxUpsertBatchSize = 500;
+    private const int PageSize = 250;
+    private const int MaxUpsertBatchSize = 100;
     private const string MetricPrefix = "DqtReporting: ";
     private const int MaxEntityTypesToProcessConcurrently = 10;
 
@@ -185,7 +186,7 @@ public partial class DqtReportingService : BackgroundService
 
         try
         {
-            await foreach (var changes in _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns).WithCancellation(cancellationToken))
+            await foreach (var changes in _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns, PageSize).WithCancellation(cancellationToken))
             {
                 totalProcessed += changes.Length;
 
