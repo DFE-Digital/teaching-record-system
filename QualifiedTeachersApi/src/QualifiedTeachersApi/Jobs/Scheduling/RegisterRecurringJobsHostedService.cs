@@ -21,6 +21,6 @@ public class RegisterRecurringJobsHostedService : IHostedService
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     private void RegisterJobs()
-    {        
+    {
     }
 }
