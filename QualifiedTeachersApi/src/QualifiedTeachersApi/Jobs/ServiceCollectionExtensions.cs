@@ -2,7 +2,6 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using QualifiedTeachersApi;
 using QualifiedTeachersApi.Jobs.Scheduling;
-using QualifiedTeachersApi.Jobs.Security;
 
 namespace TeacherIdentity.AuthServer.Services.BackgroundJobs;
 
@@ -21,11 +20,6 @@ public static class ServiceCollectionExtensions
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
                 .UsePostgreSqlStorage(postgresConnectionString));
-
-            services.AddOptions<BasicAuthDashboardAuthorizationFilterOptions>()
-                .Bind(configuration.GetSection("JobDashboard"))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
 
             services.AddHangfireServer();
 
