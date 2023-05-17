@@ -5,6 +5,8 @@ using AspNetCoreRateLimit.Redis;
 using Azure.Storage.Blobs;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Hangfire;
+using idunno.Authentication.Basic;
 using Medallion.Threading;
 using Medallion.Threading.Azure;
 using Medallion.Threading.FileSystem;
@@ -39,6 +41,7 @@ using Serilog;
 using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using TeacherIdentity.AuthServer.Services.BackgroundJobs;
 
 namespace QualifiedTeachersApi;
 
@@ -77,6 +80,41 @@ public class Program
                 options.Authority = configuration["GetAnIdentity:BaseAddress"];
                 options.MapInboundClaims = false;
                 options.TokenValidationParameters.ValidateAudience = false;
+            })
+            .AddBasic(options =>
+            {
+                options.Realm = "QualifiedTeachersApi";
+                options.Events = new BasicAuthenticationEvents
+                {
+                    OnValidateCredentials = context =>
+                    {
+                        var config = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+                        var username = config["AdminCredentials:Username"];
+                        var password = config["AdminCredentials:Password"];
+
+                        if (context.Username == username && context.Password == password)
+                        {
+                            var claims = new[]
+                            {
+                                new Claim(
+                                    ClaimTypes.NameIdentifier,
+                                    context.Username,
+                                    ClaimValueTypes.String,
+                                    context.Options.ClaimsIssuer),
+                                new Claim(
+                                    ClaimTypes.Name,
+                                    context.Username,
+                                    ClaimValueTypes.String,
+                                    context.Options.ClaimsIssuer)
+                            };
+
+                            context.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, context.Scheme.Name));
+                            context.Success();
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
         services.AddAuthorization(options =>
@@ -97,6 +135,13 @@ public class Program
                             return scopes.Contains("dqt:read");
                         })
                         .RequireClaim("trn"));
+
+            options.AddPolicy(
+                AuthorizationPolicies.Hangfire,
+                policy => policy
+                    .AddAuthenticationSchemes(BasicAuthenticationDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                );
         });
 
         services
@@ -246,6 +291,7 @@ public class Program
         services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
         services.AddDqtReporting(builder.Configuration);
+        services.AddBackgroundJobs(builder.Configuration, env, pgConnectionString);
 
         if (env.EnvironmentName != "Testing")
         {
@@ -304,6 +350,11 @@ public class Program
             endpoints.MapMetrics();
 
             endpoints.MapControllers();
+
+            if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+            {
+                endpoints.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.Hangfire, "/_hangfire");
+            }
         });
 
         app.UseSwagger(options =>
