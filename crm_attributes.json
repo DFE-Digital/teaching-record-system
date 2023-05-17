@@ -47,7 +47,8 @@
     "middlename",
     "mobilephone",
     "statecode",
-    "telephone1"
+    "telephone1",
+    "dfeta_slugid"
   ],
   "dfeta_country": [
     "dfeta_name",
@@ -112,7 +113,8 @@
     "dfeta_subject3id",
     "dfeta_traineeid",
     "statecode",
-    "dfeta_ittqualificationaim"
+    "dfeta_ittqualificationaim",
+    "dfeta_slugid"
   ],
   "dfeta_ittsubject": [
     "dfeta_name",
