@@ -28,6 +28,7 @@ public static class Modifiers
 
                 property.ShouldSerialize = CreateShouldSerializePredicate(property.PropertyType);
                 property.CustomConverter = (JsonConverter)Activator.CreateInstance(typeof(OptionJsonConverter<>).MakeGenericType(underlyingType))!;
+                property.IsRequired = false;
             }
         }
 
