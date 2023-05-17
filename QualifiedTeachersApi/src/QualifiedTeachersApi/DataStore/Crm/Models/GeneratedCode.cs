@@ -837,6 +837,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
 			public const string dfeta_NINumber = "dfeta_ninumber";
 			public const string dfeta_QTSDate = "dfeta_qtsdate";
+			public const string dfeta_SlugId = "dfeta_slugid";
 			public const string dfeta_StatedFirstName = "dfeta_statedfirstname";
 			public const string dfeta_StatedLastName = "dfeta_statedlastname";
 			public const string dfeta_StatedMiddleName = "dfeta_statedmiddlename";
@@ -1203,6 +1204,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_QTSDate");
 				this.SetAttributeValue("dfeta_qtsdate", value);
 				this.OnPropertyChanged("dfeta_QTSDate");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_slugid")]
+		public string dfeta_SlugId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_slugid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_SlugId");
+				this.SetAttributeValue("dfeta_slugid", value);
+				this.OnPropertyChanged("dfeta_SlugId");
 			}
 		}
 		
@@ -3863,6 +3884,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_ProgrammeStartDate = "dfeta_programmestartdate";
 			public const string dfeta_ProgrammeType = "dfeta_programmetype";
 			public const string dfeta_Result = "dfeta_result";
+			public const string dfeta_SlugId = "dfeta_slugid";
 			public const string dfeta_Subject1Id = "dfeta_subject1id";
 			public const string dfeta_Subject2Id = "dfeta_subject2id";
 			public const string dfeta_Subject3Id = "dfeta_subject3id";
@@ -4158,6 +4180,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_Result");
 				this.SetAttributeValue("dfeta_result", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
 				this.OnPropertyChanged("dfeta_Result");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_slugid")]
+		public string dfeta_SlugId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_slugid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_SlugId");
+				this.SetAttributeValue("dfeta_slugid", value);
+				this.OnPropertyChanged("dfeta_SlugId");
 			}
 		}
 		
