@@ -17,6 +17,7 @@ namespace QualifiedTeachersApi.Services.DqtReporting;
 public partial class DqtReportingService : BackgroundService
 {
     public const string ChangesKey = "DqtReporting";
+    public const string CrmClientName = "DqtReporting";
     public const string ProcessChangesOperationName = "DqtReporting: process changes";
 
     private const int MaxParameters = 1024;
@@ -186,7 +187,10 @@ public partial class DqtReportingService : BackgroundService
 
         try
         {
-            await foreach (var changes in _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns, PageSize).WithCancellation(cancellationToken))
+            var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, CrmClientName, entityLogicalName, columns, PageSize)
+                .WithCancellation(cancellationToken);
+
+            await foreach (var changes in changesEnumerable)
             {
                 totalProcessed += changes.Length;
 

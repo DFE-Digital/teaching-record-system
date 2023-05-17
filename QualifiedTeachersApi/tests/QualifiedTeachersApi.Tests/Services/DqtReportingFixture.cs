@@ -114,7 +114,8 @@ public class DqtReportingFixture
         }
 
         public IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
-            string key,
+            string changesKey,
+            string serviceClientName,
             string entityLogicalName,
             ColumnSet columns,
             int pageSize = 1000,

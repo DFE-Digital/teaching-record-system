@@ -26,7 +26,8 @@ public class CrmEntityChangesService : ICrmEntityChangesService
     }
 
     public async IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
-        string key,
+        string changesKey,
+        string crmClientName,
         string entityLogicalName,
         ColumnSet columns,
         int pageSize,
@@ -36,7 +37,7 @@ public class CrmEntityChangesService : ICrmEntityChangesService
 
         // Ensure only one node is processing changes for this key and entity type at a time
         var @lock = await _distributedLockProvider.TryAcquireLockAsync(
-            DistributedLockKeys.EntityChanges(key, entityLogicalName),
+            DistributedLockKeys.EntityChanges(changesKey, entityLogicalName),
             cancellationToken: cancellationToken);
 
         if (@lock is null)
@@ -49,9 +50,9 @@ public class CrmEntityChangesService : ICrmEntityChangesService
 #pragma warning restore CS0642 // Possible mistaken empty statement
 
         var entityChangesJournal = await dbContext.EntityChangesJournals
-            .SingleOrDefaultAsync(t => t.Key == key && t.EntityLogicalName == entityLogicalName);
+            .SingleOrDefaultAsync(t => t.Key == changesKey && t.EntityLogicalName == entityLogicalName);
 
-        var organizationService = _crmServiceClientProvider.GetClient(key);
+        var organizationService = _crmServiceClientProvider.GetClient(changesKey);
 
         var request = new RetrieveEntityChangesRequest()
         {
@@ -91,7 +92,7 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                 {
                     dbContext.EntityChangesJournals.Add(new()
                     {
-                        Key = key,
+                        Key = changesKey,
                         EntityLogicalName = entityLogicalName,
                         DataToken = response.EntityChanges.DataToken
                     });
