@@ -23,7 +23,7 @@ public static partial class Commands
             (string connectionString) =>
             {
                 var migrator = new Migrator(connectionString);
-                migrator.ResetJournal("Initial.sql");
+                migrator.ResetJournal("0001_Initial.sql");
             },
             connectionStringOption);
 

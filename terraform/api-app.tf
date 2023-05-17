@@ -1,28 +1,24 @@
 locals {
   api_app_config = {
-    AppConfig = jsonencode(merge(
-      jsondecode(data.azurerm_key_vault_secret.secrets["APP-CONFIG"].value),
-      {
-        "ApplicationInsights" : {
-          "ConnectionString" : azurerm_application_insights.api_app_insights.connection_string
-        }
-      }
-    )),
+    AppConfig                                 = local.appconfig_json,
     AppVersion                                = var.api_app_version,
     PaasEnvironment                           = var.environment_name,
     StorageConnectionString                   = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}",
-    DqtReporting__ReportingDbConnectionString = length(azurerm_mssql_server.reporting_server) == 1 ? "Data Source=tcp:${azurerm_mssql_server.reporting_server[0].fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.reporting_db[0].name};Persist Security Info=False;User ID=${azurerm_mssql_server.reporting_server[0].administrator_login};Password=${yamldecode(data.azurerm_key_vault_secret.secrets["REPORTING-DB"].value)["PASSWORD"]};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" : "",
+    DqtReporting__ReportingDbConnectionString = local.dqt_reporting_connection_string,
     DistributedLockContainerName              = local.distributed_lock_container_name,
     ConnectionStrings__DefaultConnection      = local.pg_connection_string,
-    ConnectionStrings__Redis                  = local.redis_connection_string
+    ConnectionStrings__Redis                  = local.redis_connection_string,
+    ApplicationInsights__ConnectionString     = azurerm_application_insights.api_app_insights.connection_string
   }
 
+  appconfig_json                  = data.azurerm_key_vault_secret.secrets["APP-CONFIG"].value
   logstash_endpoint               = data.azurerm_key_vault_secret.secrets["LOGSTASH-ENDPOINT"].value
   distributed_lock_container_name = "locks"
   pg_credentials                  = cloudfoundry_service_key.postgres-key.credentials
   pg_connection_string            = "Host=${local.pg_credentials.host};Database=${local.pg_credentials.name};Username=${local.pg_credentials.username};Password='${local.pg_credentials.password}';Port=${local.pg_credentials.port};SslMode=Require;TrustServerCertificate=true"
   redis_credentials               = cloudfoundry_service_key.redis-key.credentials
   redis_connection_string         = "${local.redis_credentials.host}:${local.redis_credentials.port},password=${local.redis_credentials.password},ssl=True"
+  dqt_reporting_connection_string = length(azurerm_mssql_server.reporting_server) == 1 ? "Data Source=tcp:${azurerm_mssql_server.reporting_server[0].fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.reporting_db[0].name};Persist Security Info=False;User ID=${azurerm_mssql_server.reporting_server[0].administrator_login};Password=${yamldecode(data.azurerm_key_vault_secret.secrets["REPORTING-DB"].value)["PASSWORD"]};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" : ""
 }
 
 resource "cloudfoundry_route" "api_public" {
