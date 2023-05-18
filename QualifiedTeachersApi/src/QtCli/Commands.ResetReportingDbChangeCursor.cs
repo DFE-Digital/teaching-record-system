@@ -32,7 +32,7 @@ public static partial class Commands
             {
                 var serviceProvider = new ServiceCollection()
                     .AddDbContextFactory<DqtContext>(options => DqtContext.ConfigureOptions(options, dbConnectionString))
-                    .AddServiceClient(DqtReportingService.ChangesKey, _ => new ServiceClient(crmConnectionString))
+                    .AddServiceClient(DqtReportingService.CrmClientName, _ => new ServiceClient(crmConnectionString))
                     .BuildServiceProvider();
 
                 var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<DqtContext>>();
@@ -50,7 +50,7 @@ public static partial class Commands
 
                 async Task ProcessChangesForEntityType(string entityType)
                 {
-                    await foreach (var changes in entityChangesService.GetEntityChanges(DqtReportingService.ChangesKey, entityType, emptyColumnSet, pageSize: 10000))
+                    await foreach (var changes in entityChangesService.GetEntityChanges(DqtReportingService.ChangesKey, DqtReportingService.CrmClientName, entityType, emptyColumnSet, pageSize: 10000))
                     {
                     }
                 }
