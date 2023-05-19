@@ -34,10 +34,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - run: echo $PACKAGE_RESULT
-      env:
-        PACKAGE_RESULT: ${{ needs.package.result }}
-
     - uses: ./.github/workflows/actions/deploy-environment
       id: deploy
       with:
