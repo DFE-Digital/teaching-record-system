@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.V3.Requests;
 using Swashbuckle.AspNetCore.Annotations;
@@ -11,6 +12,7 @@ namespace QualifiedTeachersApi.V3.Controllers;
 [ApiController]
 [Route("certificates")]
 [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
+[SupportsReadOnlyMode]
 public class CertificatesController : Controller
 {
     private readonly IMediator _mediator;

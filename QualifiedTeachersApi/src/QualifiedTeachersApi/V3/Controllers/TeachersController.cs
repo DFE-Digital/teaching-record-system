@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.ModelBinding;
 using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.V3.Requests;
@@ -12,6 +13,7 @@ namespace QualifiedTeachersApi.V3.Controllers;
 [ApiController]
 [Route("teachers")]
 [Authorize(AuthorizationPolicies.ApiKey)]
+[SupportsReadOnlyMode]
 public class TeachersController : ControllerBase
 {
     private readonly IMediator _mediator;

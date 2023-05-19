@@ -153,6 +153,7 @@ public class Program
                 options.Filters.Add(new CrmServiceProtectionFaultExceptionFilter());
                 options.Filters.Add(new DefaultErrorExceptionFilter(statusCode: StatusCodes.Status400BadRequest));
                 options.Filters.Add(new ValidationExceptionFilter());
+                options.Filters.Add(new ReadOnlyModeFilterFactory());
 
                 options.Conventions.Add(new ApiVersionConvention());
                 options.Conventions.Add(new AuthorizationPolicyConvention());
@@ -247,6 +248,7 @@ public class Program
         services.AddSingleton<ISchemaGenerator, Infrastructure.Swagger.SchemaGenerator>();
         services.AddSingleton<IClock, Clock>();
         services.AddMemoryCache();
+        services.AddSingleton<ReadOnlyModeFilter>();
 
         services.AddHttpClient("EvidenceFiles", client =>
         {
