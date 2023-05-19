@@ -1,5 +1,4 @@
-﻿#nullable disable
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.V2.Requests;
@@ -9,6 +8,7 @@ namespace QualifiedTeachersApi.V2.Controllers;
 
 [ApiController]
 [Route("npq-qualifications")]
+[SupportsReadOnlyMode]
 public class NpqQualificationsController : ControllerBase
 {
     private readonly IMediator _mediator;

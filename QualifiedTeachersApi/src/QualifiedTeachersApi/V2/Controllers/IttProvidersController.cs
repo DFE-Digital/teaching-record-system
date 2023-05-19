@@ -1,6 +1,6 @@
-﻿#nullable disable
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
 using Swashbuckle.AspNetCore.Annotations;
@@ -9,6 +9,7 @@ namespace QualifiedTeachersApi.V2.Controllers;
 
 [ApiController]
 [Route("itt-providers")]
+[SupportsReadOnlyMode]
 public class IttProvidersController : ControllerBase
 {
     private readonly IMediator _mediator;

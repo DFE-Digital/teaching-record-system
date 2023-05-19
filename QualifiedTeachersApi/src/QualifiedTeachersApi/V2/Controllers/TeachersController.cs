@@ -1,5 +1,4 @@
-﻿#nullable disable
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.Logging;
@@ -23,6 +22,7 @@ public class TeachersController : Controller
     [HttpGet("find")]
     [SwaggerOperation(summary: "Returns teachers matching the specified criteria")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
+    [SupportsReadOnlyMode]
     public async Task<IActionResult> FindTeachers(FindTeachersRequest request)
     {
         var response = await _mediator.Send(request);
@@ -34,6 +34,7 @@ public class TeachersController : Controller
         summary: "Teacher",
         description: "Get an individual teacher by their TRN")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
+    [SupportsReadOnlyMode]
     public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)
     {
         var response = await _mediator.Send(request);
