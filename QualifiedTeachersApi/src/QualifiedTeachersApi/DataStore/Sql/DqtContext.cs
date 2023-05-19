@@ -17,6 +17,8 @@ public class DqtContext : DbContext
 
     public DbSet<EntityChangesJournal> EntityChangesJournals => Set<EntityChangesJournal>();
 
+    public DbSet<Person> People => Set<Person>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
     {
         if (connectionString != null)

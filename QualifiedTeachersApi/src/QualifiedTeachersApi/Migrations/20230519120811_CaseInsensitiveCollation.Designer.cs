@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QualifiedTeachersApi.DataStore.Sql;
@@ -11,9 +12,11 @@ using QualifiedTeachersApi.DataStore.Sql;
 namespace QualifiedTeachersApi.Migrations
 {
     [DbContext(typeof(DqtContext))]
-    partial class DqtContextModelSnapshot : ModelSnapshot
+    [Migration("20230519120811_CaseInsensitiveCollation")]
+    partial class CaseInsensitiveCollation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,62 +44,6 @@ namespace QualifiedTeachersApi.Migrations
                         .HasName("pk_entity_changes_journals");
 
                     b.ToTable("entity_changes_journals", (string)null);
-                });
-
-            modelBuilder.Entity("QualifiedTeachersApi.DataStore.Sql.Models.Person", b =>
-                {
-                    b.Property<Guid>("PersonId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("person_id");
-
-                    b.Property<DateOnly>("DateOfBirth")
-                        .HasColumnType("date")
-                        .HasColumnName("date_of_birth");
-
-                    b.Property<Guid?>("DqtContactId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("dqt_contact_id");
-
-                    b.Property<int?>("DqtState")
-                        .HasColumnType("integer")
-                        .HasColumnName("dqt_state");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("first_name")
-                        .UseCollation("case_insensitive");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("last_name")
-                        .UseCollation("case_insensitive");
-
-                    b.Property<string>("MiddleName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("middle_name")
-                        .UseCollation("case_insensitive");
-
-                    b.Property<string>("Trn")
-                        .HasMaxLength(7)
-                        .HasColumnType("character(7)")
-                        .HasColumnName("trn")
-                        .IsFixedLength();
-
-                    b.HasKey("PersonId")
-                        .HasName("pk_people");
-
-                    b.HasIndex("Trn")
-                        .IsUnique()
-                        .HasDatabaseName("ix_people_trn");
-
-                    b.ToTable("people", (string)null);
                 });
 
             modelBuilder.Entity("QualifiedTeachersApi.DataStore.Sql.Models.TrnRequest", b =>
