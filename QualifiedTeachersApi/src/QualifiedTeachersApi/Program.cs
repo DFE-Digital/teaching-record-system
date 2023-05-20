@@ -30,6 +30,7 @@ using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.Infrastructure.ModelBinding;
 using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.Infrastructure.Swagger;
+using QualifiedTeachersApi.Jobs;
 using QualifiedTeachersApi.Services;
 using QualifiedTeachersApi.Services.Certificates;
 using QualifiedTeachersApi.Services.CrmEntityChanges;
@@ -41,7 +42,6 @@ using Serilog;
 using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using TeacherIdentity.AuthServer.Services.BackgroundJobs;
 
 namespace QualifiedTeachersApi;
 
@@ -293,7 +293,7 @@ public class Program
         services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
         services.AddDqtReporting(builder.Configuration);
-        services.AddBackgroundJobs(builder.Configuration, env, pgConnectionString);
+        services.AddBackgroundJobs(env, pgConnectionString);
 
         if (env.EnvironmentName != "Testing")
         {
