@@ -1,7 +1,6 @@
-﻿using MediatR;
-using QualifiedTeachersApi.Infrastructure.Swagger;
+﻿using System.ComponentModel;
+using MediatR;
 using QualifiedTeachersApi.V3.Responses;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V3.Requests;
 
@@ -13,8 +12,7 @@ public record GetTeacherRequest : IRequest<GetTeacherResponse?>
 }
 
 [Flags]
-[SwaggerSchema(Description = "Comma-separated list")]
-[SwaggerSchemaFilter(typeof(RemoveNonFlagEnumValuesSchemaFilter))]
+[Description("Comma-separated list of data to include in response.")]
 public enum GetTeacherRequestIncludes
 {
     None = 0,

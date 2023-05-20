@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V2.Controllers;
 
@@ -20,7 +20,10 @@ public class TeachersController : Controller
     }
 
     [HttpGet("find")]
-    [SwaggerOperation(summary: "Returns teachers matching the specified criteria")]
+    [OpenApiOperation(
+        operationId: "FindTeachers",
+        summary: "Find teachers",
+        description: "Returns teachers matching the specified criteria")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [SupportsReadOnlyMode]
     public async Task<IActionResult> FindTeachers(FindTeachersRequest request)
@@ -30,9 +33,10 @@ public class TeachersController : Controller
     }
 
     [HttpGet("{trn}")]
-    [SwaggerOperation(
-        summary: "Teacher",
-        description: "Get an individual teacher by their TRN")]
+    [OpenApiOperation(
+        operationId: "GetTeacher",
+        summary: "Get teacher",
+        description: "Gets an individual teacher by their TRN")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [SupportsReadOnlyMode]
     public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)
@@ -42,7 +46,10 @@ public class TeachersController : Controller
     }
 
     [HttpPatch("update/{trn}")]
-    [SwaggerOperation(summary: "Updates a Teacher record")]
+    [OpenApiOperation(
+        operationId: "UpdateTeacher",
+        summary: "Update teacher",
+        description: "Updates a teacher")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
     [MapError(10002, statusCode: StatusCodes.Status409Conflict)]

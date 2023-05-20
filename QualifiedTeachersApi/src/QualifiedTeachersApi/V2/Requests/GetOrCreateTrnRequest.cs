@@ -1,18 +1,18 @@
 ﻿#nullable disable
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using QualifiedTeachersApi.V2.ApiModels;
 using QualifiedTeachersApi.V2.Responses;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V2.Requests;
 
 public class GetOrCreateTrnRequest : IRequest<TrnRequestInfo>
 {
     [FromRoute(Name = "requestId")]
-    [SwaggerParameter(Description =
+    [Description(
         "A unique ID that represents this request. " +
         "If a request has already been created with this ID then that existing record's result is returned.")]
     [JsonIgnore]

@@ -2,10 +2,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.V3.Requests;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V3.Controllers;
 
@@ -24,11 +24,12 @@ public class CertificatesController : Controller
 
     [HttpGet]
     [Route("qts")]
-    [SwaggerOperation(
-        summary: "QTS Certificate",
-        description: "Returns a PDF of the QTS Certificate for the provided TRN holder")]
-    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(FileResult), StatusCodes.Status404NotFound)]
+    [OpenApiOperation(
+        operationId: "GetQtsCertificate",
+        summary: "Get QTS Certificate",
+        description: "Returns a PDF of the QTS Certificate for the authenticated teacher.")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK, "application/pdf")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetQts()
     {
         var trn = User.FindFirstValue("trn");
@@ -56,11 +57,12 @@ public class CertificatesController : Controller
 
     [HttpGet]
     [Route("eyts")]
-    [SwaggerOperation(
-    summary: "EYTS Certificate",
-    description: "Returns a PDF of the EYTS Certificate for the provided TRN holder")]
-    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(FileResult), StatusCodes.Status404NotFound)]
+    [OpenApiOperation(
+        operationId: "GetEytsCertificate",
+        summary: "Get EYTS Certificate",
+        description: "Returns a PDF of the EYTS Certificate for the authenticated teacher.")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK, "application/pdf")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetEyts()
     {
         var trn = User.FindFirstValue("trn");
@@ -88,11 +90,12 @@ public class CertificatesController : Controller
 
     [HttpGet]
     [Route("induction")]
-    [SwaggerOperation(
-    summary: "Induction Certificate",
-    description: "Returns a PDF of the Induction Certificate for the provided TRN holder")]
-    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(FileResult), StatusCodes.Status404NotFound)]
+    [OpenApiOperation(
+        operationId: "GetInductionCertificate",
+        summary: "Induction Certificate",
+        description: "Returns a PDF of the Induction Certificate for the authenticated teacher.")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK, "application/pdf")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetInduction()
     {
         var trn = User.FindFirstValue("trn");
@@ -120,11 +123,12 @@ public class CertificatesController : Controller
 
     [HttpGet]
     [Route("npq/{qualificationId}")]
-    [SwaggerOperation(
+    [OpenApiOperation(
+        operationId: "GetNpqCertificate",
         summary: "NPQ Certificate",
-        description: "Returns a PDF of the NPQ Certificate associated with the provided Qualification ID")]
-    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(FileResult), StatusCodes.Status404NotFound)]
+        description: "Returns a PDF of the NPQ Certificate associated with the provided qualification ID.")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK, "application/pdf")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetNpq(GetNpqCertificateRequest request)
     {
         var response = await _mediator.Send(request);

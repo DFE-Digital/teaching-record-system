@@ -1,16 +1,16 @@
 ﻿#nullable disable
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using QualifiedTeachersApi.V2.ApiModels;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V2.Requests;
 
 public class UpdateTeacherRequest : IRequest
 {
-    [SwaggerParameter(Description = "The TRN of the teacher to update")]
+    [Description("The TRN of the teacher to update")]
     [FromRoute(Name = "trn")]
     [JsonIgnore]
     public string Trn { get; set; }
@@ -21,7 +21,7 @@ public class UpdateTeacherRequest : IRequest
     public UpdateTeacherRequestQualification Qualification { get; set; }
 
     [Required]
-    [FromQuery(Name = "birthdate"), SwaggerParameter(Required = true, Description = "DoB of teacher"), SwaggerSchema(Format = "date")]
+    [FromQuery(Name = "birthdate"), Description("DoB of teacher")]
     [JsonIgnore]
     public DateOnly? BirthDate { get; set; }
 

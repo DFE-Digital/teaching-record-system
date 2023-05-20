@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Security.Claims;
 using AspNetCoreRateLimit;
 using AspNetCoreRateLimit.Redis;
@@ -11,13 +10,10 @@ using Medallion.Threading;
 using Medallion.Threading.Azure;
 using Medallion.Threading.FileSystem;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
-using Microsoft.OpenApi.Models;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Prometheus;
 using QualifiedTeachersApi.DataStore.Crm;
@@ -28,8 +24,8 @@ using QualifiedTeachersApi.Infrastructure.Configuration;
 using QualifiedTeachersApi.Infrastructure.Json;
 using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.Infrastructure.ModelBinding;
+using QualifiedTeachersApi.Infrastructure.OpenApi;
 using QualifiedTeachersApi.Infrastructure.Security;
-using QualifiedTeachersApi.Infrastructure.Swagger;
 using QualifiedTeachersApi.Jobs;
 using QualifiedTeachersApi.Services;
 using QualifiedTeachersApi.Services.Certificates;
@@ -40,8 +36,6 @@ using QualifiedTeachersApi.Services.TrnGenerationApi;
 using QualifiedTeachersApi.Validation;
 using Serilog;
 using StackExchange.Redis;
-using Swashbuckle.AspNetCore.Filters;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace QualifiedTeachersApi;
 
@@ -49,8 +43,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        TypeDescriptor.AddAttributes(typeof(DateOnly), new TypeConverterAttribute(typeof(DateOnlyTypeConverter)));
-
         var builder = WebApplication.CreateBuilder(args);
 
         builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
@@ -149,7 +141,6 @@ public class Program
             {
                 options.AddHybridBodyModelBinderProvider();
 
-                options.Filters.Add(new ProducesJsonOrProblemAttribute());
                 options.Filters.Add(new CrmServiceProtectionFaultExceptionFilter());
                 options.Filters.Add(new DefaultErrorExceptionFilter(statusCode: StatusCodes.Status400BadRequest));
                 options.Filters.Add(new ValidationExceptionFilter());
@@ -181,54 +172,7 @@ public class Program
 
         services.Decorate<Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory, CamelCaseErrorKeysProblemDetailsFactory>();
 
-        services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo() { Title = "DQT API", Version = "v1" });
-            c.SwaggerDoc("v2", new OpenApiInfo() { Title = "DQT API", Version = "v2" });
-            c.SwaggerDoc("v3", new OpenApiInfo() { Title = "DQT API", Version = "v3" });
-
-            c.DocInclusionPredicate((docName, api) => docName.Equals(api.GroupName, StringComparison.OrdinalIgnoreCase));
-            c.EnableAnnotations();
-            c.ExampleFilters();
-            c.OperationFilter<ResponseContentTypeOperationFilter>();
-            c.OperationFilter<RateLimitOperationFilter>();
-
-            c.CustomSchemaIds(type =>
-            {
-                // Generated CRM models for custom entities have a weird type name; fix that up here
-                // e.g. for the 'dfeta_inductionState' type use 'InductionState' in the API spec
-
-                if (type.Name.StartsWith("dfeta_"))
-                {
-                    var prefixTrimmedTypeName = type.Name.Substring("dfeta_".Length);
-                    return prefixTrimmedTypeName[0..1].ToUpper() + prefixTrimmedTypeName[1..];
-                }
-
-                return type.Name;
-            });
-
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-            {
-                In = ParameterLocation.Header,
-                Name = "Authorization",
-                Scheme = "Bearer",
-                Type = SecuritySchemeType.Http
-            });
-
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-            {
-                [
-                    new OpenApiSecurityScheme()
-                    {
-                        Reference = new OpenApiReference()
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    }
-                ] = new List<string>()
-            });
-        });
+        services.AddOpenApi(configuration);
 
         var pgConnectionString = configuration.GetConnectionString("DefaultConnection") ??
             throw new Exception("Missing DefaultConnection connection string.");
@@ -239,13 +183,6 @@ public class Program
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
         services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
         services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
-        services.AddSwaggerExamplesFromAssemblyOf<Program>();
-        services.AddTransient<ISerializerDataContractResolver>(sp =>
-        {
-            var serializerOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions;
-            return new Infrastructure.Swagger.JsonSerializerDataContractResolver(serializerOptions);
-        });
-        services.AddSingleton<ISchemaGenerator, Infrastructure.Swagger.SchemaGenerator>();
         services.AddSingleton<IClock, Clock>();
         services.AddMemoryCache();
         services.AddSingleton<ReadOnlyModeFilter>();
@@ -359,24 +296,8 @@ public class Program
             }
         });
 
-        app.UseSwagger(options =>
-        {
-            options.PreSerializeFilters.Add((_, request) =>
-            {
-                request.HttpContext.Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
-            });
-        });
-
         if (env.IsDevelopment())
         {
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("v1/swagger.json", "DQT API v1");
-                c.SwaggerEndpoint("v2/swagger.json", "DQT API v2");
-                c.SwaggerEndpoint("v3/swagger.json", "DQT API v3");
-                c.EnablePersistAuthorization();
-            });
-
             app.UseMigrationsEndPoint();
         }
 

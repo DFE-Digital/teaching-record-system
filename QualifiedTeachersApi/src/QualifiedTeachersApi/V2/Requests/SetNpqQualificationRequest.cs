@@ -4,7 +4,6 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using QualifiedTeachersApi.V2.ApiModels;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V2.Requests;
 
@@ -14,8 +13,9 @@ public class SetNpqQualificationRequest : IRequest
     public DateOnly? CompletionDate { get; set; }
 
     [Required]
-    [FromQuery(Name = "trn"), SwaggerParameter(Required = true, Description = "Trn")]
+    [FromQuery(Name = "trn")]
     public string Trn { get; set; }
+
     [Required]
     public QualificationType? QualificationType { get; set; }
 }

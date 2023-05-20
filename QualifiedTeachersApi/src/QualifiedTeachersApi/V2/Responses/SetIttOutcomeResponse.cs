@@ -1,20 +1,17 @@
-﻿#nullable disable
-using Swashbuckle.AspNetCore.Annotations;
-using Swashbuckle.AspNetCore.Filters;
+﻿using NSwag.Examples;
 
 namespace QualifiedTeachersApi.V2.Responses;
 
 public class SetIttOutcomeResponse
 {
-    [SwaggerSchema(Nullable = false)]
-    public string Trn { get; set; }
+    public required string Trn { get; set; }
 
-    public DateOnly? QtsDate { get; set; }
+    public required DateOnly? QtsDate { get; set; }
 }
 
-public class SetQtsResponseExample : IExamplesProvider<SetIttOutcomeResponse>
+public class SetQtsResponseExample : IExampleProvider<SetIttOutcomeResponse>
 {
-    public SetIttOutcomeResponse GetExamples() => new()
+    public SetIttOutcomeResponse GetExample() => new()
     {
         Trn = "1234567",
         QtsDate = new DateOnly(2021, 12, 23)

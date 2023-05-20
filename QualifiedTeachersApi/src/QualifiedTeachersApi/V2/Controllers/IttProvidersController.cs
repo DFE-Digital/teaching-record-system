@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V2.Controllers;
 
@@ -20,7 +20,10 @@ public class IttProvidersController : ControllerBase
     }
 
     [HttpGet("")]
-    [SwaggerOperation(summary: "Gets a list of all ITT Providers")]
+    [OpenApiOperation(
+        operationId: "GetIttProviders",
+        summary: "Get ITT Providers",
+        description: "Gets the list of ITT providers")]
     [ProducesResponseType(typeof(GetIttProvidersResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetIttProviders()
     {

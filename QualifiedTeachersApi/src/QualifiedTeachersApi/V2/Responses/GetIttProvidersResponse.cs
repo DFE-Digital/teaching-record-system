@@ -1,10 +1,6 @@
-﻿#nullable disable
-using Swashbuckle.AspNetCore.Annotations;
-
-namespace QualifiedTeachersApi.V2.Responses;
+﻿namespace QualifiedTeachersApi.V2.Responses;
 
 public class GetIttProvidersResponse
 {
-    [SwaggerSchema(Nullable = false)]
-    public IEnumerable<IttProviderInfo> IttProviders { get; set; }
+    public required IEnumerable<IttProviderInfo> IttProviders { get; set; }
 }

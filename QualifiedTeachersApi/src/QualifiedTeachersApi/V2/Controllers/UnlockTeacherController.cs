@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V2.Controllers;
 
@@ -20,7 +20,10 @@ public class UnlockTeacherController : ControllerBase
     }
 
     [HttpPut("{teacherId}")]
-    [SwaggerOperation(description: "Unlocks the teacher record allowing the teacher to sign in to the portals")]
+    [OpenApiOperation(
+        operationId: "UnlockTeacher",
+        summary: "Unlock teacher",
+        description: "Unlocks the teacher record allowing the teacher to sign in to the portals")]
     [ProducesResponseType(typeof(UnlockTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UnlockTeacher([FromRoute] UnlockTeacherRequest request)
