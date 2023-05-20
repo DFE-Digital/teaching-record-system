@@ -378,12 +378,6 @@ public class Program
             });
 
             app.UseMigrationsEndPoint();
-
-            using (var scope = app.Services.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<DqtContext>();
-                context.Database.EnsureCreated();
-            }
         }
 
         if (env.IsProduction())
