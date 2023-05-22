@@ -1,6 +1,4 @@
 using System.Security.Claims;
-using AspNetCoreRateLimit;
-using AspNetCoreRateLimit.Redis;
 using Azure.Storage.Blobs;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -25,8 +23,10 @@ using QualifiedTeachersApi.Infrastructure.Json;
 using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.Infrastructure.ModelBinding;
 using QualifiedTeachersApi.Infrastructure.OpenApi;
+using QualifiedTeachersApi.Infrastructure.Redis;
 using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.Jobs;
+using QualifiedTeachersApi.RateLimiting;
 using QualifiedTeachersApi.Services;
 using QualifiedTeachersApi.Services.Certificates;
 using QualifiedTeachersApi.Services.CrmEntityChanges;
@@ -35,7 +35,6 @@ using QualifiedTeachersApi.Services.GetAnIdentityApi;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
 using QualifiedTeachersApi.Validation;
 using Serilog;
-using StackExchange.Redis;
 
 namespace QualifiedTeachersApi;
 
@@ -244,8 +243,8 @@ public class Program
 
         if (env.IsProduction())
         {
-            ConfigureRateLimitServices();
-            ConfigureRedisServices();
+            services.AddRedis(env, configuration, healthCheckBuilder);
+            services.AddRateLimiting(env, configuration);
         }
 
         MetricLabels.ConfigureLabels(builder.Configuration);
@@ -265,7 +264,7 @@ public class Program
 
         if (env.IsProduction())
         {
-            app.UseMiddleware<RateLimitMiddleware>();
+            app.UseRateLimiter();
         }
 
         app.Use((ctx, next) =>
@@ -301,15 +300,6 @@ public class Program
             app.UseMigrationsEndPoint();
         }
 
-        if (env.IsProduction())
-        {
-            using (var scope = app.Services.CreateScope())
-            {
-                var clientPolicyStore = scope.ServiceProvider.GetRequiredService<IClientPolicyStore>();
-                clientPolicyStore.SeedAsync().GetAwaiter().GetResult();
-            }
-        }
-
         app.Run();
 
         ServiceClient GetCrmServiceClient()
@@ -332,31 +322,6 @@ public class Program
                 MaxRetryCount = 2,
                 RetryPauseTime = TimeSpan.FromSeconds(1)
             };
-        }
-
-        void ConfigureRateLimitServices()
-        {
-            services.Configure<ClientRateLimitOptions>(configuration.GetSection("ClientRateLimiting"));
-            services.Configure<ClientRateLimitPolicies>(configuration.GetSection("ClientRateLimitPolicies"));
-
-            services.AddDistributedRateLimiting<AsyncKeyLockProcessingStrategy>();
-            services.AddDistributedRateLimiting<RedisProcessingStrategy>();
-            services.AddRedisRateLimiting();
-
-            services.AddSingleton<IClientPolicyStore, DistributedCacheClientPolicyStore>();
-            services.AddSingleton<IRateLimitCounterStore, DistributedCacheRateLimitCounterStore>();
-            services.AddSingleton<IRateLimitConfiguration, Infrastructure.Security.RateLimitConfiguration>();
-        }
-
-        void ConfigureRedisServices()
-        {
-            var connectionString = configuration.GetConnectionString("Redis") ??
-                throw new Exception("Missing Redis connection string.");
-
-            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(connectionString));
-            services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);
-
-            healthCheckBuilder.AddRedis(connectionString);
         }
     }
 }
