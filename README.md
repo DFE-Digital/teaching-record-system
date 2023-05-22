@@ -61,16 +61,6 @@ The CRM user secrets described within [Developer setup](#dynamics-crm) must be c
 The tool is a .NET Framework application and requires .NET 4.6.
 
 
-## API specs
-
-All endpoints exposed by the API are versioned - `v1`, `v2` etc. Each version has its own Swagger doc describing the endpoints within that version.
-The specs are stored in `docs/api-specs`. These specs are published to a docs site during the CI process.
-
-These specs are generated from a deployed instance of the API using `just sync-api-specs`. By default the script looks at https://localhost:5001. To override this location provide the `BaseUrl` parameter e.g. `just sync-api-specs -BaseUrl http://localhost:1234`.
-
-A step in the build pipeline verifies that the specs are in-sync with the implementation. The build will fail if there are discrepancies.
-
-
 ## Environment configuration
 
 Environment-specific configuration is stored in Key Vault inside a single JSON-encoded key named 'APP-CONFIG'.

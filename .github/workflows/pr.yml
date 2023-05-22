@@ -193,24 +193,3 @@ jobs:
     with:
       api_docker_image: ${{ needs.package.outputs.api_docker_image }}
     secrets: inherit
-
-  sync_api_specs:
-    name: Sync API specs
-    needs: deploy_dev
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: extractions/setup-just@v1
-
-    - name: Generate specs
-      run: just sync-api-specs ${{ needs.deploy_dev.outputs.api_url }}
-
-    - name: Verify specs
-      run: |
-        git add docs/api-specs
-        git diff --cached --quiet docs/api-specs || (
-          echo "::error ::API specs are stale; run Sync-ApiSpecs.ps1"
-          exit 1
-        )
