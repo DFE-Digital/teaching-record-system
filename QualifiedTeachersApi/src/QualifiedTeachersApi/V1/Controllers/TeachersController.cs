@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.V1.Requests;
 using QualifiedTeachersApi.V1.Responses;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V1.Controllers;
 
@@ -21,9 +21,10 @@ public class TeachersController : ControllerBase
     }
 
     [HttpGet("{trn}")]
-    [SwaggerOperation(
-        summary: "Teacher",
-        description: "Get an individual teacher by their TRN")]
+    [OpenApiOperation(
+        operationId: "GetTeacher",
+        summary: "Get teacher",
+        description: "Gets a teacher by their DOB and either TRN or NINO")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]

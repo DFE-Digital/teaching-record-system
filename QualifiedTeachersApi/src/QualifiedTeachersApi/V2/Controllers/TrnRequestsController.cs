@@ -1,9 +1,8 @@
-﻿#nullable disable
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V2.Controllers;
 
@@ -19,7 +18,10 @@ public class TrnRequestsController : ControllerBase
     }
 
     [HttpGet("{requestId}")]
-    [SwaggerOperation(summary: "Retrieves a TRN request")]
+    [OpenApiOperation(
+        operationId: "GetTrnRequest",
+        summary: "Get TRN request",
+        description: "Gets a TRN request and the associated teacher's TRN")]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetTrnRequest(GetTrnRequest request)
@@ -29,7 +31,10 @@ public class TrnRequestsController : ControllerBase
     }
 
     [HttpPut("{requestId}")]
-    [SwaggerOperation(summary: "Creates a request for a TRN")]
+    [OpenApiOperation(
+        operationId: "GetOrCreateTrnRequest",
+        summary: "Get or create TRN request",
+        description: "Gets or creates a request for a TRN")]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

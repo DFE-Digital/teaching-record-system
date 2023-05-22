@@ -1,7 +1,7 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.0",
   "info": {
-    "title": "DQT API",
+    "title": "Qualified Teachers API",
     "version": "v3"
   },
   "paths": {
@@ -10,13 +10,14 @@
         "tags": [
           "Certificates"
         ],
-        "summary": "QTS Certificate",
-        "description": "Returns a PDF of the QTS Certificate for the provided TRN holder",
+        "summary": "Get QTS Certificate",
+        "description": "Returns a PDF of the QTS Certificate for the authenticated teacher.",
+        "operationId": "GetQtsCertificate",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
-              "application/json": {
+              "application/pdf": {
                 "schema": {
                   "type": "string",
                   "format": "binary"
@@ -29,29 +30,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              },
-              "application/problem+json": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
           },
           "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
           }
-        }
+        },
+        "security": [
+          {
+            "GetAnIdentityAccessToken": []
+          }
+        ]
       }
     },
     "/v3/certificates/eyts": {
@@ -59,13 +52,14 @@
         "tags": [
           "Certificates"
         ],
-        "summary": "EYTS Certificate",
-        "description": "Returns a PDF of the EYTS Certificate for the provided TRN holder",
+        "summary": "Get EYTS Certificate",
+        "description": "Returns a PDF of the EYTS Certificate for the authenticated teacher.",
+        "operationId": "GetEytsCertificate",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
-              "application/json": {
+              "application/pdf": {
                 "schema": {
                   "type": "string",
                   "format": "binary"
@@ -78,29 +72,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              },
-              "application/problem+json": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
           },
           "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
           }
-        }
+        },
+        "security": [
+          {
+            "GetAnIdentityAccessToken": []
+          }
+        ]
       }
     },
     "/v3/certificates/induction": {
@@ -109,12 +95,13 @@
           "Certificates"
         ],
         "summary": "Induction Certificate",
-        "description": "Returns a PDF of the Induction Certificate for the provided TRN holder",
+        "description": "Returns a PDF of the Induction Certificate for the authenticated teacher.",
+        "operationId": "GetInductionCertificate",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
-              "application/json": {
+              "application/pdf": {
                 "schema": {
                   "type": "string",
                   "format": "binary"
@@ -127,29 +114,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              },
-              "application/problem+json": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
           },
           "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
           }
-        }
+        },
+        "security": [
+          {
+            "GetAnIdentityAccessToken": []
+          }
+        ]
       }
     },
     "/v3/certificates/npq/{qualificationId}": {
@@ -158,24 +137,26 @@
           "Certificates"
         ],
         "summary": "NPQ Certificate",
-        "description": "Returns a PDF of the NPQ Certificate associated with the provided Qualification ID",
+        "description": "Returns a PDF of the NPQ Certificate associated with the provided qualification ID.",
+        "operationId": "GetNpqCertificate",
         "parameters": [
           {
             "name": "qualificationId",
             "in": "path",
-            "description": "The ID of the qualification record associated with the certificate",
             "required": true,
+            "description": "The ID of the qualification record associated with the certificate.",
             "schema": {
               "type": "string",
-              "format": "uuid"
-            }
+              "format": "guid"
+            },
+            "x-position": 1
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
-              "application/json": {
+              "application/pdf": {
                 "schema": {
                   "type": "string",
                   "format": "binary"
@@ -188,29 +169,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              },
-              "application/problem+json": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
           },
           "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
           }
-        }
+        },
+        "security": [
+          {
+            "GetAnIdentityAccessToken": []
+          }
+        ]
       }
     },
     "/v3/teacher": {
@@ -219,20 +192,27 @@
           "Teacher"
         ],
         "summary": "Get the current teacher's details",
-        "description": "Gets the details of the currently authenticated teacher.",
+        "description": "Gets the details for the authenticated teacher.",
+        "operationId": "GetCurrentTeacher",
         "parameters": [
           {
             "name": "include",
             "in": "query",
             "description": "The additional properties to include in the response.",
             "schema": {
-              "$ref": "#/components/schemas/GetTeacherRequestIncludes"
-            }
+              "nullable": true,
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/GetTeacherRequestIncludes"
+                }
+              ]
+            },
+            "x-position": 1
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -242,26 +222,18 @@
             }
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": "Bad Request"
           },
           "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
           }
-        }
+        },
+        "security": [
+          {
+            "GetAnIdentityAccessToken": []
+          }
+        ]
       }
     },
     "/v3/teachers/{trn}": {
@@ -271,6 +243,7 @@
         ],
         "summary": "Get teacher details by TRN",
         "description": "Gets the details of the teacher corresponding to the given TRN.",
+        "operationId": "GetTeacherByTrn",
         "parameters": [
           {
             "name": "trn",
@@ -278,20 +251,27 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "x-position": 1
           },
           {
             "name": "include",
             "in": "query",
             "description": "The additional properties to include in the response.",
             "schema": {
-              "$ref": "#/components/schemas/GetTeacherRequestIncludes"
-            }
+              "nullable": true,
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/GetTeacherRequestIncludes"
+                }
+              ]
+            },
+            "x-position": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -301,24 +281,12 @@
             }
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -332,25 +300,19 @@
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
-              },
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
               }
             }
           },
           "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
           }
-        }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
       }
     },
     "/v3/teachers/name-changes": {
@@ -358,51 +320,38 @@
         "tags": [
           "Teachers"
         ],
-        "summary": "Creates a name change for the teacher with the given TRN",
+        "summary": "Create name change request",
+        "description": "Creates a name change request for the teacher with the given TRN.",
+        "operationId": "CreateNameChange",
         "requestBody": {
+          "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateNameChangeRequest"
               }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateNameChangeRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateNameChangeRequest"
-              }
             }
-          }
+          },
+          "required": true,
+          "x-position": 1
         },
         "responses": {
           "204": {
             "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": "Bad Request"
           },
           "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
           }
-        }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
       }
     },
     "/v3/teachers/date-of-birth-changes": {
@@ -410,113 +359,75 @@
         "tags": [
           "Teachers"
         ],
-        "summary": "Creates a date of birth change for the teacher with the given TRN",
+        "summary": "Create DOB change request",
+        "description": "Creates a date of birth change request for the teacher with the given TRN.",
+        "operationId": "CreateDobChange",
         "requestBody": {
+          "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateDateOfBirthChangeRequest"
               }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateDateOfBirthChangeRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateDateOfBirthChangeRequest"
-              }
             }
-          }
+          },
+          "required": true,
+          "x-position": 1
         },
         "responses": {
           "204": {
             "description": "No Content"
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": "Bad Request"
           },
           "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
           }
-        }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
       }
     }
   },
   "components": {
     "schemas": {
-      "CreateDateOfBirthChangeRequest": {
+      "ProblemDetails": {
         "type": "object",
-        "properties": {
-          "trn": {
-            "type": "string"
-          },
-          "dateOfBirth": {
-            "type": "string",
-            "format": "date"
-          },
-          "evidenceFileName": {
-            "type": "string"
-          },
-          "evidenceFileUrl": {
-            "type": "string"
-          }
+        "additionalProperties": {
+          "nullable": true
         },
-        "additionalProperties": false
-      },
-      "CreateNameChangeRequest": {
-        "type": "object",
         "properties": {
-          "trn": {
-            "type": "string"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "middleName": {
+          "type": {
             "type": "string",
             "nullable": true
           },
-          "lastName": {
-            "type": "string"
+          "title": {
+            "type": "string",
+            "nullable": true
           },
-          "evidenceFileName": {
-            "type": "string"
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           },
-          "evidenceFileUrl": {
-            "type": "string"
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
           }
-        },
-        "additionalProperties": false
-      },
-      "GetTeacherRequestIncludes": {
-        "enum": [
-          "Induction",
-          "InitialTeacherTraining",
-          "NpqQualifications",
-          "MandatoryQualifications",
-          "PendingDetailChanges"
-        ],
-        "type": "string",
-        "description": "Comma-separated list"
+        }
       },
       "GetTeacherResponse": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "trn": {
             "type": "string"
@@ -545,10 +456,20 @@
             "type": "boolean"
           },
           "qts": {
-            "$ref": "#/components/schemas/GetTeacherResponseQts"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GetTeacherResponseQts"
+              }
+            ]
           },
           "eyts": {
-            "$ref": "#/components/schemas/GetTeacherResponseEyts"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GetTeacherResponseEyts"
+              }
+            ]
           },
           "induction": {
             "$ref": "#/components/schemas/GetTeacherResponseInduction"
@@ -571,24 +492,39 @@
               "$ref": "#/components/schemas/GetTeacherResponseMandatoryQualificationsQualification"
             }
           }
-        },
-        "additionalProperties": false
+        }
       },
-      "GetTeacherResponseEyts": {
+      "GetTeacherResponseQts": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "awarded": {
             "type": "string",
             "format": "date"
           },
           "certificateUrl": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
-        },
-        "additionalProperties": false
+        }
+      },
+      "GetTeacherResponseEyts": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "awarded": {
+            "type": "string",
+            "format": "date"
+          },
+          "certificateUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        }
       },
       "GetTeacherResponseInduction": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "startDate": {
             "type": "string",
@@ -601,10 +537,16 @@
             "nullable": true
           },
           "status": {
-            "$ref": "#/components/schemas/InductionStatus"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/InductionStatus"
+              }
+            ]
           },
           "certificateUrl": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "periods": {
             "type": "array",
@@ -612,11 +554,27 @@
               "$ref": "#/components/schemas/GetTeacherResponseInductionPeriod"
             }
           }
-        },
-        "additionalProperties": false
+        }
+      },
+      "InductionStatus": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Exempt",
+          "Fail",
+          "InductionExtended",
+          "PassedinWales"
+        ],
+        "enum": [
+          "Exempt",
+          "Fail",
+          "InductionExtended",
+          "PassedinWales"
+        ]
       },
       "GetTeacherResponseInductionPeriod": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "startDate": {
             "type": "string",
@@ -636,23 +594,28 @@
           "appropriateBody": {
             "$ref": "#/components/schemas/GetTeacherResponseInductionPeriodAppropriateBody"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "GetTeacherResponseInductionPeriodAppropriateBody": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "name": {
             "type": "string"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "GetTeacherResponseInitialTeacherTraining": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "qualification": {
-            "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingQualification"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingQualification"
+              }
+            ]
           },
           "startDate": {
             "type": "string",
@@ -665,16 +628,36 @@
             "nullable": true
           },
           "programmeType": {
-            "$ref": "#/components/schemas/IttProgrammeType"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IttProgrammeType"
+              }
+            ]
           },
           "result": {
-            "$ref": "#/components/schemas/IttOutcome"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IttOutcome"
+              }
+            ]
           },
           "ageRange": {
-            "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingAgeRange"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingAgeRange"
+              }
+            ]
           },
           "provider": {
-            "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingProvider"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingProvider"
+              }
+            ]
           },
           "subjects": {
             "type": "array",
@@ -682,20 +665,49 @@
               "$ref": "#/components/schemas/GetTeacherResponseInitialTeacherTrainingSubject"
             }
           }
-        },
-        "additionalProperties": false
+        }
+      },
+      "GetTeacherResponseInitialTeacherTrainingQualification": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "IttProgrammeType": {
+        "type": "string",
+        "description": ""
+      },
+      "IttOutcome": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Pass",
+          "Fail",
+          "Deferred",
+          "Approved"
+        ],
+        "enum": [
+          "Pass",
+          "Fail",
+          "Deferred",
+          "Approved"
+        ]
       },
       "GetTeacherResponseInitialTeacherTrainingAgeRange": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "description": {
             "type": "string"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "GetTeacherResponseInitialTeacherTrainingProvider": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "name": {
             "type": "string"
@@ -703,20 +715,11 @@
           "ukprn": {
             "type": "string"
           }
-        },
-        "additionalProperties": false
-      },
-      "GetTeacherResponseInitialTeacherTrainingQualification": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
+        }
       },
       "GetTeacherResponseInitialTeacherTrainingSubject": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "code": {
             "type": "string"
@@ -724,24 +727,11 @@
           "name": {
             "type": "string"
           }
-        },
-        "additionalProperties": false
-      },
-      "GetTeacherResponseMandatoryQualificationsQualification": {
-        "type": "object",
-        "properties": {
-          "awarded": {
-            "type": "string",
-            "format": "date"
-          },
-          "specialism": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
+        }
       },
       "GetTeacherResponseNpqQualificationsQualification": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "awarded": {
             "type": "string",
@@ -751,13 +741,14 @@
             "$ref": "#/components/schemas/GetTeacherResponseNpqQualificationsQualificationType"
           },
           "certificateUrl": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
-        },
-        "additionalProperties": false
+        }
       },
       "GetTeacherResponseNpqQualificationsQualificationType": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "code": {
             "$ref": "#/components/schemas/NpqQualificationType"
@@ -765,134 +756,125 @@
           "name": {
             "type": "string"
           }
-        },
-        "additionalProperties": false
+        }
       },
-      "GetTeacherResponseQts": {
+      "NpqQualificationType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "NPQEL",
+          "NPQEYL",
+          "NPQLBC",
+          "NPQML"
+        ],
+        "enum": [
+          "NPQEL",
+          "NPQEYL",
+          "NPQLBC",
+          "NPQML"
+        ]
+      },
+      "GetTeacherResponseMandatoryQualificationsQualification": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "awarded": {
             "type": "string",
             "format": "date"
           },
-          "certificateUrl": {
+          "specialism": {
             "type": "string"
           }
-        },
-        "additionalProperties": false
+        }
       },
-      "InductionStatus": {
-        "enum": [
-          "Exempt",
-          "Fail",
-          "FailedinWales",
-          "InductionExtended",
-          "InProgress",
-          "NotYetCompleted",
-          "Pass",
-          "PassedinWales",
-          "RequiredtoComplete"
+      "GetTeacherRequestIncludes": {
+        "type": "string",
+        "description": "",
+        "x-enumFlags": true,
+        "x-enumNames": [
+          "Induction",
+          "InitialTeacherTraining",
+          "NpqQualifications",
+          "MandatoryQualifications",
+          "PendingDetailChanges"
         ],
-        "type": "string"
-      },
-      "IttOutcome": {
         "enum": [
-          "Pass",
-          "Fail",
-          "Withdrawn",
-          "Deferred",
-          "DeferredForSkillsTests",
-          "ApplicationReceived",
-          "ApplicationUnsuccessful",
-          "Approved",
-          "Info",
-          "InTraining",
-          "NoResultSubmitted",
-          "UnderAssessment"
-        ],
-        "type": "string"
+          "Induction",
+          "InitialTeacherTraining",
+          "NpqQualifications",
+          "MandatoryQualifications",
+          "PendingDetailChanges"
+        ]
       },
-      "IttProgrammeType": {
-        "enum": [
-          "Core",
-          "HEI",
-          "SchoolDirectTrainingProgrammeSelfFunded",
-          "SchoolDirectTrainingProgrammeSalaried",
-          "SchoolDirectTrainingProgramme",
-          "TeachFirstProgrammeCC",
-          "TeachFirstProgramme",
-          "OverseasTrainedTeacherProgramme",
-          "RegisteredTeacherProgramme",
-          "GraduateTeacherProgramme",
-          "AssessmentOnlyRoute",
-          "CoreFlexible",
-          "LicensedTeacherProgramme",
-          "UndergraduateOptIn",
-          "EYITTAssessmentOnly",
-          "EYITTGraduateEntry",
-          "EYITTGraduateEmploymentBased",
-          "EYITTUndergraduate",
-          "EYITTSchoolDirectEarlyYears",
-          "Apprenticeship",
-          "FutureTeachingScholars",
-          "ProviderLedPostgrad",
-          "ProviderLedUndergrad",
-          "InternationalQualifiedTeacherStatus"
-        ],
-        "type": "string"
-      },
-      "NpqQualificationType": {
-        "enum": [
-          "NPQEL",
-          "NPQEYL",
-          "NPQH",
-          "NPQLBC",
-          "NPQLL",
-          "NPQLT",
-          "NPQLTD",
-          "NPQML",
-          "NPQSL"
-        ],
-        "type": "string"
-      },
-      "ProblemDetails": {
+      "CreateNameChangeRequest": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
+          "trn": {
+            "type": "string"
           },
-          "title": {
-            "type": "string",
-            "nullable": true
+          "firstName": {
+            "type": "string"
           },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+          "middleName": {
+            "type": "string"
           },
-          "detail": {
-            "type": "string",
-            "nullable": true
+          "lastName": {
+            "type": "string"
           },
-          "instance": {
-            "type": "string",
-            "nullable": true
+          "evidenceFileName": {
+            "type": "string"
+          },
+          "evidenceFileUrl": {
+            "type": "string"
           }
-        },
-        "additionalProperties": { }
+        }
+      },
+      "CreateDateOfBirthChangeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "trn": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "evidenceFileName": {
+            "type": "string"
+          },
+          "evidenceFileUrl": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "429": {
+        "description": "Too Many Requests",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            }
+          }
+        }
       }
     },
     "securitySchemes": {
-      "Bearer": {
+      "ApiKey": {
         "type": "http",
+        "name": "Authorization",
+        "in": "header",
         "scheme": "Bearer"
+      },
+      "GetAnIdentityAccessToken": {
+        "type": "openIdConnect",
+        "in": "header",
+        "scheme": "Bearer",
+        "openIdConnectUrl": "https://dev.teaching-identity.education.gov.uk/.well-known/openid-configuration"
       }
     }
-  },
-  "security": [
-    {
-      "Bearer": [ ]
-    }
-  ]
+  }
 }

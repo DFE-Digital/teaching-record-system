@@ -1,7 +1,7 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.0",
   "info": {
-    "title": "DQT API",
+    "title": "Qualified Teachers API",
     "version": "v1"
   },
   "paths": {
@@ -10,8 +10,9 @@
         "tags": [
           "Teachers"
         ],
-        "summary": "Teacher",
-        "description": "Get an individual teacher by their TRN",
+        "summary": "Get teacher",
+        "description": "Gets a teacher by their DOB and either TRN or NINO",
+        "operationId": "GetTeacher",
         "parameters": [
           {
             "name": "trn",
@@ -19,28 +20,32 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "x-position": 1
           },
           {
             "name": "birthdate",
             "in": "query",
-            "required": true,
             "schema": {
               "type": "string",
-              "format": "date"
-            }
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 2
           },
           {
             "name": "nino",
             "in": "query",
             "schema": {
-              "type": "string"
-            }
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -50,27 +55,14 @@
             }
           },
           "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found"
           },
           "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "$ref": "#/components/responses/429",
+            "description": "Too Many Requests"
           }
         }
       }
@@ -78,37 +70,9 @@
   },
   "components": {
     "schemas": {
-      "ClassDivision": {
-        "enum": [
-          "FirstClassHonours",
-          "UpperSecondClassHonours",
-          "LowerSecondClassHonours",
-          "UndividedSecondClassHonours",
-          "ThirdClassHonours",
-          "FourthClassHonours",
-          "UnclassifiedHonours",
-          "Aegrotat",
-          "PassFollowingAnHonoursCourse",
-          "Ordinary",
-          "GeneralDegree",
-          "Distinction",
-          "Merit",
-          "Pass",
-          "Notapplicable",
-          "NotKnown",
-          "HigherDegree"
-        ],
-        "type": "string"
-      },
-      "ContactState": {
-        "enum": [
-          "Active",
-          "Inactive"
-        ],
-        "type": "string"
-      },
       "GetTeacherResponse": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "trn": {
             "type": "string",
@@ -119,20 +83,35 @@
             "nullable": true
           },
           "qualified_teacher_status": {
-            "$ref": "#/components/schemas/QualifiedTeacherStatus"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/QualifiedTeacherStatus"
+              }
+            ]
           },
           "induction": {
-            "$ref": "#/components/schemas/Induction"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Induction"
+              }
+            ]
           },
           "initial_teacher_training": {
-            "$ref": "#/components/schemas/InitialTeacherTraining"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/InitialTeacherTraining"
+              }
+            ]
           },
           "qualifications": {
             "type": "array",
+            "nullable": true,
             "items": {
               "$ref": "#/components/schemas/Qualification"
-            },
-            "nullable": true
+            }
           },
           "name": {
             "type": "string",
@@ -154,11 +133,43 @@
             "type": "string",
             "nullable": true
           }
-        },
-        "additionalProperties": false
+        }
+      },
+      "QualifiedTeacherStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "$ref": "#/components/schemas/QtsregistrationState"
+          },
+          "state_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "qts_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "QtsregistrationState": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Inactive"
+        ],
+        "enum": [
+          "Inactive"
+        ]
       },
       "Induction": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "start_date": {
             "type": "string",
@@ -181,18 +192,21 @@
             "type": "string",
             "nullable": true
           }
-        },
-        "additionalProperties": false
+        }
       },
       "InductionState": {
-        "enum": [
-          "Active",
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
           "Inactive"
         ],
-        "type": "string"
+        "enum": [
+          "Inactive"
+        ]
       },
       "InitialTeacherTraining": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "state": {
             "$ref": "#/components/schemas/InitialteachertrainingState"
@@ -247,52 +261,21 @@
             "type": "string",
             "nullable": true
           }
-        },
-        "additionalProperties": false
+        }
       },
       "InitialteachertrainingState": {
-        "enum": [
-          "Active",
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
           "Inactive"
         ],
-        "type": "string"
-      },
-      "ProblemDetails": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": { }
-      },
-      "QtsregistrationState": {
         "enum": [
-          "Active",
           "Inactive"
-        ],
-        "type": "string"
+        ]
       },
       "Qualification": {
         "type": "object",
+        "additionalProperties": false,
         "properties": {
           "name": {
             "type": "string",
@@ -332,44 +315,83 @@
             "nullable": true
           },
           "class": {
-            "$ref": "#/components/schemas/ClassDivision"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ClassDivision"
+              }
+            ]
           }
-        },
-        "additionalProperties": false
+        }
       },
-      "QualifiedTeacherStatus": {
+      "ClassDivision": {
+        "type": "string",
+        "description": ""
+      },
+      "ContactState": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Inactive"
+        ],
+        "enum": [
+          "Inactive"
+        ]
+      },
+      "ProblemDetails": {
         "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
         "properties": {
-          "name": {
+          "type": {
             "type": "string",
             "nullable": true
           },
-          "state": {
-            "$ref": "#/components/schemas/QtsregistrationState"
-          },
-          "state_name": {
+          "title": {
             "type": "string",
             "nullable": true
           },
-          "qts_date": {
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
             "type": "string",
-            "format": "date-time",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
             "nullable": true
           }
-        },
-        "additionalProperties": false
+        }
+      }
+    },
+    "responses": {
+      "429": {
+        "description": "Too Many Requests",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            }
+          }
+        }
       }
     },
     "securitySchemes": {
-      "Bearer": {
+      "ApiKey": {
         "type": "http",
+        "name": "Authorization",
+        "in": "header",
         "scheme": "Bearer"
       }
     }
   },
   "security": [
     {
-      "Bearer": [ ]
+      "ApiKey": []
     }
   ]
 }

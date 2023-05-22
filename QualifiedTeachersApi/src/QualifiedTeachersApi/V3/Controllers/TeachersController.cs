@@ -1,12 +1,13 @@
-﻿using MediatR;
+﻿using System.ComponentModel;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.ModelBinding;
 using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.V3.Requests;
 using QualifiedTeachersApi.V3.Responses;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V3.Controllers;
 
@@ -23,9 +24,9 @@ public class TeachersController : ControllerBase
         _mediator = mediator;
     }
 
-    [Authorize(AuthorizationPolicies.ApiKey)]
     [HttpGet("{trn}")]
-    [SwaggerOperation(
+    [OpenApiOperation(
+        operationId: "GetTeacherByTrn",
         summary: "Get teacher details by TRN",
         description: "Gets the details of the teacher corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
@@ -34,7 +35,7 @@ public class TeachersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(
         [FromRoute] string trn,
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), Description("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
     {
         var request = new GetTeacherRequest()
         {
@@ -54,7 +55,10 @@ public class TeachersController : ControllerBase
     }
 
     [HttpPost("name-changes")]
-    [SwaggerOperation(summary: "Creates a name change for the teacher with the given TRN")]
+    [OpenApiOperation(
+        operationId: "CreateNameChange",
+        summary: "Create name change request",
+        description: "Creates a name change request for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateNameChange([FromBody] CreateNameChangeRequest request)
@@ -64,7 +68,10 @@ public class TeachersController : ControllerBase
     }
 
     [HttpPost("date-of-birth-changes")]
-    [SwaggerOperation(summary: "Creates a date of birth change for the teacher with the given TRN")]
+    [OpenApiOperation(
+        operationId: "CreateDobChange",
+        summary: "Create DOB change request",
+        description: "Creates a date of birth change request for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateDateOfBirthChange([FromBody] CreateDateOfBirthChangeRequest request)

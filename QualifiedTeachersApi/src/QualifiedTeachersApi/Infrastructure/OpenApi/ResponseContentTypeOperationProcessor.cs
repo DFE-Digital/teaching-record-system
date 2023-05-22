@@ -1,17 +1,16 @@
-﻿#nullable disable
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
+﻿using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 
-namespace QualifiedTeachersApi.Infrastructure.Swagger;
+namespace QualifiedTeachersApi.Infrastructure.OpenApi;
 
-public class ResponseContentTypeOperationFilter : IOperationFilter
+public class ResponseContentTypeOperationProcessor : IOperationProcessor
 {
-    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    public bool Process(OperationProcessorContext context)
     {
         // Remove invalid Content-Types for a given response.
         // By convention, success responses are application/json and error responses are application/problem+json.
 
-        foreach (var (key, response) in operation.Responses)
+        foreach (var (key, response) in context.OperationDescription.Operation.Responses)
         {
             foreach (var contentType in response.Content.Keys.ToArray())
             {
@@ -26,5 +25,7 @@ public class ResponseContentTypeOperationFilter : IOperationFilter
                 bool IsClientErrorResponse() => key == "400";
             }
         }
+
+        return true;
     }
 }

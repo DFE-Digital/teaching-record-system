@@ -1,11 +1,10 @@
-﻿#nullable disable
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.V2.Requests;
 using QualifiedTeachersApi.V2.Responses;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace QualifiedTeachersApi.V2.Controllers;
 
@@ -21,7 +20,10 @@ public class IttOutcomeController : ControllerBase
     }
 
     [HttpPut("")]
-    [SwaggerOperation(summary: "Sets ITT outcome for a teacher")]
+    [OpenApiOperation(
+        operationId: "SetIttOutcome",
+        summary: "Set ITT outcome",
+        description: "Sets the ITT outcome for a teacher")]
     [ProducesResponseType(typeof(SetIttOutcomeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
