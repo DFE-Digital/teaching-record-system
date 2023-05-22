@@ -16,7 +16,10 @@ public static class ServiceCollectionExtensions
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            services.AddTransient<IHostedService, LinkTrnToIdentityUserService>();
+            if (configuration.GetValue<bool>("GetAnIdentity:RunLinkTrnToIdentityUserService"))
+            {
+                services.AddTransient<IHostedService, LinkTrnToIdentityUserService>();
+            }
 
             services
                 .AddTransient<ClientCredentialsBearerTokenDelegatingHandler>()
