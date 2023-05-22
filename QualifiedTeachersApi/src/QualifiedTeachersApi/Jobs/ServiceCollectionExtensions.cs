@@ -1,15 +1,13 @@
 using Hangfire;
 using Hangfire.PostgreSql;
-using QualifiedTeachersApi;
 using QualifiedTeachersApi.Jobs.Scheduling;
 
-namespace TeacherIdentity.AuthServer.Services.BackgroundJobs;
+namespace QualifiedTeachersApi.Jobs;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddBackgroundJobs(
         this IServiceCollection services,
-        IConfiguration configuration,
         IWebHostEnvironment environment,
         string postgresConnectionString)
     {
