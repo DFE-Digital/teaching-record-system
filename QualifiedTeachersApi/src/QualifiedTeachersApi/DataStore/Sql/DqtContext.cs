@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using QualifiedTeachersApi.DataStore.Sql.Models;
+using QualifiedTeachersApi.Events;
 
 namespace QualifiedTeachersApi.DataStore.Sql;
 
@@ -17,6 +18,8 @@ public class DqtContext : DbContext
 
     public DbSet<EntityChangesJournal> EntityChangesJournals => Set<EntityChangesJournal>();
 
+    public DbSet<Event> Events => Set<Event>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
     {
         if (connectionString != null)
@@ -30,6 +33,11 @@ public class DqtContext : DbContext
 
         optionsBuilder
             .UseSnakeCaseNamingConvention();
+    }
+
+    public void AddEvent(EventBase @event)
+    {
+        Events.Add(Event.FromEventBase(@event));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
