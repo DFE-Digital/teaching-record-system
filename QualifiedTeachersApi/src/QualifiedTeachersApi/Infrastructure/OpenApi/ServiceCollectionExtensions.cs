@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using NSwag.Examples;
-using QualifiedTeachersApi.Services.GetAnIdentityApi;
+﻿using NSwag.Examples;
 
 namespace QualifiedTeachersApi.Infrastructure.OpenApi;
 
@@ -14,7 +12,7 @@ public static class ServiceCollectionExtensions
         {
             services.AddOpenApiDocument((settings, provider) =>
             {
-                settings.DocumentName = $"Qualified Teachers API {version}";
+                settings.DocumentName = OpenApiDocumentHelper.GetDocumentName(version);
                 settings.Version = version;
                 settings.Title = "Qualified Teachers API";
                 settings.ApiGroupNames = new[] { version };
@@ -65,57 +63,4 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-}
-
-public class OpenApiEndpointsStartupFilter : IStartupFilter
-{
-    private readonly IWebHostEnvironment _environment;
-    private readonly IOptions<GetAnIdentityOptions> _identityOptionsAccessor;
-
-    public OpenApiEndpointsStartupFilter(IWebHostEnvironment environment, IOptions<GetAnIdentityOptions> identityOptionsAccessor)
-    {
-        _environment = environment;
-        _identityOptionsAccessor = identityOptionsAccessor;
-    }
-
-    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
-    {
-        next(app);
-
-        foreach (var version in Api.Constants.Versions)
-        {
-            app.UseOpenApi(settings =>
-            {
-                settings.DocumentName = $"Qualified Teachers API {version}";
-                settings.Path = $"/swagger/{version}/swagger.json";
-
-                settings.PostProcess = (document, request) =>
-                {
-                    document.Host = null;
-                    document.Generator = null;
-                    document.Servers.Clear();
-                };
-            });
-        }
-
-        if (_environment.IsDevelopment())
-        {
-            app.UseSwaggerUi3(settings =>
-            {
-                foreach (var version in Api.Constants.Versions)
-                {
-                    settings.SwaggerRoutes.Add(new NSwag.AspNetCore.SwaggerUi3Route(version, $"/swagger/{version}/swagger.json"));
-                }
-
-                settings.PersistAuthorization = true;
-
-                settings.OAuth2Client = new NSwag.AspNetCore.OAuth2ClientSettings()
-                {
-                    ClientId = _identityOptionsAccessor.Value.ClientId,
-                    ClientSecret = _identityOptionsAccessor.Value.ClientSecret,
-                    UsePkceWithAuthorizationCodeGrant = true
-                };
-            });
-        }
-    };
 }

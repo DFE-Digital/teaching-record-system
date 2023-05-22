@@ -73,7 +73,3 @@ make *ARGS:
 # Generates CRM model types
 generate-crm-models *ARGS:
   @scripts/Generate-CrmModels.ps1 {{ARGS}}
-
-# Synchronize the API specs
-sync-api-specs *ARGS:
-  @scripts/Sync-ApiSpecs {{ARGS}}
