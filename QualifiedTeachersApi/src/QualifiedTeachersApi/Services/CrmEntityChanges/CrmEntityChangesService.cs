@@ -33,6 +33,12 @@ public class CrmEntityChangesService : ICrmEntityChangesService
         int pageSize,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        // CRM ignores page sizes above 5000
+        if (pageSize > 5000)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pageSize));
+        }
+
         using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         // Ensure only one node is processing changes for this key and entity type at a time
