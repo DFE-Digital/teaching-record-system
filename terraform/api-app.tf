@@ -10,16 +10,16 @@ locals {
 
   api_app_config = {
     AppConfig = jsonencode(merge(
+      local.dqt_reporting_connection_string != "" ? { "DqtReporting:ReportingDbConnectionString" = local.dqt_reporting_connection_string } : {},
       jsondecode(local.appconfig_json),
       {
-        "ApplicationInsights:ConnectionString"     = azurerm_application_insights.api_app_insights.connection_string,
-        "AppVersion"                               = var.api_app_version,
-        "ConnectionStrings:DefaultConnection"      = local.pg_connection_string,
-        "ConnectionStrings:Redis"                  = local.redis_connection_string,
-        "DistributedLockContainerName"             = local.distributed_lock_container_name,
-        "DqtReporting:ReportingDbConnectionString" = local.dqt_reporting_connection_string,
-        "PaasEnvironment"                          = var.environment_name,
-        "StorageConnectionString"                  = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}",
+        "ApplicationInsights:ConnectionString" = azurerm_application_insights.api_app_insights.connection_string,
+        "AppVersion"                           = var.api_app_version,
+        "ConnectionStrings:DefaultConnection"  = local.pg_connection_string,
+        "ConnectionStrings:Redis"              = local.redis_connection_string,
+        "DistributedLockContainerName"         = local.distributed_lock_container_name,
+        "PaasEnvironment"                      = var.environment_name,
+        "StorageConnectionString"              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}",
       }
     ))
   }
