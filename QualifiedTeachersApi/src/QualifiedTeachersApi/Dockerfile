@@ -10,7 +10,7 @@ WORKDIR /App
 RUN sed -i'.bak' 's/$/ contrib/' /etc/apt/sources.list
 RUN apt-get update; apt-get install -y ttf-mscorefonts-installer fontconfig
 
-RUN apt-get install -y jq
+ENV PATH="${PATH}:/QtCli"
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 EXPOSE 80
