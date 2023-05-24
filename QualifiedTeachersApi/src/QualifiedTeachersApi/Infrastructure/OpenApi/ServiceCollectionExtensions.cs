@@ -41,7 +41,6 @@ public static class ServiceCollectionExtensions
                     settings.SchemaProcessors.Add(new RemoveEnumValuesSchemaProcessor());
 
                     settings.OperationProcessors.Add(new ResponseContentTypeOperationProcessor());
-                    settings.OperationProcessors.Add(new AddTooManyRequestsResponseOperationProcessor());
                     settings.OperationProcessors.Add(new PopulateResponseDescriptionOperationProcessor());
                     settings.OperationProcessors.Add(new AssignBinaryContentTypeFromProducesOperationProcessor());
 

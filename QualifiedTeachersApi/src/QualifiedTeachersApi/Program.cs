@@ -289,6 +289,10 @@ public class Program
 
         app.UseFastEndpoints(c =>
         {
+            c.Endpoints.Configurator = ep =>
+            {
+                ep.Description(x => x.ClearDefaultProduces(401));
+            };
             c.Serializer.Options.Configure();
             c.Versioning.Prefix = "v";
             c.Versioning.PrependToRoute = true;
