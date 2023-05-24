@@ -1114,6 +1114,38 @@ public partial class DataverseAdapter : IDataverseAdapter
         return contacts.GroupBy(c => c.Id).Select(c => c.First()).ToArray();
     }
 
+    public async Task<Contact[]> FindTeachersByLastNameAndDateOfBirth(string lastName, DateOnly dateOfBirth, string[] columnNames)
+    {
+        var request = new RetrieveMultipleRequest()
+        {
+            Query = new QueryExpression()
+            {
+                ColumnSet = new ColumnSet(columnNames),
+                EntityName = Contact.EntityLogicalName,
+                Criteria = new FilterExpression(LogicalOperator.And)
+                {
+                    Conditions =
+                    {
+                        new ConditionExpression(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active),
+                        new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull),
+                        new ConditionExpression(Contact.Fields.BirthDate, ConditionOperator.Equal, dateOfBirth.ToDateTime()),
+                        new ConditionExpression(Contact.Fields.LastName, ConditionOperator.Equal, lastName)
+                    }
+                },
+                Orders =
+                {
+                    new OrderExpression() { AttributeName = Contact.Fields.LastName },
+                    new OrderExpression() { AttributeName = Contact.Fields.FirstName },
+                    new OrderExpression() { AttributeName = Contact.Fields.dfeta_TRN },
+                }
+            }
+        };
+
+        var response = (RetrieveMultipleResponse)await _service.ExecuteAsync(request);
+
+        return response.EntityCollection.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
+    }
+
     public async Task<Contact> GetTeacherByTsPersonId(string tsPersonId, string[] columnNames)
     {
         var filter = new FilterExpression(LogicalOperator.And);

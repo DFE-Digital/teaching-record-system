@@ -371,12 +371,3 @@ public class Program
         }
     }
 }
-
-[HttpGet("dummy")]
-public class DummyEndpoint : EndpointWithoutRequest
-{
-    public override Task HandleAsync(CancellationToken ct)
-    {
-        return Task.CompletedTask;
-    }
-}
