@@ -2,5 +2,5 @@
 
 public static class Constants
 {
-    public static IReadOnlyCollection<string> Versions { get; } = new[] { "v1", "v2", "v3" }.AsReadOnly();
+    public static IReadOnlyCollection<int> Versions { get; } = new[] { 1, 2, 3 }.AsReadOnly();
 }

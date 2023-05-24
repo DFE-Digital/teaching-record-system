@@ -26,7 +26,7 @@ public class AddSecuritySchemeOperationProcessor : IOperationProcessor
 
             if (authorizationPolicy == AuthorizationPolicies.ApiKey)
             {
-                requirement = new NSwag.OpenApiSecurityRequirement()
+                requirement = new OpenApiSecurityRequirement()
                 {
                     {
                         SecuritySchemes.ApiKey,
@@ -36,7 +36,7 @@ public class AddSecuritySchemeOperationProcessor : IOperationProcessor
             }
             else if (authorizationPolicy == AuthorizationPolicies.IdentityUserWithTrn)
             {
-                requirement = new NSwag.OpenApiSecurityRequirement()
+                requirement = new OpenApiSecurityRequirement()
                 {
                     {
                         SecuritySchemes.GetAnIdentityAccessToken,
