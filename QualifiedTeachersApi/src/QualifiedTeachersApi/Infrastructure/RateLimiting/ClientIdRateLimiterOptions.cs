@@ -1,4 +1,4 @@
-namespace QualifiedTeachersApi.RateLimiting;
+namespace QualifiedTeachersApi.Infrastructure.RateLimiting;
 
 public class ClientIdRateLimiterOptions
 {

@@ -6,7 +6,7 @@ using RedisRateLimiting;
 using RedisRateLimiting.AspNetCore;
 using StackExchange.Redis;
 
-namespace QualifiedTeachersApi.RateLimiting;
+namespace QualifiedTeachersApi.Infrastructure.RateLimiting;
 
 public static class ServiceCollectionExtensions
 {
