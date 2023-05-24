@@ -38,7 +38,7 @@ public class OpenApiEndpointsStartupFilter : IStartupFilter
         {
             foreach (var version in Api.Constants.Versions)
             {
-                settings.SwaggerRoutes.Add(new NSwag.AspNetCore.SwaggerUi3Route(version, OpenApiDocumentHelper.GetDocumentPath(version)));
+                settings.SwaggerRoutes.Add(new NSwag.AspNetCore.SwaggerUi3Route($"v{version}", OpenApiDocumentHelper.GetDocumentPath(version)));
             }
 
             settings.PersistAuthorization = true;

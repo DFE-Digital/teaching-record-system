@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Azure.Storage.Blobs;
+using FastEndpoints;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
@@ -153,6 +154,8 @@ public class Program
                 options.SuppressInferBindingSourcesForParameters = true;
             });
 
+        services.AddFastEndpoints();
+
         services.AddHttpContextAccessor();
 
         services.AddFluentValidationAutoValidation(options => options.DisableDataAnnotationsValidation = true);
@@ -284,6 +287,13 @@ public class Program
             return next();
         });
 
+        app.UseFastEndpoints(c =>
+        {
+            c.Serializer.Options.Configure();
+            c.Versioning.Prefix = "v";
+            c.Versioning.PrependToRoute = true;
+        });
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGet("/health", async context =>
@@ -331,5 +341,14 @@ public class Program
                 RetryPauseTime = TimeSpan.FromSeconds(1)
             };
         }
+    }
+}
+
+[HttpGet("dummy")]
+public class DummyEndpoint : EndpointWithoutRequest
+{
+    public override Task HandleAsync(CancellationToken ct)
+    {
+        return Task.CompletedTask;
     }
 }

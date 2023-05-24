@@ -2,7 +2,9 @@
 
 public static class OpenApiDocumentHelper
 {
-    public static string GetDocumentName(string version) => $"Qualified Teachers API {version}";
+    public static string GetDocumentName(int version) => $"Qualified Teachers API {GetVersionName(version)}";
 
-    public static string GetDocumentPath(string version) => $"/swagger/{version}.json";
+    public static string GetDocumentPath(int version) => $"/swagger/{GetVersionName(version)}.json";
+
+    public static string GetVersionName(int version) => $"v{version}";
 }

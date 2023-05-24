@@ -14,6 +14,14 @@ public class AddTooManyRequestsResponseOperationProcessor : IOperationProcessor
 
         if (document429Response is null)
         {
+            if (!context.SchemaResolver.HasSchema(typeof(ProblemDetails), isIntegerEnumeration: false))
+            {
+                context.SchemaResolver.AddSchema(
+                    typeof(ProblemDetails),
+                    isIntegerEnumeration: false,
+                    context.SchemaGenerator.Generate(typeof(ProblemDetails)));
+            }
+
             var problemDetailsSchema = context.SchemaResolver.GetSchema(typeof(ProblemDetails), isIntegerEnumeration: false);
 
             document429Response = new OpenApiResponse()
