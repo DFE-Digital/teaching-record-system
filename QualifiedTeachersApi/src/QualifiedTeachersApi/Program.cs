@@ -9,6 +9,7 @@ using Medallion.Threading;
 using Medallion.Threading.Azure;
 using Medallion.Threading.FileSystem;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -20,6 +21,7 @@ using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.ApplicationModel;
 using QualifiedTeachersApi.Infrastructure.Configuration;
+using QualifiedTeachersApi.Infrastructure.FastEndpoints;
 using QualifiedTeachersApi.Infrastructure.Json;
 using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.Infrastructure.ModelBinding;
@@ -289,6 +291,32 @@ public class Program
 
         app.UseFastEndpoints(c =>
         {
+            c.Binding.ValueParserFor<DateOnly>(Parsers.DateOnlyParser);
+            c.Binding.ValueParserFor<DateOnly?>(Parsers.NullableDateOnlyParser);
+            c.Binding.FailureMessage = (propertyType, propertyName, attemptedValue) => $"'{attemptedValue}' is not valid.";
+            c.Endpoints.Configurator = ep =>
+            {
+                ep.Description(x => x.ClearDefaultProduces(401));
+            };
+            c.Errors.ProducesMetadataType = typeof(HttpValidationProblemDetails);
+            c.Errors.ResponseBuilder = (failures, ctx, statusCode) =>
+            {
+                var errors = failures
+                    .GroupBy(f => c.Serializer.Options.PropertyNamingPolicy?.ConvertName(f.PropertyName) ?? f.PropertyName)
+                    .ToDictionary(e => e.Key, e => e.Select(m => m.ErrorMessage).ToArray());
+
+                return new ValidationProblemDetails(errors)
+                {
+                    Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+                    Title = "One or more validation errors occurred.",
+                    Status = statusCode,
+                    Instance = ctx.Request.Path,
+                    Extensions =
+                    {
+                        { "traceId", ctx.TraceIdentifier }
+                    }
+                };
+            };
             c.Serializer.Options.Configure();
             c.Versioning.Prefix = "v";
             c.Versioning.PrependToRoute = true;
@@ -344,7 +372,7 @@ public class Program
     }
 }
 
-[HttpGet("dummy")]
+[FastEndpoints.HttpGet("dummy")]
 public class DummyEndpoint : EndpointWithoutRequest
 {
     public override Task HandleAsync(CancellationToken ct)
