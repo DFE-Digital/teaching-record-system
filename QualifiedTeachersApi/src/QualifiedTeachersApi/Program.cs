@@ -20,6 +20,7 @@ using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.ApplicationModel;
 using QualifiedTeachersApi.Infrastructure.Configuration;
+using QualifiedTeachersApi.Infrastructure.FastEndpoints;
 using QualifiedTeachersApi.Infrastructure.Json;
 using QualifiedTeachersApi.Infrastructure.Logging;
 using QualifiedTeachersApi.Infrastructure.ModelBinding;
@@ -289,6 +290,8 @@ public class Program
 
         app.UseFastEndpoints(c =>
         {
+            c.Binding.ValueParserFor<DateOnly>(Parsers.DateOnlyParser);
+            c.Binding.ValueParserFor<DateOnly?>(Parsers.NullableDateOnlyParser);
             c.Endpoints.Configurator = ep =>
             {
                 ep.Description(x => x.ClearDefaultProduces(401));
