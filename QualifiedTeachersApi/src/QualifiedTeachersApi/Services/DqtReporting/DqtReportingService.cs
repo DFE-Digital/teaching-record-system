@@ -74,9 +74,7 @@ public partial class DqtReportingService : BackgroundService
                 }
 
                 // If we've hit CRM API limits, back off and retry later
-                if (ex is FaultException<OrganizationServiceFault> fault &&
-                    fault.Detail.ErrorDetails.TryGetValue("Retry-After", out var retryAfterObj) &&
-                    retryAfterObj is TimeSpan retryAfter)
+                if (ex.IsCrmRateLimitException(out var retryAfter))
                 {
                     _logger.LogWarning(ex, "Hit CRM rate limit error.");
 
@@ -95,16 +93,40 @@ public partial class DqtReportingService : BackgroundService
     {
         foreach (var entity in _options.Entities)
         {
-            var entityMetadata = await _dataverseAdapter.GetEntityMetadata(entity, EntityFilters.Default | EntityFilters.Attributes);
+            const int maxAttempts = 5;
+            var attempts = 0;
 
-            if (entityMetadata.ChangeTrackingEnabled != true)
+            while (true)
             {
-                throw new Exception($"Entity '{entity}' does not have change tracking enabled.");
+                attempts++;
+
+                try
+                {
+                    var entityMetadata = await _dataverseAdapter.GetEntityMetadata(entity, EntityFilters.Default | EntityFilters.Attributes);
+
+                    if (entityMetadata.ChangeTrackingEnabled != true)
+                    {
+                        throw new Exception($"Entity '{entity}' does not have change tracking enabled.");
+                    }
+
+                    var entityTableMapping = EntityTableMapping.Create(entityMetadata);
+
+                    _entityMetadata[entity] = (entityMetadata, entityTableMapping);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    if (ex.IsCrmRateLimitException(out var retryAfter) && attempts < maxAttempts)
+                    {
+                        _logger.LogWarning(ex, "Failed retrieving metadata from CRM.");
+
+                        await Task.Delay(retryAfter);
+                        continue;
+                    }
+
+                    throw;
+                }
             }
-
-            var entityTableMapping = EntityTableMapping.Create(entityMetadata);
-
-            _entityMetadata[entity] = (entityMetadata, entityTableMapping);
         }
     }
 
@@ -439,5 +461,22 @@ public partial class DqtReportingService : BackgroundService
 
             onDeletedCounterUpdated(deleted);
         }
+    }
+}
+
+file static class ExceptionExtensions
+{
+    public static bool IsCrmRateLimitException(this Exception exception, out TimeSpan retryAfter)
+    {
+        if (exception is FaultException<OrganizationServiceFault> fault &&
+            fault.Detail.ErrorDetails.TryGetValue("Retry-After", out var retryAfterObj) &&
+            retryAfterObj is TimeSpan retryAfterTs)
+        {
+            retryAfter = retryAfterTs;
+            return true;
+        }
+
+        retryAfter = default;
+        return false;
     }
 }
