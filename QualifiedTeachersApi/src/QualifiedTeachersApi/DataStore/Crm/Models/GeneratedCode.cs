@@ -846,6 +846,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_trnrequired = "dfeta_trnrequired";
 			public const string dfeta_TSPersonID = "dfeta_tspersonid";
 			public const string EMailAddress1 = "emailaddress1";
+			public const string EMailAddress2 = "emailaddress2";
 			public const string FirstName = "firstname";
 			public const string FullName = "fullname";
 			public const string GenderCode = "gendercode";
@@ -1384,6 +1385,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("EMailAddress1");
 				this.SetAttributeValue("emailaddress1", value);
 				this.OnPropertyChanged("EMailAddress1");
+			}
+		}
+		
+		/// <summary>
+		/// Type the secondary email address for the contact.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("emailaddress2")]
+		public string EMailAddress2
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("emailaddress2");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("EMailAddress2");
+				this.SetAttributeValue("emailaddress2", value);
+				this.OnPropertyChanged("EMailAddress2");
 			}
 		}
 		
