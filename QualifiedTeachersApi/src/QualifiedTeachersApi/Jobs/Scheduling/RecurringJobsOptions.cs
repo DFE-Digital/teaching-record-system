@@ -7,7 +7,7 @@ public class RecurringJobsOptions
 
 public class BatchSendQtsAwardedEmailsJobOptions
 {
-    public required DateTime InitialLastAwardedDateUtc { get; init; }
+    public required DateTime InitialLastAwardedToUtc { get; init; }
     public required int EmailDelayDays { get; init; } = 3;
     public required string JobSchedule { get; init; }
 }

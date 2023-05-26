@@ -865,6 +865,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string Referencedcontact_master_contact = "Referencedcontact_master_contact";
 			public const string Referencedcontact_parent_contact = "Referencedcontact_parent_contact";
 			public const string Contact_Tasks = "Contact_Tasks";
+			public const string dfeta_contact_dfeta_businesseventaudit_Person = "dfeta_contact_dfeta_businesseventaudit_Person";
 			public const string dfeta_contact_dfeta_document = "dfeta_contact_dfeta_document";
 			public const string dfeta_contact_dfeta_induction = "dfeta_contact_dfeta_induction";
 			public const string dfeta_contact_dfeta_induction1 = "dfeta_contact_dfeta_induction1";
@@ -1784,6 +1785,26 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 		}
 		
 		/// <summary>
+		/// 1:N dfeta_contact_dfeta_businesseventaudit_Person
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_businesseventaudit_Person")]
+		public System.Collections.Generic.IEnumerable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_businesseventaudit> dfeta_contact_dfeta_businesseventaudit_Person
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_businesseventaudit>("dfeta_contact_dfeta_businesseventaudit_Person", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_contact_dfeta_businesseventaudit_Person");
+				this.SetRelatedEntities<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_businesseventaudit>("dfeta_contact_dfeta_businesseventaudit_Person", null, value);
+				this.OnPropertyChanged("dfeta_contact_dfeta_businesseventaudit_Person");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N dfeta_contact_dfeta_document
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_document")]
@@ -2146,6 +2167,218 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_dfeta_qtsregistration_contact");
 				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_qtsregistration>("dfeta_dfeta_qtsregistration_contact", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_contact");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_businesseventauditState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_businesseventaudit")]
+	public partial class dfeta_businesseventaudit : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_businesseventaudit entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string CreatedOn = "createdon";
+			public const string dfeta_changedfield = "dfeta_changedfield";
+			public const string dfeta_NewValue = "dfeta_newvalue";
+			public const string dfeta_OldValue = "dfeta_oldvalue";
+			public const string dfeta_Person = "dfeta_person";
+			public const string dfeta_contact_dfeta_businesseventaudit_Person = "dfeta_contact_dfeta_businesseventaudit_Person";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_businesseventaudit() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "dfeta_businesseventaudit";
+		
+		public const string PrimaryIdAttribute = "dfeta_businesseventauditid";
+		
+		public const string PrimaryNameAttribute = "dfeta_changedfield";
+		
+		public const string EntityLogicalName = "dfeta_businesseventaudit";
+		
+		public const string EntityLogicalCollectionName = "dfeta_businesseventaudits";
+		
+		public const string EntitySetName = "dfeta_businesseventaudits";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the record was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+		
+		/// <summary>
+		/// The name of the custom entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_changedfield")]
+		public string dfeta_changedfield
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_changedfield");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_changedfield");
+				this.SetAttributeValue("dfeta_changedfield", value);
+				this.OnPropertyChanged("dfeta_changedfield");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_newvalue")]
+		public string dfeta_NewValue
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_newvalue");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_NewValue");
+				this.SetAttributeValue("dfeta_newvalue", value);
+				this.OnPropertyChanged("dfeta_NewValue");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_oldvalue")]
+		public string dfeta_OldValue
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_oldvalue");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_OldValue");
+				this.SetAttributeValue("dfeta_oldvalue", value);
+				this.OnPropertyChanged("dfeta_OldValue");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for Person associated with Business Event Audit.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_person")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_Person
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((Microsoft.Xrm.Sdk.EntityReference)(System.Enum.ToObject(typeof(Microsoft.Xrm.Sdk.EntityReference), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Person");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("dfeta_Person");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_contact_dfeta_businesseventaudit_Person
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_person")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_businesseventaudit_Person")]
+		public QualifiedTeachersApi.DataStore.Crm.Models.Contact dfeta_contact_dfeta_businesseventaudit_Person
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("dfeta_contact_dfeta_businesseventaudit_Person", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_contact_dfeta_businesseventaudit_Person");
+				this.SetRelatedEntity<QualifiedTeachersApi.DataStore.Crm.Models.Contact>("dfeta_contact_dfeta_businesseventaudit_Person", null, value);
+				this.OnPropertyChanged("dfeta_contact_dfeta_businesseventaudit_Person");
 			}
 		}
 	}
@@ -8278,6 +8511,18 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			get
 			{
 				return this.CreateQuery<QualifiedTeachersApi.DataStore.Crm.Models.Contact>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="QualifiedTeachersApi.DataStore.Crm.Models.dfeta_businesseventaudit"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_businesseventaudit> dfeta_businesseventauditSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_businesseventaudit>();
 			}
 		}
 		

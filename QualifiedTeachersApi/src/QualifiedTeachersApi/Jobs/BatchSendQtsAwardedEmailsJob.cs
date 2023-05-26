@@ -31,15 +31,15 @@ public class BatchSendQtsAwardedEmailsJob
 
     public async Task Execute(CancellationToken cancellationToken)
     {
-        var lastAwardedToUtc = _batchSendQtsAwardedEmailsJobOptions.InitialLastAwardedDateUtc;
+        var lastAwardedToUtc = _batchSendQtsAwardedEmailsJobOptions.InitialLastAwardedToUtc;
         var lastExecutedJob = await _dbContext.QtsAwardedEmailsJobs.OrderBy(j => j.ExecutedUtc).LastOrDefaultAsync();
         if (lastExecutedJob != null)
         {
             lastAwardedToUtc = lastExecutedJob.AwardedToUtc;
         }
 
-        // Look for QTS up to the end of the day the configurable amount of days ago to provide a delay between award and email being sent.
-        var awardedToUtc = (_clock.Today.ToDateTime() - TimeSpan.FromDays(_batchSendQtsAwardedEmailsJobOptions.EmailDelayDays + 1)) - TimeSpan.FromSeconds(1);
+        // Look for new QTS awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.
+        var awardedToUtc = (_clock.Today.ToDateTime() - TimeSpan.FromDays(_batchSendQtsAwardedEmailsJobOptions.EmailDelayDays)).AddDays(1) - TimeSpan.FromSeconds(1);
 
         var executed = _clock.UtcNow;
         var startDate = lastAwardedToUtc.AddSeconds(1);
