@@ -51,6 +51,13 @@
     "telephone1",
     "dfeta_slugid"
   ],
+  "dfeta_businesseventaudit":[
+    "createdon",
+    "dfeta_changedfield",
+    "dfeta_newvalue",
+    "dfeta_oldvalue",
+    "dfeta_person"
+  ],
   "dfeta_country": [
     "dfeta_name",
     "dfeta_value",
