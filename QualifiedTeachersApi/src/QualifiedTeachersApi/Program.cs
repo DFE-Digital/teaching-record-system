@@ -15,8 +15,10 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.FeatureManagement;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Moq;
 using Prometheus;
 using QualifiedTeachersApi.DataStore.Crm;
+using QualifiedTeachersApi.DataStore.Crm.Models;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Filters;
 using QualifiedTeachersApi.Infrastructure.ApplicationModel;
@@ -31,10 +33,12 @@ using QualifiedTeachersApi.Infrastructure.Redis;
 using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.Jobs;
 using QualifiedTeachersApi.Services;
+using QualifiedTeachersApi.Services.AccessYourQualifications;
 using QualifiedTeachersApi.Services.Certificates;
 using QualifiedTeachersApi.Services.CrmEntityChanges;
 using QualifiedTeachersApi.Services.DqtReporting;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
+using QualifiedTeachersApi.Services.Notify;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
 using QualifiedTeachersApi.Validation;
 using Serilog;
@@ -231,20 +235,49 @@ public class Program
 
         services.AddTrnGenerationApi(configuration);
         services.AddIdentityApi(configuration, env);
+        services.AddAccessYourQualifications(configuration, env);
         services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
         services.AddDqtReporting(builder.Configuration);
-        services.AddBackgroundJobs(env, pgConnectionString);
+        services.AddBackgroundJobs(env, configuration, pgConnectionString);
+        services.AddEmail(env, configuration);
 
-        if (env.EnvironmentName != "Testing")
+        ////if (env.EnvironmentName != "Testing")
+        ////{
+        ////    var crmServiceClient = GetCrmServiceClient();
+
+        ////    services.AddTransient<IOrganizationServiceAsync>(_ => crmServiceClient.Clone());
+        ////    services.AddTransient<IDataverseAdapter, DataverseAdapter>();
+
+        ////    healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
+        ////}
+
+        // TODO set up mock dataverse adapter and make it return some QtsAwardees
+        var qtsAwardees = new[]
         {
-            var crmServiceClient = GetCrmServiceClient();
+            new QtsAwardee
+            {
+                TeacherId = Guid.NewGuid(),
+                Trn = "1234567",
+                FirstName = "Bob",
+                LastName = "Bobbins",
+                EmailAddress = "andrew.horth@digital.education.gov.uk"
+            },
+            new QtsAwardee
+            {
+                TeacherId = Guid.NewGuid(),
+                Trn = "7654321",
+                FirstName = "Dave",
+                LastName = "Davis",
+                EmailAddress = "andrew@horth.co.uk"
+            }
+        };
 
-            services.AddTransient<IOrganizationServiceAsync>(_ => crmServiceClient.Clone());
-            services.AddTransient<IDataverseAdapter, DataverseAdapter>();
-
-            healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
-        }
+        var dataverseAdapter = Mock.Of<IDataverseAdapter>();
+        Mock.Get(dataverseAdapter)
+            .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(qtsAwardees);
+        services.AddSingleton(dataverseAdapter);
 
         if (env.IsProduction())
         {

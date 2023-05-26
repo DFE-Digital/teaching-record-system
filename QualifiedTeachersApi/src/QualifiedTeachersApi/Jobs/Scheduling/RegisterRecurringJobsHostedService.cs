@@ -1,15 +1,19 @@
 using Hangfire;
+using Microsoft.Extensions.Options;
 
 namespace QualifiedTeachersApi.Jobs.Scheduling;
 
 public class RegisterRecurringJobsHostedService : IHostedService
 {
     private readonly IRecurringJobManager _recurringJobManager;
+    private readonly RecurringJobsOptions _recurringJobsOptions;
 
     public RegisterRecurringJobsHostedService(
-        IRecurringJobManager recurringJobManager)
+        IRecurringJobManager recurringJobManager,
+        IOptions<RecurringJobsOptions> recurringJobsOptions)
     {
         _recurringJobManager = recurringJobManager;
+        _recurringJobsOptions = recurringJobsOptions.Value;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -22,5 +26,6 @@ public class RegisterRecurringJobsHostedService : IHostedService
 
     private void RegisterJobs()
     {
+        _recurringJobManager.AddOrUpdate<BatchSendQtsAwardedEmailsJob>(nameof(BatchSendQtsAwardedEmailsJob), job => job.Execute(CancellationToken.None), _recurringJobsOptions.BatchSendQtsAwardedEmails.JobSchedule);
     }
 }

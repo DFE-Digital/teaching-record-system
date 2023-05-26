@@ -41,7 +41,7 @@ public class ClientCredentialsBearerTokenDelegatingHandler : DelegatingHandler
             Address = _options.TokenEndpoint,
             ClientId = _options.ClientId,
             ClientSecret = _options.ClientSecret,
-            Scope = "user:write user:read"
+            Scope = "user:write user:read trn_token:write"
         });
 
         _accessToken = tokenResponse.AccessToken;

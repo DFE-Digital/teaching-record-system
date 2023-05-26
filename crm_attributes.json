@@ -38,6 +38,7 @@
     "dfeta_trnallocaterequest",
     "dfeta_trnrequired",
     "emailaddress1",
+    "emailaddress2",
     "firstname",
     "fullname",
     "gendercode",
