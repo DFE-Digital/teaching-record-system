@@ -61,7 +61,8 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
             Status = status,
             Trn = trn,
             QtsDate = qtsDate,
-            PotentialDuplicate = status == TrnRequestStatus.Pending
+            PotentialDuplicate = status == TrnRequestStatus.Pending,
+            SlugId = teacher.dfeta_SlugId
         };
     }
 }

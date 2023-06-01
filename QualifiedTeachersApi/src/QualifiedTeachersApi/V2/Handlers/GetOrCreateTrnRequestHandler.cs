@@ -139,7 +139,8 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                     null,
                 QtsDate = request.QtsDate,
                 InductionRequired = request.InductionRequired,
-                UnderNewOverseasRegulations = request.UnderNewOverseasRegulations
+                UnderNewOverseasRegulations = request.UnderNewOverseasRegulations,
+                SlugId = request.SlugId
             });
 
             if (!createTeacherResult.Succeeded)
@@ -172,7 +173,8 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             Trn = trn,
             Status = status,
             QtsDate = qtsDate,
-            PotentialDuplicate = status == TrnRequestStatus.Pending
+            PotentialDuplicate = status == TrnRequestStatus.Pending,
+            SlugId = request.SlugId
         };
     }
 

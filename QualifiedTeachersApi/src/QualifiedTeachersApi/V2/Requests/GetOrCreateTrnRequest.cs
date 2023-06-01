@@ -40,6 +40,7 @@ public class GetOrCreateTrnRequest : IRequest<TrnRequestInfo>
     public bool? InductionRequired { get; set; }
     public Guid? IdentityUserId { get; set; }
     public bool? UnderNewOverseasRegulations { get; set; }
+    public string SlugId { get; set; }
 }
 
 public class GetOrCreateTrnRequestAddress

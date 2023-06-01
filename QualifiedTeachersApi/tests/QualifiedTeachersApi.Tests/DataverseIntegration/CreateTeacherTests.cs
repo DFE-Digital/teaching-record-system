@@ -435,6 +435,139 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     }
 
     [Fact]
+    public async Task Given_itt_slugid_exists_request_succeeds_and_creates_review_task()
+    {
+        // Arrange
+        var slugId = Guid.NewGuid().ToString();
+        var teachercommand1 = new CreateTeacherCommand()
+        {
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            BirthDate = Faker.Identification.DateOfBirth(),
+            GenderCode = Contact_GenderCode.Female,
+            InitialTeacherTraining = new()
+            {
+                ProviderUkprn = "10044534",  // ARK Teacher Training
+                ProgrammeStartDate = new(2020, 4, 1),
+                ProgrammeEndDate = new(2020, 10, 10),
+                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
+            },
+            SlugId = slugId
+        };
+
+        //teacher has ITT record with slugid that exists because it was created above
+        var teachercommand2 = new CreateTeacherCommand()
+        {
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            BirthDate = Faker.Identification.DateOfBirth(),
+            GenderCode = Contact_GenderCode.Female,
+            InitialTeacherTraining = new()
+            {
+                ProviderUkprn = "10044534",  // ARK Teacher Training
+                ProgrammeStartDate = new(2020, 4, 1),
+                ProgrammeEndDate = new(2020, 10, 10),
+                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
+
+            },
+            SlugId = slugId
+        };
+        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImpl(teachercommand1);
+
+        // Act
+        var (result2, transactionRequest2) = await _dataverseAdapter.CreateTeacherImpl(teachercommand2);
+
+        // Assert
+        Assert.True(result1.Succeeded);
+        transactionRequest1.AssertDoesNotContainCreateRequest<CrmTask>();
+        Assert.True(result2.Succeeded);
+        transactionRequest2.AssertContainsCreateRequest<CrmTask>(x => x.Description.Contains($"- ITT SlugId: '{slugId}'"));
+    }
+
+    [Fact]
+    public async Task Given_slugid_does_not_exist_request_succeeds_and_does_not_creates_review_task()
+    {
+        // Arrange
+        var slugId = Guid.NewGuid().ToString();
+        var teachercommand1 = new CreateTeacherCommand()
+        {
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            BirthDate = Faker.Identification.DateOfBirth(),
+            GenderCode = Contact_GenderCode.Female,
+            InitialTeacherTraining = new()
+            {
+                ProviderUkprn = "10044534",  // ARK Teacher Training
+                ProgrammeStartDate = new(2020, 4, 1),
+                ProgrammeEndDate = new(2020, 10, 10),
+                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
+            },
+            SlugId = slugId
+        };
+
+        // Act
+        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImpl(teachercommand1);
+
+        // Assert
+        Assert.True(result1.Succeeded);
+        transactionRequest1.AssertDoesNotContainCreateRequest<CrmTask>();
+    }
+
+    [Fact]
+    public async Task Given_teacher_slugid_exists_request_succeeds_and_creates_review_task()
+    {
+        // Arrange
+        var slugId = Guid.NewGuid().ToString();
+        var teachercommand1 = new CreateTeacherCommand()
+        {
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            BirthDate = Faker.Identification.DateOfBirth(),
+            GenderCode = Contact_GenderCode.Female,
+            InitialTeacherTraining = new()
+            {
+                ProviderUkprn = "10044534",  // ARK Teacher Training
+                ProgrammeStartDate = new(2020, 4, 1),
+                ProgrammeEndDate = new(2020, 10, 10),
+                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
+            },
+            SlugId = slugId
+        };
+
+        //teacher with slugid already exists because it was created above
+        var teachercommand2 = new CreateTeacherCommand()
+        {
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            BirthDate = Faker.Identification.DateOfBirth(),
+            GenderCode = Contact_GenderCode.Female,
+            InitialTeacherTraining = new()
+            {
+                ProviderUkprn = "10044534",  // ARK Teacher Training
+                ProgrammeStartDate = new(2020, 4, 1),
+                ProgrammeEndDate = new(2020, 10, 10),
+                ProgrammeType = dfeta_ITTProgrammeType.GraduateTeacherProgramme,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
+            },
+            SlugId = slugId
+        };
+        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImpl(teachercommand1);
+
+        // Act
+        var (result2, transactionRequest2) = await _dataverseAdapter.CreateTeacherImpl(teachercommand2);
+
+        // Assert
+        Assert.True(result1.Succeeded);
+        transactionRequest1.AssertDoesNotContainCreateRequest<CrmTask>();
+        Assert.True(result2.Succeeded);
+        transactionRequest2.AssertContainsCreateRequest<CrmTask>(x => x.Description.Contains($"- SlugId: '{slugId}'"));
+    }
+
+    [Fact]
     public async Task Given_husid_exists_request_succeeds_and_creates_review_task()
     {
         // Arrange
@@ -779,6 +912,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var firstName2 = Faker.Name.First();
         var middleName = Faker.Name.Middle();
         var lastName = Faker.Name.Last();
+        var slugId = Guid.NewGuid().ToString();
 
         var command = new CreateTeacherCommand()
         {
@@ -790,6 +924,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
             StatedLastName = lastName,
             BirthDate = Faker.Identification.DateOfBirth(),
             EmailAddress = Faker.Internet.Email(),
+            SlugId = slugId,
             Address = new()
             {
                 AddressLine1 = Faker.Address.StreetAddress(),

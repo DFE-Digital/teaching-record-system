@@ -165,6 +165,46 @@ public partial class DataverseAdapter : IDataverseAdapter
         bool activeOnly = true) =>
         GetInitialTeacherTrainingByTeacher(teacherId, columnNames, establishmentColumnNames, subjectColumnNames, qualificationColumnNames, requestBuilder: null, activeOnly);
 
+
+    public async Task<Contact[]> GetTeachersByInitialTeacherTrainingSlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true)
+    {
+        requestBuilder ??= RequestBuilder.CreateSingle(_service);
+        var query = new QueryExpression(Contact.EntityLogicalName)
+        {
+            ColumnSet = new ColumnSet(new string[] { Contact.Fields.dfeta_TRN })
+        };
+
+        if (activeOnly == true)
+        {
+            query.Criteria.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+        }
+
+        AddContactLink(query, Contact.EntityLogicalCollectionName, new string[] { dfeta_initialteachertraining.Fields.dfeta_SlugId }, slugId);
+
+        var request = new RetrieveMultipleRequest()
+        {
+            Query = query
+        };
+
+        var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+
+        return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Contact>()).ToArray();
+
+        static void AddContactLink(QueryExpression query, string alias, string[] columnNames, string slugId)
+        {
+            var contactLink = query.AddLink(
+                dfeta_initialteachertraining.EntityLogicalName,
+                Contact.PrimaryIdAttribute,
+                dfeta_initialteachertraining.Fields.dfeta_PersonId,
+                JoinOperator.Inner);
+
+            contactLink.Columns = new ColumnSet(columnNames);
+            contactLink.EntityAlias = alias;
+            contactLink.LinkCriteria.AddCondition(dfeta_initialteachertraining.Fields.dfeta_SlugId, ConditionOperator.Equal, slugId);
+        }
+    }
+
     public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
         Guid teacherId,
         string[] columnNames,
@@ -231,6 +271,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         };
 
         var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
 
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>()).ToArray();
 
@@ -866,6 +907,23 @@ public partial class DataverseAdapter : IDataverseAdapter
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Contact.Fields.dfeta_HUSID, ConditionOperator.Equal, husId);
+        filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+
+        var query = new QueryExpression(Contact.EntityLogicalName)
+        {
+            ColumnSet = new(columnNames),
+            Criteria = filter
+        };
+
+        var result = await _service.RetrieveMultipleAsync(query);
+
+        return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
+    }
+
+    public async Task<Contact[]> GetTeachersBySlugId(string slugId, string[] columnNames)
+    {
+        var filter = new FilterExpression(LogicalOperator.And);
+        filter.AddCondition(Contact.Fields.dfeta_SlugId, ConditionOperator.Equal, slugId);
         filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
 
         var query = new QueryExpression(Contact.EntityLogicalName)

@@ -1,6 +1,7 @@
 #nullable disable
 using Microsoft.Xrm.Sdk.Metadata;
 using QualifiedTeachersApi.DataStore.Crm.Models;
+using static QualifiedTeachersApi.DataStore.Crm.DataverseAdapter;
 
 namespace QualifiedTeachersApi.DataStore.Crm;
 
@@ -92,6 +93,8 @@ public interface IDataverseAdapter
     Task<Incident[]> GetIncidentsByContactId(Guid contactId, IncidentState? state, string[] columnNames);
 
     Task<EntityMetadata> GetEntityMetadata(string entityLogicalName, EntityFilters entityFilters = EntityFilters.Default);
+
+    Task<Contact[]> GetTeachersByInitialTeacherTrainingSlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);
 
     Task<QtsAwardee[]> GetQtsAwardeesForDateRange(DateTime startDate, DateTime endDate);
 
