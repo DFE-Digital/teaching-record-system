@@ -15,7 +15,7 @@ public class QtsAwardedEmailsJobItemMapping : IEntityTypeConfiguration<QtsAwarde
         builder.HasKey(i => new { i.QtsAwardedEmailsJobId, i.PersonId });
         builder.Property(i => i.Trn).IsRequired().HasMaxLength(7).IsFixedLength();
         builder.Property(i => i.EmailAddress).IsRequired().HasMaxLength(200);
-        builder.Property(i => i.Personalization).HasConversion<DictionaryValueConverter, DictionaryValueComparer>().IsRequired().HasColumnType("jsonb");
+        builder.Property(i => i.Personalization).HasJsonConversion().IsRequired().HasColumnType("jsonb");
         builder.HasIndex(i => i.Personalization).HasMethod("gin");
         builder.HasOne(i => i.QtsAwardedEmailsJob).WithMany(j => j.JobItems).HasForeignKey(i => i.QtsAwardedEmailsJobId);
     }
