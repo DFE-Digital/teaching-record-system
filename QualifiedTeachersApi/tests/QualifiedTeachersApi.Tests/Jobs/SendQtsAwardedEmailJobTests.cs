@@ -103,7 +103,7 @@ public class SendQtsAwardedEmailJobTests : IAsyncLifetime
                                 .ToListAsync();
         var emailSentEvent = events
                 .Select(e => JsonSerializer.Deserialize<QtsAwardedEmailSentEvent>(e.Payload))
-                .Where(e => e.QtsAwardedEmailsJobId == qtsAwardedEmailsJobId && e.PersonId == personId)
+                .Where(e => e!.QtsAwardedEmailsJobId == qtsAwardedEmailsJobId && e.PersonId == personId)
                 .SingleOrDefault();
         Assert.NotNull(emailSentEvent);
     }
