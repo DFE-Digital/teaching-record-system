@@ -7,7 +7,7 @@ public static class ServiceCollectionExtensions
         IWebHostEnvironment environment,
         IConfiguration configuration)
     {
-        if (environment.IsProduction() || true)
+        if (environment.IsProduction())
         {
             services.AddOptions<NotifyOptions>()
                 .Bind(configuration.GetSection("Notify"))

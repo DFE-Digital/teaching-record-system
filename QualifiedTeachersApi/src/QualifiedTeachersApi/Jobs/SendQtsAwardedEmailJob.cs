@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using QualifiedTeachersApi.DataStore.Sql;
 using QualifiedTeachersApi.Events;
@@ -36,20 +35,16 @@ public class SendQtsAwardedEmailJob
 
     public async Task Execute(Guid qtsAwardedEmailsJobId, Guid personId)
     {
-        var item = await _dbContext.QtsAwardedEmailsJobItems.SingleOrDefaultAsync(i => i.QtsAwardedEmailsJobId == qtsAwardedEmailsJobId && i.PersonId == personId);
-        if (item == null)
-        {
-            return;
-        }
-
-        var request = new CreateTrnTokenRequest
-        {
-            Trn = item.Trn,
-            Email = item.EmailAddress
-        };
+        var item = await _dbContext.QtsAwardedEmailsJobItems.SingleAsync(i => i.QtsAwardedEmailsJobId == qtsAwardedEmailsJobId && i.PersonId == personId);
 
         if (!item.Personalization.ContainsKey(LinkToAccessYourQualificationsServicePersonalisationKey))
         {
+            var request = new CreateTrnTokenRequest
+            {
+                Trn = item.Trn,
+                Email = item.EmailAddress
+            };
+
             var tokenResponse = await _identityApiClient.CreateTrnToken(request);
             item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourQualificationsOptions.BaseAddress}/qualifications/start?trn_token={tokenResponse.TrnToken}";
         }
@@ -64,7 +59,7 @@ public class SendQtsAwardedEmailJob
             EmailAddress = item.EmailAddress,
             CreatedUtc = _clock.UtcNow,
         });
-        
+
         await _dbContext.SaveChangesAsync();
     }
 }

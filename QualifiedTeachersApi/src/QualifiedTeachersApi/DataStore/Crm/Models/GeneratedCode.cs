@@ -830,6 +830,8 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string Address1_Line3 = "address1_line3";
 			public const string Address1_PostalCode = "address1_postalcode";
 			public const string BirthDate = "birthdate";
+			public const string ContactId = "contactid";
+			public const string Id = "contactid";
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_HUSID = "dfeta_husid";
@@ -1066,6 +1068,49 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				this.OnPropertyChanging("BirthDate");
 				this.SetAttributeValue("birthdate", value);
 				this.OnPropertyChanged("BirthDate");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the contact.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("contactid")]
+		public System.Nullable<System.Guid> ContactId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("contactid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ContactId");
+				this.SetAttributeValue("contactid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("ContactId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("contactid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.ContactId = value;
 			}
 		}
 		
@@ -2200,6 +2245,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			public const string dfeta_NewValue = "dfeta_newvalue";
 			public const string dfeta_OldValue = "dfeta_oldvalue";
 			public const string dfeta_Person = "dfeta_person";
+			public const string StateCode = "statecode";
 			public const string dfeta_contact_dfeta_businesseventaudit_Person = "dfeta_contact_dfeta_businesseventaudit_Person";
 		}
 		
@@ -2335,10 +2381,30 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_person");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Person");
+				this.SetAttributeValue("dfeta_person", value);
+				this.OnPropertyChanged("dfeta_Person");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the Business Event Audit
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<QualifiedTeachersApi.DataStore.Crm.Models.dfeta_businesseventauditState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
 				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
 				if ((optionSet != null))
 				{
-					return ((Microsoft.Xrm.Sdk.EntityReference)(System.Enum.ToObject(typeof(Microsoft.Xrm.Sdk.EntityReference), optionSet.Value)));
+					return ((QualifiedTeachersApi.DataStore.Crm.Models.dfeta_businesseventauditState)(System.Enum.ToObject(typeof(QualifiedTeachersApi.DataStore.Crm.Models.dfeta_businesseventauditState), optionSet.Value)));
 				}
 				else
 				{
@@ -2348,7 +2414,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 			[System.Diagnostics.DebuggerNonUserCode()]
 			set
 			{
-				this.OnPropertyChanging("dfeta_Person");
+				this.OnPropertyChanging("StateCode");
 				if ((value == null))
 				{
 					this.SetAttributeValue("statecode", null);
@@ -2357,7 +2423,7 @@ namespace QualifiedTeachersApi.DataStore.Crm.Models
 				{
 					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
 				}
-				this.OnPropertyChanged("dfeta_Person");
+				this.OnPropertyChanged("StateCode");
 			}
 		}
 		
