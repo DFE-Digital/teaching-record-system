@@ -339,7 +339,7 @@ public class Program
 
             endpoints.MapControllers();
 
-            if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+            if (configuration.GetValue<bool>("RecurringJobs:Enabled") && !builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
             {
                 endpoints.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.Hangfire, "/_hangfire");
             }
