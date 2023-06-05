@@ -19,7 +19,7 @@ public class BatchSendQtsAwardedEmailsJobTests : IAsyncLifetime
         _jobFixture = jobFixture;
     }
 
-    public static TheoryData<DateTime, DateTime?, DateTime, DateTime, DateTime> DateRangeEvaulationTestData { get; } = new()
+    public static TheoryData<DateTime, DateTime?, DateTime, DateTime, DateTime> DateRangeEvaluationTestData { get; } = new()
     {
         // Last awarded to date and today minus email delay (3 days) are both within GMT
         {
@@ -68,7 +68,7 @@ public class BatchSendQtsAwardedEmailsJobTests : IAsyncLifetime
     public Task DisposeAsync() => _jobFixture.DisposeAsync();
 
     [Theory]
-    [MemberData(nameof(DateRangeEvaulationTestData))]
+    [MemberData(nameof(DateRangeEvaluationTestData))]
     public async Task Execute_ForMultipleScenarios_EvaluatesDateRangeCorrectly(
         DateTime initialLastAwardedToUtc,
         DateTime? previousJobLastAwardedToUtc,
