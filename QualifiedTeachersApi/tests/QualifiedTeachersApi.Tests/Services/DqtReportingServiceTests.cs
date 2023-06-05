@@ -26,7 +26,6 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
             FirstName = Faker.Name.First(),
             LastName = Faker.Name.Last(),
         };
-        newContact.Attributes.Add(Contact.PrimaryIdAttribute, contactId);
 
         var newItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, newContact);
 
@@ -64,7 +63,6 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
             FirstName = Faker.Name.First(),
             LastName = Faker.Name.Last(),
         };
-        updatedContact.Attributes.Add(Contact.PrimaryIdAttribute, contactId);
 
         var newItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, updatedContact);
 
