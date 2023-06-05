@@ -155,18 +155,23 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
 
         // Assert
         Assert.Equal(3, qtsAwardees.Count());
-        Assert.Equal(teacher1Id, qtsAwardees[0].TeacherId);
-        Assert.Equal(teacher1FirstName, qtsAwardees[0].FirstName);
-        Assert.Equal(teacher1LastName, qtsAwardees[0].LastName);
-        Assert.Equal(teacher1EmailAddress1, qtsAwardees[0].EmailAddress);
-        Assert.Equal(teacher3Id, qtsAwardees[1].TeacherId);
-        Assert.Equal(teacher3FirstName, qtsAwardees[1].FirstName);
-        Assert.Equal(teacher3LastName, qtsAwardees[1].LastName);
-        Assert.Equal(teacher3EmailAddress2, qtsAwardees[1].EmailAddress);
-        Assert.Equal(teacher4Id, qtsAwardees[2].TeacherId);
-        Assert.Equal(teacher4StatedFirstName, qtsAwardees[2].FirstName);
-        Assert.Equal(teacher4StatedLastName, qtsAwardees[2].LastName);
-        Assert.Equal(teacher4EmailAddress1, qtsAwardees[2].EmailAddress);
+        var teacher1 = qtsAwardees.SingleOrDefault(a => a.TeacherId == teacher1Id);
+        Assert.NotNull(teacher1);        
+        Assert.Equal(teacher1FirstName, teacher1.FirstName);
+        Assert.Equal(teacher1LastName, teacher1.LastName);
+        Assert.Equal(teacher1EmailAddress1, teacher1.EmailAddress);
+        var teacher3 = qtsAwardees.SingleOrDefault(a => a.TeacherId == teacher3Id);
+        Assert.NotNull(teacher3);
+        Assert.Equal(teacher3Id, teacher3.TeacherId);
+        Assert.Equal(teacher3FirstName, teacher3.FirstName);
+        Assert.Equal(teacher3LastName, teacher3.LastName);
+        Assert.Equal(teacher3EmailAddress2, teacher3.EmailAddress);
+        var teacher4 = qtsAwardees.SingleOrDefault(a => a.TeacherId == teacher4Id);
+        Assert.NotNull(teacher4);
+        Assert.Equal(teacher4Id, teacher4.TeacherId);
+        Assert.Equal(teacher4StatedFirstName, teacher4.FirstName);
+        Assert.Equal(teacher4StatedLastName, teacher4.LastName);
+        Assert.Equal(teacher4EmailAddress1, teacher4.EmailAddress);
     }
 
     private async Task<Guid> CreateTeacherWithQts(
