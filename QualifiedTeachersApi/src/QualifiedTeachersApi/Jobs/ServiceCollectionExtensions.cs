@@ -45,7 +45,7 @@ public static class ServiceCollectionExtensions
             {
                 services.AddSingleton<IBackgroundJobScheduler, ExecuteImmediatelyJobScheduler>();
             }
-        }        
+        }
 
         return services;
     }
