@@ -156,7 +156,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
         // Assert
         Assert.Equal(3, qtsAwardees.Count());
         var teacher1 = qtsAwardees.SingleOrDefault(a => a.TeacherId == teacher1Id);
-        Assert.NotNull(teacher1);        
+        Assert.NotNull(teacher1);
         Assert.Equal(teacher1FirstName, teacher1.FirstName);
         Assert.Equal(teacher1LastName, teacher1.LastName);
         Assert.Equal(teacher1EmailAddress1, teacher1.EmailAddress);
