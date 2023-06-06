@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.ServiceModel;
 using Medallion.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Xrm.Sdk;
@@ -78,7 +79,19 @@ public class CrmEntityChangesService : ICrmEntityChangesService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var response = (RetrieveEntityChangesResponse)await organizationService.ExecuteAsync(request);
+            RetrieveEntityChangesResponse response;
+            try
+            {
+                response = (RetrieveEntityChangesResponse)await organizationService.ExecuteAsync(request);
+            }
+            catch (FaultException<OrganizationServiceFault> fault) when (fault.Detail.ErrorCode == -2147204270)  // ExpiredVersionStamp
+            {
+                // If entity metadata has changed we get an error:
+                // Version stamp associated with the client has expired. Please perform a full sync.
+                // Resetting DataVersion will give us a full sync.
+                request.DataVersion = null;
+                continue;
+            }
 
             gotData |= response.EntityChanges.Changes.Count > 0;
 
