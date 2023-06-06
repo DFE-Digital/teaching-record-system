@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.FeatureManagement;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Prometheus;
 using QualifiedTeachersApi.DataStore.Crm;
@@ -66,8 +65,6 @@ public class Program
         var paasEnvironmentName = configuration["PaasEnvironment"];
 
         WebApplicationBuilderExtensions.ConfigureLogging(builder, paasEnvironmentName);
-
-        builder.Services.AddFeatureManagement();
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
