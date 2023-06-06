@@ -11,32 +11,25 @@ using Xunit;
 
 namespace QualifiedTeachersApi.Tests.Jobs;
 
-[Collection("Job")]
-public class SendQtsAwardedEmailJobTests : IAsyncLifetime
+public class SendQtsAwardedEmailJobTests : JobTestBase
 {
-    private readonly JobFixture _jobFixture;
-
     public SendQtsAwardedEmailJobTests(JobFixture jobFixture)
+        : base(jobFixture)
     {
-        _jobFixture = jobFixture;
     }
-
-    public Task InitializeAsync() => _jobFixture.InitializeAsync();
-
-    public Task DisposeAsync() => _jobFixture.DisposeAsync();
 
     [Fact]
     public async Task Execute_WhenCalled_GetsTrnTokenSendsEmailAddsEventAndUpdatesDatabase()
     {
         // Arrange
         var utcNow = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
-        using var dbContext = _jobFixture.DbFixture.GetDbContext();
+        using var dbContext = JobFixture.DbFixture.GetDbContext();
         var accessYourQualificationOptions = Options.Create(
             new AccessYourQualificationsOptions
             {
                 BaseAddress = "https://aytq.com"
             });
-        _jobFixture.Clock.UtcNow = utcNow;
+        JobFixture.Clock.UtcNow = utcNow;
         var qtsAwardedEmailsJobId = Guid.NewGuid();
         var personId = Guid.NewGuid();
         var trn = "1234567";
@@ -76,22 +69,22 @@ public class SendQtsAwardedEmailJobTests : IAsyncLifetime
             ExpiresUtc = utcNow.AddDays(60)
         };
 
-        _jobFixture.GetAnIdentityApiClient
+        JobFixture.GetAnIdentityApiClient
             .Setup(i => i.CreateTrnToken(It.Is<CreateTrnTokenRequest>(r => r.Trn == trn && r.Email == emailAddress)))
             .ReturnsAsync(tokenResponse);
 
         var job = new SendQtsAwardedEmailJob(
-            _jobFixture.NotificationSender.Object,
+            JobFixture.NotificationSender.Object,
             dbContext,
-            _jobFixture.GetAnIdentityApiClient.Object,
+            JobFixture.GetAnIdentityApiClient.Object,
             accessYourQualificationOptions,
-            _jobFixture.Clock);
+            JobFixture.Clock);
 
         // Act
         await job.Execute(qtsAwardedEmailsJobId, personId);
 
         // Assert
-        _jobFixture.NotificationSender
+        JobFixture.NotificationSender
             .Verify(n => n.SendEmail(It.IsAny<string>(), It.Is<string>(s => s == emailAddress), It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
 
         var updatedJobItem = await dbContext.QtsAwardedEmailsJobItems.SingleOrDefaultAsync(i => i.QtsAwardedEmailsJobId == qtsAwardedEmailsJobId && i.PersonId == personId);

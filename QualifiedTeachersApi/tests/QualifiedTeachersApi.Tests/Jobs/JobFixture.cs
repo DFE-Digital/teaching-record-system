@@ -29,7 +29,19 @@ public class JobFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await DbFixture.InitializeAsync();
+        await DbFixture.InitializeAsync();        
+    }
+
+    public void ResetMocks()
+    {
+        DataverseAdapter.Reset();
+        BackgroundJobScheduler.Reset();
+        NotificationSender.Reset();
+        GetAnIdentityApiClient.Reset();
+    }
+
+    public async Task ClearData()
+    {
         using var dbContext = DbFixture.GetDbContext();
         await dbContext.Database.ExecuteSqlAsync($"delete from qts_awarded_emails_jobs");
     }
