@@ -6,7 +6,7 @@ namespace QualifiedTeachersApi.Tests.Jobs;
 public abstract class JobTestBase : IAsyncLifetime
 {
     public JobTestBase(JobFixture jobFixture)
-    {        
+    {
         JobFixture = jobFixture;
         JobFixture.ResetMocks();
     }

@@ -29,7 +29,7 @@ public class JobFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await DbFixture.InitializeAsync();        
+        await DbFixture.InitializeAsync();
     }
 
     public void ResetMocks()

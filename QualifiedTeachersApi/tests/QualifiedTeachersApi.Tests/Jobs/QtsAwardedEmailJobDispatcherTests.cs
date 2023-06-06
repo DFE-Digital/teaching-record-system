@@ -9,7 +9,7 @@ public class QtsAwardedEmailJobDispatcherTests : JobTestBase
 {
     public QtsAwardedEmailJobDispatcherTests(JobFixture jobFixture)
         : base(jobFixture)
-    {        
+    {
     }
 
     [Fact]
@@ -17,7 +17,7 @@ public class QtsAwardedEmailJobDispatcherTests : JobTestBase
     {
         // Arrange
         var utcNow = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
-        using var dbContext = JobFixture.DbFixture.GetDbContext();        
+        using var dbContext = JobFixture.DbFixture.GetDbContext();
         var qtsAwardedEmailsJobId = Guid.NewGuid();
         var teacher1PersonId = Guid.NewGuid();
         var teacher1Trn = "1234567";
