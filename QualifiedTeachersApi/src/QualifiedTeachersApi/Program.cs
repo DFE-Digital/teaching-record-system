@@ -53,12 +53,6 @@ public class Program
         var env = builder.Environment;
         var configuration = builder.Configuration;
 
-        var paasEnvironmentName = configuration["PaasEnvironment"];
-
-        WebApplicationBuilderExtensions.ConfigureLogging(builder, paasEnvironmentName);
-
-        builder.Services.AddFeatureManagement();
-
         if (builder.Environment.IsProduction())
         {
             builder.Configuration
@@ -66,6 +60,12 @@ public class Program
                 .AddJsonEnvironmentVariable("VCAP_SERVICES", configurationKeyPrefix: "VCAP_SERVICES")
                 .AddJsonEnvironmentVariable("VCAP_APPLICATION", configurationKeyPrefix: "VCAP_APPLICATION");
         }
+
+        var paasEnvironmentName = configuration["PaasEnvironment"];
+
+        WebApplicationBuilderExtensions.ConfigureLogging(builder, paasEnvironmentName);
+
+        builder.Services.AddFeatureManagement();
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
