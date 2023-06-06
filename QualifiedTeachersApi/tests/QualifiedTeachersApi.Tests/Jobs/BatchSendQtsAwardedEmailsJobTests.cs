@@ -90,7 +90,6 @@ public class BatchSendQtsAwardedEmailsJobTests : IAsyncLifetime
             await dbContext.SaveChangesAsync();
         }
 
-        var logger = new Mock<ILogger<BatchSendQtsAwardedEmailsJob>>();
         var jobOptions = Options.Create(
             new BatchSendQtsAwardedEmailsJobOptions
             {
@@ -118,8 +117,7 @@ public class BatchSendQtsAwardedEmailsJobTests : IAsyncLifetime
             dbContext,
             _jobFixture.DataverseAdapter.Object,
             _jobFixture.BackgroundJobScheduler.Object,
-            _jobFixture.Clock,
-            logger.Object);
+            _jobFixture.Clock);
 
         // Act
         await job.Execute(CancellationToken.None);
@@ -136,7 +134,6 @@ public class BatchSendQtsAwardedEmailsJobTests : IAsyncLifetime
         var initialLastAwardedToUtc = new DateTime(2023, 02, 02, 23, 59, 59, DateTimeKind.Utc);
         var today = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
         using var dbContext = _jobFixture.DbFixture.GetDbContext();
-        var logger = new Mock<ILogger<BatchSendQtsAwardedEmailsJob>>();
         var jobOptions = Options.Create(
             new BatchSendQtsAwardedEmailsJobOptions
             {
@@ -167,8 +164,7 @@ public class BatchSendQtsAwardedEmailsJobTests : IAsyncLifetime
             dbContext,
             _jobFixture.DataverseAdapter.Object,
             _jobFixture.BackgroundJobScheduler.Object,
-            _jobFixture.Clock,
-            logger.Object);
+            _jobFixture.Clock);
 
         // Act
         await job.Execute(CancellationToken.None);
@@ -182,6 +178,98 @@ public class BatchSendQtsAwardedEmailsJobTests : IAsyncLifetime
         Assert.Equal(qtsAwardee1.LastName, jobItem.Personalization["last name"]);
 
         _jobFixture.BackgroundJobScheduler
-            .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<SendQtsAwardedEmailJob, Task>>>()), Times.Once);
+            .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<QtsAwardedEmailJobDispatcher, Task>>>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Execute_WhenDoesNotHaveAwardeesForDateRange_UpdatesDatabaseOnly()
+    {
+        // Arrange
+        var initialLastAwardedToUtc = new DateTime(2023, 02, 02, 23, 59, 59, DateTimeKind.Utc);
+        var today = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
+        using var dbContext = _jobFixture.DbFixture.GetDbContext();
+        var jobOptions = Options.Create(
+            new BatchSendQtsAwardedEmailsJobOptions
+            {
+                EmailDelayDays = 3,
+                InitialLastAwardedToUtc = initialLastAwardedToUtc,
+                JobSchedule = "0 8 * * *"
+            });
+
+        _jobFixture.Clock.UtcNow = today;
+
+        _jobFixture.DataverseAdapter
+            .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(new QtsAwardee[] { });
+
+        var job = new BatchSendQtsAwardedEmailsJob(
+            jobOptions,
+            dbContext,
+            _jobFixture.DataverseAdapter.Object,
+            _jobFixture.BackgroundJobScheduler.Object,
+            _jobFixture.Clock);
+
+        // Act
+        await job.Execute(CancellationToken.None);
+
+        // Assert
+        var jobInfo = await dbContext.QtsAwardedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);
+        Assert.NotNull(jobInfo);
+
+        _jobFixture.BackgroundJobScheduler
+            .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<QtsAwardedEmailJobDispatcher, Task>>>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Execute_WhenEnqueueFails_DoesNotUpdateDatabase()
+    {
+        // Arrange
+        var initialLastAwardedToUtc = new DateTime(2023, 02, 02, 23, 59, 59, DateTimeKind.Utc);
+        var today = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
+        using var dbContext = _jobFixture.DbFixture.GetDbContext();
+        var jobOptions = Options.Create(
+            new BatchSendQtsAwardedEmailsJobOptions
+            {
+                EmailDelayDays = 3,
+                InitialLastAwardedToUtc = initialLastAwardedToUtc,
+                JobSchedule = "0 8 * * *"
+            });
+
+        _jobFixture.Clock.UtcNow = today;
+
+        var qtsAwardee1 = new QtsAwardee
+        {
+            TeacherId = Guid.NewGuid(),
+            Trn = "1234567",
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            EmailAddress = Faker.Internet.Email()
+        };
+
+        var qtsAwardees = new[] { qtsAwardee1 };
+
+        _jobFixture.DataverseAdapter
+            .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(qtsAwardees);
+
+        _jobFixture.BackgroundJobScheduler
+            .Setup(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<QtsAwardedEmailJobDispatcher, Task>>>()))
+            .Throws<Exception>();
+
+        var job = new BatchSendQtsAwardedEmailsJob(
+            jobOptions,
+            dbContext,
+            _jobFixture.DataverseAdapter.Object,
+            _jobFixture.BackgroundJobScheduler.Object,
+            _jobFixture.Clock);
+
+        // Act
+        await Assert.ThrowsAsync<Exception>(() => job.Execute(CancellationToken.None));
+
+        // Assert
+        var jobInfo = await dbContext.QtsAwardedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);
+        Assert.Null(jobInfo);
+        var jobItem = await dbContext.QtsAwardedEmailsJobItems.SingleOrDefaultAsync(i => i.PersonId == qtsAwardee1.TeacherId);
+        Assert.Null(jobItem);
     }
 }

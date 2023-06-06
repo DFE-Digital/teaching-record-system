@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
 
                 services.AddSingleton<IHostedService, RegisterRecurringJobsHostedService>();
                 services.AddTransient<SendQtsAwardedEmailJob>();
+                services.AddTransient<QtsAwardedEmailJobDispatcher>();
             }
 
             if (environment.IsProduction())
