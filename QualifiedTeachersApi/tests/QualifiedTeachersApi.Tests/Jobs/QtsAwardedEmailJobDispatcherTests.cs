@@ -1,6 +1,7 @@
 ﻿using Moq;
 using QualifiedTeachersApi.DataStore.Sql.Models;
 using QualifiedTeachersApi.Jobs;
+using QualifiedTeachersApi.Jobs.Scheduling;
 using Xunit;
 
 namespace QualifiedTeachersApi.Tests.Jobs;
@@ -25,6 +26,7 @@ public class QtsAwardedEmailJobDispatcherTests : IAsyncLifetime
         // Arrange
         var utcNow = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
         using var dbContext = _jobFixture.DbFixture.GetDbContext();
+        var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
         var qtsAwardedEmailsJobId = Guid.NewGuid();
         var teacher1PersonId = Guid.NewGuid();
         var teacher1Trn = "1234567";
@@ -99,13 +101,13 @@ public class QtsAwardedEmailJobDispatcherTests : IAsyncLifetime
 
         var dispatcher = new QtsAwardedEmailJobDispatcher(
             dbContext,
-            _jobFixture.BackgroundJobScheduler.Object);
+            backgroundJobScheduler.Object);
 
         // Act
         await dispatcher.Execute(qtsAwardedEmailsJobId);
 
         // Assert
-        _jobFixture.BackgroundJobScheduler
+        backgroundJobScheduler
             .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<SendQtsAwardedEmailJob, Task>>>()), Times.Exactly(2));
     }
 }
