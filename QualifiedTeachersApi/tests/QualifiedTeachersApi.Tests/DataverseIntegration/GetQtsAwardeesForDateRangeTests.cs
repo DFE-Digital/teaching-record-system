@@ -29,7 +29,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
     {
         // Arrange
         var startDate = new DateTime(2022, 04, 13, 09, 53, 00, DateTimeKind.Utc);
-        var endDate = new DateTime(2022, 04, 13, 11, 07, 59, DateTimeKind.Utc);
+        var endDate = new DateTime(2022, 04, 13, 11, 08, 00, DateTimeKind.Utc);
         var expectedCount = 8;
 
         // Act
@@ -95,7 +95,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
             teacher1QtsDate,
             teacher1StatusValue);
 
-        await Task.Delay(2000);
+        await Task.Delay(3000);
 
         var teacher2Id = await CreateTeacherWithQts(
             teacher2FirstName,
@@ -108,7 +108,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
             teacher2QtsDate,
             teacher2StatusValue);
 
-        await Task.Delay(2000);
+        await Task.Delay(3000);
 
         var teacher3Id = await CreateTeacherWithQts(
             teacher3FirstName,
@@ -121,7 +121,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
             teacher3QtsDate,
             teacher3StatusValue);
 
-        await Task.Delay(2000);
+        await Task.Delay(3000);
 
         var teacher4Id = await CreateTeacherWithQts(
             teacher4FirstName,
@@ -133,6 +133,9 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
             teacher4DateOfBirth,
             teacher4QtsDate,
             teacher4StatusValue);
+
+        // Allow for the fact that we are using "less than" with the end date
+        await Task.Delay(1000);
 
         stopwatch.Stop();
         var endDate = startDate.AddSeconds(Math.Ceiling(stopwatch.Elapsed.TotalSeconds));

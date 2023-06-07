@@ -9,7 +9,7 @@ public partial class DataverseAdapter
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(dfeta_businesseventaudit.Fields.CreatedOn, ConditionOperator.GreaterEqual, startDate);
-        filter.AddCondition(dfeta_businesseventaudit.Fields.CreatedOn, ConditionOperator.LessEqual, endDate);
+        filter.AddCondition(dfeta_businesseventaudit.Fields.CreatedOn, ConditionOperator.LessThan, endDate);
         filter.AddCondition(dfeta_businesseventaudit.Fields.dfeta_changedfield, ConditionOperator.Equal, "QTS Date");
         filter.AddCondition(dfeta_businesseventaudit.Fields.dfeta_NewValue, ConditionOperator.NotNull);
         filter.AddCondition(dfeta_businesseventaudit.Fields.dfeta_OldValue, ConditionOperator.Null);
@@ -108,14 +108,12 @@ public partial class DataverseAdapter
 
     private QtsAwardee MapContactToQtsAwardee(Contact contact)
     {
-        var useStatedNames = !string.IsNullOrEmpty(contact.dfeta_StatedFirstName) && !string.IsNullOrEmpty(contact.dfeta_StatedLastName);
-
         return new QtsAwardee
         {
             TeacherId = contact.ContactId!.Value,
             Trn = contact.dfeta_TRN,
-            FirstName = useStatedNames ? contact.dfeta_StatedFirstName : contact.FirstName,
-            LastName = useStatedNames ? contact.dfeta_StatedLastName : contact.LastName,
+            FirstName = contact.ResolveFirstName(),
+            LastName = contact.ResolveLastName(),
             EmailAddress = contact.EMailAddress1 ?? contact.EMailAddress2
         };
     }
