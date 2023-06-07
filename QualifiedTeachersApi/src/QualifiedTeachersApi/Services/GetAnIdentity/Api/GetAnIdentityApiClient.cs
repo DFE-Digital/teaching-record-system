@@ -37,6 +37,15 @@ public class GetAnIdentityApiClient : IGetAnIdentityApiClient
         return user;
     }
 
+    public async Task<CreateTrnTokenResponse> CreateTrnToken(CreateTrnTokenRequest request)
+    {
+        HttpContent content = JsonContent.Create(request);
+        var response = await _httpClient.PostAsync("/api/v1/trn-tokens", content);
+        response.EnsureSuccessStatusCode();
+        var tokenResponse = await response.Content.ReadFromJsonAsync<CreateTrnTokenResponse>();
+        return tokenResponse!;
+    }
+
     public async Task SetTeacherTrn(Guid userId, string trn)
     {
         var request = new SetTeacherTrnRequestBody { Trn = trn };

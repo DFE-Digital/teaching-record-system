@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.FeatureManagement;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Prometheus;
 using QualifiedTeachersApi.DataStore.Crm;
@@ -31,10 +30,12 @@ using QualifiedTeachersApi.Infrastructure.Redis;
 using QualifiedTeachersApi.Infrastructure.Security;
 using QualifiedTeachersApi.Jobs;
 using QualifiedTeachersApi.Services;
+using QualifiedTeachersApi.Services.AccessYourQualifications;
 using QualifiedTeachersApi.Services.Certificates;
 using QualifiedTeachersApi.Services.CrmEntityChanges;
 using QualifiedTeachersApi.Services.DqtReporting;
 using QualifiedTeachersApi.Services.GetAnIdentityApi;
+using QualifiedTeachersApi.Services.Notify;
 using QualifiedTeachersApi.Services.TrnGenerationApi;
 using QualifiedTeachersApi.Validation;
 using Serilog;
@@ -64,8 +65,6 @@ public class Program
         var paasEnvironmentName = configuration["PaasEnvironment"];
 
         WebApplicationBuilderExtensions.ConfigureLogging(builder, paasEnvironmentName);
-
-        builder.Services.AddFeatureManagement();
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
@@ -231,10 +230,12 @@ public class Program
 
         services.AddTrnGenerationApi(configuration);
         services.AddIdentityApi(configuration, env);
+        services.AddAccessYourQualifications(configuration, env);
         services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
         services.AddDqtReporting(builder.Configuration);
-        services.AddBackgroundJobs(env, pgConnectionString);
+        services.AddBackgroundJobs(env, configuration, pgConnectionString);
+        services.AddEmail(env, configuration);
 
         if (env.EnvironmentName != "Testing")
         {
@@ -335,7 +336,7 @@ public class Program
 
             endpoints.MapControllers();
 
-            if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+            if (configuration.GetValue<bool>("RecurringJobs:Enabled") && !builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
             {
                 endpoints.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.Hangfire, "/_hangfire");
             }

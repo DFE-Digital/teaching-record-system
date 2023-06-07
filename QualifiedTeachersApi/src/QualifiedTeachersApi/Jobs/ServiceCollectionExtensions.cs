@@ -9,19 +9,43 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBackgroundJobs(
         this IServiceCollection services,
         IWebHostEnvironment environment,
+        IConfiguration configuration,
         string postgresConnectionString)
     {
-        if (!environment.IsUnitTests() && !environment.IsEndToEndTests())
+        if (configuration.GetValue<bool>("RecurringJobs:Enabled"))
         {
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(postgresConnectionString));
+            if ((!environment.IsUnitTests() && !environment.IsEndToEndTests()))
+            {
+                services.AddHangfire(configuration => configuration
+                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    .UsePostgreSqlStorage(postgresConnectionString));
 
-            services.AddHangfireServer();
+                services.AddHangfireServer();
 
-            services.AddSingleton<IHostedService, RegisterRecurringJobsHostedService>();
+                services.AddOptions<RecurringJobsOptions>()
+                    .Bind(configuration.GetSection("RecurringJobs"))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+                services.AddOptions<BatchSendQtsAwardedEmailsJobOptions>()
+                    .Bind(configuration.GetSection("RecurringJobs:BatchSendQtsAwardedEmails"))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+
+                services.AddSingleton<IHostedService, RegisterRecurringJobsHostedService>();
+                services.AddTransient<SendQtsAwardedEmailJob>();
+                services.AddTransient<QtsAwardedEmailJobDispatcher>();
+            }
+
+            if (environment.IsProduction())
+            {
+                services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
+            }
+            else
+            {
+                services.AddSingleton<IBackgroundJobScheduler, ExecuteImmediatelyJobScheduler>();
+            }
         }
 
         return services;

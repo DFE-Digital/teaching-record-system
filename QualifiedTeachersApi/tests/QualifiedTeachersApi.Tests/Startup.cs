@@ -12,6 +12,7 @@ public class Startup
         var dbHelper = new DbHelper(testConfiguration.Configuration.GetConnectionString("DefaultConnection") ??
             throw new Exception("Connection string DefaultConnection is missing."));
         var apiFixture = new ApiFixture(testConfiguration, dbHelper);
+        var dbFixture = new DbFixture(testConfiguration, dbHelper);
 
         apiFixture.Initialize().GetAwaiter().GetResult();
 
@@ -19,6 +20,7 @@ public class Startup
         services.AddSingleton(testConfiguration);
         services.AddSingleton(dbHelper);
         services.AddSingleton(apiFixture);
+        services.AddSingleton(dbFixture);
         services.AddSingleton<CrmClientFixture>();
         services.AddMemoryCache();
 
