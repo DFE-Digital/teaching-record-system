@@ -1,14 +1,23 @@
-﻿using NJsonSchema.Generation;
+﻿using System.Reflection;
+using NJsonSchema.Generation;
 
 namespace QualifiedTeachersApi.Infrastructure.OpenApi;
 
-public class RemoveEnumValuesSchemaProcessor : ISchemaProcessor
+public class RemoveCompositeValuesFromFlagsEnumSchemaProcessor : ISchemaProcessor
 {
     public void Process(SchemaProcessorContext context)
     {
+        // For Flags enums we may have composite values defined as well as a '0' value;
+        // we don't want these to appear in the Swagger doc.
+
         var type = context.ContextualType.Type;
 
         if (!type.IsEnum)
+        {
+            return;
+        }
+
+        if (type.GetCustomAttribute<FlagsAttribute>() is null)
         {
             return;
         }

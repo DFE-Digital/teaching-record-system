@@ -38,7 +38,7 @@ public static class ServiceCollectionExtensions
 
                     settings.DocumentProcessors.Add(new PopulateResponseDescriptionOperationProcessor());
 
-                    settings.SchemaProcessors.Add(new RemoveEnumValuesSchemaProcessor());
+                    settings.SchemaProcessors.Add(new RemoveCompositeValuesFromFlagsEnumSchemaProcessor());
 
                     settings.OperationProcessors.Add(new ResponseContentTypeOperationProcessor());
                     settings.OperationProcessors.Add(new PopulateResponseDescriptionOperationProcessor());
