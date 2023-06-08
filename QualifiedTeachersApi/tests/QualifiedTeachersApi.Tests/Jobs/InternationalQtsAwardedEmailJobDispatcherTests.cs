@@ -55,7 +55,7 @@ public class InternationalQtsAwardedEmailJobDispatcherTests : InternationalQtsAw
         var batchJob = new InternationalQtsAwardedEmailsJob
         {
             InternationalQtsAwardedEmailsJobId = internationalQtsAwardedEmailsJobId,
-            AwardedToUtc = utcNow.AddDays(-1),
+            AwardedToUtc = utcNow.AddDays(1),
             ExecutedUtc = utcNow
         };
         dbContext.InternationalQtsAwardedEmailsJobs.Add(batchJob);

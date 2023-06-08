@@ -102,7 +102,7 @@ public partial class DataverseAdapter
             teacherStatusLink.EntityAlias = dfeta_teacherstatus.EntityLogicalName;
 
             var filter = new FilterExpression();
-            filter.AddCondition(dfeta_teacherstatus.Fields.dfeta_name, ConditionOperator.Equal, "Qualified Teacher: By virtue of overseas qualifications");
+            filter.AddCondition(dfeta_teacherstatus.Fields.dfeta_name, ConditionOperator.Equal, "Qualified teacher: by virtue of achieving international qualified teacher status");
             teacherStatusLink.LinkCriteria = filter;
         }
     }
