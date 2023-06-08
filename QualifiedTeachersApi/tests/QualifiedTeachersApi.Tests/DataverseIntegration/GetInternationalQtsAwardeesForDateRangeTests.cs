@@ -8,13 +8,13 @@ using Xunit;
 namespace QualifiedTeachersApi.Tests.DataverseIntegration;
 
 [Collection(nameof(ExclusiveCrmTestCollection))]
-public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
+public class GetInternationalQtsAwardeesForDateRangeTests : IAsyncLifetime
 {
     private CrmClientFixture.TestDataScope _dataScope;
     private DataverseAdapter _dataverseAdapter;
     private ITrackedEntityOrganizationService _organizationService;
 
-    public GetQtsAwardeesForDateRangeTests(CrmClientFixture crmClientFixture)
+    public GetInternationalQtsAwardeesForDateRangeTests(CrmClientFixture crmClientFixture)
     {
         _dataScope = crmClientFixture.CreateTestDataScope();
         _dataverseAdapter = _dataScope.CreateDataverseAdapter();
@@ -26,22 +26,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
     [Fact]
-    public async Task GetQtsAwardeesForDateRange_WhenCalledForFixedDataInBuildEnvironment_ReturnsExpectedQtsAwardees()
-    {
-        // Arrange
-        var startDate = new DateTime(2022, 04, 13, 09, 53, 00, DateTimeKind.Utc);
-        var endDate = new DateTime(2022, 04, 13, 11, 08, 00, DateTimeKind.Utc);
-        var expectedCount = 8;
-
-        // Act
-        var qtsAwardees = await _dataverseAdapter.GetQtsAwardeesForDateRange(startDate, endDate);
-
-        // Assert
-        Assert.Equal(expectedCount, qtsAwardees.Count());
-    }
-
-    [Fact]
-    public async Task GetQtsAwardeesForDateRange_WhenCalledForDataGeneratedInTest_ReturnsExpectedQtsAwardees()
+    public async Task GetInternationalQtsAwardeesForDateRange_WhenCalledForDataGeneratedInTest_ReturnsExpectedInternationalQtsAwardees()
     {
         // Arrange
         var teacher1FirstName = Faker.Name.First();
@@ -53,10 +38,10 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
 
         var teacher2FirstName = Faker.Name.First();
         var teacher2LastName = Faker.Name.Last();
-        var teacher2EmailAddress1 = Faker.Internet.Email();
+        var teacher2EmailAddress2 = Faker.Internet.Email();
         var teacher2DateOfBirth = new DateOnly(1997, 4, 23);
         var teacher2QtsDate = new DateOnly(2022, 08, 24);
-        var teacher2StatusValue = "103"; // Qualified Teacher: By virtue of overseas qualifications
+        var teacher2StatusValue = "90"; // Qualified teacher: by virtue of achieving international qualified teacher status
 
         var teacher3FirstName = Faker.Name.First();
         var teacher3LastName = Faker.Name.Last();
@@ -73,7 +58,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
         var teacher4EmailAddress2 = Faker.Internet.Email();
         var teacher4DateOfBirth = new DateOnly(1997, 4, 25);
         var teacher4QtsDate = new DateOnly(2022, 08, 26);
-        var teacher4StatusValue = "100"; // Qualified Teacher: Assessment Only Route
+        var teacher4StatusValue = "90"; // Qualified teacher: by virtue of achieving international qualified teacher status
 
         var teacher5FirstName = Faker.Name.First();
         var teacher5LastName = Faker.Name.Last();
@@ -85,7 +70,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
         var startDate = DateTime.UtcNow;
         var stopwatch = Stopwatch.StartNew();
 
-        var teacher1Id = await CreateTeacherWithQts(
+        var teacher1Id = await CreateTeacherWithInternationalQts(
             teacher1FirstName,
             teacher1LastName,
             null,
@@ -98,20 +83,20 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
 
         await Task.Delay(3000);
 
-        var teacher2Id = await CreateTeacherWithQts(
+        var teacher2Id = await CreateTeacherWithInternationalQts(
             teacher2FirstName,
             teacher2LastName,
             null,
             null,
-            teacher2EmailAddress1,
             null,
+            teacher2EmailAddress2,
             teacher2DateOfBirth,
             teacher2QtsDate,
             teacher2StatusValue);
 
         await Task.Delay(3000);
 
-        var teacher3Id = await CreateTeacherWithQts(
+        var teacher3Id = await CreateTeacherWithInternationalQts(
             teacher3FirstName,
             teacher3LastName,
             null,
@@ -124,7 +109,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
 
         await Task.Delay(3000);
 
-        var teacher4Id = await CreateTeacherWithQts(
+        var teacher4Id = await CreateTeacherWithInternationalQts(
             teacher4FirstName,
             teacher4LastName,
             teacher4StatedFirstName,
@@ -143,7 +128,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
 
         await Task.Delay(2000);
 
-        var teacher5Id = await CreateTeacherWithQts(
+        var teacher5Id = await CreateTeacherWithInternationalQts(
             teacher5FirstName,
             teacher5LastName,
             null,
@@ -155,21 +140,15 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
             teacher5StatusValue);
 
         // Act
-        var qtsAwardees = await _dataverseAdapter.GetQtsAwardeesForDateRange(startDate, endDate);
+        var qtsAwardees = await _dataverseAdapter.GetInternationalQtsAwardeesForDateRange(startDate, endDate);
 
         // Assert
-        Assert.Equal(3, qtsAwardees.Count());
-        var teacher1 = qtsAwardees.SingleOrDefault(a => a.TeacherId == teacher1Id);
-        Assert.NotNull(teacher1);
-        Assert.Equal(teacher1FirstName, teacher1.FirstName);
-        Assert.Equal(teacher1LastName, teacher1.LastName);
-        Assert.Equal(teacher1EmailAddress1, teacher1.EmailAddress);
-        var teacher3 = qtsAwardees.SingleOrDefault(a => a.TeacherId == teacher3Id);
-        Assert.NotNull(teacher3);
-        Assert.Equal(teacher3Id, teacher3.TeacherId);
-        Assert.Equal(teacher3FirstName, teacher3.FirstName);
-        Assert.Equal(teacher3LastName, teacher3.LastName);
-        Assert.Equal(teacher3EmailAddress2, teacher3.EmailAddress);
+        Assert.Equal(2, qtsAwardees.Count());
+        var teacher2 = qtsAwardees.SingleOrDefault(a => a.TeacherId == teacher2Id);
+        Assert.NotNull(teacher2);
+        Assert.Equal(teacher2FirstName, teacher2.FirstName);
+        Assert.Equal(teacher2LastName, teacher2.LastName);
+        Assert.Equal(teacher2EmailAddress2, teacher2.EmailAddress);
         var teacher4 = qtsAwardees.SingleOrDefault(a => a.TeacherId == teacher4Id);
         Assert.NotNull(teacher4);
         Assert.Equal(teacher4Id, teacher4.TeacherId);
@@ -178,7 +157,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
         Assert.Equal(teacher4EmailAddress1, teacher4.EmailAddress);
     }
 
-    private async Task<Guid> CreateTeacherWithQts(
+    private async Task<Guid> CreateTeacherWithInternationalQts(
         string firstName,
         string lastName,
         string? statedFirstName,

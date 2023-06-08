@@ -5,7 +5,7 @@ namespace QualifiedTeachersApi.DataStore.Crm;
 
 public partial class DataverseAdapter
 {
-    public async Task<QtsAwardee[]> GetQtsAwardeesForDateRange(DateTime startDate, DateTime endDate)
+    public async Task<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRange(DateTime startDate, DateTime endDate)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(dfeta_businesseventaudit.Fields.CreatedOn, ConditionOperator.GreaterEqual, startDate);
@@ -32,7 +32,7 @@ public partial class DataverseAdapter
             .Select(e => e.ToEntity<dfeta_businesseventaudit>())
             .Select(e => e.Extract<Contact>(Contact.EntityLogicalName, Contact.PrimaryIdAttribute))
             .GroupBy(c => c.ContactId)
-            .Select(g => MapContactToQtsAwardee(g.First()))
+            .Select(g => MapContactToInternationalQtsAwardee(g.First()))
             .ToArray();
 
         static void AddContactLink(QueryExpression query)
@@ -102,14 +102,14 @@ public partial class DataverseAdapter
             teacherStatusLink.EntityAlias = dfeta_teacherstatus.EntityLogicalName;
 
             var filter = new FilterExpression();
-            filter.AddCondition(dfeta_teacherstatus.Fields.dfeta_name, ConditionOperator.In, "Qualified teacher (trained)", "Qualified Teacher: Assessment Only Route");
+            filter.AddCondition(dfeta_teacherstatus.Fields.dfeta_name, ConditionOperator.Equal, "Qualified teacher: by virtue of achieving international qualified teacher status");
             teacherStatusLink.LinkCriteria = filter;
         }
     }
 
-    private QtsAwardee MapContactToQtsAwardee(Contact contact)
+    private InternationalQtsAwardee MapContactToInternationalQtsAwardee(Contact contact)
     {
-        return new QtsAwardee
+        return new InternationalQtsAwardee
         {
             TeacherId = contact.ContactId!.Value,
             Trn = contact.dfeta_TRN,

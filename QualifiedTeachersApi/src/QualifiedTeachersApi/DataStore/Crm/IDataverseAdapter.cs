@@ -94,4 +94,6 @@ public interface IDataverseAdapter
     Task<EntityMetadata> GetEntityMetadata(string entityLogicalName, EntityFilters entityFilters = EntityFilters.Default);
 
     Task<QtsAwardee[]> GetQtsAwardeesForDateRange(DateTime startDate, DateTime endDate);
+
+    Task<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRange(DateTime startDate, DateTime endDate);
 }
