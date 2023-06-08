@@ -24,6 +24,10 @@ public class DqtContext : DbContext
 
     public DbSet<QtsAwardedEmailsJobItem> QtsAwardedEmailsJobItems => Set<QtsAwardedEmailsJobItem>();
 
+    public DbSet<InternationalQtsAwardedEmailsJob> InternationalQtsAwardedEmailsJobs => Set<InternationalQtsAwardedEmailsJob>();
+
+    public DbSet<InternationalQtsAwardedEmailsJobItem> InternationalQtsAwardedEmailsJobItems => Set<InternationalQtsAwardedEmailsJobItem>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
     {
         if (connectionString != null)
