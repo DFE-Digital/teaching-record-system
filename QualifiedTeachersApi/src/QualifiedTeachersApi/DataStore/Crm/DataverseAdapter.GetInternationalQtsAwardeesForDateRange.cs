@@ -56,6 +56,7 @@ public partial class DataverseAdapter
 
             var filter = new FilterExpression();
             filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+            filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull);
             var emailAddressFilter = new FilterExpression(LogicalOperator.Or);
             emailAddressFilter.AddCondition(Contact.Fields.EMailAddress1, ConditionOperator.NotNull);
             emailAddressFilter.AddCondition(Contact.Fields.EMailAddress2, ConditionOperator.NotNull);

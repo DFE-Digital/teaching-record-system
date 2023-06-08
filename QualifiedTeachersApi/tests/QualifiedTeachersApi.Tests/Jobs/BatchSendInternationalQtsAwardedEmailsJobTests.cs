@@ -216,7 +216,7 @@ public class BatchSendInternationalQtsAwardedEmailsJobTests : InternationalQtsAw
         await job.Execute(CancellationToken.None);
 
         // Assert
-        var jobInfo = await dbContext.QtsAwardedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);
+        var jobInfo = await dbContext.InternationalQtsAwardedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);
         Assert.NotNull(jobInfo);
 
         backgroundJobScheduler
