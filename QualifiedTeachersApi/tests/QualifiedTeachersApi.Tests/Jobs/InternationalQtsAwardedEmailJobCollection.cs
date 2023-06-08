@@ -2,7 +2,7 @@
 
 namespace QualifiedTeachersApi.Tests.Jobs;
 
-[CollectionDefinition("InternationalQtsAwardedEmailJob", DisableParallelization = true)]
+[CollectionDefinition("InternationalQtsAwardedEmailJob")]
 public class InternationalQtsAwardedEmailJobCollection
 {
 }

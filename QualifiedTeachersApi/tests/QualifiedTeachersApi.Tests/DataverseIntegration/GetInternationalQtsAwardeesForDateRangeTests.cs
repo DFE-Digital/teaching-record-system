@@ -7,6 +7,7 @@ using Xunit;
 
 namespace QualifiedTeachersApi.Tests.DataverseIntegration;
 
+[Collection(nameof(ExclusiveCrmTestCollection))]
 public class GetInternationalQtsAwardeesForDateRangeTests : IAsyncLifetime
 {
     private CrmClientFixture.TestDataScope _dataScope;
