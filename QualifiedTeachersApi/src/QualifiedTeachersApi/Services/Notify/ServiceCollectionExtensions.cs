@@ -7,18 +7,21 @@ public static class ServiceCollectionExtensions
         IWebHostEnvironment environment,
         IConfiguration configuration)
     {
-        if (environment.IsProduction())
+        if (configuration.GetValue<bool>("RecurringJobs:Enabled"))
         {
-            services.AddOptions<NotifyOptions>()
-                .Bind(configuration.GetSection("Notify"))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
+            if (environment.IsProduction())
+            {
+                services.AddOptions<NotifyOptions>()
+                    .Bind(configuration.GetSection("Notify"))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
 
-            services.AddSingleton<INotificationSender, NotificationSender>();
-        }
-        else
-        {
-            services.AddSingleton<INotificationSender, NoopNotificationSender>();
+                services.AddSingleton<INotificationSender, NotificationSender>();
+            }
+            else
+            {
+                services.AddSingleton<INotificationSender, NoopNotificationSender>();
+            }
         }
 
         return services;

@@ -3,4 +3,5 @@
 public class RecurringJobsOptions
 {
     public required BatchSendQtsAwardedEmailsJobOptions BatchSendQtsAwardedEmails { get; init; }
+    public required BatchSendInternationalQtsAwardedEmailsJobOptions BatchSendInternationalQtsAwardedEmails { get; init; }
 }

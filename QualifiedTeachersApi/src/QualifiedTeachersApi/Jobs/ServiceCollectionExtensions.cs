@@ -32,10 +32,16 @@ public static class ServiceCollectionExtensions
                     .Bind(configuration.GetSection("RecurringJobs:BatchSendQtsAwardedEmails"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
+                services.AddOptions<BatchSendInternationalQtsAwardedEmailsJobOptions>()
+                    .Bind(configuration.GetSection("RecurringJobs:BatchSendInternationalQtsAwardedEmails"))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
 
                 services.AddSingleton<IHostedService, RegisterRecurringJobsHostedService>();
                 services.AddTransient<SendQtsAwardedEmailJob>();
                 services.AddTransient<QtsAwardedEmailJobDispatcher>();
+                services.AddTransient<SendInternationalQtsAwardedEmailJob>();
+                services.AddTransient<InternationalQtsAwardedEmailJobDispatcher>();
             }
 
             if (environment.IsProduction())
