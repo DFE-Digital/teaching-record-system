@@ -40,7 +40,7 @@ public class GetInternationalQtsAwardeesForDateRangeTests : IAsyncLifetime
         var teacher2EmailAddress2 = Faker.Internet.Email();
         var teacher2DateOfBirth = new DateOnly(1997, 4, 23);
         var teacher2QtsDate = new DateOnly(2022, 08, 24);
-        var teacher2StatusValue = "103"; // Qualified Teacher: By virtue of overseas qualifications
+        var teacher2StatusValue = "90"; // Qualified teacher: by virtue of achieving international qualified teacher status
 
         var teacher3FirstName = Faker.Name.First();
         var teacher3LastName = Faker.Name.Last();
@@ -57,7 +57,7 @@ public class GetInternationalQtsAwardeesForDateRangeTests : IAsyncLifetime
         var teacher4EmailAddress2 = Faker.Internet.Email();
         var teacher4DateOfBirth = new DateOnly(1997, 4, 25);
         var teacher4QtsDate = new DateOnly(2022, 08, 26);
-        var teacher4StatusValue = "103"; // Qualified Teacher: By virtue of overseas qualifications
+        var teacher4StatusValue = "90"; // Qualified teacher: by virtue of achieving international qualified teacher status
 
         var teacher5FirstName = Faker.Name.First();
         var teacher5LastName = Faker.Name.Last();
