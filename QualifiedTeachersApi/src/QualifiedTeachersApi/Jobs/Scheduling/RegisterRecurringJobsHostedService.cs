@@ -28,5 +28,6 @@ public class RegisterRecurringJobsHostedService : IHostedService
     {
         _recurringJobManager.AddOrUpdate<BatchSendQtsAwardedEmailsJob>(nameof(BatchSendQtsAwardedEmailsJob), job => job.Execute(CancellationToken.None), _recurringJobsOptions.BatchSendQtsAwardedEmails.JobSchedule);
         _recurringJobManager.AddOrUpdate<BatchSendInternationalQtsAwardedEmailsJob>(nameof(BatchSendInternationalQtsAwardedEmailsJob), job => job.Execute(CancellationToken.None), _recurringJobsOptions.BatchSendInternationalQtsAwardedEmails.JobSchedule);
+        _recurringJobManager.AddOrUpdate<BatchSendEytsAwardedEmailsJob>(nameof(BatchSendEytsAwardedEmailsJob), job => job.Execute(CancellationToken.None), _recurringJobsOptions.BatchSendEytsAwardedEmails.JobSchedule);
     }
 }
