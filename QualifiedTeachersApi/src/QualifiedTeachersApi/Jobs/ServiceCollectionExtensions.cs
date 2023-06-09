@@ -40,7 +40,7 @@ public static class ServiceCollectionExtensions
                     .Bind(configuration.GetSection("RecurringJobs:BatchSendEytsAwardedEmails"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
-                services.AddOptions<BatchSendEytsAwardedEmailsJobOptions>()
+                services.AddOptions<BatchSendInductionCompletedEmailsJobOptions>()
                     .Bind(configuration.GetSection("RecurringJobs:BatchSendInductionCompletedEmails"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
