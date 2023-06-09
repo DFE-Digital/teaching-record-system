@@ -5,14 +5,14 @@ namespace QualifiedTeachersApi.DataStore.Crm;
 
 public partial class DataverseAdapter
 {
-    public async Task<EytsAwardee[]> GetEytsAwardeesForDateRange(DateTime startDate, DateTime endDate)
+    public async Task<InductionCompletee[]> GetInductionCompleteesForDateRange(DateTime startDate, DateTime endDate)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(dfeta_businesseventaudit.Fields.CreatedOn, ConditionOperator.GreaterEqual, startDate);
         filter.AddCondition(dfeta_businesseventaudit.Fields.CreatedOn, ConditionOperator.LessThan, endDate);
-        filter.AddCondition(dfeta_businesseventaudit.Fields.dfeta_changedfield, ConditionOperator.Equal, "EYTS Date");
-        filter.AddCondition(dfeta_businesseventaudit.Fields.dfeta_NewValue, ConditionOperator.NotNull);
-        filter.AddCondition(dfeta_businesseventaudit.Fields.dfeta_OldValue, ConditionOperator.Null);
+        filter.AddCondition(dfeta_businesseventaudit.Fields.dfeta_changedfield, ConditionOperator.Equal, "Induction Status");
+        filter.AddCondition(dfeta_businesseventaudit.Fields.dfeta_NewValue, ConditionOperator.Equal, "Passed");
+        filter.AddCondition(dfeta_businesseventaudit.Fields.dfeta_OldValue, ConditionOperator.NotEqual, "Passed");
 
         var query = new QueryExpression(dfeta_businesseventaudit.EntityLogicalName)
         {
@@ -32,7 +32,7 @@ public partial class DataverseAdapter
             .Select(e => e.ToEntity<dfeta_businesseventaudit>())
             .Select(e => e.Extract<Contact>(Contact.EntityLogicalName, Contact.PrimaryIdAttribute))
             .GroupBy(c => c.ContactId)
-            .Select(g => MapContactToEytsAwardee(g.First()))
+            .Select(g => MapContactToInductionCompletee(g.First()))
             .ToArray();
 
         static void AddContactLink(QueryExpression query)
@@ -63,32 +63,33 @@ public partial class DataverseAdapter
             filter.AddFilter(emailAddressFilter);
             contactLink.LinkCriteria = filter;
 
-            AddQtsRegistrationLink(contactLink);
+            AddInductionLink(contactLink);
         }
 
-        static void AddQtsRegistrationLink(LinkEntity contactLink)
+        static void AddInductionLink(LinkEntity contactLink)
         {
-            var qtsRegistrationLink = contactLink.AddLink(
-            dfeta_qtsregistration.EntityLogicalName,
+            var inductionLink = contactLink.AddLink(
+            dfeta_induction.EntityLogicalName,
             Contact.PrimaryIdAttribute,
-            dfeta_qtsregistration.Fields.dfeta_PersonId,
+            dfeta_induction.Fields.dfeta_PersonId,
             JoinOperator.Inner);
 
-            qtsRegistrationLink.Columns = new ColumnSet(
-                dfeta_qtsregistration.Fields.dfeta_PersonId,
-                dfeta_qtsregistration.Fields.dfeta_EYTSDate,
-                dfeta_qtsregistration.Fields.StateCode);
-            qtsRegistrationLink.EntityAlias = dfeta_qtsregistration.EntityLogicalName;
+            inductionLink.Columns = new ColumnSet(
+                dfeta_induction.Fields.dfeta_PersonId,
+                dfeta_induction.Fields.dfeta_InductionStatus,
+                dfeta_induction.Fields.StateCode);
+            inductionLink.EntityAlias = dfeta_induction.EntityLogicalName;
 
             var filter = new FilterExpression();
-            filter.AddCondition(dfeta_qtsregistration.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_qtsregistrationState.Active);
-            qtsRegistrationLink.LinkCriteria = filter;
+            filter.AddCondition(dfeta_induction.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_qtsregistrationState.Active);
+            filter.AddCondition(dfeta_induction.Fields.dfeta_InductionStatus, ConditionOperator.Equal, (int)dfeta_InductionStatus.Pass);
+            inductionLink.LinkCriteria = filter;
         }
     }
 
-    private EytsAwardee MapContactToEytsAwardee(Contact contact)
+    private InductionCompletee MapContactToInductionCompletee(Contact contact)
     {
-        return new EytsAwardee
+        return new InductionCompletee
         {
             TeacherId = contact.ContactId!.Value,
             Trn = contact.dfeta_TRN,

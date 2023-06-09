@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QualifiedTeachersApi.DataStore.Sql;
@@ -11,9 +12,11 @@ using QualifiedTeachersApi.DataStore.Sql;
 namespace QualifiedTeachersApi.Migrations
 {
     [DbContext(typeof(DqtContext))]
-    partial class DqtContextModelSnapshot : ModelSnapshot
+    [Migration("20230609143020_InductionCompletedEmailsJob")]
+    partial class InductionCompletedEmailsJob
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
