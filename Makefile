@@ -12,6 +12,7 @@ dev:
 	$(eval RESOURCE_NAME_PREFIX=s165d01)
 	$(eval ENV_SHORT=dv)
 	$(eval ENV_TAG=dev)
+  $(eval PLATFORM=paas)
 
 .PHONY: test
 test:
@@ -20,6 +21,7 @@ test:
 	$(eval RESOURCE_NAME_PREFIX=s165t01)
 	$(eval ENV_SHORT=ts)
 	$(eval ENV_TAG=test)
+  $(eval PLATFORM=paas)
 
 .PHONY: pre-production
 pre-production:
@@ -28,6 +30,7 @@ pre-production:
 	$(eval RESOURCE_NAME_PREFIX=s165t01)
 	$(eval ENV_SHORT=pp)
 	$(eval ENV_TAG=pre-prod)
+  $(eval PLATFORM=paas)
 
 .PHONY: production
 production:
@@ -38,6 +41,7 @@ production:
 	$(eval ENV_TAG=prod)
 	$(eval AZURE_BACKUP_STORAGE_ACCOUNT_NAME=s165p01dqtapidbbackup)
 	$(eval AZURE_BACKUP_STORAGE_CONTAINER_NAME=dqt-api)
+  $(eval PLATFORM=paas)
 
 .PHONY: domain
 domain:
@@ -48,8 +52,8 @@ domain:
 	$(eval ENV_TAG=prod)
 
 read-keyvault-config:
-	$(eval KEY_VAULT_NAME=$(shell jq -r '.key_vault_name' terraform/$(DEPLOY_ENV).tfvars.json))
-	$(eval KEY_VAULT_SECRET_NAME=$(shell jq -r '.key_vault_secret_name' terraform/$(DEPLOY_ENV).tfvars.json))
+	$(eval KEY_VAULT_NAME=$(shell jq -r '.key_vault_name' terraform/$(PLATFORM)/workspace_variables/$(DEPLOY_ENV).tfvars.json))
+	$(eval KEY_VAULT_SECRET_NAME=$(shell jq -r '.key_vault_secret_name' terraform/$(PLATFORM)/workspace_variables/$(DEPLOY_ENV).tfvars.json))
 
 read-deployment-config:
 	$(eval SPACE=$(shell jq -r '.paas_space' terraform/$(DEPLOY_ENV).tfvars.json))
@@ -134,16 +138,16 @@ restore-data-from-backup: read-deployment-config # make production restore-data-
 terraform-init:
 	$(if $(or $(DISABLE_PASSCODE),$(PASSCODE)), , $(error Missing environment variable "PASSCODE", retrieve from https://login.london.cloud.service.gov.uk/passcode))
 	[[ "${SP_AUTH}" != "true" ]] && az account set -s $(AZURE_SUBSCRIPTION) || true
-	terraform -chdir=terraform init -backend-config ${DEPLOY_ENV}.backend.tfvars -reconfigure
+	terraform -chdir=terraform/$(PLATFORM) init -backend-config workspace_variables/${DEPLOY_ENV}.backend.tfvars -reconfigure
 
 terraform-plan: terraform-init
-	terraform -chdir=terraform plan -var-file ${DEPLOY_ENV}.tfvars.json
+	terraform -chdir=terraform/$(PLATFORM) plan -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json
 
 terraform-apply: terraform-init
-	terraform -chdir=terraform apply -var-file ${DEPLOY_ENV}.tfvars.json ${AUTO_APPROVE}
+	terraform -chdir=terraform/$(PLATFORM) apply -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json ${AUTO_APPROVE}
 
 terraform-destroy: terraform-init
-	terraform -chdir=terraform destroy -var-file ${DEPLOY_ENV}.tfvars.json ${AUTO_APPROVE}
+	terraform -chdir=terraform/$(PLATFORM) destroy -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json ${AUTO_APPROVE}
 
 deploy-azure-resources: set-azure-account tags # make dev deploy-azure-resources CONFIRM_DEPLOY=1
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))

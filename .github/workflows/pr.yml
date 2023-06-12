@@ -70,9 +70,8 @@ jobs:
         fi
         echo "key_vault_name=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
       env:
-        TFVARS: dev.tfvars.json
+        TFVARS: terraform/paas/workspace_variables/dev.tfvars.json
       shell: bash
-      working-directory: terraform
 
     - uses: Azure/get-keyvault-secrets@v1
       name: Get secrets
@@ -154,6 +153,9 @@ jobs:
   validate_terraform:
     name: Validate Terraform
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [paas]
 
     steps:
     - uses: actions/checkout@v3
@@ -164,20 +166,20 @@ jobs:
 
     - name: Check formatting
       run: terraform fmt -check -diff
-      working-directory: terraform
+      working-directory: terraform/${{ matrix.platform }}
 
     - name: Validate
       run: |
         terraform init -backend=false
         terraform validate -no-color
-      working-directory: terraform
+      working-directory: terraform/${{ matrix.platform }}
 
     - name: Lint
       uses: reviewdog/action-tflint@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         tflint_rulesets: azurerm
-        working_directory: terraform
+        working_directory: terraform/${{ matrix.platform }}
       continue-on-error: true  # temporary- we're getting sporadic 503 errors here in action setup
 
   package:
