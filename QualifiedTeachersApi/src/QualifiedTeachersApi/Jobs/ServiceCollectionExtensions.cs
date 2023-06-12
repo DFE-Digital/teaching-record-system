@@ -40,6 +40,10 @@ public static class ServiceCollectionExtensions
                     .Bind(configuration.GetSection("RecurringJobs:BatchSendEytsAwardedEmails"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
+                services.AddOptions<BatchSendInductionCompletedEmailsJobOptions>()
+                    .Bind(configuration.GetSection("RecurringJobs:BatchSendInductionCompletedEmails"))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
 
                 services.AddSingleton<IHostedService, RegisterRecurringJobsHostedService>();
                 services.AddTransient<SendQtsAwardedEmailJob>();
@@ -48,6 +52,8 @@ public static class ServiceCollectionExtensions
                 services.AddTransient<InternationalQtsAwardedEmailJobDispatcher>();
                 services.AddTransient<SendEytsAwardedEmailJob>();
                 services.AddTransient<EytsAwardedEmailJobDispatcher>();
+                services.AddTransient<SendInductionCompletedEmailJob>();
+                services.AddTransient<InductionCompletedEmailJobDispatcher>();
             }
 
             if (environment.IsProduction())

@@ -98,4 +98,6 @@ public interface IDataverseAdapter
     Task<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRange(DateTime startDate, DateTime endDate);
 
     Task<EytsAwardee[]> GetEytsAwardeesForDateRange(DateTime startDate, DateTime endDate);
+
+    Task<InductionCompletee[]> GetInductionCompleteesForDateRange(DateTime startDate, DateTime endDate);
 }

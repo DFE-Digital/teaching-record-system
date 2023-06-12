@@ -186,10 +186,11 @@ public class GetInductionByTeacherTests : IAsyncLifetime
         if (numberOfInductionPeriods == 2)
         {
             Assert.Equal(2, inductionPeriods.Length);
-            Assert.Equal(inductionPeriod2StartDate.ToDateTime(), inductionPeriods[1].dfeta_StartDate);
-            Assert.Equal(inductionPeriod2EndDate.ToDateTime(), inductionPeriods[1].dfeta_EndDate);
-            Assert.Equal(inductionPeriod2Terms, inductionPeriods[1].dfeta_Numberofterms);
-            var appropriateBody = inductionPeriods[1].Extract<Account>("appropriatebody", Account.PrimaryIdAttribute);
+            var inductionPeriod2 = inductionPeriods.Where(p => p.dfeta_StartDate == inductionPeriod2StartDate.ToDateTime()).SingleOrDefault();
+            Assert.NotNull(inductionPeriod2);
+            Assert.Equal(inductionPeriod2EndDate.ToDateTime(), inductionPeriod2.dfeta_EndDate);
+            Assert.Equal(inductionPeriod2Terms, inductionPeriod2.dfeta_Numberofterms);
+            var appropriateBody = inductionPeriod2.Extract<Account>("appropriatebody", Account.PrimaryIdAttribute);
             Assert.NotNull(appropriateBody);
             Assert.Equal(inductionPeriod2AppropriateBodyName, appropriateBody.Name);
         }
