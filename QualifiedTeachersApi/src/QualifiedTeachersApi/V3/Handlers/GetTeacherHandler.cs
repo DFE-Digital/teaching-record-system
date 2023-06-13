@@ -110,23 +110,59 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         dfeta_qualification[]? qualifications = default;
 
-        if ((request.Include & (GetTeacherRequestIncludes.MandatoryQualifications | GetTeacherRequestIncludes.NpqQualifications)) != 0)
+        if ((request.Include & (GetTeacherRequestIncludes.MandatoryQualifications | GetTeacherRequestIncludes.NpqQualifications | GetTeacherRequestIncludes.HigherEducationQualifications)) != 0)
         {
-            qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
-                teacher.Id,
-                columnNames: new[]
+            string[]? columnNames = new[]
+            {
+                dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
+                dfeta_qualification.Fields.dfeta_Type,
+                dfeta_qualification.Fields.StateCode
+            };
+
+            string[]? specialismColumnNames = null;
+            string[]? heQualificationColumnNames = null;
+            string[]? heSubjectColumnNames = null;
+
+            if (request.Include.HasFlag(GetTeacherRequestIncludes.MandatoryQualifications))
+            {
+                columnNames = new[]
                 {
                     dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
                     dfeta_qualification.Fields.dfeta_Type,
                     dfeta_qualification.Fields.StateCode,
                     dfeta_qualification.Fields.dfeta_MQ_Date,
                     dfeta_qualification.Fields.dfeta_MQ_SpecialismId
-                },
-                specialismColumnNames: new[]
+                };
+
+                specialismColumnNames = new[]
                 {
                     dfeta_specialism.PrimaryIdAttribute,
                     dfeta_specialism.Fields.dfeta_name
-                });
+                };
+            }
+
+            if (request.Include.HasFlag(GetTeacherRequestIncludes.HigherEducationQualifications))
+            {
+                heQualificationColumnNames = new[]
+                {
+                    dfeta_hequalification.PrimaryIdAttribute,
+                    dfeta_hequalification.Fields.dfeta_name
+                };
+
+                heSubjectColumnNames = new[]
+                {
+                    dfeta_hesubject.PrimaryIdAttribute,
+                    dfeta_hesubject.Fields.dfeta_name,
+                    dfeta_hesubject.Fields.dfeta_Value
+                };
+            }
+
+            qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+                teacher.Id,
+                columnNames,
+                heQualificationColumnNames,
+                heSubjectColumnNames,
+                specialismColumnNames);
         }
 
         bool pendingNameChange = default, pendingDateOfBirthChange = default;
@@ -188,6 +224,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 default,
             MandatoryQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.MandatoryQualifications) ?
                 Option.Some(MapMandatoryQualifications(qualifications!)) :
+                default,
+            HigherEducationQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.HigherEducationQualifications) ?
+                Option.Some(MapHigherEducationQualifications(qualifications!)) :
                 default
         };
     }
@@ -383,4 +422,52 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Specialism = mq.Specialism.dfeta_name
             })
             .ToArray() ?? Array.Empty<GetTeacherResponseMandatoryQualificationsQualification>();
+
+    private static IEnumerable<GetTeacherResponseHigherEducationQualificationsQualification> MapHigherEducationQualifications(dfeta_qualification[] qualifications) =>
+        qualifications
+        ?.Where(q => q.dfeta_Type.HasValue
+                && q.dfeta_Type.Value == dfeta_qualification_dfeta_Type.HigherEducation
+                && q.StateCode == dfeta_qualificationState.Active)
+        ?.Select(q =>
+        {
+            var heQualification = q.Extract<dfeta_hequalification>();
+            var heSubject1 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}1", dfeta_hesubject.PrimaryIdAttribute);
+            var heSubject2 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}2", dfeta_hesubject.PrimaryIdAttribute);
+            var heSubject3 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}3", dfeta_hesubject.PrimaryIdAttribute);
+            var heSubjects = new List<GetTeacherResponseHigherEducationQualificationsQualificationSubject>();
+            if (heSubject1 != null)
+            {
+                heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
+                {
+                    Code = heSubject1.dfeta_Value,
+                    Name = heSubject1.dfeta_name,
+                });
+            }
+
+            if (heSubject2 != null)
+            {
+                heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
+                {
+                    Code = heSubject2.dfeta_Value,
+                    Name = heSubject2.dfeta_name,
+                });
+            }
+
+            if (heSubject3 != null)
+            {
+                heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
+                {
+                    Code = heSubject3.dfeta_Value,
+                    Name = heSubject3.dfeta_name,
+                });
+            }
+
+            return new GetTeacherResponseHigherEducationQualificationsQualification
+            {
+                Name = heQualification.dfeta_name,
+                Awarded = q.dfeta_CompletionorAwardDate.ToDateOnly(),
+                Subjects = heSubjects.ToArray()
+            };
+        })
+        .ToArray() ?? Array.Empty<GetTeacherResponseHigherEducationQualificationsQualification>();
 }

@@ -56,33 +56,43 @@ public class GetTeacherTests : GetTeacherTestBase
     }
 
     [Fact]
-    public Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent()
+    public Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent()
     {
         var trn = "1234567";
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent(httpClient, baseUrl, trn);
+        return ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(httpClient, baseUrl, trn);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent()
+    public Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent()
     {
         var trn = "1234567";
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
+        return ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent()
+    public Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
     {
         var trn = "1234567";
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent(httpClient, baseUrl, trn);
+        return ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(httpClient, baseUrl, trn);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent()
+    {
+        var trn = "1234567";
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var baseUrl = "/v3/teacher";
+
+        return ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(httpClient, baseUrl, trn);
     }
 
     [Fact]

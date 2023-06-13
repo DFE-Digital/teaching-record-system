@@ -22,6 +22,7 @@ public enum GetTeacherRequestIncludes
     NpqQualifications = 1 << 2,
     MandatoryQualifications = 1 << 3,
     PendingDetailChanges = 1 << 4,
+    HigherEducationQualifications = 1 << 5,
 
-    All = Induction | InitialTeacherTraining | NpqQualifications | MandatoryQualifications | PendingDetailChanges
+    All = Induction | InitialTeacherTraining | NpqQualifications | MandatoryQualifications | PendingDetailChanges | HigherEducationQualifications
 }

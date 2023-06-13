@@ -67,30 +67,39 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     }
 
     [Fact]
-    public Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent()
+    public Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent()
     {
         var trn = "1234567";
         var baseUrl = $"/v3/teachers/{trn}";
 
-        return ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn);
+        return ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(HttpClientWithApiKey, baseUrl, trn);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent()
+    public Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent()
     {
         var trn = "1234567";
         var baseUrl = $"/v3/teachers/{trn}";
 
-        return ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn, expectCertificateUrls: false);
+        return ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(HttpClientWithApiKey, baseUrl, trn, expectCertificateUrls: false);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent()
+    public Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
     {
         var trn = "1234567";
         var baseUrl = $"/v3/teachers/{trn}";
 
-        return ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn);
+        return ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(HttpClientWithApiKey, baseUrl, trn);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent()
+    {
+        var trn = "1234567";
+        var baseUrl = $"/v3/teachers/{trn}";
+
+        return ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(HttpClientWithApiKey, baseUrl, trn);
     }
 
     [Fact]
