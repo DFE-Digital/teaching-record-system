@@ -39,7 +39,8 @@ public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest
                 Contact.PrimaryIdAttribute,
                 Contact.Fields.FirstName,
                 Contact.Fields.MiddleName,
-                Contact.Fields.LastName
+                Contact.Fields.LastName,
+                Contact.Fields.dfeta_TRN
             });
 
         if (qualification == null
@@ -51,7 +52,8 @@ public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest
         }
 
         var teacher = qualification.Extract<Contact>(Contact.EntityLogicalName, Contact.PrimaryIdAttribute);
-        if (teacher == null)
+        if (teacher == null
+            || teacher.dfeta_TRN != request.Trn)
         {
             return null;
         }

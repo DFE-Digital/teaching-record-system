@@ -129,8 +129,20 @@ public class CertificatesController : Controller
         description: "Returns a PDF of the NPQ Certificate associated with the provided qualification ID.")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK, "application/pdf")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetNpq(GetNpqCertificateRequest request)
+    public async Task<IActionResult> GetNpq([FromRoute] Guid qualificationId)
     {
+        var trn = User.FindFirstValue("trn");
+        if (trn is null)
+        {
+            return NotFound();
+        }
+
+        var request = new GetNpqCertificateRequest()
+        {
+            QualificationId = qualificationId,
+            Trn = trn
+        };
+
         var response = await _mediator.Send(request);
         if (response is null)
         {
