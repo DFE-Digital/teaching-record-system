@@ -18,8 +18,9 @@ locals {
         "ConnectionStrings:DefaultConnection"  = local.pg_connection_string,
         "ConnectionStrings:Redis"              = local.redis_connection_string,
         "DistributedLockContainerName"         = local.distributed_lock_container_name,
-        "PaasEnvironment"                      = var.environment_name,
+        "PlatformEnvironment"                  = var.environment_name,
         "StorageConnectionString"              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}",
+        "Platform"                             = "PAAS"
       }
     ))
   }

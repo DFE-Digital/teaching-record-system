@@ -58,13 +58,13 @@ public class Program
         {
             builder.Configuration
                 .AddJsonEnvironmentVariable("AppConfig")
-                .AddJsonEnvironmentVariable("VCAP_SERVICES", configurationKeyPrefix: "VCAP_SERVICES")
                 .AddJsonEnvironmentVariable("VCAP_APPLICATION", configurationKeyPrefix: "VCAP_APPLICATION");
         }
 
-        var paasEnvironmentName = configuration["PaasEnvironment"];
+        var platform = configuration["Platform"] ?? throw new Exception("Missing 'Platform' configuration entry.");
+        var platformEnvironmentName = configuration["PlatformEnvironment"];
 
-        WebApplicationBuilderExtensions.ConfigureLogging(builder, paasEnvironmentName);
+        builder.ConfigureLogging(platformEnvironmentName);
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
@@ -253,7 +253,10 @@ public class Program
             services.AddRateLimiting(env, configuration);
         }
 
-        MetricLabels.ConfigureLabels(builder.Configuration);
+        if (platform == "PAAS")
+        {
+            MetricLabels.ConfigureLabels(builder.Configuration);
+        }
 
         var app = builder.Build();
 
@@ -269,7 +272,10 @@ public class Program
 
         app.UseRouting();
 
-        app.UseHttpMetrics();
+        if (platform == "PAAS")
+        {
+            app.UseHttpMetrics();
+        }
 
         app.UseHealthChecks("/status");
 
@@ -332,7 +338,10 @@ public class Program
 
             endpoints.MapWebHookEndpoints();
 
-            endpoints.MapMetrics();
+            if (platform == "PAAS")
+            {
+                endpoints.MapMetrics();
+            }
 
             endpoints.MapControllers();
 

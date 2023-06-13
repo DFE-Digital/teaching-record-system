@@ -9,7 +9,7 @@ namespace QualifiedTeachersApi.Infrastructure.Logging;
 
 public static class WebApplicationBuilderExtensions
 {
-    public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder, string? paasEnvironmentName)
+    public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder, string? platformEnvironmentName)
     {
         if (builder.Environment.IsProduction())
         {
@@ -19,9 +19,9 @@ public static class WebApplicationBuilderExtensions
 
             builder.Services.Configure<SentryAspNetCoreOptions>(options =>
             {
-                if (!string.IsNullOrEmpty(paasEnvironmentName))
+                if (!string.IsNullOrEmpty(platformEnvironmentName))
                 {
-                    options.Environment = paasEnvironmentName;
+                    options.Environment = platformEnvironmentName;
                 }
 
                 var gitSha = builder.Configuration["GitSha"];
