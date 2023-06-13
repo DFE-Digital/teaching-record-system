@@ -167,7 +167,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         AssertEx.JsonObjectEquals(responseInduction, expectedJson);
     }
 
-    protected async Task ValidRequestWithInitialTeacherTraining_ReturnsExpectedInductionContent(
+    protected async Task ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(
         HttpClient httpClient,
         string baseUrl,
         string trn)
@@ -232,7 +232,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             });
     }
 
-    protected async Task ValidRequestWithNpqQualifications_ReturnsExpectedInductionContent(
+    protected async Task ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(
         HttpClient httpClient,
         string baseUrl,
         string trn,
@@ -285,7 +285,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         AssertEx.JsonObjectEquals(responseNpqQualifications, expectedJson);
     }
 
-    protected async Task ValidRequestWithMandatoryQualifications_ReturnsExpectedInductionContent(
+    protected async Task ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(
         HttpClient httpClient,
         string baseUrl,
         string trn)
@@ -325,6 +325,120 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 {
                     awarded = mandatoryQualificationValid.dfeta_MQ_Date?.ToString("yyyy-MM-dd"),
                     specialism = mandatoryQualificationValid.GetAttributeValue<AliasedValue>($"{dfeta_specialism.EntityLogicalName}.{dfeta_specialism.Fields.dfeta_name}").Value
+                }
+            });
+    }
+
+    protected async Task ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(
+        HttpClient httpClient,
+        string baseUrl,
+        string trn)
+    {
+        // Arrange
+        var contact = CreateContact(trn);
+        var qualification1AwardDate = new DateTime(2022, 4, 6);
+        var qualification1Name = "My HE Qual 1";
+        var qualification1Subject1 = (Code: "Qualification1Subject1", Name: "Qualification 1 Subject 1");
+        var qualification1Subject2 = (Code: "Qualification1Subject2", Name: "Qualification 1 Subject 2");
+        var qualification1Subject3 = (Code: "Qualification1Subject3", Name: "Qualification 1 Subject 3");
+
+        var qualification2AwardDate = new DateTime(2022, 4, 2);
+        var qualification2Name = "My HE Qual 2";
+        var qualification2Subject1 = (Code: "Qualification2Subject1", Name: "Qualification 2 Subject 1");
+
+        var qualification3Name = "My HE Qual 3";
+        var qualification3Subject1 = (Code: "Qualification3Subject1", Name: "Qualification 3 Subject 1");
+
+        var qualification4AwardDate = new DateTime(2022, 4, 8);
+        var qualification4Name = "My HE Qual 4";
+        var qualification4Subject1 = (Code: "Qualification4Subject1", Name: "Qualification 4 Subject 1");
+        var qualification4Subject2 = (Code: "Qualification4Subject2", Name: "Qualification 4 Subject 2");
+        var qualification4Subject3 = (Code: "Qualification4Subject3", Name: "Qualification 4 Subject 3");
+
+        var heQualificationWith3Subjects = CreateQualification(
+            dfeta_qualification_dfeta_Type.HigherEducation,
+            qualification1AwardDate,
+            dfeta_qualificationState.Active,
+            null,
+            qualification1Name,
+            qualification1Subject1,
+            qualification1Subject2,
+            qualification1Subject3);
+        var heQualificationWith1Subject = CreateQualification(
+            dfeta_qualification_dfeta_Type.HigherEducation,
+            qualification2AwardDate,
+            dfeta_qualificationState.Active,
+            null,
+            qualification2Name,
+            qualification2Subject1);
+        var heQualificationWithNoAwardDate = CreateQualification(
+            dfeta_qualification_dfeta_Type.HigherEducation,
+            null,
+            dfeta_qualificationState.Active,
+            null,
+            qualification3Name,
+            qualification3Subject1);
+        var heQualificationInactive = CreateQualification(
+            dfeta_qualification_dfeta_Type.HigherEducation,
+            qualification4AwardDate,
+            dfeta_qualificationState.Inactive,
+            null,
+            qualification4Name,
+            qualification4Subject1,
+            qualification4Subject2,
+            qualification4Subject3);
+
+        var qualifications = new dfeta_qualification[]
+        {
+            heQualificationWith3Subjects,
+            heQualificationWith1Subject,
+            heQualificationWithNoAwardDate,
+            heQualificationInactive
+        };
+
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications, incidents: null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=HigherEducationQualifications");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responsehigherEducationQualifications = jsonResponse.RootElement.GetProperty("higherEducationQualifications");
+
+        AssertEx.JsonObjectEquals(
+            responsehigherEducationQualifications,
+            new[]
+            {
+                new
+                {
+                    name = qualification1Name,
+                    awarded = (string?)qualification1AwardDate.ToString("yyyy-MM-dd"),
+                    subjects = new[]
+                    {
+                        new { code = qualification1Subject1.Code, name = qualification1Subject1.Name },
+                        new { code = qualification1Subject2.Code, name = qualification1Subject2.Name },
+                        new { code = qualification1Subject3.Code, name = qualification1Subject3.Name }
+                    }
+                },
+                new
+                {
+                    name = qualification2Name,
+                    awarded = (string?)qualification2AwardDate.ToString("yyyy-MM-dd"),
+                    subjects = new[]
+                    {
+                        new { code = qualification2Subject1.Code, name = qualification2Subject1.Name }
+                    }
+                },
+                new
+                {
+                    name = qualification3Name,
+                    awarded = (string?)null,
+                    subjects = new[]
+                    {
+                        new { code = qualification3Subject1.Code, name = qualification3Subject1.Name }
+                    }
                 }
             });
     }
@@ -589,7 +703,11 @@ public abstract class GetTeacherTestBase : ApiTestBase
         dfeta_qualification_dfeta_Type type,
         DateTime? date,
         dfeta_qualificationState state,
-        string? specialismName)
+        string? specialismName,
+        string? heName = null,
+        (string Code, string Name)? heSubject1 = null,
+        (string Code, string Name)? heSubject2 = null,
+        (string Code, string Name)? heSubject3 = null)
     {
         var qualification = new dfeta_qualification
         {
@@ -605,6 +723,33 @@ public abstract class GetTeacherTestBase : ApiTestBase
         else
         {
             qualification.dfeta_CompletionorAwardDate = date;
+        }
+
+        if (type == dfeta_qualification_dfeta_Type.HigherEducation)
+        {
+            qualification.Attributes.Add($"{nameof(dfeta_hequalification)}.{dfeta_hequalification.PrimaryIdAttribute}", new AliasedValue(dfeta_hequalification.EntityLogicalName, dfeta_hequalification.PrimaryIdAttribute, Guid.NewGuid()));
+            qualification.Attributes.Add($"{nameof(dfeta_hequalification)}.{dfeta_hequalification.Fields.dfeta_name}", new AliasedValue(dfeta_hequalification.EntityLogicalName, dfeta_hequalification.Fields.dfeta_name, heName));
+
+            if (heSubject1 != null)
+            {
+                qualification.Attributes.Add($"{nameof(dfeta_hesubject)}1.{dfeta_hesubject.PrimaryIdAttribute}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.PrimaryIdAttribute, Guid.NewGuid()));
+                qualification.Attributes.Add($"{nameof(dfeta_hesubject)}1.{dfeta_hesubject.Fields.dfeta_name}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_name, heSubject1.Value.Name));
+                qualification.Attributes.Add($"{nameof(dfeta_hesubject)}1.{dfeta_hesubject.Fields.dfeta_Value}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_Value, heSubject1.Value.Code));
+            }
+
+            if (heSubject2 != null)
+            {
+                qualification.Attributes.Add($"{nameof(dfeta_hesubject)}2.{dfeta_hesubject.PrimaryIdAttribute}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.PrimaryIdAttribute, Guid.NewGuid()));
+                qualification.Attributes.Add($"{nameof(dfeta_hesubject)}2.{dfeta_hesubject.Fields.dfeta_name}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_name, heSubject2.Value.Name));
+                qualification.Attributes.Add($"{nameof(dfeta_hesubject)}2.{dfeta_hesubject.Fields.dfeta_Value}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_Value, heSubject2.Value.Code));
+            }
+
+            if (heSubject3 != null)
+            {
+                qualification.Attributes.Add($"{nameof(dfeta_hesubject)}3.{dfeta_hesubject.PrimaryIdAttribute}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.PrimaryIdAttribute, Guid.NewGuid()));
+                qualification.Attributes.Add($"{nameof(dfeta_hesubject)}3.{dfeta_hesubject.Fields.dfeta_name}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_name, heSubject3.Value.Name));
+                qualification.Attributes.Add($"{nameof(dfeta_hesubject)}3.{dfeta_hesubject.Fields.dfeta_Value}", new AliasedValue(dfeta_hesubject.EntityLogicalName, dfeta_hesubject.Fields.dfeta_Value, heSubject3.Value.Code));
+            }
         }
 
         if (specialismName is not null)
