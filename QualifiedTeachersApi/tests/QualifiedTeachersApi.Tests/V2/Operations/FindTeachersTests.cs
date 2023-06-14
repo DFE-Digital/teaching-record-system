@@ -44,6 +44,7 @@ public class FindTeachersTests : ApiTestBase
         var contact1 = new Contact()
         {
             FirstName = "test",
+            MiddleName = "tester",
             LastName = "testing",
             Id = Guid.NewGuid(),
             dfeta_NINumber = "1111",
@@ -72,6 +73,7 @@ public class FindTeachersTests : ApiTestBase
                          trn = contact1.dfeta_TRN,
                          emailAddresses = Array.Empty<string>(),
                          firstName = contact1.FirstName,
+                         middleName = contact1.MiddleName,
                          lastName = contact1.LastName,
                          dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
                          nationalInsuranceNumber = contact1.dfeta_NINumber,
@@ -117,6 +119,7 @@ public class FindTeachersTests : ApiTestBase
         var contact1 = new Contact()
         {
             FirstName = "test",
+            MiddleName = "tester",
             LastName = "testing",
             Id = Guid.NewGuid(),
             dfeta_NINumber = "1111",
@@ -155,6 +158,7 @@ public class FindTeachersTests : ApiTestBase
                          trn = contact1.dfeta_TRN,
                          emailAddresses = Array.Empty<string>(),
                          firstName = contact1.FirstName,
+                         middleName = contact1.MiddleName,
                          lastName = contact1.LastName,
                          dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
                          nationalInsuranceNumber = contact1.dfeta_NINumber,
@@ -173,6 +177,7 @@ public class FindTeachersTests : ApiTestBase
         var contact1 = new Contact()
         {
             FirstName = "test",
+            MiddleName = "tester",
             LastName = "testing",
             Id = Guid.NewGuid(),
             dfeta_NINumber = "1111",
@@ -199,7 +204,7 @@ public class FindTeachersTests : ApiTestBase
     public async Task Given_search_returns_a_result_with_no_active_sanctions_returns_expected_response()
     {
         // Arrange
-        var contact1 = new Contact() { FirstName = "test", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference", dfeta_ActiveSanctions = null };
+        var contact1 = new Contact() { FirstName = "test", MiddleName = "tester", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference", dfeta_ActiveSanctions = null };
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
@@ -221,6 +226,7 @@ public class FindTeachersTests : ApiTestBase
                          trn = contact1.dfeta_TRN,
                          emailAddresses = Array.Empty<string>(),
                          firstName = contact1.FirstName,
+                         middleName = contact1.MiddleName,
                          lastName = contact1.LastName,
                          dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
                          nationalInsuranceNumber = contact1.dfeta_NINumber,
@@ -241,6 +247,7 @@ public class FindTeachersTests : ApiTestBase
         var contact1 = new Contact()
         {
             FirstName = "test",
+            MiddleName = "tester",
             LastName = "testing",
             Id = Guid.NewGuid(),
             dfeta_NINumber = "1111",
@@ -270,6 +277,7 @@ public class FindTeachersTests : ApiTestBase
                          trn = contact1.dfeta_TRN,
                          emailAddresses = Array.Empty<string>(),
                          firstName = contact1.FirstName,
+                         middleName = contact1.MiddleName,
                          lastName = contact1.LastName,
                          dateOfBirth = DateOnly.FromDateTime(contact1.BirthDate.Value).ToString("yyyy-MM-dd"),
                          nationalInsuranceNumber = contact1.dfeta_NINumber,

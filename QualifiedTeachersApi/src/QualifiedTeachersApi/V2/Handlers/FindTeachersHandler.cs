@@ -68,6 +68,7 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
                 Trn = a.dfeta_TRN,
                 EmailAddresses = !string.IsNullOrEmpty(a.EMailAddress1) ? new[] { a.EMailAddress1 } : Array.Empty<string>(),
                 FirstName = a.FirstName,
+                MiddleName = a.MiddleName,
                 LastName = a.LastName,
                 DateOfBirth = a.BirthDate.HasValue ? DateOnly.FromDateTime(a.BirthDate.Value) : null,
                 NationalInsuranceNumber = a.dfeta_NINumber,
