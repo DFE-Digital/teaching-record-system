@@ -147,6 +147,8 @@ public partial class DataverseAdapter
                         Contact.Fields.LastName => $"  - Last name: '{_command.LastName}'",
                         Contact.Fields.BirthDate => $"  - Date of birth: '{_command.BirthDate:dd/MM/yyyy}'",
                         Contact.Fields.dfeta_HUSID => $"  - HusId: '{_command.HusId}'",
+                        Contact.Fields.dfeta_SlugId => $"  - SlugId: '{_command.SlugId}'",
+                        $"{nameof(dfeta_initialteachertraining)}_{dfeta_initialteachertraining.Fields.dfeta_SlugId}" => $"  - ITT SlugId: '{_command.SlugId}'",
                         _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
                     });
                 }
@@ -244,7 +246,8 @@ public partial class DataverseAdapter
                 Address1_PostalCode = _command.Address?.PostalCode,
                 Address1_Country = _command.Address?.Country,
                 GenderCode = _command.GenderCode,
-                dfeta_HUSID = _command.HusId
+                dfeta_HUSID = _command.HusId,
+                dfeta_SlugId = _command.SlugId,
             };
 
             // We get a NullReferenceException back from CRM if City is null or empty
@@ -312,7 +315,8 @@ public partial class DataverseAdapter
                 dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
                 dfeta_TraineeID = _command.HusId,
                 dfeta_ITTQualificationId = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName),
-                dfeta_ittqualificationaim = _command.InitialTeacherTraining.IttQualificationAim
+                dfeta_ittqualificationaim = _command.InitialTeacherTraining.IttQualificationAim,
+                dfeta_SlugId = _command.SlugId //slugid is the same as contact.slugid
             };
         }
 
@@ -375,7 +379,8 @@ public partial class DataverseAdapter
                         Contact.Fields.MiddleName,
                         Contact.Fields.LastName,
                         Contact.Fields.BirthDate,
-                        Contact.Fields.dfeta_HUSID
+                        Contact.Fields.dfeta_HUSID,
+                        Contact.Fields.dfeta_SlugId
                     }
                 },
                 Criteria = filter
@@ -384,7 +389,17 @@ public partial class DataverseAdapter
             var result = await _dataverseAdapter._service.RetrieveMultipleAsync(query);
 
             // Old implementation returns the first record that matches on at least three attributes; replicating that here
-            var match = result.Entities.Select(entity => entity.ToEntity<Contact>()).FirstOrDefault();
+            var matches = result.Entities.Select(entity => entity.ToEntity<Contact>()).ToList();
+
+            // if a teacher exists that contains an itt record with a slugid that matches request slugid, use it
+            // in potential duplicate check
+            var teachersWithIttWithSlugs = string.IsNullOrEmpty(_command.SlugId) ? Array.Empty<Contact>() : await _dataverseAdapter.GetTeachersByInitialTeacherTrainingSlugId(_command.SlugId, columnNames: new[] { Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_SlugId }, null);
+            if (teachersWithIttWithSlugs.Any())
+            {
+                matches.AddRange(teachersWithIttWithSlugs);
+            }
+
+            var match = matches.FirstOrDefault();
 
             if (match == null)
             {
@@ -416,6 +431,16 @@ public partial class DataverseAdapter
                 attributeMatches = attributeMatches.Concat(new[] { (Contact.Fields.dfeta_HUSID, _command.HusId.Equals(match.dfeta_HUSID)) }).ToArray();
             }
 
+            if (!string.IsNullOrEmpty(_command.SlugId))
+            {
+                attributeMatches = attributeMatches.Concat(new[] { (Contact.Fields.dfeta_SlugId, _command.SlugId.Equals(match.dfeta_SlugId, StringComparison.OrdinalIgnoreCase)) }).ToArray();
+            }
+
+            if (!string.IsNullOrEmpty(_command.SlugId) && teachersWithIttWithSlugs.Any())
+            {
+                attributeMatches = attributeMatches.Concat(new[] { ($"{nameof(dfeta_initialteachertraining)}_{dfeta_initialteachertraining.Fields.dfeta_SlugId}", true) }).ToArray();
+            }
+
             var matchedAttributeNames = attributeMatches.Where(m => m.Matches).Select(m => m.Attribute).ToArray();
 
             return new CreateTeacherDuplicateTeacherResult()
@@ -425,7 +450,8 @@ public partial class DataverseAdapter
                 HasActiveSanctions = match.dfeta_ActiveSanctions == true,
                 HasQtsDate = match.dfeta_QTSDate.HasValue,
                 HasEytsDate = match.dfeta_EYTSDate.HasValue,
-                HusId = match.dfeta_HUSID
+                HusId = match.dfeta_HUSID,
+                SlugId = match.dfeta_SlugId
             };
 
             bool TryGetMatchCombinationsFilter(out FilterExpression filter)
@@ -459,6 +485,14 @@ public partial class DataverseAdapter
                     var husIdFilter = new FilterExpression(LogicalOperator.Or);
                     husIdFilter.AddCondition(Contact.Fields.dfeta_HUSID, ConditionOperator.Equal, _command.HusId);
                     combinationsFilter.AddFilter(husIdFilter);
+                }
+
+                // SlugId overrides at least 3 matches so needs to be in its own block
+                if (!string.IsNullOrEmpty(_command.SlugId))
+                {
+                    var slugIdFilter = new FilterExpression(LogicalOperator.Or);
+                    slugIdFilter.AddCondition(Contact.Fields.dfeta_SlugId, ConditionOperator.Equal, _command.SlugId);
+                    combinationsFilter.AddFilter(slugIdFilter);
                 }
 
                 foreach (var combination in combinations)
@@ -807,5 +841,6 @@ public partial class DataverseAdapter
         public bool HasQtsDate { get; set; }
         public bool HasEytsDate { get; set; }
         public string HusId { get; set; }
+        public string SlugId { get; set; }
     }
 }

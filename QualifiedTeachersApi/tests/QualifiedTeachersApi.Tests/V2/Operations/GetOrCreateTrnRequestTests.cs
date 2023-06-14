@@ -45,9 +45,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
 
             await dbContext.SaveChangesAsync();
         });
+        var slugId = Guid.NewGuid().ToString();
+        var request = CreateRequest(req =>
+        {
+            req.SlugId = slugId;
+        });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
+        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -58,7 +63,8 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
                 trn = trn,
                 status = "Completed",
                 qtsDate = (DateOnly?)null,
-                potentialDuplicate = false
+                potentialDuplicate = false,
+                slugId = slugId
             },
             expectedStatusCode: 200);
     }
@@ -81,9 +87,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
 
             await dbContext.SaveChangesAsync();
         });
+        var slugId = Guid.NewGuid().ToString();
+        var request = CreateRequest(req =>
+        {
+            req.SlugId = slugId;
+        });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
+        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -94,7 +105,8 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
                 trn = (string)null,
                 status = "Pending",
                 qtsDate = (DateOnly?)null,
-                potentialDuplicate = true
+                potentialDuplicate = true,
+                slugId = slugId
             },
             expectedStatusCode: 200);
     }
@@ -147,9 +159,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
+        var slugId = Guid.NewGuid().ToString();
+        var request = CreateRequest(req =>
+        {
+            req.SlugId = slugId;
+        });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
+        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         ApiFixture.DataverseAdapter.Verify();
@@ -162,7 +179,8 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
                 trn = trn,
                 status = expectedStatus,
                 qtsDate = (DateOnly?)null,
-                potentialDuplicate = expectedPotentialDuplicate
+                potentialDuplicate = expectedPotentialDuplicate,
+                slugId = slugId
             },
             expectedStatusCode: 201);
     }
@@ -360,6 +378,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var response = await HttpClientWithApiKey.PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
+        CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -682,6 +701,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             req.QtsDate = new DateOnly(2020, 10, 10);
             req.RecognitionRoute = QualifiedTeachersApi.V2.Requests.CreateTeacherRecognitionRoute.Scotland;
             req.InductionRequired = false;
+            req.SlugId = null;
         });
 
         // Act
@@ -721,6 +741,49 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         ApiFixture.DataverseAdapter.Verify();
     }
 
+    [Fact]
+    public async Task Given_request_with_too_long_invalid_slugid_returns_error()
+    {
+        // Arrange
+        var slugId = new string('x', 155);  // Limit is 150
+        var requestId = Guid.NewGuid().ToString();
+        var request = CreateRequest(req =>
+        {
+            req.SlugId = slugId;
+        });
+
+        // Act
+        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: nameof(GetOrCreateTrnRequest.SlugId),
+            expectedError: Properties.StringResources.ErrorMessages_SlugIdMustBe150CharactersOrFewer);
+    }
+
+    [Fact]
+    public async Task Given_request_for_non_traineeteacher_with_slugid_returns_error()
+    {
+        // Arrange
+        var slugId = Guid.NewGuid().ToString();
+        var requestId = Guid.NewGuid().ToString();
+        var request = CreateRequest(req =>
+        {
+            req.SlugId = slugId;
+            req.TeacherType = QualifiedTeachersApi.V2.Requests.CreateTeacherType.OverseasQualifiedTeacher;
+        });
+
+        // Act
+        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: nameof(GetOrCreateTrnRequest.SlugId),
+            expectedError: Properties.StringResources.ErrorMessages_SlugIdCanOnlyBeProvidedForTraineeTeachers);
+    }
+
     public static TheoryData<int?, int?, string, string> InvalidAgeCombinationsData { get; } = new()
     {
         {
@@ -751,6 +814,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             MiddleName = "Van",
             LastName = "Ryder",
             BirthDate = new(1990, 5, 23),
+            SlugId = Guid.NewGuid().ToString(),
             EmailAddress = "minnie.van.ryder@example.com",
             Address = new()
             {

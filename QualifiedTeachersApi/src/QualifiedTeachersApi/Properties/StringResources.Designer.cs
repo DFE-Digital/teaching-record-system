@@ -142,6 +142,24 @@ namespace QualifiedTeachersApi.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SlugId can only be provided for trainee teachers..
+        /// </summary>
+        public static string ErrorMessages_SlugIdCanOnlyBeProvidedForTraineeTeachers {
+            get {
+                return ResourceManager.GetString("ErrorMessages.SlugIdCanOnlyBeProvidedForTraineeTeachers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to slugid must be 150 characters or fewer.
+        /// </summary>
+        public static string ErrorMessages_SlugIdMustBe150CharactersOrFewer {
+            get {
+                return ResourceManager.GetString("ErrorMessages.SlugIdMustBe150CharactersOrFewer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to TRN must consist of 7 digits.
         /// </summary>
         public static string ErrorMessages_TRNMustBe7Digits {

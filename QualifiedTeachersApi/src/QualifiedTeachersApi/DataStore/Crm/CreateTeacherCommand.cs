@@ -23,6 +23,7 @@ public class CreateTeacherCommand
     public DateOnly? QtsDate { get; set; }
     public bool? InductionRequired { get; set; }
     public bool? UnderNewOverseasRegulations { get; set; }
+    public string SlugId { get; set; }
 }
 
 public class CreateTeacherCommandAddress

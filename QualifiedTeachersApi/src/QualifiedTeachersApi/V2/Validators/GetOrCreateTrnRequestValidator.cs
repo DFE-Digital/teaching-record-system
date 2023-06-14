@@ -220,5 +220,15 @@ public class GetOrCreateTrnRequestValidator : AbstractValidator<GetOrCreateTrnRe
             .When(r => r.TeacherType == CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator)
             .Null()
             .When(r => r.TeacherType != CreateTeacherType.OverseasQualifiedTeacher, ApplyConditionTo.CurrentValidator);
+
+        RuleFor(r => r.SlugId)
+            .MaximumLength(AttributeConstraints.Contact.SlugId_MaxLength)
+            .WithMessage(Properties.StringResources.ErrorMessages_SlugIdMustBe150CharactersOrFewer);
+
+        RuleFor(r => r.SlugId)
+            .Empty()
+            .When(x => x.TeacherType != CreateTeacherType.TraineeTeacher)
+            .WithMessage(Properties.StringResources.ErrorMessages_SlugIdCanOnlyBeProvidedForTraineeTeachers);
+
     }
 }

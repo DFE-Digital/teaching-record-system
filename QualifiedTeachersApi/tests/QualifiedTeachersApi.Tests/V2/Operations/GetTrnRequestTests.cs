@@ -62,13 +62,15 @@ public class GetTrnRequestTests : ApiTestBase
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var teacherId = Guid.NewGuid();
+        var slugId = Guid.NewGuid().ToString();
 
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
             .ReturnsAsync(new Contact()
             {
                 Id = teacherId,
-                dfeta_TRN = null
+                dfeta_TRN = null,
+                dfeta_SlugId = slugId
             });
 
         await WithDbContext(async dbContext =>
@@ -96,6 +98,7 @@ public class GetTrnRequestTests : ApiTestBase
                 trn = (string)null,
                 qtsDate = (DateOnly?)null,
                 potentialDuplicate = true,
+                slugId = slugId
             },
             expectedStatusCode: StatusCodes.Status200OK);
     }
@@ -107,13 +110,15 @@ public class GetTrnRequestTests : ApiTestBase
         var requestId = Guid.NewGuid().ToString();
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
+        var slugId = Guid.NewGuid().ToString();
 
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
             .ReturnsAsync(new Contact()
             {
                 Id = teacherId,
-                dfeta_TRN = trn
+                dfeta_TRN = trn,
+                dfeta_SlugId = slugId
             });
 
         await WithDbContext(async dbContext =>
@@ -141,6 +146,7 @@ public class GetTrnRequestTests : ApiTestBase
                 trn = trn,
                 qtsDate = (DateOnly?)null,
                 potentialDuplicate = false,
+                slugId = slugId
             },
             expectedStatusCode: StatusCodes.Status200OK);
     }

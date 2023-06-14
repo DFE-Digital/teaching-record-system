@@ -17,6 +17,8 @@ public class TrnRequestInfo
 
     [JsonIgnore]
     public bool WasCreated { get; set; }
+
+    public string? SlugId { get; set; }
 }
 
 public class TrnRequestInfoExample : IExampleProvider<TrnRequestInfo>

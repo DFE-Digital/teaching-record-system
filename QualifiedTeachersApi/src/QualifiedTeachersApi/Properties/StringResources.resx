@@ -144,6 +144,12 @@
   <data name="ErrorMessages.RequestIdMustBe100CharactersOrFewer" xml:space="preserve">
     <value>requestId must be 100 characters or fewer</value>
   </data>
+  <data name="ErrorMessages.SlugIdCanOnlyBeProvidedForTraineeTeachers" xml:space="preserve">
+    <value>SlugId can only be provided for trainee teachers.</value>
+  </data>
+  <data name="ErrorMessages.SlugIdMustBe150CharactersOrFewer" xml:space="preserve">
+    <value>slugid must be 150 characters or fewer</value>
+  </data>
   <data name="ErrorMessages.TRNMustBe7Digits" xml:space="preserve">
     <value>TRN must consist of 7 digits</value>
   </data>
