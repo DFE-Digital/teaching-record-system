@@ -132,10 +132,11 @@ public class GetNpqCertificateTests : ApiTestBase
     }
 
     [Fact]
-    public async Task Get_ValidRequest_ReturnsExpectedResponse()
+    public async Task Get_NpqCertificateWhenAssociatedTeacherIsNotTheAuthenticatedUser_ReturnsNotFound()
     {
-        // Arrange        
+        // Arrange
         var trn = "1234567";
+        var qualificationTrn = "7654321";
         var qualificationId = Guid.NewGuid();
         var teacherId = Guid.NewGuid();
 
@@ -144,7 +145,8 @@ public class GetNpqCertificateTests : ApiTestBase
             Id = teacherId,
             FirstName = Faker.Name.First(),
             MiddleName = Faker.Name.Middle(),
-            LastName = Faker.Name.Last()
+            LastName = Faker.Name.Last(),
+            dfeta_TRN = qualificationTrn
         };
 
         var qualification = new dfeta_qualification()
@@ -160,6 +162,53 @@ public class GetNpqCertificateTests : ApiTestBase
         qualification.Attributes.Add($"contact.{Contact.Fields.FirstName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.FirstName, teacher.FirstName));
         qualification.Attributes.Add($"contact.{Contact.Fields.MiddleName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.MiddleName, teacher.MiddleName));
         qualification.Attributes.Add($"contact.{Contact.Fields.LastName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.FirstName, teacher.LastName));
+        qualification.Attributes.Add($"contact.{Contact.Fields.dfeta_TRN}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.dfeta_TRN, teacher.dfeta_TRN));
+
+        ApiFixture.DataverseAdapter
+            .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
+            .ReturnsAsync(qualification);
+
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequest_ReturnsExpectedResponse()
+    {
+        // Arrange        
+        var trn = "1234567";
+        var qualificationId = Guid.NewGuid();
+        var teacherId = Guid.NewGuid();
+
+        var teacher = new Contact()
+        {
+            Id = teacherId,
+            FirstName = Faker.Name.First(),
+            MiddleName = Faker.Name.Middle(),
+            LastName = Faker.Name.Last(),
+            dfeta_TRN = trn
+        };
+
+        var qualification = new dfeta_qualification()
+        {
+            Id = qualificationId,
+            dfeta_Type = dfeta_qualification_dfeta_Type.NPQLT,
+            dfeta_CompletionorAwardDate = new DateTime(2021, 10, 11),
+            StateCode = dfeta_qualificationState.Active,
+            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId)
+        };
+
+        qualification.Attributes.Add($"contact.{Contact.PrimaryIdAttribute}", new AliasedValue(Contact.EntityLogicalName, Contact.PrimaryIdAttribute, teacherId));
+        qualification.Attributes.Add($"contact.{Contact.Fields.FirstName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.FirstName, teacher.FirstName));
+        qualification.Attributes.Add($"contact.{Contact.Fields.MiddleName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.MiddleName, teacher.MiddleName));
+        qualification.Attributes.Add($"contact.{Contact.Fields.LastName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.FirstName, teacher.LastName));
+        qualification.Attributes.Add($"contact.{Contact.Fields.dfeta_TRN}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.dfeta_TRN, teacher.dfeta_TRN));
 
         ApiFixture.DataverseAdapter
             .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))

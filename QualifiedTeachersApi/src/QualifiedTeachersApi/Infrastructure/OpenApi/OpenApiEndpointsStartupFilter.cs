@@ -53,7 +53,15 @@ public class OpenApiEndpointsStartupFilter : IStartupFilter
                     ClientSecret = _identityOptionsAccessor.Value.ClientSecret,
                     UsePkceWithAuthorizationCodeGrant = true
                 };
+
+                settings.CustomJavaScriptPath = "/docs/swagger-custom.js";
             }
         });
+
+        if (_environment.IsDevelopment())
+        {
+            // Needed to use custom Javascript for Swagger UI
+            app.UseStaticFiles();
+        }
     };
 }
