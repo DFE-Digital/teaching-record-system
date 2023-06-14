@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel;
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -129,7 +130,7 @@ public class CertificatesController : Controller
         description: "Returns a PDF of the NPQ Certificate associated with the provided qualification ID.")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK, "application/pdf")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetNpq([FromRoute] Guid qualificationId)
+    public async Task<IActionResult> GetNpq([FromRoute][Description("The ID of the qualification record associated with the certificate.")] Guid qualificationId)
     {
         var trn = User.FindFirstValue("trn");
         if (trn is null)
