@@ -5,35 +5,46 @@ SHELL				:=/bin/bash
 help: ## Show this help
 	@grep -E '^[a-zA-Z\.\-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+.PHONY: paas
+paas:
+	$(eval PLATFORM=paas)
+	$(eval REGION=West Europe)
+	$(eval SERVICE_SHORT=dqtapi)
+	$(eval RG_TAGS=$(shell echo '{"Portfolio": "Early Years and Schools Group", "Parent Business":"Teacher Training and Qualifications", "Product" : "Database of Qualified Teachers", "Service Line": "Teaching Workforce", "Service": "Teacher Training and Qualifications", "Service Offering": "Database of Qualified Teachers", "Environment" : "$(ENV_TAG)"}' | jq . ))
+
+.PHONY: aks
+aks:
+	$(eval PLATFORM=aks)
+	$(eval REGION=UK South)
+	$(eval SERVICE_SHORT=trs)
+	$(eval RG_TAGS=$(shell echo '{"Portfolio": "Early Years and Schools Group", "Parent Business":"Teacher Training and Qualifications", "Product" : "Teaching Record System", "Service Line": "Teaching Workforce", "Service": "Teacher Training and Qualifications", "Service Offering": "Database of Qualified Teachers", "Environment" : "$(ENV_TAG)"}' | jq . ))
+
 .PHONY: dev
-dev:
+dev: paas
 	$(eval DEPLOY_ENV=dev)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-development)
 	$(eval RESOURCE_NAME_PREFIX=s165d01)
 	$(eval ENV_SHORT=dv)
 	$(eval ENV_TAG=dev)
-  $(eval PLATFORM=paas)
 
 .PHONY: test
-test:
+test: paas
 	$(eval DEPLOY_ENV=test)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
 	$(eval RESOURCE_NAME_PREFIX=s165t01)
 	$(eval ENV_SHORT=ts)
 	$(eval ENV_TAG=test)
-  $(eval PLATFORM=paas)
 
 .PHONY: pre-production
-pre-production:
+pre-production: paas
 	$(eval DEPLOY_ENV=pre-production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
 	$(eval RESOURCE_NAME_PREFIX=s165t01)
 	$(eval ENV_SHORT=pp)
 	$(eval ENV_TAG=pre-prod)
-  $(eval PLATFORM=paas)
 
 .PHONY: production
-production:
+production: paas
 	$(eval DEPLOY_ENV=production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-production)
 	$(eval RESOURCE_NAME_PREFIX=s165p01)
@@ -41,7 +52,15 @@ production:
 	$(eval ENV_TAG=prod)
 	$(eval AZURE_BACKUP_STORAGE_ACCOUNT_NAME=s165p01dqtapidbbackup)
 	$(eval AZURE_BACKUP_STORAGE_CONTAINER_NAME=dqt-api)
-  $(eval PLATFORM=paas)
+
+.PHONY: dev_aks
+dev_aks: aks
+	$(eval DEPLOY_ENV=dev)
+	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
+	$(eval RESOURCE_NAME_PREFIX=s189t01)
+	$(eval ENV_SHORT=dv)
+	$(eval ENV_TAG=dev)
+	$(eval KEY_VAULT_NAME_SUFFIX=2)
 
 .PHONY: domain
 domain:
@@ -68,9 +87,6 @@ ci:	## Run in automation environment
 	$(eval DISABLE_PASSCODE=true)
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SP_AUTH=true)
-
-tags: ##Tags that will be added to resource group on it's creation in ARM template
-	$(eval RG_TAGS=$(shell echo '{"Portfolio": "Early Years and Schools Group", "Parent Business":"Teacher Training and Qualifications", "Product" : "Database of Qualified Teachers", "Service Line": "Teaching Workforce", "Service": "Teacher Training and Qualifications", "Service Offering": "Database of Qualified Teachers", "Environment" : "$(ENV_TAG)"}' | jq . ))
 
 .PHONY: install-fetch-config
 install-fetch-config: ## Install the fetch-config script, for viewing/editing secrets in Azure Key Vault
@@ -137,6 +153,13 @@ restore-data-from-backup: read-deployment-config # make production restore-data-
 
 terraform-init:
 	$(if $(or $(DISABLE_PASSCODE),$(PASSCODE)), , $(error Missing environment variable "PASSCODE", retrieve from https://login.london.cloud.service.gov.uk/passcode))
+	$(if $(PLATFORM), , $(error Missing environment variable "PLATFORM"))
+
+	$(eval export TF_VAR_service_name=$(SERVICE_SHORT))
+	$(eval export TF_VAR_service_short_name=$(SERVICE_SHORT))
+	$(eval export TF_VAR_environment_short_name=$(ENV_SHORT))
+	$(eval export TF_VAR_azure_resource_prefix=$(RESOURCE_NAME_PREFIX))
+
 	[[ "${SP_AUTH}" != "true" ]] && az account set -s $(AZURE_SUBSCRIPTION) || true
 	terraform -chdir=terraform/$(PLATFORM) init -backend-config workspace_variables/${DEPLOY_ENV}.backend.tfvars -reconfigure
 
@@ -149,13 +172,13 @@ terraform-apply: terraform-init
 terraform-destroy: terraform-init
 	terraform -chdir=terraform/$(PLATFORM) destroy -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json ${AUTO_APPROVE}
 
-deploy-azure-resources: set-azure-account tags # make dev deploy-azure-resources CONFIRM_DEPLOY=1
+deploy-azure-resources: set-azure-account # make dev deploy-azure-resources CONFIRM_DEPLOY=1
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
-	az deployment sub create -l "West Europe" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-dqtapi-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "environment=${DEPLOY_ENV}" "tfStorageAccountName=${RESOURCE_NAME_PREFIX}dqtapitfstate${ENV_SHORT}" "tfStorageContainerName=dqtapi-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultName=${RESOURCE_NAME_PREFIX}-dqtapi-${ENV_SHORT}-kv"
+	az deployment sub create -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}${SERVICE_SHORT}tfstate${ENV_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-kv${KEY_VAULT_NAME_SUFFIX}"
 
-validate-azure-resources: set-azure-account  tags# make dev validate-azure-resources
-	az deployment sub create -l "West Europe" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-dqtapi-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "environment=${DEPLOY_ENV}" "tfStorageAccountName=${RESOURCE_NAME_PREFIX}dqtapitfstate${ENV_SHORT}" "tfStorageContainerName=dqtapi-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultName=${RESOURCE_NAME_PREFIX}-dqtapi-${ENV_SHORT}-kv" --what-if
+validate-azure-resources: set-azure-account # make dev validate-azure-resources
+	az deployment sub create -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}${SERVICE_SHORT}tfstate${ENV_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-kv${KEY_VAULT_NAME_SUFFIX}" --what-if
 
-domain-azure-resources: set-azure-account tags # make domain deploy-custom-domain CONFIRM_DEPLOY=1
+domain-azure-resources: set-azure-account # make domain deploy-custom-domain CONFIRM_DEPLOY=1
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
-	az deployment sub create -l "West Europe" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-dqtdomains-rg" 'tags=${RG_TAGS}' "environment=${DEPLOY_ENV}" "tfStorageAccountName=${RESOURCE_NAME_PREFIX}dqtdomainstf" "tfStorageContainerName=dqtdomains-tf"  "keyVaultName=${RESOURCE_NAME_PREFIX}-dqtdomain-kv"
+	az deployment sub create -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-dqtdomains-rg" 'tags=${RG_TAGS}' "environment=${DEPLOY_ENV}" "tfStorageAccountName=${RESOURCE_NAME_PREFIX}dqtdomainstf" "tfStorageContainerName=dqtdomains-tf"  "keyVaultName=${RESOURCE_NAME_PREFIX}-dqtdomain-kv"
