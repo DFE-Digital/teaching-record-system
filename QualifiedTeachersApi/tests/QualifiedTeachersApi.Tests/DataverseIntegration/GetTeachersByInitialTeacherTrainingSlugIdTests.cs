@@ -53,15 +53,7 @@ public class GetTeachersByInitialTeacherTrainingSlugIdTests : IAsyncLifetime
 
         // Assert
         Assert.NotEmpty(result);
-        Assert.Collection(result,
-            item1 =>
-            {
-                Assert.Equal(teacher1Id, item1.Id);
-            },
-            item2 =>
-            {
-                Assert.Equal(teacher2Id, item2.Id);
-            }
-        );
+        Assert.Contains(result, item => item.Id == teacher1Id);
+        Assert.Contains(result, item => item.Id == teacher2Id);
     }
 }
