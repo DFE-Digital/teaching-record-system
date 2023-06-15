@@ -8,7 +8,7 @@ public class ApiVersionConvention : IControllerModelConvention
     public void Apply(ControllerModel controller)
     {
         var controllerNamespace = controller.ControllerType.Namespace;
-        var namespaceVersion = controllerNamespace?.Split('.')[1];
+        var namespaceVersion = controllerNamespace?.Split('.')[2];
 
         if (namespaceVersion is not null && namespaceVersion[0] == 'V' && int.TryParse(namespaceVersion.TrimStart('V'), out var version))
         {
