@@ -68,7 +68,7 @@ runs:
       id: terraform
       run: |
         make ci ${{ inputs.environment_name }} terraform-apply
-        (cd terraform/paas && echo "api_url=https://$(terraform output -raw api_fqdn)/" >> $GITHUB_OUTPUT)
+        echo "api_url=https://$(terraform -chdir=terraform/paas output -raw api_fqdn)/" >> $GITHUB_OUTPUT
       env:
         ARM_ACCESS_KEY: ${{ env.TFSTATE_CONTAINER_ACCESS_KEY }}
         TF_VAR_azure_sp_credentials_json: ${{ inputs.azure_credentials }}
