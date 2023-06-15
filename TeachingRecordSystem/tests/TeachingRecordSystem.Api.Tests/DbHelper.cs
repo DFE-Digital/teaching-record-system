@@ -2,8 +2,8 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Api.DataStore.Sql;
 using Respawn;
+using TeachingRecordSystem.Api.DataStore.Sql;
 
 namespace TeachingRecordSystem.Api.Tests;
 

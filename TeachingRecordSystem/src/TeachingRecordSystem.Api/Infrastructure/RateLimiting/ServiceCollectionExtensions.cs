@@ -1,10 +1,10 @@
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using RedisRateLimiting;
 using RedisRateLimiting.AspNetCore;
 using StackExchange.Redis;
+using TeachingRecordSystem.Api.Infrastructure.Security;
 
 namespace TeachingRecordSystem.Api.Infrastructure.RateLimiting;
 

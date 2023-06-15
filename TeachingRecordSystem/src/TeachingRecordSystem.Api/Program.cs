@@ -15,6 +15,7 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Prometheus;
+using Serilog;
 using TeachingRecordSystem.Api.DataStore.Crm;
 using TeachingRecordSystem.Api.DataStore.Sql;
 using TeachingRecordSystem.Api.Filters;
@@ -38,7 +39,6 @@ using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Api.Services.Notify;
 using TeachingRecordSystem.Api.Services.TrnGenerationApi;
 using TeachingRecordSystem.Api.Validation;
-using Serilog;
 
 namespace TeachingRecordSystem.Api;
 

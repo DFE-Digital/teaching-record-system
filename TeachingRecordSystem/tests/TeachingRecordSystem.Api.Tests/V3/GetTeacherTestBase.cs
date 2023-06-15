@@ -3,8 +3,8 @@ using Microsoft.Xrm.Sdk;
 using Moq;
 using TeachingRecordSystem.Api.DataStore.Crm;
 using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.TestCommon;
 using TeachingRecordSystem.Api.V3.ApiModels;
+using TeachingRecordSystem.TestCommon;
 using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests.V3;

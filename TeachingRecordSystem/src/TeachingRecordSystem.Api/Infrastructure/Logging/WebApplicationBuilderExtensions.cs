@@ -1,9 +1,9 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility;
-using TeachingRecordSystem.Api.Infrastructure.ApplicationInsights;
 using Sentry.AspNetCore;
 using Sentry.Extensibility;
 using Serilog;
 using Serilog.Formatting.Compact;
+using TeachingRecordSystem.Api.Infrastructure.ApplicationInsights;
 
 namespace TeachingRecordSystem.Api.Infrastructure.Logging;
 
