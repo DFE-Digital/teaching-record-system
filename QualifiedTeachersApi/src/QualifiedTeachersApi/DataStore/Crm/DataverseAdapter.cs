@@ -1135,6 +1135,7 @@ public partial class DataverseAdapter : IDataverseAdapter
                 Contact.Fields.dfeta_TRN,
                 Contact.Fields.EMailAddress1,
                 Contact.Fields.FirstName,
+                Contact.Fields.MiddleName,
                 Contact.Fields.LastName,
                 Contact.Fields.BirthDate,
                 Contact.Fields.dfeta_NINumber,
