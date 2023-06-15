@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
                 {
                     settings.DocumentName = OpenApiDocumentHelper.GetDocumentName(version);
                     settings.Version = OpenApiDocumentHelper.GetVersionName(version);
-                    settings.Title = "Qualified Teachers API";
+                    settings.Title = "Teaching Record System API";
                     settings.AddOperationFilter(o =>
                     {
                         // Include Controllers for this version and all Endpoints (EndpointFilter above applies filter for Endpoints)

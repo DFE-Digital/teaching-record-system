@@ -129,26 +129,26 @@ jobs:
     - name: Tests
       uses: ./.github/workflows/actions/test
       with:
-        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Tests
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Api.Tests
         report_name: "Test results"
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
           -e DqtReporting__ReportingDbConnectionString="Data Source=(local); Initial Catalog=${{ env.MSSQL_DB }}; User=sa; Password=${{ env.MSSQL_PASSWORD }}; TrustServerCertificate=True"
-          --filter "FullyQualifiedName!~TeachingRecordSystem.Tests.DataverseIntegration"
+          --filter "FullyQualifiedName!~TeachingRecordSystem.Api.Tests.DataverseIntegration"
         config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
 
     - name: CRM integration tests
       if: steps.check_changed_files.outputs.run_crm_integration_tests == 'true'
       uses: ./.github/workflows/actions/test
       with:
-        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Tests
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Api.Tests
         report_name: "CRM integration test results"
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
           -e DqtReporting__ReportingDbConnectionString="Data Source=(local); Initial Catalog=${{ env.MSSQL_DB }}; User=sa; Password=${{ env.MSSQL_PASSWORD }}; TrustServerCertificate=True"
-          --filter "FullyQualifiedName~TeachingRecordSystem.Tests.DataverseIntegration"
+          --filter "FullyQualifiedName~TeachingRecordSystem.Api.Tests.DataverseIntegration"
         config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
 
   validate_terraform:
