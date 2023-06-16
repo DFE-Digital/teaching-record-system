@@ -7,11 +7,11 @@ REPORTING_DB_CONNSTR=$(dotnet /App/TeachingRecordSystem.Api.dll config "DqtRepor
 
 if [ "$CF_INSTANCE_INDEX" == "0" ]; then
   echo "Applying database migrations..."
-  qtcli migrate-db --connection-string "$CONNSTR"
+  trscli migrate-db --connection-string "$CONNSTR"
   echo "Done applying database migrations" 
 
   echo "Applying reporting database migrations..."
-  qtcli migrate-reporting-db --connection-string "$REPORTING_DB_CONNSTR"
+  trscli migrate-reporting-db --connection-string "$REPORTING_DB_CONNSTR"
   echo "Done applying reporting database migrations"
 else
   echo "Disabling DqtReportingService"
