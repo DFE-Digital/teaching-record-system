@@ -6,7 +6,7 @@ param (
 
 $ErrorActionPreference = "Stop"
 
-$userSecretsId = "QualifiedTeachersApi"
+$userSecretsId = "TeachingRecordSystem.Api"
 
 function Get-UserSecret {
     [CmdletBinding()]
@@ -50,9 +50,9 @@ function Set-Configuration {
 
 Set-Configuration
 
-$namespace = "QualifiedTeachersApi.DataStore.Crm.Models"
-$entitiesOutput = Join-Path -Path $PSScriptRoot -ChildPath ".." QualifiedTeachersApi src QualifiedTeachersApi DataStore Crm Models GeneratedCode.cs
-$optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath ".." QualifiedTeachersApi src QualifiedTeachersApi DataStore Crm Models GeneratedOptionSets.cs
+$namespace = "TeachingRecordSystem.Api.DataStore.Crm.Models"
+$entitiesOutput = Join-Path -Path $PSScriptRoot -ChildPath ".." TeachingRecordSystem src TeachingRecordSystem.Api DataStore Crm Models GeneratedCode.cs
+$optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath ".." TeachingRecordSystem src TeachingRecordSystem.Api DataStore Crm Models GeneratedOptionSets.cs
 mkdir (Split-Path $entitiesOutput) -Force | Out-Null
 
 $crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"

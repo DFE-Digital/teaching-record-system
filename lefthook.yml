@@ -1,5 +1,5 @@
 pre-commit:
   commands:
     dotnet-format:
-      glob: "QualifiedTeachersApi/**/*.cs"
-      run: dotnet format QualifiedTeachersApi/QualifiedTeachersApi.sln --verify-no-changes --include {staged_files}
+      glob: "TeachingRecordSystem/**/*.cs"
+      run: dotnet format TeachingRecordSystem/TeachingRecordSystem.sln --verify-no-changes --include {staged_files}

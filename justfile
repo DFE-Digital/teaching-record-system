@@ -1,13 +1,13 @@
 set shell := ["pwsh", "-nop", "-c"]
 
-solution-root := "QualifiedTeachersApi"
+solution-root := "TeachingRecordSystem"
 
 default:
   @just --list
 
 # Run the QtCli
 cli *ARGS:
-  @cd {{solution-root / "src" / "QtCli"}} && dotnet {{"bin" / "Release" / "net7.0" / "QtCli.dll"}} {{ARGS}}
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Release" / "net7.0" / "trscli.dll"}} {{ARGS}}
 
 # Build the .NET solution
 build:
@@ -39,29 +39,29 @@ format-changed:
 
 # Run the EF Core Command-line Tools for the Api project
 ef *ARGS:
-  @cd {{solution-root / "src" / "QualifiedTeachersApi"}} && dotnet ef {{ARGS}}
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet ef {{ARGS}}
 
 # Run the API project in Development mode
 run-api:
-  @cd {{solution-root / "src" / "QualifiedTeachersApi"}} && dotnet run
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet run
 
 # Run the API project in Development mode and watch for file changes
 watch-api:
-  @cd {{solution-root / "src" / "QualifiedTeachersApi"}} && dotnet watch
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet watch
 
 # Build the API Docker image
 docker-build *ARGS:
-  @cd {{solution-root / "src" / "QualifiedTeachersApi"}} && dotnet publish -c Release
-  @cd {{solution-root / "src" / "QtCli"}} && dotnet publish -c Release
-  @cd {{solution-root}} && docker build . -f {{"src" / "QualifiedTeachersApi" / "Dockerfile"}} {{ARGS}}
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet publish -c Release
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet publish -c Release
+  @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.Api" / "Dockerfile"}} {{ARGS}}
 
 # Set a configuration entry in user secrets for the API project
 set-api-secret key value:
-  @cd {{solution-root / "src" / "QualifiedTeachersApi"}} && dotnet user-secrets set "{{key}}" "{{value}}"
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet user-secrets set "{{key}}" "{{value}}"
 
 # Set a configuration entry in user secrets for the API tests project
 set-api-tests-secret key value:
-  @cd {{solution-root / "tests" / "QualifiedTeachersApi.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
+  @cd {{solution-root / "tests" / "TeachingRecordSystem.Api.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
 
 # Run terraform from the terraform directory
 tf *ARGS:
