@@ -32,7 +32,7 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
             (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId), _lockTimeout) :
             NoopAsyncDisposable.Instance;
 
-        var teachers = (await _dataverseAdapter.GetTeachersByTrnAndDoB(request.Trn, request.BirthDate.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
+        var teachers = await GetTeacherByTrnDobOrSlugId(request.Trn, request.BirthDate, request.SlugId);
 
         if (teachers.Length == 0)
         {
@@ -76,12 +76,31 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
                     Subject3 = request.Qualification.Subject3,
                 } :
                 null,
-            HusId = request.HusId
+            HusId = request.HusId,
+            SlugId = request.SlugId
         });
 
         if (!updateTeacherResult.Succeeded)
         {
             throw CreateValidationExceptionFromFailedReasons(updateTeacherResult.FailedReasons);
+        }
+
+        async Task<Contact[]> GetTeacherByTrnDobOrSlugId(string trn, DateOnly? dob, string slugId)
+        {
+            if (!string.IsNullOrEmpty(slugId))
+            {
+                var contacts = await _dataverseAdapter.GetTeachersBySlugIdAndTrn(request.SlugId, trn, columnNames: Array.Empty<string>(), true);
+
+                //fallback to fetching teacher by trn/dob if slugid match doesn't return anything
+                if (contacts.Count() == 0)
+                    contacts = (await _dataverseAdapter.GetTeachersByTrnAndDoB(trn, dob.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
+
+                return contacts;
+            }
+            else
+            {
+                return (await _dataverseAdapter.GetTeachersByTrnAndDoB(trn, dob.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
+            }
         }
     }
 

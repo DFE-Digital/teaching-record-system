@@ -106,5 +106,9 @@ public interface IDataverseAdapter
 
     Task<InductionCompletee[]> GetInductionCompleteesForDateRange(DateTime startDate, DateTime endDate);
 
+    Task<Contact[]> GetTeachersBySlugIdAndTrn(string slugId, string trn, string[] columnNames, bool activeOnly = true);
+
+    Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingBySlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);
+
     Task ClearTeacherIdentityInfo(Guid identityUserId, DateTime updateTimeUtc);
 }

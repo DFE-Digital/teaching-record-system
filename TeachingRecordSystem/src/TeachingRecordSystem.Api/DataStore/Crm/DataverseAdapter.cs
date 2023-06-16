@@ -168,6 +168,32 @@ public partial class DataverseAdapter : IDataverseAdapter
         GetInitialTeacherTrainingByTeacher(teacherId, columnNames, establishmentColumnNames, subjectColumnNames, qualificationColumnNames, requestBuilder: null, activeOnly);
 
 
+    public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingBySlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true)
+    {
+        requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
+        var query = new QueryExpression(dfeta_initialteachertraining.EntityLogicalName)
+        {
+            ColumnSet = new(columnNames)
+        };
+
+        query.Criteria.AddCondition(dfeta_initialteachertraining.Fields.dfeta_SlugId, ConditionOperator.Equal, slugId);
+
+        if (activeOnly == true)
+        {
+            query.Criteria.AddCondition(dfeta_initialteachertraining.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_initialteachertrainingState.Active);
+        }
+
+        var request = new RetrieveMultipleRequest()
+        {
+            Query = query
+        };
+
+        var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+
+        return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>()).ToArray();
+    }
+
     public async Task<Contact[]> GetTeachersByInitialTeacherTrainingSlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
@@ -869,6 +895,27 @@ public partial class DataverseAdapter : IDataverseAdapter
         if (activeOnly)
         {
             filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+        }
+
+        var query = new QueryExpression(Contact.EntityLogicalName)
+        {
+            ColumnSet = new(columnNames),
+            Criteria = filter
+        };
+
+        var result = await _service.RetrieveMultipleAsync(query);
+
+        return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
+    }
+
+    public async Task<Contact[]> GetTeachersBySlugIdAndTrn(string slugId, string trn, string[] columnNames, bool activeOnly = true)
+    {
+        var filter = new FilterExpression(LogicalOperator.And);
+        filter.AddCondition(Contact.Fields.dfeta_SlugId, ConditionOperator.Equal, slugId);
+        if (activeOnly)
+        {
+            filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+            filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
         }
 
         var query = new QueryExpression(Contact.EntityLogicalName)

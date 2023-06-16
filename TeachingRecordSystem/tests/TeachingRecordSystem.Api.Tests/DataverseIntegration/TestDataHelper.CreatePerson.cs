@@ -14,7 +14,8 @@ public partial class TestDataHelper
         bool assessmentOnly = false,
         bool iqts = false,
         bool withQualification = false,
-        bool withActiveSanction = false)
+        bool withActiveSanction = false,
+        string slugId = null)
     {
         if (earlyYears && assessmentOnly)
         {
@@ -114,7 +115,8 @@ public partial class TestDataHelper
                     Address1_Line1 = Faker.Address.StreetAddress(),
                     Address1_City = Faker.Address.City(),
                     Address1_Country = "United Kingdom",
-                    Address1_PostalCode = Faker.Address.UkPostCode()
+                    Address1_PostalCode = Faker.Address.UkPostCode(),
+                    dfeta_SlugId = slugId
                 }
             },
             new UpdateRequest()
@@ -139,7 +141,8 @@ public partial class TestDataHelper
                 dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
                 dfeta_EstablishmentId = new EntityReference(Account.EntityLogicalName, ittProvider.Id),
                 dfeta_ProgrammeType = programmeType,
-                dfeta_Result = assessmentOnly ? dfeta_ITTResult.UnderAssessment : dfeta_ITTResult.InTraining
+                dfeta_Result = assessmentOnly ? dfeta_ITTResult.UnderAssessment : dfeta_ITTResult.InTraining,
+                dfeta_SlugId = slugId
             }
         });
 
