@@ -26,12 +26,20 @@ format:
 format-changed:
   #!pwsh -nop
 
-  $changedTfFiles = & git diff HEAD --name-only "terraform/*.tf"
+  function Get-ChangedFiles {
+    param (
+      $Path
+    )
+
+    (git status --porcelain $Path) | foreach { $_.substring(3) } | Where-Object { Test-Path $_ }
+  }
+
+  $changedTfFiles = Get-ChangedFiles "terraform/*.tf"
   foreach ($tf in $changedTfFiles) {
     terraform fmt $tf
   }
 
-  $changedCsFiles = (& git diff HEAD --name-only "{{solution-root}}/**/*.cs") -Replace "^{{solution-root}}/", ""
+  $changedCsFiles = (Get-ChangedFiles "{{solution-root}}/**/*.cs") | foreach { $_ -Replace "^{{solution-root}}/", "" }
   if ($changedCsFiles.Length -gt 0) {
     $dotnetArgs = @("format", "--no-restore", "--include") + $changedCsFiles
     cd {{solution-root}} && dotnet $dotnetArgs
