@@ -1,7 +1,3 @@
-locals {
-  postgres_connection_string = "Server=${module.postgres.host};Database=${module.postgres.name};Port=${module.postgres.port};User Id=${module.postgres.username};Password='${module.postgres.password}';Ssl Mode=Require;Trust Server Certificate=true"
-}
-
 module "redis" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/redis?ref=main"
 
@@ -19,7 +15,7 @@ module "redis" {
 }
 
 module "postgres" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/postgres?ref=testing"
+  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/postgres?ref=main"
 
   namespace             = var.namespace
   environment           = var.environment_name
