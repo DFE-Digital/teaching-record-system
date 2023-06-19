@@ -14,6 +14,7 @@ variable "key_vault_name" {
 variable "resource_group_name" {
   type = string
 }
+
 variable "paas_api_url" {
   default = "https://api.london.cloud.service.gov.uk"
 }
@@ -40,10 +41,6 @@ variable "prometheus_app" {
 }
 
 variable "api_docker_image" {
-  type = string
-}
-
-variable "api_app_version" {
   type = string
 }
 

@@ -11,10 +11,10 @@ inputs:
     description: 'JSON object containing a service principal that can read from Azure Key Vault'
     required: true
   terraform_vars:
-    description: 'Path to the tfvars file for the environment'
+    description: 'Name of the tfvars file for the environment'
     required: true
   terraform_backend_vars:
-    description: 'Path to the backend tfvars file for the environment'
+    description: 'Name of the backend tfvars file for the environment'
     required: true
 
 outputs:
@@ -47,16 +47,7 @@ runs:
       shell: bash
       env:
         TFVARS: ${{ inputs.terraform_vars }}
-      working-directory: terraform
-
-    - name: Extract version
-      id: get_version
-      run: |
-        API_VERSION=${DOCKER_IMAGE##*:}
-        echo "api_version=$API_VERSION" >> $GITHUB_ENV
-      env:
-        DOCKER_IMAGE: ${{ inputs.docker_image }}
-      shell: bash
+      working-directory: terraform/paas/workspace_variables
 
     - uses: Azure/login@v1
       with:
@@ -70,18 +61,16 @@ runs:
 
     - uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: 1.0.10
+        terraform_version: 1.5.0
         terraform_wrapper: false
 
     - name: Terraform
       id: terraform
       run: |
         make ci ${{ inputs.environment_name }} terraform-apply
-        cd terraform
-        echo "api_url=https://$(terraform output -raw api_fqdn)/" >> $GITHUB_OUTPUT
+        echo "api_url=https://$(terraform -chdir=terraform/paas output -raw api_fqdn)/" >> $GITHUB_OUTPUT
       env:
         ARM_ACCESS_KEY: ${{ env.TFSTATE_CONTAINER_ACCESS_KEY }}
         TF_VAR_azure_sp_credentials_json: ${{ inputs.azure_credentials }}
         TF_VAR_api_docker_image: ${{ inputs.api_docker_image }}
-        TF_VAR_api_app_version: ${{ env.api_version }}
       shell: bash

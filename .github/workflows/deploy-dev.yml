@@ -25,7 +25,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - uses: ./.github/workflows/actions/deploy-environment
+    - uses: ./.github/workflows/actions/deploy-paas-environment
       id: deploy
       with:
         environment_name: dev
