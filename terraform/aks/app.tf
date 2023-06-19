@@ -12,7 +12,7 @@ resource "azurerm_application_insights" "app" {
 }
 
 module "application_configuration" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=main"
+  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
 
   namespace             = var.namespace
   environment           = var.environment_name
@@ -39,7 +39,7 @@ module "application_configuration" {
 }
 
 module "web_application" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=main"
+  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
 
   name   = "web"
   is_web = true

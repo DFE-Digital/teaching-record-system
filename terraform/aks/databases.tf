@@ -1,5 +1,5 @@
 module "redis" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/redis?ref=main"
+  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/redis?ref=testing"
 
   namespace             = var.namespace
   environment           = var.environment_name
@@ -15,7 +15,7 @@ module "redis" {
 }
 
 module "postgres" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/postgres?ref=main"
+  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/postgres?ref=testing"
 
   namespace             = var.namespace
   environment           = var.environment_name
