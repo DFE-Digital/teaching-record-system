@@ -60,7 +60,6 @@ dev_aks: aks
 	$(eval RESOURCE_NAME_PREFIX=s189t01)
 	$(eval ENV_SHORT=dv)
 	$(eval ENV_TAG=dev)
-	$(eval KEY_VAULT_NAME_SUFFIX=2)
 
 .PHONY: domain
 domain:
@@ -174,10 +173,10 @@ terraform-destroy: terraform-init
 
 deploy-azure-resources: set-azure-account # make dev deploy-azure-resources CONFIRM_DEPLOY=1
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
-	az deployment sub create -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}${SERVICE_SHORT}tfstate${ENV_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-kv${KEY_VAULT_NAME_SUFFIX}"
+	az deployment sub create -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}${SERVICE_SHORT}tfstate${ENV_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultNames=['${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-app-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-inf-kv']"
 
 validate-azure-resources: set-azure-account # make dev validate-azure-resources
-	az deployment sub create -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}${SERVICE_SHORT}tfstate${ENV_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-kv${KEY_VAULT_NAME_SUFFIX}" --what-if
+	az deployment sub create -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}${SERVICE_SHORT}tfstate${ENV_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultNames=['${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-app-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-inf-kv']" --what-if
 
 domain-azure-resources: set-azure-account # make domain deploy-custom-domain CONFIRM_DEPLOY=1
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))

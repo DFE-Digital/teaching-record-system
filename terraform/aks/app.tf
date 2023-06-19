@@ -14,12 +14,12 @@ resource "azurerm_application_insights" "app" {
 module "application_configuration" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
 
-  namespace             = var.namespace
-  environment           = var.environment_name
-  azure_resource_prefix = var.azure_resource_prefix
-  service_short         = var.service_short_name
-  config_short          = var.environment_short_name
-  key_vault_name        = var.key_vault_name
+  namespace              = var.namespace
+  environment            = var.environment_name
+  azure_resource_prefix  = var.azure_resource_prefix
+  service_short          = var.service_short_name
+  config_short           = var.environment_short_name
+  secret_key_vault_short = "app"
 
   config_variables = {
     Platform                                       = "AKS"
