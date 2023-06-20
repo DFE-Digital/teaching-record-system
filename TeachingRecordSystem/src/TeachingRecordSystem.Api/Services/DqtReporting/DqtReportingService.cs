@@ -65,7 +65,8 @@ public partial class DqtReportingService : BackgroundService
             }
             catch (Exception ex)
             {
-                if (ex is SqlException sqlException && sqlException.IsTransient)
+                if (ex is SqlException sqlException &&
+                    (sqlException.IsTransient || sqlException.Message.StartsWith("Execution Timeout Expired.")))
                 {
                     _logger.LogWarning(ex, "Transient SQL exception thrown.");
                     continue;
