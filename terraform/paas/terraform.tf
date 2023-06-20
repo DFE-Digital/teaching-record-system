@@ -1,6 +1,4 @@
 terraform {
-  required_version = "1.0.10"
-
   backend "azurerm" {
     container_name = "dqtapi-tfstate"
   }

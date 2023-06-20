@@ -14,7 +14,6 @@ locals {
       jsondecode(local.appconfig_json),
       {
         "ApplicationInsights:ConnectionString" = azurerm_application_insights.api_app_insights.connection_string,
-        "AppVersion"                           = var.api_app_version,
         "ConnectionStrings:DefaultConnection"  = local.pg_connection_string,
         "ConnectionStrings:Redis"              = local.redis_connection_string,
         "DistributedLockContainerName"         = local.distributed_lock_container_name,
