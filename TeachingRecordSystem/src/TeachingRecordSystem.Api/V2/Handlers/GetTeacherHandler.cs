@@ -80,15 +80,15 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         return new GetTeacherResponse()
         {
-            DateOfBirth = teacher.BirthDate.ToDateOnly(),
+            DateOfBirth = teacher.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
             FirstName = teacher.FirstName,
             HasActiveSanctions = teacher.dfeta_ActiveSanctions == true,
             LastName = teacher.LastName,
             MiddleName = teacher.MiddleName,
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             Trn = teacher.dfeta_TRN,
-            QtsDate = teacher.dfeta_QTSDate.ToDateOnly(),
-            EytsDate = teacher.dfeta_EYTSDate.ToDateOnly(),
+            QtsDate = teacher.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            EytsDate = teacher.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             HusId = teacher.dfeta_HUSID,
             EarlyYearsStatus = earlyYearsStatus is not null ?
                 new GetTeacherResponseEarlyYearsStatus()
@@ -99,8 +99,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 null,
             InitialTeacherTraining = itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
             {
-                ProgrammeEndDate = i.dfeta_ProgrammeEndDate.ToDateOnly(),
-                ProgrammeStartDate = i.dfeta_ProgrammeStartDate.ToDateOnly(),
+                ProgrammeEndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                ProgrammeStartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>(),
                 Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
                 Provider = new()

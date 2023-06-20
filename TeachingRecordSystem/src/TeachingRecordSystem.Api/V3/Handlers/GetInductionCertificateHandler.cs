@@ -78,7 +78,12 @@ public class GetInductionCertificateHandler : IRequestHandler<GetInductionCertif
         {
             { FullNameFormField, fullName.ToString() },
             { TrnFormField, request.Trn },
-            { InductionDateFormField, induction.dfeta_CompletionDate.HasValue ? induction.dfeta_CompletionDate.Value.ToString("d MMMM yyyy") : string.Empty }
+            {
+                InductionDateFormField,
+                induction.dfeta_CompletionDate.HasValue ?
+                    induction.dfeta_CompletionDate.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("d MMMM yyyy") :
+                    string.Empty
+            }
         };
 
         var pdfStream = await _certificateGenerator.GenerateCertificate("Induction certificate.pdf", fieldValues);

@@ -586,7 +586,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var firstName2 = Faker.Name.First();
         var lastName = Faker.Name.Last();
         var middleName = Faker.Name.Middle();
-        var dateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
+        var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
         var nino = Faker.Identification.UkNationalInsuranceNumber();
 
         var qtsDate = new DateOnly(1997, 4, 23);

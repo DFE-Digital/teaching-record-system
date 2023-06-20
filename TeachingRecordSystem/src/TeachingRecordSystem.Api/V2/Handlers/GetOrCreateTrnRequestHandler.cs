@@ -66,7 +66,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
 
             wasCreated = false;
             trn = teacher?.dfeta_TRN;
-            qtsDate = teacher?.dfeta_QTSDate?.ToDateOnly();
+            qtsDate = teacher?.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true);
         }
         else
         {

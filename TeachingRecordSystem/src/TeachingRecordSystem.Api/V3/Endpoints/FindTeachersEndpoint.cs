@@ -59,7 +59,7 @@ public class FindTeachersEndpoint : Endpoint<FindTeachersRequest, FindTeachersRe
             Results = results.Select(r => new FindTeachersResponseResult()
             {
                 Trn = r.dfeta_TRN,
-                DateOfBirth = r.BirthDate!.Value.ToDateOnly(),
+                DateOfBirth = r.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),
                 FirstName = r.ResolveFirstName(),
                 MiddleName = r.ResolveMiddleName(),
                 LastName = r.ResolveLastName()

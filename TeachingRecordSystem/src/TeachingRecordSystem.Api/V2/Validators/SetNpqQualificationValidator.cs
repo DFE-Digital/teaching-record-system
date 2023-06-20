@@ -23,7 +23,7 @@ public class SetNpqQualificationValidator : AbstractValidator<SetNpqQualificatio
                     return;
                 }
 
-                if (ctx.InstanceToValidate.CompletionDate.Value > clock.UtcNow.Date.ToDateOnly())
+                if (ctx.InstanceToValidate.CompletionDate.Value > clock.Today)
                 {
                     ctx.AddFailure(ctx.PropertyName, StringResources.Errors_10019_Title);
                 }
@@ -31,7 +31,6 @@ public class SetNpqQualificationValidator : AbstractValidator<SetNpqQualificatio
                 {
                     ctx.AddFailure(ctx.PropertyName, StringResources.Errors_10022_Title);
                 }
-
             });
     }
 }
