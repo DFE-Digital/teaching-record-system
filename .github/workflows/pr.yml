@@ -194,4 +194,5 @@ jobs:
     uses: ./.github/workflows/deploy-dev.yml
     with:
       api_docker_image: ${{ needs.package.outputs.api_docker_image }}
+      ui_docker_image: ${{ needs.package.outputs.ui_docker_image }}
     secrets: inherit
