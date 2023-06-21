@@ -11,7 +11,7 @@ resource "azurerm_application_insights" "app" {
   }
 }
 
-module "application_configuration" {
+module "api_application_configuration" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
 
   namespace              = var.namespace
@@ -19,7 +19,7 @@ module "application_configuration" {
   azure_resource_prefix  = var.azure_resource_prefix
   service_short          = var.service_short_name
   config_short           = var.environment_short_name
-  secret_key_vault_short = "app"
+  secret_key_vault_short = "api"
 
   config_variables = {
     Platform                                       = "AKS"
@@ -38,10 +38,10 @@ module "application_configuration" {
   }
 }
 
-module "web_application" {
+module "api_application" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
 
-  name   = "web"
+  name   = "api"
   is_web = true
 
   namespace    = var.namespace
@@ -50,10 +50,48 @@ module "web_application" {
 
   cluster_configuration_map = module.cluster_data.configuration_map
 
-  kubernetes_config_map_name = module.application_configuration.kubernetes_config_map_name
-  kubernetes_secret_name     = module.application_configuration.kubernetes_secret_name
+  kubernetes_config_map_name = module.api_application_configuration.kubernetes_config_map_name
+  kubernetes_secret_name     = module.api_application_configuration.kubernetes_secret_name
 
-  docker_image = var.app_docker_image
+  docker_image = var.api_docker_image
+  web_port     = 80
+  probe_path   = "/health"
+}
+
+module "ui_application_configuration" {
+  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
+
+  namespace              = var.namespace
+  environment            = var.environment_name
+  azure_resource_prefix  = var.azure_resource_prefix
+  service_short          = var.service_short_name
+  config_short           = var.environment_short_name
+  secret_key_vault_short = "ui"
+
+  config_variables = {
+    PlatformEnvironment = var.environment_name
+  }
+
+  secret_variables = {
+  }
+}
+
+module "ui_application" {
+  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+
+  name   = "ui"
+  is_web = true
+
+  namespace    = var.namespace
+  environment  = var.environment_name
+  service_name = var.service_name
+
+  cluster_configuration_map = module.cluster_data.configuration_map
+
+  kubernetes_config_map_name = module.ui_application_configuration.kubernetes_config_map_name
+  kubernetes_secret_name     = module.ui_application_configuration.kubernetes_secret_name
+
+  docker_image = var.ui_docker_image
   web_port     = 80
   probe_path   = "/health"
 }

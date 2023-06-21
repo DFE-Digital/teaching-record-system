@@ -58,10 +58,15 @@ watch-api:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet watch
 
 # Build the API Docker image
-docker-build *ARGS:
+docker-build-api *ARGS:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet publish -c Release
   @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet publish -c Release
   @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.Api" / "Dockerfile"}} {{ARGS}}
+
+# Build the Support UI Docker image
+docker-build-ui *ARGS:
+  @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet publish -c Release
+  @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.SupportUi" / "Dockerfile"}} {{ARGS}}
 
 # Set a configuration entry in user secrets for the API project
 set-api-secret key value:

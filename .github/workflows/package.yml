@@ -5,6 +5,8 @@ on:
     outputs:
       api_docker_image:
         value: ${{ jobs.package.outputs.api_image_tag }}
+      ui_docker_image:
+        value: ${{ jobs.package.outputs.ui_image_tag }}
 
 jobs:
   package:
@@ -15,6 +17,7 @@ jobs:
 
     outputs:
       api_image_tag: ${{ steps.image_tags.outputs.api_tag }}
+      ui_image_tag: ${{ steps.image_tags.outputs.ui_tag }}
 
     steps:
       - uses: actions/checkout@v3
@@ -24,7 +27,8 @@ jobs:
       - name: Get Docker image tags
         id: image_tags
         run: |
-          echo "api_tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):app-$GITHUB_SHA" >> $GITHUB_OUTPUT
+          echo "api_tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):api-$GITHUB_SHA" >> $GITHUB_OUTPUT
+          echo "ui_tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):ui-$GITHUB_SHA" >> $GITHUB_OUTPUT
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -35,7 +39,11 @@ jobs:
 
       - name: Docker build & push
         run: |
-          just docker-build --build-arg GIT_SHA=$GITHUB_SHA --tag $TAG
-          docker push $TAG
+          just docker-build-api --build-arg GIT_SHA=$GITHUB_SHA --tag $API_TAG
+          docker push $API_TAG
+
+          just docker-build-ui --build-arg GIT_SHA=$GITHUB_SHA --tag $UI_TAG
+          docker push $UI_TAG
         env:
-          TAG: ${{ steps.image_tags.outputs.api_tag }}
+          API_TAG: ${{ steps.image_tags.outputs.api_tag }}
+          UI_TAG: ${{ steps.image_tags.outputs.ui_tag }}
