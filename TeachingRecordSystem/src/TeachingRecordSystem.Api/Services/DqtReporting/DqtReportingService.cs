@@ -63,24 +63,27 @@ public partial class DqtReportingService : BackgroundService
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
             }
+            catch (ProcessChangesException ex)
+                when (ex.InnerException is SqlException sqlException &&
+                    (sqlException.IsTransient || sqlException.Message.StartsWith("Execution Timeout Expired.")))
+            {
+                _logger.LogWarning(ex, "Transient SQL exception thrown.");
+                continue;
+            }
+            catch (ProcessChangesException ex) when (ex.InnerException!.IsCrmRateLimitException(out var retryAfter))
+            {
+                _logger.LogWarning(ex, "Hit CRM rate limit error.");
+
+                await Task.Delay(retryAfter, stoppingToken);
+                continue;
+            }
+            catch (ProcessChangesException ex)
+            {
+                _logger.LogError(ex.InnerException, ex.Message);
+                return;
+            }
             catch (Exception ex)
             {
-                if (ex is SqlException sqlException &&
-                    (sqlException.IsTransient || sqlException.Message.StartsWith("Execution Timeout Expired.")))
-                {
-                    _logger.LogWarning(ex, "Transient SQL exception thrown.");
-                    continue;
-                }
-
-                // If we've hit CRM API limits, back off and retry later
-                if (ex.IsCrmRateLimitException(out var retryAfter))
-                {
-                    _logger.LogWarning(ex, "Hit CRM rate limit error.");
-
-                    await Task.Delay(retryAfter, stoppingToken);
-                    continue;
-                }
-
                 _logger.LogError(ex, "Failed processing entity changes.");
                 return;
             }
@@ -148,7 +151,7 @@ public partial class DqtReportingService : BackgroundService
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Failed processing changes for '{entityType}' entity.", ex);
+                    throw new ProcessChangesException($"Failed processing changes for '{entityType}' entity.", ex);
                 }
             });
     }
@@ -364,6 +367,20 @@ public partial class DqtReportingService : BackgroundService
             await command.ExecuteNonQueryAsync(cancellationToken);
         }
     }
+}
+
+file class ProcessChangesException : Exception
+{
+    public ProcessChangesException(string entityType, Exception innerException)
+        : base(GetMessage(entityType), innerException)
+    {
+        EntityType = entityType;
+    }
+
+    public string EntityType { get; }
+
+    private static string GetMessage(string entityType) =>
+        $"Failed processing changes for '{entityType}' entity.";
 }
 
 file static class ExceptionExtensions
