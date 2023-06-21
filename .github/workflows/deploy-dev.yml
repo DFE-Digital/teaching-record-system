@@ -8,13 +8,13 @@ on:
         required: true
     outputs:
       api_url:
-        value: ${{ jobs.deploy.outputs.api_url }}
+        value: ${{ jobs.deploy_paas.outputs.api_url }}
 
+concurrency: deploy_dev
 jobs:
-  deploy:
-    name: Deploy
+  deploy_paas:
+    name: Deploy to PAAS
     runs-on: ubuntu-latest
-    concurrency: deploy_dev
 
     outputs:
       api_url: ${{ steps.deploy.outputs.api_url }}
@@ -33,3 +33,21 @@ jobs:
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
         terraform_vars: dev.tfvars.json
         terraform_backend_vars: dev.backend.tfvars
+
+  deploy_aks:
+    name: Deploy to AKS
+    runs-on: ubuntu-latest
+
+    environment:
+      name: dev_aks
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: ./.github/workflows/actions/deploy-aks-environment
+      id: deploy
+      with:
+        environment_name: dev
+        api_docker_image: ${{ inputs.api_docker_image }}
+        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+

@@ -1,0 +1,34 @@
+name: Deploy AKS environment
+
+inputs:
+  environment_name:
+    description: 'The name of the environment'
+    required: true
+  api_docker_image:
+    description: 'The API Docker image to deploy to the environment'
+    required: true
+  azure_credentials:
+    description: 'JSON object containing a service principal that can deploy to the environment'
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0
+        terraform_wrapper: false
+
+    - uses: DFE-Digital/github-actions/set-arm-environment-variables@master
+      with:
+        azure-credentials: ${{ inputs.azure_credentials }}
+
+    - name: Terraform
+      id: terraform
+      run: |
+        make ci ${{ inputs.environment_name }}_aks terraform-apply
+      env:
+        TF_VAR_azure_sp_credentials_json: ${{ inputs.azure_credentials }}
+        TF_VAR_app_docker_image: ${{ inputs.api_docker_image }}
+      shell: bash
