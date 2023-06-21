@@ -2,12 +2,12 @@
   "profiles": {
     "TeachingRecordSystem.SupportUi": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7077",
+      "applicationUrl": "https://localhost:44321/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "dotnetRunMessages": true
     }
   }
 }
