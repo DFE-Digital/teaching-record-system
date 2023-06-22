@@ -20,7 +20,7 @@ test:
 # Format the .NET solution and Terraform code
 format:
   @cd {{solution-root}} && dotnet format
-  @just tf fat
+  @just tf fmt
 
 # Format any un-committed .tf or .cs files
 format-changed:
