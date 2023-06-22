@@ -9,6 +9,7 @@ using Medallion.Threading;
 using Medallion.Threading.Azure;
 using Medallion.Threading.FileSystem;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Azure;
@@ -258,6 +259,16 @@ public class Program
             MetricLabels.ConfigureLabels(builder.Configuration);
         }
 
+        if (builder.Environment.IsProduction())
+        {
+            builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.All;
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+        }
+
         var app = builder.Build();
 
         // If we've been invoked with `config` as an argument, return the corresponding config key and exit
@@ -269,6 +280,11 @@ public class Program
         }
 
         app.UseSerilogRequestLogging();
+
+        if (app.Environment.IsProduction())
+        {
+            app.UseForwardedHeaders();
+        }
 
         app.UseRouting();
 
