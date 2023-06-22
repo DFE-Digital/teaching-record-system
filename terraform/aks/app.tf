@@ -11,6 +11,38 @@ resource "azurerm_application_insights" "app" {
   }
 }
 
+resource "kubernetes_job" "migrations" {
+  metadata {
+    name      = "${var.service_name}-${var.environment_name}-migrations"
+    namespace = var.namespace
+  }
+
+  spec {
+    template {
+      metadata {}
+      spec {
+        container {
+          name    = "cli"
+          image   = var.cli_docker_image
+          command = ["trscli"]
+          args    = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
+
+          env {
+            name  = "CONNECTION_STRING"
+            value = module.postgres.dotnet_connection_string
+          }
+        }
+
+        restart_policy = "Never"
+      }
+    }
+
+    backoff_limit = 1
+  }
+
+  wait_for_completion = true
+}
+
 module "api_application_configuration" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
 
@@ -40,7 +72,8 @@ module "api_application_configuration" {
 }
 
 module "api_application" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+  source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+  depends_on = [kubernetes_job.migrations]
 
   name   = "api"
   is_web = true
@@ -78,7 +111,8 @@ module "ui_application_configuration" {
 }
 
 module "ui_application" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+  source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+  depends_on = [kubernetes_job.migrations]
 
   name   = "ui"
   is_web = true
