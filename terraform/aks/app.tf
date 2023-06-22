@@ -28,6 +28,7 @@ module "api_application_configuration" {
     DqtReporting__RunService                       = "false"
     GetAnIdentity__RunLinkTrnToIdentityUserService = "false"
     RecurringJobs__Enabled                         = "false"
+    ReadOnlyMode                                   = "true"
   }
 
   secret_variables = {

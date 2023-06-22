@@ -19,7 +19,8 @@ locals {
         "DistributedLockContainerName"         = local.distributed_lock_container_name,
         "PlatformEnvironment"                  = var.environment_name,
         "StorageConnectionString"              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}",
-        "Platform"                             = "PAAS"
+        "Platform"                             = "PAAS",
+        "ReadOnlyMode"                         = "false"
       }
     ))
   }
