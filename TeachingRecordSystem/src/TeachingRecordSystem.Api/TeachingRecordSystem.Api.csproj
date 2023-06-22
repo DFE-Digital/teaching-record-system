@@ -13,7 +13,7 @@
     <PackageReference Include="DistributedLock.Azure" Version="1.0.0" />
     <PackageReference Include="DistributedLock.FileSystem" Version="1.0.1" />
     <PackageReference Include="EFCore.NamingConventions" Version="7.0.2" />
-    <PackageReference Include="FastEndpoints" Version="5.10.0" />
+    <PackageReference Include="FastEndpoints" Version="5.12.0" />
     <PackageReference Include="FastEndpoints.Swagger" Version="5.10.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="GovukNotify" Version="6.1.0" />
