@@ -70,7 +70,7 @@ public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest
         var fieldValues = new Dictionary<string, string>()
         {
             { FullNameFormField, fullName.ToString() },
-            { PassDateFormField, qualification.dfeta_CompletionorAwardDate.Value.ToLongDateString() }
+            { PassDateFormField, qualification.dfeta_CompletionorAwardDate.Value.ToString("dd MMMM yyyy") }
         };
 
         var pdfStream = await _certificateGenerator.GenerateCertificate($"{qualification.dfeta_Type} Certificate.pdf", fieldValues);
