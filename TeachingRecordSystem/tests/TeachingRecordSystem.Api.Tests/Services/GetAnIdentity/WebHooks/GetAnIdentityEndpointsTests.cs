@@ -23,7 +23,6 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         // Arrange
         var httpClient = ApiFixture.CreateClient();
 
-
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity");
 
         // Act
@@ -73,14 +72,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
             UnexpectedProperty = "blah blah"
         };
 
-        var jsonContent = JsonSerializer.Serialize(content);
+        var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(clientSecret, jsonContent);
         var httpClient = ApiFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
         {
-            Content = CreateJsonContent(content)
+            Content = CreateJsonContent(jsonContent)
         };
 
         // Act / Assert
@@ -109,14 +108,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
             }
         };
 
-        var jsonContent = JsonSerializer.Serialize(content);
+        var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(clientSecret, jsonContent);
         var httpClient = ApiFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
         {
-            Content = CreateJsonContent(content)
+            Content = CreateJsonContent(jsonContent)
         };
 
         // Act / Assert
@@ -142,14 +141,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
             Message = (string?)null
         };
 
-        var jsonContent = JsonSerializer.Serialize(content);
+        var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(clientSecret, jsonContent);
         var httpClient = ApiFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
         {
-            Content = CreateJsonContent(content)
+            Content = CreateJsonContent(jsonContent)
         };
 
         // Act / Assert
@@ -178,14 +177,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
             }
         };
 
-        var jsonContent = JsonSerializer.Serialize(content);
+        var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(clientSecret, jsonContent);
         var httpClient = ApiFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
         {
-            Content = CreateJsonContent(content)
+            Content = CreateJsonContent(jsonContent)
         };
 
         // Act / Assert
@@ -216,7 +215,8 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
                     EmailAddress = Faker.Internet.Email(),
                     Trn = "7654321",
                     MobileNumber = "07968987654"
-                }
+                },
+                Changes = new { }
             }
         };
 
@@ -229,14 +229,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
             .Returns(Task.CompletedTask)
             .Callback<UpdateTeacherIdentityInfoCommand>(c => actualCommand = c);
 
-        var jsonContent = JsonSerializer.Serialize(content);
+        var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(clientSecret, jsonContent);
         var httpClient = ApiFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
         {
-            Content = CreateJsonContent(content)
+            Content = CreateJsonContent(jsonContent)
         };
 
         // Act
@@ -274,7 +274,8 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
                     EmailAddress = Faker.Internet.Email(),
                     Trn = (string?)null,
                     MobileNumber = "07968987654"
-                }
+                },
+                Changes = new { }
             }
         };
 
@@ -282,7 +283,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
             .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact());
 
-        var jsonContent = JsonSerializer.Serialize(content);
+        var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(clientSecret, jsonContent);
         var httpClient = ApiFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
@@ -336,14 +337,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
             .Returns(Task.CompletedTask)
             .Callback<UpdateTeacherIdentityInfoCommand>(c => actualCommand = c);
 
-        var jsonContent = JsonSerializer.Serialize(content);
+        var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(clientSecret, jsonContent);
         var httpClient = ApiFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
         {
-            Content = CreateJsonContent(content)
+            Content = CreateJsonContent(jsonContent)
         };
 
         // Act
@@ -356,6 +357,64 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         Assert.Equal(content.Message.User.MobileNumber, actualCommand?.MobilePhone);
         Assert.Equal(content.TimeUtc, actualCommand?.UpdateTimeUtc);
     }
+
+    [Fact]
+    public async Task Post_WithUserUpdatedMessageForRemovedTrn_RemovesLinkFromDqt()
+    {
+        // Arrange
+        var clientSecret = "MySecret";
+        var identityOptions = CreateOptions(clientSecret);
+
+        ApiFixture.GetAnIdentityOptions
+            .Setup(o => o.Value)
+            .Returns(identityOptions);
+
+        var identityUserId = Guid.NewGuid();
+        var timeUtc = DateTime.UtcNow;
+
+        var content = new
+        {
+            NotificationId = Guid.NewGuid(),
+            TimeUtc = timeUtc,
+            MessageType = UserUpdatedMessage.MessageTypeName,
+            Message = new
+            {
+                User = new
+                {
+                    UserId = identityUserId,
+                    EmailAddress = Faker.Internet.Email(),
+                    Trn = (string?)null,
+                    MobileNumber = "07968987654"
+                },
+                Changes = new
+                {
+                    Trn = (string?)null
+                }
+            }
+        };
+
+        ApiFixture.DataverseAdapter
+            .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
+            .ReturnsAsync(new Contact());
+
+        var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
+        var signature = GenerateSignature(clientSecret, jsonContent);
+        var httpClient = ApiFixture.CreateClient();
+        httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
+        {
+            Content = CreateJsonContent(jsonContent)
+        };
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        ApiFixture.DataverseAdapter.Verify(mock => mock.ClearTeacherIdentityInfo(identityUserId, timeUtc));
+    }
+
+    private static StringContent CreateJsonContent(string json) => new(json, Encoding.UTF8, "application/json");
 
     private static GetAnIdentityOptions CreateOptions(string clientSecret) => new()
     {

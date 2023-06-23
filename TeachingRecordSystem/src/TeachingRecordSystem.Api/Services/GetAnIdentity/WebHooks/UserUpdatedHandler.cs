@@ -27,6 +27,12 @@ public class UserUpdatedHandler : IRequestHandler<UserUpdatedRequest>
     {
         if (request.Trn is null)
         {
+            if (request.ChangedTrn.HasValue)
+            {
+                // TRN has been removed
+                await _dataverseAdapter.ClearTeacherIdentityInfo(request.UserId, request.UpdateTimeUtc);
+            }
+
             return;
         }
 

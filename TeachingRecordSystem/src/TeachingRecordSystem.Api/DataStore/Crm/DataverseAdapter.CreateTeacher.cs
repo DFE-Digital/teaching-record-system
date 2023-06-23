@@ -57,7 +57,7 @@ public partial class DataverseAdapter
 
         if (allocateTrn)
         {
-            trn = await _trnGenerationApiClient.GenerateTrn();
+            trn = await GenerateTrn();
             newContact.dfeta_TRN = trn;
         }
         else

@@ -1,6 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using MediatR;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Infrastructure.Json;
@@ -10,7 +12,27 @@ namespace TeachingRecordSystem.Api.Services.GetAnIdentity.WebHooks;
 
 public static class GetAnIdentityEndpoints
 {
-    private static JsonSerializerOptions SerializerOptions { get; } = new JsonSerializerOptions(JsonSerializerDefaults.Web).AddConverters();
+    static GetAnIdentityEndpoints()
+    {
+        SerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+        {
+            Converters =
+            {
+                new JsonStringEnumConverter(),
+                new NotificationEnvelopeConverter()
+            }
+        };
+
+        SerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+        {
+            Modifiers =
+            {
+                Modifiers.OptionProperties
+            }
+        };
+    }
+
+    public static JsonSerializerOptions SerializerOptions { get; }
 
     public static IEndpointConventionBuilder MapIdentityEndpoints(this IEndpointRouteBuilder builder)
     {
@@ -44,7 +66,8 @@ public static class GetAnIdentityEndpoints
                         Trn = userUpdatedMessage.User.Trn,
                         EmailAddress = userUpdatedMessage.User.EmailAddress,
                         MobileNumber = userUpdatedMessage.User.MobileNumber,
-                        UpdateTimeUtc = notification.TimeUtc
+                        UpdateTimeUtc = notification.TimeUtc,
+                        ChangedTrn = userUpdatedMessage.Changes.Trn
                     };
 
                     await mediator.Send(request);

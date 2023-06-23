@@ -31,6 +31,8 @@ public partial class DataverseAdapter : IDataverseAdapter
         _trnGenerationApiClient = trnGenerationApiClient;
     }
 
+    public Task<string> GenerateTrn() => _trnGenerationApiClient.GenerateTrn();
+
     public Task<dfeta_country> GetCountry(string value) => GetCountry(value, requestBuilder: null);
 
     public async Task<dfeta_country> GetCountry(string value, RequestBuilder requestBuilder)
@@ -1298,6 +1300,33 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
 
         return entityResponse.EntityMetadata;
+    }
+
+    public async Task ClearTeacherIdentityInfo(Guid identityUserId, DateTime updateTimeUtc)
+    {
+        var query = new QueryByAttribute(Contact.EntityLogicalName)
+        {
+            ColumnSet = new()
+        };
+
+        query.AddAttributeValue(Contact.Fields.dfeta_TSPersonID, identityUserId.ToString());
+
+        var request = new RetrieveMultipleRequest()
+        {
+            Query = query
+        };
+
+        var result = (RetrieveMultipleResponse)await _service.ExecuteAsync(request);
+
+        if (result.EntityCollection.Entities.Count == 1)
+        {
+            await _service.UpdateAsync(new Contact()
+            {
+                Id = result.EntityCollection.Entities[0].Id,
+                dfeta_TSPersonID = null,
+                dfeta_LastIdentityUpdate = updateTimeUtc
+            });
+        }
     }
 
     public RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);

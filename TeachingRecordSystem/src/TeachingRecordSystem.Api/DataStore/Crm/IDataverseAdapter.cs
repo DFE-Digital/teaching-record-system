@@ -103,4 +103,6 @@ public interface IDataverseAdapter
     Task<EytsAwardee[]> GetEytsAwardeesForDateRange(DateTime startDate, DateTime endDate);
 
     Task<InductionCompletee[]> GetInductionCompleteesForDateRange(DateTime startDate, DateTime endDate);
+
+    Task ClearTeacherIdentityInfo(Guid identityUserId, DateTime updateTimeUtc);
 }
