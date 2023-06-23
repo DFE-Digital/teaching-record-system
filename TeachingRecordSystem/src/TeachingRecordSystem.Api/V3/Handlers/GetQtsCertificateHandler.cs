@@ -56,7 +56,7 @@ public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest
         {
             { QtsFormNameField, fullName.ToString() },
             { QtsFormTrnField, teacher.dfeta_TRN },
-            { QtsFormDateField, teacher.dfeta_QTSDate!.Value.ToString("dd MMMM yyyy") }
+            { QtsFormDateField, teacher.dfeta_QTSDate!.Value.ToString("d MMMM yyyy") }
         };
 
         var pdfStream = await _certificateGenerator.GenerateCertificate("QTS certificate.pdf", fieldValues);
