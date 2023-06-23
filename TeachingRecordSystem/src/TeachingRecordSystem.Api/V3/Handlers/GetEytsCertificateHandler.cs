@@ -56,7 +56,7 @@ public class GetEytsCertificateHandler : IRequestHandler<GetEytsCertificateReque
         {
             { FullNameFormField, fullName.ToString() },
             { TrnFormField, teacher.dfeta_TRN },
-            { EytsDateFormField, teacher.dfeta_EYTSDate!.Value.ToLongDateString() }
+            { EytsDateFormField, teacher.dfeta_EYTSDate!.Value.ToString("d MMMM yyyy") }
         };
 
         var pdfStream = await _certificateGenerator.GenerateCertificate("EYTS certificate.pdf", fieldValues);
