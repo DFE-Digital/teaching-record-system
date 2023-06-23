@@ -1,23 +1,40 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Teaching Record System";
 }
 
-<ul class="navbar-nav">
-    @if (User.Identity!.IsAuthenticated)
-    {
-        <li class="nav-item">
-            <span class="navbar-text text-dark">Hello @User.Identity.Name!</span>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut">Sign out</a>
-        </li>
-    }
-    else
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignIn">Sign in</a>
-        </li>
-    }
-</ul>
+@section HeaderNav {
+    <nav aria-label="Menu" class="govuk-header__navigation">
+        <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu" hidden>Menu</button>
+        <ul id="navigation" class="govuk-header__navigation-list">
+            @if (User.Identity!.IsAuthenticated)
+            {
+                <li class="govuk-header__navigation-item">
+                    <a class="govuk-header__link" asp-area="" asp-page="/Account/Logout">Sign out</a>
+                </li>
+            }
+            else
+            {
+                <li class="govuk-header__navigation-item">
+                    <a class="govuk-header__link" asp-area="" asp-page="/Account/Login">Sign in</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+          @if (User.Identity!.IsAuthenticated)
+          {
+            <span class="govuk-body">Hello @User.Identity.Name!</span>
+          }
+          else
+          {
+            <span class="govuk-body">Please sign in</span>
+          }
+        </h1>
+    </div>
+</div>
