@@ -101,21 +101,25 @@ public partial class DataverseAdapter
             lookupData.EarlyYearsTeacherStatusId,
             lookupData.QualifiedTeacherTrainedStatusId,
             lookupData.QualifiedTeacherAssessmentOnlyRouteId,
-            lookupData.QualifiedTeacherInternationalTeacherStatusId
-            );
+            lookupData.QualifiedTeacherInternationalTeacherStatusId);
 
         if (qtsLookupFailed.HasValue)
         {
             return (SetIttResultForTeacherResult.Failed(qtsLookupFailed.Value), null);
         }
 
-        if (isEarlyYears && lookupData.Teacher.dfeta_EYTSDate.HasValue && lookupData.Teacher.dfeta_EYTSDate.Value.ToDateOnly() != (assessmentDate.HasValue ? assessmentDate.Value : null))
+        if (assessmentDate.HasValue)
         {
-            return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.EytsDateMismatch), null);
-        }
-        else if (!isEarlyYears && lookupData.Teacher.dfeta_QTSDate.HasValue && lookupData.Teacher.dfeta_QTSDate.Value.ToDateOnly() != (assessmentDate.HasValue ? assessmentDate.Value : null))
-        {
-            return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.QtsDateMismatch), null);
+            if (isEarlyYears && lookupData.Teacher.dfeta_EYTSDate.HasValue &&
+                lookupData.Teacher.dfeta_EYTSDate.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true) != assessmentDate.Value)
+            {
+                return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.EytsDateMismatch), null);
+            }
+            else if (!isEarlyYears && lookupData.Teacher.dfeta_QTSDate.HasValue &&
+                lookupData.Teacher.dfeta_QTSDate.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true) != assessmentDate.Value)
+            {
+                return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.QtsDateMismatch), null);
+            }
         }
 
         var qtsUpdate = new dfeta_qtsregistration()

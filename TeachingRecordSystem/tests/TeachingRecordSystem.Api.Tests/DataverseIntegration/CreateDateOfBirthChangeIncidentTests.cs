@@ -26,7 +26,7 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
         // Arrange
         var createPersonResult = await _dataScope.CreateTestDataHelper().CreatePerson();
 
-        var newDateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
+        var newDateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
         var evidenceFileName = "evidence.txt";
         var evidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
         var evidenceFileMimeType = "text/plain";
@@ -52,7 +52,7 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
         Assert.NotNull(createdIncident);
         Assert.Equal(createPersonResult.TeacherId, createdIncident.CustomerId.Id);
         Assert.Equal("Request to change date of birth", createdIncident.Title);
-        Assert.Equal(newDateOfBirth, createdIncident.dfeta_NewDateofBirth?.ToDateOnly());
+        Assert.Equal(newDateOfBirth, DateOnly.FromDateTime(createdIncident.dfeta_NewDateofBirth!.Value));
         Assert.Equal(command.FromIdentity, createdIncident.dfeta_FromIdentity);
     }
 }

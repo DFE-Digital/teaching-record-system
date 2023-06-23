@@ -52,7 +52,7 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
         }
 
         var trn = teacher.dfeta_TRN;
-        var qtsDate = teacher.dfeta_QTSDate.ToDateOnly();
+        var qtsDate = teacher.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true);
         var status = trn != null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
 
         return new TrnRequestInfo()

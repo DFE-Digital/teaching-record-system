@@ -197,12 +197,12 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
-            DateOfBirth = teacher.BirthDate!.Value.ToDateOnly(),
+            DateOfBirth = teacher.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             PendingNameChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingNameChange) : default,
             PendingDateOfBirthChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingDateOfBirthChange) : default,
-            Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnly(), request.AccessMode),
-            Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnly(), request.AccessMode),
+            Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), request.AccessMode),
+            Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), request.AccessMode),
             Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ?
                 Option.Some(MapInduction(induction!, inductionPeriods!, request.AccessMode)) :
                 default,
@@ -211,8 +211,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 {
                     Qualification = MapIttQualification(i),
                     ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>(),
-                    StartDate = i.dfeta_ProgrammeStartDate.ToDateOnly(),
-                    EndDate = i.dfeta_ProgrammeEndDate.ToDateOnly(),
+                    StartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    EndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
                     AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
                     Provider = MapIttProvider(i),
@@ -253,8 +253,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         induction != null ?
             new GetTeacherResponseInduction()
             {
-                StartDate = induction.dfeta_StartDate.ToDateOnly(),
-                EndDate = induction.dfeta_CompletionDate.ToDateOnly(),
+                StartDate = induction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                EndDate = induction.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 Status = MapInductionStatus(induction.dfeta_InductionStatus),
                 CertificateUrl =
                     (induction.dfeta_InductionStatus == dfeta_InductionStatus.Pass || induction.dfeta_InductionStatus == dfeta_InductionStatus.PassedinWales) &&
@@ -271,8 +271,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         return new GetTeacherResponseInductionPeriod()
         {
-            StartDate = inductionPeriod.dfeta_StartDate.ToDateOnly(),
-            EndDate = inductionPeriod.dfeta_EndDate.ToDateOnly(),
+            StartDate = inductionPeriod.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            EndDate = inductionPeriod.dfeta_EndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             Terms = inductionPeriod.dfeta_Numberofterms,
             AppropriateBody = new GetTeacherResponseInductionPeriodAppropriateBody()
             {
@@ -379,7 +379,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 && q.dfeta_CompletionorAwardDate.HasValue)
             .Select(q => new GetTeacherResponseNpqQualificationsQualification()
             {
-                Awarded = q.dfeta_CompletionorAwardDate!.Value.ToDateOnly(),
+                Awarded = q.dfeta_CompletionorAwardDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 Type = new GetTeacherResponseNpqQualificationsQualificationType()
                 {
                     Code = MapNpqQualificationType(q.dfeta_Type!.Value),
@@ -412,7 +412,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 && q.dfeta_MQ_Date.HasValue)
             .Select(mq => new
             {
-                Awarded = mq.dfeta_MQ_Date!.Value.ToDateOnly(),
+                Awarded = mq.dfeta_MQ_Date!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 Specialism = mq.Extract<dfeta_specialism>(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute)
             })
             .Where(mq => mq.Specialism != null)
@@ -465,7 +465,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return new GetTeacherResponseHigherEducationQualificationsQualification
             {
                 Name = heQualification.dfeta_name,
-                Awarded = q.dfeta_CompletionorAwardDate.ToDateOnly(),
+                Awarded = q.dfeta_CompletionorAwardDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 Subjects = heSubjects.ToArray()
             };
         })

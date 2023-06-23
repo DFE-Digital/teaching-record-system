@@ -54,7 +54,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         // Arrange
         var trn = "1234567";
         var contactId = Guid.NewGuid();
-        var newDateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
+        var newDateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 
         var evidenceFileName = "evidence.txt";
         var evidenceFileUrl = Faker.Internet.SecureUrl();
@@ -88,7 +88,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         // Arrange
         var trn = "1234567";
         var contactId = Guid.NewGuid();
-        var newDateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
+        var newDateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 
         var evidenceFileName = "evidence.txt";
         var evidenceFileUrl = Faker.Internet.SecureUrl();
@@ -126,7 +126,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         // Arrange
         var trn = "1234567";
         var contactId = Guid.NewGuid();
-        var newDateOfBirth = Faker.Identification.DateOfBirth().ToDateOnly();
+        var newDateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 
         var evidenceFileName = "evidence.txt";
         var evidenceFileUrl = Faker.Internet.SecureUrl();
