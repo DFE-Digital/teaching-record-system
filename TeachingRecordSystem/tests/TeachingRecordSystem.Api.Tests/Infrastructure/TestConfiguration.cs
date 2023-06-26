@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Api.Infrastructure.Configuration;
+﻿using TeachingRecordSystem.Core.Infrastructure.Configuration;
 
 namespace TeachingRecordSystem.Api.Tests.Infrastructure;
 

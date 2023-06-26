@@ -81,4 +81,8 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\*.sql" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
+  </ItemGroup>
+
 </Project>

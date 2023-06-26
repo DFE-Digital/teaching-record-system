@@ -1,4 +1,6 @@
-﻿namespace TeachingRecordSystem.Api.Infrastructure.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+
+namespace TeachingRecordSystem.Core.Infrastructure.Configuration;
 
 public static class ConfigurationBuilderExtensions
 {

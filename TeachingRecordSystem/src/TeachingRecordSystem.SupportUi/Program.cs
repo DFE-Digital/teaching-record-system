@@ -5,11 +5,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
+using TeachingRecordSystem.Core.Infrastructure.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
+    builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
+
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
     {
         options.ForwardedHeaders = ForwardedHeaders.All;
@@ -31,13 +34,13 @@ builder.Services.AddGovUkFrontend();
 builder.Services.AddCsp(nonceByteAmount: 32);
 
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-       .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd");
+    .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd");
 
 builder.Services.AddRazorPages().AddMvcOptions(options =>
 {
     var policy = new AuthorizationPolicyBuilder()
-                  .RequireAuthenticatedUser()
-                  .Build();
+        .RequireAuthenticatedUser()
+        .Build();
     options.Filters.Add(new AuthorizeFilter(policy));
 });
 

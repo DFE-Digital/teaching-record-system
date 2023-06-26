@@ -40,6 +40,7 @@ using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Api.Services.Notify;
 using TeachingRecordSystem.Api.Services.TrnGenerationApi;
 using TeachingRecordSystem.Api.Validation;
+using TeachingRecordSystem.Core.Infrastructure.Configuration;
 
 namespace TeachingRecordSystem.Api;
 

@@ -1,7 +1,8 @@
 ﻿using System.Text;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 
-namespace TeachingRecordSystem.Api.Infrastructure.Configuration;
+namespace TeachingRecordSystem.Core.Infrastructure.Configuration;
 
 /// <summary>
 /// Represents an environment variable with JSON contents as an <see cref="IConfigurationSource"/>.
