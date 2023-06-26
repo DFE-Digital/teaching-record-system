@@ -2,9 +2,11 @@ using GovUk.Frontend.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
+using TeachingRecordSystem;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 if (builder.Environment.IsProduction())
 {
     builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
+}
 
+if (builder.Environment.IsProduction())
+{
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
     {
         options.ForwardedHeaders = ForwardedHeaders.All;
@@ -26,6 +31,12 @@ if (builder.Environment.IsProduction())
         options.IncludeSubDomains = true;
         options.MaxAge = TimeSpan.FromDays(365);
     });
+
+    builder.Services.AddDataProtection()
+        .PersistKeysToAzureBlobStorage(
+            builder.Configuration.GetRequiredValue("StorageConnectionString"),
+            builder.Configuration.GetRequiredValue("DataProtectionKeysContainerName"),
+            "SupportUi");
 }
 
 builder.Services.AddRazorPages();

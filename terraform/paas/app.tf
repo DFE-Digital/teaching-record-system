@@ -20,7 +20,8 @@ locals {
         "PlatformEnvironment"                  = var.environment_name,
         "StorageConnectionString"              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}",
         "Platform"                             = "PAAS",
-        "ReadOnlyMode"                         = "false"
+        "ReadOnlyMode"                         = "false",
+        "DataProtectionKeysContainerName"      = azurerm_storage_container.keys.name
       }
     ))
   }

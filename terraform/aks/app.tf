@@ -61,6 +61,7 @@ module "api_application_configuration" {
     GetAnIdentity__RunLinkTrnToIdentityUserService = "false"
     RecurringJobs__Enabled                         = "false"
     ReadOnlyMode                                   = "true"
+    DataProtectionKeysContainerName                = azurerm_storage_container.keys.name
   }
 
   secret_variables = {
@@ -103,10 +104,12 @@ module "ui_application_configuration" {
   secret_key_vault_short = "ui"
 
   config_variables = {
-    PlatformEnvironment = var.environment_name
+    PlatformEnvironment             = var.environment_name
+    DataProtectionKeysContainerName = azurerm_storage_container.keys.name
   }
 
   secret_variables = {
+    StorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
   }
 }
 

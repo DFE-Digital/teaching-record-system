@@ -30,3 +30,9 @@ resource "azurerm_storage_container" "locks" {
   storage_account_name  = azurerm_storage_account.app_storage.name
   container_access_type = "private"
 }
+
+resource "azurerm_storage_container" "keys" {
+  name                  = "keys"
+  storage_account_name  = azurerm_storage_account.app_storage.name
+  container_access_type = "private"
+}
