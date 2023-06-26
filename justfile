@@ -63,6 +63,11 @@ docker-build-api *ARGS:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet publish -c Release
   @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.Api" / "Dockerfile"}} {{ARGS}}
 
+# Build the CLI Docker image
+docker-build-cli *ARGS:
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet publish -c Release
+  @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.Cli" / "Dockerfile"}} {{ARGS}}
+
 # Build the Support UI Docker image
 docker-build-ui *ARGS:
   @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet publish -c Release

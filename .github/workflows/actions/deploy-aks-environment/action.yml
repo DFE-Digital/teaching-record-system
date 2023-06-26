@@ -7,6 +7,9 @@ inputs:
   api_docker_image:
     description: 'The API Docker image to deploy to the environment'
     required: true
+  cli_docker_image:
+    description: 'The CLI Docker image to deploy to the environment'
+    required: true
   ui_docker_image:
     description: 'The Support UI Docker image to deploy to the environment'
     required: true
@@ -34,5 +37,6 @@ runs:
       env:
         TF_VAR_azure_sp_credentials_json: ${{ inputs.azure_credentials }}
         TF_VAR_api_docker_image: ${{ inputs.api_docker_image }}
+        TF_VAR_cli_docker_image: ${{ inputs.cli_docker_image }}
         TF_VAR_ui_docker_image: ${{ inputs.ui_docker_image }}
       shell: bash

@@ -54,6 +54,10 @@ variable "api_docker_image" {
   type = string
 }
 
+variable "cli_docker_image" {
+  type = string
+}
+
 variable "ui_docker_image" {
   type = string
 }
