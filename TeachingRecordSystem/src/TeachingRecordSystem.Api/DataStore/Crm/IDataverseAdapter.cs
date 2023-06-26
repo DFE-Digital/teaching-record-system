@@ -78,6 +78,8 @@ public interface IDataverseAdapter
 
     Task SetTsPersonId(Guid teacherId, string tsPersonId);
 
+    Task<dfeta_teacherstatus> GetTeacherStatus(string value, RequestBuilder requestBuilder);
+
     Task<bool> UnlockTeacherRecord(Guid teacherId);
 
     Task<SetNpqQualificationResult> SetNpqQualification(SetNpqQualificationCommand command);

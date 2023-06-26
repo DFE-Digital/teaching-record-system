@@ -6,11 +6,15 @@ using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.TestCommon;
 using Xunit;
+using static TeachingRecordSystem.Api.DataStore.Crm.DataverseAdapter;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
 public abstract class GetTeacherTestBase : ApiTestBase
 {
+    private const string QtsAwardedInWalesTeacherStatusValue = "213";
+    private readonly Guid _qtsAwardedInWalesTeacherStatusId = Guid.NewGuid();
+
     private readonly Guid _changeOfNameSubjectId = Guid.NewGuid();
     private readonly Guid _changeOfDateOfBirthSubjectId = Guid.NewGuid();
 
@@ -22,12 +26,27 @@ public abstract class GetTeacherTestBase : ApiTestBase
         HttpClient httpClient,
         string baseUrl,
         string trn,
-        bool expectCertificateUrls)
+        bool qualifiedInWales,
+        bool expectQtsCertificateUrl,
+        bool expectEysCertificateUrl)
     {
         // Arrange
         var contact = CreateContact(trn);
 
-        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications: null, incidents: null);
+        dfeta_qtsregistration[]? qtsRegistrations = null;
+        if (qualifiedInWales)
+        {
+            qtsRegistrations = new[]
+            {
+                new dfeta_qtsregistration()
+                {
+                    dfeta_QTSDate = contact.dfeta_QTSDate,
+                    dfeta_TeacherStatusId = _qtsAwardedInWalesTeacherStatusId.ToEntityReference(dfeta_teacherstatus.EntityLogicalName)
+                }
+            };
+        }
+
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications: null, incidents: null, qtsRegistrations);
 
         var request = new HttpRequestMessage(HttpMethod.Get, baseUrl);
 
@@ -55,9 +74,13 @@ public abstract class GetTeacherTestBase : ApiTestBase
             }
         })!;
 
-        if (!expectCertificateUrls)
+        if (!expectQtsCertificateUrl)
         {
             expectedJson["qts"]?.AsObject().Remove("certificateUrl");
+        }
+
+        if (!expectEysCertificateUrl)
+        {
             expectedJson["eyts"]?.AsObject().Remove("certificateUrl");
         }
 
@@ -76,7 +99,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         // Arrange
         var contact = CreateContact(trn, hasMultiWordFirstName: true);
 
-        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications: null, incidents: null);
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications: null, incidents: null, qtsRegistrations: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, baseUrl);
 
@@ -127,7 +150,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var induction = CreateInduction();
         var inductionPeriods = CreateInductionPeriods();
 
-        ConfigureDataverseApiMock(trn, contact, itt: null, induction, inductionPeriods, qualifications: null, incidents: null);
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction, inductionPeriods, qualifications: null, incidents: null, qtsRegistrations: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Induction");
 
@@ -176,7 +199,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var contact = CreateContact(trn);
         var itt = CreateItt(contact);
 
-        ConfigureDataverseApiMock(trn, contact, itt, induction: null, inductionPeriods: null, qualifications: null, incidents: null);
+        ConfigureDataverseApiMock(trn, contact, itt, induction: null, inductionPeriods: null, qualifications: null, incidents: null, qtsRegistrations: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=InitialTeacherTraining");
 
@@ -252,7 +275,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             npqQualificationValid
         };
 
-        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications, incidents: null);
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications, incidents: null, qtsRegistrations: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=NpqQualifications");
 
@@ -306,7 +329,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             mandatoryQualificationInactive
         };
 
-        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications, incidents: null);
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications, incidents: null, qtsRegistrations: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=MandatoryQualifications");
 
@@ -396,7 +419,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             heQualificationInactive
         };
 
-        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications, incidents: null);
+        ConfigureDataverseApiMock(trn, contact, itt: null, induction: null, inductionPeriods: null, qualifications, incidents: null, qtsRegistrations: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=HigherEducationQualifications");
 
@@ -468,7 +491,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
             induction: null,
             inductionPeriods: null,
             qualifications: Array.Empty<dfeta_qualification>(),
-            incidents);
+            incidents,
+            qtsRegistrations: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=PendingDetailChanges");
 
@@ -505,7 +529,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
             induction: null,
             inductionPeriods: null,
             qualifications: Array.Empty<dfeta_qualification>(),
-            incidents);
+            incidents,
+            qtsRegistrations: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=PendingDetailChanges");
 
@@ -524,7 +549,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
         dfeta_induction? induction,
         dfeta_inductionperiod[]? inductionPeriods,
         dfeta_qualification[]? qualifications,
-        Incident[]? incidents)
+        Incident[]? incidents,
+        dfeta_qtsregistration[]? qtsRegistrations)
     {
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.GetSubjectByTitle("Change of Name", It.IsAny<string[]>()))
@@ -577,6 +603,30 @@ public abstract class GetTeacherTestBase : ApiTestBase
         ApiFixture.DataverseAdapter
             .Setup(mock => mock.GetIncidentsByContactId(contact.Id, IncidentState.Active, It.IsAny<string[]>()))
             .ReturnsAsync(incidents ?? Array.Empty<Incident>());
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeacherStatus(
+                It.Is<string>(s => s == QtsAwardedInWalesTeacherStatusValue),
+                It.IsAny<RequestBuilder>()))
+            .ReturnsAsync(new dfeta_teacherstatus()
+            {
+                Id = _qtsAwardedInWalesTeacherStatusId
+            });
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeacherStatus(
+                It.Is<string>(s => s != QtsAwardedInWalesTeacherStatusValue),
+                It.IsAny<RequestBuilder>()))
+            .ReturnsAsync(new dfeta_teacherstatus()
+            {
+                Id = Guid.NewGuid()
+            });
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetQtsRegistrationsByTeacher(
+                contact.Id,
+                It.IsAny<string[]>()))
+            .ReturnsAsync(qtsRegistrations ?? Array.Empty<dfeta_qtsregistration>());
     }
 
     private static Contact CreateContact(string trn, bool hasMultiWordFirstName = false)

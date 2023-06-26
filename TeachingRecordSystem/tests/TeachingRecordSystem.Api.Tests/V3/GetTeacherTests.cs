@@ -32,7 +32,17 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
+        return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, trn, qualifiedInWales: false, expectQtsCertificateUrl: true, expectEysCertificateUrl: true);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse()
+    {
+        var trn = "1234567";
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var baseUrl = "/v3/teacher";
+
+        return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, trn, qualifiedInWales: true, expectQtsCertificateUrl: false, expectEysCertificateUrl: true);
     }
 
     [Fact]

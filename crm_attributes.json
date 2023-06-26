@@ -27,6 +27,7 @@
     "dfeta_activesanctions",
     "dfeta_eytsdate",
     "dfeta_husid",
+    "dfeta_inductionStatus",
     "dfeta_lastidentityupdate",
     "dfeta_loginfailedcounter",
     "dfeta_ninumber",
