@@ -2,11 +2,19 @@ using GovUk.Frontend.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
+using TeachingRecordSystem;
+using TeachingRecordSystem.Core.Infrastructure.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsProduction())
+{
+    builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
+}
 
 if (builder.Environment.IsProduction())
 {
@@ -23,6 +31,12 @@ if (builder.Environment.IsProduction())
         options.IncludeSubDomains = true;
         options.MaxAge = TimeSpan.FromDays(365);
     });
+
+    builder.Services.AddDataProtection()
+        .PersistKeysToAzureBlobStorage(
+            builder.Configuration.GetRequiredValue("StorageConnectionString"),
+            builder.Configuration.GetRequiredValue("DataProtectionKeysContainerName"),
+            "SupportUi");
 }
 
 builder.Services.AddRazorPages();
@@ -31,13 +45,13 @@ builder.Services.AddGovUkFrontend();
 builder.Services.AddCsp(nonceByteAmount: 32);
 
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-       .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd");
+    .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd");
 
 builder.Services.AddRazorPages().AddMvcOptions(options =>
 {
     var policy = new AuthorizationPolicyBuilder()
-                  .RequireAuthenticatedUser()
-                  .Build();
+        .RequireAuthenticatedUser()
+        .Build();
     options.Filters.Add(new AuthorizeFilter(policy));
 });
 

@@ -25,9 +25,14 @@ resource "azurerm_storage_container" "certificates" {
   container_access_type = "private"
 }
 
-
 resource "azurerm_storage_container" "locks" {
   name                  = local.distributed_lock_container_name
+  storage_account_name  = azurerm_storage_account.app-storage.name
+  container_access_type = "private"
+}
+
+resource "azurerm_storage_container" "keys" {
+  name                  = "keys"
   storage_account_name  = azurerm_storage_account.app-storage.name
   container_access_type = "private"
 }

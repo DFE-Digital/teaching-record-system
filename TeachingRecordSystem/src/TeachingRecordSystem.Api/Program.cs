@@ -9,6 +9,7 @@ using Medallion.Threading;
 using Medallion.Threading.Azure;
 using Medallion.Threading.FileSystem;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -40,6 +41,7 @@ using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Api.Services.Notify;
 using TeachingRecordSystem.Api.Services.TrnGenerationApi;
 using TeachingRecordSystem.Api.Validation;
+using TeachingRecordSystem.Core.Infrastructure.Configuration;
 
 namespace TeachingRecordSystem.Api;
 
@@ -62,10 +64,11 @@ public class Program
                 .AddJsonEnvironmentVariable("VCAP_APPLICATION", configurationKeyPrefix: "VCAP_APPLICATION");
         }
 
-        var platform = configuration["Platform"] ?? throw new Exception("Missing 'Platform' configuration entry.");
         var platformEnvironmentName = configuration["PlatformEnvironment"];
-
         builder.ConfigureLogging(platformEnvironmentName);
+
+        var platform = configuration.GetRequiredValue("Platform");
+        var pgConnectionString = configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
@@ -80,11 +83,11 @@ public class Program
                 options.Realm = "TeachingRecordSystem.Api";
                 options.Events = new BasicAuthenticationEvents
                 {
-                    OnValidateCredentials = context =>
+                    OnValidateCredentials = static context =>
                     {
-                        var config = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-                        var username = config["AdminCredentials:Username"];
-                        var password = config["AdminCredentials:Password"];
+                        var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+                        var username = configuration.GetRequiredValue("AdminCredentials:Username");
+                        var password = configuration.GetRequiredValue("AdminCredentials:Password");
 
                         if (context.Username == username && context.Password == password)
                         {
@@ -178,9 +181,6 @@ public class Program
 
         services.AddOpenApi(configuration);
 
-        var pgConnectionString = configuration.GetConnectionString("DefaultConnection") ??
-            throw new Exception("Missing DefaultConnection connection string.");
-
         var healthCheckBuilder = services.AddHealthChecks()
             .AddNpgSql(pgConnectionString);
 
@@ -206,15 +206,17 @@ public class Program
 
         services.AddDatabaseDeveloperPageExceptionFilter();
 
-        services.AddAzureClients(clientBuilder =>
+        if (!env.IsUnitTests())
         {
-            clientBuilder.AddBlobServiceClient(configuration["StorageConnectionString"]);
-        });
+            services.AddAzureClients(clientBuilder =>
+            {
+                clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("StorageConnectionString"));
+            });
+        }
 
         if (env.IsProduction())
         {
-            var containerName = configuration["DistributedLockContainerName"] ??
-                throw new Exception("DistributedLockContainerName configuration key is missing.");
+            var containerName = configuration.GetRequiredValue("DistributedLockContainerName");
 
             services.AddSingleton<IDistributedLockProvider>(sp =>
             {
@@ -267,6 +269,12 @@ public class Program
                 options.KnownNetworks.Clear();
                 options.KnownProxies.Clear();
             });
+
+            builder.Services.AddDataProtection()
+                .PersistKeysToAzureBlobStorage(
+                    configuration.GetRequiredValue("StorageConnectionString"),
+                    configuration.GetRequiredValue("DataProtectionKeysContainerName"),
+                    "Api");
         }
 
         var app = builder.Build();
@@ -385,7 +393,7 @@ public class Program
             // fires, even though the operation in CRM is still going on.
             ServiceClient.MaxConnectionTimeout = TimeSpan.FromMinutes(5);
 
-            var connectionString = configuration.GetConnectionString("Crm") ?? throw new Exception("Crm connection string is missing.");
+            var connectionString = configuration.GetRequiredValue("ConnectionStrings:Crm");
 
             return new ServiceClient(connectionString)
             {

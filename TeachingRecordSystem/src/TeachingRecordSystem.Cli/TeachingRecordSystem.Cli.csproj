@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeachingRecordSystem.Api\TeachingRecordSystem.Api.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
   </ItemGroup>
 
 </Project>
