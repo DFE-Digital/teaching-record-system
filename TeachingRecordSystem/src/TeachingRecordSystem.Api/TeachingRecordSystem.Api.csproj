@@ -18,7 +18,7 @@
     <PackageReference Include="FastEndpoints.Swagger" Version="5.10.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="GovukNotify" Version="6.1.0" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.0" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.2" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.19.12" />
     <PackageReference Include="IdentityModel" Version="6.1.0" />
     <PackageReference Include="idunno.Authentication.Basic" Version="2.3.0" />
