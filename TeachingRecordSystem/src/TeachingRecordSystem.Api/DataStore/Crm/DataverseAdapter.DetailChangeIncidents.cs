@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Microsoft.Xrm.Sdk.Messages;
+﻿using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Api.DataStore.Crm.Models;
 
 namespace TeachingRecordSystem.Api.DataStore.Crm;
@@ -105,17 +104,9 @@ public partial class DataverseAdapter
 
     private static async Task<string> GetBase64EncodedFileContent(Stream file)
     {
-        var sb = new StringBuilder();
-
-        var buffer = new byte[64 * 1024];
-
-        int read;
-        while ((read = await file.ReadAsync(buffer)) != 0)
-        {
-            var encoded = Convert.ToBase64String(buffer, 0, read);
-            sb.Append(encoded);
-        }
-
-        return sb.ToString();
+        using var ms = new MemoryStream();
+        await file.CopyToAsync(ms);
+        var buffer = ms.ToArray();
+        return Convert.ToBase64String(buffer);
     }
 }
