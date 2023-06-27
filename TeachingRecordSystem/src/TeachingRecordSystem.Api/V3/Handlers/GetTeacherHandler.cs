@@ -11,6 +11,8 @@ namespace TeachingRecordSystem.Api.V3.Handlers;
 
 public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherResponse?>
 {
+    private const string QtsAwardedInWalesTeacherStatusValue = "213";
+
     private readonly IDataverseAdapter _dataverseAdapter;
 
     public GetTeacherHandler(IDataverseAdapter dataverseAdapter)
@@ -191,6 +193,17 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             lastName = teacher.dfeta_StatedLastName;
         }
 
+        var qtsAwardedInWalesStatus = await _dataverseAdapter.GetTeacherStatus(QtsAwardedInWalesTeacherStatusValue, null);
+        var qtsRegistrations = await _dataverseAdapter.GetQtsRegistrationsByTeacher(
+            teacher.Id,
+            columnNames: new[]
+            {
+                dfeta_qtsregistration.Fields.dfeta_QTSDate,
+                dfeta_qtsregistration.Fields.dfeta_TeacherStatusId
+            });
+
+        var qtsAwardedInWales = qtsRegistrations.Any(qts => qts.dfeta_QTSDate is not null && qts.dfeta_TeacherStatusId.Id == qtsAwardedInWalesStatus.Id);
+
         return new GetTeacherResponse()
         {
             Trn = request.Trn,
@@ -201,7 +214,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             PendingNameChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingNameChange) : default,
             PendingDateOfBirthChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingDateOfBirthChange) : default,
-            Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), request.AccessMode),
+            Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), qtsAwardedInWales, request.AccessMode),
             Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), request.AccessMode),
             Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ?
                 Option.Some(MapInduction(induction!, inductionPeriods!, request.AccessMode)) :
@@ -231,12 +244,12 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         };
     }
 
-    private static GetTeacherResponseQts? MapQts(DateOnly? qtsDate, AccessMode accessMode) =>
+    private static GetTeacherResponseQts? MapQts(DateOnly? qtsDate, bool qtsAwardedInWales, AccessMode accessMode) =>
         qtsDate != null ?
             new GetTeacherResponseQts()
             {
                 Awarded = qtsDate.Value,
-                CertificateUrl = accessMode == AccessMode.IdentityAccessToken ? "/v3/certificates/qts" : null
+                CertificateUrl = accessMode == AccessMode.IdentityAccessToken && !qtsAwardedInWales ? "/v3/certificates/qts" : null
             } :
             null;
 

@@ -45,7 +45,16 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var trn = "1234567";
         var baseUrl = $"/v3/teachers/{trn}";
 
-        return ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, trn, expectCertificateUrls: false);
+        return ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, trn, qualifiedInWales: false, expectQtsCertificateUrl: false, expectEysCertificateUrl: false);
+    }
+
+    [Fact]
+    public Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse()
+    {
+        var trn = "1234567";
+        var baseUrl = $"/v3/teachers/{trn}";
+
+        return ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, trn, qualifiedInWales: true, expectQtsCertificateUrl: false, expectEysCertificateUrl: false);
     }
 
     [Fact]

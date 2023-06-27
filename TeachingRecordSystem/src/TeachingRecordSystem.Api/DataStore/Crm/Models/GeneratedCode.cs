@@ -835,6 +835,7 @@ namespace TeachingRecordSystem.Api.DataStore.Crm.Models
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_HUSID = "dfeta_husid";
+			public const string dfeta_InductionStatus = "dfeta_inductionstatus";
 			public const string dfeta_LastIdentityUpdate = "dfeta_lastidentityupdate";
 			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
 			public const string dfeta_NINumber = "dfeta_ninumber";
@@ -1171,6 +1172,26 @@ namespace TeachingRecordSystem.Api.DataStore.Crm.Models
 				this.OnPropertyChanging("dfeta_HUSID");
 				this.SetAttributeValue("dfeta_husid", value);
 				this.OnPropertyChanged("dfeta_HUSID");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionstatus")]
+		public virtual dfeta_InductionStatus? dfeta_InductionStatus
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_InductionStatus?)(EntityOptionSetEnum.GetEnum(this, "dfeta_inductionstatus")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_InductionStatus");
+				this.SetAttributeValue("dfeta_inductionstatus", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("dfeta_InductionStatus");
 			}
 		}
 		

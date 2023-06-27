@@ -6,7 +6,7 @@ param (
 
 $ErrorActionPreference = "Stop"
 
-$userSecretsId = "TeachingRecordSystem.Api"
+$userSecretsId = "TeachingRecordSystemApi"
 
 function Get-UserSecret {
     [CmdletBinding()]
