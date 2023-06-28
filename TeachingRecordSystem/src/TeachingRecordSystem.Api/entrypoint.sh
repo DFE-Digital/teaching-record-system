@@ -13,9 +13,6 @@ if [ "$CF_INSTANCE_INDEX" == "0" ]; then
   echo "Applying reporting database migrations..."
   trscli migrate-reporting-db --connection-string "$REPORTING_DB_CONNSTR"
   echo "Done applying reporting database migrations"
-else
-  echo "Disabling DqtReportingService"
-  export DqtReporting__RunService="false"
 fi
 
 dotnet /App/TeachingRecordSystem.Api.dll
