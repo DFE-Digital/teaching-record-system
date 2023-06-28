@@ -61,3 +61,8 @@ variable "cli_docker_image" {
 variable "ui_docker_image" {
   type = string
 }
+
+variable "deploy_dqt_reporting_server" {
+  type    = bool
+  default = false
+}

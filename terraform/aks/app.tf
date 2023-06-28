@@ -74,7 +74,7 @@ module "api_application_configuration" {
 
 module "api_application" {
   source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
-  depends_on = [kubernetes_job.migrations]
+  depends_on = [kubernetes_job.migrations, kubernetes_job.reporting_migrations]
 
   name   = "api"
   is_web = true
