@@ -27,5 +27,8 @@ dotnet_sort_system_directives_first = true
 csharp_style_namespace_declarations = file_scoped:warning
 csharp_prefer_braces = true:warning
 
+[*.cshtml]
+indent_size = 4
+
 [TeachingRecordSystem/src/**/Migrations/*]
 generated_code = true
