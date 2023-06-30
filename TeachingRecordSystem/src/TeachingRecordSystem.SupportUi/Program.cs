@@ -41,8 +41,6 @@ if (builder.Environment.IsProduction())
             "SupportUi");
 }
 
-builder.Services.AddRazorPages();
-
 builder.Services.AddGovUkFrontend();
 builder.Services.AddCsp(nonceByteAmount: 32);
 
