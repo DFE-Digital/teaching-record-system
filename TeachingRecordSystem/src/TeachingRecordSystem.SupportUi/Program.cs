@@ -1,5 +1,6 @@
 using GovUk.Frontend.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.SupportUi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +49,17 @@ builder.Services.AddCsp(nonceByteAmount: 32);
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd");
 
+builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.Cookie.Name = "trs-auth";
+
+    options.Events.OnSigningOut = ctx =>
+    {
+        ctx.Response.Redirect("/signed-out");
+        return Task.CompletedTask;
+    };
+});
+
 builder.Services.AddRazorPages().AddMvcOptions(options =>
 {
     var policy = new AuthorizationPolicyBuilder()
@@ -54,6 +67,8 @@ builder.Services.AddRazorPages().AddMvcOptions(options =>
         .Build();
     options.Filters.Add(new AuthorizeFilter(policy));
 });
+
+builder.Services.AddTransient<TrsLinkGenerator>();
 
 var app = builder.Build();
 
@@ -73,7 +88,16 @@ app.UseCsp(csp =>
 
     csp.AllowScripts
         .FromSelf()
-        .From(pageTemplateHelper.GetCspScriptHashes());
+        .From(pageTemplateHelper.GetCspScriptHashes())
+        .AddNonce();
+
+    // Ensure ASP.NET Core's auto refresh works
+    // See https://github.com/dotnet/aspnetcore/issues/33068
+    if (builder.Environment.IsDevelopment())
+    {
+        csp.AllowConnections
+            .ToAnywhere();
+    }
 });
 
 app.UseHttpsRedirection();

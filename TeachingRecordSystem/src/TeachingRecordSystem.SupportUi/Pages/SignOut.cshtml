@@ -1,0 +1,15 @@
+﻿@page "/sign-out"
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@model TeachingRecordSystem.SupportUi.Pages.SignOutModel
+@{
+    ViewBag.Title = "Sign out";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form action="@LinkGenerator.SignOut()" method="post" asp-antiforgery="true">
+            <govuk-button type="submit">Sign out</govuk-button>
+        </form>
+        <script asp-add-nonce="true">document.forms[0].submit();</script>
+    </div>
+</div>

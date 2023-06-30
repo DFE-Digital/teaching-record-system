@@ -4,37 +4,11 @@
     ViewData["Title"] = "Teaching Record System";
 }
 
-@section HeaderNav {
-    <nav aria-label="Menu" class="govuk-header__navigation">
-        <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu" hidden>Menu</button>
-        <ul id="navigation" class="govuk-header__navigation-list">
-            @if (User.Identity!.IsAuthenticated)
-            {
-                <li class="govuk-header__navigation-item">
-                    <a class="govuk-header__link" asp-area="" asp-page="/Account/Logout">Sign out</a>
-                </li>
-            }
-            else
-            {
-                <li class="govuk-header__navigation-item">
-                    <a class="govuk-header__link" asp-area="" asp-page="/Account/Login">Sign in</a>
-                </li>
-            }
-        </ul>
-    </nav>
-}
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">
-          @if (User.Identity!.IsAuthenticated)
-          {
+        @if (User.Identity?.IsAuthenticated == true)
+        {
             <span class="govuk-body">Hello @User.Identity.Name!</span>
-          }
-          else
-          {
-            <span class="govuk-body">Please sign in</span>
-          }
-        </h1>
+        }
     </div>
 </div>
