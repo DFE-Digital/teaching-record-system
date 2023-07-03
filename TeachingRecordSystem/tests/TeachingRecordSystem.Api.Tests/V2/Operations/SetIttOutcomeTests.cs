@@ -245,7 +245,7 @@ public class SetIttOutcomeTests : ApiTestBase
             .ReturnsAsync(new[] { contact });
 
         ApiFixture.DataverseAdapter
-            .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate))
+            .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate, It.IsAny<string>()))
             .ReturnsAsync(SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.QtsDateMismatch));
 
         var requestBody = new SetIttOutcomeRequest()
@@ -285,7 +285,7 @@ public class SetIttOutcomeTests : ApiTestBase
             .ReturnsAsync(new[] { contact });
 
         ApiFixture.DataverseAdapter
-            .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), null))
+            .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), null, It.IsAny<string>()))
             .ReturnsAsync(SetIttResultForTeacherResult.Success(null));
 
         var requestBody = new SetIttOutcomeRequest()
@@ -332,7 +332,7 @@ public class SetIttOutcomeTests : ApiTestBase
             .ReturnsAsync(new[] { contact });
 
         ApiFixture.DataverseAdapter
-            .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate))
+            .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate, It.IsAny<string>()))
             .ReturnsAsync(SetIttResultForTeacherResult.Failed(failedReason));
 
         var requestBody = new SetIttOutcomeRequest()
@@ -352,5 +352,87 @@ public class SetIttOutcomeTests : ApiTestBase
 
         // Assert
         await AssertEx.JsonResponseIsError(response, expectedErrorCode, expectedStatusCode: StatusCodes.Status400BadRequest);
+    }
+
+    [Fact]
+    public async Task Given_teacher_is_fetched_using_fallback_if_notfound_using_slugid()
+    {
+        // Arrange
+        var trn = "1234567";
+        var ittProviderUkprn = "1001234";
+        var outcome = IttOutcome.Pass;
+        var assessmentDate = Clock.Today;
+        var dob = new DateOnly(1987, 1, 1);
+        var slugId = Guid.NewGuid().ToString();
+
+        var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .ReturnsAsync(Array.Empty<Contact>());
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersBySlugIdAndTrn(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .ReturnsAsync(Array.Empty<Contact>());
+
+        var requestBody = new SetIttOutcomeRequest()
+        {
+            IttProviderUkprn = ittProviderUkprn,
+            Outcome = outcome,
+            AssessmentDate = assessmentDate
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome?birthdate={dob.ToString("yyyy-MM-dd")}&slugid={slugId}")
+        {
+            Content = CreateJsonContent(requestBody)
+        };
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        ApiFixture.DataverseAdapter.Verify(x => x.GetTeachersBySlugIdAndTrn(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
+        ApiFixture.DataverseAdapter.Verify(x => x.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
+    }
+
+    [Fact]
+    public async Task Given_teacher_is_fetched_using_correct_method_without_passing_slugid()
+    {
+        // Arrange
+        var trn = "1234567";
+        var ittProviderUkprn = "1001234";
+        var outcome = IttOutcome.Pass;
+        var assessmentDate = Clock.Today;
+        var dob = new DateOnly(1987, 1, 1);
+        var slugId = Guid.NewGuid().ToString();
+
+        var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .ReturnsAsync(Array.Empty<Contact>());
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersBySlugIdAndTrn(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .ReturnsAsync(Array.Empty<Contact>());
+
+        var requestBody = new SetIttOutcomeRequest()
+        {
+            IttProviderUkprn = ittProviderUkprn,
+            Outcome = outcome,
+            AssessmentDate = assessmentDate
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome?birthdate={dob.ToString("yyyy-MM-dd")}")
+        {
+            Content = CreateJsonContent(requestBody)
+        };
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        ApiFixture.DataverseAdapter.Verify(x => x.GetTeachersBySlugIdAndTrn(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Never);
+        ApiFixture.DataverseAdapter.Verify(x => x.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
     }
 }

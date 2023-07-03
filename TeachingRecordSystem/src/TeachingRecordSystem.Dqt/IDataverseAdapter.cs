@@ -72,7 +72,8 @@ public interface IDataverseAdapter
         Guid teacherId,
         string ittProviderUkprn,
         dfeta_ITTResult result,
-        DateOnly? assessmentDate);
+        DateOnly? assessmentDate,
+        string slugId = null);
 
     Task SetTsPersonId(Guid teacherId, string tsPersonId);
 

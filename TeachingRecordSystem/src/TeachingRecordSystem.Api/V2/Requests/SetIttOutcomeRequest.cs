@@ -26,6 +26,9 @@ public class SetIttOutcomeRequest : IRequest<SetIttOutcomeResponse>
 
     [Required, Description("DoB of teacher"), FromQuery(Name = "birthdate"), JsonIgnore]
     public DateOnly? BirthDate { get; set; }
+
+    [Description("SlugId of Teacher"), FromQuery(Name = "slugid"), JsonIgnore]
+    public string SlugId { get; set; }
 }
 
 public class SetQtsRequestExample : IExampleProvider<SetIttOutcomeRequest>
@@ -35,6 +38,7 @@ public class SetQtsRequestExample : IExampleProvider<SetIttOutcomeRequest>
         Trn = "1234567",
         IttProviderUkprn = "1001234",
         Outcome = IttOutcome.Pass,
-        AssessmentDate = new DateOnly(2021, 12, 22)
+        AssessmentDate = new DateOnly(2021, 12, 22),
+        SlugId = "2c408fff-de46-4a6e-bf5a-e77aa9d36961"
     };
 }
