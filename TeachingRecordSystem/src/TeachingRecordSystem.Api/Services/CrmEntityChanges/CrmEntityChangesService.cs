@@ -52,77 +52,76 @@ public class CrmEntityChangesService : ICrmEntityChangesService
             yield break;
         }
 
-#pragma warning disable CS0642 // Possible mistaken empty statement
-        await using (@lock) ;
-#pragma warning restore CS0642 // Possible mistaken empty statement
-
-        var entityChangesJournal = await dbContext.EntityChangesJournals
-            .SingleOrDefaultAsync(t => t.Key == changesKey && t.EntityLogicalName == entityLogicalName);
-
-        var organizationService = _crmServiceClientProvider.GetClient(changesKey);
-
-        var request = new RetrieveEntityChangesRequest()
+        await using (@lock)
         {
-            Columns = columns,
-            EntityName = entityLogicalName,
-            PageInfo = new()
+            var entityChangesJournal = await dbContext.EntityChangesJournals
+                .SingleOrDefaultAsync(t => t.Key == changesKey && t.EntityLogicalName == entityLogicalName);
+
+            var organizationService = _crmServiceClientProvider.GetClient(changesKey);
+
+            var request = new RetrieveEntityChangesRequest()
             {
-                Count = pageSize,
-                PageNumber = 1
-            },
-            DataVersion = entityChangesJournal?.DataToken
-        };
-
-        var gotData = false;
-
-        while (true)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            RetrieveEntityChangesResponse response;
-            try
-            {
-                response = (RetrieveEntityChangesResponse)await organizationService.ExecuteAsync(request);
-            }
-            catch (FaultException<OrganizationServiceFault> fault) when (fault.Detail.ErrorCode == -2147204270)  // ExpiredVersionStamp
-            {
-                // If entity metadata has changed we get an error:
-                // Version stamp associated with the client has expired. Please perform a full sync.
-                // Resetting DataVersion will give us a full sync.
-                request.DataVersion = null;
-                continue;
-            }
-
-            gotData |= response.EntityChanges.Changes.Count > 0;
-
-            if (response.EntityChanges.Changes.Count > 0)
-            {
-                yield return response.EntityChanges.Changes.ToArray();
-            }
-
-            if (!response.EntityChanges.MoreRecords)
-            {
-                if (gotData && entityChangesJournal is not null)
+                Columns = columns,
+                EntityName = entityLogicalName,
+                PageInfo = new()
                 {
-                    entityChangesJournal.DataToken = response.EntityChanges.DataToken;
-                    await dbContext.SaveChangesAsync();
+                    Count = pageSize,
+                    PageNumber = 1
+                },
+                DataVersion = entityChangesJournal?.DataToken
+            };
+
+            var gotData = false;
+
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                RetrieveEntityChangesResponse response;
+                try
+                {
+                    response = (RetrieveEntityChangesResponse)await organizationService.ExecuteAsync(request);
                 }
-                else if (entityChangesJournal is null)
+                catch (FaultException<OrganizationServiceFault> fault) when (fault.Detail.ErrorCode == -2147204270)  // ExpiredVersionStamp
                 {
-                    dbContext.EntityChangesJournals.Add(new()
+                    // If entity metadata has changed we get an error:
+                    // Version stamp associated with the client has expired. Please perform a full sync.
+                    // Resetting DataVersion will give us a full sync.
+                    request.DataVersion = null;
+                    continue;
+                }
+
+                gotData |= response.EntityChanges.Changes.Count > 0;
+
+                if (response.EntityChanges.Changes.Count > 0)
+                {
+                    yield return response.EntityChanges.Changes.ToArray();
+                }
+
+                if (!response.EntityChanges.MoreRecords)
+                {
+                    if (gotData && entityChangesJournal is not null)
                     {
-                        Key = changesKey,
-                        EntityLogicalName = entityLogicalName,
-                        DataToken = response.EntityChanges.DataToken
-                    });
-                    await dbContext.SaveChangesAsync();
+                        entityChangesJournal.DataToken = response.EntityChanges.DataToken;
+                        await dbContext.SaveChangesAsync();
+                    }
+                    else if (entityChangesJournal is null)
+                    {
+                        dbContext.EntityChangesJournals.Add(new()
+                        {
+                            Key = changesKey,
+                            EntityLogicalName = entityLogicalName,
+                            DataToken = response.EntityChanges.DataToken
+                        });
+                        await dbContext.SaveChangesAsync();
+                    }
+
+                    break;
                 }
 
-                break;
+                request.PageInfo.PageNumber++;
+                request.PageInfo.PagingCookie = response.EntityChanges.PagingCookie;
             }
-
-            request.PageInfo.PageNumber++;
-            request.PageInfo.PagingCookie = response.EntityChanges.PagingCookie;
         }
     }
 }
