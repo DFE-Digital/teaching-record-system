@@ -10,6 +10,7 @@ public class UpdateTeacherCommand
     public UpdateTeacherCommandQualification Qualification { get; set; }
     public string Trn { get; set; }
     public string HusId { get; set; }
+    public string SlugId { get; set; }
 }
 
 public class UpdateTeacherCommandInitialTeacherTraining

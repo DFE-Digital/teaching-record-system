@@ -109,5 +109,9 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
             .When(r => r.InitialTeacherTraining.ProgrammeType != IttProgrammeType.InternationalQualifiedTeacherStatus, ApplyConditionTo.CurrentValidator)
             .When(r => r.InitialTeacherTraining != null, ApplyConditionTo.AllValidators)
             .When(r => r.InitialTeacherTraining != null);
+
+        RuleFor(r => r.SlugId)
+            .MaximumLength(AttributeConstraints.Contact.SlugId_MaxLength)
+            .WithMessage(Properties.StringResources.ErrorMessages_SlugIdMustBe150CharactersOrFewer);
     }
 }

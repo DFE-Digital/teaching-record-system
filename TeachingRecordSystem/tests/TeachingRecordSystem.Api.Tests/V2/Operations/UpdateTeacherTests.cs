@@ -435,7 +435,77 @@ public class UpdateTeacherTests : ApiTestBase
     }
 
     [Fact]
-    public async Task Given_valid_update_succeeds_return_nocontent()
+    public async Task Given_valid_update_with_slugid_return_nocontent()
+    {
+        // Arrange
+        var slugid = Guid.NewGuid().ToString();
+        var subject = "xxx";
+        var trn = "123456";
+        var contact = new Contact() { Id = Guid.NewGuid() };
+        var contactList = new[] { contact };
+        var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
+        var dob = new DateOnly(1987, 01, 01);
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,  /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+                .ReturnsAsync(contactList);
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                .ReturnsAsync(result);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}&slugid={slugid}",
+            CreateRequest(req => req.Qualification.Subject = subject));
+
+        // Assert
+        ApiFixture.DataverseAdapter
+            .Verify(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
+        ApiFixture.DataverseAdapter
+            .Verify(mock => mock.GetTeachersByTrnAndDoB(It.IsAny<string>(), It.IsAny<DateOnly>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Given_slugid_does_not_return_contact_fallback_to_trn_and_dob_return_nocontent()
+    {
+        // Arrange
+        var slugid = Guid.NewGuid().ToString();
+        var subject = "xxx";
+        var trn = "123456";
+        var contact = new Contact() { Id = Guid.NewGuid() };
+        var contactList = new[] { contact };
+        var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
+        var dob = new DateOnly(1987, 01, 01);
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,  /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+                .ReturnsAsync(Array.Empty<Contact>());
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+                .ReturnsAsync(contactList);
+
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                .ReturnsAsync(result);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}&slugid={slugid}",
+            CreateRequest(req => req.Qualification.Subject = subject));
+
+        // Assert
+        ApiFixture.DataverseAdapter
+            .Verify(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
+        ApiFixture.DataverseAdapter
+            .Verify(mock => mock.GetTeachersByTrnAndDoB(It.IsAny<string>(), It.IsAny<DateOnly>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Given_valid_update_with_trn_and_dob_succeeds_return_nocontent()
     {
         // Arrange
         var subject = "xxx";
@@ -459,6 +529,10 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
+        ApiFixture.DataverseAdapter
+            .Verify(mock => mock.GetTeachersByTrnAndDoB(trn, dob, It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
+        ApiFixture.DataverseAdapter
+            .Verify(mock => mock.GetTeachersBySlugIdAndTrn(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
@@ -811,6 +885,29 @@ public class UpdateTeacherTests : ApiTestBase
             response,
             $"{nameof(GetOrCreateTrnRequest.HusId)}.{nameof(GetOrCreateTrnRequest.HusId)}",
             StringResources.Errors_10018_Title);
+    }
+
+    [Fact]
+    public async Task Given_request_slugid_exceeding_maxlength_return_error()
+    {
+        // Arrange
+        var trn = "123456";
+        var slugId = new string('x', 155);  // Limit is 150
+        var contact = new Contact() { Id = Guid.NewGuid() };
+        var contactList = new[] { contact };
+        var result = UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.DuplicateHusId);
+        var dob = new DateOnly(1987, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}&slugid={slugId}",
+            CreateRequest());
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: nameof(UpdateTeacherRequest.SlugId),
+            expectedError: Properties.StringResources.ErrorMessages_SlugIdMustBe150CharactersOrFewer);
     }
 
     private JsonContent CreateRequest(Action<UpdateTeacherRequest> configureRequest = null)

@@ -26,6 +26,10 @@ public class UpdateTeacherRequest : IRequest
     public DateOnly? BirthDate { get; set; }
 
     public string HusId { get; set; }
+
+    [FromQuery(Name = "slugId"), Description("Register slug ID")]
+    [JsonIgnore]
+    public string SlugId { get; set; }
 }
 
 public class UpdateTeacherRequestInitialTeacherTraining
