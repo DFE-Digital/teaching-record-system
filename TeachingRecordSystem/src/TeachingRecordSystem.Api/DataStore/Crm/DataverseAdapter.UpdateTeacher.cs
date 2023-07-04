@@ -41,7 +41,7 @@ public partial class DataverseAdapter
             return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.AlreadyHaveQtsDate), null);
         }
 
-        if (itt != null && itt.dfeta_ProgrammeType.Value.IsEarlyYears() != command.InitialTeacherTraining.ProgrammeType.IsEarlyYears())
+        if (itt != null && itt.dfeta_ProgrammeType?.IsEarlyYears() != command.InitialTeacherTraining.ProgrammeType.IsEarlyYears())
         {
             return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.CannotChangeProgrammeType), null);
         }
