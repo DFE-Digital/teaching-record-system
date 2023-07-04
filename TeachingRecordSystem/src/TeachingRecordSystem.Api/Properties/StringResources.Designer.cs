@@ -268,7 +268,7 @@ namespace TeachingRecordSystem.Api.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ProgrammeType cannot be change.
+        ///   Looks up a localized string similar to ProgrammeType cannot be changed.
         /// </summary>
         public static string Errors_10011_Title {
             get {
