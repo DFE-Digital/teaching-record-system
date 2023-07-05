@@ -221,6 +221,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                         name = itt.GetAttributeValue<AliasedValue>($"qualification.{dfeta_ittqualification.Fields.dfeta_name}").Value
                     },
                     programmeType = itt.dfeta_ProgrammeType.ToString(),
+                    programmeTypeDescription = itt.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
                     startDate = itt.dfeta_ProgrammeStartDate?.ToString("yyyy-MM-dd"),
                     endDate = itt.dfeta_ProgrammeEndDate?.ToString("yyyy-MM-dd"),
                     result = itt.dfeta_Result?.ToString(),
