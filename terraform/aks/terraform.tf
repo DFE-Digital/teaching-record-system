@@ -16,5 +16,10 @@ terraform {
       source  = "hashicorp/random"
       version = "3.5.1"
     }
+
+    statuscake = {
+      source  = "StatusCakeDev/statuscake"
+      version = "2.1.0"
+    }
   }
 }
