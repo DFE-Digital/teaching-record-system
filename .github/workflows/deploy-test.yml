@@ -6,13 +6,19 @@ on:
       api_docker_image:
         type: string
         required: true
+      cli_docker_image:
+        type: string
+        required: true
+      ui_docker_image:
+        type: string
+        required: true
     outputs:
       api_url:
         value: ${{ jobs.deploy.outputs.api_url }}
 
 jobs:
   deploy:
-    name: Deploy
+    name: Deploy to PAAS
     runs-on: ubuntu-latest
     concurrency: deploy_test
 
@@ -33,3 +39,23 @@ jobs:
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
         terraform_vars: test.tfvars.json
         terraform_backend_vars: test.backend.tfvars
+
+  deploy_aks:
+    name: Deploy to AKS
+    runs-on: ubuntu-latest
+
+    environment:
+      name: test_aks
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: ./.github/workflows/actions/deploy-aks-environment
+      id: deploy
+      with:
+        environment_name: test
+        api_docker_image: ${{ inputs.api_docker_image }}
+        cli_docker_image: ${{ inputs.cli_docker_image }}
+        ui_docker_image: ${{ inputs.ui_docker_image }}
+        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+
