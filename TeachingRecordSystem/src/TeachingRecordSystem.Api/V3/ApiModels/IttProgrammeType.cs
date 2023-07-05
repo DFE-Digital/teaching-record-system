@@ -85,4 +85,33 @@ public static class IttProgrammeTypeExtensions
 
     public static bool TryConvertToIttProgrammeType(this IttProgrammeType input, out dfeta_ITTProgrammeType result) =>
         input.TryConvertToEnum(out result);
+
+    public static string GetDescription(this IttProgrammeType input) => input switch
+    {
+        IttProgrammeType.Apprenticeship => "Apprenticeship",
+        IttProgrammeType.AssessmentOnlyRoute => "Assessment Only Route",
+        IttProgrammeType.Core => "Core",
+        IttProgrammeType.CoreFlexible => "Core Flexible",
+        IttProgrammeType.EYITTAssessmentOnly => "EYITT - Assessment Only",
+        IttProgrammeType.EYITTGraduateEmploymentBased => "EYITT - Graduate Employment Based",
+        IttProgrammeType.EYITTGraduateEntry => "EYITT - Graduate Entry",
+        IttProgrammeType.EYITTSchoolDirectEarlyYears => "EYITT - School Direct (Early Years)",
+        IttProgrammeType.EYITTUndergraduate => "EYITT - Undergraduate",
+        IttProgrammeType.FutureTeachingScholars => "Future Teaching Scholars",
+        IttProgrammeType.GraduateTeacherProgramme => "Graduate Teacher Programme",
+        IttProgrammeType.HEI => "HEI",
+        IttProgrammeType.LicensedTeacherProgramme => "Licensed Teacher Programme",
+        IttProgrammeType.OverseasTrainedTeacherProgramme => "Overseas Trained Teacher Programme",
+        IttProgrammeType.RegisteredTeacherProgramme => "Registered Teacher Programme",
+        IttProgrammeType.SchoolDirectTrainingProgramme => "School Direct training programme",
+        IttProgrammeType.SchoolDirectTrainingProgrammeSalaried => "School Direct training programme (Salaried)",
+        IttProgrammeType.SchoolDirectTrainingProgrammeSelfFunded => "School Direct training programme (Self funded)",
+        IttProgrammeType.TeachFirstProgramme => "Teach First Programme",
+        IttProgrammeType.TeachFirstProgrammeCC => "Teach First Programme (CC)",
+        IttProgrammeType.UndergraduateOptIn => "Undergraduate Opt In",
+        IttProgrammeType.ProviderLedPostgrad => "Provider-led (postgrad)",
+        IttProgrammeType.ProviderLedUndergrad => "Provider-led (undergrad)",
+        IttProgrammeType.InternationalQualifiedTeacherStatus => "International qualified teacher status",
+        _ => throw new ArgumentException($"Unknown {nameof(IttProgrammeType)}: '{input}'.")
+    };
 }

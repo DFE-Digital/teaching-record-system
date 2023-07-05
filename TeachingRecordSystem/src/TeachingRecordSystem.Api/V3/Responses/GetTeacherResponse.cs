@@ -66,6 +66,7 @@ public record GetTeacherResponseInitialTeacherTraining
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
     public required IttProgrammeType? ProgrammeType { get; init; }
+    public required string? ProgrammeTypeDescription { get; init; }
     public required IttOutcome? Result { get; init; }
     public required GetTeacherResponseInitialTeacherTrainingAgeRange? AgeRange { get; init; }
     public required GetTeacherResponseInitialTeacherTrainingProvider? Provider { get; init; }
