@@ -14,14 +14,14 @@ public class SendEytsAwardedEmailJob
     private const string EytsAwardedEmailConfirmationTemplateId = "f85babdb-049b-4f32-9579-2a812acc0a2b";
     private const string LinkToAccessYourQualificationsServicePersonalisationKey = "link to access your teaching qualifications service";
     private readonly INotificationSender _notificationSender;
-    private readonly TrsContext _dbContext;
+    private readonly TrsDbContext _dbContext;
     private readonly IGetAnIdentityApiClient _identityApiClient;
     private readonly IClock _clock;
     private readonly AccessYourQualificationsOptions _accessYourQualificationsOptions;
 
     public SendEytsAwardedEmailJob(
         INotificationSender notificationSender,
-        TrsContext dbContext,
+        TrsDbContext dbContext,
         IGetAnIdentityApiClient identityApiClient,
         IOptions<AccessYourQualificationsOptions> accessYourQualificationsOptions,
         IClock clock)

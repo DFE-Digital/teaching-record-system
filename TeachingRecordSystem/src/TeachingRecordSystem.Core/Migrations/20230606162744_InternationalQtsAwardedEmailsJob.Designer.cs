@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.Migrations
 {
-    [DbContext(typeof(TrsContext))]
+    [DbContext(typeof(TrsDbContext))]
     [Migration("20230606162744_InternationalQtsAwardedEmailsJob")]
     partial class InternationalQtsAwardedEmailsJob
     {

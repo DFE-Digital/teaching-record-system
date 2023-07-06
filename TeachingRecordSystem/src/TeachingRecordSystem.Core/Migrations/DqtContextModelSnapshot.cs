@@ -10,8 +10,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.Migrations
 {
-    [DbContext(typeof(TrsContext))]
-    partial class TrsContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(TrsDbContext))]
+    partial class TrsDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

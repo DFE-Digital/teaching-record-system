@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.Migrations
 {
-    [DbContext(typeof(TrsContext))]
+    [DbContext(typeof(TrsDbContext))]
     [Migration("20230522115339_Events")]
     partial class Events
     {

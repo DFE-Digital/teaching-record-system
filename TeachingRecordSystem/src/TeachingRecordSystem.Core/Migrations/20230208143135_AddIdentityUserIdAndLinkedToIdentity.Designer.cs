@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.Migrations
 {
-    [DbContext(typeof(TrsContext))]
+    [DbContext(typeof(TrsDbContext))]
     [Migration("20230208143135_AddIdentityUserIdAndLinkedToIdentity")]
     partial class AddIdentityUserIdAndLinkedToIdentity
     {

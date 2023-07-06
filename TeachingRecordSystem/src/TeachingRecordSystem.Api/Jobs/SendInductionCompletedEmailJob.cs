@@ -14,14 +14,14 @@ public class SendInductionCompletedEmailJob
     private const string InductionCompletedEmailConfirmationTemplateId = "8029faa8-8409-4423-a717-c142dfd2ba86";
     private const string LinkToAccessYourQualificationsServicePersonalisationKey = "link to access your teaching qualifications service";
     private readonly INotificationSender _notificationSender;
-    private readonly TrsContext _dbContext;
+    private readonly TrsDbContext _dbContext;
     private readonly IGetAnIdentityApiClient _identityApiClient;
     private readonly IClock _clock;
     private readonly AccessYourQualificationsOptions _accessYourQualificationsOptions;
 
     public SendInductionCompletedEmailJob(
         INotificationSender notificationSender,
-        TrsContext dbContext,
+        TrsDbContext dbContext,
         IGetAnIdentityApiClient identityApiClient,
         IOptions<AccessYourQualificationsOptions> accessYourQualificationsOptions,
         IClock clock)

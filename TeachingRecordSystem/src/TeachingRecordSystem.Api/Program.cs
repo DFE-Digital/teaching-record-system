@@ -197,12 +197,12 @@ public class Program
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
-        services.AddDbContext<TrsContext>(
-            options => TrsContext.ConfigureOptions(options, pgConnectionString),
+        services.AddDbContext<TrsDbContext>(
+            options => TrsDbContext.ConfigureOptions(options, pgConnectionString),
             contextLifetime: ServiceLifetime.Transient,
             optionsLifetime: ServiceLifetime.Singleton);
 
-        services.AddDbContextFactory<TrsContext>(options => TrsContext.ConfigureOptions(options, pgConnectionString));
+        services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options, pgConnectionString));
 
         services.AddDatabaseDeveloperPageExceptionFilter();
 

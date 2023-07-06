@@ -4,15 +4,15 @@ using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
-public class TrsContext : DbContext
+public class TrsDbContext : DbContext
 {
-    public TrsContext(DbContextOptions<TrsContext> options)
+    public TrsDbContext(DbContextOptions<TrsDbContext> options)
         : base(options)
     {
     }
 
-    public static TrsContext Create(string connectionString) =>
-        new TrsContext(CreateOptions(connectionString));
+    public static TrsDbContext Create(string connectionString) =>
+        new TrsDbContext(CreateOptions(connectionString));
 
     public DbSet<TrnRequest> TrnRequests => Set<TrnRequest>();
 
@@ -58,12 +58,12 @@ public class TrsContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(TrsContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(TrsDbContext).Assembly);
     }
 
-    private static DbContextOptions<TrsContext> CreateOptions(string connectionString)
+    private static DbContextOptions<TrsDbContext> CreateOptions(string connectionString)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<TrsContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
         ConfigureOptions(optionsBuilder, connectionString);
         return optionsBuilder.Options;
     }

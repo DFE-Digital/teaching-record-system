@@ -23,7 +23,7 @@ public static partial class Commands
         migrateDbCommand.SetHandler(
             async (string connectionString) =>
             {
-                using var dbContext = TrsContext.Create(connectionString);
+                using var dbContext = TrsDbContext.Create(connectionString);
                 await dbContext.Database.MigrateAsync();
             },
             connectionStringOption);

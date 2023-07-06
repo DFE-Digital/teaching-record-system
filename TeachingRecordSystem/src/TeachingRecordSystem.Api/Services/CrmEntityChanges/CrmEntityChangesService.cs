@@ -12,12 +12,12 @@ namespace TeachingRecordSystem.Api.Services.CrmEntityChanges;
 
 public class CrmEntityChangesService : ICrmEntityChangesService
 {
-    private readonly IDbContextFactory<TrsContext> _dbContextFactory;
+    private readonly IDbContextFactory<TrsDbContext> _dbContextFactory;
     private readonly ICrmServiceClientProvider _crmServiceClientProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
 
     public CrmEntityChangesService(
-        IDbContextFactory<TrsContext> dbContextFactory,
+        IDbContextFactory<TrsDbContext> dbContextFactory,
         ICrmServiceClientProvider crmServiceClientProvider,
         IDistributedLockProvider distributedLockProvider)
     {

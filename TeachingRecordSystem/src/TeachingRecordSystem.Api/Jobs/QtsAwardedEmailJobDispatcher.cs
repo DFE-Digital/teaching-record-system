@@ -6,11 +6,11 @@ namespace TeachingRecordSystem.Api.Jobs;
 
 public class QtsAwardedEmailJobDispatcher
 {
-    private readonly TrsContext _dbContext;
+    private readonly TrsDbContext _dbContext;
     private readonly IBackgroundJobScheduler _backgroundJobScheduler;
 
     public QtsAwardedEmailJobDispatcher(
-        TrsContext dbContext,
+        TrsDbContext dbContext,
         IBackgroundJobScheduler backgroundJobScheduler)
     {
         _dbContext = dbContext;

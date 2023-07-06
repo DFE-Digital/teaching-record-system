@@ -74,14 +74,14 @@ public abstract class ApiTestBase : IAsyncLifetime, IDisposable
         return httpClient;
     }
 
-    public virtual async Task<T> WithDbContext<T>(Func<TrsContext, Task<T>> action)
+    public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {
         await using var scope = ApiFixture.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<TrsContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
         return await action(dbContext);
     }
 
-    public virtual Task WithDbContext(Func<TrsContext, Task> action) =>
+    public virtual Task WithDbContext(Func<TrsDbContext, Task> action) =>
         WithDbContext(async dbContext =>
         {
             await action(dbContext);

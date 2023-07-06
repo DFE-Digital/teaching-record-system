@@ -4,9 +4,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
-public class TrsDesignTimeDbContextFactory : IDesignTimeDbContextFactory<TrsContext>
+public class TrsDesignTimeDbContextFactory : IDesignTimeDbContextFactory<TrsDbContext>
 {
-    public TrsContext CreateDbContext(string[] args)
+    public TrsDbContext CreateDbContext(string[] args)
     {
         var configuration = new ConfigurationBuilder()
             .AddUserSecrets<TrsDesignTimeDbContextFactory>(optional: true)  // Optional for CI
@@ -15,9 +15,9 @@ public class TrsDesignTimeDbContextFactory : IDesignTimeDbContextFactory<TrsCont
         var connectionString = configuration.GetConnectionString("DefaultConnection") ??
             throw new Exception("Connection string DefaultConnection is missing.");
 
-        var optionsBuilder = new DbContextOptionsBuilder<TrsContext>();
-        TrsContext.ConfigureOptions(optionsBuilder, connectionString);
+        var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
+        TrsDbContext.ConfigureOptions(optionsBuilder, connectionString);
 
-        return new TrsContext(optionsBuilder.Options);
+        return new TrsDbContext(optionsBuilder.Options);
     }
 }

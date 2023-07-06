@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.Migrations
 {
-    [DbContext(typeof(TrsContext))]
+    [DbContext(typeof(TrsDbContext))]
     [Migration("20211222165123_TrnRequests")]
     partial class TrnRequests
     {

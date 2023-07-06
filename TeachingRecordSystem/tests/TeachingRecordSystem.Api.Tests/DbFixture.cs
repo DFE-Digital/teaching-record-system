@@ -24,9 +24,9 @@ public class DbFixture : IAsyncLifetime
 
     public IServiceProvider Services { get; }
 
-    public TrsContext GetDbContext() => Services.GetRequiredService<TrsContext>();
+    public TrsDbContext GetDbContext() => Services.GetRequiredService<TrsDbContext>();
 
-    public IDbContextFactory<TrsContext> GetDbContextFactory() => Services.GetRequiredService<IDbContextFactory<TrsContext>>();
+    public IDbContextFactory<TrsDbContext> GetDbContextFactory() => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
     public async Task InitializeAsync()
     {
@@ -39,12 +39,12 @@ public class DbFixture : IAsyncLifetime
     {
         var services = new ServiceCollection();
 
-        services.AddDbContext<TrsContext>(
-            options => TrsContext.ConfigureOptions(options, ConnectionString),
+        services.AddDbContext<TrsDbContext>(
+            options => TrsDbContext.ConfigureOptions(options, ConnectionString),
             contextLifetime: ServiceLifetime.Transient);
 
-        services.AddDbContextFactory<TrsContext>(
-            options => TrsContext.ConfigureOptions(options, ConnectionString));
+        services.AddDbContextFactory<TrsDbContext>(
+            options => TrsDbContext.ConfigureOptions(options, ConnectionString));
 
         return services.BuildServiceProvider();
     }

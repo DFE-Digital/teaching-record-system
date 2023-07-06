@@ -22,11 +22,11 @@ public class LinkTrnToIdentityUserService : BackgroundService
     {
         using (var scope = _serviceProvider.CreateScope())
         {
-            var TrsContext = scope.ServiceProvider.GetRequiredService<TrsContext>();
+            var TrsDbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
             var dataverseAdapter = scope.ServiceProvider.GetRequiredService<IDataverseAdapter>();
             var identityApiClient = scope.ServiceProvider.GetRequiredService<IGetAnIdentityApiClient>();
 
-            var trnsNotLinkedToIndentities = await TrsContext.TrnRequests.Where(x => x.LinkedToIdentity == false && x.IdentityUserId.HasValue).ToListAsync();
+            var trnsNotLinkedToIndentities = await TrsDbContext.TrnRequests.Where(x => x.LinkedToIdentity == false && x.IdentityUserId.HasValue).ToListAsync();
 
             foreach (var trnRequest in trnsNotLinkedToIndentities)
             {
@@ -44,7 +44,7 @@ public class LinkTrnToIdentityUserService : BackgroundService
                         //call api to link account to trn
                         await identityApiClient.SetTeacherTrn(trnRequest.IdentityUserId!.Value, teacher.dfeta_TRN);
                         trnRequest.LinkedToIdentity = true;
-                        await TrsContext.SaveChangesAsync();
+                        await TrsDbContext.SaveChangesAsync();
 
                     }
                     catch (Exception ex)

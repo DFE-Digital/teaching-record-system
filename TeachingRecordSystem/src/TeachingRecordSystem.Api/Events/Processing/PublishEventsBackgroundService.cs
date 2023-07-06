@@ -10,12 +10,12 @@ public class PublishEventsBackgroundService : BackgroundService
     private static readonly TimeSpan _pollInterval = TimeSpan.FromMinutes(1);
 
     private readonly IEventObserver _eventObserver;
-    private readonly IDbContextFactory<TrsContext> _dbContextFactory;
+    private readonly IDbContextFactory<TrsDbContext> _dbContextFactory;
     private readonly ILogger<PublishEventsBackgroundService> _logger;
 
     public PublishEventsBackgroundService(
         IEventObserver eventObserver,
-        IDbContextFactory<TrsContext> dbContextFactory,
+        IDbContextFactory<TrsDbContext> dbContextFactory,
         ILogger<PublishEventsBackgroundService> logger)
     {
         _eventObserver = eventObserver;
