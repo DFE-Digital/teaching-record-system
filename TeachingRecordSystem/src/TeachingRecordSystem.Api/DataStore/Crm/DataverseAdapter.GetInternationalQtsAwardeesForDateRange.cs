@@ -91,10 +91,10 @@ public partial class DataverseAdapter
         static void AddTeacherStatusLink(LinkEntity qtsRegistrationLink)
         {
             var teacherStatusLink = qtsRegistrationLink.AddLink(
-            dfeta_teacherstatus.EntityLogicalName,
-            dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
-            dfeta_teacherstatus.PrimaryIdAttribute,
-            JoinOperator.Inner);
+                dfeta_teacherstatus.EntityLogicalName,
+                dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
+                dfeta_teacherstatus.PrimaryIdAttribute,
+                JoinOperator.Inner);
 
             teacherStatusLink.Columns = new ColumnSet(
                 dfeta_teacherstatus.PrimaryIdAttribute,
@@ -102,7 +102,7 @@ public partial class DataverseAdapter
             teacherStatusLink.EntityAlias = dfeta_teacherstatus.EntityLogicalName;
 
             var filter = new FilterExpression();
-            filter.AddCondition(dfeta_teacherstatus.Fields.dfeta_name, ConditionOperator.Equal, "Qualified teacher: by virtue of achieving international qualified teacher status");
+            filter.AddCondition(dfeta_teacherstatus.Fields.dfeta_Value, ConditionOperator.Equal, "90");
             teacherStatusLink.LinkCriteria = filter;
         }
     }

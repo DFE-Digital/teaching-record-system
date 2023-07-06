@@ -102,7 +102,7 @@ public partial class DataverseAdapter
             teacherStatusLink.EntityAlias = dfeta_teacherstatus.EntityLogicalName;
 
             var filter = new FilterExpression();
-            filter.AddCondition(dfeta_teacherstatus.Fields.dfeta_name, ConditionOperator.In, "Qualified teacher (trained)", "Qualified Teacher: Assessment Only Route");
+            filter.AddCondition(dfeta_teacherstatus.Fields.dfeta_Value, ConditionOperator.In, "71", "100");
             teacherStatusLink.LinkCriteria = filter;
         }
     }
