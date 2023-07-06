@@ -19,7 +19,7 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using Prometheus;
 using Serilog;
 using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Sql;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Api.Filters;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Configuration;
@@ -197,12 +197,12 @@ public class Program
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
-        services.AddDbContext<DqtContext>(
-            options => DqtContext.ConfigureOptions(options, pgConnectionString),
+        services.AddDbContext<TrsContext>(
+            options => TrsContext.ConfigureOptions(options, pgConnectionString),
             contextLifetime: ServiceLifetime.Transient,
             optionsLifetime: ServiceLifetime.Singleton);
 
-        services.AddDbContextFactory<DqtContext>(options => DqtContext.ConfigureOptions(options, pgConnectionString));
+        services.AddDbContextFactory<TrsContext>(options => TrsContext.ConfigureOptions(options, pgConnectionString));
 
         services.AddDatabaseDeveloperPageExceptionFilter();
 

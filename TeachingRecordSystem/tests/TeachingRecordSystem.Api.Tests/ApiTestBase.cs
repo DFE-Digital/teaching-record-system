@@ -1,7 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
-using TeachingRecordSystem.Api.DataStore.Sql;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Api.Infrastructure.Json;
 using Xunit;
 
@@ -74,14 +74,14 @@ public abstract class ApiTestBase : IAsyncLifetime, IDisposable
         return httpClient;
     }
 
-    public virtual async Task<T> WithDbContext<T>(Func<DqtContext, Task<T>> action)
+    public virtual async Task<T> WithDbContext<T>(Func<TrsContext, Task<T>> action)
     {
         await using var scope = ApiFixture.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<DqtContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TrsContext>();
         return await action(dbContext);
     }
 
-    public virtual Task WithDbContext(Func<DqtContext, Task> action) =>
+    public virtual Task WithDbContext(Func<TrsContext, Task> action) =>
         WithDbContext(async dbContext =>
         {
             await action(dbContext);

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Api.DataStore.Crm;
 using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Api.DataStore.Sql;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Services;
@@ -22,11 +22,11 @@ public class LinkTrnToIdentityUserService : BackgroundService
     {
         using (var scope = _serviceProvider.CreateScope())
         {
-            var dqtContext = scope.ServiceProvider.GetRequiredService<DqtContext>();
+            var TrsContext = scope.ServiceProvider.GetRequiredService<TrsContext>();
             var dataverseAdapter = scope.ServiceProvider.GetRequiredService<IDataverseAdapter>();
             var identityApiClient = scope.ServiceProvider.GetRequiredService<IGetAnIdentityApiClient>();
 
-            var trnsNotLinkedToIndentities = await dqtContext.TrnRequests.Where(x => x.LinkedToIdentity == false && x.IdentityUserId.HasValue).ToListAsync();
+            var trnsNotLinkedToIndentities = await TrsContext.TrnRequests.Where(x => x.LinkedToIdentity == false && x.IdentityUserId.HasValue).ToListAsync();
 
             foreach (var trnRequest in trnsNotLinkedToIndentities)
             {
@@ -44,7 +44,7 @@ public class LinkTrnToIdentityUserService : BackgroundService
                         //call api to link account to trn
                         await identityApiClient.SetTeacherTrn(trnRequest.IdentityUserId!.Value, teacher.dfeta_TRN);
                         trnRequest.LinkedToIdentity = true;
-                        await dqtContext.SaveChangesAsync();
+                        await TrsContext.SaveChangesAsync();
 
                     }
                     catch (Exception ex)

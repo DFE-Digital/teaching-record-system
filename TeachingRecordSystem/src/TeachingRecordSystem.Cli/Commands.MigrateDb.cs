@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Api.DataStore.Sql;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Cli;
 
@@ -23,7 +23,7 @@ public static partial class Commands
         migrateDbCommand.SetHandler(
             async (string connectionString) =>
             {
-                using var dbContext = DqtContext.Create(connectionString);
+                using var dbContext = TrsContext.Create(connectionString);
                 await dbContext.Database.MigrateAsync();
             },
             connectionStringOption);

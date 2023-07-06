@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Sql;
-using TeachingRecordSystem.Api.DataStore.Sql.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Api.Jobs.Scheduling;
 
 namespace TeachingRecordSystem.Api.Jobs;
@@ -11,14 +11,14 @@ namespace TeachingRecordSystem.Api.Jobs;
 public class BatchSendEytsAwardedEmailsJob
 {
     private readonly BatchSendEytsAwardedEmailsJobOptions _batchSendEytsAwardedEmailsJobOptions;
-    private readonly DqtContext _dbContext;
+    private readonly TrsContext _dbContext;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly IBackgroundJobScheduler _backgroundJobScheduler;
     private readonly IClock _clock;
 
     public BatchSendEytsAwardedEmailsJob(
         IOptions<BatchSendEytsAwardedEmailsJobOptions> batchSendEytsAwardedEmailsJobOptions,
-        DqtContext dbContext,
+        TrsContext dbContext,
         IDataverseAdapter dataverseAdapter,
         IBackgroundJobScheduler backgroundJobScheduler,
         IClock clock)

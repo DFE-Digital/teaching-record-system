@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using TeachingRecordSystem.Api.DataStore.Sql.Models;
-using TeachingRecordSystem.Api.Events;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Api.Events.Processing;
 using Xunit;
 

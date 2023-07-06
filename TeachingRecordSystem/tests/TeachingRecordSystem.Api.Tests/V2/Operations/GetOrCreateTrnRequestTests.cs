@@ -2,7 +2,7 @@
 using Moq;
 using TeachingRecordSystem.Api.DataStore.Crm;
 using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Api.DataStore.Sql.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Api.V2.ApiModels;

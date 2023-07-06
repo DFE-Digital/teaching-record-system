@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Api.DataStore.Sql;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.Events.Processing;
 
@@ -10,12 +10,12 @@ public class PublishEventsBackgroundService : BackgroundService
     private static readonly TimeSpan _pollInterval = TimeSpan.FromMinutes(1);
 
     private readonly IEventObserver _eventObserver;
-    private readonly IDbContextFactory<DqtContext> _dbContextFactory;
+    private readonly IDbContextFactory<TrsContext> _dbContextFactory;
     private readonly ILogger<PublishEventsBackgroundService> _logger;
 
     public PublishEventsBackgroundService(
         IEventObserver eventObserver,
-        IDbContextFactory<DqtContext> dbContextFactory,
+        IDbContextFactory<TrsContext> dbContextFactory,
         ILogger<PublishEventsBackgroundService> logger)
     {
         _eventObserver = eventObserver;

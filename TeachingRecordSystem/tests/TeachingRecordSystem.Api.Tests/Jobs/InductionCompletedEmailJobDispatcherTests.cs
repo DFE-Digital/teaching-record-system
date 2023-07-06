@@ -1,5 +1,5 @@
 ﻿using Moq;
-using TeachingRecordSystem.Api.DataStore.Sql.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Api.Jobs;
 using TeachingRecordSystem.Api.Jobs.Scheduling;
 using Xunit;

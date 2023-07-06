@@ -6,8 +6,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Api.DataStore.Crm;
 using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Api.DataStore.Sql;
-using TeachingRecordSystem.Api.DataStore.Sql.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Api.V2.ApiModels;
@@ -21,20 +21,20 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
 {
     private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 
-    private readonly DqtContext _dqtContext;
+    private readonly TrsContext _TrsContext;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICurrentClientProvider _currentClientProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
     private readonly IGetAnIdentityApiClient _identityApiClient;
 
     public GetOrCreateTrnRequestHandler(
-        DqtContext dqtContext,
+        TrsContext TrsContext,
         IDataverseAdapter dataverseAdapter,
         ICurrentClientProvider currentClientProvider,
         IDistributedLockProvider distributedLockProvider,
         IGetAnIdentityApiClient identityApiClient)
     {
-        _dqtContext = dqtContext;
+        _TrsContext = TrsContext;
         _dataverseAdapter = dataverseAdapter;
         _currentClientProvider = currentClientProvider;
         _distributedLockProvider = distributedLockProvider;
@@ -53,7 +53,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId), _lockTimeout) :
             NoopAsyncDisposable.Instance;
 
-        var trnRequest = await _dqtContext.TrnRequests
+        var trnRequest = await _TrsContext.TrnRequests
             .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == request.RequestId);
 
         bool wasCreated;
@@ -148,7 +148,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 throw CreateValidationExceptionFromFailedReasons(createTeacherResult.FailedReasons);
             }
 
-            _dqtContext.TrnRequests.Add(new TrnRequest()
+            _TrsContext.TrnRequests.Add(new TrnRequest()
             {
                 ClientId = currentClientId,
                 RequestId = request.RequestId,
@@ -157,7 +157,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 IdentityUserId = request.IdentityUserId
             });
 
-            await _dqtContext.SaveChangesAsync();
+            await _TrsContext.SaveChangesAsync();
 
             wasCreated = true;
             trn = createTeacherResult.Trn;

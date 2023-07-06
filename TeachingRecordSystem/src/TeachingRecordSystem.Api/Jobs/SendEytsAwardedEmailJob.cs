@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using TeachingRecordSystem.Api.DataStore.Sql;
-using TeachingRecordSystem.Api.Events;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Api.Services.AccessYourQualifications;
 using TeachingRecordSystem.Api.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
@@ -14,14 +14,14 @@ public class SendEytsAwardedEmailJob
     private const string EytsAwardedEmailConfirmationTemplateId = "f85babdb-049b-4f32-9579-2a812acc0a2b";
     private const string LinkToAccessYourQualificationsServicePersonalisationKey = "link to access your teaching qualifications service";
     private readonly INotificationSender _notificationSender;
-    private readonly DqtContext _dbContext;
+    private readonly TrsContext _dbContext;
     private readonly IGetAnIdentityApiClient _identityApiClient;
     private readonly IClock _clock;
     private readonly AccessYourQualificationsOptions _accessYourQualificationsOptions;
 
     public SendEytsAwardedEmailJob(
         INotificationSender notificationSender,
-        DqtContext dbContext,
+        TrsContext dbContext,
         IGetAnIdentityApiClient identityApiClient,
         IOptions<AccessYourQualificationsOptions> accessYourQualificationsOptions,
         IClock clock)
