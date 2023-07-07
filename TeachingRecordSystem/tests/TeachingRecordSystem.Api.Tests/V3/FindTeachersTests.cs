@@ -91,6 +91,14 @@ public class FindTeachersTests : ApiTestBase
                 /* columnNames: */ It.IsAny<string[]>()))
             .ReturnsAsync(new[] { resultWithoutStatedNames, resultWithStatedNames });
 
+        ApiFixture.DataverseAdapter
+            .Setup(mock => mock.GetSanctionsByContactIds(It.IsAny<IEnumerable<Guid>>()))
+            .ReturnsAsync(new Dictionary<Guid, string[]>()
+            {
+                { resultWithoutStatedNames.Id, new[] { "G1" } },
+                { resultWithStatedNames.Id, new[] { "A17" } }
+            });
+
         var request = new HttpRequestMessage(
             HttpMethod.Get,
             $"/v3/teachers?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth}");
@@ -118,7 +126,8 @@ public class FindTeachersTests : ApiTestBase
                         dateOfBirth = DateOnly.FromDateTime(resultWithoutStatedNames.BirthDate!.Value),
                         firstName = resultWithoutStatedNames.FirstName,
                         middleName = resultWithoutStatedNames.MiddleName ?? "",
-                        lastName = resultWithoutStatedNames.LastName
+                        lastName = resultWithoutStatedNames.LastName,
+                        sanctions = new[] { "G1" }
                     },
                     new
                     {
@@ -126,7 +135,8 @@ public class FindTeachersTests : ApiTestBase
                         dateOfBirth = DateOnly.FromDateTime(resultWithStatedNames.BirthDate!.Value),
                         firstName = resultWithStatedNames.dfeta_StatedFirstName,
                         middleName = resultWithStatedNames.dfeta_StatedMiddleName ?? "",
-                        lastName = resultWithStatedNames.dfeta_StatedLastName
+                        lastName = resultWithStatedNames.dfeta_StatedLastName,
+                        sanctions = new[] { "A17" }
                     }
                 }
             });

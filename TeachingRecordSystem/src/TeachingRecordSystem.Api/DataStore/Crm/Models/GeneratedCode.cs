@@ -6851,6 +6851,7 @@ namespace TeachingRecordSystem.Api.DataStore.Crm.Models
 		{
 			public const string dfeta_sanctioncodeId = "dfeta_sanctioncodeid";
 			public const string Id = "dfeta_sanctioncodeid";
+			public const string dfeta_Value = "dfeta_value";
 			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_sanctioncode_dfeta_sanction = "dfeta_dfeta_sanctioncode_dfeta_sanction";
 		}
@@ -6938,6 +6939,26 @@ namespace TeachingRecordSystem.Api.DataStore.Crm.Models
 			set
 			{
 				this.dfeta_sanctioncodeId = value;
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_value")]
+		public string dfeta_Value
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_value");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Value");
+				this.SetAttributeValue("dfeta_value", value);
+				this.OnPropertyChanged("dfeta_Value");
 			}
 		}
 		

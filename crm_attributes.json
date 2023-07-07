@@ -195,6 +195,7 @@
     "statecode"
   ],
   "dfeta_sanctioncode" : [
+    "dfeta_value",
     "dfeta_sanctioncodeid",
     "statecode"
   ],

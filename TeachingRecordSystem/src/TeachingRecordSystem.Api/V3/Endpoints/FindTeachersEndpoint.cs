@@ -52,6 +52,8 @@ public class FindTeachersEndpoint : Endpoint<FindTeachersRequest, FindTeachersRe
                 Contact.Fields.dfeta_StatedLastName
             });
 
+        var sanctions = await _dataverseAdapter.GetSanctionsByContactIds(results.Select(r => r.Id));
+
         var response = new FindTeachersResponse()
         {
             Query = req,
@@ -62,7 +64,8 @@ public class FindTeachersEndpoint : Endpoint<FindTeachersRequest, FindTeachersRe
                 DateOfBirth = r.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),
                 FirstName = r.ResolveFirstName(),
                 MiddleName = r.ResolveMiddleName(),
-                LastName = r.ResolveLastName()
+                LastName = r.ResolveLastName(),
+                Sanctions = sanctions[r.Id]
             }).ToArray()
         };
 

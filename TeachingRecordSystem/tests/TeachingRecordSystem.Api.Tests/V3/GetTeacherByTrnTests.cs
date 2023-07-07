@@ -128,4 +128,13 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
 
         return ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(HttpClientWithApiKey, baseUrl, trn);
     }
+
+    [Fact]
+    public Task Get_ValidRequestWithSanctions_ReturnsExpectedSanctionsContent()
+    {
+        var trn = "1234567";
+        var baseUrl = $"/v3/teachers/{trn}";
+
+        return ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(HttpClientWithApiKey, baseUrl, trn);
+    }
 }

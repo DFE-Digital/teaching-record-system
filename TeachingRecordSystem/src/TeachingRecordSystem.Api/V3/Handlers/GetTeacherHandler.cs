@@ -183,6 +183,14 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
         }
 
+        IEnumerable<string>? sanctions = null;
+
+        if (request.Include.HasFlag(GetTeacherRequestIncludes.Sanctions))
+        {
+            sanctions = (await _dataverseAdapter.GetSanctionsByContactIds(new[] { teacher.Id }))[teacher.Id]
+                .Intersect(Constants.ExposableSanctionCodes);
+        }
+
         var firstName = teacher.FirstName;
         var middleName = teacher.MiddleName ?? string.Empty;
         var lastName = teacher.LastName;
@@ -241,6 +249,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 default,
             HigherEducationQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.HigherEducationQualifications) ?
                 Option.Some(MapHigherEducationQualifications(qualifications!)) :
+                default,
+            Sanctions = request.Include.HasFlag(GetTeacherRequestIncludes.Sanctions) ?
+                Option.Some(sanctions!) :
                 default
         };
     }
