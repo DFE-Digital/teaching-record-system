@@ -1,6 +1,6 @@
 locals {
-  reporting_db_username          = "u${random_string.reporting_server_username[0].result}"
-  reporting_db_password          = random_string.reporting_server_password[0].result
+  reporting_db_username          = var.deploy_dqt_reporting_server ? "u${random_string.reporting_server_username[0].result}" : null
+  reporting_db_password          = var.deploy_dqt_reporting_server ? random_string.reporting_server_password[0].result : null
   reporting_db_connection_string = var.deploy_dqt_reporting_server ? "Data Source=tcp:${azurerm_mssql_server.reporting_server[0].fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.reporting_db[0].name};Persist Security Info=False;User ID=${local.reporting_db_username};Password=${local.reporting_db_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" : ""
 }
 
@@ -34,6 +34,7 @@ resource "azurerm_mssql_server" "reporting_server" {
 }
 
 resource "azurerm_mssql_firewall_rule" "reporting_server_azure_access" {
+  count            = var.deploy_dqt_reporting_server ? 1 : 0
   name             = "Allow Azure"
   server_id        = azurerm_mssql_server.reporting_server[0].id
   start_ip_address = "0.0.0.0"

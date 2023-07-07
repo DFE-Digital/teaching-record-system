@@ -55,6 +55,8 @@ jobs:
     uses: ./.github/workflows/deploy-test.yml
     with:
       api_docker_image: ${{ needs.package.outputs.api_docker_image }}
+      cli_docker_image: ${{ needs.package.outputs.cli_docker_image }}
+      ui_docker_image: ${{ needs.package.outputs.ui_docker_image }}
     secrets: inherit
 
   deploy_preprod:
@@ -64,6 +66,8 @@ jobs:
     uses: ./.github/workflows/deploy-preprod.yml
     with:
       api_docker_image: ${{ needs.package.outputs.api_docker_image }}
+      cli_docker_image: ${{ needs.package.outputs.cli_docker_image }}
+      ui_docker_image: ${{ needs.package.outputs.ui_docker_image }}
     secrets: inherit
 
   deploy_prod:
@@ -73,4 +77,6 @@ jobs:
     uses: ./.github/workflows/deploy-prod.yml
     with:
       api_docker_image: ${{ needs.package.outputs.api_docker_image }}
+      cli_docker_image: ${{ needs.package.outputs.cli_docker_image }}
+      ui_docker_image: ${{ needs.package.outputs.ui_docker_image }}
     secrets: inherit

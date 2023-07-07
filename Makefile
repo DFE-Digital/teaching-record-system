@@ -61,6 +61,30 @@ dev_aks: aks
 	$(eval ENV_SHORT=dv)
 	$(eval ENV_TAG=dev)
 
+.PHONY: test_aks
+test_aks: aks
+	$(eval DEPLOY_ENV=test)
+	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
+	$(eval RESOURCE_NAME_PREFIX=s189t01)
+	$(eval ENV_SHORT=ts)
+	$(eval ENV_TAG=test)
+
+.PHONY: pre-production_aks
+pre-production_aks: aks
+	$(eval DEPLOY_ENV=pre-production)
+	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
+	$(eval RESOURCE_NAME_PREFIX=s189t01)
+	$(eval ENV_SHORT=pp)
+	$(eval ENV_TAG=pre-prod)
+
+.PHONY: production_aks
+production_aks: aks
+	$(eval DEPLOY_ENV=production)
+	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-production)
+	$(eval RESOURCE_NAME_PREFIX=s189p01)
+	$(eval ENV_SHORT=pd)
+	$(eval ENV_TAG=prod)
+
 .PHONY: domain
 domain:
 	$(eval DEPLOY_ENV=production)
