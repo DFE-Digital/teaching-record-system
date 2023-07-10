@@ -111,4 +111,6 @@ public interface IDataverseAdapter
     Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingBySlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);
 
     Task ClearTeacherIdentityInfo(Guid identityUserId, DateTime updateTimeUtc);
+
+    Task<IDictionary<Guid, string[]>> GetSanctionsByContactIds(IEnumerable<Guid> contactIds);
 }

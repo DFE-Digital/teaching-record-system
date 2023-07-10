@@ -124,4 +124,14 @@ public class GetTeacherTests : GetTeacherTestBase
 
         return ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(httpClient, baseUrl, trn);
     }
+
+    [Fact]
+    public Task Get_ValidRequestWithSanctions_ReturnsExpectedSanctionsContent()
+    {
+        var trn = "1234567";
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var baseUrl = "v3/teacher";
+
+        return ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(httpClient, baseUrl, trn);
+    }
 }

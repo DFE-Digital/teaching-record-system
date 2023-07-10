@@ -1376,6 +1376,44 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
+    public async Task<IDictionary<Guid, string[]>> GetSanctionsByContactIds(IEnumerable<Guid> contactIds)
+    {
+        var query = new QueryExpression(dfeta_sanction.EntityLogicalName)
+        {
+            ColumnSet = new(dfeta_sanction.Fields.dfeta_PersonId)
+        };
+
+        query.Criteria.AddCondition(dfeta_sanction.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_sanctionState.Active);
+        query.Criteria.AddCondition(dfeta_sanction.Fields.dfeta_PersonId, ConditionOperator.In, contactIds.Cast<object>().ToArray());  // https://community.dynamics.com/crm/b/crmbusiness/posts/crm-2011-odd-error-with-query-expression-and-conditionoperator-in
+
+        var sanctionCodeLink = query.AddLink(
+            dfeta_sanctioncode.EntityLogicalName,
+            dfeta_sanction.Fields.dfeta_SanctionCodeId,
+            dfeta_sanctioncode.PrimaryIdAttribute,
+            JoinOperator.Inner);
+
+        sanctionCodeLink.Columns = new ColumnSet(dfeta_sanctioncode.PrimaryIdAttribute, dfeta_sanctioncode.Fields.dfeta_Value);
+        sanctionCodeLink.EntityAlias = typeof(dfeta_sanctioncode).Name;
+
+        var request = new RetrieveMultipleRequest()
+        {
+            Query = query
+        };
+
+        var result = (RetrieveMultipleResponse)await _service.ExecuteAsync(request);
+
+        var sanctionsByContactIds = result.EntityCollection.Entities
+            .GroupBy(r => r.GetAttributeValue<EntityReference>(dfeta_sanction.Fields.dfeta_PersonId).Id)
+            .ToDictionary(
+                group => group.Key,
+                group => group
+                    .Select(e => e.Extract<dfeta_sanctioncode>().dfeta_Value)
+                    .OrderBy(code => code)  // Ensure we always return sanction codes in the same order
+                    .ToArray());
+
+        return contactIds.ToDictionary(id => id, id => sanctionsByContactIds.GetValueOrDefault(id, Array.Empty<string>()));
+    }
+
     public RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);
 
     public RequestBuilder CreateSingleRequestBuilder() => RequestBuilder.CreateSingle(_service);
