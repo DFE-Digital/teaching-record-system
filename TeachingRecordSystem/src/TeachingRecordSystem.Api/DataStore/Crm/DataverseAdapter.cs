@@ -1378,13 +1378,20 @@ public partial class DataverseAdapter : IDataverseAdapter
 
     public async Task<IDictionary<Guid, string[]>> GetSanctionsByContactIds(IEnumerable<Guid> contactIds)
     {
+        var contactIdsArray = contactIds.ToArray();
+
+        if (contactIdsArray.Length == 0)
+        {
+            return new Dictionary<Guid, string[]>();
+        }
+
         var query = new QueryExpression(dfeta_sanction.EntityLogicalName)
         {
             ColumnSet = new(dfeta_sanction.Fields.dfeta_PersonId)
         };
 
         query.Criteria.AddCondition(dfeta_sanction.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_sanctionState.Active);
-        query.Criteria.AddCondition(dfeta_sanction.Fields.dfeta_PersonId, ConditionOperator.In, contactIds.Cast<object>().ToArray());  // https://community.dynamics.com/crm/b/crmbusiness/posts/crm-2011-odd-error-with-query-expression-and-conditionoperator-in
+        query.Criteria.AddCondition(dfeta_sanction.Fields.dfeta_PersonId, ConditionOperator.In, contactIdsArray.Cast<object>().ToArray());  // https://community.dynamics.com/crm/b/crmbusiness/posts/crm-2011-odd-error-with-query-expression-and-conditionoperator-in
 
         var sanctionCodeLink = query.AddLink(
             dfeta_sanctioncode.EntityLogicalName,
@@ -1411,7 +1418,7 @@ public partial class DataverseAdapter : IDataverseAdapter
                     .OrderBy(code => code)  // Ensure we always return sanction codes in the same order
                     .ToArray());
 
-        return contactIds.ToDictionary(id => id, id => sanctionsByContactIds.GetValueOrDefault(id, Array.Empty<string>()));
+        return contactIdsArray.ToDictionary(id => id, id => sanctionsByContactIds.GetValueOrDefault(id, Array.Empty<string>()));
     }
 
     public RequestBuilder CreateMultipleRequestBuilder() => RequestBuilder.CreateMultiple(_service);
