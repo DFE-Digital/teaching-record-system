@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using TeachingRecordSystem.Api.DataStore.Sql;
-using TeachingRecordSystem.Api.Events;
 using TeachingRecordSystem.Api.Services.AccessYourQualifications;
 using TeachingRecordSystem.Api.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Api.Services.Notify;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.Api.Jobs;
 
@@ -14,14 +14,14 @@ public class SendInductionCompletedEmailJob
     private const string InductionCompletedEmailConfirmationTemplateId = "8029faa8-8409-4423-a717-c142dfd2ba86";
     private const string LinkToAccessYourQualificationsServicePersonalisationKey = "link to access your teaching qualifications service";
     private readonly INotificationSender _notificationSender;
-    private readonly DqtContext _dbContext;
+    private readonly TrsDbContext _dbContext;
     private readonly IGetAnIdentityApiClient _identityApiClient;
     private readonly IClock _clock;
     private readonly AccessYourQualificationsOptions _accessYourQualificationsOptions;
 
     public SendInductionCompletedEmailJob(
         INotificationSender notificationSender,
-        DqtContext dbContext,
+        TrsDbContext dbContext,
         IGetAnIdentityApiClient identityApiClient,
         IOptions<AccessYourQualificationsOptions> accessYourQualificationsOptions,
         IClock clock)

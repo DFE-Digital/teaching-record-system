@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Api.DataStore.Sql;
 using TeachingRecordSystem.Api.Tests.Infrastructure;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests;
@@ -24,9 +24,9 @@ public class DbFixture : IAsyncLifetime
 
     public IServiceProvider Services { get; }
 
-    public DqtContext GetDbContext() => Services.GetRequiredService<DqtContext>();
+    public TrsDbContext GetDbContext() => Services.GetRequiredService<TrsDbContext>();
 
-    public IDbContextFactory<DqtContext> GetDbContextFactory() => Services.GetRequiredService<IDbContextFactory<DqtContext>>();
+    public IDbContextFactory<TrsDbContext> GetDbContextFactory() => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
     public async Task InitializeAsync()
     {
@@ -39,12 +39,12 @@ public class DbFixture : IAsyncLifetime
     {
         var services = new ServiceCollection();
 
-        services.AddDbContext<DqtContext>(
-            options => DqtContext.ConfigureOptions(options, ConnectionString),
+        services.AddDbContext<TrsDbContext>(
+            options => TrsDbContext.ConfigureOptions(options, ConnectionString),
             contextLifetime: ServiceLifetime.Transient);
 
-        services.AddDbContextFactory<DqtContext>(
-            options => DqtContext.ConfigureOptions(options, ConnectionString));
+        services.AddDbContextFactory<TrsDbContext>(
+            options => TrsDbContext.ConfigureOptions(options, ConnectionString));
 
         return services.BuildServiceProvider();
     }

@@ -6,18 +6,18 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Sql;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.Services.CrmEntityChanges;
 
 public class CrmEntityChangesService : ICrmEntityChangesService
 {
-    private readonly IDbContextFactory<DqtContext> _dbContextFactory;
+    private readonly IDbContextFactory<TrsDbContext> _dbContextFactory;
     private readonly ICrmServiceClientProvider _crmServiceClientProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
 
     public CrmEntityChangesService(
-        IDbContextFactory<DqtContext> dbContextFactory,
+        IDbContextFactory<TrsDbContext> dbContextFactory,
         ICrmServiceClientProvider crmServiceClientProvider,
         IDistributedLockProvider distributedLockProvider)
     {

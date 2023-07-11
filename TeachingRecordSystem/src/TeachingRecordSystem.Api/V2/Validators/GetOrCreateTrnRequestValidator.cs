@@ -1,10 +1,10 @@
 ﻿#nullable disable
 using FluentValidation;
 using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Api.DataStore.Sql.Models;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Api.V2.Validators;
 

@@ -3,25 +3,25 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Api.DataStore.Crm;
 using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Api.DataStore.Sql;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
 public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInfo>
 {
-    private readonly DqtContext _dqtContext;
+    private readonly TrsDbContext _TrsDbContext;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICurrentClientProvider _currentClientProvider;
 
     public GetTrnRequestHandler(
-        DqtContext dqtContext,
+        TrsDbContext TrsDbContext,
         IDataverseAdapter dataverseAdapter,
         ICurrentClientProvider currentClientProvider)
     {
-        _dqtContext = dqtContext;
+        _TrsDbContext = TrsDbContext;
         _dataverseAdapter = dataverseAdapter;
         _currentClientProvider = currentClientProvider;
     }
@@ -30,7 +30,7 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
     {
         var currentClientId = _currentClientProvider.GetCurrentClientId();
 
-        var trnRequest = await _dqtContext.TrnRequests
+        var trnRequest = await _TrsDbContext.TrnRequests
             .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == request.RequestId);
 
         if (trnRequest == null)

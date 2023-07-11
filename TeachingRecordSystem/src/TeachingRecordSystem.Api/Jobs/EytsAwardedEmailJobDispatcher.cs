@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Api.DataStore.Sql;
 using TeachingRecordSystem.Api.Jobs.Scheduling;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.Jobs;
 
 public class EytsAwardedEmailJobDispatcher
 {
-    private readonly DqtContext _dbContext;
+    private readonly TrsDbContext _dbContext;
     private readonly IBackgroundJobScheduler _backgroundJobScheduler;
 
     public EytsAwardedEmailJobDispatcher(
-        DqtContext dbContext,
+        TrsDbContext dbContext,
         IBackgroundJobScheduler backgroundJobScheduler)
     {
         _dbContext = dbContext;
