@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Api.Jobs.Scheduling;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Api.Jobs;
 

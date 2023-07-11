@@ -2,13 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Api.Jobs;
 using TeachingRecordSystem.Api.Services.AccessYourQualifications;
 using TeachingRecordSystem.Api.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Api.Services.Notify;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events;
 using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests.Jobs;

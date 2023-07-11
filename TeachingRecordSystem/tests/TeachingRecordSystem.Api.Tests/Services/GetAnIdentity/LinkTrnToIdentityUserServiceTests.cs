@@ -1,9 +1,9 @@
 ﻿using Moq;
 using TeachingRecordSystem.Api.DataStore.Crm;
 using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Api.Services;
 using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests.Services;

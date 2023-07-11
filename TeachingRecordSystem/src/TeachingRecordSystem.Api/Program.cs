@@ -19,7 +19,6 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using Prometheus;
 using Serilog;
 using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Api.Filters;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Configuration;
@@ -41,6 +40,7 @@ using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Api.Services.Notify;
 using TeachingRecordSystem.Api.Services.TrnGenerationApi;
 using TeachingRecordSystem.Api.Validation;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 
 namespace TeachingRecordSystem.Api;

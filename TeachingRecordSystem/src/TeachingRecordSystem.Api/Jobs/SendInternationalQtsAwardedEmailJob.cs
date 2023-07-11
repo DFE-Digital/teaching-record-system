@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Api.Services.AccessYourQualifications;
 using TeachingRecordSystem.Api.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Api.Services.Notify;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.Api.Jobs;
 

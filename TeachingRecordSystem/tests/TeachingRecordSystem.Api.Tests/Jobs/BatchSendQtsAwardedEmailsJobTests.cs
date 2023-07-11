@@ -3,9 +3,9 @@ using Microsoft.Extensions.Options;
 using Moq;
 using TeachingRecordSystem.Api.DataStore.Crm;
 using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Api.Jobs;
 using TeachingRecordSystem.Api.Jobs.Scheduling;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests.Jobs;

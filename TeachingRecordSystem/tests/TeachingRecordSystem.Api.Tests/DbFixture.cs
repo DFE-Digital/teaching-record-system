@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Api.Tests.Infrastructure;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests;

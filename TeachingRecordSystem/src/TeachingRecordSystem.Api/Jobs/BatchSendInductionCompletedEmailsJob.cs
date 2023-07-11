@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.DataStore.Crm;
+using TeachingRecordSystem.Api.Jobs.Scheduling;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Api.Jobs.Scheduling;
 
 namespace TeachingRecordSystem.Api.Jobs;
 

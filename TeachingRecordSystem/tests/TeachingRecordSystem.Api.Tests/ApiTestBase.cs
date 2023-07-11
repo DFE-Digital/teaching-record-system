@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Api.Infrastructure.Json;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests;
