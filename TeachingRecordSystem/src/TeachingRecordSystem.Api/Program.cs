@@ -18,7 +18,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Prometheus;
 using Serilog;
-using TeachingRecordSystem.Api.DataStore.Crm;
+using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Filters;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Configuration;
@@ -31,17 +31,17 @@ using TeachingRecordSystem.Api.Infrastructure.RateLimiting;
 using TeachingRecordSystem.Api.Infrastructure.Redis;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Jobs;
-using TeachingRecordSystem.Api.Services;
-using TeachingRecordSystem.Api.Services.AccessYourQualifications;
-using TeachingRecordSystem.Api.Services.Certificates;
-using TeachingRecordSystem.Api.Services.CrmEntityChanges;
-using TeachingRecordSystem.Api.Services.DqtReporting;
-using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Api.Services.Notify;
-using TeachingRecordSystem.Api.Services.TrnGenerationApi;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.Core.Services.AccessYourQualifications;
+using TeachingRecordSystem.Core.Services.Certificates;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.Notify;
+using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.Dqt.Services.CrmEntityChanges;
+using TeachingRecordSystem.Dqt.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Api;
 
@@ -240,6 +240,10 @@ public class Program
         services.AddBackgroundJobs(env, configuration, pgConnectionString);
         services.AddEmail(env, configuration);
 
+        // Filter telemetry emitted by DqtReportingService
+        services.AddApplicationInsightsTelemetry()
+            .AddApplicationInsightsTelemetryProcessor<IgnoreDependencyTelemetryProcessor>();
+
         if (env.EnvironmentName != "Testing")
         {
             var crmServiceClient = GetCrmServiceClient();
@@ -353,27 +357,24 @@ public class Program
             c.Versioning.PrependToRoute = true;
         });
 
-        app.UseEndpoints(endpoints =>
+        app.MapGet("/health", async context =>
         {
-            endpoints.MapGet("/health", async context =>
-            {
-                await context.Response.WriteAsync("OK");
-            });
-
-            endpoints.MapWebHookEndpoints();
-
-            if (platform == "PAAS")
-            {
-                endpoints.MapMetrics();
-            }
-
-            endpoints.MapControllers();
-
-            if (configuration.GetValue<bool>("RecurringJobs:Enabled") && !builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
-            {
-                endpoints.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.Hangfire, "/_hangfire");
-            }
+            await context.Response.WriteAsync("OK");
         });
+
+        app.MapWebHookEndpoints();
+
+        if (platform == "PAAS")
+        {
+            app.MapMetrics();
+        }
+
+        app.MapControllers();
+
+        if (configuration.GetValue<bool>("RecurringJobs:Enabled") && !builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+        {
+            app.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.Hangfire, "/_hangfire");
+        }
 
         if (env.IsDevelopment())
         {

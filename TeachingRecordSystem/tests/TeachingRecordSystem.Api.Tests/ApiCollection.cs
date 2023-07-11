@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace TeachingRecordSystem.Api.Tests;
 
 [CollectionDefinition("Api", DisableParallelization = true)]

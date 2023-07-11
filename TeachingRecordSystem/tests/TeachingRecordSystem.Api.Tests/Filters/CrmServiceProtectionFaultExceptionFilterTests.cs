@@ -1,7 +1,6 @@
 ﻿using System.ServiceModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Xrm.Sdk;
-using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests.Filters;
 

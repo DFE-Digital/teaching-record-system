@@ -1,9 +1,5 @@
-﻿using Moq;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Api.Tests.Services.Certificates;
-using Xunit;
-using static TeachingRecordSystem.Api.DataStore.Crm.DataverseAdapter;
+﻿using TeachingRecordSystem.Dqt;
+using static TeachingRecordSystem.Dqt.DataverseAdapter;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
@@ -195,7 +191,7 @@ public class GetQtsCertificateTests : ApiTestBase
                 It.IsAny<string[]>()))
             .ReturnsAsync(qtsRegistrations);
 
-        using var pdfStream = typeof(CertificateGeneratorTests).Assembly.GetManifestResourceStream("TeachingRecordSystem.Api.Tests.Resources.TestCertificate.pdf") ??
+        using var pdfStream = typeof(GetQtsCertificateTests).Assembly.GetManifestResourceStream("TeachingRecordSystem.Api.Tests.Resources.TestCertificate.pdf") ??
             throw new Exception("Failed to find TestCertificate.pdf.");
 
         string? templateNameActual = null;

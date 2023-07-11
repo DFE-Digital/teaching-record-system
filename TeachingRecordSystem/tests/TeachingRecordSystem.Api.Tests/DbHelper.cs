@@ -9,19 +9,20 @@ namespace TeachingRecordSystem.Api.Tests;
 
 public class DbHelper
 {
-    private readonly string _connectionString;
     private Respawner? _respawner;
     private readonly SemaphoreSlim _schemaLock = new(1, 1);
     private bool _haveResetSchema = false;
 
     public DbHelper(string connectionString)
     {
-        _connectionString = connectionString;
+        ConnectionString = connectionString;
     }
+
+    public string ConnectionString { get; }
 
     public async Task ClearData()
     {
-        using var dbContext = TrsDbContext.Create(_connectionString);
+        using var dbContext = TrsDbContext.Create(ConnectionString);
         await dbContext.Database.OpenConnectionAsync();
         var connection = dbContext.Database.GetDbConnection();
         await EnsureRespawner(connection);
@@ -48,7 +49,7 @@ public class DbHelper
 
     public async Task ResetSchema()
     {
-        using var dbContext = TrsDbContext.Create(_connectionString);
+        using var dbContext = TrsDbContext.Create(ConnectionString);
 
         var connection = dbContext.Database.GetDbConnection();
         var dbName = connection.Database;

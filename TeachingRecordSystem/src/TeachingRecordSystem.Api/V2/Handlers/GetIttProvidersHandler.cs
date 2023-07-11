@@ -1,8 +1,8 @@
 #nullable disable
 using MediatR;
-using TeachingRecordSystem.Api.DataStore.Crm;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
+using TeachingRecordSystem.Dqt;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 

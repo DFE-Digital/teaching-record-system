@@ -1,9 +1,4 @@
-﻿using Moq;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Api.Tests.Services.Certificates;
-using Xunit;
-
-namespace TeachingRecordSystem.Api.Tests.V3;
+﻿namespace TeachingRecordSystem.Api.Tests.V3;
 
 public class GetEytsCertificateTests : ApiTestBase
 {
@@ -81,7 +76,7 @@ public class GetEytsCertificateTests : ApiTestBase
                 dfeta_EYTSDate = eytsDate.ToDateTime()
             });
 
-        using var pdfStream = typeof(CertificateGeneratorTests).Assembly.GetManifestResourceStream("TeachingRecordSystem.Api.Tests.Resources.TestCertificate.pdf") ??
+        using var pdfStream = typeof(GetEytsCertificateTests).Assembly.GetManifestResourceStream("TeachingRecordSystem.Api.Tests.Resources.TestCertificate.pdf") ??
             throw new Exception("Failed to find TestCertificate.pdf.");
 
         ApiFixture.CertificateGenerator

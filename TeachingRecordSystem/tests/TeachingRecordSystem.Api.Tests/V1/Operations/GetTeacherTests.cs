@@ -1,9 +1,6 @@
 #nullable disable
-using Moq;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.TestCommon;
-using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests.V1.Operations;
 

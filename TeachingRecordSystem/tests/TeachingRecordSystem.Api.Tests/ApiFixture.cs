@@ -4,22 +4,21 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Moq;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.Services.Certificates;
-using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Api.Tests.Infrastructure;
+using TeachingRecordSystem.Core.Services.Certificates;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests;
 
 public class ApiFixture : WebApplicationFactory<Program>
 {
     private readonly HttpClientInterceptorOptions _evidenceFilesHttpClientInterceptorOptions = new();
-    private readonly TestConfiguration _testConfiguration;
+    private readonly IConfiguration _configuration;
 
-    public ApiFixture(TestConfiguration testConfiguration, DbHelper dbHelper)
+    public ApiFixture(IConfiguration configuration, DbHelper dbHelper)
     {
-        _testConfiguration = testConfiguration;
+        _configuration = configuration;
         DbHelper = dbHelper;
         JwtSigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()), SecurityAlgorithms.RsaSha256);
     }
@@ -58,7 +57,7 @@ public class ApiFixture : WebApplicationFactory<Program>
 
         // N.B. Don't use builder.ConfigureAppConfiguration here since it runs *after* the entry point
         // i.e. Program.cs and that has a dependency on IConfiguration
-        builder.UseConfiguration(_testConfiguration.Configuration);
+        builder.UseConfiguration(_configuration);
 
         builder.ConfigureServices(services =>
         {

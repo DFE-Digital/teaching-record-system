@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace TeachingRecordSystem.Api.Tests.Jobs;
+﻿namespace TeachingRecordSystem.Api.Tests.Jobs;
 
 [CollectionDefinition("QtsAwardedEmailJob")]
 public class QtsAwardedEmailJobCollection

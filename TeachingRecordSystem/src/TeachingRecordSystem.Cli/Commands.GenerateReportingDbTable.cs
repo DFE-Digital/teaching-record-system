@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk.Metadata;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.Services.DqtReporting;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.Dqt.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Cli;
 

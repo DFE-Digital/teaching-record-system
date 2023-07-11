@@ -1,9 +1,9 @@
 ﻿#nullable disable
 using FluentValidation;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
+using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V2.Validators;
 
@@ -71,14 +71,19 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
                 }
 
                 if (!validOutcomes.Contains(request.Outcome.Value))
+                {
                     ctx.AddFailure(nameof(request.Outcome), StringResources.ErrorMessages_OutcomeMustBeDeferredInTrainingOrUnderAssessment);
+                }
                 else
                 {
                     if (request.ProgrammeType == IttProgrammeType.AssessmentOnlyRoute && request.Outcome.Value == IttOutcome.InTraining)
+                    {
                         ctx.AddFailure(nameof(request.Outcome), StringResources.ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute);
-
+                    }
                     else if (request.ProgrammeType != IttProgrammeType.AssessmentOnlyRoute && request.Outcome.Value == IttOutcome.UnderAssessment)
+                    {
                         ctx.AddFailure(nameof(request.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
+                    }
                 }
 
             }).When(r => r.InitialTeacherTraining != null); ;

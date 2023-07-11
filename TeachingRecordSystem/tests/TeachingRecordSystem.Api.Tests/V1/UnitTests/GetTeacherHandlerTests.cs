@@ -1,8 +1,6 @@
 ﻿#nullable disable
 using Microsoft.Xrm.Sdk;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.V1.Handlers;
-using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests.V1.UnitTests;
 

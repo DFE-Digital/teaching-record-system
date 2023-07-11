@@ -1,12 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Moq;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.Jobs;
 using TeachingRecordSystem.Api.Jobs.Scheduling;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using Xunit;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.Jobs;
 

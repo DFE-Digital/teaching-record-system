@@ -1,10 +1,10 @@
 ﻿using System.Text;
 using MediatR;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Api.Services.Certificates;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Core.Services.Certificates;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V3.Handlers;
 
