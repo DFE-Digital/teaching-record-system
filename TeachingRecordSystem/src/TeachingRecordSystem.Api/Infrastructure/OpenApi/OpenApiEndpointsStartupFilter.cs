@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;
 

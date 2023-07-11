@@ -1,9 +1,9 @@
 ﻿using FastEndpoints;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V3.Endpoints;
 

@@ -118,36 +118,41 @@ jobs:
         RUN_CRM_INTEGRATION_TESTS=true
         git fetch origin main --quiet --depth=1
         CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
-        if [[ $(echo "$CHANGED_FILES" | grep -EL "DataStore/Crm|Tests/DataverseIntegration") ]]; then
+        if [[ $(echo "$CHANGED_FILES" | grep -EL "TeachingRecordSystem.Dqt") ]]; then
           RUN_CRM_INTEGRATION_TESTS=false
         fi
 
         echo run_crm_integration_tests=$RUN_CRM_INTEGRATION_TESTS >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Tests
+    - name: Core Tests
       uses: ./.github/workflows/actions/test
       with:
-        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Api.Tests
-        report_name: "Test results"
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Tests
+        report_name: "Core test results"
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
-          -e DqtReporting__ReportingDbConnectionString="Data Source=(local); Initial Catalog=${{ env.MSSQL_DB }}; User=sa; Password=${{ env.MSSQL_PASSWORD }}; TrustServerCertificate=True"
-          --filter "FullyQualifiedName!~TeachingRecordSystem.Api.Tests.DataverseIntegration"
-        config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
 
-    - name: CRM integration tests
+    - name: API Tests
+      uses: ./.github/workflows/actions/test
+      with:
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Api.Tests
+        report_name: "API test results"
+        dotnet_test_args: >-
+          --no-build
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
+
+    - name: DQT tests
       if: steps.check_changed_files.outputs.run_crm_integration_tests == 'true'
       uses: ./.github/workflows/actions/test
       with:
-        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Api.Tests
-        report_name: "CRM integration test results"
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Dqt.Tests
+        report_name: "DQT test results"
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
           -e DqtReporting__ReportingDbConnectionString="Data Source=(local); Initial Catalog=${{ env.MSSQL_DB }}; User=sa; Password=${{ env.MSSQL_PASSWORD }}; TrustServerCertificate=True"
-          --filter "FullyQualifiedName~TeachingRecordSystem.Api.Tests.DataverseIntegration"
         config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
 
   validate_terraform:

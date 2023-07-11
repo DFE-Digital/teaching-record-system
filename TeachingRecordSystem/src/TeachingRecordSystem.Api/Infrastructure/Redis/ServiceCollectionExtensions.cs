@@ -11,8 +11,7 @@ public static class ServiceCollectionExtensions
     {
         if (environment.IsProduction())
         {
-            var connectionString = configuration.GetConnectionString("Redis") ??
-                throw new Exception("Missing Redis connection string.");
+            var connectionString = configuration.GetRequiredConnectionString("Redis");
 
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(connectionString));
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);

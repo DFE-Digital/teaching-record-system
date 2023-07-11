@@ -2,11 +2,11 @@
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.Validation;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 

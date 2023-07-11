@@ -1,10 +1,6 @@
 ﻿using System.Text;
 using JustEat.HttpClientInterception;
-using Moq;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.TestCommon;
-using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 

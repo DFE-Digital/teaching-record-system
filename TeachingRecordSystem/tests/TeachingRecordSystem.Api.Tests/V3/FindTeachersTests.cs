@@ -1,7 +1,4 @@
-﻿using Moq;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.TestCommon;
-using Xunit;
+﻿using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 

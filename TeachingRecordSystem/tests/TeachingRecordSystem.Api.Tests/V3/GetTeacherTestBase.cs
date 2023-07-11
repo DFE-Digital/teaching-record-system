@@ -1,13 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Xrm.Sdk;
-using Moq;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.V3.ApiModels;
+using TeachingRecordSystem.Dqt;
 using TeachingRecordSystem.TestCommon;
-using Xunit;
-using static TeachingRecordSystem.Api.DataStore.Crm.DataverseAdapter;
+using static TeachingRecordSystem.Dqt.DataverseAdapter;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 

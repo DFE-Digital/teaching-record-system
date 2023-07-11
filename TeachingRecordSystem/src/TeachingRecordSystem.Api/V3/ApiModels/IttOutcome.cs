@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Api.DataStore.Crm.Models;
+﻿using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V3.ApiModels;
 

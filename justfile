@@ -5,7 +5,7 @@ solution-root := "TeachingRecordSystem"
 default:
   @just --list
 
-# Run the QtCli
+# Run the trscli
 cli *ARGS:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Release" / "net7.0" / "trscli.dll"}} {{ARGS}}
 
@@ -20,7 +20,8 @@ test:
 # Format the .NET solution and Terraform code
 format:
   @cd {{solution-root}} && dotnet format
-  @just tf fmt
+  @terraform fmt terraform/aks
+  @terraform fmt terraform/paas
 
 # Format any un-committed .tf or .cs files
 format-changed:
@@ -84,10 +85,6 @@ set-api-secret key value:
 # Set a configuration entry in user secrets for the API tests project
 set-api-tests-secret key value:
   @cd {{solution-root / "tests" / "TeachingRecordSystem.Api.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
-
-# Run terraform from the terraform directory
-tf *ARGS:
-  @cd "terraform" && terraform {{ARGS}}
 
 make *ARGS:
   @make {{ARGS}}

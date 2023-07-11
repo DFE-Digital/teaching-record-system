@@ -12,8 +12,7 @@ public class TrsDesignTimeDbContextFactory : IDesignTimeDbContextFactory<TrsDbCo
             .AddUserSecrets<TrsDesignTimeDbContextFactory>(optional: true)  // Optional for CI
             .Build();
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection") ??
-            throw new Exception("Connection string DefaultConnection is missing.");
+        var connectionString = configuration.GetRequiredConnectionString("DefaultConnection");
 
         var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
         TrsDbContext.ConfigureOptions(optionsBuilder, connectionString);

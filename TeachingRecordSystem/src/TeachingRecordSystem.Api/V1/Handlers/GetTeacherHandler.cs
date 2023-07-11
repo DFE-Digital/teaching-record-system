@@ -1,10 +1,10 @@
 ﻿#nullable disable
 using MediatR;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.V1.Requests;
 using TeachingRecordSystem.Api.V1.Responses;
 using TeachingRecordSystem.Api.V2.ApiModels;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V1.Handlers;
 

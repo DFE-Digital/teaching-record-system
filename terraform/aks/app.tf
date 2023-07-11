@@ -54,14 +54,13 @@ module "api_application_configuration" {
   secret_key_vault_short = "api"
 
   config_variables = {
-    Platform                                       = "AKS"
-    PlatformEnvironment                            = var.environment_name
-    DistributedLockContainerName                   = azurerm_storage_container.locks.name
-    DqtReporting__RunService                       = var.run_dqt_reporting_service
-    GetAnIdentity__RunLinkTrnToIdentityUserService = "false"
-    RecurringJobs__Enabled                         = "false"
-    ReadOnlyMode                                   = "true"
-    DataProtectionKeysContainerName                = azurerm_storage_container.keys.name
+    Platform                        = "AKS"
+    PlatformEnvironment             = var.environment_name
+    DistributedLockContainerName    = azurerm_storage_container.locks.name
+    DqtReporting__RunService        = var.run_dqt_reporting_service
+    RecurringJobs__Enabled          = "false"
+    ReadOnlyMode                    = "true"
+    DataProtectionKeysContainerName = azurerm_storage_container.keys.name
   }
 
   secret_variables = {

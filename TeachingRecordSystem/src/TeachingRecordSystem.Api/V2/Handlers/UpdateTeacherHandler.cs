@@ -3,11 +3,11 @@ using FluentValidation;
 using FluentValidation.Results;
 using Medallion.Threading;
 using MediatR;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.Validation;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
@@ -92,8 +92,10 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
                 var contacts = await _dataverseAdapter.GetTeachersBySlugIdAndTrn(request.SlugId, trn, columnNames: Array.Empty<string>(), true);
 
                 //fallback to fetching teacher by trn/dob if slugid match doesn't return anything
-                if (contacts.Count() == 0)
+                if (contacts.Length == 0)
+                {
                     contacts = (await _dataverseAdapter.GetTeachersByTrnAndDoB(trn, dob.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
+                }
 
                 return contacts;
             }

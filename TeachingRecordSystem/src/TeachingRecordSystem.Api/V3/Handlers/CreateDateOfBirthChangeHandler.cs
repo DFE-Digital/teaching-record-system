@@ -1,8 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.StaticFiles;
-using TeachingRecordSystem.Api.DataStore.Crm;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.Validation;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V3.Handlers;
 

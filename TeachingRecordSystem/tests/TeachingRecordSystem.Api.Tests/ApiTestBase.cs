@@ -3,7 +3,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Json;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using Xunit;
+using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests;
 

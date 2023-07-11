@@ -4,16 +4,16 @@ using FluentValidation.Results;
 using Medallion.Threading;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Api.DataStore.Crm;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
@@ -75,15 +75,6 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             var firstName = firstAndMiddleNames[0];
             var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
 
-            if (request.IdentityUserId.HasValue)
-            {
-                var user = await _identityApiClient.GetUserById(request.IdentityUserId.Value);
-                if (user is null)
-                {
-                    throw CreateValidationExceptionFromFailedReasons(CreateTeacherFailedReasons.IdentityUserNotFound);
-                }
-            }
-
             var createTeacherResult = await _dataverseAdapter.CreateTeacher(new CreateTeacherCommand()
             {
                 FirstName = firstName,
@@ -133,9 +124,9 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                     } :
                     null,
                 HusId = request.HusId,
-                TeacherType = EnumHelper.ConvertToEnum<Requests.CreateTeacherType, DataStore.Crm.CreateTeacherType>(request.TeacherType),
+                TeacherType = EnumHelper.ConvertToEnum<Requests.CreateTeacherType, Dqt.Models.CreateTeacherType>(request.TeacherType),
                 RecognitionRoute = request.RecognitionRoute.HasValue ?
-                    EnumHelper.ConvertToEnum<Requests.CreateTeacherRecognitionRoute, DataStore.Crm.CreateTeacherRecognitionRoute>(request.RecognitionRoute.Value) :
+                    EnumHelper.ConvertToEnum<Requests.CreateTeacherRecognitionRoute, TeachingRecordSystem.Dqt.Models.CreateTeacherRecognitionRoute>(request.RecognitionRoute.Value) :
                     null,
                 QtsDate = request.QtsDate,
                 InductionRequired = request.InductionRequired,
@@ -153,8 +144,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 ClientId = currentClientId,
                 RequestId = request.RequestId,
                 TeacherId = createTeacherResult.TeacherId,
-                LinkedToIdentity = false,
-                IdentityUserId = request.IdentityUserId
+                LinkedToIdentity = false
             });
 
             await _TrsDbContext.SaveChangesAsync();
@@ -236,11 +226,6 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             CreateTeacherFailedReasons.TrainingCountryNotFound,
             $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.TrainingCountryCode)}",
             ErrorRegistry.CountryNotFound().Title);
-
-        ConsumeReason(
-            CreateTeacherFailedReasons.IdentityUserNotFound,
-            $"{nameof(GetOrCreateTrnRequest.IdentityUserId)}",
-            ErrorRegistry.IdentityUserNotFound().Title);
 
         if (failedReasons != CreateTeacherFailedReasons.None)
         {

@@ -14,4 +14,8 @@
     <PackageReference Include="xunit" Version="2.4.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
+  </ItemGroup>
+
 </Project>

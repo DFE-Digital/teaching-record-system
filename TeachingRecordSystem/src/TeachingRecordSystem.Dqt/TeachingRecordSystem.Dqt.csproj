@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Services\DqtReporting\Migrations\0001_Initial.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0002_TrackingColumns.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0003_ContactSentQtsAwardedEmail.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0004_ContactAdditionalAttributes.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0005_ContactSlugId.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0006_Incident_msdyn_copilotengaged.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0001_Initial.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0002_TrackingColumns.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0003_ContactSentQtsAwardedEmail.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0004_ContactAdditionalAttributes.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0005_ContactSlugId.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0006_Incident_msdyn_copilotengaged.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.1.9" />
+    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" Version="1.1.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
+  </ItemGroup>
+
+</Project>

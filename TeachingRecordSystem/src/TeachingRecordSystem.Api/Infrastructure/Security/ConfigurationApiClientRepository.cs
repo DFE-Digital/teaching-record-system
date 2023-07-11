@@ -29,7 +29,9 @@ public class ConfigurationApiClientRepository : IApiClientRepository
                 };
                 kvp.Bind(client);
                 if (!client.ApiKey.Any() && !string.IsNullOrEmpty(apiKey))
+                {
                     client.ApiKey.Add(apiKey);
+                }
 
                 return client;
             })

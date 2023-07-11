@@ -1,8 +1,4 @@
 ﻿using Microsoft.Xrm.Sdk;
-using Moq;
-using TeachingRecordSystem.Api.DataStore.Crm.Models;
-using TeachingRecordSystem.Api.Tests.Services.Certificates;
-using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
@@ -187,7 +183,7 @@ public class GetInductionCertificateTests : ApiTestBase
                 It.IsAny<string[]>()))
             .ReturnsAsync((induction, new dfeta_inductionperiod[] { }));
 
-        using var pdfStream = typeof(CertificateGeneratorTests).Assembly.GetManifestResourceStream("TeachingRecordSystem.Api.Tests.Resources.TestCertificate.pdf") ??
+        using var pdfStream = typeof(GetInductionCertificateTests).Assembly.GetManifestResourceStream("TeachingRecordSystem.Api.Tests.Resources.TestCertificate.pdf") ??
             throw new Exception("Failed to find TestCertificate.pdf.");
 
         ApiFixture.CertificateGenerator

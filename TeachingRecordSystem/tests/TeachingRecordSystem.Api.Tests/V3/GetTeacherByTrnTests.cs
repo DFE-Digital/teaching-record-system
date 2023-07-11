@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace TeachingRecordSystem.Api.Tests.V3;
 
 public class GetTeacherByTrnTests : GetTeacherTestBase

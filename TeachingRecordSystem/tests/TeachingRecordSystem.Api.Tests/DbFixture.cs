@@ -1,17 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Api.Tests.Infrastructure;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using Xunit;
 
 namespace TeachingRecordSystem.Api.Tests;
 
 public class DbFixture : IAsyncLifetime
 {
-    public DbFixture(TestConfiguration testConfiguration, DbHelper dbHelper)
+    public DbFixture(IConfiguration configuration, DbHelper dbHelper)
     {
-        Configuration = testConfiguration.Configuration;
-        ConnectionString = Configuration.GetConnectionString("DefaultConnection") ??
-            throw new Exception("Connection string DefaultConnection is missing.");
+        Configuration = configuration;
+        ConnectionString = dbHelper.ConnectionString;
         DbHelper = dbHelper;
         Services = GetServices();
     }
