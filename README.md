@@ -3,6 +3,26 @@
 Provides an API over the Database of Qualified Teachers (DQT).
 
 
+## Calling the API
+
+The API is versioned and each endpoint is prefixed with the version number e.g. `/v2/`. You can view the API specifications for each version by visiting `/swagger` (see [Environments](#environments) below for the base addresses).
+
+An API key is required for calling the API; speak to one of the developers to get one. The key must be passed in an `Authorization` header e.g.
+```
+Authorization: Bearer your_api_key
+```
+
+
+## Environments
+
+| Name           | URL                                                         |
+| -------------- | ----------------------------------------------------------- |
+| Production     | https://teacher-qualifications-api.education.gov.uk         |
+| Pre-production | https://preprod-teacher-qualifications-api.education.gov.uk |
+| Test           | https://test-teacher-qualifications-api.education.gov.uk    |
+| Development    | https://qualified-teachers-api-dev.london.cloudapps.digital |
+
+
 ## Developer setup
 
 ### Software requirements
