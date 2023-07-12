@@ -46,7 +46,7 @@ format-changed:
     cd {{solution-root}} && dotnet $dotnetArgs
   }
 
-# Run the EF Core Command-line Tools for the Api project
+# Run the EF Core Command-line Tools for the Core project
 ef *ARGS:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Core"}} && dotnet ef {{ARGS}}
 
@@ -85,6 +85,10 @@ set-api-secret key value:
 # Set a configuration entry in user secrets for the API tests project
 set-api-tests-secret key value:
   @cd {{solution-root / "tests" / "TeachingRecordSystem.Api.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
+
+# Set a configuration entry in user secrets for the DQT tests project
+set-dqt-tests-secret key value:
+  @cd {{solution-root / "tests" / "TeachingRecordSystem.Dqt.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
 
 make *ARGS:
   @make {{ARGS}}
