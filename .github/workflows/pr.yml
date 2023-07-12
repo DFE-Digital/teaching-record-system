@@ -22,6 +22,117 @@ jobs:
     outputs:
       run_crm_integration_tests: ${{ steps.check_changed_files.outputs.run_crm_integration_tests }}
 
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: qtapi
+          POSTGRES_DB: qtapi
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: extractions/setup-just@v1
+
+    - name: Install tools
+      run: just install-tools
+
+    - name: Restore
+      run: dotnet restore
+      working-directory: TeachingRecordSystem
+
+    - name: Lint
+      run: |
+        git fetch origin main --quiet --depth=1
+        CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA | { grep -oP '^TeachingRecordSystem\/\K.*\.cs$' || true; })
+
+        if [ "$CHANGED_FILES" == "" ]; then
+          echo "::notice::No changes to lint"
+          exit 0
+        fi
+
+        INCLUDE_ARG="--include $(echo "$CHANGED_FILES" | tr '\n' ' ')"
+        echo "::notice::Linting changed files only"
+
+        dotnet format --no-restore --verify-no-changes $INCLUDE_ARG
+      working-directory: TeachingRecordSystem
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      working-directory: TeachingRecordSystem
+
+    - name: Check changed files
+      id: check_changed_files
+      run: |
+        # If no CRM integration files (or their tests) have been changed in this PR then skip CRM integration tests
+        RUN_CRM_INTEGRATION_TESTS=true
+        git fetch origin main --quiet --depth=1
+        CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
+        if [[ $(echo "$CHANGED_FILES" | grep -EL "TeachingRecordSystem.Dqt") ]]; then
+          RUN_CRM_INTEGRATION_TESTS=false
+        fi
+
+        echo run_crm_integration_tests=$RUN_CRM_INTEGRATION_TESTS >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Core Tests
+      run: dotnet fixie --configuration Release --no-build
+      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Tests
+
+    - name: API Tests
+      uses: ./.github/workflows/actions/test
+      with:
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Api.Tests
+        report_name: "API test results"
+        dotnet_test_args: >-
+          --no-build
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
+
+  validate_terraform:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [paas, aks]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0
+
+    - name: Check formatting
+      run: terraform fmt -check -diff
+      working-directory: terraform/${{ matrix.platform }}
+
+    - name: Validate
+      run: |
+        terraform init -backend=false
+        terraform validate -no-color
+      working-directory: terraform/${{ matrix.platform }}
+
+    - name: Lint
+      uses: reviewdog/action-tflint@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        tflint_rulesets: azurerm
+        working_directory: terraform/${{ matrix.platform }}
+      continue-on-error: true  # temporary- we're getting sporadic 503 errors here in action setup
+
+  dqt_tests:
+    name: DQT tests
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: ${{ needs.build.outputs.run_crm_integration_tests == 'true' }}
+
     env:
       MSSQL_DB: dqtreports
       MSSQL_PASSWORD: SuperS3cretPassw0rd
@@ -88,59 +199,11 @@ jobs:
     - name: Create test reporting database
       run: docker exec $(docker ps --latest --quiet) /opt/mssql-tools/bin/sqlcmd -U "sa" -P "$MSSQL_PASSWORD" -Q "create database $MSSQL_DB; alter database $MSSQL_DB set ALLOW_SNAPSHOT_ISOLATION on;"
 
-    - name: Restore
-      run: dotnet restore
-      working-directory: TeachingRecordSystem
-
-    - name: Lint
-      run: |
-        git fetch origin main --quiet --depth=1
-        CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA | { grep -oP '^TeachingRecordSystem\/\K.*\.cs$' || true; })
-
-        if [ "$CHANGED_FILES" == "" ]; then
-          echo "::notice::No changes to lint"
-          exit 0
-        fi
-
-        INCLUDE_ARG="--include $(echo "$CHANGED_FILES" | tr '\n' ' ')"
-        echo "::notice::Linting changed files only"
-
-        dotnet format --no-restore --verify-no-changes $INCLUDE_ARG
-      working-directory: TeachingRecordSystem
-
     - name: Build
-      run: dotnet build --configuration Release --no-restore
-      working-directory: TeachingRecordSystem
+      run: dotnet build --configuration Release
+      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Dqt.Tests
 
-    - name: Check changed files
-      id: check_changed_files
-      run: |
-        # If no CRM integration files (or their tests) have been changed in this PR then skip CRM integration tests
-        RUN_CRM_INTEGRATION_TESTS=true
-        git fetch origin main --quiet --depth=1
-        CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
-        if [[ $(echo "$CHANGED_FILES" | grep -EL "TeachingRecordSystem.Dqt") ]]; then
-          RUN_CRM_INTEGRATION_TESTS=false
-        fi
-
-        echo run_crm_integration_tests=$RUN_CRM_INTEGRATION_TESTS >> $GITHUB_OUTPUT
-      shell: bash
-
-    - name: Core Tests
-      run: dotnet fixie --configuration Release --no-build
-      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Tests
-
-    - name: API Tests
-      uses: ./.github/workflows/actions/test
-      with:
-        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Api.Tests
-        report_name: "API test results"
-        dotnet_test_args: >-
-          --no-build
-          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
-
-    - name: DQT tests
-      if: steps.check_changed_files.outputs.run_crm_integration_tests == 'true'
+    - name: Run tests
       uses: ./.github/workflows/actions/test
       with:
         test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Dqt.Tests
@@ -150,38 +213,6 @@ jobs:
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
           -e DqtReporting__ReportingDbConnectionString="Data Source=(local); Initial Catalog=${{ env.MSSQL_DB }}; User=sa; Password=${{ env.MSSQL_PASSWORD }}; TrustServerCertificate=True"
         config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
-
-  validate_terraform:
-    name: Validate Terraform
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        platform: [paas, aks]
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.5.0
-
-    - name: Check formatting
-      run: terraform fmt -check -diff
-      working-directory: terraform/${{ matrix.platform }}
-
-    - name: Validate
-      run: |
-        terraform init -backend=false
-        terraform validate -no-color
-      working-directory: terraform/${{ matrix.platform }}
-
-    - name: Lint
-      uses: reviewdog/action-tflint@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        tflint_rulesets: azurerm
-        working_directory: terraform/${{ matrix.platform }}
-      continue-on-error: true  # temporary- we're getting sporadic 503 errors here in action setup
 
   package:
     name: Package application
