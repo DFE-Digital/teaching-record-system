@@ -4,11 +4,16 @@ namespace TeachingRecordSystem.TestFramework;
 
 public static class TestConfigurationExtensions
 {
-    public static void AddTrsTestFrameworkConventions(this TestConfiguration testConfiguration, TestEnvironment environment)
+    public static void AddTrsTestFrameworkConventions(this TestConfiguration configuration, TestEnvironment environment)
     {
         var discovery = new Discovery();
         var execution = new Execution(environment);
 
-        testConfiguration.Conventions.Add(discovery, execution);
+        configuration.Conventions.Add(discovery, execution);
+
+        if (environment.IsContinuousIntegration())
+        {
+            configuration.Reports.Add(new GitHubReport(environment));
+        }
     }
 }

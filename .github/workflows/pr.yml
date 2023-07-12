@@ -56,6 +56,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - uses: extractions/setup-just@v1
+
     - uses: Azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -81,8 +83,7 @@ jobs:
         secrets: INTEGRATION-TEST-CONFIG
 
     - name: Install tools
-      run: |
-        dotnet tool install -g dotnet-format --version "7.*" --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json >/dev/null
+      run: just install-tools
 
     - name: Create test reporting database
       run: docker exec $(docker ps --latest --quiet) /opt/mssql-tools/bin/sqlcmd -U "sa" -P "$MSSQL_PASSWORD" -Q "create database $MSSQL_DB; alter database $MSSQL_DB set ALLOW_SNAPSHOT_ISOLATION on;"
@@ -104,7 +105,7 @@ jobs:
         INCLUDE_ARG="--include $(echo "$CHANGED_FILES" | tr '\n' ' ')"
         echo "::notice::Linting changed files only"
 
-        dotnet-format --no-restore --verify-no-changes $INCLUDE_ARG
+        dotnet format --no-restore --verify-no-changes $INCLUDE_ARG
       working-directory: TeachingRecordSystem
 
     - name: Build
@@ -126,13 +127,8 @@ jobs:
       shell: bash
 
     - name: Core Tests
-      uses: ./.github/workflows/actions/test
-      with:
-        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Tests
-        report_name: "Core test results"
-        dotnet_test_args: >-
-          --no-build
-          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
+      run: dotnet fixie --configuration Release --no-build
+      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Tests
 
     - name: API Tests
       uses: ./.github/workflows/actions/test
