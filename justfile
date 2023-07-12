@@ -5,6 +5,10 @@ solution-root := "TeachingRecordSystem"
 default:
   @just --list
 
+# Install .NET local tools
+install-tools:
+  @cd {{solution-root}} && dotnet tool restore
+
 # Run the trscli
 cli *ARGS:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Release" / "net7.0" / "trscli.dll"}} {{ARGS}}
@@ -15,6 +19,7 @@ build:
 
 # Test the .NET solution
 test:
+  @cd {{solution-root / "tests" / "TeachingRecordSystem.Core.Tests"}} && dotnet fixie
   @cd {{solution-root}} && dotnet test
 
 # Format the .NET solution and Terraform code

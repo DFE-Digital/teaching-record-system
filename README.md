@@ -38,6 +38,13 @@ If you're working on infrastructure you will also need:
 - Terraform;
 - bash.
 
+### Local tools setup
+
+dotnet-format and fixie are required for linting and running tests, respectively. A `just` recipe will install them:
+```shell
+just install-tools
+```
+
 ### Database setup
 
 Install Postgres then set a connection string configuration entry in user secrets for both the `TeachingRecordSystem.Api` and `TeachingRecordSystem.Api.Tests` projects.
