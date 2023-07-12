@@ -1,8 +1,6 @@
-# qualified-teachers-api
+# teaching-record-system
 
-[![Build](https://github.com/DFE-Digital/qualified-teachers-api/actions/workflows/build.yml/badge.svg)](https://github.com/DFE-Digital/qualified-teachers-api/actions/workflows/build.yml)
-
-Provides a RESTful API for integrating with the Database of Qualified Teachers CRM.
+Provides an API over the Database of Qualified Teachers (DQT).
 
 
 ## Developer setup
@@ -13,11 +11,16 @@ The API is an ASP.NET Core 7 web application. To develop locally you will need t
 - Visual Studio 2022 (or the .NET 7 SDK an alternative IDE/editor);
 - a local Postgres 13+ instance.
 
-A `justfile` defines various recipes for development. Ensure [just](https://just.systems/) is installed and available on your `$PATH`.
+A `justfile` defines various recipes for development. Ensure [just](https://just.systems/) is installed and available on your `$PATH` as well as [PowerShell](https://microsoft.com/PowerShell).
+
+If you're working on infrastructure you will also need:
+- make;
+- Terraform;
+- bash.
 
 ### Database setup
 
-Install Postgres then set a connection string configuration entry in user secrets for both the `QualifiedTeachersApi` and `QualifiedTeachersApi.Tests` projects.
+Install Postgres then set a connection string configuration entry in user secrets for both the `TeachingRecordSystem.Api` and `TeachingRecordSystem.Api.Tests` projects.
 
 e.g.
 ```shell
@@ -25,27 +28,52 @@ just set-api-secret ConnectionStrings:DefaultConnection "Host=localhost;Username
 just set-api-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=dqt_tests"
 ```
 
-The databases will be created automatically when running the API or tests in development mode.
+To set up the initial database schema run:
+```shell
+just build
+just cli migrate-db
+```
+
+The databases will be created automatically when running the tests.
+
+#### DQT Reporting database setup
+
+This solution contains a service that synchronises changes from CRM into a SQL Server database used for reporting (this replaces the now-deprecated Data Export Service). By default this is disabled for local development. For the tests to pass, you will need a test database and a connection string defined in user secrets e.g.
+```shell
+just set-dqt-tests-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReportingTests;Integrated Security=Yes;TrustServerCertificate=True"
+```
+
+To run the service locally, override the configuration option to run the service and ensure a connection string is provided for the `Api` project e.g.
+```shell
+just set-api-secret DqtReporting:RunService true
+just set-api-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReporting;Integrated Security=Yes;TrustServerCertificate=True"
+```
+The service will run as a background service of the `Api` project.
+
 
 ### External dependencies
 
 #### Dynamics CRM
 
-The `build` CRM environment is used for local development and automated tests. Connection information should be stored in user secrets in the `ConnectionStrings:Crm` key. Secrets must be added for both the API project and the API tests project. Secrets can be added set a `just` recipe e.g.
+The `build` CRM environment is used for local development and automated tests. Connection information should be stored in user secrets in the `ConnectionStrings:Crm` key. Secrets must be added for both the `Api` project and the `Dqt.Tests` project.
+
+Secrets can be set using `just` recipes e.g.
 ```shell
 just set-api-secret ConnectionStrings:Crm "the_connection_string"
-just set-api-tests-secret ConnectionStrings:Crm "the_connection_string"
+just set-dqt-tests-secret ConnectionStrings:Crm "the_connection_string"
+just set-dqt-tests-secret BuildEnvLockBlobUri "lock_blob_uri"
+just set-dqt-tests-secret BuildEnvLockBlobSasToken "lock_blob_sas_token"
 ```
 Ask a developer on the team for the user secrets for this environment.
 
 #### TRN Generation API
 
-The DQT API calls a TRN Generation API to generate a TRNs. Configuration should be stored in user secrets in the `TrnGenerationApi:BaseAddress` and `TrnGeneration:ApiKey` keys. Secrets must be added for both the API project and the API tests project. Secrets can be set using a `just` recipe e.g.
+The DQT API calls a TRN Generation API to generate a TRNs. Configuration should be stored in user secrets in the `TrnGenerationApi:BaseAddress` and `TrnGeneration:ApiKey` keys. Secrets must be added for both the `Api` project and the `Dqt.Tests` project. Secrets can be set using `just` recipes e.g.
 ```shell
 just set-api-secret TrnGenerationApi:BaseAddress "https://the-trn-generation-url"
 just set-api-secret TrnGenerationApi:ApiKey "the-api-key"
-just set-api-tests-secret TrnGenerationApi:BaseAddress "https://the-trn-generation-url"
-just set-api-tests-secret TrnGenerationApi:ApiKey "the-api-key"
+just set-dqt-tests-secret TrnGenerationApi:BaseAddress "https://the-trn-generation-url"
+just set-dqt-tests-secret TrnGenerationApi:ApiKey "the-api-key"
 ```
 Ask a developer on the team for the user secrets for this environment.
 
@@ -53,7 +81,7 @@ Ask a developer on the team for the user secrets for this environment.
 ## CRM code generation
 
 A tool is used to generated proxy classes for the entities defined within the DQT CRM.
-The tool generates the `QualifiedTeachersApi.DataStore.Crm.Models.GeneratedCode.cs` and `QualifiedTeachersApi.DataStore.Crm.Models.GeneratedOptionSets.cs` files.
+The tool generates the `TeachingRecordSystem.Dqt.Models.GeneratedCode.cs` and `TeachingRecordSystem.Dqt.Models.GeneratedOptionSets.cs` files.
 A configuration file at `crm_attributes.json` whitelists the entities and their attributes which are included on the generated types.
 
 Run `just generate-crm-models` to run the code generator against the `build` environment using the configuration file above.
@@ -74,7 +102,7 @@ By default the script runs read-only; it calculates the new JSON configuration a
 ### Example - adding an API client
 
 ```shell
-./Set-AppConfigSecret -EnvironmentName dev -AzureSubscription s165-teachingqualificationsservice-development -ConfigKey ApiClients:new_client:ApiKey -ConfigValue super-secret-key
+./scripts/Set-AppConfigSecret -EnvironmentName dev -AzureSubscription s165-teachingqualificationsservice-development -ConfigKey ApiClients:new_client:ApiKey -ConfigValue super-secret-key
 ```
 
 ```diff
@@ -97,7 +125,17 @@ By default the script runs read-only; it calculates the new JSON configuration a
  }
 ```
 
-## More information
 
-- [Environment setup](docs/environment-setup.md)
-- [Running load tests](docs/running-load-tests.md)
+## Formatting
+
+Pull request builds will run format checks on .NET and Terraform code changes; if there are any issues the build will fail.
+
+Before committing you can format any changed files by running:
+```shell
+just format-changed
+```
+
+To format the entire codebase run
+```shell
+just format
+```
