@@ -36,6 +36,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<InductionCompletedEmailsJobItem> InductionCompletedEmailsJobItems => Set<InductionCompletedEmailsJobItem>();
 
+    public DbSet<User> Users => Set<User>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
     {
         if (connectionString != null)

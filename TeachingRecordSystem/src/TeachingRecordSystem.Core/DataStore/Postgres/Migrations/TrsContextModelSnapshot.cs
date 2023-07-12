@@ -393,6 +393,51 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.ToTable("trn_requests", (string)null);
                 });
 
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.User", b =>
+            {
+                b.Property<Guid>("UserId")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid")
+                    .HasColumnName("user_id");
+
+                b.Property<bool>("Active")
+                    .HasColumnType("boolean")
+                    .HasColumnName("active");
+
+                b.Property<string>("AzureAdSubject")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("character varying(100)")
+                    .HasColumnName("azure_ad_subject");
+
+                b.Property<string>("Email")
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnType("character varying(200)")
+                    .HasColumnName("email");
+
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnType("character varying(200)")
+                    .HasColumnName("name");
+
+                b.Property<string[]>("Roles")
+                    .IsRequired()
+                    .HasColumnType("text[]")
+                    .HasColumnName("roles");
+
+                b.Property<int>("UserType")
+                    .HasColumnType("integer")
+                    .HasColumnName("user_type");
+
+                b.HasKey("UserId")
+                    .HasName("pk_users");
+
+                b.ToTable("users", (string)null);
+            });
+
+
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.EytsAwardedEmailsJobItem", b =>
                 {
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.EytsAwardedEmailsJob", "EytsAwardedEmailsJob")
