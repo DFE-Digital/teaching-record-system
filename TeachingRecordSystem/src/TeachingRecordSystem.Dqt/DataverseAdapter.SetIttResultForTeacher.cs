@@ -12,9 +12,10 @@ public partial class DataverseAdapter
         Guid teacherId,
         string ittProviderUkprn,
         dfeta_ITTResult result,
-        DateOnly? assessmentDate)
+        DateOnly? assessmentDate,
+        string slugId = null)
     {
-        var (r, _) = await SetIttResultForTeacherImpl(teacherId, ittProviderUkprn, result, assessmentDate);
+        var (r, _) = await SetIttResultForTeacherImpl(teacherId, ittProviderUkprn, result, assessmentDate, slugId);
         return r;
     }
 
@@ -23,7 +24,8 @@ public partial class DataverseAdapter
         Guid teacherId,
         string ittProviderUkprn,
         dfeta_ITTResult result,
-        DateOnly? assessmentDate)
+        DateOnly? assessmentDate,
+        string slugId = null)
     {
         switch (result)
         {
@@ -67,7 +69,7 @@ public partial class DataverseAdapter
             return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.NoMatchingIttRecord), null);
         }
 
-        var (itt, ittLookupFailed) = helper.SelectIttRecord(lookupData.Itt, lookupData.IttProvider.Id);
+        var (itt, ittLookupFailed) = helper.SelectIttRecord(lookupData.Itt, lookupData.IttProvider.Id, slugId);
 
         if (ittLookupFailed.HasValue)
         {
@@ -289,6 +291,7 @@ public partial class DataverseAdapter
                     dfeta_initialteachertraining.Fields.dfeta_Result,
                     dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
                     dfeta_initialteachertraining.Fields.StateCode,
+                    dfeta_initialteachertraining.Fields.dfeta_SlugId
                 });
 
             var getQtsRegistrationsTask = _dataverseAdapter.GetQtsRegistrationsByTeacher(
@@ -336,15 +339,21 @@ public partial class DataverseAdapter
 
         public (dfeta_initialteachertraining Result, SetIttResultForTeacherFailedReason? FailedReason) SelectIttRecord(
             IEnumerable<dfeta_initialteachertraining> ittRecords,
-            Guid ittProviderId)
+            Guid ittProviderId,
+            string slugId = null)
         {
-            // Find an ITT record for the specified ITT Provider.
+            // if SlugId is not passed in
+            // Find an active ITT record for the specified ITT Provider.
+            // otherwise find active ITT for the slugid (which should be one).
             // if ProgrammeType is AssessmentOnlyRoute, result should be UnderAssessment,Withdrawn or Deferrred otherwise
             // record should be InTraining,WithDrawn or Deferred
             List<dfeta_initialteachertraining> matching = new List<dfeta_initialteachertraining>();
 
-            var activeForProvider = ittRecords
+            var activeForProvider = string.IsNullOrEmpty(slugId) ? ittRecords
                 .Where(r => r.dfeta_EstablishmentId?.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
+                .ToArray() :
+                ittRecords
+                .Where(r => r.dfeta_SlugId == slugId && r.dfeta_EstablishmentId?.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
                 .ToArray();
 
             foreach (var itt in activeForProvider)
