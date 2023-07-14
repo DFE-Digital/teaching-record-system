@@ -14,6 +14,7 @@ public record GetTeacherResponse
     public required string? NationalInsuranceNumber { get; init; }
     public required Option<bool> PendingNameChange { get; init; }
     public required Option<bool> PendingDateOfBirthChange { get; init; }
+    public required string? Email { get; set; }
     public required GetTeacherResponseQts? Qts { get; init; }
     public required GetTeacherResponseEyts? Eyts { get; init; }
     public required Option<GetTeacherResponseInduction?> Induction { get; init; }
