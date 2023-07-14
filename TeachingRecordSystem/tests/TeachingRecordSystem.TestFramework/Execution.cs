@@ -28,6 +28,8 @@ internal class Execution : IExecution
         startup.ConfigureServices(services, configuration);
         await using var serviceProvider = services.BuildServiceProvider();
 
+        await startup.Initialize(serviceProvider);
+
         var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
         var concurrentTests = testSuite.TestClasses
