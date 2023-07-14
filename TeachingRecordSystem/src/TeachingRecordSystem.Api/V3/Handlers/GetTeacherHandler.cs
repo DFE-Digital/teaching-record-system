@@ -35,7 +35,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Contact.Fields.BirthDate,
                 Contact.Fields.dfeta_NINumber,
                 Contact.Fields.dfeta_QTSDate,
-                Contact.Fields.dfeta_EYTSDate
+                Contact.Fields.dfeta_EYTSDate,
+                Contact.Fields.EMailAddress1
             });
 
         if (teacher is null)
@@ -224,6 +225,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             PendingDateOfBirthChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingDateOfBirthChange) : default,
             Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), qtsAwardedInWales, request.AccessMode),
             Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), request.AccessMode),
+            Email = teacher.EMailAddress1,
             Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ?
                 Option.Some(MapInduction(induction!, inductionPeriods!, request.AccessMode)) :
                 default,

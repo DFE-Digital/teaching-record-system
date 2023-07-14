@@ -69,7 +69,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
             {
                 awarded = contact.dfeta_EYTSDate?.ToString("yyyy-MM-dd"),
                 certificateUrl = "/v3/certificates/eyts"
-            }
+            },
+            email = contact.EMailAddress1
         })!;
 
         if (!expectQtsCertificateUrl)
@@ -122,7 +123,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
             {
                 awarded = contact.dfeta_EYTSDate?.ToString("yyyy-MM-dd"),
                 certificateUrl = "/v3/certificates/eyts"
-            }
+            },
+            email = contact.EMailAddress1
         })!;
 
         if (!expectCertificateUrls)
@@ -654,6 +656,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var middleName = Faker.Name.Middle();
         var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
         var nino = Faker.Identification.UkNationalInsuranceNumber();
+        var email = Faker.Internet.Email();
 
         var qtsDate = new DateOnly(1997, 4, 23);
         var eytsDate = new DateOnly(1995, 5, 14);
@@ -671,7 +674,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
             BirthDate = dateOfBirth.ToDateTime(),
             dfeta_NINumber = nino,
             dfeta_QTSDate = qtsDate.ToDateTime(),
-            dfeta_EYTSDate = eytsDate.ToDateTime()
+            dfeta_EYTSDate = eytsDate.ToDateTime(),
+            EMailAddress1 = email
         };
 
         return teacher;
