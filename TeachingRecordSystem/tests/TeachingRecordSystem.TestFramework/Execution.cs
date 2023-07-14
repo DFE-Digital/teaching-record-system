@@ -34,18 +34,20 @@ internal class Execution : IExecution
 
         var concurrentTests = testSuite.TestClasses
             .Where(c => c.Type.GetCustomAttribute<TestClassAttribute>()!.TestConcurrencyMode == TestConcurrencyMode.Default)
-            .SelectMany(tc => tc.Tests.Select(t => (Test: t, TestClass: tc)));
+            .SelectMany(tc => tc.Tests.Select(t => (Test: t, TestClass: tc)))
+            .SelectMany(t => GetTestCases(t.Test, t.TestClass).Select(args => (Test: t.Test, TestClass: t.TestClass, Arguments: args)));
 
-        await Parallel.ForEachAsync(concurrentTests, async (t, _) => await RunTest(t.Test, t.TestClass, serviceScopeFactory));
+        await Parallel.ForEachAsync(concurrentTests, async (t, _) => await RunTest(t.Test, t.TestClass, t.Arguments, serviceScopeFactory));
 
         var nonConcurrentTests = testSuite.TestClasses
             .Where(c => c.Type.GetCustomAttribute<TestClassAttribute>()!.TestConcurrencyMode == TestConcurrencyMode.NoConcurrency)
-            .SelectMany(tc => tc.Tests.Select(t => (Test: t, TestClass: tc)));
+            .SelectMany(tc => tc.Tests.Select(t => (Test: t, TestClass: tc)))
+            .SelectMany(t => GetTestCases(t.Test, t.TestClass).Select(args => (Test: t.Test, TestClass: t.TestClass, Arguments: args)));
 
         await Parallel.ForEachAsync(
             nonConcurrentTests,
             new ParallelOptions() { MaxDegreeOfParallelism = 1 },
-            async (t, _) => await RunTest(t.Test, t.TestClass, serviceScopeFactory));
+            async (t, _) => await RunTest(t.Test, t.TestClass, t.Arguments, serviceScopeFactory));
     }
 
     private ITestStartup GetTestStartup()
@@ -58,12 +60,12 @@ internal class Execution : IExecution
 
         if (startupTypes.Length == 0)
         {
-            throw new Exception("Cannot locate a test startup class.");
+            throw new TrsTestFrameworkException("Cannot locate a test startup class.");
         }
 
         if (startupTypes.Length > 1)
         {
-            throw new Exception("Multiple test startup classes found.");
+            throw new TrsTestFrameworkException("Multiple test startup classes found.");
         }
 
         var startupType = startupTypes.Single();
@@ -83,7 +85,67 @@ internal class Execution : IExecution
         return testClassInstance;
     }
 
-    private async Task RunTest(Test test, TestClass testClass, IServiceScopeFactory serviceScopeFactory)
+    private List<object?[]> GetTestCases(Test test, TestClass testClass)
+    {
+        List<object?[]> argumentGroups = new();
+
+        if (test.HasParameters)
+        {
+            var memberDatas = test.Method.GetCustomAttributes<MemberDataAttribute>(inherit: false).ToArray();
+
+            foreach (var memberData in memberDatas)
+            {
+                var member = testClass.Type.GetProperty(memberData.MemberName, BindingFlags.Public | BindingFlags.Static);
+
+                if (member is null)
+                {
+                    throw new TrsTestFrameworkException($"Could not find member {memberData.MemberName} on {testClass.Type.Name}.");
+                }
+
+                var memberValue = member.GetValue(obj: null);
+
+                if (memberValue is not TestArguments testArguments)
+                {
+                    throw new TrsTestFrameworkException("Member is not the correct type.");
+                }
+
+                foreach (var row in testArguments)
+                {
+                    if (row.Length != test.Parameters.Length)
+                    {
+                        throw new TrsTestFrameworkException("Incorrect number of arguments specified.");
+                    }
+
+                    argumentGroups.Add(row);
+                }
+            }
+
+            var inlineDatas = test.Method.GetCustomAttributes<InlineDataAttribute>(inherit: false).ToArray();
+
+            foreach (var inlineData in inlineDatas)
+            {
+                if (inlineData.Data.Length != test.Parameters.Length)
+                {
+                    throw new TrsTestFrameworkException("Incorrect number of arguments specified.");
+                }
+
+                argumentGroups.Add(inlineData.Data);
+            }
+
+            if (argumentGroups.Count == 0)
+            {
+                throw new TrsTestFrameworkException($"Could not find argument data.");
+            }
+        }
+        else
+        {
+            argumentGroups.Add(Array.Empty<object?>());
+        }
+
+        return argumentGroups;
+    }
+
+    private async Task RunTest(Test test, TestClass testClass, object?[] arguments, IServiceScopeFactory serviceScopeFactory)
     {
         await using var scope = serviceScopeFactory.CreateAsyncScope();
 
@@ -94,7 +156,7 @@ internal class Execution : IExecution
 
         try
         {
-            await test.Run(testClassInstance);
+            await test.Run(testClassInstance, arguments);
         }
         finally
         {

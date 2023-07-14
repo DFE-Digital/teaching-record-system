@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
-    <ProjectReference Include="..\TeachingRecordSystem.TestFramework\TeachingRecordSystem.TestFramework.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj" />
   </ItemGroup>
 
 </Project>
