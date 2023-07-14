@@ -3,5 +3,6 @@
 public enum TestConcurrencyMode
 {
     Default = 0,
-    NoConcurrency = 1
+    NoConcurrency = 1,
+    Group = 2
 }

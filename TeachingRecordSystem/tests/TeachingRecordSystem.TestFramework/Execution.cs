@@ -33,11 +33,23 @@ internal class Execution : IExecution
         var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
         var concurrentTests = testSuite.TestClasses
-            .Where(c => c.Type.GetCustomAttribute<TestClassAttribute>()!.TestConcurrencyMode == TestConcurrencyMode.Default)
-            .SelectMany(tc => tc.Tests.Select(t => (Test: t, TestClass: tc)))
-            .SelectMany(t => GetTestCases(t.Test, t.TestClass).Select(args => (Test: t.Test, TestClass: t.TestClass, Arguments: args)));
+            .Select(c =>
+            {
+                var testClassAttribute = c.Type.GetCustomAttribute<TestClassAttribute>()!;
+                return (testClassAttribute.TestConcurrencyMode, testClassAttribute.Group, TestClass: c);
+            })
+            .Where(t => t.TestConcurrencyMode == TestConcurrencyMode.Default || t.TestConcurrencyMode == TestConcurrencyMode.Group)
+            .GroupBy(x => x.Group)
+            .SelectMany(g =>
+            {
+                var group = g.Key;
+                var groupLock = group is not null ? new SemaphoreSlim(1, 1) : null;
+                return g.Select(t => (t.TestClass, GroupLock: groupLock));
+            })
+            .SelectMany(x => x.TestClass.Tests.Select(t => (Test: t, TestClass: x.TestClass, GroupLock: x.GroupLock)))
+            .SelectMany(t => GetTestCases(t.Test, t.TestClass).Select(args => (Test: t.Test, TestClass: t.TestClass, Arguments: args, GroupLock: t.GroupLock)));
 
-        await Parallel.ForEachAsync(concurrentTests, async (t, _) => await RunTest(t.Test, t.TestClass, t.Arguments, serviceScopeFactory));
+        await Parallel.ForEachAsync(concurrentTests, async (t, _) => await RunTest(t.Test, t.TestClass, t.Arguments, t.GroupLock, serviceScopeFactory));
 
         var nonConcurrentTests = testSuite.TestClasses
             .Where(c => c.Type.GetCustomAttribute<TestClassAttribute>()!.TestConcurrencyMode == TestConcurrencyMode.NoConcurrency)
@@ -47,7 +59,7 @@ internal class Execution : IExecution
         await Parallel.ForEachAsync(
             nonConcurrentTests,
             new ParallelOptions() { MaxDegreeOfParallelism = 1 },
-            async (t, _) => await RunTest(t.Test, t.TestClass, t.Arguments, serviceScopeFactory));
+            async (t, _) => await RunTest(t.Test, t.TestClass, t.Arguments, groupLock: null, serviceScopeFactory));
     }
 
     private ITestStartup GetTestStartup()
@@ -145,31 +157,43 @@ internal class Execution : IExecution
         return argumentGroups;
     }
 
-    private async Task RunTest(Test test, TestClass testClass, object?[] arguments, IServiceScopeFactory serviceScopeFactory)
+    private async Task RunTest(Test test, TestClass testClass, object?[] arguments, SemaphoreSlim? groupLock, IServiceScopeFactory serviceScopeFactory)
     {
-        await using var scope = serviceScopeFactory.CreateAsyncScope();
-
-        var testInfo = new TestInfo(scope.ServiceProvider, _environment.Console);
-        TestInfo.SetCurrent(testInfo);
-
-        var testClassInstance = await CreateTestClassInstance(testClass, testInfo, scope.ServiceProvider);
+        if (groupLock is not null)
+        {
+            await groupLock.WaitAsync();
+        }
 
         try
         {
-            await test.Run(testClassInstance, arguments);
+            await using var scope = serviceScopeFactory.CreateAsyncScope();
+
+            var testInfo = new TestInfo(scope.ServiceProvider, _environment.Console);
+            TestInfo.SetCurrent(testInfo);
+
+            var testClassInstance = await CreateTestClassInstance(testClass, testInfo, scope.ServiceProvider);
+
+            try
+            {
+                await test.Run(testClassInstance, arguments);
+            }
+            finally
+            {
+                if (testClassInstance is IAsyncDisposable asyncDisposable)
+                {
+                    await asyncDisposable.DisposeAsync();
+                }
+                else if (testClassInstance is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+
+                TestInfo.SetCurrent(null);
+            }
         }
         finally
         {
-            if (testClassInstance is IAsyncDisposable asyncDisposable)
-            {
-                await asyncDisposable.DisposeAsync();
-            }
-            else if (testClassInstance is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-
-            TestInfo.SetCurrent(null);
+            groupLock?.Release();
         }
     }
 }
