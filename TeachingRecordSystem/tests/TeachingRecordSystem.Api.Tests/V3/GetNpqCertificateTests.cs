@@ -2,6 +2,7 @@
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
+[TestClass]
 public class GetNpqCertificateTests : ApiTestBase
 {
     public GetNpqCertificateTests(ApiFixture apiFixture)
@@ -9,7 +10,7 @@ public class GetNpqCertificateTests : ApiTestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NpqCertificateWhenQualificationDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -26,14 +27,14 @@ public class GetNpqCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NpqCertificateWhenQualificationIsNotNpq_ReturnsNotFound()
     {
         // Arrange
         var trn = "1234567";
         var qualificationId = Guid.NewGuid();
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(new dfeta_qualification()
             {
@@ -51,14 +52,14 @@ public class GetNpqCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NpqCertificateWhenQualificationHasNoAwardDate_ReturnsNotFound()
     {
         // Arrange
         var trn = "1234567";
         var qualificationId = Guid.NewGuid();
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(new dfeta_qualification()
             {
@@ -75,14 +76,14 @@ public class GetNpqCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NpqCertificateWhenQualificationIsNotActive_ReturnsNotFound()
     {
         // Arrange
         var trn = "1234567";
         var qualificationId = Guid.NewGuid();
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(new dfeta_qualification()
             {
@@ -101,14 +102,14 @@ public class GetNpqCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NpqCertificateWhenNoAssociatedTeacher_ReturnsNotFound()
     {
         // Arrange
         var trn = "1234567";
         var qualificationId = Guid.NewGuid();
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(new dfeta_qualification()
             {
@@ -127,7 +128,7 @@ public class GetNpqCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_NpqCertificateWhenAssociatedTeacherIsNotTheAuthenticatedUser_ReturnsNotFound()
     {
         // Arrange
@@ -160,7 +161,7 @@ public class GetNpqCertificateTests : ApiTestBase
         qualification.Attributes.Add($"contact.{Contact.Fields.LastName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.FirstName, teacher.LastName));
         qualification.Attributes.Add($"contact.{Contact.Fields.dfeta_TRN}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.dfeta_TRN, teacher.dfeta_TRN));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(qualification);
 
@@ -174,7 +175,7 @@ public class GetNpqCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_ValidRequest_ReturnsExpectedResponse()
     {
         // Arrange        
@@ -206,14 +207,14 @@ public class GetNpqCertificateTests : ApiTestBase
         qualification.Attributes.Add($"contact.{Contact.Fields.LastName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.FirstName, teacher.LastName));
         qualification.Attributes.Add($"contact.{Contact.Fields.dfeta_TRN}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.dfeta_TRN, teacher.dfeta_TRN));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(qualification);
 
         using var pdfStream = typeof(GetNpqCertificateTests).Assembly.GetManifestResourceStream("TeachingRecordSystem.Api.Tests.Resources.TestCertificate.pdf") ??
             throw new Exception("Failed to find TestCertificate.pdf.");
 
-        ApiFixture.CertificateGenerator
+        CertificateGenerator
             .Setup(g => g.GenerateCertificate(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
             .ReturnsAsync(pdfStream);
 

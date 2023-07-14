@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿namespace TeachingRecordSystem.Api.Tests.Jobs;
 
-namespace TeachingRecordSystem.Api.Tests.Jobs;
-
-[Collection("InternationalQtsAwardedEmailJob")]
-public abstract class InternationalQtsAwardedEmailJobTestBase : IAsyncLifetime
+[TestClass("InternationalQtsAwardedEmailJob")]
+[ExecuteSqlSetup("delete from international_qts_awarded_emails_jobs")]
+public abstract class InternationalQtsAwardedEmailJobTestBase
 {
     public InternationalQtsAwardedEmailJobTestBase(DbFixture dbFixture)
     {
@@ -11,12 +10,4 @@ public abstract class InternationalQtsAwardedEmailJobTestBase : IAsyncLifetime
     }
 
     public DbFixture DbFixture { get; }
-
-    public async Task InitializeAsync()
-    {
-        using var dbContext = DbFixture.GetDbContext();
-        await dbContext.Database.ExecuteSqlAsync($"delete from international_qts_awarded_emails_jobs");
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

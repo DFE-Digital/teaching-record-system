@@ -1,12 +1,13 @@
 ﻿namespace TeachingRecordSystem.Api.Tests.Endpoints;
 
+[TestClass]
 public class SwaggerTests : ApiTestBase
 {
     public SwaggerTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Theory]
+    [Test]
     [InlineData("v1")]
     [InlineData("v2")]
     [InlineData("v3")]

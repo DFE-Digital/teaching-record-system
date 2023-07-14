@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using JustEat.HttpClientInterception;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
+[TestClass]
 public class CreateNameChangeTests : ApiTestBase
 {
     public CreateNameChangeTests(ApiFixture apiFixture)
@@ -11,7 +11,7 @@ public class CreateNameChangeTests : ApiTestBase
     {
     }
 
-    [Theory]
+    [Test]
     [InlineData(null, "First", "Middle", "Last", "evidence.jpg", "https://place.com/evidence.jpg")]
     [InlineData("1234567", null, "Middle", "Last", "evidence.jpg", "https://place.com/evidence.jpg")]
     [InlineData("1234567", "First", "Middle", null, "evidence.jpg", "https://place.com/evidence.jpg")]
@@ -46,7 +46,7 @@ public class CreateNameChangeTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
@@ -60,7 +60,7 @@ public class CreateNameChangeTests : ApiTestBase
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync((Contact?)null);
 
@@ -84,7 +84,7 @@ public class CreateNameChangeTests : ApiTestBase
         await AssertEx.JsonResponseIsError(response, 10001, StatusCodes.Status400BadRequest);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
@@ -98,7 +98,7 @@ public class CreateNameChangeTests : ApiTestBase
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(new Contact()
             {
@@ -126,7 +126,7 @@ public class CreateNameChangeTests : ApiTestBase
         await AssertEx.JsonResponseIsError(response, 10028, StatusCodes.Status400BadRequest);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_ValidRequest_CreatesIncident()
     {
         // Arrange
@@ -140,7 +140,7 @@ public class CreateNameChangeTests : ApiTestBase
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(new Contact()
             {
@@ -184,7 +184,7 @@ public class CreateNameChangeTests : ApiTestBase
         // Assert
         Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Verify(mock => mock.CreateNameChangeIncident(It.Is<CreateNameChangeIncidentCommand>(cmd =>
                 cmd.Trn == trn &&
                 cmd.ContactId == contactId &&

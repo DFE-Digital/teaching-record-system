@@ -4,7 +4,6 @@ using TeachingRecordSystem.Api.Jobs;
 using TeachingRecordSystem.Api.Jobs.Scheduling;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Dqt;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.Jobs;
 
@@ -15,7 +14,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
     {
     }
 
-    public static TheoryData<DateTime, DateTime?, DateTime, DateTime, DateTime> DateRangeEvaluationTestData { get; } = new()
+    public static TestArguments<DateTime, DateTime?, DateTime, DateTime, DateTime> DateRangeEvaluationTestData { get; } = new()
     {
         // Last awarded to date and today minus email delay (3 days) are both within GMT
         {
@@ -59,7 +58,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
         },
     };
 
-    [Theory]
+    [Test]
     [MemberData(nameof(DateRangeEvaluationTestData))]
     public async Task Execute_ForMultipleScenarios_EvaluatesDateRangeCorrectly(
         DateTime initialLastAwardedToUtc,
@@ -122,7 +121,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
         Assert.Equal(endExpected, endActual);
     }
 
-    [Fact]
+    [Test]
     public async Task Execute_WhenHasCompleteesForDateRange_UpdatesDatabaseAndEnqueuesJobToSendEmail()
     {
         // Arrange
@@ -179,7 +178,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
             .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<InductionCompletedEmailJobDispatcher, Task>>>()), Times.Once);
     }
 
-    [Fact]
+    [Test]
     public async Task Execute_WhenDoesNotHaveCompleteesForDateRange_UpdatesDatabaseOnly()
     {
         // Arrange
@@ -221,7 +220,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
             .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<InductionCompletedEmailJobDispatcher, Task>>>()), Times.Never);
     }
 
-    [Fact]
+    [Test]
     public async Task Execute_WhenEnqueueFails_DoesNotUpdateDatabase()
     {
         // Arrange

@@ -1,15 +1,15 @@
 ﻿#nullable disable
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
+[TestClass]
 public class GetIttProvidersTests : ApiTestBase
 {
     public GetIttProvidersTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_returns_list_of_itt_providers()
     {
         // Arrange
@@ -25,7 +25,7 @@ public class GetIttProvidersTests : ApiTestBase
             dfeta_UKPRN = "2345678"
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetIttProviders(false))
             .ReturnsAsync(new[] { provider1, provider2 });
 

@@ -87,13 +87,10 @@ jobs:
       working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Tests
 
     - name: API Tests
-      uses: ./.github/workflows/actions/test
-      with:
-        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Api.Tests
-        report_name: "API test results"
-        dotnet_test_args: >-
-          --no-build
-          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
+      run: dotnet fixie --configuration Release --no-build
+      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Api.Tests
+      env:
+        ConnectionStrings__DefaultConnection: "Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
 
   validate_terraform:
     name: Validate Terraform

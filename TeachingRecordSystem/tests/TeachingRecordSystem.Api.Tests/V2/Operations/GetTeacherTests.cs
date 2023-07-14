@@ -2,10 +2,10 @@
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V2.ApiModels;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
+[TestClass]
 public class GetTeacherTests : ApiTestBase
 {
     public GetTeacherTests(ApiFixture apiFixture)
@@ -13,7 +13,7 @@ public class GetTeacherTests : ApiTestBase
     {
     }
 
-    [Theory]
+    [Test]
     [InlineData("123456")]
     [InlineData("12345678")]
     [InlineData("xxx")]
@@ -29,14 +29,14 @@ public class GetTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_no_match_found_returns_notfound()
     {
         // Arrange
         var trn = "1234567";
 
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherByTrn(trn, It.IsAny<string[]>(), true))
             .ReturnsAsync((Contact)null);
 
@@ -49,7 +49,7 @@ public class GetTeacherTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_match_returns_ok_and_returns_active_and_inactive_itt_records()
     {
         // Arrange
@@ -128,19 +128,19 @@ public class GetTeacherTests : ApiTestBase
         inActiveItt.Attributes.Add($"establishment.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, Guid.NewGuid()));
         inActiveItt.Attributes.Add($"establishment.{Account.Fields.dfeta_UKPRN}", new AliasedValue(Account.EntityLogicalName, Account.Fields.dfeta_UKPRN, ittProviderUkprn));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(teacherId, /* columnNames: */ It.IsAny<string[]>()))
             .ReturnsAsync(new[] { qtsRegistration });
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetEarlyYearsStatus(earlyYearsStatusId))
             .ReturnsAsync(earlyYearsStatus);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
                 teacherId,
                 /* columnNames: */ It.IsAny<string[]>(),
@@ -208,7 +208,7 @@ public class GetTeacherTests : ApiTestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Given_match_returns_ok()
     {
         // Arrange
@@ -273,19 +273,19 @@ public class GetTeacherTests : ApiTestBase
         itt.Attributes.Add($"establishment.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, Guid.NewGuid()));
         itt.Attributes.Add($"establishment.{Account.Fields.dfeta_UKPRN}", new AliasedValue(Account.EntityLogicalName, Account.Fields.dfeta_UKPRN, ittProviderUkprn));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(teacherId, /* columnNames: */ It.IsAny<string[]>()))
             .ReturnsAsync(new[] { qtsRegistration });
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetEarlyYearsStatus(earlyYearsStatusId))
             .ReturnsAsync(earlyYearsStatus);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
                 teacherId,
                 /* columnNames: */ It.IsAny<string[]>(),

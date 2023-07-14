@@ -3,6 +3,7 @@ using static TeachingRecordSystem.Dqt.DataverseAdapter;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
+[TestClass]
 public class GetQtsCertificateTests : ApiTestBase
 {
     private const string QtsAwardedInWalesTeacherStatusValue = "213";
@@ -13,7 +14,7 @@ public class GetQtsCertificateTests : ApiTestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Get_QtsCertificateWithTrnDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -28,7 +29,7 @@ public class GetQtsCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_QtsCertificateWithQtsDateDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -39,7 +40,7 @@ public class GetQtsCertificateTests : ApiTestBase
         var middleName = Faker.Name.Middle();
         var lastName = Faker.Name.Last();
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(new Contact()
             {
@@ -58,7 +59,7 @@ public class GetQtsCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Get_QtsCertificateForTeacherQualifiedInWales_ReturnsNotFound()
     {
         // Arrange
@@ -80,11 +81,11 @@ public class GetQtsCertificateTests : ApiTestBase
             dfeta_QTSDate = qtsDate.ToDateTime()
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(teacher);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherStatus(
                 It.Is<string>(s => s == QtsAwardedInWalesTeacherStatusValue),
                 It.IsAny<RequestBuilder>()))
@@ -93,7 +94,7 @@ public class GetQtsCertificateTests : ApiTestBase
                 Id = _qtsAwardedInWalesTeacherStatusId
             });
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherStatus(
                 It.Is<string>(s => s != QtsAwardedInWalesTeacherStatusValue),
                 It.IsAny<RequestBuilder>()))
@@ -111,7 +112,7 @@ public class GetQtsCertificateTests : ApiTestBase
             }
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(
                 teacher.Id,
                 It.IsAny<string[]>()))
@@ -125,7 +126,7 @@ public class GetQtsCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Theory]
+    [Test]
     [InlineData(false)]
     [InlineData(true)]
     public async Task Get_ValidRequest_ReturnsExpectedResponse(bool exemptFromInduction)
@@ -154,11 +155,11 @@ public class GetQtsCertificateTests : ApiTestBase
             teacher.dfeta_InductionStatus = dfeta_InductionStatus.Exempt;
         }
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(teacher);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherStatus(
                 It.Is<string>(s => s == QtsAwardedInWalesTeacherStatusValue),
                 It.IsAny<RequestBuilder>()))
@@ -167,7 +168,7 @@ public class GetQtsCertificateTests : ApiTestBase
                 Id = _qtsAwardedInWalesTeacherStatusId
             });
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacherStatus(
                 It.Is<string>(s => s != QtsAwardedInWalesTeacherStatusValue),
                 It.IsAny<RequestBuilder>()))
@@ -185,7 +186,7 @@ public class GetQtsCertificateTests : ApiTestBase
             }
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(
                 teacher.Id,
                 It.IsAny<string[]>()))
@@ -195,7 +196,7 @@ public class GetQtsCertificateTests : ApiTestBase
             throw new Exception("Failed to find TestCertificate.pdf.");
 
         string? templateNameActual = null;
-        ApiFixture.CertificateGenerator
+        CertificateGenerator
             .Setup(g => g.GenerateCertificate(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
             .Callback<string, IReadOnlyDictionary<string, string>>(
                 (t, f) =>

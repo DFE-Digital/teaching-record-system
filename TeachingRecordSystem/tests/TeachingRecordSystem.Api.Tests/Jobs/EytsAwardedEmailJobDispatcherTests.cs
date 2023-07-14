@@ -11,7 +11,7 @@ public class EytsAwardedEmailJobDispatcherTests : EytsAwardedEmailJobTestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Execute_WhenCalled_EnqueuesSendEmailJobForAllUnsentItems()
     {
         // Arrange

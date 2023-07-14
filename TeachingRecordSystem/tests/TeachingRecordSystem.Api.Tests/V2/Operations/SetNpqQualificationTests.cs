@@ -1,17 +1,17 @@
 ﻿#nullable disable
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
+[TestClass]
 public class SetNpqQualificationTests : ApiTestBase
 {
     public SetNpqQualificationTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_without_trn_return_error()
     {
         // Arrange
@@ -26,13 +26,13 @@ public class SetNpqQualificationTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_completeddate_before_provider_earliest_completiondate_return_error()
     {
         // Arrange
         Clock.UtcNow = new DateTime(2021, 10, 31);
         var trn = "1234567";
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
            .ReturnsAsync((Contact)null);
 
@@ -48,13 +48,13 @@ public class SetNpqQualificationTests : ApiTestBase
             expectedError: Properties.StringResources.Errors_10022_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_contact_for_trn_not_found_return_error()
     {
         // Arrange
         Clock.UtcNow = new DateTime(2022, 01, 01);
         var trn = "1234567";
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
            .ReturnsAsync((Contact)null);
 
@@ -67,7 +67,7 @@ public class SetNpqQualificationTests : ApiTestBase
         await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_valid_request_for_qualification_not_createdbyapi_return_error()
     {
         // Arrange
@@ -88,15 +88,15 @@ public class SetNpqQualificationTests : ApiTestBase
            }
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
            .ReturnsAsync(contact);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
            .Setup(mock => mock.GetQualificationsForTeacher(id, It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>()))
            .ReturnsAsync(qualifications);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
            .Setup(mock => mock.SetNpqQualification(It.IsAny<SetNpqQualificationCommand>()))
            .ReturnsAsync(SetNpqQualificationResult.Failed(SetNpqQualificationFailedReasons.NpqQualificationNotCreatedByApi));
 
@@ -112,7 +112,7 @@ public class SetNpqQualificationTests : ApiTestBase
             expectedError: Properties.StringResources.Errors_10021_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualificationtype_return_error()
     {
         // Arrange
@@ -127,7 +127,7 @@ public class SetNpqQualificationTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_valid_request_return_nocontent()
     {
         // Arrange
@@ -139,11 +139,11 @@ public class SetNpqQualificationTests : ApiTestBase
             dfeta_TRN = trn
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
            .ReturnsAsync(contact);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
            .Setup(mock => mock.SetNpqQualification(It.IsAny<SetNpqQualificationCommand>()))
            .ReturnsAsync(result);
 
