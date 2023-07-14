@@ -7,4 +7,5 @@ public interface ITestStartup
 {
     void ConfigureConfiguration(IConfigurationBuilder builder);
     void ConfigureServices(IServiceCollection services, IConfiguration configuration);
+    public Task Initialize(IServiceProvider services) => Task.CompletedTask;
 }
