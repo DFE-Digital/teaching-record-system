@@ -77,7 +77,13 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
                 } :
                 null,
             HusId = request.HusId,
-            SlugId = request.SlugId
+            SlugId = request.SlugId,
+            FirstName = request.FirstName,
+            MiddleName = request.MiddleName,
+            LastName = request.LastName,
+            EmailAddress = request.EmailAddress,
+            GenderCode = request.GenderCode.Map(x => x.ConvertToContact_GenderCode()),
+            DateOfBirth = request.DateOfBirth.Map(x => x.ToDateTime())
         });
 
         if (!updateTeacherResult.Succeeded)

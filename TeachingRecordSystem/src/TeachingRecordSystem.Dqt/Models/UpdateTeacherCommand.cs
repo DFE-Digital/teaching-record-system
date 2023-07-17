@@ -1,4 +1,6 @@
-﻿namespace TeachingRecordSystem.Dqt.Models;
+﻿using Optional;
+
+namespace TeachingRecordSystem.Dqt.Models;
 
 public class UpdateTeacherCommand
 {
@@ -8,6 +10,12 @@ public class UpdateTeacherCommand
     public string Trn { get; set; }
     public string HusId { get; set; }
     public string SlugId { get; set; }
+    public Option<string> FirstName { get; set; }
+    public Option<string> MiddleName { get; set; }
+    public Option<string> LastName { get; set; }
+    public Option<string> EmailAddress { get; set; }
+    public Option<Contact_GenderCode> GenderCode { get; set; }
+    public Option<DateTime> DateOfBirth { get; set; }
 }
 
 public class UpdateTeacherCommandInitialTeacherTraining

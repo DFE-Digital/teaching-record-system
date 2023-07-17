@@ -2,6 +2,7 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using Optional;
 
 namespace TeachingRecordSystem.Dqt.Tests.DataverseAdapterTests;
 
@@ -60,6 +61,147 @@ public class UpdateTeacherTests : IAsyncLifetime
         // Assert
         Assert.True(result.Succeeded);
         transactionRequest.AssertSingleUpsertRequest<dfeta_qualification>();
+    }
+
+    [Fact]
+    public async Task Given_existing_contact_pii_fields_do_not_update_and_succeeds()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+        var originalTeacher = await _dataverseAdapter.GetTeacher(
+            teacherId,
+            columnNames: new[]
+            {
+                Contact.Fields.FirstName,
+                Contact.Fields.MiddleName,
+                Contact.Fields.LastName,
+                Contact.Fields.BirthDate,
+                Contact.Fields.EMailAddress1,
+                Contact.Fields.GenderCode,
+            });
+
+        // Act
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12
+            },
+            Qualification = new UpdateTeacherCommandQualification()
+            {
+                CountryCode = "XK",
+                Subject = "100366",  // computer science
+                Class = dfeta_classdivision.Firstclasshonours,
+                Date = new DateOnly(2022, 01, 28),
+                ProviderUkprn = ittProviderUkprn,
+                Subject2 = "X300",
+                Subject3 = "N400"
+            },
+            GenderCode = Option.None<Contact_GenderCode>(),
+            DateOfBirth = Option.None<DateTime>(),
+            FirstName = Option.None<string>(),
+            MiddleName = Option.None<string>(),
+            LastName = Option.None<string>(),
+            EmailAddress = Option.None<string>()
+        });
+
+        var teacher = await _dataverseAdapter.GetTeacher(
+            teacherId,
+            columnNames: new[]
+            {
+                Contact.Fields.FirstName,
+                Contact.Fields.MiddleName,
+                Contact.Fields.LastName,
+                Contact.Fields.BirthDate,
+                Contact.Fields.EMailAddress1,
+                Contact.Fields.GenderCode,
+            });
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.Equal(originalTeacher.FirstName, teacher.FirstName);
+        Assert.Equal(originalTeacher.MiddleName, teacher.MiddleName);
+        Assert.Equal(originalTeacher.LastName, teacher.LastName);
+        Assert.Equal(originalTeacher.EMailAddress1, teacher.EMailAddress1);
+        Assert.Equal(originalTeacher.BirthDate, teacher.BirthDate);
+        Assert.Equal(originalTeacher.GenderCode, teacher.GenderCode);
+    }
+
+    [Fact]
+    public async Task Given_existing_contact_can_update_pii_fields_succeeds()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+        DateOnly dateofBirth = new DateOnly(1998, 01, 01);
+        string firstname = "Bob";
+        string middlename = "bob";
+        string lastname = "builder";
+        string emailaddress = "bob.builder@test.com";
+        Contact_GenderCode gender = Contact_GenderCode.Male;
+
+        // Act
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12
+            },
+            Qualification = new UpdateTeacherCommandQualification()
+            {
+                CountryCode = "XK",
+                Subject = "100366",  // computer science
+                Class = dfeta_classdivision.Firstclasshonours,
+                Date = new DateOnly(2022, 01, 28),
+                ProviderUkprn = ittProviderUkprn,
+                Subject2 = "X300",
+                Subject3 = "N400"
+            },
+            GenderCode = Option.Some(gender),
+            DateOfBirth = Option.Some(dateofBirth.ToDateTime()),
+            FirstName = Option.Some(firstname),
+            MiddleName = Option.Some(middlename),
+            LastName = Option.Some(lastname),
+            EmailAddress = Option.Some(emailaddress)
+        });
+
+        var teacher = await _dataverseAdapter.GetTeacher(
+            teacherId,
+            columnNames: new[]
+            {
+                Contact.Fields.FirstName,
+                Contact.Fields.MiddleName,
+                Contact.Fields.LastName,
+                Contact.Fields.BirthDate,
+                Contact.Fields.EMailAddress1,
+                Contact.Fields.GenderCode,
+            });
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.Equal(firstname, teacher.FirstName);
+        Assert.Equal(middlename, teacher.MiddleName);
+        Assert.Equal(lastname, teacher.LastName);
+        Assert.Equal(emailaddress, teacher.EMailAddress1);
+        Assert.Equal(dateofBirth.ToDateTime(), teacher.BirthDate);
+        Assert.Equal(gender, teacher.GenderCode);
     }
 
     [Fact]

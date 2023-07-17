@@ -199,10 +199,9 @@ public partial class DataverseAdapter
             });
         }
 
-        if (referenceData.TeacherHusId != command.HusId || referenceData.Teacher.dfeta_SlugId != command.SlugId)
+        if (referenceData.TeacherHusId != command.HusId || referenceData.Teacher.dfeta_SlugId != command.SlugId || helper.ShouldUpdatePII() == true)
         {
             var contact = helper.CreateContactEntity();
-
             txnRequest.Requests.Add(new UpdateRequest()
             {
                 Target = contact
@@ -364,14 +363,35 @@ public partial class DataverseAdapter
             }
         }
 
+        public bool ShouldUpdatePII()
+        {
+            if (_command.FirstName.HasValue ||
+                _command.MiddleName.HasValue ||
+                _command.LastName.HasValue ||
+                _command.DateOfBirth.HasValue ||
+                _command.EmailAddress.HasValue ||
+                _command.GenderCode.HasValue)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public Contact CreateContactEntity()
         {
-            return new Contact()
+            var contact = new Contact()
             {
                 Id = TeacherId,
                 dfeta_HUSID = _command.HusId,
-                dfeta_SlugId = _command.SlugId
+                dfeta_SlugId = _command.SlugId,
             };
+            _command.FirstName.MatchSome(value => contact.FirstName = value);
+            _command.MiddleName.MatchSome(value => contact.MiddleName = value);
+            _command.LastName.MatchSome(value => contact.LastName = value);
+            _command.EmailAddress.MatchSome(value => contact.EMailAddress1 = value);
+            _command.GenderCode.MatchSome(value => contact.GenderCode = value);
+            _command.DateOfBirth.MatchSome(value => contact.BirthDate = value);
+            return contact;
         }
 
         public Models.Task CreateReviewTaskEntityForActiveSanctions()
