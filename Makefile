@@ -205,3 +205,10 @@ validate-azure-resources: set-azure-account # make dev validate-azure-resources
 domain-azure-resources: set-azure-account # make domain deploy-custom-domain CONFIRM_DEPLOY=1
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
 	az deployment sub create -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-dqtdomains-rg" 'tags=${RG_TAGS}' "environment=${DEPLOY_ENV}" "tfStorageAccountName=${RESOURCE_NAME_PREFIX}dqtdomainstf" "tfStorageContainerName=dqtdomains-tf"  "keyVaultName=${RESOURCE_NAME_PREFIX}-dqtdomain-kv"
+
+.PHONY: install-konduit
+install-konduit: ## Install the konduit script, for accessing backend services
+	[ ! -f bin/konduit.sh ] \
+		&& curl -s https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/master/scripts/konduit.sh -o bin/konduit.sh \
+		&& chmod +x bin/konduit.sh \
+		|| true
