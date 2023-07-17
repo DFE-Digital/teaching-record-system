@@ -43,14 +43,26 @@ jobs:
 
       - name: Docker build & push
         run: |
-          just docker-build-api --build-arg GIT_SHA=$GITHUB_SHA --tag $API_TAG
-          docker push $API_TAG
+          if skopeo inspect "docker://$API_TAG" >/dev/null 2>&1; then
+            echo "::notice::Skipping API build - tag already exists"
+          else
+            just docker-build-api --build-arg GIT_SHA=$GITHUB_SHA --tag $API_TAG
+            docker push $API_TAG
+          fi
 
-          just docker-build-cli --tag $CLI_TAG
-          docker push $CLI_TAG
+          if skopeo inspect "docker://$CLI_TAG" >/dev/null 2>&1; then
+            echo "::notice::Skipping CLI build - tag already exists"
+          else
+            just docker-build-cli --tag $CLI_TAG
+            docker push $CLI_TAG
+          fi
 
-          just docker-build-ui --build-arg GIT_SHA=$GITHUB_SHA --tag $UI_TAG
-          docker push $UI_TAG
+          if skopeo inspect "docker://$UI_TAG" >/dev/null 2>&1; then
+            echo "::notice::Skipping UI build - tag already exists"
+          else
+            just docker-build-ui --build-arg GIT_SHA=$GITHUB_SHA --tag $UI_TAG
+            docker push $UI_TAG
+          fi
         env:
           API_TAG: ${{ steps.image_tags.outputs.api_tag }}
           CLI_TAG: ${{ steps.image_tags.outputs.cli_tag }}
