@@ -4,17 +4,17 @@ using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.Validation;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
+[TestClass]
 public class UpdateTeacherTests : ApiTestBase
 {
     public UpdateTeacherTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Given_missing_initialteachertraining_providerukprn_returns_error()
     {
         // Arrange
@@ -32,7 +32,7 @@ public class UpdateTeacherTests : ApiTestBase
             expectedError: "Initial TeacherTraining ProviderUkprn is required.");
     }
 
-    [Fact]
+    [Test]
     public async Task Given_missing_birthdate_returns_error()
     {
         // Arrange
@@ -51,7 +51,7 @@ public class UpdateTeacherTests : ApiTestBase
             expectedError: "Birthdate is required.");
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_subject2_returns_error()
     {
         // Arrange
@@ -60,11 +60,11 @@ public class UpdateTeacherTests : ApiTestBase
         var contactList = new[] { contact };
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
             .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubject2NotFound));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
@@ -77,7 +77,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_subject3_returns_error()
     {
         // Arrange
@@ -86,11 +86,11 @@ public class UpdateTeacherTests : ApiTestBase
         var contactList = new[] { contact };
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
             .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubject3NotFound));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
@@ -104,7 +104,7 @@ public class UpdateTeacherTests : ApiTestBase
     }
 
 
-    [Fact]
+    [Test]
     public async Task Given_InitialTeacherTraining_is_empty_return_error()
     {
         // Arrange
@@ -122,7 +122,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}", $"'Initial Teacher Training' must not be empty.");
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_itt_provider_returns_error()
     {
         // Arrange
@@ -132,11 +132,11 @@ public class UpdateTeacherTests : ApiTestBase
         var contactList = new[] { contact };
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
             .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingIttRecord));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
@@ -149,7 +149,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}", ErrorRegistry.TeacherHasNoIncompleteIttRecord().Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_itt_subject1_returns_error()
     {
         // Arrange
@@ -159,11 +159,11 @@ public class UpdateTeacherTests : ApiTestBase
         var contactList = new[] { contact };
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject1NotFound));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
@@ -176,7 +176,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject1)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_itt_subject2_returns_error()
     {
         // Arrange
@@ -186,11 +186,11 @@ public class UpdateTeacherTests : ApiTestBase
         var contactList = new[] { contact };
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject2NotFound));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
@@ -203,7 +203,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_itt_subject3_returns_error()
     {
         // Arrange
@@ -213,11 +213,11 @@ public class UpdateTeacherTests : ApiTestBase
         var contactList = new[] { contact };
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject3NotFound));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
@@ -230,7 +230,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_itt_qualification_returns_error()
     {
         // Arrange
@@ -240,11 +240,11 @@ public class UpdateTeacherTests : ApiTestBase
         var dob = new DateOnly(1987, 01, 01);
         var ittQualificationType = (IttQualificationType)(-1);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
             .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.IttQualificationNotFound));
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
@@ -259,7 +259,7 @@ public class UpdateTeacherTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_country_returns_error()
     {
         // Arrange
@@ -269,11 +269,11 @@ public class UpdateTeacherTests : ApiTestBase
         var contactList = new[] { contact };
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationCountryNotFound));
 
@@ -286,7 +286,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.CountryCode)}", ErrorRegistry.CountryNotFound().Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_type_returns_error()
     {
         // Arrange
@@ -296,11 +296,11 @@ public class UpdateTeacherTests : ApiTestBase
         var contactList = new[] { contact };
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationNotFound));
 
@@ -313,7 +313,7 @@ public class UpdateTeacherTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_multiple_lookups_failed_returns_error()
     {
         // Arrange
@@ -323,11 +323,11 @@ public class UpdateTeacherTests : ApiTestBase
         var dob = new DateOnly(1987, 01, 01);
         var trn = "xxx";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubjectNotFound | UpdateTeacherFailedReasons.Subject2NotFound));
 
@@ -346,7 +346,7 @@ public class UpdateTeacherTests : ApiTestBase
             });
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_subject_returns_error()
     {
         // Arrange
@@ -356,11 +356,11 @@ public class UpdateTeacherTests : ApiTestBase
         var dob = new DateOnly(1987, 01, 01);
         var trn = "xxx";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubjectNotFound));
 
@@ -373,7 +373,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_valid_update_without_qualification_succeeds()
     {
         // Arrange
@@ -383,11 +383,11 @@ public class UpdateTeacherTests : ApiTestBase
         var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
@@ -402,7 +402,7 @@ public class UpdateTeacherTests : ApiTestBase
         Assert.True(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_qts_registration_not_matched_return_error()
     {
         // Arrange
@@ -413,11 +413,11 @@ public class UpdateTeacherTests : ApiTestBase
         var result = UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingQtsRecord);
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
@@ -430,7 +430,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}", StringResources.Errors_10006_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_valid_update_with_slugid_return_nocontent()
     {
         // Arrange
@@ -442,11 +442,11 @@ public class UpdateTeacherTests : ApiTestBase
         var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,  /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
@@ -456,14 +456,14 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Verify(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Verify(mock => mock.GetTeachersByTrnAndDoB(It.IsAny<string>(), It.IsAny<DateOnly>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_slugid_does_not_return_contact_fallback_to_trn_and_dob_return_nocontent()
     {
         // Arrange
@@ -475,15 +475,15 @@ public class UpdateTeacherTests : ApiTestBase
         var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,  /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(Array.Empty<Contact>());
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
@@ -493,14 +493,14 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Verify(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Verify(mock => mock.GetTeachersByTrnAndDoB(It.IsAny<string>(), It.IsAny<DateOnly>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_valid_update_with_trn_and_dob_succeeds_return_nocontent()
     {
         // Arrange
@@ -511,11 +511,11 @@ public class UpdateTeacherTests : ApiTestBase
         var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
@@ -525,14 +525,14 @@ public class UpdateTeacherTests : ApiTestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Verify(mock => mock.GetTeachersByTrnAndDoB(trn, dob, It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Verify(mock => mock.GetTeachersBySlugIdAndTrn(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
-    [Theory]
+    [Test]
     [MemberData(nameof(InvalidAgeCombinationsData))]
     public async Task Given_invalid_age_combination_returns_error(
         int? ageRangeFrom,
@@ -560,14 +560,14 @@ public class UpdateTeacherTests : ApiTestBase
             expectedErrorMessage);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_a_teacher_that_does_not_exist_returns_notfound()
     {
         // Arrange
         var trn = "1234567";
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(Array.Empty<Contact>());
 
@@ -603,7 +603,7 @@ public class UpdateTeacherTests : ApiTestBase
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_a_two_teachers_have_the_same_trn_return_conflict()
     {
         // Arrange
@@ -637,7 +637,7 @@ public class UpdateTeacherTests : ApiTestBase
             }
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
@@ -653,7 +653,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_outcome_return_error()
     {
         // Arrange
@@ -687,7 +687,7 @@ public class UpdateTeacherTests : ApiTestBase
             }
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
@@ -704,7 +704,7 @@ public class UpdateTeacherTests : ApiTestBase
     }
 
 
-    [Fact]
+    [Test]
     public async Task Given_asessmentonlyroute_programmetype_then_intraining_outcome_is_not_permitted()
     {
         // Arrange
@@ -738,7 +738,7 @@ public class UpdateTeacherTests : ApiTestBase
             }
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
@@ -754,7 +754,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute);
     }
 
-    [Theory]
+    [Test]
     [InlineData(IttProgrammeType.Apprenticeship)]
     [InlineData(IttProgrammeType.Core)]
     [InlineData(IttProgrammeType.CoreFlexible)]
@@ -801,7 +801,7 @@ public class UpdateTeacherTests : ApiTestBase
             }
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
@@ -817,7 +817,7 @@ public class UpdateTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_teacher_has_multiple_incomplete_itt_records_return_error()
     {
         // Arrange
@@ -828,16 +828,16 @@ public class UpdateTeacherTests : ApiTestBase
         var result = UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.MultipleInTrainingIttRecords);
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(It.IsAny<Guid>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), true))
                 .ReturnsAsync(ittRecords);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
@@ -853,7 +853,7 @@ public class UpdateTeacherTests : ApiTestBase
             StringResources.Errors_10004_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_with_existing_husid_for_another_teacher_returns_error()
     {
         // Arrange
@@ -863,11 +863,11 @@ public class UpdateTeacherTests : ApiTestBase
         var result = UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.DuplicateHusId);
         var dob = new DateOnly(1987, 01, 01);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
@@ -883,7 +883,7 @@ public class UpdateTeacherTests : ApiTestBase
             StringResources.Errors_10018_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_slugid_exceeding_maxlength_return_error()
     {
         // Arrange
@@ -941,7 +941,7 @@ public class UpdateTeacherTests : ApiTestBase
         return CreateJsonContent(request);
     }
 
-    public static TheoryData<int?, int?, string, string> InvalidAgeCombinationsData { get; } = new()
+    public static TestArguments<int?, int?, string, string> InvalidAgeCombinationsData { get; } = new()
     {
         {
             -1,

@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿namespace TeachingRecordSystem.Api.Tests.Jobs;
 
-namespace TeachingRecordSystem.Api.Tests.Jobs;
-
-[Collection("InductionCompletedEmailJob")]
-public abstract class InductionCompletedEmailJobTestBase : IAsyncLifetime
+[TestClass("InductionCompletedEmailJob")]
+[ExecuteSqlSetup("delete from induction_completed_emails_jobs")]
+public abstract class InductionCompletedEmailJobTestBase
 {
     public InductionCompletedEmailJobTestBase(DbFixture dbFixture)
     {
@@ -11,12 +10,4 @@ public abstract class InductionCompletedEmailJobTestBase : IAsyncLifetime
     }
 
     public DbFixture DbFixture { get; }
-
-    public async Task InitializeAsync()
-    {
-        using var dbContext = DbFixture.GetDbContext();
-        await dbContext.Database.ExecuteSqlAsync($"delete from induction_completed_emails_jobs");
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }

@@ -4,17 +4,18 @@ using Microsoft.Xrm.Sdk;
 
 namespace TeachingRecordSystem.Api.Tests.Filters;
 
+[TestClass]
 public class CrmServiceProtectionFaultExceptionFilterTests : ApiTestBase
 {
     public CrmServiceProtectionFaultExceptionFilterTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Theory]
+    [Test]
     [InlineData("number_of_requests")]
     [InlineData("execution_time")]
     [InlineData("concurrent_requests")]
-    public async Task Given_a_service_protection_fault_is_thrown_return_a_429_response(string testEndpoint)
+    public async Task ServiceProtectionFaultThrown_Returns429Response(string testEndpoint)
     {
         var response = await HttpClientWithApiKey.GetAsync($"CrmServiceProtectionFaultExceptionFilterTests/{testEndpoint}");
 

@@ -1,17 +1,17 @@
 ﻿#nullable disable
 using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
+[TestClass]
 public class GetTrnRequestTests : ApiTestBase
 {
     public GetTrnRequestTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Given_trn_request_with_specified_id_does_not_exist_returns_notfound()
     {
         // Arrange
@@ -24,7 +24,7 @@ public class GetTrnRequestTests : ApiTestBase
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_trn_request_with_specified_id_does_not_exist_for_current_client_returns_notfound()
     {
         // Arrange
@@ -53,7 +53,7 @@ public class GetTrnRequestTests : ApiTestBase
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_valid_pending_trn_request_returns_ok_with_pending_status()
     {
         // Arrange
@@ -61,7 +61,7 @@ public class GetTrnRequestTests : ApiTestBase
         var teacherId = Guid.NewGuid();
         var slugId = Guid.NewGuid().ToString();
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
             .ReturnsAsync(new Contact()
             {
@@ -100,7 +100,7 @@ public class GetTrnRequestTests : ApiTestBase
             expectedStatusCode: StatusCodes.Status200OK);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_valid_completed_trn_request_returns_ok_with_completed_status_and_trn()
     {
         // Arrange
@@ -109,7 +109,7 @@ public class GetTrnRequestTests : ApiTestBase
         var trn = "1234567";
         var slugId = Guid.NewGuid().ToString();
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
             .ReturnsAsync(new Contact()
             {

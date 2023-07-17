@@ -3,17 +3,17 @@ using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
+[TestClass]
 public class GetOrCreateTrnRequestTests : ApiTestBase
 {
     public GetOrCreateTrnRequestTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_with_id_already_exists_for_client_and_status_is_completed_returns_existing_trn()
     {
         // Arrange
@@ -21,7 +21,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
             .ReturnsAsync(new Contact()
             {
@@ -64,7 +64,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedStatusCode: 200);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_with_id_already_exists_for_client_and_status_is_pending_returns_null_trn()
     {
         // Arrange
@@ -106,7 +106,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedStatusCode: 200);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_with_invalid_id_returns_error()
     {
         // Arrange
@@ -122,7 +122,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_with_too_long_invalid_id_returns_error()
     {
         // Arrange
@@ -138,7 +138,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
     }
 
-    [Theory]
+    [Test]
     [InlineData("1234567", "Completed", false)]
     [InlineData(null, "Pending", true)]
     public async Task Given_request_with_new_id_creates_teacher_and_returns_created(
@@ -150,7 +150,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var requestId = Guid.NewGuid().ToString();
         var teacherId = Guid.NewGuid();
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
@@ -164,7 +164,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        ApiFixture.DataverseAdapter.Verify();
+        DataverseAdapter.Verify();
 
         await AssertEx.JsonResponseEquals(
             response,
@@ -180,7 +180,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedStatusCode: 201);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_with_null_qualification_passes_request_to_DataverseAdapter_successfully()
     {
         // Arrange
@@ -188,7 +188,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
@@ -202,7 +202,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         Assert.True(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_with_null_qualification_subject2_request_to_DataverseAdapter_successfully()
     {
         // Arrange
@@ -210,7 +210,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
@@ -225,7 +225,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
     }
 
 
-    [Fact]
+    [Test]
     public async Task Given_request_with_null_qualification_subject3_request_to_DataverseAdapter_successfully()
     {
         // Arrange
@@ -233,7 +233,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
@@ -247,13 +247,13 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         Assert.True(response.IsSuccessStatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_subject2_returns_error()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubject2NotFound));
 
@@ -269,13 +269,13 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.Errors_10009_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_subject3_returns_error()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubject3NotFound));
 
@@ -291,14 +291,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.Errors_10009_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_itt_provider_returns_error()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var ukprn = "xxx";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.IttProviderNotFound));
 
@@ -315,14 +315,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.Errors_10008_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_itt_subject1_returns_error()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var subject = "xxx";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.Subject1NotFound));
 
@@ -338,14 +338,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.Errors_10009_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_itt_subject2_returns_error()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var subject = "xxx";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.Subject2NotFound));
 
@@ -361,14 +361,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.Errors_10009_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_itt_qualification_returns_error()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var ittQualificationType = (IttQualificationType)(-1);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.IttQualificationNotFound));
 
@@ -381,14 +381,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_country_returns_error()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var country = "xxx";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationCountryNotFound));
 
@@ -404,14 +404,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.Errors_10010_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_subject_returns_error()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var subject = "xxx";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubjectNotFound));
 
@@ -427,14 +427,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.Errors_10009_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_provider_returns_error()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var ukprn = "xxx";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationProviderNotFound));
 
@@ -450,14 +450,14 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.Errors_10008_Title);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_invalid_qualification_returns_error()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var heQualificationType = (HeQualificationType)(-1);
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationNotFound));
 
@@ -470,7 +470,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Theory]
+    [Test]
     [InlineData(1900, 1, 1)]
     public async Task Given_dob_before_1_1_1940_returns_error(int year, int month, int day)
     {
@@ -494,7 +494,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
     }
 
-    [Theory]
+    [Test]
     [InlineData(2022, 1, 1)]
     [InlineData(2023, 1, 1)]
     public async Task Given_dob_equal_or_after_today_returns_error(int year, int month, int day)
@@ -518,7 +518,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
     }
 
-    [Theory]
+    [Test]
     [MemberData(nameof(InvalidAgeCombinationsData))]
     public async Task Given_invalid_age_combination_returns_error(
         int? ageRangeFrom,
@@ -545,7 +545,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedErrorMessage);
     }
 
-    [Theory]
+    [Test]
     [InlineData("Joe Xavier", "Andre", "Joe", "Xavier Andre")]
     [InlineData("Joe Xavier", "", "Joe", "Xavier")]
     public async Task Given_trainee_with_multiple_first_names_populates_middlename_field(
@@ -559,7 +559,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn));
 
@@ -573,11 +573,11 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Verify(mock => mock.CreateTeacher(It.Is<CreateTeacherCommand>(cmd => cmd.FirstName == expectedFirstName && cmd.MiddleName == expectedMiddleName)));
     }
 
-    [Fact]
+    [Test]
     public async Task Given_OverseasQualifiedTeacher_and_EarlyYears_ProgrammeType_returns_error()
     {
         // Arrange
@@ -585,7 +585,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
@@ -608,7 +608,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_valid_OverseasQualifiedTeacher_request_passes_request_to_DataverseAdapter_successfully()
     {
         // Arrange
@@ -616,7 +616,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
@@ -637,10 +637,10 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);
-        ApiFixture.DataverseAdapter.Verify();
+        DataverseAdapter.Verify();
     }
 
-    [Fact]
+    [Test]
     public async Task Given_valid_InternationalQualifiedTeacherStatus_request_passes_request_to_DataverseAdapter_successfully()
     {
         // Arrange
@@ -648,7 +648,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
@@ -666,10 +666,10 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);
-        ApiFixture.DataverseAdapter.Verify();
+        DataverseAdapter.Verify();
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_with_too_long_invalid_slugid_returns_error()
     {
         // Arrange
@@ -690,7 +690,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.ErrorMessages_SlugIdMustBe150CharactersOrFewer);
     }
 
-    [Fact]
+    [Test]
     public async Task Given_request_for_non_traineeteacher_with_slugid_returns_error()
     {
         // Arrange
@@ -712,7 +712,7 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             expectedError: Properties.StringResources.ErrorMessages_SlugIdCanOnlyBeProvidedForTraineeTeachers);
     }
 
-    public static TheoryData<int?, int?, string, string> InvalidAgeCombinationsData { get; } = new()
+    public static TestArguments<int?, int?, string, string> InvalidAgeCombinationsData { get; } = new()
     {
         {
             -1,

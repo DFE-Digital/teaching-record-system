@@ -8,7 +8,6 @@ using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Api.Tests.Jobs;
 
@@ -19,7 +18,7 @@ public class SendQtsAwardedEmailJobTests : QtsAwardedEmailJobTestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Execute_WhenCalled_GetsTrnTokenSendsEmailAddsEventAndUpdatesDatabase()
     {
         // Arrange

@@ -1,14 +1,16 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Json;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.TestCommon;
+using TeachingRecordSystem.Core.Services.Certificates;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Dqt;
 
 namespace TeachingRecordSystem.Api.Tests;
 
-[Collection("Api")]
-public abstract class ApiTestBase : IAsyncLifetime, IDisposable
+public abstract class ApiTestBase
 {
     protected ApiTestBase(ApiFixture apiFixture)
     {
@@ -19,34 +21,26 @@ public abstract class ApiTestBase : IAsyncLifetime, IDisposable
             HttpClientWithApiKey = apiFixture.CreateClient();
             HttpClientWithApiKey.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
         }
-
-        apiFixture.ResetMocks();
     }
 
     public ApiFixture ApiFixture { get; }
 
+    public Mock<ICertificateGenerator> CertificateGenerator => Mock.Get(TestInfo.Current.TestServices.GetRequiredService<ICertificateGenerator>());
+
     public string ClientId { get; } = "tests";
+
+    public Mock<IDataverseAdapter> DataverseAdapter => Mock.Get(TestInfo.Current.TestServices.GetRequiredService<IDataverseAdapter>());
 
     public TestableClock Clock => (TestableClock)ApiFixture.Services.GetRequiredService<IClock>();
 
+    public Mock<IOptions<GetAnIdentityOptions>> GetAnIdentityOptions => Mock.Get(TestInfo.Current.TestServices.GetRequiredService<IOptions<GetAnIdentityOptions>>());
+
     public HttpClient HttpClientWithApiKey { get; }
 
-    public DateTime UtcNow
-    {
-        get => Clock.UtcNow;
-        set => Clock.UtcNow = value;
-    }
+    public Mock<IGetAnIdentityApiClient> IdentityApiClient => Mock.Get(TestInfo.Current.TestServices.GetRequiredService<IGetAnIdentityApiClient>());
 
     public JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().AddConverters());
-
-    public virtual void Dispose()
-    {
-    }
-
-    public virtual Task DisposeAsync() => Task.CompletedTask;
-
-    public virtual Task InitializeAsync() => ApiFixture.DbHelper.ClearData();
 
     public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read")
     {

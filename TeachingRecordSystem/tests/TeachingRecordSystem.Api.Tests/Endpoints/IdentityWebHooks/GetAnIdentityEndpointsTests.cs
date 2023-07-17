@@ -7,6 +7,7 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Tests.Endpoints.IdentityWebHooks;
 
+[TestClass]
 public class GetAnIdentityEndpointsTests : ApiTestBase
 {
     public GetAnIdentityEndpointsTests(ApiFixture apiFixture)
@@ -14,7 +15,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
     {
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithNoSignatureInHeader_ReturnsUnauthorised()
     {
         // Arrange
@@ -29,14 +30,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithInvalidSignatureInHeader_ReturnsUnauthorised()
     {
         // Arrange
         var clientSecret = "MySecret";
         var identityOptions = CreateOptions(clientSecret);
 
-        ApiFixture.GetAnIdentityOptions
+        GetAnIdentityOptions
             .Setup(o => o.Value)
             .Returns(identityOptions);
 
@@ -53,14 +54,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithInvalidContent_ThrowsJsonException()
     {
         // Arrange
         var clientSecret = "MySecret";
         var identityOptions = CreateOptions(clientSecret);
 
-        ApiFixture.GetAnIdentityOptions
+        GetAnIdentityOptions
             .Setup(o => o.Value)
             .Returns(identityOptions);
 
@@ -83,14 +84,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         await Assert.ThrowsAsync<JsonException>(() => httpClient.SendAsync(request));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithMessageTypeWeAreNotInterestedIn_ThrowsJsonException()
     {
         // Arrange
         var clientSecret = "MySecret";
         var identityOptions = CreateOptions(clientSecret);
 
-        ApiFixture.GetAnIdentityOptions
+        GetAnIdentityOptions
             .Setup(o => o.Value)
             .Returns(identityOptions);
 
@@ -119,14 +120,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         await Assert.ThrowsAsync<JsonException>(() => httpClient.SendAsync(request));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithNonJsonMessage_ThrowsJsonException()
     {
         // Arrange
         var clientSecret = "MySecret";
         var identityOptions = CreateOptions(clientSecret);
 
-        ApiFixture.GetAnIdentityOptions
+        GetAnIdentityOptions
             .Setup(o => o.Value)
             .Returns(identityOptions);
 
@@ -152,14 +153,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         await Assert.ThrowsAsync<JsonException>(() => httpClient.SendAsync(request));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithInvalidMessageFormat_ThrowsJsonException()
     {
         // Arrange
         var clientSecret = "MySecret";
         var identityOptions = CreateOptions(clientSecret);
 
-        ApiFixture.GetAnIdentityOptions
+        GetAnIdentityOptions
             .Setup(o => o.Value)
             .Returns(identityOptions);
 
@@ -188,14 +189,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         await Assert.ThrowsAsync<JsonException>(() => httpClient.SendAsync(request));
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithValidUserUpdatedMessage_ReturnsNoContent()
     {
         // Arrange
         var clientSecret = "MySecret";
         var identityOptions = CreateOptions(clientSecret);
 
-        ApiFixture.GetAnIdentityOptions
+        GetAnIdentityOptions
             .Setup(o => o.Value)
             .Returns(identityOptions);
 
@@ -218,10 +219,10 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         };
 
         UpdateTeacherIdentityInfoCommand? actualCommand = null;
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact());
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.UpdateTeacherIdentityInfo(It.IsAny<UpdateTeacherIdentityInfoCommand>()))
             .Returns(Task.CompletedTask)
             .Callback<UpdateTeacherIdentityInfoCommand>(c => actualCommand = c);
@@ -247,14 +248,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         Assert.Equal(content.TimeUtc, actualCommand?.UpdateTimeUtc);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithUserWithoutTrn_DoesNotCallDqt()
     {
         // Arrange
         var clientSecret = "MySecret";
         var identityOptions = CreateOptions(clientSecret);
 
-        ApiFixture.GetAnIdentityOptions
+        GetAnIdentityOptions
             .Setup(o => o.Value)
             .Returns(identityOptions);
 
@@ -276,7 +277,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
             }
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact());
 
@@ -294,17 +295,17 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        ApiFixture.DataverseAdapter.Verify(mock => mock.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()), Times.Never);
+        DataverseAdapter.Verify(mock => mock.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()), Times.Never);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithValidUserCreatedMessage_ReturnsNoContent()
     {
         // Arrange
         var clientSecret = "MySecret";
         var identityOptions = CreateOptions(clientSecret);
 
-        ApiFixture.GetAnIdentityOptions
+        GetAnIdentityOptions
             .Setup(o => o.Value)
             .Returns(identityOptions);
 
@@ -326,10 +327,10 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         };
 
         UpdateTeacherIdentityInfoCommand? actualCommand = null;
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact());
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.UpdateTeacherIdentityInfo(It.IsAny<UpdateTeacherIdentityInfoCommand>()))
             .Returns(Task.CompletedTask)
             .Callback<UpdateTeacherIdentityInfoCommand>(c => actualCommand = c);
@@ -355,14 +356,14 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         Assert.Equal(content.TimeUtc, actualCommand?.UpdateTimeUtc);
     }
 
-    [Fact]
+    [Test]
     public async Task Post_WithUserUpdatedMessageForRemovedTrn_RemovesLinkFromDqt()
     {
         // Arrange
         var clientSecret = "MySecret";
         var identityOptions = CreateOptions(clientSecret);
 
-        ApiFixture.GetAnIdentityOptions
+        GetAnIdentityOptions
             .Setup(o => o.Value)
             .Returns(identityOptions);
 
@@ -390,7 +391,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
             }
         };
 
-        ApiFixture.DataverseAdapter
+        DataverseAdapter
             .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact());
 
@@ -408,7 +409,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        ApiFixture.DataverseAdapter.Verify(mock => mock.ClearTeacherIdentityInfo(identityUserId, timeUtc));
+        DataverseAdapter.Verify(mock => mock.ClearTeacherIdentityInfo(identityUserId, timeUtc));
     }
 
     private static StringContent CreateJsonContent(string json) => new(json, Encoding.UTF8, "application/json");
