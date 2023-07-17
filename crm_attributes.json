@@ -203,6 +203,8 @@
     "dfeta_personid",
     "dfeta_sanctionid",
     "dfeta_sanctioncodeid",
+    "dfeta_spent",
+    "dfeta_enddate",
     "statecode"
   ],
   "incident": [

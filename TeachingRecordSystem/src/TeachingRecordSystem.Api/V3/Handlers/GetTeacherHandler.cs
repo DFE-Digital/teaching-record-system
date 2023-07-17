@@ -188,7 +188,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         if (request.Include.HasFlag(GetTeacherRequestIncludes.Sanctions))
         {
-            sanctions = (await _dataverseAdapter.GetSanctionsByContactIds(new[] { teacher.Id }))[teacher.Id]
+            sanctions = (await _dataverseAdapter.GetSanctionsByContactIds(new[] { teacher.Id }, liveOnly: true))[teacher.Id]
                 .Intersect(Constants.ExposableSanctionCodes);
         }
 

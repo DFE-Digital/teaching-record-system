@@ -52,7 +52,7 @@ public class FindTeachersEndpoint : Endpoint<FindTeachersRequest, FindTeachersRe
                 Contact.Fields.dfeta_StatedLastName
             });
 
-        var sanctions = await _dataverseAdapter.GetSanctionsByContactIds(results.Select(r => r.Id));
+        var sanctions = (await _dataverseAdapter.GetSanctionsByContactIds(results.Select(r => r.Id), liveOnly: true));
 
         var response = new FindTeachersResponse()
         {

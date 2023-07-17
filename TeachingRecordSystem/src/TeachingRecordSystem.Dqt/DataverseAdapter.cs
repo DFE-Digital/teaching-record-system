@@ -1374,7 +1374,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
-    public async Task<IDictionary<Guid, string[]>> GetSanctionsByContactIds(IEnumerable<Guid> contactIds)
+    public async Task<IDictionary<Guid, string[]>> GetSanctionsByContactIds(IEnumerable<Guid> contactIds, bool liveOnly = true)
     {
         var contactIdsArray = contactIds.ToArray();
 
@@ -1387,6 +1387,12 @@ public partial class DataverseAdapter : IDataverseAdapter
         {
             ColumnSet = new(dfeta_sanction.Fields.dfeta_PersonId)
         };
+
+        if (liveOnly)
+        {
+            query.Criteria.AddCondition(dfeta_sanction.Fields.dfeta_Spent, ConditionOperator.Equal, false);
+            query.Criteria.AddCondition(dfeta_sanction.Fields.dfeta_EndDate, ConditionOperator.Null);
+        }
 
         query.Criteria.AddCondition(dfeta_sanction.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_sanctionState.Active);
         query.Criteria.AddCondition(dfeta_sanction.Fields.dfeta_PersonId, ConditionOperator.In, contactIdsArray.Cast<object>().ToArray());  // https://community.dynamics.com/crm/b/crmbusiness/posts/crm-2011-odd-error-with-query-expression-and-conditionoperator-in

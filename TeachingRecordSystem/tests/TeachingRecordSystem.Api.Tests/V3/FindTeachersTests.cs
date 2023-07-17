@@ -88,7 +88,7 @@ public class FindTeachersTests : ApiTestBase
             .ReturnsAsync(new[] { resultWithoutStatedNames, resultWithStatedNames });
 
         DataverseAdapter
-            .Setup(mock => mock.GetSanctionsByContactIds(It.IsAny<IEnumerable<Guid>>()))
+            .Setup(mock => mock.GetSanctionsByContactIds(It.IsAny<IEnumerable<Guid>>(), /* liveOnly: */ true))
             .ReturnsAsync(new Dictionary<Guid, string[]>()
             {
                 { resultWithoutStatedNames.Id, new[] { "G1" } },
