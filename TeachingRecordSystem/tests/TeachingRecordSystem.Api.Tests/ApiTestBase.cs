@@ -40,7 +40,7 @@ public abstract class ApiTestBase
     public Mock<IGetAnIdentityApiClient> IdentityApiClient => Mock.Get(TestInfo.Current.TestServices.GetRequiredService<IGetAnIdentityApiClient>());
 
     public JsonContent CreateJsonContent(object requestBody) =>
-        JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().AddConverters());
+        JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().Configure());
 
     public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read")
     {
