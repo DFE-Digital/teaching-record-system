@@ -6591,10 +6591,12 @@ namespace TeachingRecordSystem.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string dfeta_EndDate = "dfeta_enddate";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_SanctionCodeId = "dfeta_sanctioncodeid";
 			public const string dfeta_sanctionId = "dfeta_sanctionid";
 			public const string Id = "dfeta_sanctionid";
+			public const string dfeta_Spent = "dfeta_spent";
 			public const string StateCode = "statecode";
 			public const string dfeta_sanction_Annotations = "dfeta_sanction_Annotations";
 			public const string dfeta_contact_dfeta_sanction = "dfeta_contact_dfeta_sanction";
@@ -6641,6 +6643,26 @@ namespace TeachingRecordSystem.Dqt.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_enddate")]
+		public System.Nullable<System.DateTime> dfeta_EndDate
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_enddate");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_EndDate");
+				this.SetAttributeValue("dfeta_enddate", value);
+				this.OnPropertyChanged("dfeta_EndDate");
 			}
 		}
 		
@@ -6724,6 +6746,26 @@ namespace TeachingRecordSystem.Dqt.Models
 			set
 			{
 				this.dfeta_sanctionId = value;
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_spent")]
+		public System.Nullable<bool> dfeta_Spent
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_spent");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Spent");
+				this.SetAttributeValue("dfeta_spent", value);
+				this.OnPropertyChanged("dfeta_Spent");
 			}
 		}
 		

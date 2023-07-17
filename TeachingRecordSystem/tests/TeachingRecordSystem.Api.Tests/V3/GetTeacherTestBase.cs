@@ -639,7 +639,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             .ReturnsAsync(qtsRegistrations ?? Array.Empty<dfeta_qtsregistration>());
 
         DataverseAdapter
-            .Setup(mock => mock.GetSanctionsByContactIds(new[] { contact.Id }))
+            .Setup(mock => mock.GetSanctionsByContactIds(new[] { contact.Id }, /* liveOnly: */ true))
             .ReturnsAsync(new Dictionary<Guid, string[]>()
             {
                 { contact.Id, sanctions ?? Array.Empty<string>() }

@@ -111,5 +111,5 @@ public interface IDataverseAdapter
 
     Task ClearTeacherIdentityInfo(Guid identityUserId, DateTime updateTimeUtc);
 
-    Task<IDictionary<Guid, string[]>> GetSanctionsByContactIds(IEnumerable<Guid> contactIds);
+    Task<IDictionary<Guid, string[]>> GetSanctionsByContactIds(IEnumerable<Guid> contactIds, bool liveOnly = true);
 }
