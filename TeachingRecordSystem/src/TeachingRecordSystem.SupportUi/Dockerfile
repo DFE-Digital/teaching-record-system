@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine3.18
 ARG GIT_SHA
 ENV GitSha ${GIT_SHA}
 COPY src/TeachingRecordSystem.SupportUi/bin/Release/net7.0/publish/ App/
