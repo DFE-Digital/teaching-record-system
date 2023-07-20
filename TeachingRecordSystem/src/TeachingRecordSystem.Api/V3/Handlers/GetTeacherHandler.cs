@@ -285,6 +285,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Status = MapInductionStatus(induction.dfeta_InductionStatus),
                 CertificateUrl =
                     (induction.dfeta_InductionStatus == dfeta_InductionStatus.Pass || induction.dfeta_InductionStatus == dfeta_InductionStatus.PassedinWales) &&
+                        induction.dfeta_CompletionDate is not null &&
                         accessMode == AccessMode.IdentityAccessToken ?
                     "/v3/certificates/induction" :
                     null,
