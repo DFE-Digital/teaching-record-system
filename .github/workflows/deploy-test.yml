@@ -16,11 +16,11 @@ on:
       api_url:
         value: ${{ jobs.deploy.outputs.api_url }}
 
+concurrency: deploy_test
 jobs:
   deploy:
     name: Deploy to PAAS
     runs-on: ubuntu-latest
-    concurrency: deploy_test
 
     outputs:
       api_url: ${{ steps.deploy.outputs.api_url }}

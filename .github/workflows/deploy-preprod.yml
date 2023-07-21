@@ -17,6 +17,7 @@ on:
         value: ${{ jobs.deploy.outputs.api_url }}
   workflow_dispatch:
 
+concurrency: deploy_preprod
 jobs:
   package:
     name: Package application
@@ -29,7 +30,6 @@ jobs:
     needs: package
     if: always() && (needs.package.result == 'success' || needs.package.result == 'skipped')
     runs-on: ubuntu-latest
-    concurrency: deploy_preprod
 
     outputs:
       api_url: ${{ steps.deploy.outputs.api_url }}
@@ -51,6 +51,8 @@ jobs:
 
   deploy_aks:
     name: Deploy to AKS
+    needs: package
+    if: always() && (needs.package.result == 'success' || needs.package.result == 'skipped')
     runs-on: ubuntu-latest
 
     environment:
@@ -63,7 +65,7 @@ jobs:
       id: deploy
       with:
         environment_name: pre-production
-        api_docker_image: ${{ inputs.api_docker_image }}
-        cli_docker_image: ${{ inputs.cli_docker_image }}
-        ui_docker_image: ${{ inputs.ui_docker_image }}
+        api_docker_image: ${{ inputs.api_docker_image || needs.package.outputs.api_docker_image }}
+        cli_docker_image: ${{ inputs.cli_docker_image || needs.package.outputs.cli_docker_image }}
+        ui_docker_image: ${{ inputs.ui_docker_image || needs.package.outputs.ui_docker_image }}
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
