@@ -30,7 +30,7 @@ public class GetEytsAwardeesForDateRangeTests : IAsyncLifetime
         var expectedCount = 18;
 
         // Act
-        var eytsAwardees = await _dataverseAdapter.GetEytsAwardeesForDateRange(startDate, endDate);
+        var eytsAwardees = (await _dataverseAdapter.GetEytsAwardeesForDateRange(startDate, endDate).ToListAsync()).Single();
 
         // Assert
         Assert.Equal(expectedCount, eytsAwardees.Count());
@@ -150,7 +150,7 @@ public class GetEytsAwardeesForDateRangeTests : IAsyncLifetime
             teacher5EarlyYearsStatusValue);
 
         // Act
-        var eytsAwardees = await _dataverseAdapter.GetEytsAwardeesForDateRange(startDate, endDate);
+        var eytsAwardees = (await _dataverseAdapter.GetEytsAwardeesForDateRange(startDate, endDate).ToListAsync()).Single();
 
         // Assert
         Assert.Equal(3, eytsAwardees.Count());

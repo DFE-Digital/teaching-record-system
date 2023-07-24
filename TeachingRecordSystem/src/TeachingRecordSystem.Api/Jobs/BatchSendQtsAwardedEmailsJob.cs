@@ -57,30 +57,35 @@ public class BatchSendQtsAwardedEmailsJob
 
         await _dbContext.QtsAwardedEmailsJobs.AddAsync(job, cancellationToken);
 
-        var qtsAwardees = await _dataverseAdapter.GetQtsAwardeesForDateRange(startDate, endDate);
-        foreach (var qtsAwardee in qtsAwardees)
+        var totalQtsAwardees = 0;
+        await foreach (var qtsAwardees in _dataverseAdapter.GetQtsAwardeesForDateRange(startDate, endDate))
         {
-            var personalisation = new Dictionary<string, string>()
-            {
-                { "first name", qtsAwardee.FirstName },
-                { "last name", qtsAwardee.LastName },
-            };
+            totalQtsAwardees += qtsAwardees.Length;
 
-            var jobItem = new QtsAwardedEmailsJobItem
+            foreach (var qtsAwardee in qtsAwardees)
             {
-                QtsAwardedEmailsJobId = qtsAwardedEmailsJobId,
-                PersonId = qtsAwardee.TeacherId,
-                Trn = qtsAwardee.Trn,
-                EmailAddress = qtsAwardee.EmailAddress,
-                Personalization = personalisation
-            };
+                var personalisation = new Dictionary<string, string>()
+                {
+                    { "first name", qtsAwardee.FirstName },
+                    { "last name", qtsAwardee.LastName },
+                };
 
-            await _dbContext.QtsAwardedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+                var jobItem = new QtsAwardedEmailsJobItem
+                {
+                    QtsAwardedEmailsJobId = qtsAwardedEmailsJobId,
+                    PersonId = qtsAwardee.TeacherId,
+                    Trn = qtsAwardee.Trn,
+                    EmailAddress = qtsAwardee.EmailAddress,
+                    Personalization = personalisation
+                };
+
+                await _dbContext.QtsAwardedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+            }
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        if (qtsAwardees.Length > 0)
+        if (totalQtsAwardees > 0)
         {
             await _backgroundJobScheduler.Enqueue<QtsAwardedEmailJobDispatcher>(j => j.Execute(qtsAwardedEmailsJobId));
         }

@@ -57,30 +57,35 @@ public class BatchSendInductionCompletedEmailsJob
 
         await _dbContext.InductionCompletedEmailsJobs.AddAsync(job, cancellationToken);
 
-        var inductionCompletees = await _dataverseAdapter.GetInductionCompleteesForDateRange(startDate, endDate);
-        foreach (var inductionCompletee in inductionCompletees)
+        var totalInductionCompletees = 0;
+        await foreach (var inductionCompletees in _dataverseAdapter.GetInductionCompleteesForDateRange(startDate, endDate))
         {
-            var personalisation = new Dictionary<string, string>()
-            {
-                { "first name", inductionCompletee.FirstName },
-                { "last name", inductionCompletee.LastName },
-            };
+            totalInductionCompletees += inductionCompletees.Length;
 
-            var jobItem = new InductionCompletedEmailsJobItem
+            foreach (var inductionCompletee in inductionCompletees)
             {
-                InductionCompletedEmailsJobId = inductionCompletedEmailsJobId,
-                PersonId = inductionCompletee.TeacherId,
-                Trn = inductionCompletee.Trn,
-                EmailAddress = inductionCompletee.EmailAddress,
-                Personalization = personalisation
-            };
+                var personalisation = new Dictionary<string, string>()
+                {
+                    { "first name", inductionCompletee.FirstName },
+                    { "last name", inductionCompletee.LastName },
+                };
 
-            await _dbContext.InductionCompletedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+                var jobItem = new InductionCompletedEmailsJobItem
+                {
+                    InductionCompletedEmailsJobId = inductionCompletedEmailsJobId,
+                    PersonId = inductionCompletee.TeacherId,
+                    Trn = inductionCompletee.Trn,
+                    EmailAddress = inductionCompletee.EmailAddress,
+                    Personalization = personalisation
+                };
+
+                await _dbContext.InductionCompletedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+            }
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        if (inductionCompletees.Length > 0)
+        if (totalInductionCompletees > 0)
         {
             await _backgroundJobScheduler.Enqueue<InductionCompletedEmailJobDispatcher>(j => j.Execute(inductionCompletedEmailsJobId));
         }

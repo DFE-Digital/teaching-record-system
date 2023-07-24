@@ -137,7 +137,7 @@ public class GetInternationalQtsAwardeesForDateRangeTests : IAsyncLifetime
             teacher5StatusValue);
 
         // Act
-        var qtsAwardees = await _dataverseAdapter.GetInternationalQtsAwardeesForDateRange(startDate, endDate);
+        var qtsAwardees = (await _dataverseAdapter.GetInternationalQtsAwardeesForDateRange(startDate, endDate).ToListAsync()).Single();
 
         // Assert
         Assert.Equal(2, qtsAwardees.Count());

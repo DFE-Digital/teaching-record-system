@@ -31,7 +31,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
         var expectedCount = 8;
 
         // Act
-        var qtsAwardees = await _dataverseAdapter.GetQtsAwardeesForDateRange(startDate, endDate);
+        var qtsAwardees = (await _dataverseAdapter.GetQtsAwardeesForDateRange(startDate, endDate).ToListAsync()).Single();
 
         // Assert
         Assert.Equal(expectedCount, qtsAwardees.Count());
@@ -152,7 +152,7 @@ public class GetQtsAwardeesForDateRangeTests : IAsyncLifetime
             teacher5StatusValue);
 
         // Act
-        var qtsAwardees = await _dataverseAdapter.GetQtsAwardeesForDateRange(startDate, endDate);
+        var qtsAwardees = (await _dataverseAdapter.GetQtsAwardeesForDateRange(startDate, endDate).ToListAsync()).Single();
 
         // Assert
         Assert.Equal(3, qtsAwardees.Count());

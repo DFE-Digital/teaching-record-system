@@ -98,7 +98,7 @@ public class BatchSendInternationalQtsAwardedEmailsJobTests : InternationalQtsAw
         DateTime endActual = DateTime.MaxValue;
         dataverseAdapter
             .Setup(d => d.GetInternationalQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(new InternationalQtsAwardee[] { })
+            .ReturnsAsyncEnumerable(new InternationalQtsAwardee[] { })
             .Callback<DateTime, DateTime>(
                 (start, end) =>
                 {
@@ -154,7 +154,7 @@ public class BatchSendInternationalQtsAwardedEmailsJobTests : InternationalQtsAw
 
         dataverseAdapter
             .Setup(d => d.GetInternationalQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(qtsAwardees);
+            .ReturnsAsyncEnumerable(qtsAwardees);
 
         var job = new BatchSendInternationalQtsAwardedEmailsJob(
             jobOptions,
@@ -200,7 +200,7 @@ public class BatchSendInternationalQtsAwardedEmailsJobTests : InternationalQtsAw
 
         dataverseAdapter
             .Setup(d => d.GetInternationalQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(Array.Empty<InternationalQtsAwardee>());
+            .ReturnsAsyncEnumerable(Array.Empty<InternationalQtsAwardee>());
 
         var job = new BatchSendInternationalQtsAwardedEmailsJob(
             jobOptions,
@@ -253,7 +253,7 @@ public class BatchSendInternationalQtsAwardedEmailsJobTests : InternationalQtsAw
 
         dataverseAdapter
             .Setup(d => d.GetInternationalQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(qtsAwardees);
+            .ReturnsAsyncEnumerable(qtsAwardees);
 
         backgroundJobScheduler
             .Setup(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<InternationalQtsAwardedEmailJobDispatcher, Task>>>()))

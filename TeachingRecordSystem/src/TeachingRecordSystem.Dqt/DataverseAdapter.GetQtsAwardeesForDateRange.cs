@@ -1,10 +1,11 @@
-﻿using Microsoft.Xrm.Sdk.Query;
+﻿using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 
 namespace TeachingRecordSystem.Dqt;
 
 public partial class DataverseAdapter
 {
-    public async Task<QtsAwardee[]> GetQtsAwardeesForDateRange(DateTime startDate, DateTime endDate)
+    public async IAsyncEnumerable<QtsAwardee[]> GetQtsAwardeesForDateRange(DateTime startDate, DateTime endDate)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(dfeta_businesseventaudit.Fields.CreatedOn, ConditionOperator.GreaterEqual, startDate);
@@ -21,18 +22,37 @@ public partial class DataverseAdapter
                 dfeta_businesseventaudit.Fields.dfeta_NewValue,
                 dfeta_businesseventaudit.Fields.dfeta_OldValue,
                 dfeta_businesseventaudit.Fields.dfeta_Person),
-            Criteria = filter
+            Criteria = filter,
+            Orders =
+            {
+                new OrderExpression(dfeta_businesseventaudit.Fields.CreatedOn, OrderType.Ascending)
+            },
+            PageInfo = new()
+            {
+                PageNumber = 1,
+                Count = 500
+            }
         };
 
         AddContactLink(query);
 
-        var result = await _service.RetrieveMultipleAsync(query);
-        return result.Entities
-            .Select(e => e.ToEntity<dfeta_businesseventaudit>())
-            .Select(e => e.Extract<Contact>(Contact.EntityLogicalName, Contact.PrimaryIdAttribute))
-            .GroupBy(c => c.ContactId)
-            .Select(g => MapContactToQtsAwardee(g.First()))
-            .ToArray();
+        EntityCollection response;
+
+        do
+        {
+            response = await _service.RetrieveMultipleAsync(query);
+
+            yield return response.Entities
+                .Select(e => e.ToEntity<dfeta_businesseventaudit>())
+                .Select(e => e.Extract<Contact>(Contact.EntityLogicalName, Contact.PrimaryIdAttribute))
+                .GroupBy(c => c.ContactId)
+                .Select(g => MapContactToQtsAwardee(g.First()))
+                .ToArray();
+
+            query.PageInfo.PageNumber++;
+            query.PageInfo.PagingCookie = response.PagingCookie;
+        }
+        while (response.MoreRecords);
 
         static void AddContactLink(QueryExpression query)
         {
