@@ -98,7 +98,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
         DateTime endActual = DateTime.MaxValue;
         dataverseAdapter
             .Setup(d => d.GetInductionCompleteesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(new InductionCompletee[] { })
+            .ReturnsAsyncEnumerable(new InductionCompletee[] { })
             .Callback<DateTime, DateTime>(
                 (start, end) =>
                 {
@@ -154,7 +154,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
 
         dataverseAdapter
             .Setup(d => d.GetInductionCompleteesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(inductionCompletees);
+            .ReturnsAsyncEnumerable(inductionCompletees);
 
         var job = new BatchSendInductionCompletedEmailsJob(
             jobOptions,
@@ -200,7 +200,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
 
         dataverseAdapter
             .Setup(d => d.GetInductionCompleteesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(new InductionCompletee[] { });
+            .ReturnsAsyncEnumerable(new InductionCompletee[] { });
 
         var job = new BatchSendInductionCompletedEmailsJob(
             jobOptions,
@@ -253,7 +253,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
 
         dataverseAdapter
             .Setup(d => d.GetInductionCompleteesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(inductionCompletees);
+            .ReturnsAsyncEnumerable(inductionCompletees);
 
         backgroundJobScheduler
             .Setup(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<InductionCompletedEmailJobDispatcher, Task>>>()))

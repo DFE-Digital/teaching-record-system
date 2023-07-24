@@ -57,30 +57,35 @@ public class BatchSendEytsAwardedEmailsJob
 
         await _dbContext.EytsAwardedEmailsJobs.AddAsync(job, cancellationToken);
 
-        var eytsAwardees = await _dataverseAdapter.GetEytsAwardeesForDateRange(startDate, endDate);
-        foreach (var eytsAwardee in eytsAwardees)
+        var totalEytsAwardees = 0;
+        await foreach (var eytsAwardees in _dataverseAdapter.GetEytsAwardeesForDateRange(startDate, endDate))
         {
-            var personalisation = new Dictionary<string, string>()
-            {
-                { "first name", eytsAwardee.FirstName },
-                { "last name", eytsAwardee.LastName },
-            };
+            totalEytsAwardees += eytsAwardees.Length;
 
-            var jobItem = new EytsAwardedEmailsJobItem
+            foreach (var eytsAwardee in eytsAwardees)
             {
-                EytsAwardedEmailsJobId = eytsAwardedEmailsJobId,
-                PersonId = eytsAwardee.TeacherId,
-                Trn = eytsAwardee.Trn,
-                EmailAddress = eytsAwardee.EmailAddress,
-                Personalization = personalisation
-            };
+                var personalisation = new Dictionary<string, string>()
+                {
+                    { "first name", eytsAwardee.FirstName },
+                    { "last name", eytsAwardee.LastName },
+                };
 
-            await _dbContext.EytsAwardedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+                var jobItem = new EytsAwardedEmailsJobItem
+                {
+                    EytsAwardedEmailsJobId = eytsAwardedEmailsJobId,
+                    PersonId = eytsAwardee.TeacherId,
+                    Trn = eytsAwardee.Trn,
+                    EmailAddress = eytsAwardee.EmailAddress,
+                    Personalization = personalisation
+                };
+
+                await _dbContext.EytsAwardedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+            }
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        if (eytsAwardees.Length > 0)
+        if (totalEytsAwardees > 0)
         {
             await _backgroundJobScheduler.Enqueue<EytsAwardedEmailJobDispatcher>(j => j.Execute(eytsAwardedEmailsJobId));
         }

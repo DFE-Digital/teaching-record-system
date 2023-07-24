@@ -98,7 +98,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
         DateTime endActual = DateTime.MaxValue;
         dataverseAdapter
             .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(new QtsAwardee[] { })
+            .ReturnsAsyncEnumerable(new QtsAwardee[] { })
             .Callback<DateTime, DateTime>(
                 (start, end) =>
                 {
@@ -154,7 +154,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
 
         dataverseAdapter
             .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(qtsAwardees);
+            .ReturnsAsyncEnumerable(qtsAwardees);
 
         var job = new BatchSendQtsAwardedEmailsJob(
             jobOptions,
@@ -200,7 +200,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
 
         dataverseAdapter
             .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(new QtsAwardee[] { });
+            .ReturnsAsyncEnumerable(new QtsAwardee[] { });
 
         var job = new BatchSendQtsAwardedEmailsJob(
             jobOptions,
@@ -253,7 +253,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
 
         dataverseAdapter
             .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsync(qtsAwardees);
+            .ReturnsAsyncEnumerable(qtsAwardees);
 
         backgroundJobScheduler
             .Setup(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<QtsAwardedEmailJobDispatcher, Task>>>()))

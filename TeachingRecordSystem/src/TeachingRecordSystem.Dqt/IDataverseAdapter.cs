@@ -97,13 +97,13 @@ public interface IDataverseAdapter
 
     Task<Contact[]> GetTeachersByInitialTeacherTrainingSlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);
 
-    Task<QtsAwardee[]> GetQtsAwardeesForDateRange(DateTime startDate, DateTime endDate);
+    IAsyncEnumerable<QtsAwardee[]> GetQtsAwardeesForDateRange(DateTime startDate, DateTime endDate);
 
-    Task<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRange(DateTime startDate, DateTime endDate);
+    IAsyncEnumerable<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRange(DateTime startDate, DateTime endDate);
 
-    Task<EytsAwardee[]> GetEytsAwardeesForDateRange(DateTime startDate, DateTime endDate);
+    IAsyncEnumerable<EytsAwardee[]> GetEytsAwardeesForDateRange(DateTime startDate, DateTime endDate);
 
-    Task<InductionCompletee[]> GetInductionCompleteesForDateRange(DateTime startDate, DateTime endDate);
+    IAsyncEnumerable<InductionCompletee[]> GetInductionCompleteesForDateRange(DateTime startDate, DateTime endDate);
 
     Task<Contact[]> GetTeachersBySlugIdAndTrn(string slugId, string trn, string[] columnNames, bool activeOnly = true);
 

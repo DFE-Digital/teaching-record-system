@@ -153,7 +153,7 @@ public class GetInductionCompleteesForDateRangeTests : IAsyncLifetime
             teacher5FinalInductionStatus);
 
         // Act
-        var inductionCompletees = await _dataverseAdapter.GetInductionCompleteesForDateRange(startDate, endDate);
+        var inductionCompletees = (await _dataverseAdapter.GetInductionCompleteesForDateRange(startDate, endDate).ToListAsync()).Single();
 
         // Assert
         Assert.Equal(3, inductionCompletees.Count());

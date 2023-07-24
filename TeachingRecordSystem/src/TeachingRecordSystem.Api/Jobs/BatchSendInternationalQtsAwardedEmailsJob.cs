@@ -57,30 +57,35 @@ public class BatchSendInternationalQtsAwardedEmailsJob
 
         await _dbContext.InternationalQtsAwardedEmailsJobs.AddAsync(job, cancellationToken);
 
-        var internationalQtsAwardees = await _dataverseAdapter.GetInternationalQtsAwardeesForDateRange(startDate, endDate);
-        foreach (var internationalQtsAwardee in internationalQtsAwardees)
+        var totalInternationalQtsAwardees = 0;
+        await foreach (var internationalQtsAwardees in _dataverseAdapter.GetInternationalQtsAwardeesForDateRange(startDate, endDate))
         {
-            var personalisation = new Dictionary<string, string>()
-            {
-                { "first name", internationalQtsAwardee.FirstName },
-                { "last name", internationalQtsAwardee.LastName },
-            };
+            totalInternationalQtsAwardees += internationalQtsAwardees.Length;
 
-            var jobItem = new InternationalQtsAwardedEmailsJobItem
+            foreach (var internationalQtsAwardee in internationalQtsAwardees)
             {
-                InternationalQtsAwardedEmailsJobId = internationalQtsAwardedEmailsJobId,
-                PersonId = internationalQtsAwardee.TeacherId,
-                Trn = internationalQtsAwardee.Trn,
-                EmailAddress = internationalQtsAwardee.EmailAddress,
-                Personalization = personalisation
-            };
+                var personalisation = new Dictionary<string, string>()
+                {
+                    { "first name", internationalQtsAwardee.FirstName },
+                    { "last name", internationalQtsAwardee.LastName },
+                };
 
-            await _dbContext.InternationalQtsAwardedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+                var jobItem = new InternationalQtsAwardedEmailsJobItem
+                {
+                    InternationalQtsAwardedEmailsJobId = internationalQtsAwardedEmailsJobId,
+                    PersonId = internationalQtsAwardee.TeacherId,
+                    Trn = internationalQtsAwardee.Trn,
+                    EmailAddress = internationalQtsAwardee.EmailAddress,
+                    Personalization = personalisation
+                };
+
+                await _dbContext.InternationalQtsAwardedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+            }
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        if (internationalQtsAwardees.Length > 0)
+        if (totalInternationalQtsAwardees > 0)
         {
             await _backgroundJobScheduler.Enqueue<InternationalQtsAwardedEmailJobDispatcher>(j => j.Execute(internationalQtsAwardedEmailsJobId));
         }
