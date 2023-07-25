@@ -890,6 +890,51 @@ public class UpdateTeacherTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Given_slugid_is_not_provided_do_not_clear_contact_slugid()
+    {
+        // Arrange
+        var slugId = Guid.NewGuid().ToString();
+        var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId);
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new dfeta_initialteachertraining()
+            {
+                Id = ittId,
+                dfeta_SlugId = string.Empty,
+            }
+        });
+
+        // Act
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusbyassessmentonly
+            },
+            Qualification = null,
+            SlugId = string.Empty
+        });
+        var contactRecord = await _dataverseAdapter.GetTeacher(teacherId, columnNames: new[] { Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_SlugId });
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.Equal(UpdateTeacherFailedReasons.None, result.FailedReasons);
+        var contact = txnRequest.AssertSingleUpdateRequest<Contact>();
+        Assert.Null(contact.dfeta_SlugId);
+        Assert.Equal(slugId, contactRecord.dfeta_SlugId);
+    }
+
+    [Fact]
     public async Task Given_withdrawn_qts_itt_record_passing_withdrawn_returns_success_without_updating()
     {
         // Arrange
@@ -2501,47 +2546,6 @@ public class UpdateTeacherTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_contact_with_slugid_exists_but_itt_record_does_not_exist_for_slugid_return_error()
-    {
-        // Arrange
-        var slugId = Guid.NewGuid().ToString();
-        var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId);
-        await _organizationService.ExecuteAsync(new UpdateRequest()
-        {
-            Target = new dfeta_initialteachertraining()
-            {
-                Id = ittId,
-                dfeta_SlugId = Guid.NewGuid().ToString(),
-            }
-        });
-
-        // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
-        {
-            TeacherId = teacherId,
-            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
-            {
-                ProviderUkprn = ittProviderUkprn,
-                ProgrammeStartDate = new DateOnly(2011, 11, 01),
-                ProgrammeEndDate = new DateOnly(2012, 11, 01),
-                ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
-                Subject1 = "100366",  // computer science
-                Subject2 = "100403",  // mathematics
-                Subject3 = "100302",  // history
-                AgeRangeFrom = dfeta_AgeRange._11,
-                AgeRangeTo = dfeta_AgeRange._12,
-                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusbyassessmentonly
-            },
-            Qualification = null,
-            SlugId = slugId
-        });
-
-        // Assert
-        Assert.False(result.Succeeded);
-        Assert.Equal(UpdateTeacherFailedReasons.NoMatchingIttRecord, result.FailedReasons);
-    }
-
-    [Fact]
     public async Task Given_contact_slugid_does_not_exist_update_contact_slugid()
     {
         // Arrange
@@ -2880,6 +2884,89 @@ public class UpdateTeacherTests : IAsyncLifetime
         // Assert
         var contact = txnRequest.AssertSingleUpdateRequest<Contact>();
         Assert.Equal(husId, contact.dfeta_HUSID);
+    }
+
+    [Fact]
+    public async Task Given_update_with_slugid_falls_back_to_matching_using_ittproviderukprn_retuns_record()
+    {
+        // Arrange
+        var slugId = Guid.NewGuid().ToString();
+        var (teacherId, ukprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId);
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new dfeta_initialteachertraining()
+            {
+                Id = ittId,
+                dfeta_SlugId = null,
+            }
+        });
+
+        // Act
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ukprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                IttQualificationValue = "001",  // BEd,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusbyassessmentonly
+            },
+            Qualification = null,
+            SlugId = slugId
+        });
+
+        // Assert
+        Assert.Equal(UpdateTeacherFailedReasons.None, result.FailedReasons);
+    }
+
+    [Fact]
+    public async Task Given_update_using_slugid_and_different_ukprn_falls_back_to_matching_using_ittproviderukprn_retuns_error()
+    {
+        // Arrange
+        var ukprn = "10000571";
+        var slugId = Guid.NewGuid().ToString();
+        var (teacherId, _, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId);
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new dfeta_initialteachertraining()
+            {
+                Id = ittId,
+                dfeta_SlugId = null,
+            }
+        });
+
+        // Act
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ukprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                IttQualificationValue = "001",  // BEd,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusbyassessmentonly
+            },
+            Qualification = null,
+            SlugId = slugId
+        });
+
+        // Assert
+        Assert.Equal(UpdateTeacherFailedReasons.NoMatchingIttRecord, result.FailedReasons);
     }
 
     [Fact]

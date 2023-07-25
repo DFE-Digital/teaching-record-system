@@ -273,19 +273,27 @@ public partial class DataverseAdapter
                 Guid ittProviderId,
                 string slugId)
         {
-            // if SlugId is not passed in
-            // Find an active ITT record for the specified ITT Provider.
-            // otherwise find active ITT for the slugid (which should be one).
+            // if SlugId is passed in, use slugid for matching
+            // otherwise fallback to matching on establishmet
             // The record should be at the InTraining or Deferred or Withdrawn status unless the programme is 'assessment only',
             // in which case the status should be UnderAssessment or Deferred or withdrawn.
 
             List<dfeta_initialteachertraining> matching = new List<dfeta_initialteachertraining>();
-            var activeForProvider = string.IsNullOrEmpty(slugId) ? ittRecords
-                .Where(r => r.dfeta_EstablishmentId?.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
-                .ToArray()
-                : ittRecords
-                .Where(r => r.dfeta_SlugId == slugId && r.StateCode == dfeta_initialteachertrainingState.Active)
-                .ToArray();
+            var activeForProvider = Array.Empty<dfeta_initialteachertraining>();
+
+            if (!string.IsNullOrEmpty(slugId))
+            {
+                activeForProvider = ittRecords
+                    .Where(r => r.dfeta_SlugId == slugId && r.StateCode == dfeta_initialteachertrainingState.Active)
+                    .ToArray();
+            }
+
+            if (activeForProvider.Length == 0)
+            {
+                activeForProvider = ittRecords
+                    .Where(r => r.dfeta_EstablishmentId?.Id == ittProviderId && string.IsNullOrEmpty(r.dfeta_SlugId) && r.StateCode == dfeta_initialteachertrainingState.Active)
+                    .ToArray();
+            }
 
             // All incomplete qts/eyts records, regardless of provider
             var incompleteEytsOrQts = ittRecords
@@ -366,12 +374,20 @@ public partial class DataverseAdapter
 
         public Contact CreateContactEntity()
         {
-            return new Contact()
+            var contact = new Contact()
             {
                 Id = TeacherId,
                 dfeta_HUSID = _command.HusId,
-                dfeta_SlugId = _command.SlugId
+
             };
+
+            //only allow slugid to be set if its not empty
+            if (!string.IsNullOrEmpty(_command.SlugId))
+            {
+                contact.dfeta_SlugId = _command.SlugId;
+            }
+
+            return contact;
         }
 
         public Models.Task CreateReviewTaskEntityForActiveSanctions()
@@ -626,7 +642,7 @@ public partial class DataverseAdapter
                     Contact.Fields.StateCode
                 });
 
-            var getIttRecordsTask = string.IsNullOrEmpty(_command.SlugId) ? _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+            var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 TeacherId,
                 columnNames: new[]
                 {
@@ -635,7 +651,9 @@ public partial class DataverseAdapter
                     dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
                     dfeta_initialteachertraining.Fields.StateCode,
                     dfeta_initialteachertraining.Fields.dfeta_SlugId
-                }) :
+                });
+
+            var getIttRecordsBySlugIdTask = !string.IsNullOrEmpty(_command.SlugId) ?
                 _dataverseAdapter.GetInitialTeacherTrainingBySlugId(_command.SlugId, columnNames: new[]
                 {
                     dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
@@ -643,7 +661,9 @@ public partial class DataverseAdapter
                     dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
                     dfeta_initialteachertraining.Fields.StateCode,
                     dfeta_initialteachertraining.Fields.dfeta_SlugId
-                }, null, true);
+                }, null, true)
+                :
+                Task.FromResult(Array.Empty<dfeta_initialteachertraining>());
 
             var getQtsRegistrationsTask = _dataverseAdapter.GetQtsRegistrationsByTeacher(
                 TeacherId,
@@ -803,7 +823,8 @@ public partial class DataverseAdapter
                     getQualificationSubject3Task,
                     existingTeachersWithHusIdTask,
                     getAllEytsTeacherStatusesTask,
-                    getAllTeacherStatuses
+                    getAllTeacherStatuses,
+                    getIttRecordsBySlugIdTask
                 }
                 .Where(t => t != null);
 
@@ -829,7 +850,7 @@ public partial class DataverseAdapter
                 QualificationSubject3Id = getQualificationSubject3Task?.Result?.Id,
                 QualificationProviderId = getQualificationProviderTask?.Result?.Id,
                 Teacher = getTeacherTask.Result,
-                Itt = getIttRecordsTask.Result,
+                Itt = getIttRecordsBySlugIdTask?.Result.Length > 0 ? getIttRecordsBySlugIdTask.Result : getIttRecordsTask.Result,
                 Qualifications = getQualifications.Result,
                 TeacherHasActiveSanctions = getTeacherTask.Result?.dfeta_ActiveSanctions == true,
                 TeacherHusId = getTeacherTask.Result?.dfeta_HUSID,
