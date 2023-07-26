@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -11,13 +12,15 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230726140729_UserEmailLength")]
+    partial class UserEmailLength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "7.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -394,49 +397,46 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.User", b =>
-            {
-                b.Property<Guid>("UserId")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid")
-                    .HasColumnName("user_id");
+                {
+                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
 
-                b.Property<bool>("Active")
-                    .HasColumnType("boolean")
-                    .HasColumnName("active");
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
 
-                b.Property<string>("AzureAdSubject")
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .HasColumnType("character varying(100)")
-                    .HasColumnName("azure_ad_subject");
+                    b.Property<string>("AzureAdSubject")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("azure_ad_subject");
 
-                b.Property<string>("Email")
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnType("character varying(200)")
-                    .HasColumnName("email");
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("email");
 
-                b.Property<string>("Name")
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnType("character varying(200)")
-                    .HasColumnName("name");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
 
-                b.Property<string[]>("Roles")
-                    .IsRequired()
-                    .HasColumnType("text[]")
-                    .HasColumnName("roles");
+                    b.Property<string[]>("Roles")
+                        .IsRequired()
+                        .HasColumnType("varchar[]")
+                        .HasColumnName("roles");
 
-                b.Property<int>("UserType")
-                    .HasColumnType("integer")
-                    .HasColumnName("user_type");
+                    b.Property<int>("UserType")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_type");
 
-                b.HasKey("UserId")
-                    .HasName("pk_users");
+                    b.HasKey("UserId")
+                        .HasName("pk_users");
 
-                b.ToTable("users", (string)null);
-            });
-
+                    b.ToTable("users", (string)null);
+                });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.EytsAwardedEmailsJobItem", b =>
                 {
