@@ -17,7 +17,6 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Prometheus;
-using Serilog;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Filters;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
@@ -290,8 +289,6 @@ public class Program
             Console.WriteLine(app.Configuration[configKey]);
             return;
         }
-
-        app.UseSerilogRequestLogging();
 
         if (app.Environment.IsProduction())
         {
