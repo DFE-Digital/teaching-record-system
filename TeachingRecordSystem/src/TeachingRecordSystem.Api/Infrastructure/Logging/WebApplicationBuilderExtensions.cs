@@ -13,7 +13,18 @@ public static class WebApplicationBuilderExtensions
     {
         if (builder.Environment.IsProduction())
         {
-            builder.WebHost.UseSentry();
+            builder.WebHost.UseSentry(options =>
+            {
+                options.SetBeforeSend((Sentry.SentryEvent e) =>
+                {
+                    if (e.Exception is not null && !SentryErrors.ShouldReport(e.Exception))
+                    {
+                        return null;
+                    }
+
+                    return e;
+                });
+            });
 
             builder.Services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
 
