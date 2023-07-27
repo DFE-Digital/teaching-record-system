@@ -32,14 +32,10 @@ public class BatchSendInductionCompletedEmailsJob
 
     public async Task Execute(CancellationToken cancellationToken)
     {
-        var lastAwardedToUtc = _batchSendInductionCompletedEmailsJobOptions.InitialLastAwardedToUtc;
-        var lastExecutedJob = await _dbContext.InductionCompletedEmailsJobs.OrderBy(j => j.ExecutedUtc).LastOrDefaultAsync();
-        if (lastExecutedJob != null)
-        {
-            lastAwardedToUtc = lastExecutedJob.AwardedToUtc;
-        }
+        var lastAwardedToUtc = await _dbContext.InductionCompletedEmailsJobs.MaxAsync(j => (DateTime?)j.AwardedToUtc) ??
+            _batchSendInductionCompletedEmailsJobOptions.InitialLastAwardedToUtc;
 
-        // Look for new QTS awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.
+        // Look for new induction awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.
         var awardedToUtc = _clock.Today.AddDays(-_batchSendInductionCompletedEmailsJobOptions.EmailDelayDays).ToDateTime();
 
         var executed = _clock.UtcNow;
@@ -55,16 +51,19 @@ public class BatchSendInductionCompletedEmailsJob
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        await _dbContext.InductionCompletedEmailsJobs.AddAsync(job, cancellationToken);
+        _dbContext.InductionCompletedEmailsJobs.Add(job);
 
         var totalInductionCompletees = 0;
         await foreach (var inductionCompletees in _dataverseAdapter.GetInductionCompleteesForDateRange(startDate, endDate))
         {
-            totalInductionCompletees += inductionCompletees.Length;
-
             foreach (var inductionCompletee in inductionCompletees)
             {
-                var personalisation = new Dictionary<string, string>()
+                if (await _dbContext.InductionCompletedEmailsJobItems.AnyAsync(i => i.Trn == inductionCompletee.Trn))
+                {
+                    continue;
+                }
+
+                var personalization = new Dictionary<string, string>()
                 {
                     { "first name", inductionCompletee.FirstName },
                     { "last name", inductionCompletee.LastName },
@@ -76,10 +75,12 @@ public class BatchSendInductionCompletedEmailsJob
                     PersonId = inductionCompletee.TeacherId,
                     Trn = inductionCompletee.Trn,
                     EmailAddress = inductionCompletee.EmailAddress,
-                    Personalization = personalisation
+                    Personalization = personalization
                 };
 
-                await _dbContext.InductionCompletedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+                _dbContext.InductionCompletedEmailsJobItems.Add(jobItem);
+
+                totalInductionCompletees++;
             }
         }
 

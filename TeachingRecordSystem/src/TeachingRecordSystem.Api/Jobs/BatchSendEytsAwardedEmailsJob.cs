@@ -32,14 +32,10 @@ public class BatchSendEytsAwardedEmailsJob
 
     public async Task Execute(CancellationToken cancellationToken)
     {
-        var lastAwardedToUtc = _batchSendEytsAwardedEmailsJobOptions.InitialLastAwardedToUtc;
-        var lastExecutedJob = await _dbContext.EytsAwardedEmailsJobs.OrderBy(j => j.ExecutedUtc).LastOrDefaultAsync();
-        if (lastExecutedJob != null)
-        {
-            lastAwardedToUtc = lastExecutedJob.AwardedToUtc;
-        }
+        var lastAwardedToUtc = await _dbContext.EytsAwardedEmailsJobs.MaxAsync(j => (DateTime?)j.AwardedToUtc) ??
+            _batchSendEytsAwardedEmailsJobOptions.InitialLastAwardedToUtc;
 
-        // Look for new QTS awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.
+        // Look for new EYTS awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.
         var awardedToUtc = _clock.Today.AddDays(-_batchSendEytsAwardedEmailsJobOptions.EmailDelayDays).ToDateTime();
 
         var executed = _clock.UtcNow;
@@ -55,16 +51,19 @@ public class BatchSendEytsAwardedEmailsJob
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        await _dbContext.EytsAwardedEmailsJobs.AddAsync(job, cancellationToken);
+        _dbContext.EytsAwardedEmailsJobs.Add(job);
 
         var totalEytsAwardees = 0;
         await foreach (var eytsAwardees in _dataverseAdapter.GetEytsAwardeesForDateRange(startDate, endDate))
         {
-            totalEytsAwardees += eytsAwardees.Length;
-
             foreach (var eytsAwardee in eytsAwardees)
             {
-                var personalisation = new Dictionary<string, string>()
+                if (await _dbContext.EytsAwardedEmailsJobItems.AnyAsync(i => i.Trn == eytsAwardee.Trn))
+                {
+                    continue;
+                }
+
+                var personalization = new Dictionary<string, string>()
                 {
                     { "first name", eytsAwardee.FirstName },
                     { "last name", eytsAwardee.LastName },
@@ -76,10 +75,12 @@ public class BatchSendEytsAwardedEmailsJob
                     PersonId = eytsAwardee.TeacherId,
                     Trn = eytsAwardee.Trn,
                     EmailAddress = eytsAwardee.EmailAddress,
-                    Personalization = personalisation
+                    Personalization = personalization
                 };
 
-                await _dbContext.EytsAwardedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+                _dbContext.EytsAwardedEmailsJobItems.Add(jobItem);
+
+                totalEytsAwardees++;
             }
         }
 

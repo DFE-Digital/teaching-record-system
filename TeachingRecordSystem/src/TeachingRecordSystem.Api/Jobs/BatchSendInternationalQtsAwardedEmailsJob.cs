@@ -32,12 +32,8 @@ public class BatchSendInternationalQtsAwardedEmailsJob
 
     public async Task Execute(CancellationToken cancellationToken)
     {
-        var lastAwardedToUtc = _batchSendInternationalQtsAwardedEmailsJobOptions.InitialLastAwardedToUtc;
-        var lastExecutedJob = await _dbContext.InternationalQtsAwardedEmailsJobs.OrderBy(j => j.ExecutedUtc).LastOrDefaultAsync();
-        if (lastExecutedJob != null)
-        {
-            lastAwardedToUtc = lastExecutedJob.AwardedToUtc;
-        }
+        var lastAwardedToUtc = await _dbContext.InternationalQtsAwardedEmailsJobs.MaxAsync(j => (DateTime?)j.AwardedToUtc) ??
+            _batchSendInternationalQtsAwardedEmailsJobOptions.InitialLastAwardedToUtc;
 
         // Look for new International QTS awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.
         var awardedToUtc = _clock.Today.AddDays(-_batchSendInternationalQtsAwardedEmailsJobOptions.EmailDelayDays).ToDateTime();
@@ -55,16 +51,19 @@ public class BatchSendInternationalQtsAwardedEmailsJob
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        await _dbContext.InternationalQtsAwardedEmailsJobs.AddAsync(job, cancellationToken);
+        _dbContext.InternationalQtsAwardedEmailsJobs.Add(job);
 
         var totalInternationalQtsAwardees = 0;
         await foreach (var internationalQtsAwardees in _dataverseAdapter.GetInternationalQtsAwardeesForDateRange(startDate, endDate))
         {
-            totalInternationalQtsAwardees += internationalQtsAwardees.Length;
-
             foreach (var internationalQtsAwardee in internationalQtsAwardees)
             {
-                var personalisation = new Dictionary<string, string>()
+                if (await _dbContext.InternationalQtsAwardedEmailsJobItems.AnyAsync(i => i.Trn == internationalQtsAwardee.Trn))
+                {
+                    continue;
+                }
+
+                var personalization = new Dictionary<string, string>()
                 {
                     { "first name", internationalQtsAwardee.FirstName },
                     { "last name", internationalQtsAwardee.LastName },
@@ -76,10 +75,12 @@ public class BatchSendInternationalQtsAwardedEmailsJob
                     PersonId = internationalQtsAwardee.TeacherId,
                     Trn = internationalQtsAwardee.Trn,
                     EmailAddress = internationalQtsAwardee.EmailAddress,
-                    Personalization = personalisation
+                    Personalization = personalization
                 };
 
-                await _dbContext.InternationalQtsAwardedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+                _dbContext.InternationalQtsAwardedEmailsJobItems.Add(jobItem);
+
+                totalInternationalQtsAwardees++;
             }
         }
 

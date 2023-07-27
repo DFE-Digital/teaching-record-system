@@ -3,6 +3,7 @@
 public class EytsAwardedEmailsJobItem
 {
     public const int EmailAddressMaxLength = 200;
+    public const string TrnUniqueIndexName = "ix_eyts_awarded_emails_job_items_trn";
 
     public required Guid EytsAwardedEmailsJobId { get; set; }
     public EytsAwardedEmailsJob? EytsAwardedEmailsJob { get; set; }
