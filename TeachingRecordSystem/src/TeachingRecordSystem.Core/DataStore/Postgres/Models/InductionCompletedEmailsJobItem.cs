@@ -3,6 +3,7 @@
 public class InductionCompletedEmailsJobItem
 {
     public const int EmailAddressMaxLength = 200;
+    public const string TrnUniqueIndexName = "ix_induction_completed_emails_job_items_trn";
 
     public required Guid InductionCompletedEmailsJobId { get; set; }
     public InductionCompletedEmailsJob? InductionCompletedEmailsJob { get; set; }

@@ -32,12 +32,8 @@ public class BatchSendQtsAwardedEmailsJob
 
     public async Task Execute(CancellationToken cancellationToken)
     {
-        var lastAwardedToUtc = _batchSendQtsAwardedEmailsJobOptions.InitialLastAwardedToUtc;
-        var lastExecutedJob = await _dbContext.QtsAwardedEmailsJobs.OrderBy(j => j.ExecutedUtc).LastOrDefaultAsync();
-        if (lastExecutedJob != null)
-        {
-            lastAwardedToUtc = lastExecutedJob.AwardedToUtc;
-        }
+        var lastAwardedToUtc = await _dbContext.QtsAwardedEmailsJobs.MaxAsync(j => (DateTime?)j.AwardedToUtc) ??
+            _batchSendQtsAwardedEmailsJobOptions.InitialLastAwardedToUtc;
 
         // Look for new QTS awards up to the end of the day the configurable amount of days ago to provide a delay between award being given and email being sent.
         var awardedToUtc = _clock.Today.AddDays(-_batchSendQtsAwardedEmailsJobOptions.EmailDelayDays).ToDateTime();
@@ -55,16 +51,19 @@ public class BatchSendQtsAwardedEmailsJob
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        await _dbContext.QtsAwardedEmailsJobs.AddAsync(job, cancellationToken);
+        _dbContext.QtsAwardedEmailsJobs.Add(job);
 
         var totalQtsAwardees = 0;
         await foreach (var qtsAwardees in _dataverseAdapter.GetQtsAwardeesForDateRange(startDate, endDate))
         {
-            totalQtsAwardees += qtsAwardees.Length;
-
             foreach (var qtsAwardee in qtsAwardees)
             {
-                var personalisation = new Dictionary<string, string>()
+                if (await _dbContext.QtsAwardedEmailsJobItems.AnyAsync(i => i.Trn == qtsAwardee.Trn))
+                {
+                    continue;
+                }
+
+                var personalization = new Dictionary<string, string>()
                 {
                     { "first name", qtsAwardee.FirstName },
                     { "last name", qtsAwardee.LastName },
@@ -76,10 +75,12 @@ public class BatchSendQtsAwardedEmailsJob
                     PersonId = qtsAwardee.TeacherId,
                     Trn = qtsAwardee.Trn,
                     EmailAddress = qtsAwardee.EmailAddress,
-                    Personalization = personalisation
+                    Personalization = personalization
                 };
 
-                await _dbContext.QtsAwardedEmailsJobItems.AddAsync(jobItem, cancellationToken);
+                _dbContext.QtsAwardedEmailsJobItems.Add(jobItem);
+
+                totalQtsAwardees++;
             }
         }
 

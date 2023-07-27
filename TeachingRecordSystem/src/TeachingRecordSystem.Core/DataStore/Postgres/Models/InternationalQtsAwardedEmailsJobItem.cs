@@ -3,6 +3,7 @@
 public class InternationalQtsAwardedEmailsJobItem
 {
     public const int EmailAddressMaxLength = 200;
+    public const string TrnUniqueIndexName = "ix_international_qts_awarded_emails_job_items_trn";
 
     public required Guid InternationalQtsAwardedEmailsJobId { get; set; }
     public InternationalQtsAwardedEmailsJob? InternationalQtsAwardedEmailsJob { get; set; }

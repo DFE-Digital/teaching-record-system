@@ -18,5 +18,6 @@ public class InductionCompletedEmailsJobItemMapping : IEntityTypeConfiguration<I
         builder.Property(i => i.Personalization).HasJsonConversion().IsRequired().HasColumnType("jsonb");
         builder.HasIndex(i => i.Personalization).HasMethod("gin");
         builder.HasOne(i => i.InductionCompletedEmailsJob).WithMany(j => j.JobItems).HasForeignKey(i => i.InductionCompletedEmailsJobId);
+        builder.HasIndex(i => i.Trn).IsUnique().HasDatabaseName(InductionCompletedEmailsJobItem.TrnUniqueIndexName);
     }
 }

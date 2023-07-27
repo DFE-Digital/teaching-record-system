@@ -30,7 +30,7 @@ public class EytsAwardedEmailJobDispatcherTests : EytsAwardedEmailJobTestBase
             { "last name", teacher1LastName },
         };
         var teacher2PersonId = Guid.NewGuid();
-        var teacher2Trn = "1234567";
+        var teacher2Trn = "1234568";
         var teacher2EmailAddress = Faker.Internet.Email();
         var teacher2FirstName = Faker.Name.First();
         var teacher2LastName = Faker.Name.Last();
@@ -40,7 +40,7 @@ public class EytsAwardedEmailJobDispatcherTests : EytsAwardedEmailJobTestBase
             { "last name", teacher1LastName },
         };
         var teacher3PersonId = Guid.NewGuid();
-        var teacher3Trn = "1234567";
+        var teacher3Trn = "1234569";
         var teacher3EmailAddress = Faker.Internet.Email();
         var teacher3FirstName = Faker.Name.First();
         var teacher3LastName = Faker.Name.Last();
