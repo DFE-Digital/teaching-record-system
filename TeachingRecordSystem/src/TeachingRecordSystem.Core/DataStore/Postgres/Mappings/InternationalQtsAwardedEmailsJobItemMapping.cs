@@ -18,6 +18,5 @@ public class InternationalQtsAwardedEmailsJobItemMapping : IEntityTypeConfigurat
         builder.Property(i => i.Personalization).HasJsonConversion().IsRequired().HasColumnType("jsonb");
         builder.HasIndex(i => i.Personalization).HasMethod("gin");
         builder.HasOne(i => i.InternationalQtsAwardedEmailsJob).WithMany(j => j.JobItems).HasForeignKey(i => i.InternationalQtsAwardedEmailsJobId);
-        builder.HasIndex(i => i.Trn).IsUnique().HasDatabaseName(InternationalQtsAwardedEmailsJobItem.TrnUniqueIndexName);
     }
 }
