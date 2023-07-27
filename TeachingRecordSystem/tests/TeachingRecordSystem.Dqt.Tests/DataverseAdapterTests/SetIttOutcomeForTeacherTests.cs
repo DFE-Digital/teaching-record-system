@@ -589,7 +589,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_itt_does_not_exist_for_slugid_return_error()
+    public async Task Given_itt_does_not_exist_for_slugid_fallback_to_establishment_matching_return_success()
     {
         // Arrange
         var slugId = Guid.NewGuid().ToString();
@@ -603,7 +603,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             Target = new dfeta_initialteachertraining()
             {
                 Id = ittId,
-                dfeta_SlugId = "some slug that doesn't exist",
+                dfeta_SlugId = string.Empty,
             }
         });
 
@@ -616,8 +616,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             slugId);
 
         // Assert
-        Assert.False(result.Succeeded);
-        Assert.Equal(SetIttResultForTeacherFailedReason.NoMatchingIttRecord, result.FailedReason);
+        Assert.True(result.Succeeded);
     }
 
     [Fact]
@@ -640,37 +639,6 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             {
                 Id = ittId,
                 dfeta_EstablishmentId = new EntityReference(Account.EntityLogicalName, AccountId2)
-            }
-        });
-
-        // Act
-        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
-            createPersonResult.TeacherId,
-            createPersonResult.IttProviderUkprn,
-            ittResult,
-            assessmentDate,
-            slugId);
-
-        // Assert
-        Assert.False(result.Succeeded);
-        Assert.Equal(SetIttResultForTeacherFailedReason.NoMatchingIttRecord, result.FailedReason);
-    }
-
-    [Fact]
-    public async Task Given_itt_matches_on_establishmentid_but_not_slugid_return_error()
-    {
-        // Arrange
-        var slugId = Guid.NewGuid().ToString();
-        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, withActiveSanction: false, slugId: slugId);
-        var ittResult = dfeta_ITTResult.Pass;
-        var assessmentDate = _clock.Today;
-        var ittId = createPersonResult.InitialTeacherTrainingId;
-        await _organizationService.ExecuteAsync(new UpdateRequest()
-        {
-            Target = new dfeta_initialteachertraining()
-            {
-                Id = ittId,
-                dfeta_SlugId = "SOME RANDOM SLUG"
             }
         });
 

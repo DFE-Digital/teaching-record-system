@@ -342,19 +342,26 @@ public partial class DataverseAdapter
             Guid ittProviderId,
             string slugId = null)
         {
-            // if SlugId is not passed in
-            // Find an active ITT record for the specified ITT Provider.
-            // otherwise find active ITT for the slugid (which should be one).
+            // if SlugId is passed in, use slugid for matching
+            // otherwise fallback to matching on establishmet
             // if ProgrammeType is AssessmentOnlyRoute, result should be UnderAssessment,Withdrawn or Deferrred otherwise
             // record should be InTraining,WithDrawn or Deferred
             List<dfeta_initialteachertraining> matching = new List<dfeta_initialteachertraining>();
+            var activeForProvider = Array.Empty<dfeta_initialteachertraining>();
 
-            var activeForProvider = string.IsNullOrEmpty(slugId) ? ittRecords
-                .Where(r => r.dfeta_EstablishmentId?.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
-                .ToArray() :
-                ittRecords
-                .Where(r => r.dfeta_SlugId == slugId && r.dfeta_EstablishmentId?.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
-                .ToArray();
+            if (!string.IsNullOrEmpty(slugId))
+            {
+                activeForProvider = ittRecords
+                    .Where(r => r.dfeta_SlugId == slugId && r.dfeta_EstablishmentId?.Id == ittProviderId && r.StateCode == dfeta_initialteachertrainingState.Active)
+                    .ToArray();
+            }
+
+            if (activeForProvider.Length == 0)
+            {
+                activeForProvider = ittRecords
+                    .Where(r => r.dfeta_EstablishmentId?.Id == ittProviderId && string.IsNullOrEmpty(r.dfeta_SlugId) && r.StateCode == dfeta_initialteachertrainingState.Active)
+                    .ToArray();
+            }
 
             foreach (var itt in activeForProvider)
             {
