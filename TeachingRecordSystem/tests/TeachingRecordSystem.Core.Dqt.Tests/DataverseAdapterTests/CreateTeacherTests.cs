@@ -333,6 +333,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     [InlineData(CreateTeacherType.TraineeTeacher, dfeta_ITTProgrammeType.UndergraduateOptIn, dfeta_ITTResult.InTraining)]
     [InlineData(CreateTeacherType.TraineeTeacher, dfeta_ITTProgrammeType.Providerled_postgrad, dfeta_ITTResult.InTraining)]
     [InlineData(CreateTeacherType.TraineeTeacher, dfeta_ITTProgrammeType.Providerled_undergrad, dfeta_ITTResult.InTraining)]
+    [InlineData(CreateTeacherType.TraineeTeacher, dfeta_ITTProgrammeType.HighpotentialITT, dfeta_ITTResult.InTraining)]
     [InlineData(CreateTeacherType.OverseasQualifiedTeacher, dfeta_ITTProgrammeType.Apprenticeship, dfeta_ITTResult.Approved)]
     [InlineData(CreateTeacherType.OverseasQualifiedTeacher, dfeta_ITTProgrammeType.AssessmentOnlyRoute, dfeta_ITTResult.Approved)]
     [InlineData(CreateTeacherType.OverseasQualifiedTeacher, dfeta_ITTProgrammeType.Core, dfeta_ITTResult.Approved)]

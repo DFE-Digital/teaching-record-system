@@ -76,7 +76,10 @@ public enum IttProgrammeType
     ProviderLedUndergrad = 389040022,
 
     [Description("International qualified teacher status")]
-    InternationalQualifiedTeacherStatus = 389040023
+    InternationalQualifiedTeacherStatus = 389040023,
+
+    [Description("High potential ITT")]
+    HighPotentialITT = 389040024
 }
 
 public static class IttProgrammeTypeExtensions

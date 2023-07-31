@@ -1531,7 +1531,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	{
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Apprenticeship", 19)]
+		[OptionSetMetadataAttribute("Apprenticeship", 20)]
 		Apprenticeship = 389040019,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
@@ -1551,7 +1551,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		EYITTAssessmentOnly = 389040014,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("EYITT - Graduate Employment Based", 16, "", "EYITTGEB")]
+		[OptionSetMetadataAttribute("EYITT - Graduate Employment Based", 17, "", "EYITTGEB")]
 		EYITTGraduateEmploymentBased = 389040016,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
@@ -1559,15 +1559,15 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		EYITTGraduateEntry = 389040015,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("EYITT - School Direct (Early Years)", 18, "", "EYITTSD")]
+		[OptionSetMetadataAttribute("EYITT - School Direct (Early Years)", 19, "", "EYITTSD")]
 		EYITTSchoolDirect_EarlyYears = 389040018,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("EYITT - Undergraduate", 17, "", "EYITTGUR")]
+		[OptionSetMetadataAttribute("EYITT - Undergraduate", 18, "", "EYITTGUR")]
 		EYITTUndergraduate = 389040017,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Future Teaching Scholars", 22, "#0000ff")]
+		[OptionSetMetadataAttribute("Future Teaching Scholars", 23, "#0000ff")]
 		FutureTeachingScholars = 389040020,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
@@ -1579,7 +1579,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		HEI = 389040001,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("International qualified teacher status", 23, "#0000ff")]
+		[OptionSetMetadataAttribute("High potential ITT", 16, "#0000ff")]
+		HighpotentialITT = 389040024,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("International qualified teacher status", 24, "#0000ff")]
 		Internationalqualifiedteacherstatus = 389040023,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
@@ -1591,11 +1595,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		OverseasTrainedTeacherProgramme = 389040007,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Provider-led (postgrad)", 20, "#0000ff")]
+		[OptionSetMetadataAttribute("Provider-led (postgrad)", 21, "#0000ff")]
 		Providerled_postgrad = 389040021,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Provider-led (undergrad)", 21, "#0000ff")]
+		[OptionSetMetadataAttribute("Provider-led (undergrad)", 22, "#0000ff")]
 		Providerled_undergrad = 389040022,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]

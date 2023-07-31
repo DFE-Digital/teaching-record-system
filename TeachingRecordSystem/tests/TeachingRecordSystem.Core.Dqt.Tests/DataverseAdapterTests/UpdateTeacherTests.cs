@@ -1670,6 +1670,96 @@ public class UpdateTeacherTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Given_existing_contact_update_core_to_aor_and_updates_teacherstatus_to_aorcandidate_returns_success()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, assessmentOnly: false, hasActiveSanctions: false);
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
+        var aorCandidate = await _dataverseAdapter.GetTeacherStatus("212", null);
+
+        // Act
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.AssessmentOnlyRoute,
+                Subject1 = "100403",  // mathematics
+                Subject2 = "100366",  // computer science
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                IttQualificationValue = updateIttQualification.dfeta_Value
+            },
+            Qualification = new UpdateTeacherCommandQualification()
+            {
+                CountryCode = "XK",
+                Subject = "100366",  // computer science
+                Class = dfeta_classdivision.Firstclasshonours,
+                Date = new DateOnly(2022, 01, 28),
+                ProviderUkprn = ittProviderUkprn,
+                HeQualificationValue = updateHeQualification.dfeta_Value,
+                Subject2 = "X300",
+                Subject3 = "N400"
+            }
+        });
+
+        // Assert
+        Assert.True(result.Succeeded);
+        var qts = transactionRequest.AssertSingleUpdateRequest<dfeta_qtsregistration>();
+        Assert.Equal(qts.dfeta_TeacherStatusId.Id, aorCandidate.Id);
+    }
+
+    [Fact]
+    public async Task Given_existing_contact_update_aor_to_core_and_updates_teacherstatus_to_traineeteacher_returns_success()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, assessmentOnly: true, hasActiveSanctions: false);
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
+        var traineeTeacherStatusId = await _dataverseAdapter.GetTeacherStatus("211", null);
+
+        // Act
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.Core,
+                Subject1 = "100403",  // mathematics
+                Subject2 = "100366",  // computer science
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                IttQualificationValue = updateIttQualification.dfeta_Value
+            },
+            Qualification = new UpdateTeacherCommandQualification()
+            {
+                CountryCode = "XK",
+                Subject = "100366",  // computer science
+                Class = dfeta_classdivision.Firstclasshonours,
+                Date = new DateOnly(2022, 01, 28),
+                ProviderUkprn = ittProviderUkprn,
+                HeQualificationValue = updateHeQualification.dfeta_Value,
+                Subject2 = "X300",
+                Subject3 = "N400"
+            }
+        });
+
+        // Assert
+        Assert.True(result.Succeeded);
+        var qts = transactionRequest.AssertSingleUpdateRequest<dfeta_qtsregistration>();
+        Assert.Equal(qts.dfeta_TeacherStatusId.Id, traineeTeacherStatusId.Id);
+    }
+
+    [Fact]
     public async Task Given_update_itt_and_qualification_with_noactive_sanctions_does_not_create_crm_task_and_returns_success()
     {
         // Arrange
