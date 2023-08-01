@@ -4,6 +4,7 @@ using FastEndpoints;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
+using Hangfire.PostgreSql;
 using idunno.Authentication.Basic;
 using Medallion.Threading;
 using Medallion.Threading.Azure;
@@ -29,13 +30,13 @@ using TeachingRecordSystem.Api.Infrastructure.OpenApi;
 using TeachingRecordSystem.Api.Infrastructure.RateLimiting;
 using TeachingRecordSystem.Api.Infrastructure.Redis;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.Jobs;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
 using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -230,20 +231,31 @@ public class Program
             services.AddSingleton<IDistributedLockProvider>(new FileDistributedSynchronizationProvider(new DirectoryInfo(lockFileDirectory)));
         }
 
+        if (env.IsProduction())
+        {
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(pgConnectionString));
+
+            services.AddHangfireServer();
+        }
+
         services.AddTrnGenerationApi(configuration);
         services.AddIdentityApi(configuration, env);
         services.AddAccessYourQualifications(configuration, env);
         services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
         services.AddDqtReporting(builder.Configuration);
-        services.AddBackgroundJobs(env, configuration, pgConnectionString);
+        services.AddBackgroundJobs(env, configuration);
         services.AddEmail(env, configuration);
 
         // Filter telemetry emitted by DqtReportingService
         services.AddApplicationInsightsTelemetry()
             .AddApplicationInsightsTelemetryProcessor<IgnoreDependencyTelemetryProcessor>();
 
-        if (env.EnvironmentName != "Testing")
+        if (!env.IsUnitTests())
         {
             var crmServiceClient = GetCrmServiceClient();
 

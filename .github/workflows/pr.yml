@@ -89,6 +89,7 @@ jobs:
         report_name: "Core test results"
         dotnet_test_args: >-
           --no-build
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
 
     - name: API Tests
       run: dotnet fixie --configuration Release --no-build

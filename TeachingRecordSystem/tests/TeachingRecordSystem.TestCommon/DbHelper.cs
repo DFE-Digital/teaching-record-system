@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
+using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -31,6 +32,8 @@ public class DbHelper
             options => TrsDbContext.ConfigureOptions(options, connectionString));
 
         services.AddSingleton(new DbHelper(connectionString));
+
+        services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().EnsureSchema());
     }
 
     public async Task ClearData()
