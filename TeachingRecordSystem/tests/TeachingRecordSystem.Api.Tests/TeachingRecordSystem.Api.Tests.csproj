@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.Api\TeachingRecordSystem.Api.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.TestFramework\TeachingRecordSystem.TestFramework.csproj" />
   </ItemGroup>
 
 </Project>

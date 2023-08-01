@@ -82,9 +82,13 @@ jobs:
         echo run_crm_integration_tests=$RUN_CRM_INTEGRATION_TESTS >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Core Tests
-      run: dotnet fixie --configuration Release --no-build
-      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Tests
+    - name: Core tests
+      uses: ./.github/workflows/actions/test
+      with:
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Tests
+        report_name: "Core test results"
+        dotnet_test_args: >-
+          --no-build
 
     - name: API Tests
       run: dotnet fixie --configuration Release --no-build
