@@ -1,10 +1,13 @@
-namespace TeachingRecordSystem.Api.Events.Processing.EventPublishing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+namespace TeachingRecordSystem.Core.Events.Processing.EventPublishing;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddEventPublishing(
         this IServiceCollection services,
-        IWebHostEnvironment environment)
+        IHostEnvironment environment)
     {
         if (!environment.IsUnitTests())
         {

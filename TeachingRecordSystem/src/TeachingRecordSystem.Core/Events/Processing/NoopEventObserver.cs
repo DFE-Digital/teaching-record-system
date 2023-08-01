@@ -1,6 +1,4 @@
-using TeachingRecordSystem.Core.Events;
-
-namespace TeachingRecordSystem.Api.Events.Processing;
+namespace TeachingRecordSystem.Core.Events.Processing;
 
 public class NoopEventObserver : IEventObserver
 {

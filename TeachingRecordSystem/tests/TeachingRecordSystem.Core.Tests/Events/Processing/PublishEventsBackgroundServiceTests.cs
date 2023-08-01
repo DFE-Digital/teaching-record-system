@@ -1,13 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using TeachingRecordSystem.Api.Events.Processing;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
+using TeachingRecordSystem.Core.Events.Processing;
 
-namespace TeachingRecordSystem.Api.Tests.Events.Processing;
+namespace TeachingRecordSystem.Core.Tests.Events.Processing;
 
-[TestClass(TestConcurrencyMode.NoConcurrency)]
-[ExecuteSqlSetup($"delete from events")]
-public class PublishEventsBackgroundServiceTests
+[Collection(nameof(DisableParallelization))]
+public class PublishEventsBackgroundServiceTests : IAsyncLifetime
 {
     private readonly DbFixture _dbFixture;
 
@@ -16,7 +17,12 @@ public class PublishEventsBackgroundServiceTests
         _dbFixture = dbFixture;
     }
 
-    [Test]
+    public Task InitializeAsync() =>
+        _dbFixture.WithDbContext(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from events"));
+
+    public Task DisposeAsync() => Task.CompletedTask;
+
+    [Fact]
     public async Task PublishEvents_PublishesUnpublishEventsAndSetsPublishedFlag()
     {
         // Arrange
@@ -42,7 +48,7 @@ public class PublishEventsBackgroundServiceTests
         Assert.True(dbEvent.Published);
     }
 
-    [Test]
+    [Fact]
     public async Task PublishEvents_DoesNotPublishAlreadyPublishedEvent()
     {
         // Arrange
@@ -65,7 +71,7 @@ public class PublishEventsBackgroundServiceTests
         Assert.Empty(eventObserver.Events);
     }
 
-    [Test]
+    [Fact]
     public async Task PublishEvents_EventObserverThrows_DoesNotThrow()
     {
         // Arrange
