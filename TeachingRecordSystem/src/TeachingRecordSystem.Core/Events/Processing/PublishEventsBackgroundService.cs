@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
-namespace TeachingRecordSystem.Api.Events.Processing;
+namespace TeachingRecordSystem.Core.Events.Processing;
 
 public class PublishEventsBackgroundService : BackgroundService
 {
