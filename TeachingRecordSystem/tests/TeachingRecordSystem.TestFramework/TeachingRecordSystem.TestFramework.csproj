@@ -13,7 +13,7 @@
     <PackageReference Include="Fixie" Version="3.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="xunit.assert" Version="2.4.2" />
+    <PackageReference Include="xunit.assert" Version="2.5.0" />
   </ItemGroup>
 
 </Project>

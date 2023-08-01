@@ -6,10 +6,9 @@ using TeachingRecordSystem.Core.Services.Certificates;
 
 namespace TeachingRecordSystem.Core.Tests.Services.Certificates;
 
-[TestClass]
 public class CertificateGeneratorTests
 {
-    [Test]
+    [Fact]
     public async Task GenerateCertificate_GetsTemplateFromBlobStorageAndSetFieldValuesAsExpected()
     {
         // Arrange

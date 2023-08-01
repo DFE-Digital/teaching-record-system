@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.TestFramework;
 
-namespace TeachingRecordSystem.TestCommon;
+namespace TeachingRecordSystem.Api.Tests;
 
 public class ExecuteSqlSetupAttribute : TestSetupAttribute
 {
