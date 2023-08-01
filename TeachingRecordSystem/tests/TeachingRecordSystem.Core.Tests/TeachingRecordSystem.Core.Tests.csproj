@@ -5,7 +5,7 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <UserSecretsId>be3580c8-ff2f-4434-b8a0-c2d3a93d7dc4</UserSecretsId>
+    <UserSecretsId>TeachingRecordSystemCoreTests</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="xunit" Version="2.5.0" />
+    <PackageReference Include="Xunit.DependencyInjection" Version="8.7.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

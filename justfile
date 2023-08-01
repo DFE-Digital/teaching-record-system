@@ -91,9 +91,13 @@ set-api-secret key value:
 set-api-tests-secret key value:
   @cd {{solution-root / "tests" / "TeachingRecordSystem.Api.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
 
+# Set a configuration entry in user secrets for the Core tests project
+set-core-tests-secret key value:
+  @cd {{solution-root / "tests" / "TeachingRecordSystem.Core.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
+
 # Set a configuration entry in user secrets for the DQT tests project
 set-dqt-tests-secret key value:
-  @cd {{solution-root / "tests" / "TeachingRecordSystem.Dqt.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
+  @cd {{solution-root / "tests" / "TeachingRecordSystem.Core.Dqt.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
 
 make *ARGS:
   @make {{ARGS}}
