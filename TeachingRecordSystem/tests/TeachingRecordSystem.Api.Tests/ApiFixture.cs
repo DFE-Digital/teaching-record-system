@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Dqt;
 
 namespace TeachingRecordSystem.Api.Tests;
 

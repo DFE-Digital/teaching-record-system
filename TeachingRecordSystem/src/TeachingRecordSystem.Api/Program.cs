@@ -32,15 +32,15 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Jobs;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
+using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
-using TeachingRecordSystem.Dqt;
-using TeachingRecordSystem.Dqt.Services.CrmEntityChanges;
-using TeachingRecordSystem.Dqt.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Api;
 

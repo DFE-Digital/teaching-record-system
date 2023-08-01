@@ -3,7 +3,7 @@ using FluentValidation;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
-using TeachingRecordSystem.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V2.Validators;
 

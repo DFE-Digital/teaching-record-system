@@ -11,9 +11,9 @@ using TeachingRecordSystem.Api.V2.Responses;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Dqt;
-using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
@@ -124,9 +124,9 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                     } :
                     null,
                 HusId = request.HusId,
-                TeacherType = EnumHelper.ConvertToEnum<Requests.CreateTeacherType, Dqt.Models.CreateTeacherType>(request.TeacherType),
+                TeacherType = EnumHelper.ConvertToEnum<Requests.CreateTeacherType, Core.Dqt.Models.CreateTeacherType>(request.TeacherType),
                 RecognitionRoute = request.RecognitionRoute.HasValue ?
-                    EnumHelper.ConvertToEnum<Requests.CreateTeacherRecognitionRoute, TeachingRecordSystem.Dqt.Models.CreateTeacherRecognitionRoute>(request.RecognitionRoute.Value) :
+                    EnumHelper.ConvertToEnum<Requests.CreateTeacherRecognitionRoute, TeachingRecordSystem.Core.Dqt.Models.CreateTeacherRecognitionRoute>(request.RecognitionRoute.Value) :
                     null,
                 QtsDate = request.QtsDate,
                 InductionRequired = request.InductionRequired,

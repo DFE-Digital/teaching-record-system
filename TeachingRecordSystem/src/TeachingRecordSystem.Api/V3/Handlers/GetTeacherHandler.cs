@@ -4,8 +4,8 @@ using Optional;
 using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
-using TeachingRecordSystem.Dqt;
-using TeachingRecordSystem.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V3.Handlers;
 

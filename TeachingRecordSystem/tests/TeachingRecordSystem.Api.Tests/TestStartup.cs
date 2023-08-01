@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Dqt;
 
 namespace TeachingRecordSystem.Api.Tests;
 

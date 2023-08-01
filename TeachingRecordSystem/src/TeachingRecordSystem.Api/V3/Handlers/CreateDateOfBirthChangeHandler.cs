@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.StaticFiles;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.Validation;
-using TeachingRecordSystem.Dqt;
-using TeachingRecordSystem.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V3.Handlers;
 

@@ -1,5 +1,5 @@
 ﻿#nullable disable
-using TeachingRecordSystem.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V2.ApiModels;
 

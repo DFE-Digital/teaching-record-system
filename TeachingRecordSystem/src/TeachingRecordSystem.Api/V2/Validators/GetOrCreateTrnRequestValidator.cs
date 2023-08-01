@@ -4,7 +4,7 @@ using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt.Models;
 using CreateTeacherRecognitionRoute = TeachingRecordSystem.Api.V2.Requests.CreateTeacherRecognitionRoute;
 using CreateTeacherType = TeachingRecordSystem.Api.V2.Requests.CreateTeacherType;
 

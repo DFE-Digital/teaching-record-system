@@ -1,7 +1,7 @@
 ﻿using Medallion.Threading;
 using MediatR;
-using TeachingRecordSystem.Dqt;
-using TeachingRecordSystem.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 
