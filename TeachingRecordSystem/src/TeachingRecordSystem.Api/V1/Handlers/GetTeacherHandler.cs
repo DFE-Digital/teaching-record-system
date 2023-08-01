@@ -3,8 +3,8 @@ using MediatR;
 using TeachingRecordSystem.Api.V1.Requests;
 using TeachingRecordSystem.Api.V1.Responses;
 using TeachingRecordSystem.Api.V2.ApiModels;
-using TeachingRecordSystem.Dqt;
-using TeachingRecordSystem.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V1.Handlers;
 

@@ -2,9 +2,9 @@
 using MediatR;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.Certificates;
-using TeachingRecordSystem.Dqt;
-using TeachingRecordSystem.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V3.Handlers;
 

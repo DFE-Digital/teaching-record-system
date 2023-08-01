@@ -5,8 +5,8 @@ using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 using TeachingRecordSystem.Api.Validation;
-using TeachingRecordSystem.Dqt;
-using TeachingRecordSystem.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 

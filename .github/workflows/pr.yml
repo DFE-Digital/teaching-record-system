@@ -202,12 +202,12 @@ jobs:
 
     - name: Build
       run: dotnet build --configuration Release
-      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Dqt.Tests
+      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Dqt.Tests
 
     - name: Run tests
       uses: ./.github/workflows/actions/test
       with:
-        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Dqt.Tests
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Dqt.Tests
         report_name: "DQT test results"
         dotnet_test_args: >-
           --no-build

@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
-    <ProjectReference Include="..\TeachingRecordSystem.Dqt\TeachingRecordSystem.Dqt.csproj" />
   </ItemGroup>
 
 </Project>

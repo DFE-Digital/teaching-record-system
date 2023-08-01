@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Jobs.Scheduling;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Dqt;
+using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Api.Jobs;
 
