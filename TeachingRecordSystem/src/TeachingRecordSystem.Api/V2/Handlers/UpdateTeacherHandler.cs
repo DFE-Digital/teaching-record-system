@@ -43,6 +43,10 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
             throw new ErrorException(ErrorRegistry.MultipleTeachersFound());
         }
 
+        var firstAndMiddleNames = $"{request.FirstName.ValueOr("")} {request.MiddleName.ValueOr("")}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var firstName = firstAndMiddleNames[0];
+        var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
+
         var updateTeacherResult = await _dataverseAdapter.UpdateTeacher(new UpdateTeacherCommand()
         {
             TeacherId = teachers[0].Id,
@@ -83,7 +87,10 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
             LastName = request.LastName,
             EmailAddress = request.EmailAddress,
             GenderCode = request.GenderCode.Map(x => x.ConvertToContact_GenderCode()),
-            DateOfBirth = request.DateOfBirth.Map(x => x.ToDateTime())
+            DateOfBirth = request.DateOfBirth.Map(x => x.ToDateTime()),
+            StatedFirstName = request.FirstName,
+            StatedMiddleName = request.MiddleName,
+            StatedLastName = request.LastName,
         });
 
         if (!updateTeacherResult.Succeeded)

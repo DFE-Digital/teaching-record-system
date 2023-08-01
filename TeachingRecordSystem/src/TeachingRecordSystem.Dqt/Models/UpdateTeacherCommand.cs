@@ -10,6 +10,9 @@ public class UpdateTeacherCommand
     public string Trn { get; set; }
     public string HusId { get; set; }
     public string SlugId { get; set; }
+    public Option<string> StatedFirstName { get; set; }
+    public Option<string> StatedMiddleName { get; set; }
+    public Option<string> StatedLastName { get; set; }
     public Option<string> FirstName { get; set; }
     public Option<string> MiddleName { get; set; }
     public Option<string> LastName { get; set; }

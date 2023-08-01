@@ -391,6 +391,10 @@ public partial class DataverseAdapter
             _command.EmailAddress.MatchSome(value => contact.EMailAddress1 = value);
             _command.GenderCode.MatchSome(value => contact.GenderCode = value);
             _command.DateOfBirth.MatchSome(value => contact.BirthDate = value);
+            _command.StatedFirstName.MatchSome(value => contact.dfeta_StatedFirstName = value);
+            _command.StatedLastName.MatchSome(value => contact.dfeta_StatedLastName = value);
+            _command.StatedMiddleName.MatchSome(value => contact.dfeta_StatedMiddleName = value);
+
             return contact;
         }
 
