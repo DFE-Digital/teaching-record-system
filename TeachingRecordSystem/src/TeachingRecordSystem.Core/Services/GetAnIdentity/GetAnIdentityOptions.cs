@@ -8,10 +8,10 @@ public class GetAnIdentityOptions
     public required string TokenEndpoint { get; set; }
 
     [Required]
-    public required string ClientSecret { get; init; }
+    public required string ClientId { get; init; }
 
     [Required]
-    public required string ClientId { get; init; }
+    public required string ClientSecret { get; init; }
 
     [Required]
     public required string BaseAddress { get; init; }

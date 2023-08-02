@@ -5,7 +5,6 @@ using TeachingRecordSystem.Api.V2.ApiModels;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-[TestClass]
 public class GetTeacherTests : ApiTestBase
 {
     public GetTeacherTests(ApiFixture apiFixture)
@@ -13,7 +12,7 @@ public class GetTeacherTests : ApiTestBase
     {
     }
 
-    [Test]
+    [Theory]
     [InlineData("123456")]
     [InlineData("12345678")]
     [InlineData("xxx")]
@@ -29,14 +28,14 @@ public class GetTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
     }
 
-    [Test]
+    [Fact]
     public async Task Given_no_match_found_returns_notfound()
     {
         // Arrange
         var trn = "1234567";
 
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(trn, It.IsAny<string[]>(), true))
             .ReturnsAsync((Contact)null);
 
@@ -49,7 +48,7 @@ public class GetTeacherTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Given_match_returns_ok_and_returns_active_and_inactive_itt_records()
     {
         // Arrange
@@ -128,19 +127,19 @@ public class GetTeacherTests : ApiTestBase
         inActiveItt.Attributes.Add($"establishment.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, Guid.NewGuid()));
         inActiveItt.Attributes.Add($"establishment.{Account.Fields.dfeta_UKPRN}", new AliasedValue(Account.EntityLogicalName, Account.Fields.dfeta_UKPRN, ittProviderUkprn));
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(teacherId, /* columnNames: */ It.IsAny<string[]>()))
             .ReturnsAsync(new[] { qtsRegistration });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetEarlyYearsStatus(earlyYearsStatusId))
             .ReturnsAsync(earlyYearsStatus);
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
                 teacherId,
                 /* columnNames: */ It.IsAny<string[]>(),
@@ -208,7 +207,7 @@ public class GetTeacherTests : ApiTestBase
             });
     }
 
-    [Test]
+    [Fact]
     public async Task Given_match_returns_ok()
     {
         // Arrange
@@ -273,19 +272,19 @@ public class GetTeacherTests : ApiTestBase
         itt.Attributes.Add($"establishment.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, Guid.NewGuid()));
         itt.Attributes.Add($"establishment.{Account.Fields.dfeta_UKPRN}", new AliasedValue(Account.EntityLogicalName, Account.Fields.dfeta_UKPRN, ittProviderUkprn));
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(teacherId, /* columnNames: */ It.IsAny<string[]>()))
             .ReturnsAsync(new[] { qtsRegistration });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetEarlyYearsStatus(earlyYearsStatusId))
             .ReturnsAsync(earlyYearsStatus);
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
                 teacherId,
                 /* columnNames: */ It.IsAny<string[]>(),

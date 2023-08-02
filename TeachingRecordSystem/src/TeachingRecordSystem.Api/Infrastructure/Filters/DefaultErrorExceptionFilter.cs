@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Api.Validation;
 
-namespace TeachingRecordSystem.Api.Filters;
+namespace TeachingRecordSystem.Api.Infrastructure.Filters;
 
 public class DefaultErrorExceptionFilter : IExceptionFilter
 {

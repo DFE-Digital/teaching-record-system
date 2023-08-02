@@ -21,7 +21,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
 {
     private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 
-    private readonly TrsDbContext _TrsDbContext;
+    private readonly TrsDbContext _trsDbContext;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICurrentClientProvider _currentClientProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
@@ -34,7 +34,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
         IDistributedLockProvider distributedLockProvider,
         IGetAnIdentityApiClient identityApiClient)
     {
-        _TrsDbContext = TrsDbContext;
+        _trsDbContext = TrsDbContext;
         _dataverseAdapter = dataverseAdapter;
         _currentClientProvider = currentClientProvider;
         _distributedLockProvider = distributedLockProvider;
@@ -53,7 +53,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId), _lockTimeout) :
             NoopAsyncDisposable.Instance;
 
-        var trnRequest = await _TrsDbContext.TrnRequests
+        var trnRequest = await _trsDbContext.TrnRequests
             .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == request.RequestId);
 
         bool wasCreated;
@@ -139,7 +139,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 throw CreateValidationExceptionFromFailedReasons(createTeacherResult.FailedReasons);
             }
 
-            _TrsDbContext.TrnRequests.Add(new TrnRequest()
+            _trsDbContext.TrnRequests.Add(new TrnRequest()
             {
                 ClientId = currentClientId,
                 RequestId = request.RequestId,
@@ -147,7 +147,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 LinkedToIdentity = false
             });
 
-            await _TrsDbContext.SaveChangesAsync();
+            await _trsDbContext.SaveChangesAsync();
 
             wasCreated = true;
             trn = createTeacherResult.Trn;

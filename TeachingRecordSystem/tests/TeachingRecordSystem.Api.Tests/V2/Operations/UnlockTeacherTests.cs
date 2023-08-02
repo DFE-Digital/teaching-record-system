@@ -3,20 +3,19 @@ using System.Net;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-[TestClass]
 public class UnlockTeacherTests : ApiTestBase
 {
     public UnlockTeacherTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Test]
+    [Fact]
     public async Task Given_a_teacher_that_does_not_exist_returns_notfound()
     {
         // Arrange
         var teacherId = Guid.NewGuid();
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
             .ReturnsAsync((Contact)null);
 
@@ -29,13 +28,13 @@ public class UnlockTeacherTests : ApiTestBase
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Given_a_teacher_that_does_exist_and_is_locked_returns_ok()
     {
         // Arrange
         var teacherId = Guid.NewGuid();
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
             .ReturnsAsync(new Contact()
             {
@@ -44,7 +43,7 @@ public class UnlockTeacherTests : ApiTestBase
                 dfeta_loginfailedcounter = 3
             });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.UnlockTeacherRecord(teacherId))
             .ReturnsAsync(true)
             .Verifiable();
@@ -63,7 +62,7 @@ public class UnlockTeacherTests : ApiTestBase
             });
     }
 
-    [Test]
+    [Theory]
     [InlineData(null)]
     [InlineData(0)]
     [InlineData(1)]
@@ -73,7 +72,7 @@ public class UnlockTeacherTests : ApiTestBase
         // Arrange
         var teacherId = Guid.NewGuid();
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
             .ReturnsAsync(new Contact()
             {
@@ -82,7 +81,7 @@ public class UnlockTeacherTests : ApiTestBase
                 dfeta_loginfailedcounter = loginFailedCounter
             });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.UnlockTeacherRecord(teacherId))
             .ReturnsAsync(true)
             .Verifiable();
@@ -101,14 +100,14 @@ public class UnlockTeacherTests : ApiTestBase
             });
     }
 
-    [Test]
+    [Fact]
     public async Task Given_a_teacher_that_has_activesanctions_returns_error()
     {
         // Arrange
         var teacherId = Guid.NewGuid();
         var teacher = new Contact() { dfeta_ActiveSanctions = true };
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(teacher);
 

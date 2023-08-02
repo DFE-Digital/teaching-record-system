@@ -4,14 +4,13 @@ using Microsoft.Xrm.Sdk;
 
 namespace TeachingRecordSystem.Api.Tests.Filters;
 
-[TestClass]
 public class CrmServiceProtectionFaultExceptionFilterTests : ApiTestBase
 {
     public CrmServiceProtectionFaultExceptionFilterTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Test]
+    [Theory]
     [InlineData("number_of_requests")]
     [InlineData("execution_time")]
     [InlineData("concurrent_requests")]

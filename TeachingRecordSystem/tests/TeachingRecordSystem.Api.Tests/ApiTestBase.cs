@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Json;
@@ -12,9 +13,12 @@ namespace TeachingRecordSystem.Api.Tests;
 
 public abstract class ApiTestBase
 {
+    private readonly TestScopedServices _testServices;
+
     protected ApiTestBase(ApiFixture apiFixture)
     {
         ApiFixture = apiFixture;
+        _testServices = TestScopedServices.Reset();
 
         {
             var key = apiFixture.Services.GetRequiredService<IConfiguration>()["ApiClients:tests:ApiKey:0"];
@@ -25,19 +29,19 @@ public abstract class ApiTestBase
 
     public ApiFixture ApiFixture { get; }
 
-    public Mock<ICertificateGenerator> CertificateGenerator => Mock.Get(TestInfo.Current.TestServices.GetRequiredService<ICertificateGenerator>());
+    public Mock<ICertificateGenerator> CertificateGeneratorMock => _testServices.CertificateGeneratorMock;
 
     public string ClientId { get; } = "tests";
 
-    public Mock<IDataverseAdapter> DataverseAdapter => Mock.Get(TestInfo.Current.TestServices.GetRequiredService<IDataverseAdapter>());
+    public Mock<IDataverseAdapter> DataverseAdapterMock => _testServices.DataverseAdapterMock;
 
-    public TestableClock Clock => (TestableClock)ApiFixture.Services.GetRequiredService<IClock>();
+    public TestableClock Clock => _testServices.Clock;
 
-    public Mock<IOptions<GetAnIdentityOptions>> GetAnIdentityOptions => Mock.Get(TestInfo.Current.TestServices.GetRequiredService<IOptions<GetAnIdentityOptions>>());
+    public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => _testServices.GetAnIdentityApiClientMock;
+
+    public IOptions<GetAnIdentityOptions> GetAnIdentityOptions => _testServices.GetAnIdentityOptions;
 
     public HttpClient HttpClientWithApiKey { get; }
-
-    public Mock<IGetAnIdentityApiClient> IdentityApiClient => Mock.Get(TestInfo.Current.TestServices.GetRequiredService<IGetAnIdentityApiClient>());
 
     public JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().Configure());
@@ -53,11 +57,13 @@ public abstract class ApiTestBase
 
         var jwtHandler = new JwtSecurityTokenHandler();
 
+        var signingCredentials = ApiFixture.JwtSigningCredentials;
+
         var tokenDescriptor = new SecurityTokenDescriptor()
         {
             Subject = subject,
             Expires = DateTime.UtcNow.AddDays(1),
-            SigningCredentials = ApiFixture.JwtSigningCredentials
+            SigningCredentials = signingCredentials
         };
 
         var accessToken = jwtHandler.CreateEncodedJwt(tokenDescriptor);
@@ -70,8 +76,8 @@ public abstract class ApiTestBase
 
     public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {
-        await using var scope = ApiFixture.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<TrsDbContext>();
+        var dbContextFactory = ApiFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
         return await action(dbContext);
     }
 

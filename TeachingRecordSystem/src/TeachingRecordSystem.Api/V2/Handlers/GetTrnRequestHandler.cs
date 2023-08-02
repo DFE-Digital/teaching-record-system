@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.Api.V2.Handlers;
 
 public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInfo>
 {
-    private readonly TrsDbContext _TrsDbContext;
+    private readonly TrsDbContext _trsDbContext;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICurrentClientProvider _currentClientProvider;
 
@@ -21,7 +21,7 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
         IDataverseAdapter dataverseAdapter,
         ICurrentClientProvider currentClientProvider)
     {
-        _TrsDbContext = TrsDbContext;
+        _trsDbContext = TrsDbContext;
         _dataverseAdapter = dataverseAdapter;
         _currentClientProvider = currentClientProvider;
     }
@@ -30,7 +30,7 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
     {
         var currentClientId = _currentClientProvider.GetCurrentClientId();
 
-        var trnRequest = await _TrsDbContext.TrnRequests
+        var trnRequest = await _trsDbContext.TrnRequests
             .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == request.RequestId);
 
         if (trnRequest == null)

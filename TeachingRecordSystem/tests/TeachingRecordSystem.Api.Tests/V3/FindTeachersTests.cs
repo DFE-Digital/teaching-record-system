@@ -1,6 +1,5 @@
 ﻿namespace TeachingRecordSystem.Api.Tests.V3;
 
-[TestClass]
 public class FindTeachersTests : ApiTestBase
 {
     public FindTeachersTests(ApiFixture apiFixture)
@@ -8,7 +7,7 @@ public class FindTeachersTests : ApiTestBase
     {
     }
 
-    [Test]
+    [Theory]
     [InlineData("")]
     [InlineData("BadFindBy")]
     public async Task Get_InvalidFindBy_ReturnsError(string findBy)
@@ -28,7 +27,7 @@ public class FindTeachersTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, "findBy", $"'{findBy}' is not valid.");
     }
 
-    [Test]
+    [Theory]
     [InlineData("", "1990-01-01", "lastName", "A value is required when findBy is 'LastNameAndDateOfBirth'.")]
     [InlineData("Smith", "", "dateOfBirth", "A value is required when findBy is 'LastNameAndDateOfBirth'.")]
     public async Task Get_MissingPropertiesForFindBy_ReturnsError(
@@ -49,7 +48,7 @@ public class FindTeachersTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, expectedErrorPropertyName, expectedErrorMessage);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequest_ReturnsMappedContacts()
     {
         // Arrange
@@ -80,14 +79,14 @@ public class FindTeachersTests : ApiTestBase
             BirthDate = Faker.Identification.DateOfBirth()
         };
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachersByLastNameAndDateOfBirth(
                 lastName,
                 DateOnly.Parse(dateOfBirth),
                 /* columnNames: */ It.IsAny<string[]>()))
             .ReturnsAsync(new[] { resultWithoutStatedNames, resultWithStatedNames });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetSanctionsByContactIds(It.IsAny<IEnumerable<Guid>>(), /* liveOnly: */ true))
             .ReturnsAsync(new Dictionary<Guid, string[]>()
             {

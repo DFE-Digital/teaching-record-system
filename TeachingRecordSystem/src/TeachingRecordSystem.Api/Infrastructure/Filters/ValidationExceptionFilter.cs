@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
-namespace TeachingRecordSystem.Api.Filters;
+namespace TeachingRecordSystem.Api.Infrastructure.Filters;
 
 public class ValidationExceptionFilter : IExceptionFilter
 {

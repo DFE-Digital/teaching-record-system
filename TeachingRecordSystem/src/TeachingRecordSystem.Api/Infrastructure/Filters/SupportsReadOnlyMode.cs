@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace TeachingRecordSystem.Api.Filters;
+namespace TeachingRecordSystem.Api.Infrastructure.Filters;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
 public class SupportsReadOnlyModeAttribute : Attribute, IActionModelConvention, IControllerModelConvention

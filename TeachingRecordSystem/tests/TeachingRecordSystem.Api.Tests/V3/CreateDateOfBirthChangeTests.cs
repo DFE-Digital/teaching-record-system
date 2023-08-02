@@ -3,7 +3,7 @@ using JustEat.HttpClientInterception;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
-[TestClass]
+[Collection(nameof(DisableParallelization))]  // Configures EvidenceFilesHttpClient
 public class CreateDateOfBirthChangeTests : ApiTestBase
 {
     public CreateDateOfBirthChangeTests(ApiFixture apiFixture)
@@ -11,7 +11,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
     {
     }
 
-    [Test]
+    [Theory]
     [InlineData(null, "1990-07-01", "evidence.jpg", "https://place.com/evidence.jpg")]
     [InlineData("1234567", null, "evidence.jpg", "https://place.com/evidence.jpg")]
     [InlineData("1234567", "1990-07-01", "evidence.jpg", "https://place.com/evidence.jpg")]
@@ -44,7 +44,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
@@ -56,7 +56,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync((Contact?)null);
 
@@ -78,7 +78,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         await AssertEx.JsonResponseIsError(response, 10001, StatusCodes.Status400BadRequest);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
@@ -90,7 +90,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(new Contact()
             {
@@ -116,7 +116,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         await AssertEx.JsonResponseIsError(response, 10028, StatusCodes.Status400BadRequest);
     }
 
-    [Test]
+    [Fact]
     public async Task Post_ValidRequest_CreatesIncident()
     {
         // Arrange
@@ -128,7 +128,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(new Contact()
             {
@@ -170,7 +170,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         // Assert
         Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode);
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Verify(mock => mock.CreateDateOfBirthChangeIncident(It.Is<CreateDateOfBirthChangeIncidentCommand>(cmd =>
                 cmd.Trn == trn &&
                 cmd.ContactId == contactId &&

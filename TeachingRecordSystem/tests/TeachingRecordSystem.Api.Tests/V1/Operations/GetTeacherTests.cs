@@ -3,7 +3,6 @@ using TeachingRecordSystem.Api.Properties;
 
 namespace TeachingRecordSystem.Api.Tests.V1.Operations;
 
-[TestClass]
 public class GetTeacherTests : ApiTestBase
 {
     public GetTeacherTests(ApiFixture apiFixture)
@@ -11,7 +10,7 @@ public class GetTeacherTests : ApiTestBase
     {
     }
 
-    [Test]
+    [Theory]
     [InlineData("123456")]
     [InlineData("12345678")]
     [InlineData("xxx")]
@@ -28,7 +27,7 @@ public class GetTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
     }
 
-    [Test]
+    [Theory]
     [InlineData("xxx")]
     public async Task Given_invalid_birthdate_returns_error(string birthDate)
     {
@@ -43,14 +42,14 @@ public class GetTeacherTests : ApiTestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, "birthdate", expectedError: $"The value '{birthDate}' is not valid for BirthDate.");
     }
 
-    [Test]
+    [Fact]
     public async Task Given_no_match_found_returns_notfound()
     {
         // Arrange
         var trn = "1234567";
         var birthDate = "1990-04-01";
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
             .ReturnsAsync(Array.Empty<Contact>());
 
@@ -63,7 +62,7 @@ public class GetTeacherTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Given_match_returns_ok()
     {
         // Arrange
@@ -81,7 +80,7 @@ public class GetTeacherTests : ApiTestBase
             }
         };
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
             .ReturnsAsync(new[] { contact });
 
@@ -94,7 +93,7 @@ public class GetTeacherTests : ApiTestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Given_multiple_matches_returns_match_on_TRN()
     {
         // Arrange
@@ -126,7 +125,7 @@ public class GetTeacherTests : ApiTestBase
             }
         };
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
             .ReturnsAsync(new[] { contactWithMatchingTrn, contactWithMatchingNino });
 

@@ -562,7 +562,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         dfeta_qtsregistration[]? qtsRegistrations = null,
         string[]? sanctions = null)
     {
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetSubjectByTitle("Change of Name", It.IsAny<string[]>()))
             .ReturnsAsync(new Subject()
             {
@@ -570,7 +570,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 Title = "Change of Name"
             });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetSubjectByTitle("Change of Date of Birth", It.IsAny<string[]>()))
             .ReturnsAsync(new Subject()
             {
@@ -578,11 +578,11 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 Title = "Change of Date of Birth"
             });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
                 contact.Id,
                 It.IsAny<string[]>(),
@@ -592,7 +592,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 false))
             .ReturnsAsync(itt != null ? new[] { itt } : Array.Empty<dfeta_initialteachertraining>());
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetInductionByTeacher(
                 contact.Id,
                 It.IsAny<string[]>(),
@@ -601,7 +601,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 It.IsAny<string[]>()))
             .ReturnsAsync((induction, inductionPeriods));
 
-        DataverseAdapter
+        DataverseAdapterMock
              .Setup(mock => mock.GetQualificationsForTeacher(
                  contact.Id,
                  It.IsAny<string[]>(),
@@ -610,11 +610,11 @@ public abstract class GetTeacherTestBase : ApiTestBase
                  It.IsAny<string[]>()))
              .ReturnsAsync(qualifications ?? Array.Empty<dfeta_qualification>());
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetIncidentsByContactId(contact.Id, IncidentState.Active, It.IsAny<string[]>()))
             .ReturnsAsync(incidents ?? Array.Empty<Incident>());
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherStatus(
                 It.Is<string>(s => s == QtsAwardedInWalesTeacherStatusValue),
                 It.IsAny<RequestBuilder>()))
@@ -623,7 +623,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 Id = _qtsAwardedInWalesTeacherStatusId
             });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherStatus(
                 It.Is<string>(s => s != QtsAwardedInWalesTeacherStatusValue),
                 It.IsAny<RequestBuilder>()))
@@ -632,13 +632,13 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 Id = Guid.NewGuid()
             });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(
                 contact.Id,
                 It.IsAny<string[]>()))
             .ReturnsAsync(qtsRegistrations ?? Array.Empty<dfeta_qtsregistration>());
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetSanctionsByContactIds(new[] { contact.Id }, /* liveOnly: */ true))
             .ReturnsAsync(new Dictionary<Guid, string[]>()
             {

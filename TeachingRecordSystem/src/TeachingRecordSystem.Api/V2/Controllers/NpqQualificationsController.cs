@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using TeachingRecordSystem.Api.Filters;
+using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.V2.Requests;
 
 namespace TeachingRecordSystem.Api.V2.Controllers;

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Xrm.Sdk;
 
-namespace TeachingRecordSystem.Api.Filters;
+namespace TeachingRecordSystem.Api.Infrastructure.Filters;
 
 public class CrmServiceProtectionFaultExceptionFilter : IExceptionFilter
 {
