@@ -4,3 +4,4 @@ fetch_config.rb
 docs/tmp
 docs/build
 docs/source/dqt-api.yaml
+**/.DS_Store
