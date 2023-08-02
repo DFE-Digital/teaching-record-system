@@ -563,7 +563,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         string[]? sanctions = null)
     {
         DataverseAdapterMock
-            .Setup(mock => mock.GetSubjectByTitle("Change of Name", It.IsAny<string[]>()))
+            .Setup(mock => mock.GetSubjectByTitle("Change of Name"))
             .ReturnsAsync(new Subject()
             {
                 Id = _changeOfNameSubjectId,
@@ -571,7 +571,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             });
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetSubjectByTitle("Change of Date of Birth", It.IsAny<string[]>()))
+            .Setup(mock => mock.GetSubjectByTitle("Change of Date of Birth"))
             .ReturnsAsync(new Subject()
             {
                 Id = _changeOfDateOfBirthSubjectId,

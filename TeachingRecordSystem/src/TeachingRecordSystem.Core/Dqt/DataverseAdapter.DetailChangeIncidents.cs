@@ -6,7 +6,7 @@ public partial class DataverseAdapter
 {
     public async Task<Guid> CreateNameChangeIncident(CreateNameChangeIncidentCommand command)
     {
-        var subject = await GetSubjectByTitle("Change of Name", columnNames: Array.Empty<string>());
+        var subject = await GetSubjectByTitle("Change of Name");
 
         var incident = new Incident()
         {
@@ -57,7 +57,7 @@ public partial class DataverseAdapter
 
     public async Task<Guid> CreateDateOfBirthChangeIncident(CreateDateOfBirthChangeIncidentCommand command)
     {
-        var subject = await GetSubjectByTitle("Change of Date of Birth", columnNames: Array.Empty<string>());
+        var subject = await GetSubjectByTitle("Change of Date of Birth");
 
         var incident = new Incident()
         {

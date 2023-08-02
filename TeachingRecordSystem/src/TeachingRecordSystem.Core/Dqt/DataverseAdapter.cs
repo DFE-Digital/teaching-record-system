@@ -1291,7 +1291,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
     }
 
-    public async Task<Subject> GetSubjectByTitle(string title, string[] columnNames)
+    public async Task<Subject> GetSubjectByTitle(string title)
     {
         return await _cache.GetOrCreateAsync(CacheKeys.GetSubjectTitleKey(title), async _ =>
         {
@@ -1300,7 +1300,7 @@ public partial class DataverseAdapter : IDataverseAdapter
 
             var query = new QueryExpression(Subject.EntityLogicalName)
             {
-                ColumnSet = new(columnNames),
+                ColumnSet = new(allColumns: true),
                 Criteria = filter
             };
 

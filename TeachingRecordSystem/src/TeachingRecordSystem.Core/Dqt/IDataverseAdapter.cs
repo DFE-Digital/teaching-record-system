@@ -90,7 +90,7 @@ public interface IDataverseAdapter
 
     Task<Guid> CreateDateOfBirthChangeIncident(CreateDateOfBirthChangeIncidentCommand command);
 
-    Task<Subject> GetSubjectByTitle(string title, string[] columnNames);
+    Task<Subject> GetSubjectByTitle(string title);
 
     Task<Incident[]> GetIncidentsByContactId(Guid contactId, IncidentState? state, string[] columnNames);
 

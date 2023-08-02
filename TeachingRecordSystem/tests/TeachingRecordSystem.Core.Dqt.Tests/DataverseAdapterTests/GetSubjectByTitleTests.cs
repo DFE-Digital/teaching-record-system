@@ -24,7 +24,7 @@ public class GetSubjectByTitleTests : IAsyncLifetime
         var title = "Change of Name";
 
         // Act
-        var result = await _dataverseAdapter.GetSubjectByTitle(title, columnNames: new[] { Subject.Fields.Title });
+        var result = await _dataverseAdapter.GetSubjectByTitle(title);
 
         // Assert
         Assert.NotNull(result);
@@ -38,7 +38,7 @@ public class GetSubjectByTitleTests : IAsyncLifetime
         var subjectCode = "XXXX";
 
         // Act
-        var result = await _dataverseAdapter.GetSubjectByTitle(subjectCode, columnNames: new[] { Subject.Fields.Title });
+        var result = await _dataverseAdapter.GetSubjectByTitle(subjectCode);
 
         // Assert
         Assert.Null(result);
