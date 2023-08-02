@@ -3,10 +3,12 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using MediatR;
+using Medallion.Threading;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks.Messages;
 using TeachingRecordSystem.Api.Infrastructure.Json;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
@@ -35,10 +37,19 @@ public static class GetAnIdentityEndpoints
 
     public static JsonSerializerOptions SerializerOptions { get; }
 
+    private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
+
     public static IEndpointConventionBuilder MapIdentityEndpoints(this IEndpointRouteBuilder builder)
     {
         return builder.MapGroup("/identity")
-            .MapPost("", async (HttpContext context, IOptions<GetAnIdentityOptions> identityOptions, IMediator mediator) =>
+            .MapPost(
+                "",
+                async (
+                    HttpContext context,
+                    IOptions<GetAnIdentityOptions> identityOptions,
+                    IDataverseAdapter dataverseAdapter,
+                    IDistributedLockProvider distributedLockProvider
+                ) =>
             {
                 // Verify this was sent from identity
                 if (!context.Request.Headers.TryGetValue("X-Hub-Signature-256", out var signature))
@@ -59,35 +70,56 @@ public static class GetAnIdentityEndpoints
 
                 var notification = JsonSerializer.Deserialize<NotificationEnvelope>(body, SerializerOptions)!;
 
+                User? user = null;
+
                 if (notification.Message is UserUpdatedMessage userUpdatedMessage)
                 {
-                    var request = new UserUpdatedRequest()
-                    {
-                        UserId = userUpdatedMessage.User.UserId,
-                        Trn = userUpdatedMessage.User.Trn,
-                        EmailAddress = userUpdatedMessage.User.EmailAddress,
-                        MobileNumber = userUpdatedMessage.User.MobileNumber,
-                        UpdateTimeUtc = notification.TimeUtc,
-                        ChangedTrn = userUpdatedMessage.Changes.Trn
-                    };
-
-                    await mediator.Send(request);
+                    user = userUpdatedMessage.User;
                 }
                 else if (notification.Message is UserCreatedMessage userCreatedMessage)
                 {
-                    var request = new UserCreatedRequest()
-                    {
-                        UserId = userCreatedMessage.User.UserId,
-                        Trn = userCreatedMessage.User.Trn,
-                        EmailAddress = userCreatedMessage.User.EmailAddress,
-                        MobileNumber = userCreatedMessage.User.MobileNumber,
-                        UpdateTimeUtc = notification.TimeUtc
-                    };
-
-                    await mediator.Send(request);
+                    user = userCreatedMessage.User;
+                }
+                else
+                {
+                    return CreateResult();
                 }
 
-                return Results.NoContent();
+                if (user.Trn is null)
+                {
+                    if (notification.Message is UserUpdatedMessage { Changes: { Trn: { HasValue: true } } })
+                    {
+                        // TRN has been removed
+                        await dataverseAdapter.ClearTeacherIdentityInfo(user.UserId, notification.TimeUtc);
+                    }
+
+                    return CreateResult();
+                }
+
+                await using var trnLock = await distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Trn(user.Trn), _lockTimeout);
+
+                var teacher = await dataverseAdapter.GetTeacherByTrn(
+                    user.Trn,
+                    columnNames: new[]
+                    {
+                        Contact.Fields.dfeta_LastIdentityUpdate
+                    });
+
+                if (notification.TimeUtc > (teacher.dfeta_LastIdentityUpdate ?? DateTime.MinValue))
+                {
+                    await dataverseAdapter.UpdateTeacherIdentityInfo(new UpdateTeacherIdentityInfoCommand()
+                    {
+                        TeacherId = teacher.Id,
+                        IdentityUserId = user.UserId,
+                        EmailAddress = user.EmailAddress,
+                        MobilePhone = user.MobileNumber,
+                        UpdateTimeUtc = notification.TimeUtc
+                    });
+                }
+
+                return CreateResult();
+
+                static IResult CreateResult() => Results.NoContent();
             });
     }
 }
