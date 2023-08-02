@@ -3,18 +3,17 @@ using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-[TestClass]
 public class FindTeachersTests : ApiTestBase
 {
     public FindTeachersTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Test]
+    [Fact]
     public async Task Given_no_results_returns_ok()
     {
         // Arrange
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(Array.Empty<Contact>());
 
@@ -33,7 +32,7 @@ public class FindTeachersTests : ApiTestBase
             expectedStatusCode: StatusCodes.Status200OK);
     }
 
-    [Test]
+    [Fact]
     public async Task Given_search_returns_a_result_returns_expected_response()
     {
         // Arrange
@@ -48,7 +47,7 @@ public class FindTeachersTests : ApiTestBase
             dfeta_TRN = "someReference"
         };
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
@@ -81,11 +80,11 @@ public class FindTeachersTests : ApiTestBase
             expectedStatusCode: StatusCodes.Status200OK);
     }
 
-    [Test]
+    [Fact]
     public async Task Given_find_with_no_search_parameters_return_empty_collection()
     {
         // Arrange
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync((Contact[])null);
 
@@ -104,7 +103,7 @@ public class FindTeachersTests : ApiTestBase
             expectedStatusCode: StatusCodes.Status200OK);
     }
 
-    [Test]
+    [Theory]
     [InlineData("someProvider", "")]
     [InlineData(null, "1005811506")]
     public async Task Given_search_with_valid_provider_returns_results(string providerName, string providerUkprn)
@@ -123,15 +122,15 @@ public class FindTeachersTests : ApiTestBase
             dfeta_TRN = "someReference"
         };
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetIttProviderOrganizationsByName(It.IsAny<string>(), It.IsAny<string[]>(), /*activeOnly: */false))
             .ReturnsAsync(new[] { account });
 
-        DataverseAdapter
+        DataverseAdapterMock
              .Setup(mock => mock.GetIttProviderOrganizationsByUkprn(It.IsAny<string>(), It.IsAny<string[]>(), /*activeOnly: */false))
              .ReturnsAsync(new[] { account });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
@@ -166,7 +165,7 @@ public class FindTeachersTests : ApiTestBase
             expectedStatusCode: StatusCodes.Status200OK);
     }
 
-    [Test]
+    [Fact]
     public async Task Given_both_ukprn_and_provider_name_are_specified_returns_error()
     {
         // Arrange
@@ -181,7 +180,7 @@ public class FindTeachersTests : ApiTestBase
             dfeta_TRN = "someReference"
         };
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
@@ -196,12 +195,12 @@ public class FindTeachersTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Given_search_returns_a_result_with_no_active_sanctions_returns_expected_response()
     {
         // Arrange
         var contact1 = new Contact() { FirstName = "test", MiddleName = "tester", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference", dfeta_ActiveSanctions = null };
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
@@ -234,7 +233,7 @@ public class FindTeachersTests : ApiTestBase
             expectedStatusCode: StatusCodes.Status200OK);
     }
 
-    [Test]
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task Given_search_returns_a_result_with_activesanctions_set_returns_expected_response(bool? activeSanctions)
@@ -252,7 +251,7 @@ public class FindTeachersTests : ApiTestBase
             dfeta_ActiveSanctions = activeSanctions
         };
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 

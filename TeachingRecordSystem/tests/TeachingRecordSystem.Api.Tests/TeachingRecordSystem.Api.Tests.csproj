@@ -19,18 +19,22 @@
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.16.0" />
     <PackageReference Include="Faker.Net" Version="2.0.154" />
-    <PackageReference Include="Fixie.TestAdapter" Version="3.3.0" />
     <PackageReference Include="JustEat.HttpClientInterception" Version="4.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.8" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="Moq" Version="4.18.4" />
-    <PackageReference Include="xunit.assert" Version="2.5.0" />
+    <PackageReference Include="xunit" Version="2.5.0" />
+    <PackageReference Include="Xunit.DependencyInjection" Version="8.7.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.Api\TeachingRecordSystem.Api.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj" />
-    <ProjectReference Include="..\TeachingRecordSystem.TestFramework\TeachingRecordSystem.TestFramework.csproj" />
   </ItemGroup>
 
 </Project>

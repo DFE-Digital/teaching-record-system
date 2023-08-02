@@ -36,16 +36,18 @@ public class ApiFixture : WebApplicationFactory<Program>
         // i.e. Program.cs and that has a dependency on IConfiguration
         builder.UseConfiguration(_configuration);
 
-        builder.ConfigureServices(services =>
+        builder.ConfigureServices((context, services) =>
         {
+            DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
+
             // Add controllers defined in this test assembly
             services.AddMvc().AddApplicationPart(typeof(ApiFixture).Assembly);
 
-            services.AddTestScoped<IDataverseAdapter>();
-            services.AddTestScoped<IGetAnIdentityApiClient>();
-            services.AddTestScoped<IOptions<GetAnIdentityOptions>>();
-            services.AddTestScoped<ICertificateGenerator>();
-            services.AddTestScoped<IClock>();
+            services.AddTestScoped<IClock>(tss => tss.Clock);
+            services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
+            services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClientMock.Object);
+            services.AddTestScoped<IOptions<GetAnIdentityOptions>>(tss => tss.GetAnIdentityOptions);
+            services.AddTestScoped<ICertificateGenerator>(tss => tss.CertificateGeneratorMock.Object);
 
             services.AddHttpClient("EvidenceFiles")
                 .AddHttpMessageHandler(_ => EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())
@@ -78,9 +80,9 @@ public class ApiFixture : WebApplicationFactory<Program>
 
 file static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddTestScoped<T>(this IServiceCollection services)
+    public static IServiceCollection AddTestScoped<T>(this IServiceCollection services, Func<TestScopedServices, T> resolveService)
         where T : class
     {
-        return services.AddTransient<T>(_ => TestInfo.Current.TestServices.GetRequiredService<T>());
+        return services.AddTransient<T>(_ => resolveService(TestScopedServices.GetCurrent()));
     }
 }

@@ -4,10 +4,9 @@ using TeachingRecordSystem.Api.V1.Handlers;
 
 namespace TeachingRecordSystem.Api.Tests.V1.UnitTests;
 
-[TestClass]
 public class GetTeacherHandlerTests
 {
-    [Test]
+    [Fact]
     public void Given_a_contact_the_details_are_mapped()
     {
         var fullName = "Joe Bloggs";
@@ -40,7 +39,7 @@ public class GetTeacherHandlerTests
         Assert.Equal(trn, response.Trn);
     }
 
-    [Test]
+    [Fact]
     public void Given_a_contact_with_qualified_teacher_status_the_details_are_mapped()
     {
         var qualifiedTeacherStatusName = "Qualified";
@@ -81,7 +80,7 @@ public class GetTeacherHandlerTests
         Assert.Equal(dfeta_qtsregistrationState.Active.ToString(), qualifiedTeacherStatus.StateName);
     }
 
-    [Test]
+    [Fact]
     public void Given_a_contact_with_induction_the_details_are_mapped()
     {
         var completionDate = new DateTime(2021, 1, 1);
@@ -125,7 +124,7 @@ public class GetTeacherHandlerTests
         Assert.Equal(dfeta_inductionState.Active.ToString(), induction.StateName);
     }
 
-    [Test]
+    [Fact]
     public void Given_a_contact_with_initial_teacher_training_the_details_are_mapped()
     {
         var programmeEndDate = new DateTime(2021, 1, 1);
@@ -204,7 +203,7 @@ public class GetTeacherHandlerTests
         Assert.Equal(subject3Code, initialTeacherTraining.Subject3Code);
     }
 
-    [Test]
+    [Fact]
     public void Given_a_contact_with_qualifications_the_details_are_mapped()
     {
         var qualification1Subject1 = "Subject 1";

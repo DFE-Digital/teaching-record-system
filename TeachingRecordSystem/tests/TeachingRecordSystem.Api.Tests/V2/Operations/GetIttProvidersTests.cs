@@ -2,14 +2,13 @@
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-[TestClass]
 public class GetIttProvidersTests : ApiTestBase
 {
     public GetIttProvidersTests(ApiFixture apiFixture) : base(apiFixture)
     {
     }
 
-    [Test]
+    [Fact]
     public async Task Given_request_returns_list_of_itt_providers()
     {
         // Arrange
@@ -25,7 +24,7 @@ public class GetIttProvidersTests : ApiTestBase
             dfeta_UKPRN = "2345678"
         };
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetIttProviders(false))
             .ReturnsAsync(new[] { provider1, provider2 });
 

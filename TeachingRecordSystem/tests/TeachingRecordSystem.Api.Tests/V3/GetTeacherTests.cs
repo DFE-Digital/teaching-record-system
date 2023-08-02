@@ -1,6 +1,5 @@
 ﻿namespace TeachingRecordSystem.Api.Tests.V3;
 
-[TestClass]
 public class GetTeacherTests : GetTeacherTestBase
 {
     public GetTeacherTests(ApiFixture apiFixture)
@@ -8,7 +7,7 @@ public class GetTeacherTests : GetTeacherTestBase
     {
     }
 
-    [Test]
+    [Fact]
     public async Task Get_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
@@ -24,7 +23,7 @@ public class GetTeacherTests : GetTeacherTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequest_ReturnsExpectedResponse()
     {
         var trn = "1234567";
@@ -34,7 +33,7 @@ public class GetTeacherTests : GetTeacherTestBase
         return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, trn, qualifiedInWales: false, expectQtsCertificateUrl: true, expectEysCertificateUrl: true);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse()
     {
         var trn = "1234567";
@@ -44,7 +43,7 @@ public class GetTeacherTests : GetTeacherTestBase
         return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, trn, qualifiedInWales: true, expectQtsCertificateUrl: false, expectEysCertificateUrl: true);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequestForContactWithMultiWordFirstName_ReturnsExpectedResponse()
     {
         var trn = "1234567";
@@ -54,7 +53,7 @@ public class GetTeacherTests : GetTeacherTestBase
         return ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
     {
         var trn = "1234567";
@@ -64,7 +63,7 @@ public class GetTeacherTests : GetTeacherTestBase
         return ValidRequestWithInduction_ReturnsExpectedInductionContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent()
     {
         var trn = "1234567";
@@ -74,7 +73,7 @@ public class GetTeacherTests : GetTeacherTestBase
         return ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(httpClient, baseUrl, trn);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent()
     {
         var trn = "1234567";
@@ -84,7 +83,7 @@ public class GetTeacherTests : GetTeacherTestBase
         return ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
     {
         var trn = "1234567";
@@ -94,7 +93,7 @@ public class GetTeacherTests : GetTeacherTestBase
         return ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(httpClient, baseUrl, trn);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent()
     {
         var trn = "1234567";
@@ -104,7 +103,7 @@ public class GetTeacherTests : GetTeacherTestBase
         return ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(httpClient, baseUrl, trn);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue()
     {
         var trn = "1234567";
@@ -114,7 +113,7 @@ public class GetTeacherTests : GetTeacherTestBase
         return ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(httpClient, baseUrl, trn);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue()
     {
         var trn = "1234567";
@@ -124,7 +123,7 @@ public class GetTeacherTests : GetTeacherTestBase
         return ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(httpClient, baseUrl, trn);
     }
 
-    [Test]
+    [Fact]
     public Task Get_ValidRequestWithSanctions_ReturnsExpectedSanctionsContent()
     {
         var trn = "1234567";

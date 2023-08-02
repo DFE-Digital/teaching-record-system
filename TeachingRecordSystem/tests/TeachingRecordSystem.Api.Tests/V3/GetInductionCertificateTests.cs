@@ -2,7 +2,6 @@
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
-[TestClass]
 public class GetInductionCertificateTests : ApiTestBase
 {
     public GetInductionCertificateTests(ApiFixture apiFixture)
@@ -10,7 +9,7 @@ public class GetInductionCertificateTests : ApiTestBase
     {
     }
 
-    [Test]
+    [Fact]
     public async Task Get_InductionCertificateWhenNoTeacherAssociatedWithTrn_ReturnsNotFound()
     {
         // Arrange
@@ -26,13 +25,13 @@ public class GetInductionCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_InductionCertificateWhenInductionDoesNotExist_ReturnsNotFound()
     {
         // Arrange
         var trn = "1234567";
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(d => d.GetTeacherByTrn(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact()
             {
@@ -50,7 +49,7 @@ public class GetInductionCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_InductionCertificateWhenInductionNotPassed_ReturnsNotFound()
     {
         // Arrange
@@ -59,7 +58,7 @@ public class GetInductionCertificateTests : ApiTestBase
         var inductionStartDate = new DateOnly(2000, 5, 6);
         var inductionStatus = dfeta_InductionStatus.NotYetCompleted;
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(d => d.GetTeacherByTrn(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact()
             {
@@ -67,7 +66,7 @@ public class GetInductionCertificateTests : ApiTestBase
                 dfeta_TRN = trn
             });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(d => d.GetInductionByTeacher(
                 teacherId,
                 It.IsAny<string[]>(),
@@ -94,7 +93,7 @@ public class GetInductionCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_InductionCertificateWhenInductionHasNoCompletionDate_ReturnsNotFound()
     {
         // Arrange
@@ -103,7 +102,7 @@ public class GetInductionCertificateTests : ApiTestBase
         var inductionStartDate = new DateOnly(2000, 5, 6);
         var inductionStatus = dfeta_InductionStatus.Pass;
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(d => d.GetTeacherByTrn(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact()
             {
@@ -111,7 +110,7 @@ public class GetInductionCertificateTests : ApiTestBase
                 dfeta_TRN = trn
             });
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(d => d.GetInductionByTeacher(
                 teacherId,
                 It.IsAny<string[]>(),
@@ -138,7 +137,7 @@ public class GetInductionCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequest_ReturnsExpectedResponse()
     {
         // Arrange
@@ -157,7 +156,7 @@ public class GetInductionCertificateTests : ApiTestBase
             dfeta_TRN = trn
         };
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(d => d.GetTeacherByTrn(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(teacher);
 
@@ -175,7 +174,7 @@ public class GetInductionCertificateTests : ApiTestBase
         induction.Attributes.Add($"contact.{Contact.Fields.MiddleName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.MiddleName, teacher.MiddleName));
         induction.Attributes.Add($"contact.{Contact.Fields.LastName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.FirstName, teacher.LastName));
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(d => d.GetInductionByTeacher(
                 teacherId,
                 It.IsAny<string[]>(),
@@ -187,7 +186,7 @@ public class GetInductionCertificateTests : ApiTestBase
         using var pdfStream = typeof(GetInductionCertificateTests).Assembly.GetManifestResourceStream("TeachingRecordSystem.Api.Tests.Resources.TestCertificate.pdf") ??
             throw new Exception("Failed to find TestCertificate.pdf.");
 
-        CertificateGenerator
+        CertificateGeneratorMock
             .Setup(g => g.GenerateCertificate(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
             .ReturnsAsync(pdfStream);
 

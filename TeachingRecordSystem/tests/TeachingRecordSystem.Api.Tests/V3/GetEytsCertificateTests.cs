@@ -1,6 +1,5 @@
 ﻿namespace TeachingRecordSystem.Api.Tests.V3;
 
-[TestClass]
 public class GetEytsCertificateTests : ApiTestBase
 {
     public GetEytsCertificateTests(ApiFixture apiFixture)
@@ -8,7 +7,7 @@ public class GetEytsCertificateTests : ApiTestBase
     {
     }
 
-    [Test]
+    [Fact]
     public async Task Get_EytsCertificateWithTrnDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -23,7 +22,7 @@ public class GetEytsCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_EytsCertificateWithEytsDateDoesNotExist_ReturnsNotFound()
     {
         // Arrange
@@ -34,7 +33,7 @@ public class GetEytsCertificateTests : ApiTestBase
         var middleName = Faker.Name.Middle();
         var lastName = Faker.Name.Last();
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(new Contact()
             {
@@ -53,7 +52,7 @@ public class GetEytsCertificateTests : ApiTestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Test]
+    [Fact]
     public async Task Get_ValidRequest_ReturnsExpectedResponse()
     {
         // Arrange
@@ -65,7 +64,7 @@ public class GetEytsCertificateTests : ApiTestBase
         var lastName = Faker.Name.Last();
         var eytsDate = new DateOnly(1997, 4, 23);
 
-        DataverseAdapter
+        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(new Contact()
             {
@@ -80,7 +79,7 @@ public class GetEytsCertificateTests : ApiTestBase
         using var pdfStream = typeof(GetEytsCertificateTests).Assembly.GetManifestResourceStream("TeachingRecordSystem.Api.Tests.Resources.TestCertificate.pdf") ??
             throw new Exception("Failed to find TestCertificate.pdf.");
 
-        CertificateGenerator
+        CertificateGeneratorMock
             .Setup(g => g.GenerateCertificate(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
             .ReturnsAsync(pdfStream);
 
