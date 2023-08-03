@@ -41,11 +41,18 @@ if (builder.Environment.IsProduction())
             "SupportUi");
 }
 
+builder.Services.AddDistributedMemoryCache();
+
 builder.Services.AddGovUkFrontend();
 builder.Services.AddCsp(nonceByteAmount: 32);
 
+var graphApiScopes = new[] { "User.Read", "User.ReadBasic.All" };
+
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd");
+    .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd")
+    .EnableTokenAcquisitionToCallDownstreamApi(initialScopes: graphApiScopes)
+    .AddDistributedTokenCaches()
+    .AddMicrosoftGraph(defaultScopes: graphApiScopes);
 
 builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
