@@ -534,6 +534,96 @@ public class UpdateTeacherTests : ApiTestBase
     }
 
     [Test]
+    public async Task Given_update_with_lastname_provided_without_firstname_return_error()
+    {
+        // Arrange
+        var subject = "xxx";
+        var trn = "123456";
+        var dob = new DateOnly(1987, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest(req =>
+            {
+                req.Qualification.Subject = subject;
+                req.LastName = Option.Some("lastname");
+            }
+        ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.FirstName)}", "'First Name' must not be empty.");
+    }
+
+    [Test]
+    public async Task Given_update_with_firstname_provided_without_lastname_return_error()
+    {
+        // Arrange
+        var subject = "xxx";
+        var trn = "123456";
+        var dob = new DateOnly(1987, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest(req =>
+            {
+                req.Qualification.Subject = subject;
+                req.FirstName = Option.Some("FirstName");
+            }
+        ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.LastName)}", "'Last Name' must not be empty.");
+    }
+
+    [Test]
+    public async Task Given_update_with_middlename_provided_without_lastname_return_error()
+    {
+        // Arrange
+        var subject = "xxx";
+        var trn = "123456";
+        var dob = new DateOnly(1987, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest(req =>
+            {
+                req.Qualification.Subject = subject;
+                req.MiddleName = Option.Some("SomeMiddleName");
+                req.FirstName = Option.Some("FirstName");
+            }
+        ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.LastName)}", "'Last Name' must not be empty.");
+    }
+
+    [Test]
+    public async Task Given_update_with_middlename_provided_without_firstname_return_error()
+    {
+        // Arrange
+        var subject = "xxx";
+        var trn = "123456";
+        var dob = new DateOnly(1987, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest(req =>
+            {
+                req.Qualification.Subject = subject;
+                req.MiddleName = Option.Some("SomeMiddleName");
+                req.LastName = Option.Some("Lastname");
+            }
+        ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.FirstName)}", "'First Name' must not be empty.");
+    }
+
+    [Test]
     [MemberData(nameof(InvalidAgeCombinationsData))]
     public async Task Given_invalid_age_combination_returns_error(
         int? ageRangeFrom,

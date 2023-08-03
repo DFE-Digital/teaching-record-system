@@ -43,10 +43,6 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
             throw new ErrorException(ErrorRegistry.MultipleTeachersFound());
         }
 
-        var firstAndMiddleNames = $"{request.FirstName.ValueOr("")} {request.MiddleName.ValueOr("")}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var firstName = firstAndMiddleNames[0];
-        var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
-
         var updateTeacherResult = await _dataverseAdapter.UpdateTeacher(new UpdateTeacherCommand()
         {
             TeacherId = teachers[0].Id,

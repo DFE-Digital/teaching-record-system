@@ -125,7 +125,7 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
             .NotEmpty()
             .MaximumLength(AttributeConstraints.Contact.FirstNameMaxLength)
             .OverridePropertyName(nameof(UpdateTeacherRequest.FirstName))
-            .When(x => x.FirstName != Option.None<string>());
+            .When(x => x.FirstName != Option.None<string>() || x.LastName != Option.None<string>() || x.MiddleName != Option.None<string>());
 
         RuleFor(r => r.MiddleName.ValueOrDefault())
             .NotEmpty()
@@ -137,7 +137,7 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
             .NotEmpty()
             .MaximumLength(AttributeConstraints.Contact.LastNameMaxLength)
             .OverridePropertyName(nameof(UpdateTeacherRequest.LastName))
-            .When(x => x.LastName != Option.None<string>());
+            .When(x => x.LastName != Option.None<string>() || x.MiddleName != Option.None<string>() || x.FirstName != Option.None<string>());
 
         RuleFor(r => r.EmailAddress.ValueOrDefault())
             .EmailAddress()

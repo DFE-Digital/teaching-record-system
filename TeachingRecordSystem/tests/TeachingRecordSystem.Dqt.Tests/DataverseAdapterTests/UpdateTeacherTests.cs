@@ -3097,6 +3097,49 @@ public class UpdateTeacherTests : IAsyncLifetime
         Assert.Equal(ukproviderukprnid.Single().Id, ittRecord.dfeta_EstablishmentId.Id);
     }
 
+    [Theory]
+    [InlineData("Joe Xavier", "Andre", "Joe", "Xavier Andre")]
+    [InlineData("Joe Xavier", "", "Joe", "Xavier")]
+    public async Task Given_trainee_with_multiple_first_names_populates_middlename_field(
+        string firstName,
+        string middleName,
+        string expectedFirstName,
+        string expectedMiddleName)
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+
+        // Act
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                IttQualificationValue = "001",  // BEd,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusbyassessmentonly
+            },
+            Qualification = null,
+            FirstName = Option.Some(firstName),
+            MiddleName = Option.Some(middleName),
+            LastName = Option.Some("lastname")
+        });
+
+        // Assert
+        Assert.True(result.Succeeded);
+        var contact = txnRequest.AssertSingleUpdateRequest<Contact>();
+        Assert.Equal(expectedFirstName, contact.FirstName);
+        Assert.Equal(expectedMiddleName, contact.MiddleName);
+    }
+
     private async Task<(Guid TeacherId, string IttProviderUkprn, Guid InitialTeacherTrainingId)> CreatePerson(
         bool earlyYears,
         bool assessmentOnly = false,

@@ -379,14 +379,18 @@ public partial class DataverseAdapter
 
         public Contact CreateContactEntity()
         {
+            var firstAndMiddleNames = $"{_command.FirstName.ValueOr("")} {_command.MiddleName.ValueOr("")}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var firstName = firstAndMiddleNames[0];
+            var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
+
             var contact = new Contact()
             {
                 Id = TeacherId,
                 dfeta_HUSID = _command.HusId,
                 dfeta_SlugId = _command.SlugId,
             };
-            _command.FirstName.MatchSome(value => contact.FirstName = value);
-            _command.MiddleName.MatchSome(value => contact.MiddleName = value);
+            _command.FirstName.MatchSome(value => contact.FirstName = firstName);
+            _command.MiddleName.MatchSome(value => contact.MiddleName = middleName);
             _command.LastName.MatchSome(value => contact.LastName = value);
             _command.EmailAddress.MatchSome(value => contact.EMailAddress1 = value);
             _command.GenderCode.MatchSome(value => contact.GenderCode = value);
