@@ -21,13 +21,13 @@ public class UserMapping : IEntityTypeConfiguration<User>
 
     private static IEnumerable<User> GetDefaultUsers()
     {
-        return new List<User>{new()
+        yield return new()
         {
             UserId = Guid.Parse("a81394d1-a498-46d8-af3e-e077596ab303"),
             UserType = UserType.Application,
             Name = "System",
             Active = true,
-            Roles = Array.Empty<string>()
-        }};
+            Roles = new[] { UserRoles.Administrator }
+        };
     }
 }
