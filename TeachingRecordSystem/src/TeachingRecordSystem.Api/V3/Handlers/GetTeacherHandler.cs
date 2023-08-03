@@ -172,8 +172,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         if (request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges))
         {
-            var nameChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Name", columnNames: Array.Empty<string>());
-            var dateOfBirthChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Date of Birth", columnNames: Array.Empty<string>());
+            var nameChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Name");
+            var dateOfBirthChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Date of Birth");
 
             var incidents = await _dataverseAdapter.GetIncidentsByContactId(
                 teacher.Id,
