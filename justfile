@@ -87,6 +87,10 @@ docker-build-ui *ARGS:
 set-api-secret key value:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet user-secrets set "{{key}}" "{{value}}"
 
+# Set a configuration entry in user secrets for the Support UI project
+set-ui-secret key value:
+  @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet user-secrets set "{{key}}" "{{value}}"
+
 # Set a configuration entry in user secrets for the API tests project
 set-api-tests-secret key value:
   @cd {{solution-root / "tests" / "TeachingRecordSystem.Api.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"

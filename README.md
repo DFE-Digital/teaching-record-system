@@ -105,6 +105,15 @@ just set-dqt-tests-secret TrnGenerationApi:ApiKey "the-api-key"
 ```
 Ask a developer on the team for the user secrets for this environment.
 
+#### Azure AD
+
+Azure AD is used for authentication for the Support UI. The client ID and secret for local development should be stored in user secrets.
+```shell
+just set-ui-secret AzureAd:ClientId "the_client_id"
+just set-ui-secret AzureAd:ClientSecret "the_client_secret"
+```
+Ask a developer on the team for the user secrets for this environment.
+
 
 ## CRM code generation
 
