@@ -16,10 +16,10 @@ public class UserMapping : IEntityTypeConfiguration<User>
         builder.Property(e => e.AzureAdSubject).HasMaxLength(100);
         builder.Property(e => e.Roles).HasColumnType("varchar[]");
 
-        builder.HasData(DefaultSystemUser());
+        builder.HasData(GetDefaultUsers());
     }
 
-    private static IEnumerable<User> DefaultSystemUser()
+    private static IEnumerable<User> GetDefaultUsers()
     {
         return new List<User>{new()
         {
