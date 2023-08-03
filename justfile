@@ -11,7 +11,7 @@ install-tools:
 
 # Run the trscli
 cli *ARGS:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Release" / "net7.0" / "trscli.dll"}} {{ARGS}}
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Debug" / "net7.0" / "trscli.dll"}} {{ARGS}}
 
 # Build the .NET solution
 build:

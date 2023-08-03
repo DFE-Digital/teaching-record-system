@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Cli;
 
-public partial class Commands
+public static partial class Commands
 {
     public static Command CreateGenerateReportingDbTableCommand(IConfiguration configuration)
     {

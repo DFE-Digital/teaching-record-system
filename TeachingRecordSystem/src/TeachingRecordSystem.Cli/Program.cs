@@ -11,7 +11,8 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
 {
     Commands.CreateMigrateDbCommand(configuration),
     Commands.CreateMigrateReportingDbCommand(configuration),
-    Commands.CreateGenerateReportingDbTableCommand(configuration)
+    Commands.CreateGenerateReportingDbTableCommand(configuration),
+    Commands.CreateCreateAdminCommand(configuration)
 };
 
 return await rootCommand.InvokeAsync(args);
