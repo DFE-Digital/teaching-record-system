@@ -109,7 +109,8 @@ module "ui_application_configuration" {
   }
 
   secret_variables = {
-    StorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+    ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
+    StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
   }
 }
 

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GovUk.Frontend.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -6,8 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using TeachingRecordSystem;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.SupportUi;
 
@@ -17,6 +20,8 @@ if (builder.Environment.IsProduction())
 {
     builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
 }
+
+var pgConnectionString = builder.Configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
 
 if (builder.Environment.IsProduction())
 {
@@ -54,6 +59,39 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddDistributedTokenCaches()
     .AddMicrosoftGraph(defaultScopes: graphApiScopes);
 
+builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+{
+    options.Scope.Add("email");
+
+    options.Events.OnTicketReceived = async ctx =>
+    {
+        var subject = ctx.Principal!.FindFirstValue(ClaimTypes.NameIdentifier);
+        var email = ctx.Principal!.FindFirstValue(ClaimTypes.Email);
+
+        using var dbContext = ctx.HttpContext.RequestServices.GetRequiredService<TrsDbContext>();
+
+        var user = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdSubject == subject);
+
+        if (user is null)
+        {
+            // We couldn't find a user by principal, but we may find them via email
+            // (the CLI commmand to add a user creates a record *without* the AD subject).
+
+            user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.Active == true && u.AzureAdSubject == null);
+
+            if (user is not null)
+            {
+                user.AzureAdSubject = subject;
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
+        var roles = user?.Roles ?? Array.Empty<string>();
+        var identityWithRoles = new ClaimsIdentity(ctx.Principal!.Identity, roles.Select(r => new Claim(ClaimTypes.Role, r)));
+        ctx.Principal = new ClaimsPrincipal(identityWithRoles);
+    };
+});
+
 builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
     options.Cookie.Name = "trs-auth";
@@ -74,6 +112,13 @@ builder.Services.AddRazorPages().AddMvcOptions(options =>
 });
 
 builder.Services.AddTransient<TrsLinkGenerator>();
+
+builder.Services.AddDbContext<TrsDbContext>(
+    options => TrsDbContext.ConfigureOptions(options, pgConnectionString),
+    contextLifetime: ServiceLifetime.Transient,
+    optionsLifetime: ServiceLifetime.Singleton);
+
+builder.Services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options, pgConnectionString));
 
 var app = builder.Build();
 
