@@ -26,8 +26,8 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_PASSWORD: qtapi
-          POSTGRES_DB: qtapi
+          POSTGRES_PASSWORD: trs
+          POSTGRES_DB: trs
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -89,7 +89,7 @@ jobs:
         report_name: "Core test results"
         dotnet_test_args: >-
           --no-build
-          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
 
     - name: API Tests
       uses: ./.github/workflows/actions/test
@@ -98,7 +98,20 @@ jobs:
         report_name: "API test results"
         dotnet_test_args: >-
           --no-build
-          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
+
+    - name: Install Playwright
+      run: pwsh ./tests/TeachingRecordSystem.SupportUi.EndToEndTests/bin/Release/net7.0/playwright.ps1 install
+      working-directory: TeachingRecordSystem
+
+    - name: Support UI end-to-end tests
+      uses: ./.github/workflows/actions/test
+      with:
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.SupportUi.EndToEndTests
+        report_name: "Support UI end-to-end test results"
+        dotnet_test_args: >-
+          --no-build
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
 
   validate_terraform:
     name: Validate Terraform
@@ -146,8 +159,8 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_PASSWORD: qtapi
-          POSTGRES_DB: qtapi
+          POSTGRES_PASSWORD: trs
+          POSTGRES_DB: trs
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -215,7 +228,7 @@ jobs:
         report_name: "DQT test results"
         dotnet_test_args: >-
           --no-build
-          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=qtapi;Database=qtapi"
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
           -e DqtReporting__ReportingDbConnectionString="Data Source=(local); Initial Catalog=${{ env.MSSQL_DB }}; User=sa; Password=${{ env.MSSQL_PASSWORD }}; TrustServerCertificate=True"
         config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
 

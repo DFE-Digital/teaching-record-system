@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using TeachingRecordSystem;
+using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.SupportUi;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,57 +53,66 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddGovUkFrontend();
 builder.Services.AddCsp(nonceByteAmount: 32);
 
-var graphApiScopes = new[] { "User.Read", "User.ReadBasic.All" };
-
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd")
-    .EnableTokenAcquisitionToCallDownstreamApi(initialScopes: graphApiScopes)
-    .AddDistributedTokenCaches()
-    .AddMicrosoftGraph(defaultScopes: graphApiScopes);
-
-builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
 {
-    options.Scope.Add("email");
+    var graphApiScopes = new[] { "User.Read", "User.ReadBasic.All" };
 
-    options.Events.OnTicketReceived = async ctx =>
+    builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+        .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd")
+        .EnableTokenAcquisitionToCallDownstreamApi(initialScopes: graphApiScopes)
+        .AddDistributedTokenCaches()
+        .AddMicrosoftGraph(defaultScopes: graphApiScopes);
+
+    builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
-        var subject = ctx.Principal!.FindFirstValue(ClaimTypes.NameIdentifier);
-        var email = ctx.Principal!.FindFirstValue(ClaimTypes.Email);
+        options.Scope.Add("email");
 
-        using var dbContext = ctx.HttpContext.RequestServices.GetRequiredService<TrsDbContext>();
-
-        var user = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdSubject == subject);
-
-        if (user is null)
+        options.Events.OnTicketReceived = async ctx =>
         {
-            // We couldn't find a user by principal, but we may find them via email
-            // (the CLI commmand to add a user creates a record *without* the AD subject).
+            var subject = ctx.Principal!.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = ctx.Principal!.FindFirstValue(ClaimTypes.Email);
 
-            user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.Active == true && u.AzureAdSubject == null);
+            using var dbContext = ctx.HttpContext.RequestServices.GetRequiredService<TrsDbContext>();
+
+            var user = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdSubject == subject);
+
+            if (user is null)
+            {
+                // We couldn't find a user by principal, but we may find them via email
+                // (the CLI commmand to add a user creates a record *without* the AD subject).
+
+                user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.Active == true && u.AzureAdSubject == null);
+
+                if (user is not null)
+                {
+                    user.AzureAdSubject = subject;
+                    await dbContext.SaveChangesAsync();
+                }
+            }
 
             if (user is not null)
             {
-                user.AzureAdSubject = subject;
-                await dbContext.SaveChangesAsync();
+                var identityWithRoles = new ClaimsIdentity(
+                    ctx.Principal!.Identity,
+                    user.Roles.Select(r => new Claim(ClaimTypes.Role, r))
+                        .Append(new Claim(CustomClaims.UserId, user.UserId.ToString())));
+
+                ctx.Principal = new ClaimsPrincipal(identityWithRoles);
             }
-        }
+        };
+    });
 
-        var roles = user?.Roles ?? Array.Empty<string>();
-        var identityWithRoles = new ClaimsIdentity(ctx.Principal!.Identity, roles.Select(r => new Claim(ClaimTypes.Role, r)));
-        ctx.Principal = new ClaimsPrincipal(identityWithRoles);
-    };
-});
-
-builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-{
-    options.Cookie.Name = "trs-auth";
-
-    options.Events.OnSigningOut = ctx =>
+    builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
-        ctx.Response.Redirect("/signed-out");
-        return Task.CompletedTask;
-    };
-});
+        options.Cookie.Name = "trs-auth";
+
+        options.Events.OnSigningOut = ctx =>
+        {
+            ctx.Response.Redirect("/signed-out");
+            return Task.CompletedTask;
+        };
+    });
+}
 
 builder.Services.AddRazorPages().AddMvcOptions(options =>
 {
@@ -150,7 +161,6 @@ app.UseCsp(csp =>
     }
 });
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -167,3 +177,5 @@ app.MapRazorPages();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
