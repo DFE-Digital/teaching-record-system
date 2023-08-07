@@ -109,6 +109,8 @@ public partial class DataverseAdapter
             Requests = new()
         };
 
+        //When a non early programme type is changed to AOR/Trainee Teacher
+
         if (itt != null && itt.dfeta_Result == dfeta_ITTResult.Withdrawn)
         {
             //match an existing qts record based on programmetype
@@ -147,6 +149,31 @@ public partial class DataverseAdapter
                 {
                     return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingQtsRecord), null);
                 }
+            }
+        }
+        else if (itt != null && itt.dfeta_ProgrammeType?.IsEarlyYears() == false && itt.dfeta_ProgrammeType != command.InitialTeacherTraining.ProgrammeType)
+        {
+            var (existingQTS, failedQts) = helper.SelectAOROrTraineeeTeacherQtsRecord(referenceData.QtsRegistrations, itt.dfeta_ProgrammeType.Value, referenceData.AorCandidateTeacherStatusId, referenceData.TraineeTeacherDmsTeacherStatusId);
+            if (!failedQts.HasValue)
+            {
+                //AOR programmetype can go to AOR candidate, otherwise go to Trainee teacher
+                if (command.InitialTeacherTraining.ProgrammeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute)
+                {
+                    existingQTS.dfeta_TeacherStatusId = referenceData.AorCandidateTeacherStatusId.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
+                }
+                else
+                {
+                    existingQTS.dfeta_TeacherStatusId = referenceData.TraineeTeacherDmsTeacherStatusId.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
+                }
+            }
+            txnRequest.Requests.Add(new UpdateRequest()
+            {
+                Target = existingQTS
+            });
+
+            if (failedQts == UpdateTeacherFailedReasons.NoMatchingQtsRecord)
+            {
+                return (UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingQtsRecord), null);
             }
         }
 
@@ -233,6 +260,37 @@ public partial class DataverseAdapter
         public string Trn { get; }
 
         public string SlugId { get; }
+
+
+        public (dfeta_qtsregistration, UpdateTeacherFailedReasons? FailedReason) SelectAOROrTraineeeTeacherQtsRecord(
+    IEnumerable<dfeta_qtsregistration> qtsRecords,
+    dfeta_ITTProgrammeType programmeType,
+    Guid aorCandidateTeacherStatusId,
+    Guid traineeTeacherDmsTeacherStatusId)
+        {
+            var matching = new List<dfeta_qtsregistration>();
+
+            foreach (var qts in qtsRecords)
+            {
+                if (!programmeType.IsEarlyYears() && (qts.dfeta_TeacherStatusId?.Id == aorCandidateTeacherStatusId || qts.dfeta_TeacherStatusId?.Id == traineeTeacherDmsTeacherStatusId))
+                {
+                    matching.Add(qts);
+                }
+            }
+
+            if (matching.Count == 0)
+            {
+                return (null, UpdateTeacherFailedReasons.NoMatchingQtsRecord);
+            }
+            else if (matching.Count > 1)
+            {
+                return (null, UpdateTeacherFailedReasons.MultipleQtsRecords);
+            }
+            else
+            {
+                return (matching[0], null);
+            }
+        }
 
         public (dfeta_qtsregistration, UpdateTeacherFailedReasons? FailedReason) SelectWithdrawnQtsRegistrationRecord(
             IEnumerable<dfeta_qtsregistration> qtsRecords,
