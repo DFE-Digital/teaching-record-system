@@ -47,13 +47,18 @@ just install-tools
 
 ### Database setup
 
-Install Postgres then set a connection string configuration entry in user secrets for both the `TeachingRecordSystem.Api`, `TeachingRecordSystem.Core.Tests` and `TeachingRecordSystem.Api.Tests` projects.
+Install Postgres then set a connection string configuration entry in user secrets for the `TeachingRecordSystem.Api` and `TeachingRecordSystem.SupportUi` projects.
+In addition, set a connection string for a different database for the test projects.
 
 e.g.
 ```shell
-just set-api-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=dqt"
-just set-core-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=dqt_tests"
-just set-api-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=dqt_tests"
+just set-api-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
+just set-ui-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
+
+just set-core-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
+just set-api-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
+just set-dqt-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
+just set-ui-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
 ```
 
 To set up the initial database schema run:
