@@ -1,14 +1,13 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Http;
 using Xunit;
 
 namespace TeachingRecordSystem.TestCommon;
 
 public static partial class AssertEx
 {
-    public static async Task<JsonDocument> JsonResponse(HttpResponseMessage response, int expectedStatusCode = StatusCodes.Status200OK)
+    public static async Task<JsonDocument> JsonResponse(HttpResponseMessage response, int expectedStatusCode = 200)
     {
         ArgumentNullException.ThrowIfNull(response);
 
@@ -20,7 +19,7 @@ public static partial class AssertEx
         return result!;
     }
 
-    public static async Task JsonResponseEquals(HttpResponseMessage response, object expected, int expectedStatusCode = StatusCodes.Status200OK)
+    public static async Task JsonResponseEquals(HttpResponseMessage response, object expected, int expectedStatusCode = 200)
     {
         ArgumentNullException.ThrowIfNull(response);
         ArgumentNullException.ThrowIfNull(expected);
