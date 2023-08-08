@@ -135,11 +135,20 @@ builder.Services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.Confi
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
-    app.UseExceptionHandler("/Error");
     app.UseForwardedHeaders();
     app.UseHsts();
+}
+
+if (app.Environment.IsProduction() || app.Environment.IsEndToEndTests())
+{
+    app.UseExceptionHandler("/Error");
+}
+
+if (app.Environment.IsDevelopment())
+{
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 }
 
 app.UseCsp(csp =>
