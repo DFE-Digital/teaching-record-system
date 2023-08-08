@@ -18,6 +18,8 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
+
 if (builder.Environment.IsProduction())
 {
     builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
