@@ -86,7 +86,7 @@ public class FindTeachersTests : ApiTestBase
         // Arrange
         DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
-            .ReturnsAsync((Contact[])null);
+            .ReturnsAsync(Array.Empty<Contact>());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?dateOfBirth&emailAddress&firstName&ittProviderName&lastName&nationalInsuranceNumber");
 

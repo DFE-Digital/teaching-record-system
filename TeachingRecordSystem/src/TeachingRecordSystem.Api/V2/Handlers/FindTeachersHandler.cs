@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Diagnostics;
+using MediatR;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 using TeachingRecordSystem.Core.Dqt;
@@ -19,6 +20,31 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
 
     public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
     {
+        var result = request.MatchPolicy.GetValueOrDefault() == FindTeachersMatchPolicy.Default ?
+            await HandleDefaultRequest(request) :
+            await HandleStrictRequest(request);
+
+        return new FindTeachersResponse()
+        {
+            Results = result.Select(a => new FindTeacherResult()
+            {
+                Trn = a.dfeta_TRN,
+                EmailAddresses = !string.IsNullOrEmpty(a.EMailAddress1) ? new[] { a.EMailAddress1 } : Array.Empty<string>(),
+                FirstName = a.FirstName,
+                MiddleName = a.MiddleName,
+                LastName = a.LastName,
+                DateOfBirth = a.BirthDate.HasValue ? DateOnly.FromDateTime(a.BirthDate.Value) : null,
+                NationalInsuranceNumber = a.dfeta_NINumber,
+                Uid = a.Id.ToString(),
+                HasActiveSanctions = a.dfeta_ActiveSanctions == true
+            })
+        };
+    }
+
+    private async Task<Contact[]> HandleDefaultRequest(FindTeachersRequest request)
+    {
+        Debug.Assert(request.MatchPolicy.GetValueOrDefault() == FindTeachersMatchPolicy.Default);
+
         var ittProviders = Array.Empty<Account>();
 
         if (!string.IsNullOrEmpty(request.IttProviderUkprn))
@@ -59,22 +85,25 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
             Trn = request.Trn
         };
 
-        var result = await _dataverseAdapter.FindTeachers(query);
+        return await _dataverseAdapter.FindTeachers(query);
+    }
 
-        return new FindTeachersResponse()
+    private async Task<Contact[]> HandleStrictRequest(FindTeachersRequest request)
+    {
+        Debug.Assert(request.MatchPolicy == FindTeachersMatchPolicy.Strict);
+
+        var query = new FindTeachersQuery()
         {
-            Results = result?.Select(a => new FindTeacherResult()
-            {
-                Trn = a.dfeta_TRN,
-                EmailAddresses = !string.IsNullOrEmpty(a.EMailAddress1) ? new[] { a.EMailAddress1 } : Array.Empty<string>(),
-                FirstName = a.FirstName,
-                MiddleName = a.MiddleName,
-                LastName = a.LastName,
-                DateOfBirth = a.BirthDate.HasValue ? DateOnly.FromDateTime(a.BirthDate.Value) : null,
-                NationalInsuranceNumber = a.dfeta_NINumber,
-                Uid = a.Id.ToString(),
-                HasActiveSanctions = a.dfeta_ActiveSanctions == true
-            }) ?? Enumerable.Empty<FindTeacherResult>()
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            PreviousFirstName = request.PreviousFirstName,
+            PreviousLastName = request.PreviousLastName,
+            NationalInsuranceNumber = request.NationalInsuranceNumber,
+            DateOfBirth = request.DateOfBirth,
+            EmailAddress = request.EmailAddress,
+            Trn = request.Trn
         };
+
+        return await _dataverseAdapter.FindTeachersStrict(query);
     }
 }
