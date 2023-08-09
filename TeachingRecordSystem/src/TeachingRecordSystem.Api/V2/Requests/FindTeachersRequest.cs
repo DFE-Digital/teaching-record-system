@@ -6,8 +6,17 @@ using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.V2.Requests;
 
+public enum FindTeachersMatchPolicy
+{
+    Default = 0,
+    Strict = 1
+}
+
 public class FindTeachersRequest : IRequest<FindTeachersResponse>
 {
+    [FromQuery(Name = "matchPolicy")]
+    public FindTeachersMatchPolicy? MatchPolicy { get; set; }
+
     [Description("First name of person")]
     [FromQuery(Name = "firstName")]
     public string FirstName { get; set; }

@@ -1221,6 +1221,127 @@ public partial class DataverseAdapter : IDataverseAdapter
         return contacts.GroupBy(c => c.Id).Select(c => c.First()).ToArray();
     }
 
+    public async Task<Contact[]> FindTeachersStrict(FindTeachersQuery findTeachersQuery)
+    {
+        // Match on DOB, NINO & TRN *OR*
+        // DOB, TRN & Name & contact.NINO is null
+
+        if (string.IsNullOrEmpty(findTeachersQuery.Trn) || findTeachersQuery.DateOfBirth is null)
+        {
+            return Array.Empty<Contact>();
+        }
+
+        var filter = new FilterExpression(LogicalOperator.Or);
+
+        if (!string.IsNullOrEmpty(findTeachersQuery.NationalInsuranceNumber))
+        {
+            var dobNinoTrnCondition = new FilterExpression(LogicalOperator.And);
+            dobNinoTrnCondition.AddCondition(Contact.Fields.BirthDate, ConditionOperator.Equal, findTeachersQuery.DateOfBirth!.Value.ToDateTime());
+            dobNinoTrnCondition.AddCondition(Contact.Fields.dfeta_NINumber, ConditionOperator.Equal, findTeachersQuery.NationalInsuranceNumber);
+            dobNinoTrnCondition.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, findTeachersQuery.Trn);
+
+            filter.AddFilter(dobNinoTrnCondition);
+        }
+
+        var nameFilter = GetNameFilter();
+        if (nameFilter is not null)
+        {
+            var dobTrnNameAndNoNinoCondition = new FilterExpression(LogicalOperator.And);
+            dobTrnNameAndNoNinoCondition.AddCondition(Contact.Fields.BirthDate, ConditionOperator.Equal, findTeachersQuery.DateOfBirth!.Value.ToDateTime());
+            dobTrnNameAndNoNinoCondition.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, findTeachersQuery.Trn);
+            dobTrnNameAndNoNinoCondition.AddFilter(nameFilter);
+
+            var missingNinoCondition = new FilterExpression(LogicalOperator.Or);
+            missingNinoCondition.AddCondition(Contact.Fields.dfeta_NINumber, ConditionOperator.Equal, "");
+            missingNinoCondition.AddCondition(Contact.Fields.dfeta_NINumber, ConditionOperator.Null);
+
+            dobTrnNameAndNoNinoCondition.AddFilter(missingNinoCondition);
+
+            filter.AddFilter(dobTrnNameAndNoNinoCondition);
+        }
+
+        if (filter.Filters.Count == 0)
+        {
+            return Array.Empty<Contact>();
+        }
+
+        var query = new QueryExpression(Contact.EntityLogicalName)
+        {
+            ColumnSet = new ColumnSet(
+                Contact.Fields.dfeta_TRN,
+                Contact.Fields.EMailAddress1,
+                Contact.Fields.FirstName,
+                Contact.Fields.MiddleName,
+                Contact.Fields.LastName,
+                Contact.Fields.BirthDate,
+                Contact.Fields.dfeta_NINumber,
+                Contact.Fields.dfeta_ActiveSanctions
+            ),
+            Criteria = new FilterExpression(LogicalOperator.And)
+            {
+                Conditions =
+                {
+                    new ConditionExpression(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active),
+                    new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull)
+                },
+                Filters =
+                {
+                    filter
+                }
+            },
+            Orders =
+            {
+                new OrderExpression(Contact.Fields.LastName, OrderType.Ascending),
+                new OrderExpression(Contact.Fields.FirstName, OrderType.Ascending)
+            }
+        };
+
+        var result = await _service.RetrieveMultipleAsync(query);
+
+        var contacts = result.Entities.Select(entity => entity.ToEntity<Contact>());
+
+        return contacts.ToArray();
+
+        FilterExpression GetNameFilter()
+        {
+            // Find all the permutations of names to match on
+            var firstNames = new[] { findTeachersQuery.FirstName, findTeachersQuery.PreviousFirstName };
+            var lastNames = new[] { findTeachersQuery.LastName, findTeachersQuery.PreviousLastName };
+
+            var firstNamesFilter = new FilterExpression(LogicalOperator.Or);
+            foreach (var firstName in firstNames)
+            {
+                if (!string.IsNullOrEmpty(firstName))
+                {
+                    firstNamesFilter.AddCondition(Contact.Fields.FirstName, ConditionOperator.Equal, firstName);
+                }
+            }
+
+            var lastNamesFilter = new FilterExpression(LogicalOperator.Or);
+            foreach (var lastName in lastNames)
+            {
+                if (!string.IsNullOrEmpty(lastName))
+                {
+                    lastNamesFilter.AddCondition(Contact.Fields.LastName, ConditionOperator.Equal, lastName);
+                }
+            }
+
+            var nameFilter = new FilterExpression(LogicalOperator.And);
+
+            if (firstNamesFilter.Conditions.Count > 0)
+            {
+                nameFilter.AddFilter(firstNamesFilter);
+            }
+
+            if (lastNamesFilter.Conditions.Count > 0)
+            {
+                nameFilter.AddFilter(lastNamesFilter);
+            }
+
+            return nameFilter.Filters.Count > 0 ? nameFilter : null;
+        }
+    }
+
     public async Task<Contact[]> FindTeachersByLastNameAndDateOfBirth(string lastName, DateOnly dateOfBirth, string[] columnNames)
     {
         var request = new RetrieveMultipleRequest()
