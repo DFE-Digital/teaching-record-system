@@ -133,6 +133,11 @@ builder.Services.AddDbContext<TrsDbContext>(
 
 builder.Services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options, pgConnectionString));
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+}
+
 var app = builder.Build();
 
 if (app.Environment.IsProduction())
@@ -145,10 +150,10 @@ if (app.Environment.IsProduction() || app.Environment.IsEndToEndTests())
 {
     app.UseExceptionHandler("/Error");
 }
-
-if (app.Environment.IsDevelopment())
+else
 {
-    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+    app.UseDeveloperExceptionPage();
+    app.UseMigrationsEndPoint();
 }
 
 app.UseCsp(csp =>
