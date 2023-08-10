@@ -84,6 +84,14 @@ just set-api-secret DqtReporting:ReportingDbConnectionString "Data Source=(local
 The service will run as a background service of the `Api` project.
 
 
+### Admin user setup
+
+Add yourself to your local database as an administrator:
+```shell
+just create-admin "your.name@education.gov.uk" "Your Name"
+```
+
+
 ### External dependencies
 
 #### Dynamics CRM
