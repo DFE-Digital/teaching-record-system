@@ -14,6 +14,7 @@ using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.SupportUi;
+using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -122,9 +123,9 @@ builder.Services.AddRazorPages().AddMvcOptions(options =>
         .RequireAuthenticatedUser()
         .Build();
     options.Filters.Add(new AuthorizeFilter(policy));
-});
 
-builder.Services.AddTransient<TrsLinkGenerator>();
+    options.Filters.Add(new CheckUserExistsFilter());
+});
 
 builder.Services.AddDbContext<TrsDbContext>(
     options => TrsDbContext.ConfigureOptions(options, pgConnectionString),
@@ -132,6 +133,15 @@ builder.Services.AddDbContext<TrsDbContext>(
     optionsLifetime: ServiceLifetime.Singleton);
 
 builder.Services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options, pgConnectionString));
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+}
+
+builder.Services
+    .AddTransient<TrsLinkGenerator>()
+    .AddTransient<CheckUserExistsFilter>();
 
 var app = builder.Build();
 
@@ -145,10 +155,10 @@ if (app.Environment.IsProduction() || app.Environment.IsEndToEndTests())
 {
     app.UseExceptionHandler("/Error");
 }
-
-if (app.Environment.IsDevelopment())
+else
 {
-    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+    app.UseDeveloperExceptionPage();
+    app.UseMigrationsEndPoint();
 }
 
 app.UseCsp(csp =>
