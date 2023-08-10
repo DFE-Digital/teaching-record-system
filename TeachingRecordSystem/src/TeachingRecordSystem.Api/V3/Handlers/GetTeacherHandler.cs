@@ -493,7 +493,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return new GetTeacherResponseHigherEducationQualificationsQualification
             {
                 Name = heQualification.dfeta_name,
-                Awarded = q.dfeta_CompletionorAwardDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                Awarded = q.dfeta_CompletionorAwardDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 Subjects = heSubjects.ToArray()
             };
         })
