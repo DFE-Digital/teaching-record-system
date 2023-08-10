@@ -1,4 +1,6 @@
 #nullable disable
+using Optional;
+
 namespace TeachingRecordSystem.Core.Dqt.Models;
 
 public class UpdateTeacherCommand
@@ -7,8 +9,17 @@ public class UpdateTeacherCommand
     public UpdateTeacherCommandInitialTeacherTraining InitialTeacherTraining { get; set; }
     public UpdateTeacherCommandQualification Qualification { get; set; }
     public string Trn { get; set; }
-    public string HusId { get; set; }
-    public string SlugId { get; set; }
+    public Option<string> HusId { get; set; }
+    public Option<string> SlugId { get; set; }
+    public Option<string> StatedFirstName { get; set; }
+    public Option<string> StatedMiddleName { get; set; }
+    public Option<string> StatedLastName { get; set; }
+    public Option<string> FirstName { get; set; }
+    public Option<string> MiddleName { get; set; }
+    public Option<string> LastName { get; set; }
+    public Option<string> EmailAddress { get; set; }
+    public Option<Contact_GenderCode> GenderCode { get; set; }
+    public Option<DateTime> DateOfBirth { get; set; }
 }
 
 public class UpdateTeacherCommandInitialTeacherTraining

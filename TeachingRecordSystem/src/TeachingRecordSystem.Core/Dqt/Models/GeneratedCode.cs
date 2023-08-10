@@ -1119,6 +1119,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string ContactId = "contactid";
 			public const string Id = "contactid";
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
+			public const string dfeta_AllowPiiUpdatesFromRegister = "dfeta_allowpiiupdatesfromregister";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_HUSID = "dfeta_husid";
 			public const string dfeta_InductionStatus = "dfeta_inductionstatus";
@@ -1425,6 +1426,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_ActiveSanctions");
 				this.SetAttributeValue("dfeta_activesanctions", value);
 				this.OnPropertyChanged("dfeta_ActiveSanctions");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_allowpiiupdatesfromregister")]
+		public System.Nullable<bool> dfeta_AllowPiiUpdatesFromRegister
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_allowpiiupdatesfromregister");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_AllowPiiUpdatesFromRegister");
+				this.SetAttributeValue("dfeta_allowpiiupdatesfromregister", value);
+				this.OnPropertyChanged("dfeta_AllowPiiUpdatesFromRegister");
 			}
 		}
 		

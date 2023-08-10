@@ -1,5 +1,6 @@
 #nullable disable
 using System.Net;
+using Optional;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
@@ -905,6 +906,372 @@ public class UpdateTeacherTests : ApiTestBase
             expectedError: Properties.StringResources.ErrorMessages_SlugIdMustBe150CharactersOrFewer);
     }
 
+    [Fact]
+    public async Task Given_update_with_lastname_provided_without_firstname_return_error()
+    {
+        // Arrange
+        var subject = "xxx";
+        var trn = "123456";
+        var dob = new DateOnly(1987, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest(req =>
+            {
+                req.Qualification.Subject = subject;
+                req.LastName = Option.Some("lastname");
+            }
+        ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.FirstName)}", "'First Name' must not be empty.");
+    }
+
+    [Fact]
+    public async Task Given_update_with_firstname_provided_without_lastname_return_error()
+    {
+        // Arrange
+        var subject = "xxx";
+        var trn = "123456";
+        var dob = new DateOnly(1987, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest(req =>
+            {
+                req.Qualification.Subject = subject;
+                req.FirstName = Option.Some("FirstName");
+            }
+        ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.LastName)}", "'Last Name' must not be empty.");
+    }
+
+    [Fact]
+    public async Task Given_update_with_middlename_provided_without_lastname_return_error()
+    {
+        // Arrange
+        var subject = "xxx";
+        var trn = "123456";
+        var dob = new DateOnly(1987, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest(req =>
+            {
+                req.Qualification.Subject = subject;
+                req.MiddleName = Option.Some("SomeMiddleName");
+                req.FirstName = Option.Some("FirstName");
+            }
+        ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.LastName)}", "'Last Name' must not be empty.");
+    }
+
+    [Fact]
+    public async Task Given_update_with_middlename_provided_without_firstname_return_error()
+    {
+        // Arrange
+        var subject = "xxx";
+        var trn = "123456";
+        var dob = new DateOnly(1987, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
+            CreateRequest(req =>
+            {
+                req.Qualification.Subject = subject;
+                req.MiddleName = Option.Some("SomeMiddleName");
+                req.LastName = Option.Some("Lastname");
+            }
+        ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.FirstName)}", "'First Name' must not be empty.");
+    }
+
+    [Fact]
+    public async Task Given_emailaddress_exceeeds_maxlength_returns_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var emailAddress = $"{new string('x', 99)}@test.com";  // Limit is 100
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+            CreateRequest(req =>
+            {
+                req.EmailAddress = Option.Some(emailAddress);
+            }
+            ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(UpdateTeacherRequest.EmailAddress)}",
+            expectedError: $"The length of 'Email Address' must be 100 characters or fewer. You entered {emailAddress.Length} characters.");
+    }
+
+    [Fact]
+    public async Task Given_firstname_exceeeds_maxlength_returns_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var firstName = new string('x', 150);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+            CreateRequest(req =>
+            {
+                req.FirstName = Option.Some(firstName);
+            }
+            ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(UpdateTeacherRequest.FirstName)}",
+            expectedError: $"The length of 'First Name' must be 100 characters or fewer. You entered {firstName.Length} characters.");
+    }
+
+    [Fact]
+    public async Task Given_middlename_exceeeds_maxlength_returns_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var middleName = new string('x', 150);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+            CreateRequest(req =>
+            {
+                req.MiddleName = Option.Some(middleName);
+            }
+            ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(UpdateTeacherRequest.MiddleName)}",
+            expectedError: $"The length of 'Middle Name' must be 100 characters or fewer. You entered {middleName.Length} characters.");
+    }
+
+    [Fact]
+    public async Task Given_lastname_exceeeds_maxlength_returns_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var lastName = new string('x', 150);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+            CreateRequest(req =>
+            {
+                req.LastName = Option.Some(lastName);
+            }
+            ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(UpdateTeacherRequest.LastName)}",
+            expectedError: $"The length of 'Last Name' must be 100 characters or fewer. You entered {lastName.Length} characters.");
+    }
+
+    [Fact]
+    public async Task Given_firstname_empty_returns_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var firstName = string.Empty;
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+            CreateRequest(req =>
+            {
+                req.FirstName = Option.Some(firstName);
+            }
+            ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(UpdateTeacherRequest.FirstName)}",
+            expectedError: $"'First Name' must not be empty.");
+    }
+
+    [Fact]
+    public async Task Given_middlename_empty_returns_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var middleName = string.Empty;
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+            CreateRequest(req =>
+            {
+                req.MiddleName = Option.Some(middleName);
+            }
+            ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(UpdateTeacherRequest.MiddleName)}",
+            expectedError: $"'Middle Name' must not be empty.");
+    }
+
+    [Fact]
+    public async Task Given_lastname_empty_returns_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var lastname = string.Empty;
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+            CreateRequest(req =>
+            {
+                req.LastName = Option.Some(lastname);
+            }
+            ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(UpdateTeacherRequest.LastName)}",
+            expectedError: $"'Last Name' must not be empty.");
+    }
+
+    [Fact]
+    public async Task Given_invalid_email_returns_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var email = "invalid email";
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+            CreateRequest(req =>
+            {
+                req.EmailAddress = Option.Some(email);
+            }
+            ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(UpdateTeacherRequest.EmailAddress)}",
+            expectedError: $"'Email Address' is not a valid email address.");
+    }
+
+    [Fact]
+    public async Task Given_invalid_gendercode_returns_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var gender = ((Gender)(-1));
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+            CreateRequest(req =>
+            {
+                req.GenderCode = Option.Some(gender);
+            }
+            ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(UpdateTeacherRequest.GenderCode)}",
+            expectedError: $"'Gender Code' has a range of values which does not include '-1'.");
+    }
+
+    [Fact]
+    public async Task Given_invalid_dateofbirth_returns_error()
+    {
+        // Arrange
+        var trn = "1234567";
+        var dateonly = new DateOnly(01, 01, 01);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
+            CreateRequest(req =>
+            {
+                req.DateOfBirth = Option.Some(dateonly);
+            }
+            ));
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(UpdateTeacherRequest.DateOfBirth)}",
+            StringResources.ErrorMessages_BirthDateIsOutOfRange);
+    }
+
+    [Fact]
+    public async Task Given_update_pii_request_returns_nocontent()
+    {
+        // Arrange
+        DateOnly dateonly = new DateOnly(1998, 01, 01);
+        string firstname = "Bob";
+        string middlename = "bob";
+        string lastname = "builder";
+        string emailaddress = "bob.builder@test.com";
+        Gender gender = Gender.Male;
+        var trn = "123456";
+        var contact = new Contact() { Id = Guid.NewGuid() };
+        var contactList = new[] { contact };
+        var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
+        var dob = new DateOnly(1987, 01, 01);
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+                .ReturnsAsync(contactList);
+
+        DataverseAdapterMock
+            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                .ReturnsAsync(result);
+
+        //Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate=1987-01-01",
+             CreateRequest(req =>
+             {
+                 req.GenderCode = Option.Some(gender);
+                 req.DateOfBirth = Option.Some(dateonly);
+                 req.FirstName = Option.Some(firstname);
+                 req.MiddleName = Option.Some(middlename);
+                 req.LastName = Option.Some(lastname);
+                 req.EmailAddress = Option.Some(emailaddress);
+             }
+             ));
+
+        // Assert
+        DataverseAdapterMock
+            .Verify(mock => mock.GetTeachersByTrnAndDoB(trn, dob, It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
+        DataverseAdapterMock
+            .Verify(mock => mock.GetTeachersBySlugIdAndTrn(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
     private JsonContent CreateRequest(Action<UpdateTeacherRequest> configureRequest = null)
     {
         var request = new UpdateTeacherRequest()
@@ -932,7 +1299,7 @@ public class UpdateTeacherTests : ApiTestBase
                 Subject2 = "X300", // Academic Studies in Education
                 Subject3 = "N400"  // Accounting
             },
-            HusId = new Random().NextInt64(2000000000000, 2999999999999).ToString()
+            HusId = Option.Some(new Random().NextInt64(2000000000000, 2999999999999).ToString())
         };
 
         configureRequest?.Invoke(request);
