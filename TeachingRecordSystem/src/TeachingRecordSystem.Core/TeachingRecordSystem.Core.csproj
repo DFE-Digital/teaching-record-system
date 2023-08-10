@@ -13,6 +13,7 @@
     <None Remove="Dqt\Services\DqtReporting\Migrations\0004_ContactAdditionalAttributes.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0005_ContactSlugId.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0006_Incident_msdyn_copilotengaged.sql" />
+    <None Remove="Dqt\Services\DqtReporting\Migrations\0007_ContactAllowpiiUpdatesFromRegister.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +23,7 @@
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0004_ContactAdditionalAttributes.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0005_ContactSlugId.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0006_Incident_msdyn_copilotengaged.sql" />
+    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0007_ContactAllowpiiUpdatesFromRegister.sql" />
   </ItemGroup>
 
   <ItemGroup>
