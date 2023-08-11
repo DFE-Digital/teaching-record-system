@@ -192,15 +192,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 .Intersect(Constants.ExposableSanctionCodes);
         }
 
-        var firstName = teacher.FirstName;
-        var middleName = teacher.MiddleName ?? string.Empty;
-        var lastName = teacher.LastName;
-        if (!string.IsNullOrEmpty(teacher.dfeta_StatedFirstName) && !string.IsNullOrEmpty(teacher.dfeta_StatedLastName))
-        {
-            firstName = teacher.dfeta_StatedFirstName;
-            middleName = teacher.dfeta_StatedMiddleName ?? string.Empty;
-            lastName = teacher.dfeta_StatedLastName;
-        }
+        var firstName = teacher.ResolveFirstName();
+        var middleName = teacher.ResolveMiddleName();
+        var lastName = teacher.ResolveLastName();
 
         var qtsAwardedInWalesStatus = await _dataverseAdapter.GetTeacherStatus(QtsAwardedInWalesTeacherStatusValue, null);
         var qtsRegistrations = await _dataverseAdapter.GetQtsRegistrationsByTeacher(
