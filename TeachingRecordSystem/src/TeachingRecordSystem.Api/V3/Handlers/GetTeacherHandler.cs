@@ -453,49 +453,54 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
     private static IEnumerable<GetTeacherResponseHigherEducationQualificationsQualification> MapHigherEducationQualifications(dfeta_qualification[] qualifications) =>
         qualifications
-        ?.Where(q => q.dfeta_Type.HasValue
-                && q.dfeta_Type.Value == dfeta_qualification_dfeta_Type.HigherEducation
-                && q.StateCode == dfeta_qualificationState.Active)
-        ?.Select(q =>
-        {
-            var heQualification = q.Extract<dfeta_hequalification>();
-            var heSubject1 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}1", dfeta_hesubject.PrimaryIdAttribute);
-            var heSubject2 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}2", dfeta_hesubject.PrimaryIdAttribute);
-            var heSubject3 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}3", dfeta_hesubject.PrimaryIdAttribute);
-            var heSubjects = new List<GetTeacherResponseHigherEducationQualificationsQualificationSubject>();
-            if (heSubject1 != null)
+            ?.Where(q =>
+                q.dfeta_Type.HasValue &&
+                q.dfeta_Type.Value == dfeta_qualification_dfeta_Type.HigherEducation &&
+                q.StateCode == dfeta_qualificationState.Active &&
+                q.Extract<dfeta_hequalification>() is not null)
+            ?.Select(q =>
             {
-                heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
-                {
-                    Code = heSubject1.dfeta_Value,
-                    Name = heSubject1.dfeta_name,
-                });
-            }
+                var heQualification = q.Extract<dfeta_hequalification>();
 
-            if (heSubject2 != null)
-            {
-                heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
-                {
-                    Code = heSubject2.dfeta_Value,
-                    Name = heSubject2.dfeta_name,
-                });
-            }
+                var heSubject1 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}1", dfeta_hesubject.PrimaryIdAttribute);
+                var heSubject2 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}2", dfeta_hesubject.PrimaryIdAttribute);
+                var heSubject3 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}3", dfeta_hesubject.PrimaryIdAttribute);
 
-            if (heSubject3 != null)
-            {
-                heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
-                {
-                    Code = heSubject3.dfeta_Value,
-                    Name = heSubject3.dfeta_name,
-                });
-            }
+                var heSubjects = new List<GetTeacherResponseHigherEducationQualificationsQualificationSubject>();
 
-            return new GetTeacherResponseHigherEducationQualificationsQualification
-            {
-                Name = heQualification.dfeta_name,
-                Awarded = q.dfeta_CompletionorAwardDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                Subjects = heSubjects.ToArray()
-            };
-        })
-        .ToArray() ?? Array.Empty<GetTeacherResponseHigherEducationQualificationsQualification>();
+                if (heSubject1 != null)
+                {
+                    heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
+                    {
+                        Code = heSubject1.dfeta_Value,
+                        Name = heSubject1.dfeta_name,
+                    });
+                }
+
+                if (heSubject2 != null)
+                {
+                    heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
+                    {
+                        Code = heSubject2.dfeta_Value,
+                        Name = heSubject2.dfeta_name,
+                    });
+                }
+
+                if (heSubject3 != null)
+                {
+                    heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
+                    {
+                        Code = heSubject3.dfeta_Value,
+                        Name = heSubject3.dfeta_name,
+                    });
+                }
+
+                return new GetTeacherResponseHigherEducationQualificationsQualification
+                {
+                    Name = heQualification.dfeta_name,
+                    Awarded = q.dfeta_CompletionorAwardDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    Subjects = heSubjects.ToArray()
+                };
+            })
+            .ToArray() ?? Array.Empty<GetTeacherResponseHigherEducationQualificationsQualification>();
 }
