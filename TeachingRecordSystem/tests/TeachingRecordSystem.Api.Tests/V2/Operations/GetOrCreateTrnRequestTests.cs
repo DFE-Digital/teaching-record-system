@@ -456,6 +456,22 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var requestId = Guid.NewGuid().ToString();
         var heQualificationType = (HeQualificationType)(-1);
 
+        // Act
+        var response = await HttpClientWithApiKey.PutAsync(
+            $"v2/trn-requests/{requestId}",
+            CreateRequest(req => req.Qualification.HeQualificationType = heQualificationType));
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Given_invalid_qualificationtype_not_found_returns_error()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var heQualificationType = HeQualificationType.BachelorOfCommerce;
+
         DataverseAdapterMock
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationNotFound));
@@ -466,7 +482,10 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
             CreateRequest(req => req.Qualification.HeQualificationType = heQualificationType));
 
         // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.HeQualificationType)}",
+            expectedError: Properties.StringResources.Errors_10013_Title);
     }
 
     [Theory]

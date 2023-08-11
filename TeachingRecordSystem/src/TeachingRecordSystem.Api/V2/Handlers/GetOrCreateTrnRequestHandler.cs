@@ -227,6 +227,11 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.TrainingCountryCode)}",
             ErrorRegistry.CountryNotFound().Title);
 
+        ConsumeReason(
+            CreateTeacherFailedReasons.QualificationNotFound,
+            $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.HeQualificationType)}",
+            ErrorRegistry.HeQualificationNotFound().Title);
+
         if (failedReasons != CreateTeacherFailedReasons.None)
         {
             throw new NotImplementedException($"Unknown {nameof(CreateTeacherFailedReasons)}: '{failedReasons}.");
