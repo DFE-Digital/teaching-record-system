@@ -13,22 +13,22 @@
     <PackageReference Include="FastEndpoints" Version="5.13.0" />
     <PackageReference Include="FastEndpoints.Swagger" Version="5.13.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.4" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.5" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.20.0" />
     <PackageReference Include="idunno.Authentication.Basic" Version="2.3.1" />
     <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.10" />
-    <PackageReference Include="Moq" Version="4.20.1" />
-    <PackageReference Include="NSwag.Examples" Version="1.0.9" />
+    <PackageReference Include="Moq" Version="4.20.69" />
+    <PackageReference Include="NSwag.Examples" Version="1.0.10" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
     <PackageReference Include="RedisRateLimiting.AspNetCore" Version="1.0.8" />
     <PackageReference Include="Scrutor" Version="4.2.2" />
-    <PackageReference Include="Sentry.AspNetCore" Version="3.34.0" />
-    <PackageReference Include="Sentry.Serilog" Version="3.34.0" />
+    <PackageReference Include="Sentry.AspNetCore" Version="3.35.0" />
+    <PackageReference Include="Sentry.Serilog" Version="3.35.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="7.0.0" />

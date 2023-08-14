@@ -32,7 +32,7 @@
     <PackageReference Include="DistributedLock.FileSystem" Version="1.0.1" />
     <PackageReference Include="EFCore.NamingConventions" Version="7.0.2" />
     <PackageReference Include="GovukNotify" Version="6.1.0" />
-    <PackageReference Include="Hangfire.Core" Version="1.8.4" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.5" />
     <PackageReference Include="IdentityModel" Version="6.1.0" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
