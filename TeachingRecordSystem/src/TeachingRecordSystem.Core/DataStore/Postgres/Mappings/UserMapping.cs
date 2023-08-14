@@ -13,8 +13,9 @@ public class UserMapping : IEntityTypeConfiguration<User>
         builder.Property(e => e.UserType).IsRequired();
         builder.Property(e => e.Name).IsRequired().HasMaxLength(200);
         builder.Property(e => e.Email).HasMaxLength(200).UseCollation("case_insensitive");
-        builder.Property(e => e.AzureAdSubject).HasMaxLength(100);
+        builder.Property(e => e.AzureAdUserId).HasMaxLength(100);
         builder.Property(e => e.Roles).HasColumnType("varchar[]");
+        builder.HasIndex(e => e.AzureAdUserId).IsUnique();
 
         builder.HasData(GetDefaultUsers());
     }

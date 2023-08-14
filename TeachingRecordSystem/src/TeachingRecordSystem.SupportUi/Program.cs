@@ -72,23 +72,23 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 
         options.Events.OnTicketReceived = async ctx =>
         {
-            var subject = ctx.Principal!.FindFirstValue(ClaimTypes.NameIdentifier);
-            var email = ctx.Principal!.FindFirstValue(ClaimTypes.Email);
+            var userId = ctx.Principal!.FindFirstValue("uid") ?? throw new Exception("Missing uid claim.");
+            var email = ctx.Principal!.FindFirstValue(ClaimTypes.Email) ?? throw new Exception("Missing email address claim.");
 
             using var dbContext = ctx.HttpContext.RequestServices.GetRequiredService<TrsDbContext>();
 
-            var user = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdSubject == subject);
+            var user = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == userId);
 
             if (user is null)
             {
                 // We couldn't find a user by principal, but we may find them via email
                 // (the CLI commmand to add a user creates a record *without* the AD subject).
 
-                user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.Active == true && u.AzureAdSubject == null);
+                user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.Active == true && u.AzureAdUserId == null);
 
                 if (user is not null)
                 {
-                    user.AzureAdSubject = subject;
+                    user.AzureAdUserId = userId;
                     await dbContext.SaveChangesAsync();
                 }
             }
