@@ -2,6 +2,8 @@
 
 public class User
 {
+    public const int NameMaxLength = 200;
+
     public required Guid UserId { get; init; }
     public required bool Active { get; set; }
     public required UserType UserType { get; init; }

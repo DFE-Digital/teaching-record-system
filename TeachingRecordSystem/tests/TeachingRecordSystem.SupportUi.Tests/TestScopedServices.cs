@@ -1,4 +1,5 @@
 ﻿using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
@@ -10,6 +11,7 @@ public class TestScopedServices
     {
         Clock = new();
         DataverseAdapterMock = new();
+        AzureActiveDirectoryUserServiceMock = new();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -28,4 +30,6 @@ public class TestScopedServices
     public TestableClock Clock { get; }
 
     public Mock<IDataverseAdapter> DataverseAdapterMock { get; }
+
+    public Mock<IUserService> AzureActiveDirectoryUserServiceMock { get; }
 }

@@ -9,12 +9,18 @@ public class TrsLinkGenerator
         _linkGenerator = linkGenerator;
     }
 
-    public string Index() => _linkGenerator.GetPathByPage("/Index") ?? throw GetPageNotFoundException();
+    public string Index() => GetRequiredPathByPage("/Index");
 
-    public string SignOut() => _linkGenerator.GetPathByPage("/SignOut") ?? throw GetPageNotFoundException();
+    public string SignOut() => GetRequiredPathByPage("/SignOut");
 
-    public string SignedOut() => _linkGenerator.GetPathByPage("/SignedOut") ?? throw GetPageNotFoundException();
+    public string SignedOut() => GetRequiredPathByPage("/SignedOut");
 
-    private static Exception GetPageNotFoundException() =>
-        new InvalidOperationException("Page was not found.");
+    public string Users() => GetRequiredPathByPage("/Users/Index");
+
+    public string AddUser() => GetRequiredPathByPage("/Users/AddUser/Index");
+
+    public string AddUser(string userId) => GetRequiredPathByPage("/Users/AddUser/Confirm", new { userId = userId });
+
+    private string GetRequiredPathByPage(string page, object? routeValues = null) =>
+        _linkGenerator.GetPathByPage(page, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
 }

@@ -18,6 +18,7 @@ using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -156,7 +157,9 @@ if (builder.Environment.IsDevelopment())
 
 builder.Services
     .AddTransient<TrsLinkGenerator>()
-    .AddTransient<CheckUserExistsFilter>();
+    .AddTransient<CheckUserExistsFilter>()
+    .AddSingleton<IClock, Clock>()
+    .AddSupportUiServices(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 
