@@ -22,9 +22,10 @@ public class HostFixture : WebApplicationFactory<Program>
     public HostFixture(IConfiguration configuration)
     {
         _configuration = configuration;
+        _ = base.Services;  // Start the host
     }
 
-    public CaptureEventObserver EventObserver => (CaptureEventObserver)Services.GetRequiredService<IEventObserver>();
+    public CaptureEventObserver EventObserver { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -62,7 +63,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddTransient<TestUsers.CreateUsersStartupTask>();
             services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
 
-            services.AddSingleton<IEventObserver, CaptureEventObserver>();
+            services.AddSingleton<IEventObserver>(EventObserver);
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
