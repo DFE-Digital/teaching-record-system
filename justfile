@@ -103,7 +103,11 @@ set-core-tests-secret key value:
 set-dqt-tests-secret key value:
   @cd {{solution-root / "tests" / "TeachingRecordSystem.Core.Dqt.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
 
-# Set a configuration entry in user secrets for the DQT tests project
+# Set a configuration entry in user secrets for the UI tests project
+set-ui-tests-secret key value:
+  @cd {{solution-root / "tests" / "TeachingRecordSystem.SupportUi.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
+
+# Set a configuration entry in user secrets for the UI end-to-end tests project
 set-ui-e2e-tests-secret key value:
   @cd {{solution-root / "tests" / "TeachingRecordSystem.SupportUi.EndToEndTests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
 
