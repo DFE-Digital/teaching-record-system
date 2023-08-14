@@ -100,6 +100,15 @@ jobs:
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
 
+    - name: Support UI Tests
+      uses: ./.github/workflows/actions/test
+      with:
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.SupportUi.Tests
+        report_name: "Support UI test results"
+        dotnet_test_args: >-
+          --no-build
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
+
     - name: Install Playwright
       run: pwsh ./tests/TeachingRecordSystem.SupportUi.EndToEndTests/bin/Release/net7.0/playwright.ps1 install
       working-directory: TeachingRecordSystem

@@ -166,14 +166,15 @@ if (app.Environment.IsProduction())
     app.UseHsts();
 }
 
-if (app.Environment.IsProduction() || app.Environment.IsEndToEndTests())
-{
-    app.UseExceptionHandler("/Error");
-}
-else
+if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseMigrationsEndPoint();
+}
+else if (!app.Environment.IsUnitTests())
+{
+    app.UseExceptionHandler("/error");
+    app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
 }
 
 app.UseCsp(csp =>
