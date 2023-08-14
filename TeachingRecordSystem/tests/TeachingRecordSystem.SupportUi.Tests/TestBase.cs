@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
@@ -14,6 +15,7 @@ public abstract class TestBase
     {
         HostFixture = hostFixture;
 
+        HostFixture.EventObserver.Init();
         _testServices = TestScopedServices.Reset();
         SetCurrentUser(TestUsers.Administrator);
 
@@ -24,6 +26,8 @@ public abstract class TestBase
     }
 
     public HostFixture HostFixture { get; }
+
+    public CaptureEventObserver EventObserver => HostFixture.EventObserver;
 
     public Mock<IDataverseAdapter> DataverseAdapterMock => _testServices.DataverseAdapterMock;
 
