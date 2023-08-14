@@ -33,7 +33,15 @@ public abstract class TestBase
 
     public TestableClock Clock => _testServices.Clock;
 
+    public Mock<Services.AzureActiveDirectory.IUserService> AzureActiveDirectoryUserServiceMock => _testServices.AzureActiveDirectoryUserServiceMock;
+
     public HttpClient HttpClient { get; }
+
+    protected Guid GetCurrentUserId()
+    {
+        var currentUserProvider = HostFixture.Services.GetRequiredService<CurrentUserProvider>();
+        return (currentUserProvider.CurrentUser ?? throw new InvalidOperationException("No current user set.")).UserId;
+    }
 
     protected void SetCurrentUser(User user)
     {

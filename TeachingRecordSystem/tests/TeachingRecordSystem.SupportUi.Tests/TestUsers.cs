@@ -14,6 +14,15 @@ public static class TestUsers
         UserType = UserType.Person
     };
 
+    public static User NoRoles { get; } = new()
+    {
+        Active = true,
+        Name = "No roles",
+        Roles = Array.Empty<string>(),
+        UserId = Guid.NewGuid(),
+        UserType = UserType.Person
+    };
+
     public class CreateUsersStartupTask : IStartupTask
     {
         private readonly TrsDbContext _dbContext;
@@ -26,6 +35,7 @@ public static class TestUsers
         public Task Execute()
         {
             _dbContext.Users.Add(Administrator);
+            _dbContext.Users.Add(NoRoles);
 
             return _dbContext.SaveChangesAsync();
         }

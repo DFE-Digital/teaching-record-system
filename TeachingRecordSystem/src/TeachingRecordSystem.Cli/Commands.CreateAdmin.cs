@@ -1,6 +1,5 @@
 ﻿using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Cli;
 

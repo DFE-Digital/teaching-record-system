@@ -1,0 +1,17 @@
+﻿@page "/users/add"
+@model TeachingRecordSystem.SupportUi.Pages.Users.AddUser.IndexModel
+@{
+    ViewBag.Title = "Add user";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form trs-action="l => l.AddUser()">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input asp-for="Email" type="email" autocomplete="off" />
+
+            <govuk-button type="submit">Find user</govuk-button>
+        </form>
+    </div>
+</div>

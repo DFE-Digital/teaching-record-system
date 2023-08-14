@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Events.Processing;
+using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -21,9 +22,10 @@ public class HostFixture : WebApplicationFactory<Program>
     public HostFixture(IConfiguration configuration)
     {
         _configuration = configuration;
+        _ = base.Services;  // Start the host
     }
 
-    public CaptureEventObserver EventObserver => (CaptureEventObserver)Services.GetRequiredService<IEventObserver>();
+    public CaptureEventObserver EventObserver { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -61,9 +63,10 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddTransient<TestUsers.CreateUsersStartupTask>();
             services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
 
-            services.AddSingleton<IEventObserver, CaptureEventObserver>();
+            services.AddSingleton<IEventObserver>(EventObserver);
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
+            services.AddTestScoped<IUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
         });
     }
 

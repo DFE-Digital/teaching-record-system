@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
+using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
