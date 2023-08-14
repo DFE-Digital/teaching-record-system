@@ -117,15 +117,21 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     });
 }
 
-builder.Services.AddRazorPages().AddMvcOptions(options =>
-{
-    var policy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-    options.Filters.Add(new AuthorizeFilter(policy));
+builder.Services
+    .AddRazorPages()
+    .AddMvcOptions(options =>
+    {
+        var policy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+        options.Filters.Add(new AuthorizeFilter(policy));
 
-    options.Filters.Add(new CheckUserExistsFilter());
-});
+        options.Filters.Add(new CheckUserExistsFilter());
+    })
+    .AddCookieTempDataProvider(options =>
+    {
+        options.Cookie.Name = "trs-tempdata";
+    });
 
 builder.Services.AddDbContext<TrsDbContext>(
     options => TrsDbContext.ConfigureOptions(options, pgConnectionString),

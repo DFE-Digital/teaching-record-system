@@ -42,6 +42,20 @@
     </header>
 }
 
+@if (TempData.TryGetFlashSuccess(out (string Heading, string? Message)? flashSuccess))
+{
+    <govuk-notification-banner type="Success">
+        <p class="govuk-notification-banner__heading">@flashSuccess.Value.Heading</p>
+        @if (flashSuccess.Value.Message is not null)
+        {
+            @foreach (var line in flashSuccess.Value.Message.Split("\n", StringSplitOptions.RemoveEmptyEntries))
+            {
+                <p class="govuk-body">@line</p>
+            }
+        }
+    </govuk-notification-banner>
+}
+
 @RenderBody()
 
 @section Footer {
