@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
             services.AddSingleton<IHostedService, DqtReportingService>();
 
             services.AddServiceClient(
-                DqtReportingService.ChangesKey,
+                DqtReportingService.CrmClientName,
                 sp => new ServiceClient(sp.GetRequiredService<IOptions<DqtReportingOptions>>().Value.CrmConnectionString));
         }
 
