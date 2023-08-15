@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Identity.Web;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
@@ -117,11 +118,33 @@ if (builder.Environment.IsDevelopment())
 
 builder.Services.AddRedis(builder.Environment, builder.Configuration, healthCheckBuilder);
 
+if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+{
+    var crmConnectionString = $"""
+        AuthType=ClientSecret;
+        Url={builder.Configuration.GetRequiredValue("CrmUrl")};
+        ClientId={builder.Configuration.GetRequiredValue("AzureAd:ClientId")};
+        ClientSecret={builder.Configuration.GetRequiredValue("AzureAd:ClientSecret")};
+        RequireNewInstance=true
+        """;
+
+    var serviceClient = new ServiceClient(crmConnectionString)
+    {
+        DisableCrossThreadSafeties = true,
+        EnableAffinityCookie = true,
+        MaxRetryCount = 2,
+        RetryPauseTime = TimeSpan.FromSeconds(1)
+    };
+
+    builder.Services.AddTransient<ServiceClient>(_ => serviceClient.Clone());
+}
+
 builder.Services
     .AddTransient<TrsLinkGenerator>()
     .AddTransient<CheckUserExistsFilter>()
     .AddSingleton<IClock, Clock>()
-    .AddSupportUiServices(builder.Configuration, builder.Environment);
+    .AddSupportUiServices(builder.Configuration, builder.Environment)
+    .AddSingleton<ReferenceDataCache>();
 
 var app = builder.Build();
 

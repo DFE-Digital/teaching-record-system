@@ -98,6 +98,7 @@ just create-admin "your.name@education.gov.uk" "Your Name"
 #### Dynamics CRM
 
 The `build` CRM environment is used for local development and automated tests. Connection information should be stored in user secrets in the `ConnectionStrings:Crm` key. Secrets must be added for both the `Api` project and the `Dqt.Tests` project.
+In addition, the `SupportUi` project needs the `CrmUrl` configuration entry defining; the Azure AD secrets are used for authentication.
 
 Secrets can be set using `just` recipes e.g.
 ```shell
@@ -105,6 +106,7 @@ just set-api-secret ConnectionStrings:Crm "the_connection_string"
 just set-dqt-tests-secret ConnectionStrings:Crm "the_connection_string"
 just set-dqt-tests-secret BuildEnvLockBlobUri "lock_blob_uri"
 just set-dqt-tests-secret BuildEnvLockBlobSasToken "lock_blob_sas_token"
+just set-ui-secret CrmUrl "the_environment_url"
 ```
 Ask a developer on the team for the user secrets for this environment.
 
