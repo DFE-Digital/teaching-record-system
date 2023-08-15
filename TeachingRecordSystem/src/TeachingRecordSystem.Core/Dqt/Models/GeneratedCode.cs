@@ -57,6 +57,12 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Referencingaccount_master_account = "account_master_account";
 			public const string Referencingaccount_parent_account = "account_parent_account";
 			public const string account_primary_contact = "account_primary_contact";
+			public const string lk_accountbase_createdby = "lk_accountbase_createdby";
+			public const string lk_accountbase_createdonbehalfby = "lk_accountbase_createdonbehalfby";
+			public const string lk_accountbase_modifiedby = "lk_accountbase_modifiedby";
+			public const string lk_accountbase_modifiedonbehalfby = "lk_accountbase_modifiedonbehalfby";
+			public const string system_user_accounts = "system_user_accounts";
+			public const string user_accounts = "user_accounts";
 		}
 		
 		/// <summary>
@@ -459,6 +465,132 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("account_primary_contact");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_accountbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_accountbase_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_accountbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_accountbase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_accountbase_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_accountbase_createdby", null, value);
+				this.OnPropertyChanged("lk_accountbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_accountbase_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_accountbase_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_accountbase_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_accountbase_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_accountbase_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_accountbase_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_accountbase_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_accountbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_accountbase_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_accountbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_accountbase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_accountbase_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_accountbase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_accountbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_accountbase_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_accountbase_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_accountbase_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_accountbase_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_accountbase_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_accountbase_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_accountbase_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 system_user_accounts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("preferredsystemuserid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("system_user_accounts")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser system_user_accounts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("system_user_accounts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("system_user_accounts");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("system_user_accounts", null, value);
+				this.OnPropertyChanged("system_user_accounts");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_accounts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_accounts")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_accounts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_accounts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_accounts");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_accounts", null, value);
+				this.OnPropertyChanged("user_accounts");
+			}
+		}
 	}
 	
 	/// <summary>
@@ -482,10 +614,15 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string ObjectTypeCode = "objecttypecode";
 			public const string Subject = "subject";
 			public const string Account_Annotation = "Account_Annotation";
+			public const string annotation_owning_user = "annotation_owning_user";
 			public const string Contact_Annotation = "Contact_Annotation";
 			public const string dfeta_document_Annotations = "dfeta_document_Annotations";
 			public const string dfeta_sanction_Annotations = "dfeta_sanction_Annotations";
 			public const string Incident_Annotation = "Incident_Annotation";
+			public const string lk_annotationbase_createdby = "lk_annotationbase_createdby";
+			public const string lk_annotationbase_createdonbehalfby = "lk_annotationbase_createdonbehalfby";
+			public const string lk_annotationbase_modifiedby = "lk_annotationbase_modifiedby";
+			public const string lk_annotationbase_modifiedonbehalfby = "lk_annotationbase_modifiedonbehalfby";
 			public const string Task_Annotation = "Task_Annotation";
 		}
 		
@@ -694,6 +831,27 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// N:1 annotation_owning_user
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("annotation_owning_user")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser annotation_owning_user
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("annotation_owning_user", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("annotation_owning_user");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("annotation_owning_user", null, value);
+				this.OnPropertyChanged("annotation_owning_user");
+			}
+		}
+		
+		/// <summary>
 		/// N:1 Contact_Annotation
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objectid")]
@@ -774,6 +932,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Incident_Annotation");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Incident>("Incident_Annotation", null, value);
 				this.OnPropertyChanged("Incident_Annotation");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_annotationbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_annotationbase_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_annotationbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_annotationbase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_annotationbase_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_annotationbase_createdby", null, value);
+				this.OnPropertyChanged("lk_annotationbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_annotationbase_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_annotationbase_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_annotationbase_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_annotationbase_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_annotationbase_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_annotationbase_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_annotationbase_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_annotationbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_annotationbase_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_annotationbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_annotationbase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_annotationbase_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_annotationbase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_annotationbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_annotationbase_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_annotationbase_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_annotationbase_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_annotationbase_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_annotationbase_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_annotationbase_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_annotationbase_modifiedonbehalfby");
 			}
 		}
 		
@@ -884,9 +1126,15 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string contact_customer_accounts = "contact_customer_accounts";
 			public const string Referencingcontact_customer_contacts = "contact_customer_contacts";
 			public const string Referencingcontact_master_contact = "contact_master_contact";
+			public const string contact_owning_user = "contact_owning_user";
 			public const string Referencingcontact_parent_contact = "contact_parent_contact";
 			public const string dfeta_dfeta_country_contact1 = "dfeta_dfeta_country_contact1";
 			public const string dfeta_dfeta_qtsregistration_contact = "dfeta_dfeta_qtsregistration_contact";
+			public const string lk_contact_createdonbehalfby = "lk_contact_createdonbehalfby";
+			public const string lk_contact_modifiedonbehalfby = "lk_contact_modifiedonbehalfby";
+			public const string lk_contactbase_createdby = "lk_contactbase_createdby";
+			public const string lk_contactbase_modifiedby = "lk_contactbase_modifiedby";
+			public const string system_user_contacts = "system_user_contacts";
 		}
 		
 		/// <summary>
@@ -2174,6 +2422,27 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// N:1 contact_owning_user
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_owning_user")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser contact_owning_user
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("contact_owning_user", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("contact_owning_user");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("contact_owning_user", null, value);
+				this.OnPropertyChanged("contact_owning_user");
+			}
+		}
+		
+		/// <summary>
 		/// N:1 contact_parent_contact
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parent_contactid")]
@@ -2235,6 +2504,111 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_contact");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_contact_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_contact_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_contact_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_contact_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_contact_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_contact_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_contact_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_contact_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_contact_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_contact_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_contact_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_contact_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_contact_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_contact_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_contactbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_contactbase_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_contactbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_contactbase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_contactbase_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_contactbase_createdby", null, value);
+				this.OnPropertyChanged("lk_contactbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_contactbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_contactbase_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_contactbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_contactbase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_contactbase_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_contactbase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_contactbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 system_user_contacts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("preferredsystemuserid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("system_user_contacts")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser system_user_contacts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("system_user_contacts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("system_user_contacts");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("system_user_contacts", null, value);
+				this.OnPropertyChanged("system_user_contacts");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -2268,6 +2642,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_Person = "dfeta_person";
 			public const string StateCode = "statecode";
 			public const string dfeta_contact_dfeta_businesseventaudit_Person = "dfeta_contact_dfeta_businesseventaudit_Person";
+			public const string lk_dfeta_businesseventaudit_createdby = "lk_dfeta_businesseventaudit_createdby";
+			public const string lk_dfeta_businesseventaudit_createdonbehalfby = "lk_dfeta_businesseventaudit_createdonbehalfby";
+			public const string lk_dfeta_businesseventaudit_modifiedby = "lk_dfeta_businesseventaudit_modifiedby";
+			public const string lk_dfeta_businesseventaudit_modifiedonbehalfby = "lk_dfeta_businesseventaudit_modifiedonbehalfby";
+			public const string user_dfeta_businesseventaudit = "user_dfeta_businesseventaudit";
 		}
 		
 		/// <summary>
@@ -2468,6 +2847,111 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_businesseventaudit_Person");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_businesseventaudit_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_businesseventaudit_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_businesseventaudit_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_businesseventaudit_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_businesseventaudit_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_businesseventaudit_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_businesseventaudit_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_businesseventaudit_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_businesseventaudit_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_businesseventaudit_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_businesseventaudit_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_businesseventaudit_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_businesseventaudit_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_businesseventaudit_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_businesseventaudit_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_businesseventaudit_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_businesseventaudit_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_businesseventaudit_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_businesseventaudit_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_businesseventaudit_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_businesseventaudit_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_businesseventaudit_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_businesseventaudit_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_businesseventaudit_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_businesseventaudit_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_businesseventaudit_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_businesseventaudit_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_businesseventaudit_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_businesseventaudit
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_businesseventaudit")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_businesseventaudit
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_businesseventaudit", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_businesseventaudit");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_businesseventaudit", null, value);
+				this.OnPropertyChanged("user_dfeta_businesseventaudit");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -2500,6 +2984,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_dfeta_country_contact1 = "dfeta_dfeta_country_contact1";
 			public const string dfeta_dfeta_country_dfeta_initialteachertrainin = "dfeta_dfeta_country_dfeta_initialteachertrainin";
 			public const string dfeta_dfeta_country_dfeta_qualification_he = "dfeta_dfeta_country_dfeta_qualification_he";
+			public const string lk_dfeta_country_createdby = "lk_dfeta_country_createdby";
+			public const string lk_dfeta_country_createdonbehalfby = "lk_dfeta_country_createdonbehalfby";
+			public const string lk_dfeta_country_modifiedby = "lk_dfeta_country_modifiedby";
+			public const string lk_dfeta_country_modifiedonbehalfby = "lk_dfeta_country_modifiedonbehalfby";
 		}
 		
 		/// <summary>
@@ -2679,6 +3167,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_country_dfeta_qualification_he");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_country_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_country_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_country_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_country_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_country_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_country_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_country_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_country_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_country_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_country_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_country_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_country_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_country_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_country_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_country_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_country_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_country_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_country_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_country_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_country_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_country_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_country_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_country_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_country_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_country_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_country_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_country_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_country_modifiedonbehalfby");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -2716,6 +3288,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_account_dfeta_document = "dfeta_account_dfeta_document";
 			public const string dfeta_contact_dfeta_document = "dfeta_contact_dfeta_document";
 			public const string dfeta_incident_dfeta_document = "dfeta_incident_dfeta_document";
+			public const string lk_dfeta_document_createdby = "lk_dfeta_document_createdby";
+			public const string lk_dfeta_document_createdonbehalfby = "lk_dfeta_document_createdonbehalfby";
+			public const string lk_dfeta_document_modifiedby = "lk_dfeta_document_modifiedby";
+			public const string lk_dfeta_document_modifiedonbehalfby = "lk_dfeta_document_modifiedonbehalfby";
+			public const string user_dfeta_document = "user_dfeta_document";
 		}
 		
 		/// <summary>
@@ -2998,6 +3575,111 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_incident_dfeta_document");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_document_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_document_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_document_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_document_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_document_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_document_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_document_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_document_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_document_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_document_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_document_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_document_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_document_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_document_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_document_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_document_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_document_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_document_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_document_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_document_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_document_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_document_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_document_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_document_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_document_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_document_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_document_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_document_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_document
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_document")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_document
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_document", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_document");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_document", null, value);
+				this.OnPropertyChanged("user_dfeta_document");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -3028,6 +3710,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_Value = "dfeta_value";
 			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_earlyyearsstatus_dfeta_qtsregistration_EarlyYearsStatusId = "dfeta_dfeta_earlyyearsstatus_dfeta_qtsregistration_EarlyYearsStatusId";
+			public const string lk_dfeta_earlyyearsstatus_createdby = "lk_dfeta_earlyyearsstatus_createdby";
+			public const string lk_dfeta_earlyyearsstatus_createdonbehalfby = "lk_dfeta_earlyyearsstatus_createdonbehalfby";
+			public const string lk_dfeta_earlyyearsstatus_modifiedby = "lk_dfeta_earlyyearsstatus_modifiedby";
+			public const string lk_dfeta_earlyyearsstatus_modifiedonbehalfby = "lk_dfeta_earlyyearsstatus_modifiedonbehalfby";
 		}
 		
 		/// <summary>
@@ -3167,6 +3853,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_earlyyearsstatus_dfeta_qtsregistration_EarlyYearsStatusId");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_earlyyearsstatus_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_earlyyearsstatus_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_earlyyearsstatus_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_earlyyearsstatus_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_earlyyearsstatus_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_earlyyearsstatus_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_earlyyearsstatus_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_earlyyearsstatus_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_earlyyearsstatus_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_earlyyearsstatus_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_earlyyearsstatus_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_earlyyearsstatus_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_earlyyearsstatus_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_earlyyearsstatus_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_earlyyearsstatus_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_earlyyearsstatus_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_earlyyearsstatus_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_earlyyearsstatus_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_earlyyearsstatus_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_earlyyearsstatus_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_earlyyearsstatus_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_earlyyearsstatus_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_earlyyearsstatus_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_earlyyearsstatus_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_modifiedonbehalfby");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -3199,6 +3969,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_Value = "dfeta_value";
 			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_hequalification_dfeta_qualification = "dfeta_dfeta_hequalification_dfeta_qualification";
+			public const string lk_dfeta_hequalification_createdby = "lk_dfeta_hequalification_createdby";
+			public const string lk_dfeta_hequalification_createdonbehalfby = "lk_dfeta_hequalification_createdonbehalfby";
+			public const string lk_dfeta_hequalification_modifiedby = "lk_dfeta_hequalification_modifiedby";
+			public const string lk_dfeta_hequalification_modifiedonbehalfby = "lk_dfeta_hequalification_modifiedonbehalfby";
 		}
 		
 		/// <summary>
@@ -3381,6 +4155,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_hequalification_dfeta_qualification");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_hequalification_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hequalification_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_hequalification_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hequalification_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hequalification_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hequalification_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hequalification_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_hequalification_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hequalification_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_hequalification_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hequalification_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hequalification_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hequalification_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hequalification_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_hequalification_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hequalification_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_hequalification_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hequalification_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hequalification_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hequalification_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hequalification_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_hequalification_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hequalification_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_hequalification_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hequalification_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hequalification_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hequalification_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hequalification_modifiedonbehalfby");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -3413,6 +4271,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_dfeta_hesubject_dfeta_qualification1 = "dfeta_dfeta_hesubject_dfeta_qualification1";
 			public const string dfeta_dfeta_hesubject_dfeta_qualification2 = "dfeta_dfeta_hesubject_dfeta_qualification2";
 			public const string dfeta_dfeta_hesubject_dfeta_qualification3 = "dfeta_dfeta_hesubject_dfeta_qualification3";
+			public const string lk_dfeta_hesubject_createdby = "lk_dfeta_hesubject_createdby";
+			public const string lk_dfeta_hesubject_createdonbehalfby = "lk_dfeta_hesubject_createdonbehalfby";
+			public const string lk_dfeta_hesubject_modifiedby = "lk_dfeta_hesubject_modifiedby";
+			public const string lk_dfeta_hesubject_modifiedonbehalfby = "lk_dfeta_hesubject_modifiedonbehalfby";
 		}
 		
 		/// <summary>
@@ -3592,6 +4454,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_hesubject_dfeta_qualification3");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_hesubject_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hesubject_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_hesubject_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hesubject_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hesubject_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hesubject_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hesubject_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_hesubject_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hesubject_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_hesubject_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hesubject_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hesubject_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hesubject_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hesubject_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_hesubject_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hesubject_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_hesubject_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hesubject_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hesubject_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hesubject_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hesubject_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_hesubject_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hesubject_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_hesubject_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hesubject_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hesubject_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_hesubject_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hesubject_modifiedonbehalfby");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -3629,6 +4575,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_dfeta_induction_dfeta_qtsregistration = "dfeta_dfeta_induction_dfeta_qtsregistration";
 			public const string dfeta_contact_dfeta_induction = "dfeta_contact_dfeta_induction";
 			public const string dfeta_contact_dfeta_induction1 = "dfeta_contact_dfeta_induction1";
+			public const string lk_dfeta_induction_createdby = "lk_dfeta_induction_createdby";
+			public const string lk_dfeta_induction_createdonbehalfby = "lk_dfeta_induction_createdonbehalfby";
+			public const string lk_dfeta_induction_modifiedby = "lk_dfeta_induction_modifiedby";
+			public const string lk_dfeta_induction_modifiedonbehalfby = "lk_dfeta_induction_modifiedonbehalfby";
+			public const string user_dfeta_induction = "user_dfeta_induction";
 		}
 		
 		/// <summary>
@@ -3910,6 +4861,111 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_contact_dfeta_induction1");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_induction_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_induction_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_induction_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_induction_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_induction_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_induction_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_induction_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_induction_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_induction_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_induction_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_induction_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_induction_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_induction_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_induction_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_induction_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_induction_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_induction_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_induction_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_induction_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_induction_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_induction_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_induction_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_induction_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_induction_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_induction_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_induction_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_induction_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_induction_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_induction
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_induction")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_induction
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_induction", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_induction");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_induction", null, value);
+				this.OnPropertyChanged("user_dfeta_induction");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -3945,6 +5001,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_account_dfeta_inductionperiod = "dfeta_account_dfeta_inductionperiod";
 			public const string dfeta_contact_dfeta_inductionperiod = "dfeta_contact_dfeta_inductionperiod";
 			public const string dfeta_dfeta_induction_dfeta_inductionperiod = "dfeta_dfeta_induction_dfeta_inductionperiod";
+			public const string lk_dfeta_inductionperiod_createdby = "lk_dfeta_inductionperiod_createdby";
+			public const string lk_dfeta_inductionperiod_createdonbehalfby = "lk_dfeta_inductionperiod_createdonbehalfby";
+			public const string lk_dfeta_inductionperiod_modifiedby = "lk_dfeta_inductionperiod_modifiedby";
+			public const string lk_dfeta_inductionperiod_modifiedonbehalfby = "lk_dfeta_inductionperiod_modifiedonbehalfby";
+			public const string user_dfeta_inductionperiod = "user_dfeta_inductionperiod";
 		}
 		
 		/// <summary>
@@ -4187,6 +5248,111 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_induction_dfeta_inductionperiod");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_inductionperiod_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_inductionperiod_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_inductionperiod_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_inductionperiod_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_inductionperiod_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_inductionperiod_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_inductionperiod_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_inductionperiod_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_inductionperiod_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_inductionperiod_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_inductionperiod_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_inductionperiod_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_inductionperiod_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_inductionperiod_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_inductionperiod_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_inductionperiod_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_inductionperiod_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_inductionperiod_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_inductionperiod_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_inductionperiod_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_inductionperiod_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_inductionperiod_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_inductionperiod_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_inductionperiod_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_inductionperiod_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_inductionperiod_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_inductionperiod_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_inductionperiod_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_inductionperiod
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_inductionperiod")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_inductionperiod
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_inductionperiod", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_inductionperiod");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_inductionperiod", null, value);
+				this.OnPropertyChanged("user_dfeta_inductionperiod");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -4239,6 +5405,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_dfeta_ittsubject1_dfeta_initialteachertra = "dfeta_dfeta_ittsubject1_dfeta_initialteachertra";
 			public const string dfeta_dfeta_ittsubject2_dfeta_initialteachertra = "dfeta_dfeta_ittsubject2_dfeta_initialteachertra";
 			public const string dfeta_dfeta_ittsubject3_dfeta_initialteachertra = "dfeta_dfeta_ittsubject3_dfeta_initialteachertra";
+			public const string lk_dfeta_initialteachertraining_createdby = "lk_dfeta_initialteachertraining_createdby";
+			public const string lk_dfeta_initialteachertraining_createdonbehalfby = "lk_dfeta_initialteachertraining_createdonbehalfby";
+			public const string lk_dfeta_initialteachertraining_modifiedby = "lk_dfeta_initialteachertraining_modifiedby";
+			public const string lk_dfeta_initialteachertraining_modifiedonbehalfby = "lk_dfeta_initialteachertraining_modifiedonbehalfby";
+			public const string user_dfeta_initialteachertraining = "user_dfeta_initialteachertraining";
 		}
 		
 		/// <summary>
@@ -4826,6 +5997,111 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_initialteachertraining_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_initialteachertraining_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_initialteachertraining_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_initialteachertraining_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_initialteachertraining_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_initialteachertraining_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_initialteachertraining_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_initialteachertraining_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_initialteachertraining_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_initialteachertraining_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_initialteachertraining_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_initialteachertraining_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_initialteachertraining_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_initialteachertraining_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_initialteachertraining_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_initialteachertraining_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_initialteachertraining_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_initialteachertraining_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_initialteachertraining_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_initialteachertraining_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_initialteachertraining_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_initialteachertraining_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_initialteachertraining_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_initialteachertraining_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_initialteachertraining_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_initialteachertraining_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_initialteachertraining_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_initialteachertraining_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_initialteachertraining
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_initialteachertraining")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_initialteachertraining
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_initialteachertraining", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_initialteachertraining");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_initialteachertraining", null, value);
+				this.OnPropertyChanged("user_dfeta_initialteachertraining");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -4856,6 +6132,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_Value = "dfeta_value";
 			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_ittqualification_dfeta_initialteach = "dfeta_dfeta_ittqualification_dfeta_initialteach";
+			public const string lk_dfeta_ittqualification_createdby = "lk_dfeta_ittqualification_createdby";
+			public const string lk_dfeta_ittqualification_createdonbehalfby = "lk_dfeta_ittqualification_createdonbehalfby";
+			public const string lk_dfeta_ittqualification_modifiedby = "lk_dfeta_ittqualification_modifiedby";
+			public const string lk_dfeta_ittqualification_modifiedonbehalfby = "lk_dfeta_ittqualification_modifiedonbehalfby";
 		}
 		
 		/// <summary>
@@ -4995,6 +6275,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittqualification_dfeta_initialteach");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_ittqualification_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittqualification_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_ittqualification_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittqualification_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittqualification_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittqualification_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittqualification_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_ittqualification_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittqualification_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_ittqualification_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittqualification_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittqualification_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittqualification_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittqualification_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_ittqualification_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittqualification_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_ittqualification_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittqualification_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittqualification_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittqualification_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittqualification_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_ittqualification_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittqualification_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_ittqualification_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittqualification_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittqualification_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittqualification_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittqualification_modifiedonbehalfby");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -5027,6 +6391,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_dfeta_ittsubject1_dfeta_initialteachertra = "dfeta_dfeta_ittsubject1_dfeta_initialteachertra";
 			public const string dfeta_dfeta_ittsubject2_dfeta_initialteachertra = "dfeta_dfeta_ittsubject2_dfeta_initialteachertra";
 			public const string dfeta_dfeta_ittsubject3_dfeta_initialteachertra = "dfeta_dfeta_ittsubject3_dfeta_initialteachertra";
+			public const string lk_dfeta_ittsubject_createdby = "lk_dfeta_ittsubject_createdby";
+			public const string lk_dfeta_ittsubject_createdonbehalfby = "lk_dfeta_ittsubject_createdonbehalfby";
+			public const string lk_dfeta_ittsubject_modifiedby = "lk_dfeta_ittsubject_modifiedby";
+			public const string lk_dfeta_ittsubject_modifiedonbehalfby = "lk_dfeta_ittsubject_modifiedonbehalfby";
 		}
 		
 		/// <summary>
@@ -5206,6 +6574,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_ittsubject_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittsubject_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_ittsubject_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittsubject_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittsubject_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittsubject_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittsubject_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_ittsubject_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittsubject_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_ittsubject_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittsubject_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittsubject_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittsubject_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittsubject_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_ittsubject_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittsubject_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_ittsubject_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittsubject_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittsubject_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittsubject_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittsubject_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_ittsubject_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittsubject_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_ittsubject_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittsubject_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittsubject_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittsubject_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittsubject_modifiedonbehalfby");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -5246,6 +6698,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_dfeta_earlyyearsstatus_dfeta_qtsregistration_EarlyYearsStatusId = "dfeta_dfeta_earlyyearsstatus_dfeta_qtsregistration_EarlyYearsStatusId";
 			public const string dfeta_dfeta_induction_dfeta_qtsregistration = "dfeta_dfeta_induction_dfeta_qtsregistration";
 			public const string dfeta_dfeta_teacherstatus_dfeta_qtsregistration = "dfeta_dfeta_teacherstatus_dfeta_qtsregistration";
+			public const string lk_dfeta_qtsregistration_createdby = "lk_dfeta_qtsregistration_createdby";
+			public const string lk_dfeta_qtsregistration_createdonbehalfby = "lk_dfeta_qtsregistration_createdonbehalfby";
+			public const string lk_dfeta_qtsregistration_modifiedby = "lk_dfeta_qtsregistration_modifiedby";
+			public const string lk_dfeta_qtsregistration_modifiedonbehalfby = "lk_dfeta_qtsregistration_modifiedonbehalfby";
+			public const string user_dfeta_qtsregistration = "user_dfeta_qtsregistration";
 		}
 		
 		/// <summary>
@@ -5590,6 +7047,111 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_teacherstatus_dfeta_qtsregistration");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_qtsregistration_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qtsregistration_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_qtsregistration_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qtsregistration_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qtsregistration_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qtsregistration_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qtsregistration_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_qtsregistration_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qtsregistration_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_qtsregistration_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qtsregistration_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qtsregistration_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qtsregistration_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qtsregistration_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_qtsregistration_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qtsregistration_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_qtsregistration_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qtsregistration_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qtsregistration_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qtsregistration_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qtsregistration_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_qtsregistration_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qtsregistration_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_qtsregistration_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qtsregistration_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qtsregistration_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qtsregistration_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qtsregistration_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_qtsregistration
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_qtsregistration")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_qtsregistration
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_qtsregistration", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_qtsregistration");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_qtsregistration", null, value);
+				this.OnPropertyChanged("user_dfeta_qtsregistration");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -5658,6 +7220,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_dfeta_hesubject_dfeta_qualification2 = "dfeta_dfeta_hesubject_dfeta_qualification2";
 			public const string dfeta_dfeta_hesubject_dfeta_qualification3 = "dfeta_dfeta_hesubject_dfeta_qualification3";
 			public const string dfeta_dfeta_specialism_dfeta_qualification_mq = "dfeta_dfeta_specialism_dfeta_qualification_mq";
+			public const string lk_dfeta_qualification_createdby = "lk_dfeta_qualification_createdby";
+			public const string lk_dfeta_qualification_createdonbehalfby = "lk_dfeta_qualification_createdonbehalfby";
+			public const string lk_dfeta_qualification_modifiedby = "lk_dfeta_qualification_modifiedby";
+			public const string lk_dfeta_qualification_modifiedonbehalfby = "lk_dfeta_qualification_modifiedonbehalfby";
+			public const string user_dfeta_qualification = "user_dfeta_qualification";
 		}
 		
 		/// <summary>
@@ -6565,6 +8132,111 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_specialism_dfeta_qualification_mq");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_qualification_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qualification_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_qualification_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qualification_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qualification_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qualification_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qualification_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_qualification_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qualification_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_qualification_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qualification_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qualification_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qualification_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qualification_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_qualification_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qualification_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_qualification_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qualification_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qualification_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qualification_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qualification_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_qualification_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qualification_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_qualification_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qualification_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qualification_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_qualification_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qualification_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_qualification
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_qualification")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_qualification
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_qualification", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_qualification");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_qualification", null, value);
+				this.OnPropertyChanged("user_dfeta_qualification");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -6601,6 +8273,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_sanction_Annotations = "dfeta_sanction_Annotations";
 			public const string dfeta_contact_dfeta_sanction = "dfeta_contact_dfeta_sanction";
 			public const string dfeta_dfeta_sanctioncode_dfeta_sanction = "dfeta_dfeta_sanctioncode_dfeta_sanction";
+			public const string lk_dfeta_sanction_createdby = "lk_dfeta_sanction_createdby";
+			public const string lk_dfeta_sanction_createdonbehalfby = "lk_dfeta_sanction_createdonbehalfby";
+			public const string lk_dfeta_sanction_modifiedby = "lk_dfeta_sanction_modifiedby";
+			public const string lk_dfeta_sanction_modifiedonbehalfby = "lk_dfeta_sanction_modifiedonbehalfby";
+			public const string user_dfeta_sanction = "user_dfeta_sanction";
 		}
 		
 		/// <summary>
@@ -6865,6 +8542,111 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_sanctioncode_dfeta_sanction");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_sanction_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanction_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_sanction_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanction_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanction_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanction_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanction_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_sanction_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanction_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_sanction_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanction_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanction_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanction_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanction_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_sanction_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanction_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_sanction_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanction_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanction_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanction_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanction_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_sanction_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanction_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_sanction_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanction_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanction_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanction_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanction_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_sanction
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_sanction")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_sanction
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_sanction", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_sanction");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_sanction", null, value);
+				this.OnPropertyChanged("user_dfeta_sanction");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -6896,6 +8678,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_Value = "dfeta_value";
 			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_sanctioncode_dfeta_sanction = "dfeta_dfeta_sanctioncode_dfeta_sanction";
+			public const string lk_dfeta_sanctioncode_createdby = "lk_dfeta_sanctioncode_createdby";
+			public const string lk_dfeta_sanctioncode_createdonbehalfby = "lk_dfeta_sanctioncode_createdonbehalfby";
+			public const string lk_dfeta_sanctioncode_modifiedby = "lk_dfeta_sanctioncode_modifiedby";
+			public const string lk_dfeta_sanctioncode_modifiedonbehalfby = "lk_dfeta_sanctioncode_modifiedonbehalfby";
 		}
 		
 		/// <summary>
@@ -7058,6 +8844,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_sanctioncode_dfeta_sanction");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_sanctioncode_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanctioncode_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_sanctioncode_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanctioncode_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanctioncode_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanctioncode_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanctioncode_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_sanctioncode_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanctioncode_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_sanctioncode_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanctioncode_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanctioncode_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanctioncode_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanctioncode_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_sanctioncode_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanctioncode_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_sanctioncode_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanctioncode_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanctioncode_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanctioncode_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanctioncode_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_sanctioncode_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanctioncode_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_sanctioncode_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanctioncode_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanctioncode_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_sanctioncode_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanctioncode_modifiedonbehalfby");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -7088,6 +8958,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_Value = "dfeta_value";
 			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_specialism_dfeta_qualification_mq = "dfeta_dfeta_specialism_dfeta_qualification_mq";
+			public const string lk_dfeta_specialism_createdby = "lk_dfeta_specialism_createdby";
+			public const string lk_dfeta_specialism_createdonbehalfby = "lk_dfeta_specialism_createdonbehalfby";
+			public const string lk_dfeta_specialism_modifiedby = "lk_dfeta_specialism_modifiedby";
+			public const string lk_dfeta_specialism_modifiedonbehalfby = "lk_dfeta_specialism_modifiedonbehalfby";
 		}
 		
 		/// <summary>
@@ -7227,6 +9101,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_specialism_dfeta_qualification_mq");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_specialism_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_specialism_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_specialism_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_specialism_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_specialism_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_specialism_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_specialism_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_specialism_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_specialism_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_specialism_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_specialism_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_specialism_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_specialism_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_specialism_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_specialism_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_specialism_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_specialism_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_specialism_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_specialism_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_specialism_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_specialism_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_specialism_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_specialism_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_specialism_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_specialism_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_specialism_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_specialism_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_specialism_modifiedonbehalfby");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -7258,6 +9216,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_Value = "dfeta_value";
 			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_teacherstatus_dfeta_qtsregistration = "dfeta_dfeta_teacherstatus_dfeta_qtsregistration";
+			public const string lk_dfeta_teacherstatus_createdby = "lk_dfeta_teacherstatus_createdby";
+			public const string lk_dfeta_teacherstatus_createdonbehalfby = "lk_dfeta_teacherstatus_createdonbehalfby";
+			public const string lk_dfeta_teacherstatus_modifiedby = "lk_dfeta_teacherstatus_modifiedby";
+			public const string lk_dfeta_teacherstatus_modifiedonbehalfby = "lk_dfeta_teacherstatus_modifiedonbehalfby";
 		}
 		
 		/// <summary>
@@ -7417,6 +9379,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_dfeta_teacherstatus_dfeta_qtsregistration");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_teacherstatus_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_teacherstatus_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_teacherstatus_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_teacherstatus_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_teacherstatus_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_teacherstatus_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_teacherstatus_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_teacherstatus_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_teacherstatus_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_teacherstatus_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_teacherstatus_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_teacherstatus_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_teacherstatus_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_teacherstatus_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_teacherstatus_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_teacherstatus_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_teacherstatus_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_teacherstatus_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_teacherstatus_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_teacherstatus_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_teacherstatus_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_teacherstatus_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_teacherstatus_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_teacherstatus_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_teacherstatus_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_teacherstatus_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_teacherstatus_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_teacherstatus_modifiedonbehalfby");
+			}
+		}
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -7472,7 +9518,12 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Referencingincident_existingcase = "incident_existingcase";
 			public const string Referencingincident_master_incident = "incident_master_incident";
 			public const string Referencingincident_parent_incident = "incident_parent_incident";
+			public const string lk_incidentbase_createdby = "lk_incidentbase_createdby";
+			public const string lk_incidentbase_createdonbehalfby = "lk_incidentbase_createdonbehalfby";
+			public const string lk_incidentbase_modifiedby = "lk_incidentbase_modifiedby";
+			public const string lk_incidentbase_modifiedonbehalfby = "lk_incidentbase_modifiedonbehalfby";
 			public const string subject_incidents = "subject_incidents";
+			public const string system_user_incidents = "system_user_incidents";
 		}
 		
 		/// <summary>
@@ -8061,6 +10112,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// N:1 lk_incidentbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentbase_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_incidentbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentbase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentbase_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentbase_createdby", null, value);
+				this.OnPropertyChanged("lk_incidentbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_incidentbase_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentbase_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_incidentbase_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentbase_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentbase_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentbase_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_incidentbase_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_incidentbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentbase_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_incidentbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentbase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentbase_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentbase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_incidentbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_incidentbase_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentbase_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_incidentbase_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentbase_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentbase_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentbase_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_incidentbase_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
 		/// N:1 subject_incidents
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subjectid")]
@@ -8078,6 +10213,27 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("subject_incidents");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Subject>("subject_incidents", null, value);
 				this.OnPropertyChanged("subject_incidents");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 system_user_incidents
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("system_user_incidents")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser system_user_incidents
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("system_user_incidents", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("system_user_incidents");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("system_user_incidents", null, value);
+				this.OnPropertyChanged("system_user_incidents");
 			}
 		}
 	}
@@ -8099,6 +10255,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Title = "title";
 			public const string subject_incidents = "subject_incidents";
 			public const string Referencedsubject_parent_subject = "Referencedsubject_parent_subject";
+			public const string lk_subject_createdonbehalfby = "lk_subject_createdonbehalfby";
+			public const string lk_subject_modifiedonbehalfby = "lk_subject_modifiedonbehalfby";
+			public const string lk_subjectbase_createdby = "lk_subjectbase_createdby";
+			public const string lk_subjectbase_modifiedby = "lk_subjectbase_modifiedby";
 			public const string Referencingsubject_parent_subject = "subject_parent_subject";
 		}
 		
@@ -8226,6 +10386,90 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// N:1 lk_subject_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subject_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_subject_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_subject_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_subject_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_subject_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_subject_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_subject_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subject_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_subject_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_subject_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_subject_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_subject_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_subject_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_subjectbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subjectbase_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_subjectbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_subjectbase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_subjectbase_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_subjectbase_createdby", null, value);
+				this.OnPropertyChanged("lk_subjectbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_subjectbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subjectbase_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_subjectbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_subjectbase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_subjectbase_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_subjectbase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_subjectbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
 		/// N:1 subject_parent_subject
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentsubject")]
@@ -8243,6 +10487,2592 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Referencingsubject_parent_subject");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Subject>("subject_parent_subject", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
 				this.OnPropertyChanged("Referencingsubject_parent_subject");
+			}
+		}
+	}
+	
+	/// <summary>
+	/// Person with access to the Microsoft CRM system and who owns objects in the Microsoft CRM database.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("systemuser")]
+	public partial class SystemUser : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the systemuser entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string AzureActiveDirectoryObjectId = "azureactivedirectoryobjectid";
+			public const string FirstName = "firstname";
+			public const string LastName = "lastname";
+			public const string annotation_owning_user = "annotation_owning_user";
+			public const string contact_owning_user = "contact_owning_user";
+			public const string lk_accountbase_createdby = "lk_accountbase_createdby";
+			public const string lk_accountbase_createdonbehalfby = "lk_accountbase_createdonbehalfby";
+			public const string lk_accountbase_modifiedby = "lk_accountbase_modifiedby";
+			public const string lk_accountbase_modifiedonbehalfby = "lk_accountbase_modifiedonbehalfby";
+			public const string lk_annotationbase_createdby = "lk_annotationbase_createdby";
+			public const string lk_annotationbase_createdonbehalfby = "lk_annotationbase_createdonbehalfby";
+			public const string lk_annotationbase_modifiedby = "lk_annotationbase_modifiedby";
+			public const string lk_annotationbase_modifiedonbehalfby = "lk_annotationbase_modifiedonbehalfby";
+			public const string lk_contact_createdonbehalfby = "lk_contact_createdonbehalfby";
+			public const string lk_contact_modifiedonbehalfby = "lk_contact_modifiedonbehalfby";
+			public const string lk_contactbase_createdby = "lk_contactbase_createdby";
+			public const string lk_contactbase_modifiedby = "lk_contactbase_modifiedby";
+			public const string lk_dfeta_businesseventaudit_createdby = "lk_dfeta_businesseventaudit_createdby";
+			public const string lk_dfeta_businesseventaudit_createdonbehalfby = "lk_dfeta_businesseventaudit_createdonbehalfby";
+			public const string lk_dfeta_businesseventaudit_modifiedby = "lk_dfeta_businesseventaudit_modifiedby";
+			public const string lk_dfeta_businesseventaudit_modifiedonbehalfby = "lk_dfeta_businesseventaudit_modifiedonbehalfby";
+			public const string lk_dfeta_country_createdby = "lk_dfeta_country_createdby";
+			public const string lk_dfeta_country_createdonbehalfby = "lk_dfeta_country_createdonbehalfby";
+			public const string lk_dfeta_country_modifiedby = "lk_dfeta_country_modifiedby";
+			public const string lk_dfeta_country_modifiedonbehalfby = "lk_dfeta_country_modifiedonbehalfby";
+			public const string lk_dfeta_document_createdby = "lk_dfeta_document_createdby";
+			public const string lk_dfeta_document_createdonbehalfby = "lk_dfeta_document_createdonbehalfby";
+			public const string lk_dfeta_document_modifiedby = "lk_dfeta_document_modifiedby";
+			public const string lk_dfeta_document_modifiedonbehalfby = "lk_dfeta_document_modifiedonbehalfby";
+			public const string lk_dfeta_earlyyearsstatus_createdby = "lk_dfeta_earlyyearsstatus_createdby";
+			public const string lk_dfeta_earlyyearsstatus_createdonbehalfby = "lk_dfeta_earlyyearsstatus_createdonbehalfby";
+			public const string lk_dfeta_earlyyearsstatus_modifiedby = "lk_dfeta_earlyyearsstatus_modifiedby";
+			public const string lk_dfeta_earlyyearsstatus_modifiedonbehalfby = "lk_dfeta_earlyyearsstatus_modifiedonbehalfby";
+			public const string lk_dfeta_hequalification_createdby = "lk_dfeta_hequalification_createdby";
+			public const string lk_dfeta_hequalification_createdonbehalfby = "lk_dfeta_hequalification_createdonbehalfby";
+			public const string lk_dfeta_hequalification_modifiedby = "lk_dfeta_hequalification_modifiedby";
+			public const string lk_dfeta_hequalification_modifiedonbehalfby = "lk_dfeta_hequalification_modifiedonbehalfby";
+			public const string lk_dfeta_hesubject_createdby = "lk_dfeta_hesubject_createdby";
+			public const string lk_dfeta_hesubject_createdonbehalfby = "lk_dfeta_hesubject_createdonbehalfby";
+			public const string lk_dfeta_hesubject_modifiedby = "lk_dfeta_hesubject_modifiedby";
+			public const string lk_dfeta_hesubject_modifiedonbehalfby = "lk_dfeta_hesubject_modifiedonbehalfby";
+			public const string lk_dfeta_induction_createdby = "lk_dfeta_induction_createdby";
+			public const string lk_dfeta_induction_createdonbehalfby = "lk_dfeta_induction_createdonbehalfby";
+			public const string lk_dfeta_induction_modifiedby = "lk_dfeta_induction_modifiedby";
+			public const string lk_dfeta_induction_modifiedonbehalfby = "lk_dfeta_induction_modifiedonbehalfby";
+			public const string lk_dfeta_inductionperiod_createdby = "lk_dfeta_inductionperiod_createdby";
+			public const string lk_dfeta_inductionperiod_createdonbehalfby = "lk_dfeta_inductionperiod_createdonbehalfby";
+			public const string lk_dfeta_inductionperiod_modifiedby = "lk_dfeta_inductionperiod_modifiedby";
+			public const string lk_dfeta_inductionperiod_modifiedonbehalfby = "lk_dfeta_inductionperiod_modifiedonbehalfby";
+			public const string lk_dfeta_initialteachertraining_createdby = "lk_dfeta_initialteachertraining_createdby";
+			public const string lk_dfeta_initialteachertraining_createdonbehalfby = "lk_dfeta_initialteachertraining_createdonbehalfby";
+			public const string lk_dfeta_initialteachertraining_modifiedby = "lk_dfeta_initialteachertraining_modifiedby";
+			public const string lk_dfeta_initialteachertraining_modifiedonbehalfby = "lk_dfeta_initialteachertraining_modifiedonbehalfby";
+			public const string lk_dfeta_ittqualification_createdby = "lk_dfeta_ittqualification_createdby";
+			public const string lk_dfeta_ittqualification_createdonbehalfby = "lk_dfeta_ittqualification_createdonbehalfby";
+			public const string lk_dfeta_ittqualification_modifiedby = "lk_dfeta_ittqualification_modifiedby";
+			public const string lk_dfeta_ittqualification_modifiedonbehalfby = "lk_dfeta_ittqualification_modifiedonbehalfby";
+			public const string lk_dfeta_ittsubject_createdby = "lk_dfeta_ittsubject_createdby";
+			public const string lk_dfeta_ittsubject_createdonbehalfby = "lk_dfeta_ittsubject_createdonbehalfby";
+			public const string lk_dfeta_ittsubject_modifiedby = "lk_dfeta_ittsubject_modifiedby";
+			public const string lk_dfeta_ittsubject_modifiedonbehalfby = "lk_dfeta_ittsubject_modifiedonbehalfby";
+			public const string lk_dfeta_qtsregistration_createdby = "lk_dfeta_qtsregistration_createdby";
+			public const string lk_dfeta_qtsregistration_createdonbehalfby = "lk_dfeta_qtsregistration_createdonbehalfby";
+			public const string lk_dfeta_qtsregistration_modifiedby = "lk_dfeta_qtsregistration_modifiedby";
+			public const string lk_dfeta_qtsregistration_modifiedonbehalfby = "lk_dfeta_qtsregistration_modifiedonbehalfby";
+			public const string lk_dfeta_qualification_createdby = "lk_dfeta_qualification_createdby";
+			public const string lk_dfeta_qualification_createdonbehalfby = "lk_dfeta_qualification_createdonbehalfby";
+			public const string lk_dfeta_qualification_modifiedby = "lk_dfeta_qualification_modifiedby";
+			public const string lk_dfeta_qualification_modifiedonbehalfby = "lk_dfeta_qualification_modifiedonbehalfby";
+			public const string lk_dfeta_sanction_createdby = "lk_dfeta_sanction_createdby";
+			public const string lk_dfeta_sanction_createdonbehalfby = "lk_dfeta_sanction_createdonbehalfby";
+			public const string lk_dfeta_sanction_modifiedby = "lk_dfeta_sanction_modifiedby";
+			public const string lk_dfeta_sanction_modifiedonbehalfby = "lk_dfeta_sanction_modifiedonbehalfby";
+			public const string lk_dfeta_sanctioncode_createdby = "lk_dfeta_sanctioncode_createdby";
+			public const string lk_dfeta_sanctioncode_createdonbehalfby = "lk_dfeta_sanctioncode_createdonbehalfby";
+			public const string lk_dfeta_sanctioncode_modifiedby = "lk_dfeta_sanctioncode_modifiedby";
+			public const string lk_dfeta_sanctioncode_modifiedonbehalfby = "lk_dfeta_sanctioncode_modifiedonbehalfby";
+			public const string lk_dfeta_specialism_createdby = "lk_dfeta_specialism_createdby";
+			public const string lk_dfeta_specialism_createdonbehalfby = "lk_dfeta_specialism_createdonbehalfby";
+			public const string lk_dfeta_specialism_modifiedby = "lk_dfeta_specialism_modifiedby";
+			public const string lk_dfeta_specialism_modifiedonbehalfby = "lk_dfeta_specialism_modifiedonbehalfby";
+			public const string lk_dfeta_teacherstatus_createdby = "lk_dfeta_teacherstatus_createdby";
+			public const string lk_dfeta_teacherstatus_createdonbehalfby = "lk_dfeta_teacherstatus_createdonbehalfby";
+			public const string lk_dfeta_teacherstatus_modifiedby = "lk_dfeta_teacherstatus_modifiedby";
+			public const string lk_dfeta_teacherstatus_modifiedonbehalfby = "lk_dfeta_teacherstatus_modifiedonbehalfby";
+			public const string lk_incidentbase_createdby = "lk_incidentbase_createdby";
+			public const string lk_incidentbase_createdonbehalfby = "lk_incidentbase_createdonbehalfby";
+			public const string lk_incidentbase_modifiedby = "lk_incidentbase_modifiedby";
+			public const string lk_incidentbase_modifiedonbehalfby = "lk_incidentbase_modifiedonbehalfby";
+			public const string lk_subject_createdonbehalfby = "lk_subject_createdonbehalfby";
+			public const string lk_subject_modifiedonbehalfby = "lk_subject_modifiedonbehalfby";
+			public const string lk_subjectbase_createdby = "lk_subjectbase_createdby";
+			public const string lk_subjectbase_modifiedby = "lk_subjectbase_modifiedby";
+			public const string Referencedlk_systemuser_createdonbehalfby = "Referencedlk_systemuser_createdonbehalfby";
+			public const string Referencedlk_systemuser_modifiedonbehalfby = "Referencedlk_systemuser_modifiedonbehalfby";
+			public const string Referencedlk_systemuserbase_createdby = "Referencedlk_systemuserbase_createdby";
+			public const string Referencedlk_systemuserbase_modifiedby = "Referencedlk_systemuserbase_modifiedby";
+			public const string lk_task_createdby = "lk_task_createdby";
+			public const string lk_task_createdonbehalfby = "lk_task_createdonbehalfby";
+			public const string lk_task_modifiedby = "lk_task_modifiedby";
+			public const string lk_task_modifiedonbehalfby = "lk_task_modifiedonbehalfby";
+			public const string system_user_accounts = "system_user_accounts";
+			public const string system_user_contacts = "system_user_contacts";
+			public const string system_user_incidents = "system_user_incidents";
+			public const string user_accounts = "user_accounts";
+			public const string user_dfeta_businesseventaudit = "user_dfeta_businesseventaudit";
+			public const string user_dfeta_document = "user_dfeta_document";
+			public const string user_dfeta_induction = "user_dfeta_induction";
+			public const string user_dfeta_inductionperiod = "user_dfeta_inductionperiod";
+			public const string user_dfeta_initialteachertraining = "user_dfeta_initialteachertraining";
+			public const string user_dfeta_qtsregistration = "user_dfeta_qtsregistration";
+			public const string user_dfeta_qualification = "user_dfeta_qualification";
+			public const string user_dfeta_sanction = "user_dfeta_sanction";
+			public const string Referenceduser_parent_user = "Referenceduser_parent_user";
+			public const string user_task = "user_task";
+			public const string Referencinglk_systemuser_createdonbehalfby = "lk_systemuser_createdonbehalfby";
+			public const string Referencinglk_systemuser_modifiedonbehalfby = "lk_systemuser_modifiedonbehalfby";
+			public const string Referencinglk_systemuserbase_createdby = "lk_systemuserbase_createdby";
+			public const string Referencinglk_systemuserbase_modifiedby = "lk_systemuserbase_modifiedby";
+			public const string Referencinguser_parent_user = "user_parent_user";
+		}
+		
+		public const string AlternateKeys = "azureactivedirectoryobjectid";
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public SystemUser() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "SystemUser";
+		
+		public const string PrimaryIdAttribute = "systemuserid";
+		
+		public const string PrimaryNameAttribute = "fullname";
+		
+		public const string EntityLogicalName = "systemuser";
+		
+		public const string EntityLogicalCollectionName = "systemusers";
+		
+		public const string EntitySetName = "systemusers";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// This is the application directory object Id.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("azureactivedirectoryobjectid")]
+		public System.Nullable<System.Guid> AzureActiveDirectoryObjectId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("azureactivedirectoryobjectid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("AzureActiveDirectoryObjectId");
+				this.SetAttributeValue("azureactivedirectoryobjectid", value);
+				this.OnPropertyChanged("AzureActiveDirectoryObjectId");
+			}
+		}
+		
+		/// <summary>
+		/// First name of the user.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("firstname")]
+		public string FirstName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("firstname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("FirstName");
+				this.SetAttributeValue("firstname", value);
+				this.OnPropertyChanged("FirstName");
+			}
+		}
+		
+		/// <summary>
+		/// Last name of the user.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("lastname")]
+		public string LastName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("lastname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("LastName");
+				this.SetAttributeValue("lastname", value);
+				this.OnPropertyChanged("LastName");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N annotation_owning_user
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("annotation_owning_user")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Annotation> annotation_owning_user
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("annotation_owning_user", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("annotation_owning_user");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("annotation_owning_user", null, value);
+				this.OnPropertyChanged("annotation_owning_user");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N contact_owning_user
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("contact_owning_user")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Contact> contact_owning_user
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("contact_owning_user", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("contact_owning_user");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("contact_owning_user", null, value);
+				this.OnPropertyChanged("contact_owning_user");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_accountbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_accountbase_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Account> lk_accountbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("lk_accountbase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_accountbase_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("lk_accountbase_createdby", null, value);
+				this.OnPropertyChanged("lk_accountbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_accountbase_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_accountbase_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Account> lk_accountbase_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("lk_accountbase_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_accountbase_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("lk_accountbase_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_accountbase_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_accountbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_accountbase_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Account> lk_accountbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("lk_accountbase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_accountbase_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("lk_accountbase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_accountbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_accountbase_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_accountbase_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Account> lk_accountbase_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("lk_accountbase_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_accountbase_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("lk_accountbase_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_accountbase_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_annotationbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_annotationbase_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Annotation> lk_annotationbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("lk_annotationbase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_annotationbase_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("lk_annotationbase_createdby", null, value);
+				this.OnPropertyChanged("lk_annotationbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_annotationbase_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_annotationbase_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Annotation> lk_annotationbase_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("lk_annotationbase_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_annotationbase_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("lk_annotationbase_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_annotationbase_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_annotationbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_annotationbase_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Annotation> lk_annotationbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("lk_annotationbase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_annotationbase_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("lk_annotationbase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_annotationbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_annotationbase_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_annotationbase_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Annotation> lk_annotationbase_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("lk_annotationbase_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_annotationbase_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("lk_annotationbase_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_annotationbase_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_contact_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_contact_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Contact> lk_contact_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("lk_contact_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_contact_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("lk_contact_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_contact_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_contact_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_contact_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Contact> lk_contact_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("lk_contact_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_contact_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("lk_contact_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_contact_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_contactbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_contactbase_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Contact> lk_contactbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("lk_contactbase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_contactbase_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("lk_contactbase_createdby", null, value);
+				this.OnPropertyChanged("lk_contactbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_contactbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_contactbase_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Contact> lk_contactbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("lk_contactbase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_contactbase_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("lk_contactbase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_contactbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_businesseventaudit_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_businesseventaudit_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit> lk_dfeta_businesseventaudit_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>("lk_dfeta_businesseventaudit_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_businesseventaudit_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>("lk_dfeta_businesseventaudit_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_businesseventaudit_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_businesseventaudit_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_businesseventaudit_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit> lk_dfeta_businesseventaudit_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>("lk_dfeta_businesseventaudit_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_businesseventaudit_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>("lk_dfeta_businesseventaudit_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_businesseventaudit_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_businesseventaudit_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_businesseventaudit_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit> lk_dfeta_businesseventaudit_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>("lk_dfeta_businesseventaudit_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_businesseventaudit_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>("lk_dfeta_businesseventaudit_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_businesseventaudit_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_businesseventaudit_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_businesseventaudit_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit> lk_dfeta_businesseventaudit_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>("lk_dfeta_businesseventaudit_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_businesseventaudit_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>("lk_dfeta_businesseventaudit_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_businesseventaudit_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_country_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_country_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_country> lk_dfeta_country_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_country>("lk_dfeta_country_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_country_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_country>("lk_dfeta_country_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_country_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_country_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_country_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_country> lk_dfeta_country_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_country>("lk_dfeta_country_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_country_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_country>("lk_dfeta_country_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_country_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_country_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_country_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_country> lk_dfeta_country_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_country>("lk_dfeta_country_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_country_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_country>("lk_dfeta_country_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_country_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_country_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_country_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_country> lk_dfeta_country_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_country>("lk_dfeta_country_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_country_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_country>("lk_dfeta_country_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_country_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_document_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_document_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_document> lk_dfeta_document_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>("lk_dfeta_document_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_document_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>("lk_dfeta_document_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_document_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_document_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_document_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_document> lk_dfeta_document_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>("lk_dfeta_document_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_document_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>("lk_dfeta_document_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_document_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_document_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_document_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_document> lk_dfeta_document_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>("lk_dfeta_document_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_document_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>("lk_dfeta_document_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_document_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_document_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_document_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_document> lk_dfeta_document_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>("lk_dfeta_document_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_document_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>("lk_dfeta_document_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_document_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_earlyyearsstatus_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_earlyyearsstatus_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus> lk_dfeta_earlyyearsstatus_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus>("lk_dfeta_earlyyearsstatus_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_earlyyearsstatus_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus>("lk_dfeta_earlyyearsstatus_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_earlyyearsstatus_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_earlyyearsstatus_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus> lk_dfeta_earlyyearsstatus_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus>("lk_dfeta_earlyyearsstatus_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_earlyyearsstatus_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus>("lk_dfeta_earlyyearsstatus_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_earlyyearsstatus_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_earlyyearsstatus_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus> lk_dfeta_earlyyearsstatus_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus>("lk_dfeta_earlyyearsstatus_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_earlyyearsstatus_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus>("lk_dfeta_earlyyearsstatus_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_earlyyearsstatus_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_earlyyearsstatus_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus> lk_dfeta_earlyyearsstatus_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus>("lk_dfeta_earlyyearsstatus_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_earlyyearsstatus_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_earlyyearsstatus>("lk_dfeta_earlyyearsstatus_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_earlyyearsstatus_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_hequalification_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hequalification_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification> lk_dfeta_hequalification_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification>("lk_dfeta_hequalification_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hequalification_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification>("lk_dfeta_hequalification_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hequalification_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_hequalification_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hequalification_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification> lk_dfeta_hequalification_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification>("lk_dfeta_hequalification_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hequalification_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification>("lk_dfeta_hequalification_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hequalification_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_hequalification_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hequalification_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification> lk_dfeta_hequalification_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification>("lk_dfeta_hequalification_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hequalification_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification>("lk_dfeta_hequalification_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hequalification_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_hequalification_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hequalification_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification> lk_dfeta_hequalification_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification>("lk_dfeta_hequalification_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hequalification_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hequalification>("lk_dfeta_hequalification_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hequalification_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_hesubject_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hesubject_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject> lk_dfeta_hesubject_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject>("lk_dfeta_hesubject_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hesubject_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject>("lk_dfeta_hesubject_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hesubject_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_hesubject_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hesubject_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject> lk_dfeta_hesubject_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject>("lk_dfeta_hesubject_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hesubject_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject>("lk_dfeta_hesubject_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hesubject_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_hesubject_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hesubject_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject> lk_dfeta_hesubject_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject>("lk_dfeta_hesubject_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hesubject_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject>("lk_dfeta_hesubject_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hesubject_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_hesubject_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_hesubject_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject> lk_dfeta_hesubject_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject>("lk_dfeta_hesubject_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_hesubject_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_hesubject>("lk_dfeta_hesubject_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_hesubject_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_induction_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_induction_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction> lk_dfeta_induction_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>("lk_dfeta_induction_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_induction_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>("lk_dfeta_induction_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_induction_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_induction_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_induction_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction> lk_dfeta_induction_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>("lk_dfeta_induction_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_induction_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>("lk_dfeta_induction_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_induction_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_induction_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_induction_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction> lk_dfeta_induction_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>("lk_dfeta_induction_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_induction_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>("lk_dfeta_induction_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_induction_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_induction_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_induction_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction> lk_dfeta_induction_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>("lk_dfeta_induction_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_induction_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>("lk_dfeta_induction_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_induction_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_inductionperiod_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_inductionperiod_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod> lk_dfeta_inductionperiod_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>("lk_dfeta_inductionperiod_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_inductionperiod_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>("lk_dfeta_inductionperiod_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_inductionperiod_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_inductionperiod_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_inductionperiod_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod> lk_dfeta_inductionperiod_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>("lk_dfeta_inductionperiod_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_inductionperiod_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>("lk_dfeta_inductionperiod_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_inductionperiod_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_inductionperiod_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_inductionperiod_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod> lk_dfeta_inductionperiod_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>("lk_dfeta_inductionperiod_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_inductionperiod_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>("lk_dfeta_inductionperiod_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_inductionperiod_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_inductionperiod_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_inductionperiod_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod> lk_dfeta_inductionperiod_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>("lk_dfeta_inductionperiod_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_inductionperiod_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>("lk_dfeta_inductionperiod_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_inductionperiod_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_initialteachertraining_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_initialteachertraining_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining> lk_dfeta_initialteachertraining_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("lk_dfeta_initialteachertraining_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_initialteachertraining_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("lk_dfeta_initialteachertraining_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_initialteachertraining_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_initialteachertraining_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_initialteachertraining_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining> lk_dfeta_initialteachertraining_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("lk_dfeta_initialteachertraining_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_initialteachertraining_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("lk_dfeta_initialteachertraining_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_initialteachertraining_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_initialteachertraining_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_initialteachertraining_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining> lk_dfeta_initialteachertraining_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("lk_dfeta_initialteachertraining_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_initialteachertraining_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("lk_dfeta_initialteachertraining_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_initialteachertraining_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_initialteachertraining_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_initialteachertraining_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining> lk_dfeta_initialteachertraining_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("lk_dfeta_initialteachertraining_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_initialteachertraining_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("lk_dfeta_initialteachertraining_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_initialteachertraining_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_ittqualification_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittqualification_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification> lk_dfeta_ittqualification_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification>("lk_dfeta_ittqualification_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittqualification_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification>("lk_dfeta_ittqualification_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittqualification_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_ittqualification_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittqualification_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification> lk_dfeta_ittqualification_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification>("lk_dfeta_ittqualification_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittqualification_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification>("lk_dfeta_ittqualification_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittqualification_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_ittqualification_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittqualification_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification> lk_dfeta_ittqualification_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification>("lk_dfeta_ittqualification_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittqualification_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification>("lk_dfeta_ittqualification_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittqualification_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_ittqualification_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittqualification_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification> lk_dfeta_ittqualification_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification>("lk_dfeta_ittqualification_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittqualification_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittqualification>("lk_dfeta_ittqualification_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittqualification_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_ittsubject_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittsubject_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject> lk_dfeta_ittsubject_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>("lk_dfeta_ittsubject_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittsubject_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>("lk_dfeta_ittsubject_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittsubject_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_ittsubject_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittsubject_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject> lk_dfeta_ittsubject_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>("lk_dfeta_ittsubject_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittsubject_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>("lk_dfeta_ittsubject_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittsubject_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_ittsubject_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittsubject_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject> lk_dfeta_ittsubject_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>("lk_dfeta_ittsubject_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittsubject_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>("lk_dfeta_ittsubject_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittsubject_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_ittsubject_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_ittsubject_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject> lk_dfeta_ittsubject_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>("lk_dfeta_ittsubject_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_ittsubject_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>("lk_dfeta_ittsubject_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_ittsubject_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_qtsregistration_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qtsregistration_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration> lk_dfeta_qtsregistration_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("lk_dfeta_qtsregistration_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qtsregistration_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("lk_dfeta_qtsregistration_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qtsregistration_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_qtsregistration_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qtsregistration_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration> lk_dfeta_qtsregistration_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("lk_dfeta_qtsregistration_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qtsregistration_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("lk_dfeta_qtsregistration_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qtsregistration_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_qtsregistration_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qtsregistration_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration> lk_dfeta_qtsregistration_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("lk_dfeta_qtsregistration_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qtsregistration_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("lk_dfeta_qtsregistration_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qtsregistration_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_qtsregistration_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qtsregistration_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration> lk_dfeta_qtsregistration_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("lk_dfeta_qtsregistration_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qtsregistration_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("lk_dfeta_qtsregistration_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qtsregistration_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_qualification_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qualification_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification> lk_dfeta_qualification_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>("lk_dfeta_qualification_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qualification_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>("lk_dfeta_qualification_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qualification_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_qualification_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qualification_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification> lk_dfeta_qualification_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>("lk_dfeta_qualification_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qualification_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>("lk_dfeta_qualification_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qualification_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_qualification_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qualification_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification> lk_dfeta_qualification_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>("lk_dfeta_qualification_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qualification_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>("lk_dfeta_qualification_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qualification_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_qualification_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qualification_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification> lk_dfeta_qualification_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>("lk_dfeta_qualification_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_qualification_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>("lk_dfeta_qualification_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_qualification_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_sanction_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanction_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction> lk_dfeta_sanction_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("lk_dfeta_sanction_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanction_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("lk_dfeta_sanction_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanction_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_sanction_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanction_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction> lk_dfeta_sanction_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("lk_dfeta_sanction_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanction_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("lk_dfeta_sanction_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanction_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_sanction_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanction_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction> lk_dfeta_sanction_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("lk_dfeta_sanction_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanction_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("lk_dfeta_sanction_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanction_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_sanction_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanction_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction> lk_dfeta_sanction_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("lk_dfeta_sanction_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanction_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("lk_dfeta_sanction_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanction_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_sanctioncode_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanctioncode_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode> lk_dfeta_sanctioncode_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode>("lk_dfeta_sanctioncode_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanctioncode_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode>("lk_dfeta_sanctioncode_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanctioncode_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_sanctioncode_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanctioncode_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode> lk_dfeta_sanctioncode_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode>("lk_dfeta_sanctioncode_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanctioncode_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode>("lk_dfeta_sanctioncode_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanctioncode_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_sanctioncode_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanctioncode_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode> lk_dfeta_sanctioncode_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode>("lk_dfeta_sanctioncode_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanctioncode_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode>("lk_dfeta_sanctioncode_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanctioncode_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_sanctioncode_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_sanctioncode_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode> lk_dfeta_sanctioncode_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode>("lk_dfeta_sanctioncode_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_sanctioncode_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanctioncode>("lk_dfeta_sanctioncode_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_sanctioncode_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_specialism_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_specialism_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism> lk_dfeta_specialism_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism>("lk_dfeta_specialism_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_specialism_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism>("lk_dfeta_specialism_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_specialism_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_specialism_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_specialism_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism> lk_dfeta_specialism_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism>("lk_dfeta_specialism_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_specialism_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism>("lk_dfeta_specialism_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_specialism_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_specialism_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_specialism_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism> lk_dfeta_specialism_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism>("lk_dfeta_specialism_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_specialism_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism>("lk_dfeta_specialism_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_specialism_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_specialism_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_specialism_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism> lk_dfeta_specialism_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism>("lk_dfeta_specialism_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_specialism_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_specialism>("lk_dfeta_specialism_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_specialism_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_teacherstatus_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_teacherstatus_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus> lk_dfeta_teacherstatus_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus>("lk_dfeta_teacherstatus_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_teacherstatus_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus>("lk_dfeta_teacherstatus_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_teacherstatus_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_teacherstatus_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_teacherstatus_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus> lk_dfeta_teacherstatus_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus>("lk_dfeta_teacherstatus_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_teacherstatus_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus>("lk_dfeta_teacherstatus_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_teacherstatus_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_teacherstatus_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_teacherstatus_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus> lk_dfeta_teacherstatus_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus>("lk_dfeta_teacherstatus_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_teacherstatus_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus>("lk_dfeta_teacherstatus_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_teacherstatus_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_teacherstatus_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_teacherstatus_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus> lk_dfeta_teacherstatus_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus>("lk_dfeta_teacherstatus_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_teacherstatus_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_teacherstatus>("lk_dfeta_teacherstatus_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_teacherstatus_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_incidentbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentbase_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Incident> lk_incidentbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("lk_incidentbase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentbase_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("lk_incidentbase_createdby", null, value);
+				this.OnPropertyChanged("lk_incidentbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_incidentbase_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentbase_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Incident> lk_incidentbase_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("lk_incidentbase_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentbase_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("lk_incidentbase_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_incidentbase_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_incidentbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentbase_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Incident> lk_incidentbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("lk_incidentbase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentbase_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("lk_incidentbase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_incidentbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_incidentbase_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentbase_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Incident> lk_incidentbase_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("lk_incidentbase_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentbase_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("lk_incidentbase_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_incidentbase_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_subject_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subject_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Subject> lk_subject_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Subject>("lk_subject_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_subject_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Subject>("lk_subject_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_subject_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_subject_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subject_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Subject> lk_subject_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Subject>("lk_subject_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_subject_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Subject>("lk_subject_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_subject_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_subjectbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subjectbase_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Subject> lk_subjectbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Subject>("lk_subjectbase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_subjectbase_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Subject>("lk_subjectbase_createdby", null, value);
+				this.OnPropertyChanged("lk_subjectbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_subjectbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subjectbase_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Subject> lk_subjectbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Subject>("lk_subjectbase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_subjectbase_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Subject>("lk_subjectbase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_subjectbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_systemuser_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_systemuser_createdonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SystemUser> Referencedlk_systemuser_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuser_createdonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedlk_systemuser_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuser_createdonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedlk_systemuser_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_systemuser_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_systemuser_modifiedonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SystemUser> Referencedlk_systemuser_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuser_modifiedonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedlk_systemuser_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuser_modifiedonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedlk_systemuser_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_systemuserbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_systemuserbase_createdby", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SystemUser> Referencedlk_systemuserbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuserbase_createdby", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedlk_systemuserbase_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuserbase_createdby", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedlk_systemuserbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_systemuserbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_systemuserbase_modifiedby", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SystemUser> Referencedlk_systemuserbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuserbase_modifiedby", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedlk_systemuserbase_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuserbase_modifiedby", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedlk_systemuserbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_task_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_task_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Task> lk_task_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("lk_task_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_task_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("lk_task_createdby", null, value);
+				this.OnPropertyChanged("lk_task_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_task_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_task_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Task> lk_task_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("lk_task_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_task_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("lk_task_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_task_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_task_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_task_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Task> lk_task_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("lk_task_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_task_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("lk_task_modifiedby", null, value);
+				this.OnPropertyChanged("lk_task_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_task_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_task_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Task> lk_task_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("lk_task_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_task_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("lk_task_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_task_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N system_user_accounts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("system_user_accounts")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Account> system_user_accounts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("system_user_accounts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("system_user_accounts");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("system_user_accounts", null, value);
+				this.OnPropertyChanged("system_user_accounts");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N system_user_contacts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("system_user_contacts")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Contact> system_user_contacts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("system_user_contacts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("system_user_contacts");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("system_user_contacts", null, value);
+				this.OnPropertyChanged("system_user_contacts");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N system_user_incidents
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("system_user_incidents")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Incident> system_user_incidents
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("system_user_incidents", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("system_user_incidents");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("system_user_incidents", null, value);
+				this.OnPropertyChanged("system_user_incidents");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_accounts
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_accounts")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Account> user_accounts
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("user_accounts", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_accounts");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("user_accounts", null, value);
+				this.OnPropertyChanged("user_accounts");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_dfeta_businesseventaudit
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_businesseventaudit")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit> user_dfeta_businesseventaudit
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>("user_dfeta_businesseventaudit", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_businesseventaudit");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_businesseventaudit>("user_dfeta_businesseventaudit", null, value);
+				this.OnPropertyChanged("user_dfeta_businesseventaudit");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_dfeta_document
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_document")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_document> user_dfeta_document
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>("user_dfeta_document", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_document");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_document>("user_dfeta_document", null, value);
+				this.OnPropertyChanged("user_dfeta_document");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_dfeta_induction
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_induction")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction> user_dfeta_induction
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>("user_dfeta_induction", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_induction");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_induction>("user_dfeta_induction", null, value);
+				this.OnPropertyChanged("user_dfeta_induction");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_dfeta_inductionperiod
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_inductionperiod")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod> user_dfeta_inductionperiod
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>("user_dfeta_inductionperiod", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_inductionperiod");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_inductionperiod>("user_dfeta_inductionperiod", null, value);
+				this.OnPropertyChanged("user_dfeta_inductionperiod");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_dfeta_initialteachertraining
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_initialteachertraining")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining> user_dfeta_initialteachertraining
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("user_dfeta_initialteachertraining", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_initialteachertraining");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("user_dfeta_initialteachertraining", null, value);
+				this.OnPropertyChanged("user_dfeta_initialteachertraining");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_dfeta_qtsregistration
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_qtsregistration")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration> user_dfeta_qtsregistration
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("user_dfeta_qtsregistration", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_qtsregistration");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("user_dfeta_qtsregistration", null, value);
+				this.OnPropertyChanged("user_dfeta_qtsregistration");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_dfeta_qualification
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_qualification")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification> user_dfeta_qualification
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>("user_dfeta_qualification", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_qualification");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_qualification>("user_dfeta_qualification", null, value);
+				this.OnPropertyChanged("user_dfeta_qualification");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_dfeta_sanction
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_sanction")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction> user_dfeta_sanction
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("user_dfeta_sanction", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_sanction");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("user_dfeta_sanction", null, value);
+				this.OnPropertyChanged("user_dfeta_sanction");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_parent_user
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_parent_user", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SystemUser> Referenceduser_parent_user
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_parent_user", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referenceduser_parent_user");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_parent_user", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referenceduser_parent_user");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_task
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_task")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Task> user_task
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("user_task", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_task");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("user_task", null, value);
+				this.OnPropertyChanged("user_task");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_systemuser_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_systemuser_createdonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser Referencinglk_systemuser_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuser_createdonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencinglk_systemuser_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuser_createdonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencinglk_systemuser_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_systemuser_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_systemuser_modifiedonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser Referencinglk_systemuser_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuser_modifiedonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencinglk_systemuser_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuser_modifiedonbehalfby", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencinglk_systemuser_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_systemuserbase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_systemuserbase_createdby", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser Referencinglk_systemuserbase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuserbase_createdby", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencinglk_systemuserbase_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuserbase_createdby", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencinglk_systemuserbase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_systemuserbase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_systemuserbase_modifiedby", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser Referencinglk_systemuserbase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuserbase_modifiedby", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencinglk_systemuserbase_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_systemuserbase_modifiedby", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencinglk_systemuserbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_parent_user
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentsystemuserid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_parent_user", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser Referencinguser_parent_user
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_parent_user", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencinguser_parent_user");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_parent_user", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencinguser_parent_user");
 			}
 		}
 	}
@@ -8287,6 +13117,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_contact_task_potentialduplicateid = "dfeta_contact_task_potentialduplicateid";
 			public const string dfeta_document_Tasks = "dfeta_document_Tasks";
 			public const string Incident_Tasks = "Incident_Tasks";
+			public const string lk_task_createdby = "lk_task_createdby";
+			public const string lk_task_createdonbehalfby = "lk_task_createdonbehalfby";
+			public const string lk_task_modifiedby = "lk_task_modifiedby";
+			public const string lk_task_modifiedonbehalfby = "lk_task_modifiedonbehalfby";
+			public const string user_task = "user_task";
 		}
 		
 		/// <summary>
@@ -8611,6 +13446,111 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("Incident_Tasks");
 			}
 		}
+		
+		/// <summary>
+		/// N:1 lk_task_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_task_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_task_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_task_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_task_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_task_createdby", null, value);
+				this.OnPropertyChanged("lk_task_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_task_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_task_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_task_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_task_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_task_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_task_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_task_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_task_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_task_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_task_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_task_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_task_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_task_modifiedby", null, value);
+				this.OnPropertyChanged("lk_task_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_task_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_task_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_task_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_task_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_task_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_task_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_task_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_task
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_task")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_task
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_task", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_task");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_task", null, value);
+				this.OnPropertyChanged("user_task");
+			}
+		}
 	}
 	
 	/// <summary>
@@ -8889,6 +13829,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			get
 			{
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Subject>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SystemUser"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.SystemUser> SystemUserSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SystemUser>();
 			}
 		}
 		

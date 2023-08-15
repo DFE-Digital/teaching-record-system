@@ -2,7 +2,10 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.PowerPlatform.Dataverse.Client;
+using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
@@ -26,12 +29,12 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
 
         options.Events.OnTicketReceived = async ctx =>
         {
-            var userId = ctx.Principal!.FindFirstValue("uid") ?? throw new Exception("Missing uid claim.");
+            var aadUserId = ctx.Principal!.FindFirstValue("uid") ?? throw new Exception("Missing uid claim.");
             var email = ctx.Principal!.FindFirstValue(ClaimTypes.Email) ?? throw new Exception("Missing email address claim.");
 
             using var dbContext = ctx.HttpContext.RequestServices.GetRequiredService<TrsDbContext>();
 
-            var user = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == userId);
+            var user = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == aadUserId);
 
             if (user is null)
             {
@@ -42,7 +45,7 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
 
                 if (user is not null)
                 {
-                    user.AzureAdUserId = userId;
+                    user.AzureAdUserId = aadUserId;
                     await dbContext.SaveChangesAsync();
                 }
             }
@@ -62,6 +65,12 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
                 .Append(new Claim(CustomClaims.UserId, user.UserId.ToString()))
                 .Append(new Claim(ClaimTypes.Name, user.Name));
 
+            var crmUserId = await GetCrmUserId();
+            if (crmUserId.HasValue)
+            {
+                claims = claims.Append(new Claim(CustomClaims.CrmUserId, crmUserId.Value.ToString()));
+            }
+
             var identityWithRoles = new ClaimsIdentity(
                 ctx.Principal!.Identity,
                 claims,
@@ -70,6 +79,23 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
                 roleType: ClaimTypes.Role);
 
             ctx.Principal = new ClaimsPrincipal(identityWithRoles);
+
+            async Task<Guid?> GetCrmUserId()
+            {
+                using var serviceClient = ctx.HttpContext.RequestServices.GetRequiredService<ServiceClient>();
+
+                var request = new QueryByAttribute(SystemUser.EntityLogicalName);
+                request.AddAttributeValue(SystemUser.Fields.AzureActiveDirectoryObjectId, new Guid(aadUserId));
+
+                var response = await serviceClient.RetrieveMultipleAsync(request);
+
+                if (response.Entities.Count == 0)
+                {
+                    return null;
+                }
+
+                return response.Entities.Single().Id;
+            }
         };
     }
 

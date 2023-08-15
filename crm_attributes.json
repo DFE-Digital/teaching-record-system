@@ -227,6 +227,11 @@
     "title",
     "statecode"
   ],
+  "systemuser": [
+    "azureactivedirectoryobjectid",
+    "firstname",
+    "lastname"
+  ],
   "task": [
     "category",
     "description",
