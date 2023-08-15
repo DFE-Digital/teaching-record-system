@@ -58,10 +58,16 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
                 await dbContext.SaveChangesAsync();
             }
 
+            var claims = user.Roles.Select(r => new Claim(ClaimTypes.Role, r))
+                .Append(new Claim(CustomClaims.UserId, user.UserId.ToString()))
+                .Append(new Claim(ClaimTypes.Name, user.Name));
+
             var identityWithRoles = new ClaimsIdentity(
                 ctx.Principal!.Identity,
-                user.Roles.Select(r => new Claim(ClaimTypes.Role, r))
-                    .Append(new Claim(CustomClaims.UserId, user.UserId.ToString())));
+                claims,
+                authenticationType: ctx.Principal.Identity!.AuthenticationType,
+                nameType: ClaimTypes.Name,
+                roleType: ClaimTypes.Role);
 
             ctx.Principal = new ClaimsPrincipal(identityWithRoles);
         };
