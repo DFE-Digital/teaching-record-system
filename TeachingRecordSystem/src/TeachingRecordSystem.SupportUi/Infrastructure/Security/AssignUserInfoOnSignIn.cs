@@ -47,15 +47,23 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
                 }
             }
 
-            if (user is not null)
+            if (user is null)
             {
-                var identityWithRoles = new ClaimsIdentity(
-                    ctx.Principal!.Identity,
-                    user.Roles.Select(r => new Claim(ClaimTypes.Role, r))
-                        .Append(new Claim(CustomClaims.UserId, user.UserId.ToString())));
-
-                ctx.Principal = new ClaimsPrincipal(identityWithRoles);
+                return;
             }
+
+            if (user.Email?.Equals(email, StringComparison.OrdinalIgnoreCase) != true)
+            {
+                user.Email = email;
+                await dbContext.SaveChangesAsync();
+            }
+
+            var identityWithRoles = new ClaimsIdentity(
+                ctx.Principal!.Identity,
+                user.Roles.Select(r => new Claim(ClaimTypes.Role, r))
+                    .Append(new Claim(CustomClaims.UserId, user.UserId.ToString())));
+
+            ctx.Principal = new ClaimsPrincipal(identityWithRoles);
         };
     }
 
