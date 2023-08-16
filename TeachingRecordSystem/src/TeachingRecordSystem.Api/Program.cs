@@ -265,11 +265,8 @@ public class Program
             healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
         }
 
-        if (env.IsProduction())
-        {
-            services.AddRedis(env, configuration, healthCheckBuilder);
-            services.AddRateLimiting(env, configuration);
-        }
+        services.AddRedis(env, configuration, healthCheckBuilder);
+        services.AddRateLimiting(env, configuration);
 
         if (platform == "PAAS")
         {

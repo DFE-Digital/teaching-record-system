@@ -17,6 +17,7 @@ using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
+using TeachingRecordSystem.SupportUi.Infrastructure.Redis;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services;
 
@@ -57,10 +58,6 @@ if (builder.Environment.IsProduction())
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddSingleton<IDistributedCache, DevelopmentFileDistributedCache>();
-}
-else
-{
-    builder.Services.AddDistributedMemoryCache();
 }
 
 builder.Services.AddGovUkFrontend();
@@ -157,6 +154,8 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 }
+
+builder.Services.AddRedis(builder.Environment, builder.Configuration, healthCheckBuilder);
 
 builder.Services
     .AddTransient<TrsLinkGenerator>()

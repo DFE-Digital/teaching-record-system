@@ -110,6 +110,7 @@ module "ui_application_configuration" {
 
   secret_variables = {
     ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
+    ConnectionStrings__Redis             = "${module.redis.connection_string},defaultDatabase=1"
     StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
   }
 }
