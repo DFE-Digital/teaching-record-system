@@ -1,0 +1,29 @@
+@page "/users/{userid}"
+@using TeachingRecordSystem.Core
+@model TeachingRecordSystem.SupportUi.Pages.Users.EditUser
+@{
+    ViewBag.Title = "Edit User";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form trs-action="l => l.EditUser(Model.UserId!)">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input asp-for="Email" type="email" disabled />
+
+            <govuk-input asp-for="Name" />
+
+            <govuk-checkboxes asp-for="Roles">
+                <govuk-checkboxes-fieldset>
+                    @foreach (var role in UserRoles.All)
+                    {
+                        <govuk-checkboxes-item value="@role">@UserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
+                    }
+                </govuk-checkboxes-fieldset>
+            </govuk-checkboxes>
+
+            <govuk-button type="submit">Save and continue</govuk-button>
+        </form>
+    </div>
+</div>
