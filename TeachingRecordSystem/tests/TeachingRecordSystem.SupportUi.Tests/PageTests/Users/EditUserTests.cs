@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.Events;
-using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
 
@@ -17,7 +16,7 @@ public class EditUserTests : TestBase
         SetCurrentUser(TestUsers.NoRoles);
         var userId = Guid.NewGuid();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, UrlSegmentPath(userId));
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(userId));
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -33,7 +32,7 @@ public class EditUserTests : TestBase
         // Arrange
         var userId = Guid.NewGuid();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, UrlSegmentPath(userId));
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(userId));
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -46,9 +45,9 @@ public class EditUserTests : TestBase
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var user = await CreateUser();
+        var user = await TestData.CreateUser();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, UrlSegmentPath(user.UserId));
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(user.UserId));
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -65,9 +64,9 @@ public class EditUserTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.NoRoles);
 
-        var user = await CreateUser();
+        var user = await TestData.CreateUser();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, UrlSegmentPath(user.UserId))
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(user.UserId))
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -87,9 +86,9 @@ public class EditUserTests : TestBase
     public async Task Post_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var user = await CreateUser();
+        var user = await TestData.CreateUser();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, UrlSegmentPath(Guid.NewGuid()))
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(Guid.NewGuid()))
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -109,10 +108,10 @@ public class EditUserTests : TestBase
     public async Task Post_NoName_RendersError()
     {
         // Arrange
-        var user = await CreateUser();
+        var user = await TestData.CreateUser();
         const string role = UserRoles.Administrator;
 
-        var request = new HttpRequestMessage(HttpMethod.Post, UrlSegmentPath(user.UserId))
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(user.UserId))
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -131,10 +130,10 @@ public class EditUserTests : TestBase
     public async Task Post_NoRolesSelected_RendersError()
     {
         // Arrange
-        var user = await CreateUser();
+        var user = await TestData.CreateUser();
         var newName = Faker.Name.FullName();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, UrlSegmentPath(user.UserId))
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(user.UserId))
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -160,11 +159,11 @@ public class EditUserTests : TestBase
         UserUpdatedEventChanges expectedChanges)
     {
         // Arrange
-        var currentUser = await CreateUser();
-        var newName = changeName ? Faker.Name.FullName() : currentUser.Name;
-        var roles = changeRoles ? new[] { UserRoles.Administrator, "Super Admin" } : currentUser.Roles;
+        var currentUser = await TestData.CreateUser(roles: new[] { UserRoles.Helpdesk });
+        var newName = changeName ? TestData.GenerateChangedName(currentUser.Name) : currentUser.Name;
+        var roles = changeRoles ? new[] { UserRoles.Administrator } : currentUser.Roles;
 
-        var request = new HttpRequestMessage(HttpMethod.Post, UrlSegmentPath(currentUser.UserId))
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(currentUser.UserId))
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -210,16 +209,5 @@ public class EditUserTests : TestBase
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "User updated");
     }
 
-    private static string UrlSegmentPath(Guid userId) => $"/users/{userId}";
-
-    private async Task<User> CreateUser() =>
-        await WithDbContext<User>(async dbContext =>
-        {
-            var user = TestUsers.CreateUser();
-            dbContext.Users.Add(user);
-
-            await dbContext.SaveChangesAsync();
-
-            return user;
-        });
+    private static string GetRequestPath(Guid userId) => $"/users/{userId}";
 }

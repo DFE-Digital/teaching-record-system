@@ -23,6 +23,8 @@ public abstract class TestBase
         {
             AllowAutoRedirect = false
         });
+
+        TestData = new(HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>());
     }
 
     public HostFixture HostFixture { get; }
@@ -36,6 +38,8 @@ public abstract class TestBase
     public Mock<Services.AzureActiveDirectory.IUserService> AzureActiveDirectoryUserServiceMock => _testServices.AzureActiveDirectoryUserServiceMock;
 
     public HttpClient HttpClient { get; }
+
+    public TestData TestData { get; }
 
     protected Guid GetCurrentUserId()
     {
