@@ -1,4 +1,4 @@
-﻿using Optional;
+using Optional;
 
 namespace TeachingRecordSystem.Api.Endpoints.IdentityWebHooks.Messages;
 

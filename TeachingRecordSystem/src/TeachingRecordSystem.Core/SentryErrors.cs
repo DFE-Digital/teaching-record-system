@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Core;
+namespace TeachingRecordSystem.Core;
 
 public static class SentryErrors
 {

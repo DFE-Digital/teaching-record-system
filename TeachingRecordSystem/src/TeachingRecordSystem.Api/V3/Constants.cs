@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api.V3;
+namespace TeachingRecordSystem.Api.V3;
 
 public static class Constants
 {

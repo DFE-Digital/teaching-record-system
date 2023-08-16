@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using Microsoft.Xrm.Sdk.Messages;
 
 namespace TeachingRecordSystem.Core.Dqt.Tests.DataverseAdapterTests;

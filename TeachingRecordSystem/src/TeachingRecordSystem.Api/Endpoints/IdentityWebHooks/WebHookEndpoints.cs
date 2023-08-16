@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
+namespace TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 
 public static class WebHookEndpoints
 {

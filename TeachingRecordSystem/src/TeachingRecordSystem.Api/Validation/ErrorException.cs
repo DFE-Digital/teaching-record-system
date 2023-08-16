@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api.Validation;
+namespace TeachingRecordSystem.Api.Validation;
 
 public class ErrorException : Exception
 {

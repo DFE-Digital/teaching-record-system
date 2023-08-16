@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using Microsoft.Extensions.Caching.Memory;
 
 namespace TeachingRecordSystem.Core.Dqt.Tests;

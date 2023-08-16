@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.ComponentModel;
 
 namespace TeachingRecordSystem.Api.V2.Responses;

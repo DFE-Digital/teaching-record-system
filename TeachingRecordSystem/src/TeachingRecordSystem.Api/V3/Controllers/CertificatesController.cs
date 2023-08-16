@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

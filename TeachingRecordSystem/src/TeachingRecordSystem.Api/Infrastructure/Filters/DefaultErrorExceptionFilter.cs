@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Api.Validation;
 
 namespace TeachingRecordSystem.Api.Infrastructure.Filters;

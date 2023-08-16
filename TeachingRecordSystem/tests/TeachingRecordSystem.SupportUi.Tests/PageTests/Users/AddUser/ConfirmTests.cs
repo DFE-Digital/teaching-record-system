@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;

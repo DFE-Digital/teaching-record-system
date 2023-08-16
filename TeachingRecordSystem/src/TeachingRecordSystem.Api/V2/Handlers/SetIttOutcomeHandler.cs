@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using Medallion.Threading;
 using MediatR;
 using TeachingRecordSystem.Api.V2.ApiModels;

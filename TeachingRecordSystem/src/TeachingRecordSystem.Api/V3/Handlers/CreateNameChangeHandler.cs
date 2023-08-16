@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.StaticFiles;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.Validation;

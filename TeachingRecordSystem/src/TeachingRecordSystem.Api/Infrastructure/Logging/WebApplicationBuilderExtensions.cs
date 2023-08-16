@@ -1,4 +1,4 @@
-﻿using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.Extensibility;
 using Sentry.AspNetCore;
 using Sentry.Extensibility;
 using Serilog;

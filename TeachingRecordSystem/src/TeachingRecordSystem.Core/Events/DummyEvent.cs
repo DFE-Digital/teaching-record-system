@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Core.Events;
+namespace TeachingRecordSystem.Core.Events;
 
 /// <summary>
 /// A dummy event to be able to test the background publishing service.

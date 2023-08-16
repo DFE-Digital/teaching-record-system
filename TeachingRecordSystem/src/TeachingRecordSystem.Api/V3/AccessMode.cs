@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 namespace TeachingRecordSystem.Api.V3;
 
 public enum AccessMode

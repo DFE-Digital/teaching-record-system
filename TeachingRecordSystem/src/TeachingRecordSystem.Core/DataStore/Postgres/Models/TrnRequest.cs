@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 

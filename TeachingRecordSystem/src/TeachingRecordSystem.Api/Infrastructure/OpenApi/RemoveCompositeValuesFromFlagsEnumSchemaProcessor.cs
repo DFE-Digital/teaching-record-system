@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using NJsonSchema.Generation;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;

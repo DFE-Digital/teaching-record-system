@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api.Tests;
+namespace TeachingRecordSystem.Api.Tests;
 
 public class Startup
 {

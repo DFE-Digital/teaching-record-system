@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Core.Events;
+using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Processing;
 
 namespace TeachingRecordSystem.SupportUi.Tests.Infrastructure;

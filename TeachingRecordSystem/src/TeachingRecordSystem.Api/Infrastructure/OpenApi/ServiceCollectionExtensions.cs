@@ -1,4 +1,4 @@
-﻿using FastEndpoints.Swagger;
+using FastEndpoints.Swagger;
 using NSwag.Examples;
 using NSwag.Generation.AspNetCore;
 

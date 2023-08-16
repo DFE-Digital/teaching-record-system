@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 
 namespace TeachingRecordSystem.Core.Dqt.Models;

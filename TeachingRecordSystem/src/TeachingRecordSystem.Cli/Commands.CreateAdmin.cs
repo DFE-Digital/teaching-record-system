@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Core;
+using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Cli;

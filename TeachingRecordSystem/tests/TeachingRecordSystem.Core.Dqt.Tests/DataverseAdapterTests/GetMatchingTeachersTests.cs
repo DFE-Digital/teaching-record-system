@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using static TeachingRecordSystem.Core.Dqt.Tests.DataverseAdapterTests.GetMatchingTeachersFixture;
 
 namespace TeachingRecordSystem.Core.Dqt.Tests.DataverseAdapterTests;

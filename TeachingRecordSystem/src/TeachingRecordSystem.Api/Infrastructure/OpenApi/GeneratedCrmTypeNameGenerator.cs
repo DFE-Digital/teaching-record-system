@@ -1,4 +1,4 @@
-﻿using NJsonSchema;
+using NJsonSchema;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;
 

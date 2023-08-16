@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.Reflection;
 using Castle.DynamicProxy;
 using Microsoft.PowerPlatform.Dataverse.Client;

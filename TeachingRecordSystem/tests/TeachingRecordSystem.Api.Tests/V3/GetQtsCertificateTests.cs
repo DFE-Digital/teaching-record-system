@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt;
 using static TeachingRecordSystem.Core.Dqt.DataverseAdapter;
 
 namespace TeachingRecordSystem.Api.Tests.V3;

@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api.V2.Responses;
+namespace TeachingRecordSystem.Api.V2.Responses;
 
 public class FindTeachersResponse
 {

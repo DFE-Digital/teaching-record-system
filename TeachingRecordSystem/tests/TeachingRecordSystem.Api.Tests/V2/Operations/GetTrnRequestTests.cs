@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 

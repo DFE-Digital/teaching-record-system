@@ -1,4 +1,4 @@
-﻿using FastEndpoints;
+using FastEndpoints;
 using MediatR;
 using TeachingRecordSystem.Api.V3.Responses;
 

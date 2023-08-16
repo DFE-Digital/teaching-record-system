@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.AspNetCore.WebUtilities;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 

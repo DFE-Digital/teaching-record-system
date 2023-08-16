@@ -1,4 +1,4 @@
-﻿using System.Resources;
+using System.Resources;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;

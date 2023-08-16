@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using FluentValidation;
 using FluentValidation.Results;
 using Medallion.Threading;

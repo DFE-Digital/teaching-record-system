@@ -1,4 +1,4 @@
-﻿using Microsoft.Graph;
+using Microsoft.Graph;
 
 namespace TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 

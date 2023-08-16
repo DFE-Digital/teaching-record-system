@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;

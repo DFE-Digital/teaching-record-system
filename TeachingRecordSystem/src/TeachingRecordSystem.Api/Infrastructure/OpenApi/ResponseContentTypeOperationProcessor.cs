@@ -1,4 +1,4 @@
-﻿using NSwag.Generation.Processors;
+using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;

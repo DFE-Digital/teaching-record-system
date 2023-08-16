@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api.Infrastructure.Security;
+namespace TeachingRecordSystem.Api.Infrastructure.Security;
 
 public interface ICurrentClientProvider
 {

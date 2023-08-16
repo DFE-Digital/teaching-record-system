@@ -1,4 +1,4 @@
-﻿using AngleSharp.Html.Dom;
+using AngleSharp.Html.Dom;
 using Xunit.Sdk;
 
 namespace TeachingRecordSystem.SupportUi.Tests;

@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api;
+namespace TeachingRecordSystem.Api;
 
 public sealed class NoopAsyncDisposable : IAsyncDisposable
 {

@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
 public class IndexTests : TestBase
 {

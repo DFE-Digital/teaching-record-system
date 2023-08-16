@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using FluentValidation;
 using TeachingRecordSystem.Api.V2.Requests;
 

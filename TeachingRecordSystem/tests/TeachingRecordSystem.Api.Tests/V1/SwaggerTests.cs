@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api.Tests.V1;
+namespace TeachingRecordSystem.Api.Tests.V1;
 
 public class SwaggerTests : ApiTestBase
 {
