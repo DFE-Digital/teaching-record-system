@@ -2,12 +2,14 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Identity.Web;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 
+[AuthorizeForScopes(Scopes = new[] { "User.ReadBasic.All" })]
 public class ConfirmModel : PageModel
 {
     private readonly TrsDbContext _dbContext;

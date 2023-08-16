@@ -70,7 +70,7 @@ builder.Services.AddCsp(nonceByteAmount: 32);
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
 {
-    var graphApiScopes = new[] { "User.Read", "User.ReadBasic.All" };
+    var graphApiScopes = new[] { "User.Read" };
 
     builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd")
