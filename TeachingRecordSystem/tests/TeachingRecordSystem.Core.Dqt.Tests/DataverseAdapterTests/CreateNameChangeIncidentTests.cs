@@ -34,7 +34,6 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         var command = new CreateNameChangeIncidentCommand()
         {
             ContactId = createPersonResult.TeacherId,
-            Trn = createPersonResult.Trn,
             FirstName = newFirstName1,
             MiddleName = $"{newFirstName2} {newMiddleName}",
             LastName = newLastName,

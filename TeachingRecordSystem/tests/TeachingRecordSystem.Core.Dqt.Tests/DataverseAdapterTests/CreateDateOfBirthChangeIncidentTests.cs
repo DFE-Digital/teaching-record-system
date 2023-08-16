@@ -31,7 +31,6 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
         var command = new CreateDateOfBirthChangeIncidentCommand()
         {
             ContactId = createPersonResult.TeacherId,
-            Trn = createPersonResult.Trn,
             DateOfBirth = newDateOfBirth,
             EvidenceFileName = evidenceFileName,
             EvidenceFileContent = evidenceFileContent,

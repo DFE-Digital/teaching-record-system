@@ -1,12 +1,8 @@
-#nullable enable
-
-
 namespace TeachingRecordSystem.Core.Dqt.Models;
 
 public record CreateNameChangeIncidentCommand
 {
     public required Guid ContactId { get; init; }
-    public required string Trn { get; init; }
     public required string FirstName { get; init; }
     public required string? MiddleName { get; init; }
     public required string LastName { get; init; }

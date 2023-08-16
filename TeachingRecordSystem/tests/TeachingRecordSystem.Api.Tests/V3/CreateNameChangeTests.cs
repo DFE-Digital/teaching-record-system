@@ -186,7 +186,6 @@ public class CreateNameChangeTests : ApiTestBase
 
         DataverseAdapterMock
             .Verify(mock => mock.CreateNameChangeIncident(It.Is<CreateNameChangeIncidentCommand>(cmd =>
-                cmd.Trn == trn &&
                 cmd.ContactId == contactId &&
                 cmd.FirstName == newFirstName &&
                 cmd.MiddleName == newMiddleName &&
