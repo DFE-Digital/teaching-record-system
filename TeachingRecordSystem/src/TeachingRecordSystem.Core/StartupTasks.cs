@@ -8,7 +8,7 @@ public interface IStartupTask
     Task Execute();
 }
 
-public static class ServiceCollectionExtensions
+public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection AddStartupTask(this IServiceCollection services, IStartupTask task) =>
         AddStartupTask(services, _ => task);

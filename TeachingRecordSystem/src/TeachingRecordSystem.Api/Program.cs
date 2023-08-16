@@ -250,6 +250,7 @@ public class Program
         services.AddDqtReporting(builder.Configuration);
         services.AddBackgroundJobs(env, configuration);
         services.AddEmail(env, configuration);
+        services.AddCrmQueries();
 
         // Filter telemetry emitted by DqtReportingService
         services.AddApplicationInsightsTelemetry()

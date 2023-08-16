@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core;
-
 namespace TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 public static class ServiceCollectionExtensions

@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
         IHostEnvironment environment)
     {
         services.AddAzureActiveDirectory(environment);
+        services.AddCrmQueries();
 
         return services;
     }

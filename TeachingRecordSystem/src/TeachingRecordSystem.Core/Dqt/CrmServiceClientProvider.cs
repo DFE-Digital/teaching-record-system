@@ -1,4 +1,3 @@
-#nullable enable
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -58,7 +57,7 @@ file class PostConfigureCrmServiceClientOptions : IConfigureNamedOptions<CrmServ
     public void Configure(CrmServiceClientOptions options) => Configure(Options.DefaultName, options);
 }
 
-public static class ServiceCollectionExtensions
+public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServiceClient(
         this IServiceCollection services,
