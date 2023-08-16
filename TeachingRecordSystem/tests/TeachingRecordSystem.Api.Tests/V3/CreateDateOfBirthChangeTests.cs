@@ -172,7 +172,6 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
 
         DataverseAdapterMock
             .Verify(mock => mock.CreateDateOfBirthChangeIncident(It.Is<CreateDateOfBirthChangeIncidentCommand>(cmd =>
-                cmd.Trn == trn &&
                 cmd.ContactId == contactId &&
                 cmd.DateOfBirth == newDateOfBirth &&
                 cmd.EvidenceFileName == evidenceFileName &&

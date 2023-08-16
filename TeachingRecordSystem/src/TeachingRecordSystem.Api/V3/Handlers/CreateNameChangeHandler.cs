@@ -53,7 +53,6 @@ public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
         var command = new CreateNameChangeIncidentCommand()
         {
             ContactId = person.Id,
-            Trn = request.Trn,
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,

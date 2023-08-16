@@ -48,7 +48,6 @@ public class CreateDateOfBirthChangeHandler : IRequestHandler<CreateDateOfBirthC
         var command = new CreateDateOfBirthChangeIncidentCommand()
         {
             ContactId = person.Id,
-            Trn = request.Trn,
             DateOfBirth = request.DateOfBirth,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileContent = await evidenceFileResponse.Content.ReadAsStreamAsync(),
