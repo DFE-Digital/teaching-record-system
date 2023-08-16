@@ -8,9 +8,13 @@ public static class UserRoles
     [Display(Name = "Administrator")]
     public const string Administrator = "Administrator";
 
+    [Display(Name = "Helpdesk")]
+    public const string Helpdesk = "Helpdesk";
+
     public static IReadOnlyCollection<string> All { get; } = new[]
     {
-        Administrator
+        Administrator,
+        Helpdesk
     };
 
     public static string GetDisplayNameForRole(string role)
