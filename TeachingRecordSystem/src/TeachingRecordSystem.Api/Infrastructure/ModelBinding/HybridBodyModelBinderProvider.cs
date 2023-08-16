@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 

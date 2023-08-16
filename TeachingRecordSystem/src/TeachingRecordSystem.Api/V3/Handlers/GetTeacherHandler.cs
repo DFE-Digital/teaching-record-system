@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using MediatR;
 using Optional;
 using TeachingRecordSystem.Api.V3.ApiModels;

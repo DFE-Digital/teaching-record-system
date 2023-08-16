@@ -1,4 +1,4 @@
-﻿global using System.CommandLine;
+global using System.CommandLine;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Cli;

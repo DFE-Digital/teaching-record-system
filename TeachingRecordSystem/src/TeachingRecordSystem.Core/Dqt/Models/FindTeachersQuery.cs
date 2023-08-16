@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 namespace TeachingRecordSystem.Core.Dqt.Models;
 
 public class FindTeachersQuery

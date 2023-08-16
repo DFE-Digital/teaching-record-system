@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using Microsoft.AspNetCore.Http.Extensions;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
 

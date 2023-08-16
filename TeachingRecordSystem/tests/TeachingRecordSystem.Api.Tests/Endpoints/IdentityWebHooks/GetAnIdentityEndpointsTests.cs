@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;

@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using Medallion.Threading;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 namespace TeachingRecordSystem.Api.V2.Responses;
 
 public enum TrnRequestStatus

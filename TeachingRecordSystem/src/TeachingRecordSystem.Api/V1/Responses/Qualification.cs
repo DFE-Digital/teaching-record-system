@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.Text.Json.Serialization;
 using TeachingRecordSystem.Api.V2.ApiModels;
 

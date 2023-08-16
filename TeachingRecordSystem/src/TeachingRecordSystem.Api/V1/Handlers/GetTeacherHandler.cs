@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using MediatR;
 using TeachingRecordSystem.Api.V1.Requests;
 using TeachingRecordSystem.Api.V1.Responses;

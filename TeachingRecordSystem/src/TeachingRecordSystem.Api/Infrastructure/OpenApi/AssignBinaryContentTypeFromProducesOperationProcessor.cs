@@ -1,4 +1,4 @@
-﻿using NSwag.Generation.AspNetCore;
+using NSwag.Generation.AspNetCore;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 

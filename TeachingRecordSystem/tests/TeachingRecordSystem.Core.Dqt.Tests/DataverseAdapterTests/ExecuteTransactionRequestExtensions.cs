@@ -1,4 +1,4 @@
-﻿using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 
 namespace TeachingRecordSystem.Core.Dqt.Tests.DataverseAdapterTests;

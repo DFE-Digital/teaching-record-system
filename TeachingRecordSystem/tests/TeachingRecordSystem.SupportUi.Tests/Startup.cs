@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.SupportUi.Tests;
+namespace TeachingRecordSystem.SupportUi.Tests;
 
 public class Startup
 {

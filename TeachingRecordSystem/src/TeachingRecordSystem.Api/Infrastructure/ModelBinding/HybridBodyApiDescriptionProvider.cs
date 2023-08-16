@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;

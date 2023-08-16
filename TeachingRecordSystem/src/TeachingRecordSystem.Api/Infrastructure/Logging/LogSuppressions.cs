@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api.Infrastructure.Logging;
+namespace TeachingRecordSystem.Api.Infrastructure.Logging;
 
 public static class LogSuppressions
 {

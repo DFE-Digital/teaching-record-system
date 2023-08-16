@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using MediatR;
 using TeachingRecordSystem.Api.V3.Responses;
 

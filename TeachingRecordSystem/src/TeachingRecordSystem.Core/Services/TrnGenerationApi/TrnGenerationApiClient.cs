@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Core.Services.TrnGenerationApi;
+namespace TeachingRecordSystem.Core.Services.TrnGenerationApi;
 
 public class TrnGenerationApiClient : ITrnGenerationApiClient
 {

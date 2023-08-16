@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;

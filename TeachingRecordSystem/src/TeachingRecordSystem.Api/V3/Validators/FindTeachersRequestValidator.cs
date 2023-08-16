@@ -1,4 +1,4 @@
-﻿using FastEndpoints;
+using FastEndpoints;
 using FluentValidation;
 using TeachingRecordSystem.Api.V3.Requests;
 

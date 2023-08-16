@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Api.V2.Responses;

@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api.Infrastructure.ModelBinding;
+namespace TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 
 public static class Constants
 {

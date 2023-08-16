@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+namespace TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 public record User
 {

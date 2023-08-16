@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Api.Properties;
+using TeachingRecordSystem.Api.Properties;
 
 namespace TeachingRecordSystem.Api.Validation;
 

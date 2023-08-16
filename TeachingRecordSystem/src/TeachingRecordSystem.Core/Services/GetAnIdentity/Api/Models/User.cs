@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+namespace TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 public class User
 {

@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Api.Endpoints.IdentityWebHooks.Messages;
+namespace TeachingRecordSystem.Api.Endpoints.IdentityWebHooks.Messages;
 
 public record NotificationEnvelope
 {

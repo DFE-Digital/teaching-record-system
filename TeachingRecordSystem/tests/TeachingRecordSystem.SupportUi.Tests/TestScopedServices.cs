@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Tests;

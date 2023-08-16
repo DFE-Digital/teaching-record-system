@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using NSwag;
 using NSwag.Generation.AspNetCore;
 using NSwag.Generation.Processors;

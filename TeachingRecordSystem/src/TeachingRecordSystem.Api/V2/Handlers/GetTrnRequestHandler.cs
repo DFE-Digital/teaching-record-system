@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Api.Infrastructure.Security;

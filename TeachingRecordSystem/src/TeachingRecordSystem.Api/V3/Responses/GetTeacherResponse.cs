@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Optional;
 using TeachingRecordSystem.Api.V3.ApiModels;
 

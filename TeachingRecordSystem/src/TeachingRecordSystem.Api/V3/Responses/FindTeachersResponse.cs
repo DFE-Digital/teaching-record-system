@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Api.V3.Requests;
+using TeachingRecordSystem.Api.V3.Requests;
 
 namespace TeachingRecordSystem.Api.V3.Responses;
 

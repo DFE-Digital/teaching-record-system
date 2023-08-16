@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;

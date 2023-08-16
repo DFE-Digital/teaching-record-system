@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using TeachingRecordSystem.Api.V2.Requests;

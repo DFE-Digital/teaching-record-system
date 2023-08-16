@@ -1,4 +1,4 @@
-﻿using IdentityModel.Client;
+using IdentityModel.Client;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 

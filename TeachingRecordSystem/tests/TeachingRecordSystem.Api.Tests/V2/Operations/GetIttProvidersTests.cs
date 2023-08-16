@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 

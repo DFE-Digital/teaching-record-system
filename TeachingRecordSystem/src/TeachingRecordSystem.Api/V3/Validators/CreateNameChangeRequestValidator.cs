@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using TeachingRecordSystem.Api.V3.Requests;
 
 namespace TeachingRecordSystem.Api.V3.Validators;

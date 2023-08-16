@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using JustEat.HttpClientInterception;
 
 namespace TeachingRecordSystem.Api.Tests.V3;

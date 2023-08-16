@@ -1,4 +1,4 @@
-﻿using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Messages;
 
 namespace TeachingRecordSystem.Core.Dqt;
 

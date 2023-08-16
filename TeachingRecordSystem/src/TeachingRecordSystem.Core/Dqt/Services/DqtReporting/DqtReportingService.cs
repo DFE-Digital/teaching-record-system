@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Data;
 using System.ServiceModel;
 using System.Text;

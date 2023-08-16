@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Api.V3.ApiModels;

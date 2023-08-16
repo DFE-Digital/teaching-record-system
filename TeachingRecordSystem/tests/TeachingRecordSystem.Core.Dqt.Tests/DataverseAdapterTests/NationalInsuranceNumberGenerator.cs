@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 

@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.Diagnostics;
 using System.Text;
 using Microsoft.Xrm.Sdk.Messages;

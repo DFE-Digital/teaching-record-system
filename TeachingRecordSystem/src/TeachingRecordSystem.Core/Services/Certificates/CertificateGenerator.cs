@@ -1,4 +1,4 @@
-﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
 

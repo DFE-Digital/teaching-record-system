@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
+namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 public static class CustomClaims
 {

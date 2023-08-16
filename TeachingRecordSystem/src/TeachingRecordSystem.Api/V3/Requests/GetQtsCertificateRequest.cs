@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using TeachingRecordSystem.Api.V3.Responses;
 
 namespace TeachingRecordSystem.Api.V3.Requests;

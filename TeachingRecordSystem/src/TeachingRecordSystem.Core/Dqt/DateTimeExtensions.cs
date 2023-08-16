@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Core.Dqt;
+namespace TeachingRecordSystem.Core.Dqt;
 
 public static class DateTimeExtensions
 {

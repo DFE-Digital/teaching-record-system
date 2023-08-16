@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 namespace TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 

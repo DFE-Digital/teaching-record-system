@@ -1,4 +1,4 @@
-﻿using NSwag.Examples;
+using NSwag.Examples;
 
 namespace TeachingRecordSystem.Api.V2.Responses;
 

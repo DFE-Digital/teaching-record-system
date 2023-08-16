@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Core;
+using TeachingRecordSystem.Core;
 
 namespace TeachingRecordSystem.TestCommon;
 

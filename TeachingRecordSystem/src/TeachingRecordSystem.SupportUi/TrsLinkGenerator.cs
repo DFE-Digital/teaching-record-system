@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.SupportUi;
+namespace TeachingRecordSystem.SupportUi;
 
 public class TrsLinkGenerator
 {

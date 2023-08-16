@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Core.Services.Certificates;
+namespace TeachingRecordSystem.Core.Services.Certificates;
 
 public interface ICertificateGenerator
 {

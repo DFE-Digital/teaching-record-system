@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.Core.Dqt.Models;
+namespace TeachingRecordSystem.Core.Dqt.Models;
 
 public static class ContactExtensions
 {
