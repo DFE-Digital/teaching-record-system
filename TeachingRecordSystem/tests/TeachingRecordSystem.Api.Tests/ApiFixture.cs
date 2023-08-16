@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
@@ -46,6 +47,7 @@ public class ApiFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClientMock.Object);
+            services.AddTestScoped<IOptions<AccessYourQualificationsOptions>>(tss => tss.AccessYourQualificationsOptions);
             services.AddTestScoped<IOptions<GetAnIdentityOptions>>(tss => tss.GetAnIdentityOptions);
             services.AddTestScoped<ICertificateGenerator>(tss => tss.CertificateGeneratorMock.Object);
 

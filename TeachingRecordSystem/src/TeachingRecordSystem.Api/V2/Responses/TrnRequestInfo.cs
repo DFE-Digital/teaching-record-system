@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using NSwag.Examples;
+using Optional;
 
 namespace TeachingRecordSystem.Api.V2.Responses;
 
@@ -19,6 +20,8 @@ public class TrnRequestInfo
     public bool WasCreated { get; set; }
 
     public string? SlugId { get; set; }
+
+    public required Option<string> AccessYourTeachingQualificationsLink { get; set; }
 }
 
 public class TrnRequestInfoExample : IExampleProvider<TrnRequestInfo>
@@ -29,6 +32,7 @@ public class TrnRequestInfoExample : IExampleProvider<TrnRequestInfo>
         Status = TrnRequestStatus.Completed,
         Trn = "1234567",
         PotentialDuplicate = false,
-        QtsDate = null
+        QtsDate = null,
+        AccessYourTeachingQualificationsLink = Option.Some("https://urltoaccessyourteachingqualifications")
     };
 }

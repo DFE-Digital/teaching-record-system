@@ -1,6 +1,7 @@
 #nullable disable
 using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
@@ -143,6 +144,59 @@ public class GetTrnRequestTests : ApiTestBase
                 qtsDate = (DateOnly?)null,
                 potentialDuplicate = false,
                 slugId = slugId
+            },
+            expectedStatusCode: StatusCodes.Status200OK);
+    }
+
+    [Fact]
+    public async Task Get_ForTrnRequestWithTrnToken_ReturnsAccessYourQualificationsLink()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var teacherId = Guid.NewGuid();
+        var trn = "1234567";
+        var trnToken = "ABCDEFG1234567";
+        var slugId = Guid.NewGuid().ToString();
+        var qtsDate = new DateTime(2020, 10, 03);
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
+            .ReturnsAsync(new Contact()
+            {
+                Id = teacherId,
+                dfeta_TRN = trn,
+                dfeta_SlugId = slugId,
+                dfeta_QTSDate = qtsDate
+            });
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Add(new TrnRequest()
+            {
+                ClientId = ClientId,
+                RequestId = requestId,
+                TeacherId = teacherId,
+                TrnToken = trnToken
+            });
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        // Act
+        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
+
+        // Assert
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId = requestId,
+                status = "Completed",
+                trn = trn,
+                qtsDate = qtsDate.ToDateOnlyWithDqtBstFix(true),
+                potentialDuplicate = false,
+                slugId = slugId,
+                accessYourTeachingQualificationsLink = $"https://aytq.com/qualifications/start?trn_token={trnToken}"
             },
             expectedStatusCode: StatusCodes.Status200OK);
     }

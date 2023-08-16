@@ -1,12 +1,15 @@
 #nullable disable
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Optional;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
@@ -15,15 +18,18 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
     private readonly TrsDbContext _trsDbContext;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICurrentClientProvider _currentClientProvider;
+    private readonly AccessYourQualificationsOptions _accessYourQualificationsOptions;
 
     public GetTrnRequestHandler(
         TrsDbContext TrsDbContext,
         IDataverseAdapter dataverseAdapter,
-        ICurrentClientProvider currentClientProvider)
+        ICurrentClientProvider currentClientProvider,
+        IOptions<AccessYourQualificationsOptions> accessYourQualificationsOptions)
     {
         _trsDbContext = TrsDbContext;
         _dataverseAdapter = dataverseAdapter;
         _currentClientProvider = currentClientProvider;
+        _accessYourQualificationsOptions = accessYourQualificationsOptions.Value;
     }
 
     public async Task<TrnRequestInfo> Handle(GetTrnRequest request, CancellationToken cancellationToken)
@@ -62,7 +68,8 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
             Trn = trn,
             QtsDate = qtsDate,
             PotentialDuplicate = status == TrnRequestStatus.Pending,
-            SlugId = teacher.dfeta_SlugId
+            SlugId = teacher.dfeta_SlugId,
+            AccessYourTeachingQualificationsLink = trnRequest.TrnToken is not null ? Option.Some($"{_accessYourQualificationsOptions.BaseAddress}/qualifications/start?trn_token={trnRequest.TrnToken}") : default
         };
     }
 }
