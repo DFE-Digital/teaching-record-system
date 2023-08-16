@@ -63,10 +63,10 @@ public class EditUser : PageModel
             return this.PageWithErrors();
         }
 
-        var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);
+        var user = await _dbContext.Users.SingleAsync(u => u.UserId == UserId);
 
         var changes = UserUpdatedEventChanges.None |
-                      (user!.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
+                      (user.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
                       (!user.Roles.SequenceEqual(Roles!) ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
 
         if (changes == UserUpdatedEventChanges.None)
