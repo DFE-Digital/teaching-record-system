@@ -143,6 +143,9 @@ builder.Services
         options.Cookie.Name = "trs-tempdata";
     });
 
+var healthCheckBuilder = builder.Services.AddHealthChecks()
+    .AddNpgSql(pgConnectionString);
+
 builder.Services.AddDbContext<TrsDbContext>(
     options => TrsDbContext.ConfigureOptions(options, pgConnectionString),
     contextLifetime: ServiceLifetime.Transient,
@@ -200,6 +203,8 @@ app.UseCsp(csp =>
             .ToAnywhere();
     }
 });
+
+app.UseHealthChecks("/status");
 
 app.UseStaticFiles();
 
