@@ -149,20 +149,27 @@ public class EditUserTests : TestBase
         await AssertEx.HtmlResponseHasError(response, "Roles", "Select at least one role");
     }
 
-    [Fact]
-    public async Task Post_ValidRequest_CreatesUserEmitsEventAndRedirectsWithFlashMessage()
+    [Theory]
+    [InlineData(true, false, true, UserUpdatedEventChanges.Name)]
+    [InlineData(false, true, true, UserUpdatedEventChanges.Roles)]
+    [InlineData(true, true, true, UserUpdatedEventChanges.Name | UserUpdatedEventChanges.Roles)]
+    public async Task Post_ValidRequest_CreatesUserEmitsEventAndRedirectsWithFlashMessage(
+        bool changeName,
+        bool changeRoles,
+        bool expectedEvent,
+        UserUpdatedEventChanges expectedChanges)
     {
         // Arrange
         var currentUser = await CreateUser();
-        var newName = Faker.Name.FullName();
-        const string role = UserRoles.Administrator;
+        var newName = changeName ? Faker.Name.FullName() : currentUser.Name;
+        var roles = changeRoles ? new[] { UserRoles.Administrator, "Super Admin" } : currentUser.Roles;
 
         var request = new HttpRequestMessage(HttpMethod.Post, UrlSegmentPath(currentUser.UserId))
         {
             Content = new FormUrlEncodedContentBuilder()
             {
                 { "Name", newName },
-                { "Roles", role }
+                { "Roles", roles }
             }
         };
 
@@ -172,26 +179,31 @@ public class EditUserTests : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var updatedUser = await WithDbContext(dbContext => dbContext.Users.SingleOrDefaultAsync(u => u.UserId == currentUser.UserId));
+        var updatedUser = await WithDbContext(dbContext =>
+            dbContext.Users.SingleOrDefaultAsync(u => u.UserId == currentUser.UserId));
         Assert.NotNull(updatedUser);
 
         Assert.Equal(UserType.Person, updatedUser.UserType);
         Assert.Equal(newName, updatedUser.Name);
         Assert.Equal(currentUser.Email, updatedUser.Email);
         Assert.Equal(currentUser.AzureAdUserId, updatedUser.AzureAdUserId);
-        Assert.Collection(updatedUser.Roles, r => Assert.Equal(role, r));
+        Assert.True(updatedUser.Roles.SequenceEqual(roles));
 
-        EventObserver.AssertEventsSaved(e =>
+        if (expectedEvent)
         {
-            var userCreatedEvent = Assert.IsType<UserEditedEvent>(e);
-            Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.AddedByUserId, GetCurrentUserId());
-            Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
-            Assert.Equal(newName, userCreatedEvent.User.Name);
-            Assert.Equal(updatedUser.Email, userCreatedEvent.User.Email);
-            Assert.Equal(updatedUser.AzureAdUserId, userCreatedEvent.User.AzureAdUserId);
-            Assert.Collection(userCreatedEvent.User.Roles, r => Assert.Equal(role, r));
-        });
+            EventObserver.AssertEventsSaved(e =>
+            {
+                var userCreatedEvent = Assert.IsType<UserUpdatedEvent>(e);
+                Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
+                Assert.Equal(userCreatedEvent.UpdatedByUserId, GetCurrentUserId());
+                Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
+                Assert.Equal(newName, userCreatedEvent.User.Name);
+                Assert.Equal(updatedUser.Email, userCreatedEvent.User.Email);
+                Assert.Equal(updatedUser.AzureAdUserId, userCreatedEvent.User.AzureAdUserId);
+                Assert.Equal(expectedChanges, userCreatedEvent.Changes);
+                Assert.True(userCreatedEvent.User.Roles.SequenceEqual(roles));
+            });
+        }
 
         var redirectResponse = await response.FollowRedirect(HttpClient);
         var redirectDoc = await redirectResponse.GetDocument();

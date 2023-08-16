@@ -65,22 +65,24 @@ public class EditUser : PageModel
 
         var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);
 
-        var rolesChanged = Roles!.SequenceEqual(user!.Roles);
-        var nameChanged = !Name!.Equals(user.Name, StringComparison.OrdinalIgnoreCase);
+        var changes = UserUpdatedEventChanges.None |
+                      (user!.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
+                      (!user.Roles.SequenceEqual(Roles!) ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
 
-        if (!(rolesChanged | nameChanged))
+        if (changes == UserUpdatedEventChanges.None)
         {
             return Redirect(_linkGenerator.Users());
         }
 
         user.Roles = Roles!;
-        user.Name = Name;
+        user.Name = Name!;
 
-        _dbContext.AddEvent(new UserEditedEvent
+        _dbContext.AddEvent(new UserUpdatedEvent
         {
             User = Core.Events.User.FromModel(user),
-            AddedByUserId = User.GetUserId(),
-            CreatedUtc = _clock.UtcNow
+            UpdatedByUserId = User.GetUserId(),
+            CreatedUtc = _clock.UtcNow,
+            Changes = changes
         });
 
         await _dbContext.SaveChangesAsync();
