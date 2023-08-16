@@ -23,6 +23,20 @@ public static class TestUsers
         UserType = UserType.Person
     };
 
+    public static User CreateUser(bool active = true, UserType userType = UserType.Person, string? name = null, string? email = null, string? azureId = null, string[]? roles = null)
+    {
+        return new User
+        {
+            UserId = Guid.NewGuid(),
+            AzureAdUserId = azureId ?? Guid.NewGuid().ToString("D"),
+            Active = active,
+            UserType = userType,
+            Name = name ?? Faker.Name.FullName(),
+            Email = email ?? Faker.Internet.Email(),
+            Roles = roles ?? new[] { UserRoles.Administrator }
+        };
+    }
+
     public class CreateUsersStartupTask : IStartupTask
     {
         private readonly TrsDbContext _dbContext;

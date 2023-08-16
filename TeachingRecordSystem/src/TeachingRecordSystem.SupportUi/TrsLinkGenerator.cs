@@ -21,6 +21,8 @@ public class TrsLinkGenerator
 
     public string AddUser(string userId) => GetRequiredPathByPage("/Users/AddUser/Confirm", new { userId = userId });
 
+    public string EditUser(Guid userId) => GetRequiredPathByPage("/Users/EditUser", new { userId });
+
     private string GetRequiredPathByPage(string page, object? routeValues = null) =>
         _linkGenerator.GetPathByPage(page, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
 }
