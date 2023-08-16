@@ -1,6 +1,5 @@
 #nullable disable
 using Microsoft.Xrm.Sdk.Metadata;
-using static TeachingRecordSystem.Core.Dqt.DataverseAdapter;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
