@@ -92,14 +92,17 @@ public sealed class CrmClientFixture : IDisposable
             Func<IOrganizationServiceAsync2, CrmQueryDispatcher> createCrmQueryDispatcher,
             IMemoryCache memoryCache)
         {
-            OrganizationService = EntityTrackingOrganizationService.CreateProxy(serviceClient);
-
             _createDataverseAdapter = createDataverseAdapter;
             _createCrmQueryDispatcher = createCrmQueryDispatcher;
             _memoryCache = memoryCache;
+
+            OrganizationService = EntityTrackingOrganizationService.CreateProxy(serviceClient);
+            TestData = new CrmTestData(OrganizationService);
         }
 
         public ITrackedEntityOrganizationService OrganizationService { get; }
+
+        public CrmTestData TestData { get; }
 
         public CrmQueryDispatcher CreateQueryDispatcher() => _createCrmQueryDispatcher(OrganizationService);
 

@@ -1,60 +1,30 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public partial class TestData
+public partial class TestData : CrmTestData
 {
-    private static readonly object _gate = new();
-    private static readonly HashSet<string> _emails = new();
-
-    private readonly IDbContextFactory<TrsDbContext> _dbContextFactory;
-
-    public TestData(IDbContextFactory<TrsDbContext> dbContextFactory)
+    public TestData(
+        IDbContextFactory<TrsDbContext> dbContextFactory,
+        IOrganizationServiceAsync organizationService)
+        : base(organizationService)
     {
-        _dbContextFactory = dbContextFactory;
+        DbContextFactory = dbContextFactory;
     }
 
-    public string GenerateName() => Faker.Name.FullName();
+    protected IDbContextFactory<TrsDbContext> DbContextFactory { get; }
 
-    public string GenerateChangedName(string currentName)
+    protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {
-        string newName;
-
-        do
-        {
-            newName = GenerateName();
-        }
-        while (newName == currentName);
-
-        return newName;
-    }
-
-    public string GenerateUniqueEmail()
-    {
-        string email;
-
-        lock (_gate)
-        {
-            do
-            {
-                email = Faker.Internet.Email();
-            }
-            while (!_emails.Add(email));
-        }
-
-        return email;
-    }
-
-    private async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
-    {
-        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
         return await action(dbContext);
     }
 
-    private async Task WithDbContext(Func<TrsDbContext, Task> action)
+    protected async Task WithDbContext(Func<TrsDbContext, Task> action)
     {
-        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
         await action(dbContext);
     }
 }
