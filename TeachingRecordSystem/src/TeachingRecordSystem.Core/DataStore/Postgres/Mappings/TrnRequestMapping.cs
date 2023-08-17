@@ -10,6 +10,7 @@ public class TrnRequestMapping : IEntityTypeConfiguration<TrnRequest>
     {
         builder.Property(r => r.ClientId).IsRequired().HasMaxLength(50);
         builder.Property(r => r.RequestId).IsRequired().HasMaxLength(TrnRequest.RequestIdMaxLength);
+        builder.Property(t => t.TrnToken).HasMaxLength(TrnRequest.TrnTokenMaxLength);
         builder.HasIndex(r => new { r.ClientId, r.RequestId }).IsUnique();
     }
 }

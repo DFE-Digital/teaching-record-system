@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
@@ -23,6 +24,11 @@ public class TestScopedServices
             ClientSecret = "dummy",
             BaseAddress = "dummy",
             WebHookClientSecret = "dummy"
+        });
+
+        AccessYourQualificationsOptions = Options.Create(new AccessYourQualificationsOptions()
+        {
+            BaseAddress = "https://aytq.com",
         });
     }
 
@@ -48,4 +54,7 @@ public class TestScopedServices
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
     public IOptions<GetAnIdentityOptions> GetAnIdentityOptions { get; }
+
+    public IOptions<AccessYourQualificationsOptions> AccessYourQualificationsOptions { get; }
+
 }

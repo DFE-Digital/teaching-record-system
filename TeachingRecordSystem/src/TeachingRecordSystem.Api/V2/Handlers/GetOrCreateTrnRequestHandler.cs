@@ -4,6 +4,8 @@ using FluentValidation.Results;
 using Medallion.Threading;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Optional;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
@@ -13,6 +15,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Services.AccessYourQualifications;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
@@ -26,19 +30,22 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
     private readonly ICurrentClientProvider _currentClientProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
     private readonly IGetAnIdentityApiClient _identityApiClient;
+    private readonly AccessYourQualificationsOptions _accessYourQualificationsOptions;
 
     public GetOrCreateTrnRequestHandler(
         TrsDbContext TrsDbContext,
         IDataverseAdapter dataverseAdapter,
         ICurrentClientProvider currentClientProvider,
         IDistributedLockProvider distributedLockProvider,
-        IGetAnIdentityApiClient identityApiClient)
+        IGetAnIdentityApiClient identityApiClient,
+        IOptions<AccessYourQualificationsOptions> accessYourQualificationsOptions)
     {
         _trsDbContext = TrsDbContext;
         _dataverseAdapter = dataverseAdapter;
         _currentClientProvider = currentClientProvider;
         _distributedLockProvider = distributedLockProvider;
         _identityApiClient = identityApiClient;
+        _accessYourQualificationsOptions = accessYourQualificationsOptions.Value;
     }
 
     public async Task<TrnRequestInfo> Handle(GetOrCreateTrnRequest request, CancellationToken cancellationToken)
@@ -59,6 +66,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
         bool wasCreated;
         string trn;
         DateOnly? qtsDate = null;
+        string trnToken = null;
 
         if (trnRequest != null)
         {
@@ -67,6 +75,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             wasCreated = false;
             trn = teacher?.dfeta_TRN;
             qtsDate = teacher?.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true);
+            trnToken = qtsDate is not null ? trnRequest.TrnToken : null;
         }
         else
         {
@@ -139,12 +148,25 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 throw CreateValidationExceptionFromFailedReasons(createTeacherResult.FailedReasons);
             }
 
+            if (request.QtsDate is not null && createTeacherResult.Trn is not null)
+            {
+                var trnTokenRequest = new CreateTrnTokenRequest
+                {
+                    Trn = createTeacherResult.Trn,
+                    Email = request.EmailAddress
+                };
+
+                var trnTokenResponse = await _identityApiClient.CreateTrnToken(trnTokenRequest);
+                trnToken = trnTokenResponse.TrnToken;
+            }
+
             _trsDbContext.TrnRequests.Add(new TrnRequest()
             {
                 ClientId = currentClientId,
                 RequestId = request.RequestId,
                 TeacherId = createTeacherResult.TeacherId,
-                LinkedToIdentity = false
+                LinkedToIdentity = false,
+                TrnToken = trnToken
             });
 
             await _trsDbContext.SaveChangesAsync();
@@ -164,7 +186,8 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             Status = status,
             QtsDate = qtsDate,
             PotentialDuplicate = status == TrnRequestStatus.Pending,
-            SlugId = request.SlugId
+            SlugId = request.SlugId,
+            AccessYourTeachingQualificationsLink = trnToken is not null ? Option.Some($"{_accessYourQualificationsOptions.BaseAddress}{_accessYourQualificationsOptions.StartUrlPath}?trn_token={trnToken}") : default
         };
     }
 

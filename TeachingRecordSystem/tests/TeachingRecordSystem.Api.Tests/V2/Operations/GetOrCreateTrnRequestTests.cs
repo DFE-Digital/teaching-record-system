@@ -3,6 +3,7 @@ using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
@@ -222,7 +223,6 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         // Assert
         Assert.True(response.IsSuccessStatusCode);
     }
-
 
     [Fact]
     public async Task Given_request_with_null_qualification_subject3_request_to_DataverseAdapter_successfully()
@@ -633,11 +633,23 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         var requestId = Guid.NewGuid().ToString();
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
+        var trnToken = "ABCDEFG1234567";
+        var qtsDate = new DateOnly(2020, 10, 10);
 
         DataverseAdapterMock
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
+
+        GetAnIdentityApiClientMock
+            .Setup(mock => mock.CreateTrnToken(It.IsAny<CreateTrnTokenRequest>()))
+            .ReturnsAsync(new CreateTrnTokenResponse()
+            {
+                Email = Faker.Internet.Email(),
+                Trn = trn,
+                TrnToken = trnToken,
+                ExpiresUtc = DateTime.UtcNow.AddDays(1),
+            });
 
         var request = CreateRequest(req =>
         {
@@ -656,6 +668,20 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
         // Assert
         Assert.True(response.IsSuccessStatusCode);
         DataverseAdapterMock.Verify();
+
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId = requestId,
+                trn = trn,
+                status = "Completed",
+                qtsDate = qtsDate,
+                potentialDuplicate = false,
+                slugId = (string)null,
+                accessYourTeachingQualificationsLink = $"https://aytq.com/qualifications/start?trn_token={trnToken}"
+            },
+            expectedStatusCode: 201);
     }
 
     [Fact]

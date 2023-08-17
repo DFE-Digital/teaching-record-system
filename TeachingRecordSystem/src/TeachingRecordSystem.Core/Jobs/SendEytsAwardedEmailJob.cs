@@ -46,7 +46,7 @@ public class SendEytsAwardedEmailJob
             };
 
             var tokenResponse = await _identityApiClient.CreateTrnToken(request);
-            item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourQualificationsOptions.BaseAddress}/qualifications/start?trn_token={tokenResponse.TrnToken}";
+            item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourQualificationsOptions.BaseAddress}{_accessYourQualificationsOptions.StartUrlPath}?trn_token={tokenResponse.TrnToken}";
         }
 
         await _notificationSender.SendEmail(EytsAwardedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
