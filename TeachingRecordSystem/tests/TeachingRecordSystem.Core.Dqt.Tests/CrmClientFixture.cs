@@ -18,7 +18,7 @@ public sealed class CrmClientFixture : IDisposable
     private readonly EnvironmentLockManager _lockManager;
     private readonly IMemoryCache _memoryCache;
     private readonly ITrnGenerationApiClient _trnGenerationApiClient;
-    private readonly IServiceProvider _queryServiceProvider;
+    private readonly ReferenceDataCache _referenceDataCache;
 
     public CrmClientFixture(ServiceClient serviceClient, IConfiguration configuration, IMemoryCache memoryCache)
     {
@@ -30,7 +30,7 @@ public sealed class CrmClientFixture : IDisposable
         _lockManager.AcquireLock(_completedCts.Token);
         _memoryCache = memoryCache;
         _trnGenerationApiClient = GetTrnGenerationApiClient();
-        _queryServiceProvider = CreateQueryServiceProvider();
+        _referenceDataCache = new ReferenceDataCache(new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, referenceDataCache: null)));
     }
 
     public TestableClock Clock { get; }
@@ -38,10 +38,7 @@ public sealed class CrmClientFixture : IDisposable
     public IConfiguration Configuration { get; }
 
     public CrmQueryDispatcher CreateQueryDispatcher() =>
-        ActivatorUtilities.CreateInstance<CrmQueryDispatcher>(_queryServiceProvider, (IOrganizationServiceAsync)_baseServiceClient);
-
-    public CrmQueryDispatcher CreateQueryDispatcherForDataScope(TestDataScope scope) =>
-        ActivatorUtilities.CreateInstance<CrmQueryDispatcher>(_queryServiceProvider, scope.OrganizationService);
+        new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, _referenceDataCache));
 
     /// <summary>
     /// Creates a scope that owns an implementation of <see cref="IOrganizationServiceAsync2"/> that tracks the entities created through it.
@@ -50,6 +47,7 @@ public sealed class CrmClientFixture : IDisposable
     public TestDataScope CreateTestDataScope() => new(
         _baseServiceClient,
         orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient),
+        orgService => new CrmQueryDispatcher(CreateQueryServiceProvider(orgService, _referenceDataCache)),
         _memoryCache);
 
     public void Dispose()
@@ -58,10 +56,17 @@ public sealed class CrmClientFixture : IDisposable
         _completedCts.Cancel();
     }
 
-    private static IServiceProvider CreateQueryServiceProvider()
+    private static IServiceProvider CreateQueryServiceProvider(IOrganizationServiceAsync organizationService, ReferenceDataCache? referenceDataCache)
     {
         var services = new ServiceCollection();
         services.AddCrmQueries();
+        services.AddSingleton(organizationService);
+
+        if (referenceDataCache is not null)
+        {
+            services.AddSingleton(referenceDataCache);
+        }
+
         return services.BuildServiceProvider();
     }
 
@@ -78,20 +83,25 @@ public sealed class CrmClientFixture : IDisposable
     public sealed class TestDataScope : IAsyncDisposable
     {
         private readonly Func<IOrganizationServiceAsync2, DataverseAdapter> _createDataverseAdapter;
+        private readonly Func<IOrganizationServiceAsync2, CrmQueryDispatcher> _createCrmQueryDispatcher;
         private readonly IMemoryCache _memoryCache;
 
         internal TestDataScope(
             ServiceClient serviceClient,
             Func<IOrganizationServiceAsync2, DataverseAdapter> createDataverseAdapter,
+            Func<IOrganizationServiceAsync2, CrmQueryDispatcher> createCrmQueryDispatcher,
             IMemoryCache memoryCache)
         {
             OrganizationService = EntityTrackingOrganizationService.CreateProxy(serviceClient);
 
             _createDataverseAdapter = createDataverseAdapter;
+            _createCrmQueryDispatcher = createCrmQueryDispatcher;
             _memoryCache = memoryCache;
         }
 
         public ITrackedEntityOrganizationService OrganizationService { get; }
+
+        public CrmQueryDispatcher CreateQueryDispatcher() => _createCrmQueryDispatcher(OrganizationService);
 
         public DataverseAdapter CreateDataverseAdapter() => _createDataverseAdapter(OrganizationService);
 
