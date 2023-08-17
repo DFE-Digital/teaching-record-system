@@ -148,7 +148,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 throw CreateValidationExceptionFromFailedReasons(createTeacherResult.FailedReasons);
             }
 
-            if (request.QtsDate is not null)
+            if (request.QtsDate is not null && createTeacherResult.Trn is not null)
             {
                 var trnTokenRequest = new CreateTrnTokenRequest
                 {
