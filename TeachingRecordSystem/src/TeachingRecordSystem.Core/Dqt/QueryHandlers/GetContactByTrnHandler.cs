@@ -7,10 +7,8 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetContactByTrnHandler : ICrmQueryHandler<GetContactByTrn, Contact?>
 {
-    public async Task<Contact?> Execute(GetContactByTrn query, IOrganizationServiceAsync organizationService, RequestBuilder? requestBuilder)
+    public async Task<Contact?> Execute(GetContactByTrn query, IOrganizationServiceAsync organizationService)
     {
-        requestBuilder ??= RequestBuilder.CreateSingle(organizationService);
-
         var queryByAttribute = new QueryByAttribute()
         {
             EntityName = Contact.EntityLogicalName,
@@ -24,8 +22,8 @@ public class GetContactByTrnHandler : ICrmQueryHandler<GetContactByTrn, Contact?
             Query = queryByAttribute
         };
 
-        var response = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+        var response = await organizationService.RetrieveMultipleAsync(queryByAttribute);
 
-        return response.EntityCollection.Entities.SingleOrDefault()?.ToEntity<Contact>();
+        return response.Entities.SingleOrDefault()?.ToEntity<Contact>();
     }
 }

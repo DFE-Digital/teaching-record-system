@@ -14,7 +14,7 @@ public class CrmQueryDispatcher : ICrmQueryDispatcher
         _organizationServiceAsync = organizationServiceAsync;
     }
 
-    public async Task<TResult> ExecuteQuery<TResult>(ICrmQuery<TResult> query, RequestBuilder? requestBuilder = null)
+    public async Task<TResult> ExecuteQuery<TResult>(ICrmQuery<TResult> query)
     {
         var handlerType = typeof(ICrmQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
         var handler = _serviceProvider.GetRequiredService(handlerType);
@@ -22,12 +22,12 @@ public class CrmQueryDispatcher : ICrmQueryDispatcher
         var wrapperHandlerType = typeof(QueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
         var wrappedHandler = (QueryHandler<TResult>)Activator.CreateInstance(wrapperHandlerType, handler)!;
 
-        return await wrappedHandler.Execute(query, _organizationServiceAsync, requestBuilder);
+        return await wrappedHandler.Execute(query, _organizationServiceAsync);
     }
 
     private abstract class QueryHandler<T>
     {
-        public abstract Task<T> Execute(ICrmQuery<T> query, IOrganizationServiceAsync organizationService, RequestBuilder? requestBuilder);
+        public abstract Task<T> Execute(ICrmQuery<T> query, IOrganizationServiceAsync organizationService);
     }
 
     private class QueryHandler<TQuery, TResult> : QueryHandler<TResult>
@@ -40,9 +40,9 @@ public class CrmQueryDispatcher : ICrmQueryDispatcher
             _innerHandler = innerHandler;
         }
 
-        public override Task<TResult> Execute(ICrmQuery<TResult> query, IOrganizationServiceAsync organizationService, RequestBuilder? requestBuilder)
+        public override Task<TResult> Execute(ICrmQuery<TResult> query, IOrganizationServiceAsync organizationService)
         {
-            return _innerHandler.Execute((TQuery)query, organizationService, requestBuilder);
+            return _innerHandler.Execute((TQuery)query, organizationService);
         }
     }
 }
