@@ -48,6 +48,7 @@ public sealed class CrmClientFixture : IDisposable
         _baseServiceClient,
         orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient),
         orgService => new CrmQueryDispatcher(CreateQueryServiceProvider(orgService, _referenceDataCache)),
+        orgService => new CrmTestData(orgService, () => _trnGenerationApiClient.GenerateTrn()),
         _memoryCache);
 
     public void Dispose()
@@ -90,6 +91,7 @@ public sealed class CrmClientFixture : IDisposable
             ServiceClient serviceClient,
             Func<IOrganizationServiceAsync2, DataverseAdapter> createDataverseAdapter,
             Func<IOrganizationServiceAsync2, CrmQueryDispatcher> createCrmQueryDispatcher,
+            Func<IOrganizationServiceAsync2, CrmTestData> createTestData,
             IMemoryCache memoryCache)
         {
             _createDataverseAdapter = createDataverseAdapter;
@@ -97,7 +99,7 @@ public sealed class CrmClientFixture : IDisposable
             _memoryCache = memoryCache;
 
             OrganizationService = EntityTrackingOrganizationService.CreateProxy(serviceClient);
-            TestData = new CrmTestData(OrganizationService);
+            TestData = createTestData(OrganizationService);
         }
 
         public ITrackedEntityOrganizationService OrganizationService { get; }

@@ -7,12 +7,17 @@ public partial class CrmTestData
     private static readonly object _gate = new();
     private static readonly HashSet<string> _emails = new();
 
-    private readonly IOrganizationServiceAsync _organizationService;
+    private readonly Func<Task<string>> _generateTrn;
 
-    public CrmTestData(IOrganizationServiceAsync organizationService)
+    public CrmTestData(
+        IOrganizationServiceAsync organizationService,
+        Func<Task<string>> generateTrn)
     {
-        _organizationService = organizationService;
+        OrganizationService = organizationService;
+        _generateTrn = generateTrn;
     }
+
+    public IOrganizationServiceAsync OrganizationService;
 
     public DateOnly GenerateDateOfBirth() => DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 
@@ -52,4 +57,6 @@ public partial class CrmTestData
 
         return email;
     }
+
+    public virtual Task<string> GenerateTrn() => _generateTrn();
 }
