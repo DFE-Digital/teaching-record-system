@@ -75,7 +75,7 @@ jobs:
         RUN_CRM_INTEGRATION_TESTS=true
         git fetch origin main --quiet --depth=1
         CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
-        if [[ $(echo "$CHANGED_FILES" | grep -EL "TeachingRecordSystem.Dqt") ]]; then
+        if [[ $(echo "$CHANGED_FILES" | grep -EL "TeachingRecordSystem.Core.Dqt") ]]; then
           RUN_CRM_INTEGRATION_TESTS=false
         fi
 

@@ -1,4 +1,3 @@
-#nullable disable
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using Azure;
@@ -6,6 +5,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 
@@ -18,6 +18,7 @@ public sealed class CrmClientFixture : IDisposable
     private readonly EnvironmentLockManager _lockManager;
     private readonly IMemoryCache _memoryCache;
     private readonly ITrnGenerationApiClient _trnGenerationApiClient;
+    private readonly IServiceProvider _queryServiceProvider;
 
     public CrmClientFixture(ServiceClient serviceClient, IConfiguration configuration, IMemoryCache memoryCache)
     {
@@ -29,11 +30,18 @@ public sealed class CrmClientFixture : IDisposable
         _lockManager.AcquireLock(_completedCts.Token);
         _memoryCache = memoryCache;
         _trnGenerationApiClient = GetTrnGenerationApiClient();
+        _queryServiceProvider = CreateQueryServiceProvider();
     }
 
     public TestableClock Clock { get; }
 
     public IConfiguration Configuration { get; }
+
+    public CrmQueryDispatcher CreateQueryDispatcher() =>
+        ActivatorUtilities.CreateInstance<CrmQueryDispatcher>(_queryServiceProvider, (IOrganizationServiceAsync)_baseServiceClient);
+
+    public CrmQueryDispatcher CreateQueryDispatcherForDataScope(TestDataScope scope) =>
+        ActivatorUtilities.CreateInstance<CrmQueryDispatcher>(_queryServiceProvider, scope.OrganizationService);
 
     /// <summary>
     /// Creates a scope that owns an implementation of <see cref="IOrganizationServiceAsync2"/> that tracks the entities created through it.
@@ -50,11 +58,18 @@ public sealed class CrmClientFixture : IDisposable
         _completedCts.Cancel();
     }
 
+    private static IServiceProvider CreateQueryServiceProvider()
+    {
+        var services = new ServiceCollection();
+        services.AddCrmQueries();
+        return services.BuildServiceProvider();
+    }
+
     private ITrnGenerationApiClient GetTrnGenerationApiClient()
     {
         var httpClient = new HttpClient
         {
-            BaseAddress = new Uri(Configuration["TrnGenerationApi:BaseAddress"])
+            BaseAddress = new Uri(Configuration.GetRequiredValue("TrnGenerationApi:BaseAddress"))
         };
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Configuration["TrnGenerationApi:ApiKey"]);
         return new TrnGenerationApiClient(httpClient);
@@ -96,8 +111,8 @@ public sealed class CrmClientFixture : IDisposable
 
         public EnvironmentLockManager(IConfiguration configuration)
         {
-            var blobUri = new Uri(configuration["BuildEnvLockBlobUri"]);
-            var sasToken = configuration["BuildEnvLockBlobSasToken"];
+            var blobUri = new Uri(configuration.GetRequiredValue("BuildEnvLockBlobUri"));
+            var sasToken = configuration.GetRequiredValue("BuildEnvLockBlobSasToken");
 
             _blobClient = new BlobClient(blobUri, new AzureSasCredential(sasToken));
         }
