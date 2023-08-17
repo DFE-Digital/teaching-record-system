@@ -23,8 +23,6 @@ public abstract class TestBase
         {
             AllowAutoRedirect = false
         });
-
-        TestData = new(HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>());
     }
 
     public HostFixture HostFixture { get; }
@@ -39,7 +37,7 @@ public abstract class TestBase
 
     public HttpClient HttpClient { get; }
 
-    public TestData TestData { get; }
+    public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
     protected Guid GetCurrentUserId()
     {
