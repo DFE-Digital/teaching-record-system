@@ -6,23 +6,23 @@ namespace TeachingRecordSystem.Core.Dqt;
 public class CrmQueryDispatcher : ICrmQueryDispatcher
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IOrganizationServiceAsync _organizationServiceAsync;
 
-    public CrmQueryDispatcher(IServiceProvider serviceProvider, IOrganizationServiceAsync organizationServiceAsync)
+    public CrmQueryDispatcher(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _organizationServiceAsync = organizationServiceAsync;
     }
 
     public async Task<TResult> ExecuteQuery<TResult>(ICrmQuery<TResult> query)
     {
+        var organizationService = _serviceProvider.GetRequiredService<IOrganizationServiceAsync>();
+
         var handlerType = typeof(ICrmQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
         var handler = _serviceProvider.GetRequiredService(handlerType);
 
         var wrapperHandlerType = typeof(QueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
         var wrappedHandler = (QueryHandler<TResult>)Activator.CreateInstance(wrapperHandlerType, handler)!;
 
-        return await wrappedHandler.Execute(query, _organizationServiceAsync);
+        return await wrappedHandler.Execute(query, organizationService);
     }
 
     private abstract class QueryHandler<T>
