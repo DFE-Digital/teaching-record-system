@@ -66,7 +66,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
         bool wasCreated;
         string trn;
         DateOnly? qtsDate = null;
-        string? trnToken = null;
+        string trnToken = null;
 
         if (trnRequest != null)
         {
@@ -75,7 +75,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             wasCreated = false;
             trn = teacher?.dfeta_TRN;
             qtsDate = teacher?.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true);
-            trnToken = qtsDate is not null ? trnRequest.TrnToken : default;
+            trnToken = qtsDate is not null ? trnRequest.TrnToken : null;
         }
         else
         {
@@ -148,14 +148,14 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 throw CreateValidationExceptionFromFailedReasons(createTeacherResult.FailedReasons);
             }
 
-            var trnTokenRequest = new CreateTrnTokenRequest
-            {
-                Trn = createTeacherResult.Trn,
-                Email = request.EmailAddress
-            };
-
             if (request.QtsDate is not null)
             {
+                var trnTokenRequest = new CreateTrnTokenRequest
+                {
+                    Trn = createTeacherResult.Trn,
+                    Email = request.EmailAddress
+                };
+
                 var trnTokenResponse = await _identityApiClient.CreateTrnToken(trnTokenRequest);
                 trnToken = trnTokenResponse.TrnToken;
             }
@@ -187,7 +187,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             QtsDate = qtsDate,
             PotentialDuplicate = status == TrnRequestStatus.Pending,
             SlugId = request.SlugId,
-            AccessYourTeachingQualificationsLink = trnToken is not null ? Option.Some($"{_accessYourQualificationsOptions.BaseAddress}/qualifications/start?trn_token={trnToken}") : default
+            AccessYourTeachingQualificationsLink = trnToken is not null ? Option.Some($"{_accessYourQualificationsOptions.BaseAddress}{_accessYourQualificationsOptions.StartUrlPath}?trn_token={trnToken}") : default
         };
     }
 

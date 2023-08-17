@@ -69,7 +69,7 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
             QtsDate = qtsDate,
             PotentialDuplicate = status == TrnRequestStatus.Pending,
             SlugId = teacher.dfeta_SlugId,
-            AccessYourTeachingQualificationsLink = trnRequest.TrnToken is not null ? Option.Some($"{_accessYourQualificationsOptions.BaseAddress}/qualifications/start?trn_token={trnRequest.TrnToken}") : default
+            AccessYourTeachingQualificationsLink = trnRequest.TrnToken is not null ? Option.Some($"{_accessYourQualificationsOptions.BaseAddress}{_accessYourQualificationsOptions.StartUrlPath}?trn_token={trnRequest.TrnToken}") : default
         };
     }
 }
