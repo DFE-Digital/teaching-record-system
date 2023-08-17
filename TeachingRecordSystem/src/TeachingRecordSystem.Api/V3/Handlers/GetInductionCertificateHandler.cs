@@ -87,13 +87,11 @@ public class GetInductionCertificateHandler : IRequestHandler<GetInductionCertif
         };
 
         var pdfStream = await _certificateGenerator.GenerateCertificate("Induction certificate.pdf", fieldValues);
-        using var output = new MemoryStream();
-        pdfStream.CopyTo(output);
 
         return new GetCertificateResponse()
         {
             FileDownloadName = $"InductionCertificate.pdf",
-            FileContents = output.ToArray()
+            FileContents = pdfStream
         };
     }
 }

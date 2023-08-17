@@ -74,13 +74,11 @@ public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest
         };
 
         var pdfStream = await _certificateGenerator.GenerateCertificate($"{qualification.dfeta_Type} Certificate.pdf", fieldValues);
-        using var output = new MemoryStream();
-        pdfStream.CopyTo(output);
 
         return new GetCertificateResponse()
         {
             FileDownloadName = $"{qualification.dfeta_Type}Certificate.pdf",
-            FileContents = output.ToArray()
+            FileContents = pdfStream
         };
     }
 }
