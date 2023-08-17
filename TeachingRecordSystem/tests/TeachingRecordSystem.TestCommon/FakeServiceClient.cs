@@ -59,33 +59,139 @@ public class FakeServiceClient : IOrganizationServiceAsync
 
     public OrganizationResponse Execute(OrganizationRequest request)
     {
-        if (request is RetrieveMultipleRequest retrieveMultipleRequest)
+        lock (_lock)
         {
-            return new RetrieveMultipleResponse()
-            {
-                Results =
-                {
-                    { nameof(EntityCollection), RetrieveMultiple(retrieveMultipleRequest.Query) }
-                }
-            };
+            _data = Execute(_data, request, out var response);
+            return response;
         }
-
-        throw new NotImplementedException($"Support for {request.GetType().Name} requests is not implemented.");
     }
 
     public Task<OrganizationResponse> ExecuteAsync(OrganizationRequest request) =>
         Task.FromResult(Execute(request));
 
-    public Entity Retrieve(string entityName, Guid id, ColumnSet columnSet)
-    {
-        return _data.Entities.SingleOrDefault(e => e.Id == id && e.EntityName == entityName)?.ToEntity() ??
-            throw new ArgumentException("Could not retrieve entity.");
-    }
+    public Entity Retrieve(string entityName, Guid id, ColumnSet columnSet) => Retrieve(_data, entityName, id, columnSet);
 
     public Task<Entity> RetrieveAsync(string entityName, Guid id, ColumnSet columnSet) =>
         Task.FromResult(Retrieve(entityName, id, columnSet));
 
-    public EntityCollection RetrieveMultiple(QueryBase query)
+    public EntityCollection RetrieveMultiple(QueryBase query) => RetrieveMultiple(_data, query);
+
+    public Task<EntityCollection> RetrieveMultipleAsync(QueryBase query) =>
+        Task.FromResult(RetrieveMultiple(query));
+
+    public void Update(Entity entity)
+    {
+        lock (_lock)
+        {
+            _data = Update(_data, entity);
+        }
+    }
+
+    public Task UpdateAsync(Entity entity)
+    {
+        Update(entity);
+        return Task.CompletedTask;
+    }
+
+    private static DataSnapshot Execute(DataSnapshot currentSnapshot, OrganizationRequest request, out OrganizationResponse response)
+    {
+        if (request is RetrieveMultipleRequest retrieveMultipleRequest)
+        {
+            response = new RetrieveMultipleResponse()
+            {
+                Results =
+                {
+                    { nameof(EntityCollection), RetrieveMultiple(currentSnapshot, retrieveMultipleRequest.Query) }
+                }
+            };
+
+            return currentSnapshot;
+        }
+
+        if (request is CreateRequest createRequest)
+        {
+            var newSnapshot = Create(currentSnapshot, createRequest.Target, out var id);
+
+            response = new CreateResponse()
+            {
+                Results =
+                {
+                    { "id", id }
+                }
+            };
+
+            return newSnapshot;
+        }
+
+        if (request is UpdateRequest updateRequest)
+        {
+            var newSnapshot = Update(currentSnapshot, updateRequest.Target);
+
+            response = new UpdateResponse();
+
+            return newSnapshot;
+        }
+
+        if (request is DeleteRequest deleteRequest)
+        {
+            var newSnapshot = Delete(currentSnapshot, deleteRequest.Target.LogicalName, deleteRequest.Target.Id);
+
+            response = new DeleteResponse();
+
+            return newSnapshot;
+        }
+
+        if (request is ExecuteTransactionRequest executeTransactionRequest)
+        {
+            var responseCollection = new OrganizationResponseCollection();
+
+            var snapshot = currentSnapshot;
+            foreach (var innerRequest in executeTransactionRequest.Requests)
+            {
+                snapshot = Execute(snapshot, innerRequest, out var innerResponse);
+                responseCollection.Add(innerResponse);
+            }
+
+            response = new ExecuteTransactionResponse()
+            {
+                Results =
+                {
+                    { nameof(ExecuteTransactionResponse.Responses), responseCollection }
+                }
+            };
+
+            return snapshot;
+        }
+
+        throw new NotImplementedException($"Support for {request.GetType().Name} requests is not implemented.");
+    }
+
+    private static DataSnapshot Create(DataSnapshot currentSnapshot, Entity entity, out Guid id)
+    {
+        ThrowOnUnsupportData(entity);
+
+        if (!TryGetId(entity, out id))
+        {
+            id = Guid.NewGuid();
+        }
+
+        var attributes = entity.Attributes.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        if (!attributes.ContainsKey("statecode"))
+        {
+            attributes.Add("statecode", 0);
+        }
+
+        return currentSnapshot.Add(new(entity.LogicalName, id, attributes));
+    }
+
+    private static Entity Retrieve(DataSnapshot currentSnapshot, string entityName, Guid id, ColumnSet columnSet)
+    {
+        return currentSnapshot.Entities.SingleOrDefault(e => e.Id == id && e.EntityName == entityName)?.ToEntity(columnSet) ??
+            throw new ArgumentException("Could not retrieve entity.");
+    }
+
+    private static EntityCollection RetrieveMultiple(DataSnapshot currentSnapshot, QueryBase query)
     {
         if (query is QueryByAttribute queryByAttribute)
         {
@@ -124,7 +230,7 @@ public class FakeServiceClient : IOrganizationServiceAsync
                 throw new NotSupportedException();
             }
 
-            var filter = CreateFilter(queryExpression.Criteria);
+            Predicate<EntitySnapshot> filter = e => e.EntityName == queryExpression.EntityName && CreateFilter(queryExpression.Criteria)(e);
 
             return HandleQuery(filter, queryExpression.PageInfo, queryExpression.EntityName, queryExpression.ColumnSet, queryExpression.Orders);
 
@@ -169,7 +275,7 @@ public class FakeServiceClient : IOrganizationServiceAsync
             ColumnSet columnSet,
             DataCollection<OrderExpression> orders)
         {
-            var results = ApplyOrders(_data.Entities.Where(e => filter(e)))
+            var results = ApplyOrders(currentSnapshot.Entities.Where(e => filter(e)))
                 .Select(s => s.ToEntity(columnSet))
                 .ToList();
 
@@ -214,43 +320,7 @@ public class FakeServiceClient : IOrganizationServiceAsync
         throw new NotImplementedException();
     }
 
-    public Task<EntityCollection> RetrieveMultipleAsync(QueryBase query) =>
-        Task.FromResult(RetrieveMultiple(query));
-
-    public void Update(Entity entity)
-    {
-        lock (_lock)
-        {
-            _data = Update(_data, entity);
-        }
-    }
-
-    public Task UpdateAsync(Entity entity)
-    {
-        Update(entity);
-        return Task.CompletedTask;
-    }
-
-    private DataSnapshot Create(DataSnapshot currentSnapshot, Entity entity, out Guid id)
-    {
-        ThrowOnUnsupportData(entity);
-
-        if (!TryGetId(entity, out id))
-        {
-            id = Guid.NewGuid();
-        }
-
-        var attributes = entity.Attributes.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-        if (!attributes.ContainsKey("statecode"))
-        {
-            attributes.Add("statecode", 0);
-        }
-
-        return currentSnapshot.Add(new(entity.LogicalName, id, attributes));
-    }
-
-    private DataSnapshot Update(DataSnapshot currentSnapshot, Entity entity)
+    private static DataSnapshot Update(DataSnapshot currentSnapshot, Entity entity)
     {
         ThrowOnUnsupportData(entity);
 
@@ -272,7 +342,7 @@ public class FakeServiceClient : IOrganizationServiceAsync
         });
     }
 
-    private DataSnapshot Delete(DataSnapshot currentSnapshot, string entityName, Guid id)
+    private static DataSnapshot Delete(DataSnapshot currentSnapshot, string entityName, Guid id)
     {
         var newSnapshot = currentSnapshot.Remove(entityName, id, out var removed);
 
@@ -393,8 +463,10 @@ public class FakeServiceClient : IOrganizationServiceAsync
     {
         public Entity ToEntity() => ToEntity(new ColumnSet(allColumns: true));
 
-        public Entity ToEntity(ColumnSet columnSet)
+        public Entity ToEntity(ColumnSet? columnSet)
         {
+            columnSet ??= new();
+
             var entity = new Entity(EntityName, Id);
 
             foreach (var kvp in Attributes)
