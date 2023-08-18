@@ -1,4 +1,37 @@
-﻿@page
+@page "/cases"
 @model TeachingRecordSystem.SupportUi.Pages.Cases.IndexModel
 @{
+    ViewBag.Title = "Open Cases";
 }
+
+<table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--xl">@ViewBag.Title</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">Case reference</th>
+            <th scope="col" class="govuk-table__header govuk-!-width-one-third">Name</th>
+            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">Case type</th>
+            <th scope="col" class="govuk-table__header">Created on</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        @if (Model.Cases!.Length == 0)
+        {
+            <tr class="govuk-table__row" data-testid="no-cases">
+                 <td class="govuk-table__cell" colspan="4">No cases</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var caseInfo in Model.Cases!)
+            {
+                <tr class="govuk-table__row" data-testid="case-@caseInfo.CaseReference">
+                    <td class="govuk-table__cell" data-testid="case-reference-@caseInfo.CaseReference"><a href="@LinkGenerator.EditCase(caseInfo.CaseReference)">@caseInfo.CaseReference</a></td>
+                    <td class="govuk-table__cell" data-testid="name-@caseInfo.CaseReference">@caseInfo.Customer</td>
+                    <td class="govuk-table__cell" data-testid="case-type-@caseInfo.CaseReference">@caseInfo.CaseType</td>
+                    <td class="govuk-table__cell" data-testid="created-on-@caseInfo.CaseReference">@caseInfo.CreatedOn.ToString("dd/MM/yyyy")</td>
+                </tr>
+            }
+        }        
+    </tbody>
+</table>

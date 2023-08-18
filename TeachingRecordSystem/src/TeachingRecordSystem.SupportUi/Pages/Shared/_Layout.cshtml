@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = "_GovUkPageTemplate";
 }
 
@@ -29,6 +29,9 @@
                 <nav aria-label="Menu" class="govuk-header__navigation">
                     <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide menu" hidden>Menu</button>
                     <ul id="navigation" class="govuk-header__navigation-list">
+                        <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/cases") ? "govuk-header__navigation-item--active" : "")">
+                            <a class="govuk-header__link" href="@LinkGenerator.Cases()">Cases</a>
+                        </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             if (User.IsInRole(UserRoles.Administrator))

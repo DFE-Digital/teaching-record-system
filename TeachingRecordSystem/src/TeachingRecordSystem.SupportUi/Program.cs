@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Identity.Web;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
@@ -146,6 +148,17 @@ builder.Services
     .AddSupportUiServices(builder.Configuration, builder.Environment)
     .AddSingleton<ReferenceDataCache>();
 
+if (!builder.Environment.IsUnitTests())
+{
+    var crmServiceClient = GetCrmServiceClient();
+    builder.Services
+        .AddSingleton<ITrnGenerationApiClient, TrnGenerationApiClient>() // Purely needed to DI into DataverseAdapter
+        .AddTransient<IOrganizationServiceAsync>(_ => crmServiceClient.Clone())
+        .AddTransient<IDataverseAdapter, DataverseAdapter>();
+
+    healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
+}
+
 var app = builder.Build();
 
 if (app.Environment.IsProduction())
@@ -204,5 +217,27 @@ app.MapRazorPages();
 app.MapControllers();
 
 app.Run();
+
+ServiceClient GetCrmServiceClient()
+{
+    // This property is poorly-named. It's really a request timeout.
+    // It's worth noting this is a client-side timeout; it's not respected by the server.
+    // If this timeout fires the operation is still going to complete on the server.
+    //
+    // It's important for some of our operations that we never see this timeout fire;
+    // we have advisory locks in place that surround these operations that are dropped once this timeout
+    // fires, even though the operation in CRM is still going on.
+    ServiceClient.MaxConnectionTimeout = TimeSpan.FromMinutes(5);
+
+    var connectionString = builder.Configuration.GetRequiredValue("ConnectionStrings:Crm");
+
+    return new ServiceClient(connectionString)
+    {
+        DisableCrossThreadSafeties = true,
+        EnableAffinityCookie = true,
+        MaxRetryCount = 2,
+        RetryPauseTime = TimeSpan.FromSeconds(1)
+    };
+}
 
 public partial class Program { }

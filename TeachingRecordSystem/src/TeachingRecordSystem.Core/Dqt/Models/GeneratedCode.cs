@@ -9492,6 +9492,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string CreatedOn = "createdon";
 			public const string CustomerId = "customerid";
 			public const string Description = "description";
 			public const string dfeta_FromIdentity = "dfeta_fromidentity";
@@ -9504,6 +9505,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_StatedMiddleName = "dfeta_statedmiddlename";
 			public const string StateCode = "statecode";
 			public const string SubjectId = "subjectid";
+			public const string TicketNumber = "ticketnumber";
 			public const string Title = "title";
 			public const string dfeta_incident_dfeta_document = "dfeta_incident_dfeta_document";
 			public const string Incident_Annotation = "Incident_Annotation";
@@ -9566,6 +9568,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the record was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 		
@@ -9821,6 +9843,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("SubjectId");
 				this.SetAttributeValue("subjectid", value);
 				this.OnPropertyChanged("SubjectId");
+			}
+		}
+		
+		/// <summary>
+		/// Shows the case number for customer reference and searching capabilities. This cannot be modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ticketnumber")]
+		public string TicketNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("ticketnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("TicketNumber");
+				this.SetAttributeValue("ticketnumber", value);
+				this.OnPropertyChanged("TicketNumber");
 			}
 		}
 		
