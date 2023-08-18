@@ -159,6 +159,17 @@ if (!builder.Environment.IsUnitTests())
     healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
 }
 
+if (!builder.Environment.IsUnitTests())
+{
+    var crmServiceClient = GetCrmServiceClient();
+    builder.Services
+        .AddSingleton<ITrnGenerationApiClient, TrnGenerationApiClient>() // Purely needed to DI into DataverseAdapter
+        .AddTransient<IOrganizationServiceAsync>(_ => crmServiceClient.Clone())
+        .AddTransient<IDataverseAdapter, DataverseAdapter>();
+
+    healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
+}
+
 var app = builder.Build();
 
 if (app.Environment.IsProduction())
