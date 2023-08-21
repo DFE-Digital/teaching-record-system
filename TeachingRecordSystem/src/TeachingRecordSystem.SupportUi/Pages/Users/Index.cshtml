@@ -16,7 +16,7 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    @if (Model.AllUsers != null && Model.AllUsers.Any())
+    @if (Model.AllUsers.Length > 0)
     {
         @foreach (var user in Model.AllUsers)
         {
@@ -24,15 +24,9 @@
                 <td class="govuk-table__cell">
                     <a href="@LinkGenerator.EditUser(user.UserId)" class="govuk-link">@user.Name</a>
                 </td>
-                <td class="govuk-table__cell empty-hyphens">@Html.ShyEmail(user.Email ?? "")</td>
+                <td class="govuk-table__cell empty-hyphens">@Html.ShyEmail(user.Email!)</td>
             </tr>
         }
-    }
-    else
-    {
-        <tr class="govuk-table__row" data-testid="no-users">
-            <td class="govuk-table__cell" colspan="2">No users</td>
-        </tr>
     }
     </tbody>
 </table>

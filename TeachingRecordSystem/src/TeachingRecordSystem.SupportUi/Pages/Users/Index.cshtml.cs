@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -15,10 +16,10 @@ public class IndexModel : PageModel
         _dbContext = dbContext;
     }
 
-    public IEnumerable<User>? AllUsers { get; set; }
+    public User[] AllUsers { get; set; }
 
-    public void OnGet()
+    public async Task OnGet()
     {
-        AllUsers = _dbContext.Users.Where(u => u.UserType == UserType.Person).OrderBy(u => u.Name);
+        AllUsers = await _dbContext.Users.Where(u => u.UserType == UserType.Person).OrderBy(u => u.Name).ToArrayAsync();
     }
 }
