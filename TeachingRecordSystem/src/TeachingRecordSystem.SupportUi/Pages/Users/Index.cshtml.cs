@@ -16,7 +16,7 @@ public class IndexModel : PageModel
         _dbContext = dbContext;
     }
 
-    public User[] AllUsers { get; set; }
+    public User[]? AllUsers { get; set; }
 
     public async Task OnGet()
     {

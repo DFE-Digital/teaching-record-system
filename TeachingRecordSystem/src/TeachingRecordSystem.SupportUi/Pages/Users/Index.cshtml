@@ -16,7 +16,7 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    @if (Model.AllUsers.Length > 0)
+    @if (Model.AllUsers?.Length > 0)
     {
         @foreach (var user in Model.AllUsers)
         {
