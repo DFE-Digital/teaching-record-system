@@ -1412,7 +1412,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
     }
 
-    public Task<Subject> GetSubjectByTitle(string title) => GetSubjectByTitle(title, requestBuilder: null);    
+    public Task<Subject> GetSubjectByTitle(string title) => GetSubjectByTitle(title, requestBuilder: null);
 
     public async Task<Subject> GetSubjectByTitle(string title, RequestBuilder requestBuilder)
     {

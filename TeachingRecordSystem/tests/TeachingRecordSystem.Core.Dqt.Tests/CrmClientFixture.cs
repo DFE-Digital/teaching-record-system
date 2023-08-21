@@ -48,7 +48,7 @@ public sealed class CrmClientFixture : IDisposable
         _baseServiceClient,
         orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient),
         orgService => new CrmQueryDispatcher(CreateQueryServiceProvider(orgService, _referenceDataCache)),
-        orgService => new CrmTestData(orgService, () => _trnGenerationApiClient.GenerateTrn()),
+        orgService => new CrmTestData(orgService, _referenceDataCache, () => _trnGenerationApiClient.GenerateTrn()),
         _memoryCache);
 
     public void Dispose()

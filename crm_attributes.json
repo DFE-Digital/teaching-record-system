@@ -221,8 +221,15 @@
     "dfeta_statedmiddlename",
     "subjectid",
     "statecode",
+    "statuscode",
     "ticketnumber",
     "title"
+  ],
+  "incidentresolution": [
+    "activityid",
+    "incidentid",
+    "statecode",
+    "subject"
   ],
   "subject": [
     "description",
