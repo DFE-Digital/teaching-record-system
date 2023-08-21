@@ -139,7 +139,18 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     };
 
     builder.Services
-        .AddTransient<ServiceClient>(_ => serviceClient.Clone())
+        .AddTransient<ServiceClient>(sp =>
+        {
+            var sc = serviceClient.Clone();
+
+            var httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated == true)
+            {
+                sc.CallerId = httpContext.User.GetCrmUserId();
+            }
+
+            return sc;
+        })
         .AddSingleton<ITrnGenerationApiClient, TrnGenerationApiClient>() // Purely needed to DI into DataverseAdapter
         .AddTransient<IOrganizationServiceAsync>(sp => sp.GetRequiredService<ServiceClient>())
         .AddTransient<IDataverseAdapter, DataverseAdapter>();

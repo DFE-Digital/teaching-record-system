@@ -5,6 +5,9 @@ namespace TeachingRecordSystem.SupportUi;
 
 public static class ClaimsPrincipalExtensions
 {
+    public static Guid GetCrmUserId(this ClaimsPrincipal principal) =>
+        Guid.Parse(principal.FindFirstValue(CustomClaims.CrmUserId) ?? throw new InvalidOperationException("CrmUserId claim was not found."));
+
     public static Guid GetUserId(this ClaimsPrincipal principal) =>
         Guid.Parse(principal.FindFirstValue(CustomClaims.UserId) ?? throw new InvalidOperationException("UserId claim was not found."));
 }
