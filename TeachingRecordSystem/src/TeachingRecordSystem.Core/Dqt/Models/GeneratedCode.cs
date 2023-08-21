@@ -10736,6 +10736,267 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 	}
 	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum IncidentResolutionState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Open = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Completed = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Canceled = 2,
+	}
+	
+	/// <summary>
+	/// Special type of activity that includes description of the resolution, billing status, and the duration of the case.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("incidentresolution")]
+	public partial class IncidentResolution : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the incidentresolution entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string ActivityId = "activityid";
+			public const string Id = "activityid";
+			public const string IncidentId = "incidentid";
+			public const string StateCode = "statecode";
+			public const string Subject = "subject";
+			public const string IncidentResolution_Annotation = "IncidentResolution_Annotation";
+			public const string account_IncidentResolutions = "account_IncidentResolutions";
+			public const string Incident_IncidentResolutions = "Incident_IncidentResolutions";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public IncidentResolution() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "IncidentResolution";
+		
+		public const string PrimaryIdAttribute = "activityid";
+		
+		public const string PrimaryNameAttribute = "subject";
+		
+		public const string EntityLogicalName = "incidentresolution";
+		
+		public const string EntityLogicalCollectionName = "incidentresolutions";
+		
+		public const string EntitySetName = "incidentresolutions";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the case resolution activity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("activityid")]
+		public System.Nullable<System.Guid> ActivityId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("activityid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ActivityId");
+				this.SetAttributeValue("activityid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("ActivityId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("activityid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.ActivityId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the case.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("incidentid")]
+		public Microsoft.Xrm.Sdk.EntityReference IncidentId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("incidentid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IncidentId");
+				this.SetAttributeValue("incidentid", value);
+				this.OnPropertyChanged("IncidentId");
+			}
+		}
+		
+		/// <summary>
+		/// Shows whether the case resolution is open, completed, or canceled. By default, all case resolutions are completed and the status value can't be changed.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<TeachingRecordSystem.Core.Dqt.Models.IncidentResolutionState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((TeachingRecordSystem.Core.Dqt.Models.IncidentResolutionState)(System.Enum.ToObject(typeof(TeachingRecordSystem.Core.Dqt.Models.IncidentResolutionState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// Subject associated with the case resolution activity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subject")]
+		public string Subject
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("subject");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Subject");
+				this.SetAttributeValue("subject", value);
+				this.OnPropertyChanged("Subject");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N IncidentResolution_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("IncidentResolution_Annotation")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Annotation> IncidentResolution_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("IncidentResolution_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IncidentResolution_Annotation");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("IncidentResolution_Annotation", null, value);
+				this.OnPropertyChanged("IncidentResolution_Annotation");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 account_IncidentResolutions
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("regardingobjectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("account_IncidentResolutions")]
+		public TeachingRecordSystem.Core.Dqt.Models.Account account_IncidentResolutions
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Account>("account_IncidentResolutions", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("account_IncidentResolutions");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Account>("account_IncidentResolutions", null, value);
+				this.OnPropertyChanged("account_IncidentResolutions");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 Incident_IncidentResolutions
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("incidentid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Incident_IncidentResolutions")]
+		public TeachingRecordSystem.Core.Dqt.Models.Incident Incident_IncidentResolutions
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Incident>("Incident_IncidentResolutions", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Incident_IncidentResolutions");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Incident>("Incident_IncidentResolutions", null, value);
+				this.OnPropertyChanged("Incident_IncidentResolutions");
+			}
+		}
+	}
+	
 	/// <summary>
 	/// Information regarding subjects available in the system.
 	/// </summary>
