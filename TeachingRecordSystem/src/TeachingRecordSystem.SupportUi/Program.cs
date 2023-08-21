@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using GovUk.Frontend.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -7,9 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Identity.Web;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
@@ -72,44 +71,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
         .AddDistributedTokenCaches()
         .AddMicrosoftGraph(defaultScopes: graphApiScopes);
 
-    builder.Services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
-    {
-        options.Scope.Add("email");
-
-        options.Events.OnTicketReceived = async ctx =>
-        {
-            var userId = ctx.Principal!.FindFirstValue("uid") ?? throw new Exception("Missing uid claim.");
-            var email = ctx.Principal!.FindFirstValue(ClaimTypes.Email) ?? throw new Exception("Missing email address claim.");
-
-            using var dbContext = ctx.HttpContext.RequestServices.GetRequiredService<TrsDbContext>();
-
-            var user = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == userId);
-
-            if (user is null)
-            {
-                // We couldn't find a user by principal, but we may find them via email
-                // (the CLI commmand to add a user creates a record *without* the AD subject).
-
-                user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.Active == true && u.AzureAdUserId == null);
-
-                if (user is not null)
-                {
-                    user.AzureAdUserId = userId;
-                    await dbContext.SaveChangesAsync();
-                }
-            }
-
-            if (user is not null)
-            {
-                var identityWithRoles = new ClaimsIdentity(
-                    ctx.Principal!.Identity,
-                    user.Roles.Select(r => new Claim(ClaimTypes.Role, r))
-                        .Append(new Claim(CustomClaims.UserId, user.UserId.ToString())));
-
-                ctx.Principal = new ClaimsPrincipal(identityWithRoles);
-            }
-        };
-    });
+    builder.Services.ConfigureOptions(new AssignUserInfoOnSignIn(OpenIdConnectDefaults.AuthenticationScheme));
 
     builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
@@ -156,11 +118,33 @@ if (builder.Environment.IsDevelopment())
 
 builder.Services.AddRedis(builder.Environment, builder.Configuration, healthCheckBuilder);
 
+if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+{
+    var crmConnectionString = $"""
+        AuthType=ClientSecret;
+        Url={builder.Configuration.GetRequiredValue("CrmUrl")};
+        ClientId={builder.Configuration.GetRequiredValue("AzureAd:ClientId")};
+        ClientSecret={builder.Configuration.GetRequiredValue("AzureAd:ClientSecret")};
+        RequireNewInstance=true
+        """;
+
+    var serviceClient = new ServiceClient(crmConnectionString)
+    {
+        DisableCrossThreadSafeties = true,
+        EnableAffinityCookie = true,
+        MaxRetryCount = 2,
+        RetryPauseTime = TimeSpan.FromSeconds(1)
+    };
+
+    builder.Services.AddTransient<ServiceClient>(_ => serviceClient.Clone());
+}
+
 builder.Services
     .AddTransient<TrsLinkGenerator>()
     .AddTransient<CheckUserExistsFilter>()
     .AddSingleton<IClock, Clock>()
-    .AddSupportUiServices(builder.Configuration, builder.Environment);
+    .AddSupportUiServices(builder.Configuration, builder.Environment)
+    .AddSingleton<ReferenceDataCache>();
 
 var app = builder.Build();
 
