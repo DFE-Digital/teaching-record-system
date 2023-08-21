@@ -20,6 +20,6 @@ public class IndexModel : PageModel
 
     public async Task OnGet()
     {
-        AllUsers = await _dbContext.Users.Where(u => u.UserType == UserType.Person).OrderBy(u => u.Name).ToArrayAsync();
+        AllUsers = await _dbContext.Users.Where(u => u.UserType == UserType.Person && !string.IsNullOrWhiteSpace(u.Email)).OrderBy(u => u.Name).ToArrayAsync();
     }
 }

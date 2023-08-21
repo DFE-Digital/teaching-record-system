@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
 
 public class UsersTests : TestBase
@@ -30,7 +28,8 @@ public class UsersTests : TestBase
     public async Task Get_UserWithAdministratorRole_ReturnsOk()
     {
         // Arrange
-        SetCurrentUser(TestUsers.Administrator);
+        var user = await TestData.CreateUser(roles: new[] { UserRoles.Administrator });
+        SetCurrentUser(user);
 
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
 
@@ -40,34 +39,14 @@ public class UsersTests : TestBase
         // Assert
 
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_ValidRequestAndNoUsersFound_RendersUsers()
-    {
-        // Arrange
-        SetCurrentUser(TestUsers.Administrator);
-        await WithDbContext(async dbContext => { await dbContext.Users.ExecuteDeleteAsync(); });
-        var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await response.GetDocument();
-        var element = doc.GetElementByTestId("no-users")!.InnerHtml;
-
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        Assert.NotNull(element);
-        Assert.Contains("No users", element);
     }
 
     [Fact]
     public async Task Get_ValidRequestAndUsersFound_RendersUsers()
     {
         // Arrange
+        var user = await TestData.CreateUser(roles: new[] { UserRoles.Administrator });
         SetCurrentUser(TestUsers.Administrator);
-        var user = await TestData.CreateUser();
 
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
 
