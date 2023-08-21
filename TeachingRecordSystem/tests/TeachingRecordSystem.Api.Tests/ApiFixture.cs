@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
@@ -50,6 +51,10 @@ public class ApiFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IOptions<AccessYourQualificationsOptions>>(tss => tss.AccessYourQualificationsOptions);
             services.AddTestScoped<IOptions<GetAnIdentityOptions>>(tss => tss.GetAnIdentityOptions);
             services.AddTestScoped<ICertificateGenerator>(tss => tss.CertificateGeneratorMock.Object);
+            services.AddSingleton<IOrganizationServiceAsync, FakeServiceClient>();
+            services.AddSingleton<TestData>();
+            services.AddSingleton<SeedReferenceData>();
+            services.AddStartupTask<SeedReferenceData>();
 
             services.AddHttpClient("EvidenceFiles")
                 .AddHttpMessageHandler(_ => EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())

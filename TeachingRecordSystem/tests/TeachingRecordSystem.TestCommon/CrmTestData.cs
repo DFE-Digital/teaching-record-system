@@ -21,6 +21,19 @@ public partial class CrmTestData
 
     public DateOnly GenerateDateOfBirth() => DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 
+    public DateOnly GenerateChangedDateOfBirth(DateOnly currentDateOfBirth)
+    {
+        DateOnly newDateOfBirth;
+
+        do
+        {
+            newDateOfBirth = GenerateDateOfBirth();
+        }
+        while (newDateOfBirth == currentDateOfBirth);
+
+        return newDateOfBirth;
+    }
+
     public string GenerateFirstName() => Faker.Name.First();
 
     public string GenerateMiddleName() => Faker.Name.Middle();

@@ -3,28 +3,29 @@ using Microsoft.AspNetCore.StaticFiles;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.V3.Handlers;
 
 public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
 {
-    private readonly IDataverseAdapter _dataverseAdapter;
+    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly HttpClient _downloadEvidenceFileHttpClient;
 
     public CreateNameChangeHandler(
-        IDataverseAdapter dataverseAdapter,
+        ICrmQueryDispatcher crmQueryDispatcher,
         IHttpClientFactory httpClientFactory)
     {
-        _dataverseAdapter = dataverseAdapter;
+        _crmQueryDispatcher = crmQueryDispatcher;
         _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
     }
 
     public async Task Handle(CreateNameChangeRequest request, CancellationToken cancellationToken)
     {
-        var person = await _dataverseAdapter.GetTeacherByTrn(request.Trn, columnNames: Array.Empty<string>());
+        var contact = await _crmQueryDispatcher.ExecuteQuery(
+            new GetContactByTrnQuery(request.Trn, new Microsoft.Xrm.Sdk.Query.ColumnSet()));
 
-        if (person is null)
+        if (contact is null)
         {
             throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
         }
@@ -50,9 +51,9 @@ public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
         var firstName = firstAndMiddleNames[0];
         var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
 
-        var command = new CreateNameChangeIncidentCommand()
+        await _crmQueryDispatcher.ExecuteQuery(new CreateNameChangeIncidentQuery()
         {
-            ContactId = person.Id,
+            ContactId = contact.Id,
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
@@ -63,8 +64,6 @@ public class CreateNameChangeHandler : IRequestHandler<CreateNameChangeRequest>
             EvidenceFileContent = await evidenceFileResponse.Content.ReadAsStreamAsync(),
             EvidenceFileMimeType = evidenceFileMimeType,
             FromIdentity = true
-        };
-
-        await _dataverseAdapter.CreateNameChangeIncident(command);
+        });
     }
 }

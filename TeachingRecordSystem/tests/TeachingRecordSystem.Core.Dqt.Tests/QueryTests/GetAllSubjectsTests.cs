@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Dqt.Queries;
-
 namespace TeachingRecordSystem.Core.Dqt.Tests.QueryTests;
 
 public class GetAllSubjectsTests

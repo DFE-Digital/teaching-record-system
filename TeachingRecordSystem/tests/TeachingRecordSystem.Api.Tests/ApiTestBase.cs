@@ -43,6 +43,8 @@ public abstract class ApiTestBase
 
     public HttpClient HttpClientWithApiKey { get; }
 
+    public TestData TestData => ApiFixture.Services.GetRequiredService<TestData>();
+
     public JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().Configure());
 

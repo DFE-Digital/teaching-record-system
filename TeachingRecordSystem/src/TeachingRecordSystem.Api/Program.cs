@@ -251,6 +251,7 @@ public class Program
         services.AddBackgroundJobs(env, configuration);
         services.AddEmail(env, configuration);
         services.AddCrmQueries();
+        services.AddSingleton<ReferenceDataCache>();
 
         // Filter telemetry emitted by DqtReportingService
         services.AddApplicationInsightsTelemetry()

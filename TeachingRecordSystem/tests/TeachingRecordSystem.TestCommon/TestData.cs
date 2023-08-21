@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData : CrmTestData
 {
-    private int _nextTrn = 4000000;
+    private static int _lastTrn = 4000000;
 
     public TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
@@ -18,7 +18,7 @@ public partial class TestData : CrmTestData
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory { get; }
 
-    public override Task<string> GenerateTrn() => Task.FromResult(Interlocked.Increment(ref _nextTrn).ToString());
+    public override Task<string> GenerateTrn() => Task.FromResult(Interlocked.Increment(ref _lastTrn).ToString());
 
     protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {
