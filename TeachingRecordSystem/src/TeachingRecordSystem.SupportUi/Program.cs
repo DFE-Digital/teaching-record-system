@@ -139,6 +139,12 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     };
 
     builder.Services.AddTransient<ServiceClient>(_ => serviceClient.Clone());
+    builder.Services
+        .AddSingleton<ITrnGenerationApiClient, TrnGenerationApiClient>() // Purely needed to DI into DataverseAdapter
+        .AddTransient<IOrganizationServiceAsync>(_ => serviceClient.Clone())
+        .AddTransient<IDataverseAdapter, DataverseAdapter>();
+
+    healthCheckBuilder.AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
 }
 
 builder.Services
@@ -147,28 +153,6 @@ builder.Services
     .AddSingleton<IClock, Clock>()
     .AddSupportUiServices(builder.Configuration, builder.Environment)
     .AddSingleton<ReferenceDataCache>();
-
-if (!builder.Environment.IsUnitTests())
-{
-    var crmServiceClient = GetCrmServiceClient();
-    builder.Services
-        .AddSingleton<ITrnGenerationApiClient, TrnGenerationApiClient>() // Purely needed to DI into DataverseAdapter
-        .AddTransient<IOrganizationServiceAsync>(_ => crmServiceClient.Clone())
-        .AddTransient<IDataverseAdapter, DataverseAdapter>();
-
-    healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
-}
-
-if (!builder.Environment.IsUnitTests())
-{
-    var crmServiceClient = GetCrmServiceClient();
-    builder.Services
-        .AddSingleton<ITrnGenerationApiClient, TrnGenerationApiClient>() // Purely needed to DI into DataverseAdapter
-        .AddTransient<IOrganizationServiceAsync>(_ => crmServiceClient.Clone())
-        .AddTransient<IDataverseAdapter, DataverseAdapter>();
-
-    healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
-}
 
 var app = builder.Build();
 
