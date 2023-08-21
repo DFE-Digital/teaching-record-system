@@ -8,14 +8,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Cases;
 public class IndexModel : PageModel
 {
     private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly TrsLinkGenerator _linkGenerator;
 
-    public IndexModel(
-        IDataverseAdapter dataverseAdapter,
-        TrsLinkGenerator linkGenerator)
+    public IndexModel(IDataverseAdapter dataverseAdapter)
     {
         _dataverseAdapter = dataverseAdapter;
-        _linkGenerator = linkGenerator;
     }
 
     public CaseInfo[]? Cases { get; set; }
