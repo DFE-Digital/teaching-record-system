@@ -84,13 +84,11 @@ public class GetQtsCertificateHandler : IRequestHandler<GetQtsCertificateRequest
         }
 
         var pdfStream = await _certificateGenerator.GenerateCertificate(certificateName, fieldValues);
-        using var output = new MemoryStream();
-        pdfStream.CopyTo(output);
 
         return new GetCertificateResponse()
         {
             FileDownloadName = $"QTSCertificate.pdf",
-            FileContents = output.ToArray()
+            FileContents = pdfStream
         };
     }
 }

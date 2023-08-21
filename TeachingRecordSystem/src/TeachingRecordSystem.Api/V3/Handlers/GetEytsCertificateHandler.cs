@@ -60,13 +60,11 @@ public class GetEytsCertificateHandler : IRequestHandler<GetEytsCertificateReque
         };
 
         var pdfStream = await _certificateGenerator.GenerateCertificate("EYTS certificate.pdf", fieldValues);
-        using var output = new MemoryStream();
-        pdfStream.CopyTo(output);
 
         return new GetCertificateResponse()
         {
             FileDownloadName = $"EYTSCertificate.pdf",
-            FileContents = output.ToArray()
+            FileContents = pdfStream
         };
     }
 }

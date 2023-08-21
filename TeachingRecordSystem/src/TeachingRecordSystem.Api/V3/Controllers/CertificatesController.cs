@@ -50,7 +50,7 @@ public class CertificatesController : Controller
             return NotFound();
         }
 
-        return new FileContentResult(response.FileContents, "application/pdf")
+        return new FileStreamResult(response.FileContents, "application/pdf")
         {
             FileDownloadName = response.FileDownloadName
         };
@@ -83,7 +83,7 @@ public class CertificatesController : Controller
             return NotFound();
         }
 
-        return new FileContentResult(response.FileContents, "application/pdf")
+        return new FileStreamResult(response.FileContents, "application/pdf")
         {
             FileDownloadName = response.FileDownloadName
         };
@@ -116,7 +116,7 @@ public class CertificatesController : Controller
             return NotFound();
         }
 
-        return new FileContentResult(response.FileContents, "application/pdf")
+        return new FileStreamResult(response.FileContents, "application/pdf")
         {
             FileDownloadName = response.FileDownloadName
         };
@@ -150,7 +150,7 @@ public class CertificatesController : Controller
             return NotFound();
         }
 
-        return new FileContentResult(response.FileContents, "application/pdf")
+        return new FileStreamResult(response.FileContents, "application/pdf")
         {
             FileDownloadName = response.FileDownloadName
         };
