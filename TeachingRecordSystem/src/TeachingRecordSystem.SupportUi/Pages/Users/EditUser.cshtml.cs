@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events;
-using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users;
 
@@ -18,8 +17,8 @@ public class EditUser : PageModel
     private readonly TrsLinkGenerator _linkGenerator;
     private Core.DataStore.Postgres.Models.User? _user;
 
-    public EditUser(TrsDbContext dbContext,
-        IUserService userService,
+    public EditUser(
+        TrsDbContext dbContext,
         IClock clock,
         TrsLinkGenerator linkGenerator)
     {
@@ -49,6 +48,7 @@ public class EditUser : PageModel
     {
         Name = _user!.Name;
         IsActiveUser = _user.Active;
+        Roles = _user.Roles;
 
         return Page();
     }

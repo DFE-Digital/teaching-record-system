@@ -1,8 +1,12 @@
-@page "/users/{userid}/{handler?}"
+@page "/users/{userId}/{handler?}"
 @using TeachingRecordSystem.Core
 @model TeachingRecordSystem.SupportUi.Pages.Users.EditUser
 @{
     ViewBag.Title = "Edit User";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Users()" />
 }
 
 <div class="govuk-grid-row">
@@ -26,8 +30,8 @@
             @if (Model.IsActiveUser)
             {
                 <div class="govuk-button-group">
-                    <govuk-button class="govuk-button" type="submit">Save and continue</govuk-button>
-                    <govuk-button class="govuk-button govuk-button--secondary" type="submit" asp-page-handler="deactivate">Deactivate</govuk-button>
+                    <govuk-button type="submit">Save and continue</govuk-button>
+                    <govuk-button class="govuk-button--secondary" type="submit" asp-page-handler="deactivate">Deactivate</govuk-button>
                 </div>
             }
         </form>
