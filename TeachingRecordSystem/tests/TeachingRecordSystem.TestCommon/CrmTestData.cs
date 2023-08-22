@@ -21,7 +21,7 @@ public partial class CrmTestData
     }
 
     public IOrganizationServiceAsync OrganizationService;
-    public ReferenceDataCache ReferenceDataCache { get; }  
+    public ReferenceDataCache ReferenceDataCache { get; }
 
     public DateOnly GenerateDateOfBirth() => DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 

@@ -65,7 +65,7 @@ public partial class CrmTestData
                 dfeta_NewLastName = lastName,
                 dfeta_StatedFirstName = firstName,
                 dfeta_StatedMiddleName = middleName,
-                dfeta_StatedLastName = lastName                               
+                dfeta_StatedLastName = lastName
             };
 
             var document = new dfeta_document()
@@ -89,14 +89,14 @@ public partial class CrmTestData
                 MimeType = _evidenceFileMimeType,
                 FileName = _evidenceFileName,
                 NoteText = string.Empty
-            };            
+            };
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = incident });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = document });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = annotation });
             switch (_incidentStatusType)
-            {                
+            {
                 case IncidentStatusType.Canceled:
                     txnRequestBuilder.AddRequest(
                         new UpdateRequest()

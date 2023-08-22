@@ -59,7 +59,7 @@ public partial class CrmTestData
                 Title = title,
                 SubjectId = dateOfBirthChangeSubject!.Id.ToEntityReference(Subject.EntityLogicalName),
                 CustomerId = person.ContactId.ToEntityReference(Contact.EntityLogicalName),
-                dfeta_NewDateofBirth = dateOfBirth.ToDateTime()                  
+                dfeta_NewDateofBirth = dateOfBirth.ToDateTime()
             };
 
             var document = new dfeta_document()
@@ -83,14 +83,14 @@ public partial class CrmTestData
                 MimeType = _evidenceFileMimeType,
                 FileName = _evidenceFileName,
                 NoteText = string.Empty
-            };            
+            };
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = incident });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = document });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = annotation });
             switch (_incidentStatusType)
-            {                
+            {
                 case IncidentStatusType.Canceled:
                     txnRequestBuilder.AddRequest(
                         new UpdateRequest()
@@ -141,7 +141,7 @@ public partial class CrmTestData
                 SubjectId = dateOfBirthChangeSubject.Id,
                 SubjectTitle = subjectTitle,
                 CurrentDateOfBirth = person.DateOfBirth,
-                NewDateOfBirth = dateOfBirth,                
+                NewDateOfBirth = dateOfBirth,
                 CustomerFirstName = person.FirstName,
                 CustomerMiddleName = person.MiddleName,
                 CustomerLastName = person.LastName,

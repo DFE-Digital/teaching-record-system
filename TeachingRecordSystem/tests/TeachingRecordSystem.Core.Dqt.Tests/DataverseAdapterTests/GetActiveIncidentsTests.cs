@@ -20,8 +20,8 @@ public class GetActiveIncidentsTests : IAsyncLifetime
     {
         // Arrange
         var cancelledCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident((builder) => builder.WithCanceledStatus());
-        var activeCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident();        
-        var rejectedCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident((builder) => builder.WithRejectedStatus());        
+        var activeCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident();
+        var rejectedCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident((builder) => builder.WithRejectedStatus());
         var activeCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident();
         var approvedCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident((builder) => builder.WithApprovedStatus());
 
@@ -29,7 +29,7 @@ public class GetActiveIncidentsTests : IAsyncLifetime
         var incidents = await _dataverseAdapter.GetActiveIncidents();
 
         // Assert
-        Assert.Contains(incidents, i => i.Id == activeCreateNameChangeIncidentResult.IncidentId);        
+        Assert.Contains(incidents, i => i.Id == activeCreateNameChangeIncidentResult.IncidentId);
         Assert.Contains(incidents, i => i.Id == activeCreateDateOfBirthChangeIncidentResult.IncidentId);
         Assert.DoesNotContain(incidents, i => i.Id == cancelledCreateNameChangeIncidentResult.IncidentId);
         Assert.DoesNotContain(incidents, i => i.Id == rejectedCreateNameChangeIncidentResult.IncidentId);
