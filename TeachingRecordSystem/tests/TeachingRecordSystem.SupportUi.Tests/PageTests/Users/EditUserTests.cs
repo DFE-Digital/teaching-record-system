@@ -210,19 +210,6 @@ public class EditUserTests : TestBase
     }
 
     [Fact]
-    public async Task Post_UserDoesNotExistForDeactivation_ReturnsNotFound()
-    {
-        // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(Guid.NewGuid())}/deactivate");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
-    [Fact]
     public async Task Post_UserExistsButIsAlreadyDeactivated_ReturnsBadRequest()
     {
         // Arrange
@@ -260,9 +247,9 @@ public class EditUserTests : TestBase
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.UpdatedByUserId, GetCurrentUserId());
+            Assert.Equal(userCreatedEvent.DeactivatedByUserId, GetCurrentUserId());
             Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
-            Assert.Equal(UserActivationEventChanges.Deactivated, userCreatedEvent.Changes);
+            Assert.Equal(UserDeactivatedEventChanges.Deactivated, userCreatedEvent.Changes);
         });
 
         var redirectResponse = await response.FollowRedirect(HttpClient);

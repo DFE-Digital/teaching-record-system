@@ -96,12 +96,7 @@ public class EditUser : PageModel
 
     public async Task<IActionResult> OnPostDeactivate()
     {
-        var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);
-
-        if (user is null)
-        {
-            return NotFound();
-        }
+        var user = await _dbContext.Users.SingleAsync(u => u.UserId == UserId);
 
         if (!user.Active)
         {
@@ -113,9 +108,9 @@ public class EditUser : PageModel
         _dbContext.AddEvent(new UserDeactivatedEvent
         {
             User = Core.Events.User.FromModel(user),
-            UpdatedByUserId = User.GetUserId(),
+            DeactivatedByUserId = User.GetUserId(),
             CreatedUtc = _clock.UtcNow,
-            Changes = UserActivationEventChanges.Deactivated
+            Changes = UserDeactivatedEventChanges.Deactivated
         });
 
         await _dbContext.SaveChangesAsync();
