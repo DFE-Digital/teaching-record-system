@@ -56,6 +56,10 @@
     </header>
 }
 
+@section BeforeContent {
+    @RenderSection("BeforeContent", required: false)
+}
+
 @if (TempData.TryGetFlashSuccess(out (string Heading, string? Message)? flashSuccess))
 {
     <govuk-notification-banner type="Success">
