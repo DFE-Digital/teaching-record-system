@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = "_GovUkPageTemplate";
 }
 
@@ -31,9 +31,16 @@
                     <ul id="navigation" class="govuk-header__navigation-list">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
+                            if (User.IsInRole(UserRoles.Helpdesk) || User.IsInRole(UserRoles.Administrator))
+                            {
+                                <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/cases") ? "govuk-header__navigation-item--active" : "")">
+                                    <a class="govuk-header__link" href="@LinkGenerator.Cases()">Cases</a>
+                                </li>
+                            }
+                            
                             if (User.IsInRole(UserRoles.Administrator))
                             {
-                                <li class="govuk-header__navigation-item">
+                                <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/users") ? "govuk-header__navigation-item--active" : "")">
                                     <a class="govuk-header__link" href="@LinkGenerator.Users()">Users</a>
                                 </li>
                             }

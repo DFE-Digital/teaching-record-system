@@ -32,6 +32,7 @@ public partial class CrmTestData
             var trn = hasTrn ? await testData.GenerateTrn() : null;
 
             var firstName = testData.GenerateFirstName();
+            var middleName = testData.GenerateMiddleName();
             var lastName = testData.GenerateLastName();
             var dateOfBirth = testData.GenerateDateOfBirth();
 
@@ -41,6 +42,7 @@ public partial class CrmTestData
             {
                 Id = personId,
                 FirstName = firstName,
+                MiddleName = middleName,
                 LastName = lastName,
                 BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
                 dfeta_TRN = trn
@@ -54,6 +56,7 @@ public partial class CrmTestData
                 Trn = trn,
                 DateOfBirth = dateOfBirth,
                 FirstName = firstName,
+                MiddleName = middleName,
                 LastName = lastName
             };
         }
@@ -66,6 +69,7 @@ public partial class CrmTestData
         public required string? Trn { get; init; }
         public required DateOnly DateOfBirth { get; init; }
         public required string FirstName { get; init; }
+        public required string MiddleName { get; init; }
         public required string LastName { get; init; }
     }
 }

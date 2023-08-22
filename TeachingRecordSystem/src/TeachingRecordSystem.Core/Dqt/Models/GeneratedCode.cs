@@ -45,6 +45,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Name = "name";
 			public const string StateCode = "statecode";
 			public const string Account_Annotation = "Account_Annotation";
+			public const string account_IncidentResolutions = "account_IncidentResolutions";
 			public const string Referencedaccount_master_account = "Referencedaccount_master_account";
 			public const string Referencedaccount_parent_account = "Referencedaccount_parent_account";
 			public const string Account_Tasks = "Account_Tasks";
@@ -220,6 +221,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Account_Annotation");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("Account_Annotation", null, value);
 				this.OnPropertyChanged("Account_Annotation");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N account_IncidentResolutions
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("account_IncidentResolutions")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution> account_IncidentResolutions
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("account_IncidentResolutions", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("account_IncidentResolutions");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("account_IncidentResolutions", null, value);
+				this.OnPropertyChanged("account_IncidentResolutions");
 			}
 		}
 		
@@ -619,6 +640,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_document_Annotations = "dfeta_document_Annotations";
 			public const string dfeta_sanction_Annotations = "dfeta_sanction_Annotations";
 			public const string Incident_Annotation = "Incident_Annotation";
+			public const string IncidentResolution_Annotation = "IncidentResolution_Annotation";
 			public const string lk_annotationbase_createdby = "lk_annotationbase_createdby";
 			public const string lk_annotationbase_createdonbehalfby = "lk_annotationbase_createdonbehalfby";
 			public const string lk_annotationbase_modifiedby = "lk_annotationbase_modifiedby";
@@ -932,6 +954,27 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Incident_Annotation");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Incident>("Incident_Annotation", null, value);
 				this.OnPropertyChanged("Incident_Annotation");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 IncidentResolution_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("IncidentResolution_Annotation")]
+		public TeachingRecordSystem.Core.Dqt.Models.IncidentResolution IncidentResolution_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("IncidentResolution_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IncidentResolution_Annotation");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("IncidentResolution_Annotation", null, value);
+				this.OnPropertyChanged("IncidentResolution_Annotation");
 			}
 		}
 		
@@ -9492,6 +9535,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string CreatedOn = "createdon";
 			public const string CustomerId = "customerid";
 			public const string Description = "description";
 			public const string dfeta_FromIdentity = "dfeta_fromidentity";
@@ -9503,11 +9547,14 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_StatedLastName = "dfeta_statedlastname";
 			public const string dfeta_StatedMiddleName = "dfeta_statedmiddlename";
 			public const string StateCode = "statecode";
+			public const string StatusCode = "statuscode";
 			public const string SubjectId = "subjectid";
+			public const string TicketNumber = "ticketnumber";
 			public const string Title = "title";
 			public const string dfeta_incident_dfeta_document = "dfeta_incident_dfeta_document";
 			public const string Incident_Annotation = "Incident_Annotation";
 			public const string Referencedincident_existingcase = "Referencedincident_existingcase";
+			public const string Incident_IncidentResolutions = "Incident_IncidentResolutions";
 			public const string Referencedincident_master_incident = "Referencedincident_master_incident";
 			public const string Referencedincident_parent_incident = "Referencedincident_parent_incident";
 			public const string Incident_Tasks = "Incident_Tasks";
@@ -9566,6 +9613,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the record was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 		
@@ -9805,6 +9872,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// Reason for the status of the case.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
+		public virtual Incident_StatusCode? StatusCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((Incident_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StatusCode");
+				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("StatusCode");
+			}
+		}
+		
+		/// <summary>
 		/// Choose the subject for the case, such as catalog request or product complaint, so customer service managers can identify frequent requests or problem areas. Administrators can configure subjects under Business Management in the Settings area.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subjectid")]
@@ -9821,6 +9908,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("SubjectId");
 				this.SetAttributeValue("subjectid", value);
 				this.OnPropertyChanged("SubjectId");
+			}
+		}
+		
+		/// <summary>
+		/// Shows the case number for customer reference and searching capabilities. This cannot be modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ticketnumber")]
+		public string TicketNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("ticketnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("TicketNumber");
+				this.SetAttributeValue("ticketnumber", value);
+				this.OnPropertyChanged("TicketNumber");
 			}
 		}
 		
@@ -9901,6 +10008,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Referencedincident_existingcase");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Incident>("incident_existingcase", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
 				this.OnPropertyChanged("Referencedincident_existingcase");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N Incident_IncidentResolutions
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Incident_IncidentResolutions")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution> Incident_IncidentResolutions
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("Incident_IncidentResolutions", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Incident_IncidentResolutions");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("Incident_IncidentResolutions", null, value);
+				this.OnPropertyChanged("Incident_IncidentResolutions");
 			}
 		}
 		
@@ -10234,6 +10361,377 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("system_user_incidents");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("system_user_incidents", null, value);
 				this.OnPropertyChanged("system_user_incidents");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum IncidentResolutionState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Open = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Completed = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Canceled = 2,
+	}
+	
+	/// <summary>
+	/// Special type of activity that includes description of the resolution, billing status, and the duration of the case.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("incidentresolution")]
+	public partial class IncidentResolution : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the incidentresolution entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string ActivityId = "activityid";
+			public const string Id = "activityid";
+			public const string IncidentId = "incidentid";
+			public const string StateCode = "statecode";
+			public const string Subject = "subject";
+			public const string IncidentResolution_Annotation = "IncidentResolution_Annotation";
+			public const string account_IncidentResolutions = "account_IncidentResolutions";
+			public const string Incident_IncidentResolutions = "Incident_IncidentResolutions";
+			public const string lk_incidentresolution_createdby = "lk_incidentresolution_createdby";
+			public const string lk_incidentresolution_createdonbehalfby = "lk_incidentresolution_createdonbehalfby";
+			public const string lk_incidentresolution_modifiedby = "lk_incidentresolution_modifiedby";
+			public const string lk_incidentresolution_modifiedonbehalfby = "lk_incidentresolution_modifiedonbehalfby";
+			public const string user_incidentresolution = "user_incidentresolution";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public IncidentResolution() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "IncidentResolution";
+		
+		public const string PrimaryIdAttribute = "activityid";
+		
+		public const string PrimaryNameAttribute = "subject";
+		
+		public const string EntityLogicalName = "incidentresolution";
+		
+		public const string EntityLogicalCollectionName = "incidentresolutions";
+		
+		public const string EntitySetName = "incidentresolutions";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the case resolution activity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("activityid")]
+		public System.Nullable<System.Guid> ActivityId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("activityid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ActivityId");
+				this.SetAttributeValue("activityid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("ActivityId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("activityid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.ActivityId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the case.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("incidentid")]
+		public Microsoft.Xrm.Sdk.EntityReference IncidentId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("incidentid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IncidentId");
+				this.SetAttributeValue("incidentid", value);
+				this.OnPropertyChanged("IncidentId");
+			}
+		}
+		
+		/// <summary>
+		/// Shows whether the case resolution is open, completed, or canceled. By default, all case resolutions are completed and the status value can't be changed.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<TeachingRecordSystem.Core.Dqt.Models.IncidentResolutionState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((TeachingRecordSystem.Core.Dqt.Models.IncidentResolutionState)(System.Enum.ToObject(typeof(TeachingRecordSystem.Core.Dqt.Models.IncidentResolutionState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// Subject associated with the case resolution activity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subject")]
+		public string Subject
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("subject");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Subject");
+				this.SetAttributeValue("subject", value);
+				this.OnPropertyChanged("Subject");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N IncidentResolution_Annotation
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("IncidentResolution_Annotation")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Annotation> IncidentResolution_Annotation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("IncidentResolution_Annotation", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IncidentResolution_Annotation");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("IncidentResolution_Annotation", null, value);
+				this.OnPropertyChanged("IncidentResolution_Annotation");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 account_IncidentResolutions
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("regardingobjectid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("account_IncidentResolutions")]
+		public TeachingRecordSystem.Core.Dqt.Models.Account account_IncidentResolutions
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Account>("account_IncidentResolutions", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("account_IncidentResolutions");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Account>("account_IncidentResolutions", null, value);
+				this.OnPropertyChanged("account_IncidentResolutions");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 Incident_IncidentResolutions
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("incidentid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("Incident_IncidentResolutions")]
+		public TeachingRecordSystem.Core.Dqt.Models.Incident Incident_IncidentResolutions
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Incident>("Incident_IncidentResolutions", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Incident_IncidentResolutions");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Incident>("Incident_IncidentResolutions", null, value);
+				this.OnPropertyChanged("Incident_IncidentResolutions");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_incidentresolution_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentresolution_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_incidentresolution_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentresolution_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentresolution_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentresolution_createdby", null, value);
+				this.OnPropertyChanged("lk_incidentresolution_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_incidentresolution_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentresolution_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_incidentresolution_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentresolution_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentresolution_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentresolution_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_incidentresolution_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_incidentresolution_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentresolution_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_incidentresolution_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentresolution_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentresolution_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentresolution_modifiedby", null, value);
+				this.OnPropertyChanged("lk_incidentresolution_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_incidentresolution_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentresolution_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_incidentresolution_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentresolution_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentresolution_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_incidentresolution_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_incidentresolution_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_incidentresolution
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_incidentresolution")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_incidentresolution
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_incidentresolution", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_incidentresolution");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_incidentresolution", null, value);
+				this.OnPropertyChanged("user_incidentresolution");
 			}
 		}
 	}
@@ -10593,6 +11091,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_incidentbase_createdonbehalfby = "lk_incidentbase_createdonbehalfby";
 			public const string lk_incidentbase_modifiedby = "lk_incidentbase_modifiedby";
 			public const string lk_incidentbase_modifiedonbehalfby = "lk_incidentbase_modifiedonbehalfby";
+			public const string lk_incidentresolution_createdby = "lk_incidentresolution_createdby";
+			public const string lk_incidentresolution_createdonbehalfby = "lk_incidentresolution_createdonbehalfby";
+			public const string lk_incidentresolution_modifiedby = "lk_incidentresolution_modifiedby";
+			public const string lk_incidentresolution_modifiedonbehalfby = "lk_incidentresolution_modifiedonbehalfby";
 			public const string lk_subject_createdonbehalfby = "lk_subject_createdonbehalfby";
 			public const string lk_subject_modifiedonbehalfby = "lk_subject_modifiedonbehalfby";
 			public const string lk_subjectbase_createdby = "lk_subjectbase_createdby";
@@ -10617,6 +11119,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string user_dfeta_qtsregistration = "user_dfeta_qtsregistration";
 			public const string user_dfeta_qualification = "user_dfeta_qualification";
 			public const string user_dfeta_sanction = "user_dfeta_sanction";
+			public const string user_incidentresolution = "user_incidentresolution";
 			public const string Referenceduser_parent_user = "Referenceduser_parent_user";
 			public const string user_task = "user_task";
 			public const string Referencinglk_systemuser_createdonbehalfby = "lk_systemuser_createdonbehalfby";
@@ -12452,6 +12955,86 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N lk_incidentresolution_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentresolution_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution> lk_incidentresolution_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("lk_incidentresolution_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentresolution_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("lk_incidentresolution_createdby", null, value);
+				this.OnPropertyChanged("lk_incidentresolution_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_incidentresolution_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentresolution_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution> lk_incidentresolution_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("lk_incidentresolution_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentresolution_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("lk_incidentresolution_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_incidentresolution_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_incidentresolution_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentresolution_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution> lk_incidentresolution_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("lk_incidentresolution_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentresolution_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("lk_incidentresolution_modifiedby", null, value);
+				this.OnPropertyChanged("lk_incidentresolution_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_incidentresolution_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentresolution_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution> lk_incidentresolution_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("lk_incidentresolution_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_incidentresolution_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("lk_incidentresolution_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_incidentresolution_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N lk_subject_createdonbehalfby
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subject_createdonbehalfby")]
@@ -12928,6 +13511,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("user_dfeta_sanction");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_sanction>("user_dfeta_sanction", null, value);
 				this.OnPropertyChanged("user_dfeta_sanction");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_incidentresolution
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_incidentresolution")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution> user_incidentresolution
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("user_incidentresolution", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_incidentresolution");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>("user_incidentresolution", null, value);
+				this.OnPropertyChanged("user_incidentresolution");
 			}
 		}
 		
@@ -13817,6 +14420,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			get
 			{
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Incident>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.IncidentResolution"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution> IncidentResolutionSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>();
 			}
 		}
 		

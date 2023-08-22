@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -10,8 +11,9 @@ public partial class TestData : CrmTestData
 
     public TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
-        IOrganizationServiceAsync organizationService)
-        : base(organizationService, generateTrn: () => throw new NotImplementedException())
+        IOrganizationServiceAsync organizationService,
+        ReferenceDataCache referenceDataCache)
+        : base(organizationService, referenceDataCache, generateTrn: () => throw new NotImplementedException())
     {
         DbContextFactory = dbContextFactory;
     }

@@ -209,6 +209,7 @@
   ],
   "incident": [
     "customerid",
+    "createdon",
     "description",
     "dfeta_fromidentity",
     "dfeta_newdateofbirth",
@@ -218,9 +219,17 @@
     "dfeta_statedfirstname",
     "dfeta_statedlastname",
     "dfeta_statedmiddlename",
-    "title",
     "subjectid",
-    "statecode"
+    "statecode",
+    "statuscode",
+    "ticketnumber",
+    "title"
+  ],
+  "incidentresolution": [
+    "activityid",
+    "incidentid",
+    "statecode",
+    "subject"
   ],
   "subject": [
     "description",

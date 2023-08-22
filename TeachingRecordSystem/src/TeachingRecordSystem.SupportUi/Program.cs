@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Identity.Web;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
@@ -136,7 +138,13 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
         RetryPauseTime = TimeSpan.FromSeconds(1)
     };
 
-    builder.Services.AddTransient<ServiceClient>(_ => serviceClient.Clone());
+    builder.Services
+        .AddTransient<ServiceClient>(_ => serviceClient.Clone())
+        .AddSingleton<ITrnGenerationApiClient, TrnGenerationApiClient>() // Purely needed to DI into DataverseAdapter
+        .AddTransient<IOrganizationServiceAsync>(sp => sp.GetRequiredService<ServiceClient>())
+        .AddTransient<IDataverseAdapter, DataverseAdapter>();
+
+    healthCheckBuilder.AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
 }
 
 builder.Services

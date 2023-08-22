@@ -1412,10 +1412,14 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
     }
 
-    public async Task<Subject> GetSubjectByTitle(string title)
+    public Task<Subject> GetSubjectByTitle(string title) => GetSubjectByTitle(title, requestBuilder: null);
+
+    public async Task<Subject> GetSubjectByTitle(string title, RequestBuilder requestBuilder)
     {
         return await _cache.GetOrCreateAsync(CacheKeys.GetSubjectTitleKey(title), async _ =>
         {
+            requestBuilder ??= RequestBuilder.CreateSingle(_service);
+
             var filter = new FilterExpression(LogicalOperator.And);
             filter.AddCondition(Subject.Fields.Title, ConditionOperator.Equal, title);
 
@@ -1425,9 +1429,13 @@ public partial class DataverseAdapter : IDataverseAdapter
                 Criteria = filter
             };
 
-            var result = await _service.RetrieveMultipleAsync(query);
+            var request = new RetrieveMultipleRequest()
+            {
+                Query = query
+            };
 
-            return result.Entities.Select(e => e.ToEntity<Subject>()).SingleOrDefault();
+            var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
+            return result.EntityCollection.Entities.Select(e => e.ToEntity<Subject>()).SingleOrDefault();
         });
     }
 
