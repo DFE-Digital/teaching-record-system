@@ -31,6 +31,13 @@
                     <ul id="navigation" class="govuk-header__navigation-list">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
+                            if (User.IsInRole(UserRoles.Administrator))
+                            {
+                                <li class="govuk-header__navigation-item">
+                                    <a class="govuk-header__link" href="@LinkGenerator.Users()">Users</a>
+                                </li>
+                            }
+
                             <li class="govuk-header__navigation-item">
                                 <a class="govuk-header__link" href="@LinkGenerator.SignOut()">Sign out</a>
                             </li>
