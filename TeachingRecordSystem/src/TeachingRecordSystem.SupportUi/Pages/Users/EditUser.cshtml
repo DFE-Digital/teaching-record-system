@@ -1,4 +1,4 @@
-@page "/users/{userid}"
+@page "/users/{userid}/{handler?}"
 @using TeachingRecordSystem.Core
 @model TeachingRecordSystem.SupportUi.Pages.Users.EditUser
 @{
@@ -12,18 +12,24 @@
 
             <govuk-input asp-for="Email" type="email" disabled />
 
-            <govuk-input asp-for="Name" />
+            <govuk-input asp-for="Name" disabled="@(!Model.IsActiveUser)" />
 
             <govuk-checkboxes asp-for="Roles">
                 <govuk-checkboxes-fieldset>
                     @foreach (var role in UserRoles.All)
                     {
-                        <govuk-checkboxes-item value="@role">@UserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
+                        <govuk-checkboxes-item value="@role" disabled="@(!Model.IsActiveUser)">@UserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
                     }
                 </govuk-checkboxes-fieldset>
             </govuk-checkboxes>
 
-            <govuk-button type="submit">Save and continue</govuk-button>
+            @if (Model.IsActiveUser)
+            {
+                <div class="govuk-button-group">
+                    <govuk-button class="govuk-button" type="submit">Save and continue</govuk-button>
+                    <govuk-button class="govuk-button govuk-button--secondary" type="submit" asp-page-handler="deactivate">Deactivate</govuk-button>
+                </div>
+            }
         </form>
     </div>
 </div>

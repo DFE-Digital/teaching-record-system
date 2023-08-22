@@ -43,9 +43,12 @@ public class EditUser : PageModel
     [Display(Name = "Roles")]
     public string[]? Roles { get; set; }
 
+    public bool IsActiveUser { get; set; }
+
     public IActionResult OnGet()
     {
         Name = _user!.Name;
+        IsActiveUser = _user.Active;
 
         return Page();
     }
@@ -89,6 +92,31 @@ public class EditUser : PageModel
         TempData.SetFlashSuccess("User updated");
         return Redirect(_linkGenerator.Users());
 
+    }
+
+    public async Task<IActionResult> OnPostDeactivate()
+    {
+        var user = await _dbContext.Users.SingleAsync(u => u.UserId == UserId);
+
+        if (!user.Active)
+        {
+            return BadRequest();
+        }
+
+        user.Active = false;
+
+        _dbContext.AddEvent(new UserDeactivatedEvent
+        {
+            User = Core.Events.User.FromModel(user),
+            DeactivatedByUserId = User.GetUserId(),
+            CreatedUtc = _clock.UtcNow,
+            Changes = UserDeactivatedEventChanges.Deactivated
+        });
+
+        await _dbContext.SaveChangesAsync();
+
+        TempData.SetFlashSuccess("User deactivated");
+        return Redirect(_linkGenerator.Users());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
