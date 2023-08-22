@@ -68,7 +68,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<IEventObserver>(EventObserver);
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
-            services.AddTestScoped<IUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
+            services.AddTestScoped<IAadUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
             services.AddSingleton<TestData>();
             services.AddFakeXrm();
             services.AddTransient<ICurrentUserIdProvider, TestUserCurrentUserIdProvider>();

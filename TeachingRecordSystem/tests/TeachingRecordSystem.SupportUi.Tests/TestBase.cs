@@ -38,7 +38,7 @@ public abstract class TestBase
 
     public TestableClock Clock => _testServices.Clock;
 
-    public Mock<Services.AzureActiveDirectory.IUserService> AzureActiveDirectoryUserServiceMock => _testServices.AzureActiveDirectoryUserServiceMock;
+    public Mock<Services.AzureActiveDirectory.IAadUserService> AzureActiveDirectoryUserServiceMock => _testServices.AzureActiveDirectoryUserServiceMock;
 
     public HttpClient HttpClient { get; }
 

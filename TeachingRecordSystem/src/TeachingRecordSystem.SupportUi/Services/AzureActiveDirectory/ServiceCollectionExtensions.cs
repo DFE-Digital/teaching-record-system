@@ -8,7 +8,7 @@ public static class ServiceCollectionExtensions
     {
         if (!environment.IsUnitTests())
         {
-            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IAadUserService, AadUserService>();
         }
 
         return services;

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users;
@@ -13,16 +15,19 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users;
 public class EditUser : PageModel
 {
     private readonly TrsDbContext _dbContext;
+    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly IClock _clock;
     private readonly TrsLinkGenerator _linkGenerator;
     private Core.DataStore.Postgres.Models.User? _user;
 
     public EditUser(
         TrsDbContext dbContext,
+        ICrmQueryDispatcher crmQueryDispatcher,
         IClock clock,
         TrsLinkGenerator linkGenerator)
     {
         _dbContext = dbContext;
+        _crmQueryDispatcher = crmQueryDispatcher;
         _clock = clock;
         _linkGenerator = linkGenerator;
     }
@@ -44,13 +49,29 @@ public class EditUser : PageModel
 
     public bool IsActiveUser { get; set; }
 
-    public IActionResult OnGet()
+    public bool HasCrmAccount { get; set; }
+
+    public bool CrmAccountIsDisabled { get; set; }
+
+    public async Task OnGet()
     {
         Name = _user!.Name;
         IsActiveUser = _user.Active;
         Roles = _user.Roles;
 
-        return Page();
+        if (_user.AzureAdUserId is not null)
+        {
+            var crmUser = await _crmQueryDispatcher.ExecuteQuery(
+                new GetSystemUserByAzureActiveDirectoryObjectIdQuery(
+                    _user.AzureAdUserId, new ColumnSet(SystemUser.Fields.IsDisabled)));
+
+            HasCrmAccount = crmUser is not null;
+            CrmAccountIsDisabled = crmUser?.IsDisabled == true;
+        }
+        else
+        {
+            HasCrmAccount = false;
+        }
     }
 
     public async Task<IActionResult> OnPost()

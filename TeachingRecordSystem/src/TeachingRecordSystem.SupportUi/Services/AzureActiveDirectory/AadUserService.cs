@@ -2,11 +2,11 @@ using Microsoft.Graph;
 
 namespace TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
-public class UserService : IUserService
+public class AadUserService : IAadUserService
 {
     private readonly GraphServiceClient _graphServiceClient;
 
-    public UserService(GraphServiceClient graphServiceClient)
+    public AadUserService(GraphServiceClient graphServiceClient)
     {
         _graphServiceClient = graphServiceClient;
     }
