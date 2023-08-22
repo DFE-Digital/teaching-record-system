@@ -213,26 +213,4 @@ app.MapControllers();
 
 app.Run();
 
-ServiceClient GetCrmServiceClient()
-{
-    // This property is poorly-named. It's really a request timeout.
-    // It's worth noting this is a client-side timeout; it's not respected by the server.
-    // If this timeout fires the operation is still going to complete on the server.
-    //
-    // It's important for some of our operations that we never see this timeout fire;
-    // we have advisory locks in place that surround these operations that are dropped once this timeout
-    // fires, even though the operation in CRM is still going on.
-    ServiceClient.MaxConnectionTimeout = TimeSpan.FromMinutes(5);
-
-    var connectionString = builder.Configuration.GetRequiredValue("ConnectionStrings:Crm");
-
-    return new ServiceClient(connectionString)
-    {
-        DisableCrossThreadSafeties = true,
-        EnableAffinityCookie = true,
-        MaxRetryCount = 2,
-        RetryPauseTime = TimeSpan.FromSeconds(1)
-    };
-}
-
 public partial class Program { }
