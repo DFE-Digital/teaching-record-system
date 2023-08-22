@@ -41,9 +41,9 @@ public class IndexModel : PageModel
 
     public record CaseInfo
     {
-        public required string CaseReference { get; set; }
-        public required string Customer { get; set; }
-        public required string CaseType { get; set; }
-        public required DateTime CreatedOn { get; set; }
+        public required string CaseReference { get; init; }
+        public required string Customer { get; init; }
+        public required string CaseType { get; init; }
+        public required DateTime CreatedOn { get; init; }
     }
 }

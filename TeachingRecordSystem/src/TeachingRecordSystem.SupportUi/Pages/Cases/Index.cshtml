@@ -26,7 +26,7 @@
             @foreach (var caseInfo in Model.Cases!)
             {
                 <tr class="govuk-table__row" data-testid="case-@caseInfo.CaseReference">
-                    <td class="govuk-table__cell" data-testid="case-reference-@caseInfo.CaseReference"><a href="@LinkGenerator.EditCase(caseInfo.CaseReference)">@caseInfo.CaseReference</a></td>
+                    <td class="govuk-table__cell" data-testid="case-reference-@caseInfo.CaseReference"><a href="@LinkGenerator.EditCase(caseInfo.CaseReference)" class="govuk-link">@caseInfo.CaseReference</a></td>
                     <td class="govuk-table__cell" data-testid="name-@caseInfo.CaseReference">@caseInfo.Customer</td>
                     <td class="govuk-table__cell" data-testid="case-type-@caseInfo.CaseReference">@caseInfo.CaseType</td>
                     <td class="govuk-table__cell" data-testid="created-on-@caseInfo.CaseReference">@caseInfo.CreatedOn.ToString("dd/MM/yyyy")</td>

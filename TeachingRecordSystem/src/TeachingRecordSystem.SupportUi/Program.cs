@@ -138,10 +138,10 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
         RetryPauseTime = TimeSpan.FromSeconds(1)
     };
 
-    builder.Services.AddTransient<ServiceClient>(_ => serviceClient.Clone());
     builder.Services
+        .AddTransient<ServiceClient>(_ => serviceClient.Clone())
         .AddSingleton<ITrnGenerationApiClient, TrnGenerationApiClient>() // Purely needed to DI into DataverseAdapter
-        .AddTransient<IOrganizationServiceAsync>(_ => serviceClient.Clone())
+        .AddTransient<IOrganizationServiceAsync>(sp => sp.GetRequiredService<ServiceClient>())
         .AddTransient<IDataverseAdapter, DataverseAdapter>();
 
     healthCheckBuilder.AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
