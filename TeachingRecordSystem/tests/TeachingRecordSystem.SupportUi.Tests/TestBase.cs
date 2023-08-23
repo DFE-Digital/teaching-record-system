@@ -1,3 +1,4 @@
+using FakeXrmEasy.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -38,6 +39,8 @@ public abstract class TestBase
     public HttpClient HttpClient { get; }
 
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+
+    public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     protected Guid GetCurrentUserId()
     {

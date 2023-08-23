@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Events.Processing;
@@ -68,8 +67,8 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
-            services.AddSingleton<IOrganizationServiceAsync, FakeServiceClient>();
             services.AddSingleton<TestData>();
+            services.AddFakeXrm();
         });
     }
 
