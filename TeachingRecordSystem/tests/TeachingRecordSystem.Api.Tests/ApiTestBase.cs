@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using FakeXrmEasy.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -44,6 +45,8 @@ public abstract class ApiTestBase
     public HttpClient HttpClientWithApiKey { get; }
 
     public TestData TestData => ApiFixture.Services.GetRequiredService<TestData>();
+
+    public IXrmFakedContext XrmFakedContext => ApiFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     public JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().Configure());
