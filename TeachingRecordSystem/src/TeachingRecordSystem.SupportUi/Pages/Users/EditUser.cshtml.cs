@@ -119,6 +119,30 @@ public class EditUser : PageModel
         return Redirect(_linkGenerator.Users());
     }
 
+    public async Task<IActionResult> OnPostActivate()
+    {
+        var user = await _dbContext.Users.SingleAsync(u => u.UserId == UserId);
+
+        if (user.Active)
+        {
+            return BadRequest();
+        }
+
+        user.Active = true;
+
+        _dbContext.AddEvent(new UserActivatedEvent
+        {
+            User = Core.Events.User.FromModel(user),
+            ActivatedByUserId = User.GetUserId(),
+            CreatedUtc = _clock.UtcNow
+        });
+
+        await _dbContext.SaveChangesAsync();
+
+        TempData.SetFlashSuccess("Activated");
+        return Redirect(_linkGenerator.EditUser(UserId));
+    }
+
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         _user = await _dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);

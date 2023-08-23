@@ -257,5 +257,52 @@ public class EditUserTests : TestBase
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "User deactivated");
     }
 
+    [Fact]
+    public async Task Post_UserExistsButIsAlreadyActive_ReturnsBadRequest()
+    {
+        // Arrange
+        var user = await TestData.CreateUser();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(user.UserId)}/activate");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_ValidRequest_ActivatesUsersEmitsEventAndRedirectsWithFlashMessage()
+    {
+        // Arrange
+        var currentUser = await TestData.CreateUser(active: false);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(currentUser.UserId)}/activate");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var updatedUser = await WithDbContext(dbContext =>
+            dbContext.Users.SingleOrDefaultAsync(u => u.UserId == currentUser.UserId));
+        Assert.NotNull(updatedUser);
+
+        Assert.True(updatedUser.Active);
+
+        EventObserver.AssertEventsSaved(e =>
+        {
+            var userCreatedEvent = Assert.IsType<UserActivatedEvent>(e);
+            Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
+            Assert.Equal(userCreatedEvent.ActivatedByUserId, GetCurrentUserId());
+            Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
+        });
+
+        var redirectResponse = await response.FollowRedirect(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocument();
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Activated");
+    }
+
     private static string GetRequestPath(Guid userId) => $"/users/{userId}";
 }
