@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
@@ -9,7 +10,7 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class CrmTestData
 {
-    public Task<CreateNameChangeIncidentResult> CreateNameChangeIncident(Action<CreateNameChangeIncidentBuilder>? configure = null)
+    public Task<CreateNameChangeIncidentResult> CreateNameChangeIncident(Action<CreateNameChangeIncidentBuilder> configure)
     {
         var builder = new CreateNameChangeIncidentBuilder();
         configure?.Invoke(builder);
@@ -18,36 +19,69 @@ public partial class CrmTestData
 
     public class CreateNameChangeIncidentBuilder
     {
-        private string _evidenceFileName = "evidence.txt";
-        private MemoryStream _evidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
-        private string _evidenceFileMimeType = "text/plain";
-        private IncidentStatusType _incidentStatusType = IncidentStatusType.Active;
+        private const IncidentStatusType DefaultIncidentStatus = IncidentStatusType.Active;
+
+        private static readonly string _defaultEvidenceFileName = "evidence.txt";
+        private static readonly MemoryStream _defaultEvidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
+        private static readonly string _defaultEvidenceFileMimeType = "text/plain";
+
+        private Guid? _customerId;
+        private IncidentStatusType? _incidentStatusType;
+
+        public CreateNameChangeIncidentBuilder WithCustomerId(Guid customerId)
+        {
+            if (_customerId is not null && _customerId != customerId)
+            {
+                throw new InvalidOperationException("Customer ID cannot be changed after it's set.");
+            }
+
+            _customerId = customerId;
+            return this;
+        }
 
         public CreateNameChangeIncidentBuilder WithCanceledStatus()
         {
+            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Canceled)
+            {
+                throw new InvalidOperationException("Incident status cannot be changed after it's set.");
+            }
+
             _incidentStatusType = IncidentStatusType.Canceled;
             return this;
         }
 
         public CreateNameChangeIncidentBuilder WithRejectedStatus()
         {
+            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Rejected)
+            {
+                throw new InvalidOperationException("Incident status cannot be changed after it's set.");
+            }
+
             _incidentStatusType = IncidentStatusType.Rejected;
             return this;
         }
 
         public CreateNameChangeIncidentBuilder WithApprovedStatus()
         {
+            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Approved)
+            {
+                throw new InvalidOperationException("Incident status cannot be changed after it's set.");
+            }
+
             _incidentStatusType = IncidentStatusType.Approved;
             return this;
         }
 
         public async Task<CreateNameChangeIncidentResult> Execute(CrmTestData testData)
         {
-            var person = await testData.CreatePerson();
+            if (_customerId is null)
+            {
+                throw new InvalidOperationException("Customer ID must be specified.");
+            }
 
             var firstName = testData.GenerateFirstName();
             var middleName = testData.GenerateMiddleName();
-            var lastName = testData.GenerateChangedLastName(person.LastName);
+            var lastName = testData.GenerateLastName();
 
             var incidentId = Guid.NewGuid();
             var title = "Request to change name";
@@ -59,7 +93,7 @@ public partial class CrmTestData
                 Id = incidentId,
                 Title = title,
                 SubjectId = nameChangeSubject!.Id.ToEntityReference(Subject.EntityLogicalName),
-                CustomerId = person.ContactId.ToEntityReference(Contact.EntityLogicalName),
+                CustomerId = _customerId.Value.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_NewFirstName = firstName,
                 dfeta_NewMiddleName = middleName,
                 dfeta_NewLastName = lastName,
@@ -71,23 +105,23 @@ public partial class CrmTestData
             var document = new dfeta_document()
             {
                 Id = Guid.NewGuid(),
-                dfeta_name = _evidenceFileName,
+                dfeta_name = _defaultEvidenceFileName,
                 dfeta_Type = dfeta_DocumentType.ChangeofNameDOBEvidence,
-                dfeta_PersonId = person.ContactId.ToEntityReference(Contact.EntityLogicalName),
+                dfeta_PersonId = _customerId.Value.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_CaseId = incidentId.ToEntityReference(Incident.EntityLogicalName),
                 StatusCode = dfeta_document_StatusCode.Active
             };
 
-            var annotationBody = await GetBase64EncodedFileContent(_evidenceFileContent);
+            var annotationBody = await GetBase64EncodedFileContent(_defaultEvidenceFileContent);
 
             var annotation = new Annotation()
             {
                 ObjectId = document.Id.ToEntityReference(dfeta_document.EntityLogicalName),
                 ObjectTypeCode = dfeta_document.EntityLogicalName,
-                Subject = _evidenceFileName,
+                Subject = _defaultEvidenceFileName,
                 DocumentBody = annotationBody,
-                MimeType = _evidenceFileMimeType,
-                FileName = _evidenceFileName,
+                MimeType = _defaultEvidenceFileMimeType,
+                FileName = _defaultEvidenceFileName,
                 NoteText = string.Empty
             };
 
@@ -95,6 +129,9 @@ public partial class CrmTestData
             txnRequestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = incident });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = document });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = annotation });
+
+            _incidentStatusType ??= DefaultIncidentStatus;
+
             switch (_incidentStatusType)
             {
                 case IncidentStatusType.Canceled:
@@ -134,30 +171,38 @@ public partial class CrmTestData
                         });
                     break;
                 default:
+                    Debug.Assert(_incidentStatusType == IncidentStatusType.Active);
                     break;
             }
 
+            var retrieveIncidentResponse = txnRequestBuilder.AddRequest<RetrieveResponse>(
+                new RetrieveRequest()
+                {
+                    Target = incidentId.ToEntityReference(Incident.EntityLogicalName),
+                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(Incident.Fields.TicketNumber)
+                });
+
             await txnRequestBuilder.Execute();
+
+            var ticketNumber = retrieveIncidentResponse.GetResponse().Entity.ToEntity<Incident>().TicketNumber;
 
             return new CreateNameChangeIncidentResult()
             {
                 IncidentId = incidentId,
-                CustomerId = person.ContactId,
+                TicketNumber = ticketNumber,
+                CustomerId = _customerId.Value,
                 Title = title,
                 SubjectId = nameChangeSubject.Id,
                 SubjectTitle = subjectTitle,
-                CurrentFirstName = person.FirstName,
-                CurrentMiddleName = person.MiddleName,
-                CurrentLastName = person.LastName,
                 NewFirstName = firstName,
                 NewMiddleName = middleName,
                 NewLastName = lastName,
                 StatedFirstName = firstName,
                 StatedMiddleName = middleName,
                 StatedLastName = lastName,
-                EvidenceFileName = _evidenceFileName,
+                EvidenceFileName = _defaultEvidenceFileName,
                 EvidenceBase64EncodedFileContent = annotationBody,
-                EvidenceFileMimeType = _evidenceFileMimeType
+                EvidenceFileMimeType = _defaultEvidenceFileMimeType
             };
         }
 
@@ -173,13 +218,11 @@ public partial class CrmTestData
     public record CreateNameChangeIncidentResult
     {
         public required Guid IncidentId { get; init; }
+        public required string TicketNumber { get; init; }
         public required Guid CustomerId { get; init; }
         public required string Title { get; init; }
         public required Guid SubjectId { get; init; }
         public required string SubjectTitle { get; init; }
-        public required string CurrentFirstName { get; init; }
-        public required string? CurrentMiddleName { get; init; }
-        public required string CurrentLastName { get; init; }
         public required string NewFirstName { get; init; }
         public required string? NewMiddleName { get; init; }
         public required string NewLastName { get; init; }

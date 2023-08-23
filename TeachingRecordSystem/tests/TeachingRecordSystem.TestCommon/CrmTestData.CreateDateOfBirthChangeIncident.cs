@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
@@ -19,34 +20,67 @@ public partial class CrmTestData
 
     public class CreateDateOfBirthChangeIncidentBuilder
     {
-        private string _evidenceFileName = "evidence.txt";
-        private MemoryStream _evidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
-        private string _evidenceFileMimeType = "text/plain";
-        private IncidentStatusType _incidentStatusType = IncidentStatusType.Active;
+        private const IncidentStatusType DefaultIncidentStatus = IncidentStatusType.Active;
+
+        private static readonly string _defaultEvidenceFileName = "evidence.txt";
+        private static readonly MemoryStream _defaultEvidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
+        private static readonly string _defaultEvidenceFileMimeType = "text/plain";
+
+        private Guid? _customerId;
+        private IncidentStatusType? _incidentStatusType;
+
+        public CreateDateOfBirthChangeIncidentBuilder WithCustomerId(Guid customerId)
+        {
+            if (_customerId is not null && _customerId != customerId)
+            {
+                throw new InvalidOperationException("Customer ID cannot be changed after it's set.");
+            }
+
+            _customerId = customerId;
+            return this;
+        }
 
         public CreateDateOfBirthChangeIncidentBuilder WithCanceledStatus()
         {
+            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Canceled)
+            {
+                throw new InvalidOperationException("Incident status cannot be changed after it's set.");
+            }
+
             _incidentStatusType = IncidentStatusType.Canceled;
             return this;
         }
 
         public CreateDateOfBirthChangeIncidentBuilder WithRejectedStatus()
         {
+            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Rejected)
+            {
+                throw new InvalidOperationException("Incident status cannot be changed after it's set.");
+            }
+
             _incidentStatusType = IncidentStatusType.Rejected;
             return this;
         }
 
         public CreateDateOfBirthChangeIncidentBuilder WithApprovedStatus()
         {
+            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Approved)
+            {
+                throw new InvalidOperationException("Incident status cannot be changed after it's set.");
+            }
+
             _incidentStatusType = IncidentStatusType.Approved;
             return this;
         }
 
         public async Task<CreateDateOfBirthChangeIncidentResult> Execute(CrmTestData testData)
         {
-            var person = await testData.CreatePerson();
+            if (_customerId is null)
+            {
+                throw new InvalidOperationException("Customer ID must be specified.");
+            }
 
-            var dateOfBirth = testData.GenerateChangedDateOfBirth(person.DateOfBirth);
+            var dateOfBirth = testData.GenerateDateOfBirth();
 
             var incidentId = Guid.NewGuid();
             var title = "Request to change date of birth";
@@ -58,30 +92,30 @@ public partial class CrmTestData
                 Id = incidentId,
                 Title = title,
                 SubjectId = dateOfBirthChangeSubject!.Id.ToEntityReference(Subject.EntityLogicalName),
-                CustomerId = person.ContactId.ToEntityReference(Contact.EntityLogicalName),
+                CustomerId = _customerId.Value.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_NewDateofBirth = dateOfBirth.ToDateTime()
             };
 
             var document = new dfeta_document()
             {
                 Id = Guid.NewGuid(),
-                dfeta_name = _evidenceFileName,
+                dfeta_name = _defaultEvidenceFileName,
                 dfeta_Type = dfeta_DocumentType.ChangeofNameDOBEvidence,
-                dfeta_PersonId = person.ContactId.ToEntityReference(Contact.EntityLogicalName),
+                dfeta_PersonId = _customerId.Value.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_CaseId = incidentId.ToEntityReference(Incident.EntityLogicalName),
                 StatusCode = dfeta_document_StatusCode.Active
             };
 
-            var annotationBody = await GetBase64EncodedFileContent(_evidenceFileContent);
+            var annotationBody = await GetBase64EncodedFileContent(_defaultEvidenceFileContent);
 
             var annotation = new Annotation()
             {
                 ObjectId = document.Id.ToEntityReference(dfeta_document.EntityLogicalName),
                 ObjectTypeCode = dfeta_document.EntityLogicalName,
-                Subject = _evidenceFileName,
+                Subject = _defaultEvidenceFileName,
                 DocumentBody = annotationBody,
-                MimeType = _evidenceFileMimeType,
-                FileName = _evidenceFileName,
+                MimeType = _defaultEvidenceFileMimeType,
+                FileName = _defaultEvidenceFileName,
                 NoteText = string.Empty
             };
 
@@ -89,6 +123,9 @@ public partial class CrmTestData
             txnRequestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = incident });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = document });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = annotation });
+
+            _incidentStatusType ??= DefaultIncidentStatus;
+
             switch (_incidentStatusType)
             {
                 case IncidentStatusType.Canceled:
@@ -128,26 +165,33 @@ public partial class CrmTestData
                         });
                     break;
                 default:
+                    Debug.Assert(_incidentStatusType == IncidentStatusType.Active);
                     break;
             }
 
+            var retrieveIncidentResponse = txnRequestBuilder.AddRequest<RetrieveResponse>(
+                new RetrieveRequest()
+                {
+                    Target = incidentId.ToEntityReference(Incident.EntityLogicalName),
+                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(Incident.Fields.TicketNumber)
+                });
+
             await txnRequestBuilder.Execute();
+
+            var ticketNumber = retrieveIncidentResponse.GetResponse().Entity.ToEntity<Incident>().TicketNumber;
 
             return new CreateDateOfBirthChangeIncidentResult()
             {
                 IncidentId = incidentId,
-                CustomerId = person.ContactId,
+                TicketNumber = ticketNumber,
+                CustomerId = _customerId.Value,
                 Title = title,
                 SubjectId = dateOfBirthChangeSubject.Id,
                 SubjectTitle = subjectTitle,
-                CurrentDateOfBirth = person.DateOfBirth,
                 NewDateOfBirth = dateOfBirth,
-                CustomerFirstName = person.FirstName,
-                CustomerMiddleName = person.MiddleName,
-                CustomerLastName = person.LastName,
-                EvidenceFileName = _evidenceFileName,
+                EvidenceFileName = _defaultEvidenceFileName,
                 EvidenceBase64EncodedFileContent = annotationBody,
-                EvidenceFileMimeType = _evidenceFileMimeType
+                EvidenceFileMimeType = _defaultEvidenceFileMimeType
             };
         }
 
@@ -163,15 +207,12 @@ public partial class CrmTestData
     public record CreateDateOfBirthChangeIncidentResult
     {
         public required Guid IncidentId { get; init; }
+        public required string TicketNumber { get; init; }
         public required Guid CustomerId { get; init; }
         public required string Title { get; init; }
         public required Guid SubjectId { get; init; }
         public required string SubjectTitle { get; init; }
-        public required DateOnly CurrentDateOfBirth { get; init; }
         public required DateOnly NewDateOfBirth { get; init; }
-        public required string CustomerFirstName { get; init; }
-        public required string CustomerMiddleName { get; init; }
-        public required string CustomerLastName { get; init; }
         public required string EvidenceFileName { get; init; }
         public required string EvidenceBase64EncodedFileContent { get; init; }
         public required string EvidenceFileMimeType { get; init; }

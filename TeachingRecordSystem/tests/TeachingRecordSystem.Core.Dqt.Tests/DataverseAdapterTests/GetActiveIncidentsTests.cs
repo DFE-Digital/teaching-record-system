@@ -19,11 +19,12 @@ public class GetActiveIncidentsTests : IAsyncLifetime
     public async Task WhenCalled_ReturnsActiveIncidentsOnly()
     {
         // Arrange
-        var cancelledCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident((builder) => builder.WithCanceledStatus());
-        var activeCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident();
-        var rejectedCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident((builder) => builder.WithRejectedStatus());
-        var activeCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident();
-        var approvedCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident((builder) => builder.WithApprovedStatus());
+        var createPersonResult = await _dataScope.TestData.CreatePerson();
+        var cancelledCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
+        var activeCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var rejectedCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithRejectedStatus());
+        var activeCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var approvedCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithApprovedStatus());
 
         // Act
         var incidents = await _dataverseAdapter.GetActiveIncidents();
