@@ -134,8 +134,7 @@ public class EditUser : PageModel
         {
             User = Core.Events.User.FromModel(user),
             ActivatedByUserId = User.GetUserId(),
-            CreatedUtc = _clock.UtcNow,
-            Changes = UserActivatedEventChanges.Activated
+            CreatedUtc = _clock.UtcNow
         });
 
         await _dbContext.SaveChangesAsync();

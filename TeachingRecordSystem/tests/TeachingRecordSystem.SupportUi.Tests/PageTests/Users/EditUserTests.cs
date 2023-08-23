@@ -297,7 +297,6 @@ public class EditUserTests : TestBase
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.ActivatedByUserId, GetCurrentUserId());
             Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
-            Assert.Equal(UserActivatedEventChanges.Activated, userCreatedEvent.Changes);
         });
 
         var redirectResponse = await response.FollowRedirect(HttpClient);
