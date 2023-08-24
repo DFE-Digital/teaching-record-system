@@ -231,10 +231,14 @@
     "statecode",
     "subject"
   ],
+  "plugintype": [],
+  "sdkmessage": [],
+  "sdkmessagefilter": [],
+  "sdkmessageprocessingstep": [],
   "subject": [
     "description",
-    "title",
-    "statecode"
+    "statecode",
+    "title"
   ],
   "systemuser": [
     "azureactivedirectoryobjectid",
