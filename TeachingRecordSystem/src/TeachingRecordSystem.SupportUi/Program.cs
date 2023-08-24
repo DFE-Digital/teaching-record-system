@@ -14,6 +14,7 @@ using TeachingRecordSystem;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.SupportUi;
+using TeachingRecordSystem.SupportUi.Endpoints;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.Redis;
@@ -215,6 +216,8 @@ app.MapGet("/health", async context =>
 {
     await context.Response.WriteAsync("OK");
 });
+
+app.MapCaseEndpoints();
 
 app.MapRazorPages();
 app.MapControllers();

@@ -1,5 +1,71 @@
 @page "/cases/{caseId}"
 @model TeachingRecordSystem.SupportUi.Pages.Cases.EditCase.IndexModel
 @{
-    ViewBag.Title = "Edit Case";
+    ViewBag.Title = Model.CaseHeader!.CaseType;
 }
+
+<table class="govuk-table trs-table--no-border">
+    <caption class="govuk-table__caption govuk-table__caption--xl">@ViewBag.Title</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-font-size-16 govuk-!-width-one-quarter">Case reference</th>
+            <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-font-size-16 govuk-!-width-one-third">Name</th>
+            <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-font-size-16">Created on</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row" data-testid="case-header">
+            <td class="govuk-table__cell trs-table__cell--no-border govuk-!-font-size-16" data-testid="case-header-case-reference">@Model.CaseHeader.CaseReference</td>
+            <td class="govuk-table__cell trs-table__cell--no-border govuk-!-font-size-16" data-testid="case-header-name">@Model.CaseHeader.Customer</td>
+            <td class="govuk-table__cell trs-table__cell--no-border govuk-!-font-size-16" data-testid="case-header-created-on">@Model.CaseHeader.CreatedOn.ToString("dd/MM/yyyy")</td>
+        </tr>
+    </tbody>
+</table>
+
+<table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--l">Request</caption>
+    @if (Model.CaseHeader.CaseType == DqtConstants.NameChangeSubjectTitle)
+    {
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">Name</th>
+                <th scope="col" class="govuk-table__header">Current</th>
+                <th scope="col" class="govuk-table__header">Request</th>
+            </tr>
+        </thead>    
+        <tbody class="govuk-table__body">
+            <tr class="govuk-table__row" data-testid="first-name">
+                <td class="govuk-table__cell" data-testid="first-name-title">First name</td>
+                <td class="govuk-table__cell" data-testid="first-name-current">@Model.NameChangeRequest!.CurrentFirstName</td>
+                <td class="govuk-table__cell" data-testid="first-name-new">@Model.NameChangeRequest!.NewFirstName</td>
+            </tr>
+            <tr class="govuk-table__row" data-testid="middle-name">
+                <td class="govuk-table__cell" data-testid="middle-name-title">Middle name</td>
+                <td class="govuk-table__cell" data-testid="middle-name-current">@Model.NameChangeRequest!.CurrentMiddleName</td>
+                <td class="govuk-table__cell" data-testid="middle-name-new">@Model.NameChangeRequest!.NewMiddleName</td>
+            </tr>
+            <tr class="govuk-table__row" data-testid="last-name">
+                <td class="govuk-table__cell" data-testid="last-name-title">Last name</td>
+                <td class="govuk-table__cell" data-testid="last-name-current">@Model.NameChangeRequest!.CurrentLastName</td>
+                <td class="govuk-table__cell" data-testid="last-name-new">@Model.NameChangeRequest!.NewLastName</td>
+            </tr>
+        </tbody>
+    }
+    @if (Model.CaseHeader.CaseType == DqtConstants.DateOfBirthChangeSubjectTitle)
+    {
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Current</th>
+                <th scope="col" class="govuk-table__header">Request</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            <tr class="govuk-table__row" data-testid="date-of-birth">
+                <td class="govuk-table__cell" data-testid="date-of-birth-current">@Model.DateOfBirthChangeRequest!.CurrentDateOfBirth</td>
+                <td class="govuk-table__cell" data-testid="date-of-birth-new">@Model.DateOfBirthChangeRequest!.NewDateOfBirth</td>
+            </tr>
+        </tbody>
+    }
+</table>
+
+<img src="/cases/@Model.CaseId/documents/@Model.Proof?.DocumentId" alt="@Model.Proof?.DocumentName" />

@@ -1,0 +1,5 @@
+.trs-table__header--no-border,
+.trs-table__cell--no-border,
+.trs-table--no-border {
+  border: 0;
+}

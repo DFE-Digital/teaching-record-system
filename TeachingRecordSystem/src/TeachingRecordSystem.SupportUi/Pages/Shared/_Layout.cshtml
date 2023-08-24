@@ -1,5 +1,13 @@
+@inject GovUk.Frontend.AspNetCore.PageTemplateHelper PageTemplateHelper
 @{
     Layout = "_GovUkPageTemplate";
+}
+
+@section Head {
+    @PageTemplateHelper.GenerateStyleImports()
+    <link rel="stylesheet" asp-href-include="~/Styles/site.css">
+        @RenderSection("Styles", required: false)
+        @RenderSection("Scripts", required: false)
 }
 
 @section Header {

@@ -110,4 +110,10 @@ public interface IDataverseAdapter
     Task ClearTeacherIdentityInfo(Guid identityUserId, DateTime updateTimeUtc);
 
     Task<IDictionary<Guid, string[]>> GetSanctionsByContactIds(IEnumerable<Guid> contactIds, bool liveOnly = true);
+
+    Task<Incident[]> GetActiveIncidents();
+
+    Task<Incident?> GetIncidentByTicketNumber(string ticketNumber);
+
+    Task<dfeta_document?> GetDocumentById(Guid documentId);
 }
