@@ -14452,6 +14452,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		public static class Fields
 		{
 			public const string Description = "description";
+			public const string SubjectId = "subjectid";
+			public const string Id = "subjectid";
 			public const string Title = "title";
 			public const string subject_incidents = "subject_incidents";
 			public const string Referencedsubject_parent_subject = "Referencedsubject_parent_subject";
@@ -14522,6 +14524,49 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Description");
 				this.SetAttributeValue("description", value);
 				this.OnPropertyChanged("Description");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the subject.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subjectid")]
+		public System.Nullable<System.Guid> SubjectId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("subjectid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SubjectId");
+				this.SetAttributeValue("subjectid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("SubjectId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("subjectid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.SubjectId = value;
 			}
 		}
 		

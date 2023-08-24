@@ -179,17 +179,20 @@ public partial class CrmTestData
                 new RetrieveRequest()
                 {
                     Target = incidentId.ToEntityReference(Incident.EntityLogicalName),
-                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(Incident.Fields.TicketNumber)
+                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(Incident.Fields.TicketNumber, Incident.Fields.CreatedOn)
                 });
 
             await txnRequestBuilder.Execute();
 
-            var ticketNumber = retrieveIncidentResponse.GetResponse().Entity.ToEntity<Incident>().TicketNumber;
+            var createdIncident = retrieveIncidentResponse.GetResponse().Entity.ToEntity<Incident>();
+            var ticketNumber = createdIncident.TicketNumber;
+            var createdOn = createdIncident.CreatedOn!.Value;
 
             return new CreateNameChangeIncidentResult()
             {
                 IncidentId = incidentId,
                 TicketNumber = ticketNumber,
+                CreatedOn = createdOn,
                 CustomerId = _customerId.Value,
                 Title = title,
                 SubjectId = nameChangeSubject.Id,
@@ -219,6 +222,7 @@ public partial class CrmTestData
     {
         public required Guid IncidentId { get; init; }
         public required string TicketNumber { get; init; }
+        public required DateTime CreatedOn { get; init; }
         public required Guid CustomerId { get; init; }
         public required string Title { get; init; }
         public required Guid SubjectId { get; init; }
