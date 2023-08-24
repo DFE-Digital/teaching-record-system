@@ -51,7 +51,8 @@
     "mobilephone",
     "statecode",
     "telephone1",
-    "dfeta_slugid"
+    "dfeta_slugid",
+    "dfeta_previouslastname"
   ],
   "dfeta_businesseventaudit":[
     "createdon",

@@ -54,7 +54,7 @@ public interface IDataverseAdapter
 
     Task<Contact[]> FindTeachersStrict(FindTeachersQuery query);
 
-    Task<Contact[]> FindTeachersByLastNameAndDateOfBirth(string lastName, DateOnly dateOfBirth, string previousLastName, string[] columnNames);
+    Task<Contact[]> FindTeachersByLastNameAndDateOfBirth(string lastName, DateOnly dateOfBirth, string[] columnNames);
 
     Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);
 

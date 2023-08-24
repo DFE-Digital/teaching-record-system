@@ -1125,6 +1125,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_LastIdentityUpdate = "dfeta_lastidentityupdate";
 			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
 			public const string dfeta_NINumber = "dfeta_ninumber";
+			public const string dfeta_PreviousLastName = "dfeta_previouslastname";
 			public const string dfeta_QTSDate = "dfeta_qtsdate";
 			public const string dfeta_SlugId = "dfeta_slugid";
 			public const string dfeta_StatedFirstName = "dfeta_statedfirstname";
@@ -1544,6 +1545,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_NINumber");
 				this.SetAttributeValue("dfeta_ninumber", value);
 				this.OnPropertyChanged("dfeta_NINumber");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_previouslastname")]
+		public string dfeta_PreviousLastName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_previouslastname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_PreviousLastName");
+				this.SetAttributeValue("dfeta_previouslastname", value);
+				this.OnPropertyChanged("dfeta_PreviousLastName");
 			}
 		}
 		
