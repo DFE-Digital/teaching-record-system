@@ -50,6 +50,15 @@ function Set-Configuration {
 
 Set-Configuration
 
+function Preprend-NullableDisable {
+    [CmdletBinding()]
+    param (
+        [string]$File
+    )
+
+    "#nullable disable`r`n" + (Get-Content -Raw $File) | Set-Content -Path $File
+}
+
 $namespace = "TeachingRecordSystem.Core.Dqt.Models"
 $entitiesOutput = Join-Path -Path $PSScriptRoot -ChildPath ".." TeachingRecordSystem src TeachingRecordSystem.Core Dqt Models GeneratedCode.cs
 $optionSetsOutput = Join-Path -Path $PSScriptRoot -ChildPath ".." TeachingRecordSystem src TeachingRecordSystem.Core Dqt Models GeneratedOptionSets.cs
@@ -71,6 +80,8 @@ $crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"
     /namingservice:"DLaB.CrmSvcUtilExtensions.NamingService,DLaB.CrmSvcUtilExtensions" `
     /metadataproviderservice:"DLaB.CrmSvcUtilExtensions.Entity.MetadataProviderService,DLaB.CrmSvcUtilExtensions"
 
+Preprend-NullableDisable $entitiesOutput
+
 # option sets
 if ($IncludeOptionSets -eq $true) {
     & $crmSvcUtil `
@@ -83,4 +94,6 @@ if ($IncludeOptionSets -eq $true) {
         /codewriterfilter:"DLaB.CrmSvcUtilExtensions.OptionSet.CodeWriterFilterService,DLaB.CrmSvcUtilExtensions" `
         /namingservice:"DLaB.CrmSvcUtilExtensions.NamingService,DLaB.CrmSvcUtilExtensions" `
         /metadataproviderservice:"DLaB.CrmSvcUtilExtensions.BaseMetadataProviderService,DLaB.CrmSvcUtilExtensions"
+
+    Preprend-NullableDisable $optionSetsOutput
 }
