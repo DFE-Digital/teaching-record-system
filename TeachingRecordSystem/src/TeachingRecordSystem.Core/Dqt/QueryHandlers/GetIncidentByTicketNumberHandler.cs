@@ -1,15 +1,16 @@
+using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.Dqt.Queries;
 
-namespace TeachingRecordSystem.Core.Dqt;
-
-public partial class DataverseAdapter
+namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
+public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTicketNumberQuery, Incident?>
 {
-    public async Task<Incident?> GetIncidentByTicketNumber(string ticketNumber)
+    public async Task<Incident?> Execute(GetIncidentByTicketNumberQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
-        filter.AddCondition(Incident.Fields.TicketNumber, ConditionOperator.Equal, ticketNumber);
+        filter.AddCondition(Incident.Fields.TicketNumber, ConditionOperator.Equal, query.TicketNumber);
 
-        var query = new QueryExpression(Incident.EntityLogicalName)
+        var queryExpression = new QueryExpression(Incident.EntityLogicalName)
         {
             ColumnSet = new ColumnSet(
                 Incident.Fields.TicketNumber,
@@ -26,11 +27,11 @@ public partial class DataverseAdapter
             Criteria = filter
         };
 
-        AddContactLink(query);
-        AddSubjectLink(query);
-        AddDocumentLink(query);
+        AddContactLink(queryExpression);
+        AddSubjectLink(queryExpression);
+        AddDocumentLink(queryExpression);
 
-        var result = await _service.RetrieveMultipleAsync(query);
+        var result = await organizationService.RetrieveMultipleAsync(queryExpression);
         return result.Entities.Select(entity => entity.ToEntity<Incident>()).SingleOrDefault();
 
         static void AddContactLink(QueryExpression query)

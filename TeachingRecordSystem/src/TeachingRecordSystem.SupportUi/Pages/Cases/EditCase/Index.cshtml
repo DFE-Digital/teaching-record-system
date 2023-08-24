@@ -1,7 +1,11 @@
-@page "/cases/{caseId}"
+@page "/cases/{ticketNumber}"
 @model TeachingRecordSystem.SupportUi.Pages.Cases.EditCase.IndexModel
 @{
     ViewBag.Title = Model.CaseHeader!.CaseType;
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Cases()" />
 }
 
 <table class="govuk-table trs-table--no-border">
@@ -32,7 +36,7 @@
                 <th scope="col" class="govuk-table__header">Current</th>
                 <th scope="col" class="govuk-table__header">Request</th>
             </tr>
-        </thead>    
+        </thead>
         <tbody class="govuk-table__body">
             <tr class="govuk-table__row" data-testid="first-name">
                 <td class="govuk-table__cell" data-testid="first-name-title">First name</td>
@@ -68,4 +72,11 @@
     }
 </table>
 
-<img src="/cases/@Model.CaseId/documents/@Model.Proof?.DocumentId" alt="@Model.Proof?.DocumentName" />
+@if (Model.Evidence?.MimeType == "application/pdf")
+{
+    <object data="/cases/@Model.TicketNumber/documents/@Model.Evidence?.DocumentId" />
+}
+else
+{
+    <img src="/cases/@Model.TicketNumber/documents/@Model.Evidence?.DocumentId" alt="@Model.Evidence?.DocumentName" />
+}

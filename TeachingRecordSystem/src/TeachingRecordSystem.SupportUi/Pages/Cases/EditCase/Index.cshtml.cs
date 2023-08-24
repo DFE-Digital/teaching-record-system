@@ -2,17 +2,18 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Cases.EditCase;
 
 [Authorize(Roles = $"{UserRoles.Helpdesk},{UserRoles.Administrator}")]
 public class IndexModel : PageModel
 {
-    private readonly IDataverseAdapter _dataverseAdapter;
+    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
 
-    public IndexModel(IDataverseAdapter dataverseAdapter)
+    public IndexModel(ICrmQueryDispatcher crmQueryDispatcher)
     {
-        _dataverseAdapter = dataverseAdapter;
+        _crmQueryDispatcher = crmQueryDispatcher;
     }
 
     public CaseInfo? CaseHeader { get; set; }
@@ -21,17 +22,14 @@ public class IndexModel : PageModel
 
     public DateOfBirthChangeRequestInfo? DateOfBirthChangeRequest { get; set; }
 
-    public EvidenceInfo? Proof { get; set; }
-
-    [ViewData]
-    public string? ImageString => $"data:{Proof?.DocumentMimeType};base64,{Proof?.DocumentData}";
+    public EvidenceInfo? Evidence { get; set; }
 
     [FromRoute]
-    public string CaseId { get; set; } = null!;
+    public string TicketNumber { get; set; } = null!;
 
     public async Task<IActionResult> OnGet()
     {
-        var incident = await _dataverseAdapter.GetIncidentByTicketNumber(CaseId);
+        var incident = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
         if (incident is null)
         {
             return NotFound();
@@ -86,12 +84,11 @@ public class IndexModel : PageModel
 
         if (document is not null && annotation is not null)
         {
-            Proof = new EvidenceInfo()
+            Evidence = new EvidenceInfo()
             {
-                DocumentId = document!.Id,
+                DocumentId = document!.dfeta_documentId!.Value,
                 DocumentName = annotation.FileName,
-                DocumentData = annotation.DocumentBody,
-                DocumentMimeType = annotation.MimeType
+                MimeType = annotation.MimeType
             };
         }
     }
@@ -124,7 +121,6 @@ public class IndexModel : PageModel
     {
         public required Guid DocumentId { get; init; }
         public required string DocumentName { get; init; }
-        public required string DocumentData { get; init; }
-        public required string DocumentMimeType { get; init; }
+        public required string MimeType { get; init; }
     }
 }

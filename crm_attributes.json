@@ -69,6 +69,7 @@
   ],
   "dfeta_document": [
     "dfeta_caseid",
+    "dfeta_documentid",
     "dfeta_name",
     "dfeta_type",
     "dfeta_personid",

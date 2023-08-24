@@ -3343,6 +3343,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		public static class Fields
 		{
 			public const string dfeta_CaseId = "dfeta_caseid";
+			public const string dfeta_documentId = "dfeta_documentid";
+			public const string Id = "dfeta_documentid";
 			public const string dfeta_name = "dfeta_name";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_Type = "dfeta_type";
@@ -3420,6 +3422,49 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_CaseId");
 				this.SetAttributeValue("dfeta_caseid", value);
 				this.OnPropertyChanged("dfeta_CaseId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_documentid")]
+		public System.Nullable<System.Guid> dfeta_documentId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_documentid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_documentId");
+				this.SetAttributeValue("dfeta_documentid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_documentId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_documentid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_documentId = value;
 			}
 		}
 		

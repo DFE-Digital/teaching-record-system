@@ -17,7 +17,7 @@ public class TrsLinkGenerator
 
     public string Cases() => GetRequiredPathByPage("/Cases/Index");
 
-    public string EditCase(string caseId) => GetRequiredPathByPage("/Cases/EditCase/Index", new { caseId = caseId });
+    public string EditCase(string ticketNumber) => GetRequiredPathByPage("/Cases/EditCase/Index", new { ticketNumber = ticketNumber });
 
     public string Users() => GetRequiredPathByPage("/Users/Index");
 

@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Endpoints;
 
@@ -8,14 +9,14 @@ public static class CaseEndpoints
     {
         return builder.MapGroup("/cases")
             .MapGet(
-            "/{caseId}/documents/{documentId}",
+            "/{ticketNumber}/documents/{documentId}",
             async (
-                string caseId,
+                string ticketNumber,
                 Guid documentId,
                 HttpContext httpContext,
-                IDataverseAdapter dataverseAdapter) =>
+                ICrmQueryDispatcher crmQueryDispatcher) =>
             {
-                var document = await dataverseAdapter.GetDocumentById(documentId);
+                var document = await crmQueryDispatcher.ExecuteQuery(new GetDocumentByIdQuery(documentId));
                 var annotation = document?.Extract<Annotation>("annotation", Annotation.PrimaryIdAttribute);
 
                 if (document is null || annotation is null)
@@ -28,8 +29,8 @@ public static class CaseEndpoints
                     return Results.BadRequest();
                 }
 
-                return Results.Ok($"data:{annotation.MimeType};base64,{annotation.DocumentBody}");
+                var bytes = Convert.FromBase64String(annotation.DocumentBody);
+                return Results.Bytes(bytes, annotation.MimeType);
             });
-
     }
 }
