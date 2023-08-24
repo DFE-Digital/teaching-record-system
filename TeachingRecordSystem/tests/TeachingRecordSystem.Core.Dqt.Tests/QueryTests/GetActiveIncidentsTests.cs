@@ -1,14 +1,14 @@
-namespace TeachingRecordSystem.Core.Dqt.Tests.DataverseAdapterTests;
+namespace TeachingRecordSystem.Core.Dqt.Tests.QueryTests;
 
 public class GetActiveIncidentsTests : IAsyncLifetime
 {
     private readonly CrmClientFixture.TestDataScope _dataScope;
-    private readonly DataverseAdapter _dataverseAdapter;
+    private readonly CrmQueryDispatcher _crmQueryDispatcher;
 
     public GetActiveIncidentsTests(CrmClientFixture crmClientFixture)
     {
         _dataScope = crmClientFixture.CreateTestDataScope();
-        _dataverseAdapter = _dataScope.CreateDataverseAdapter();
+        _crmQueryDispatcher = crmClientFixture.CreateQueryDispatcher();
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
@@ -16,7 +16,7 @@ public class GetActiveIncidentsTests : IAsyncLifetime
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
     [Fact]
-    public async Task WhenCalled_ReturnsActiveIncidentsOnly()
+    public async Task ReturnsActiveIncidentsOnly()
     {
         // Arrange
         var createPersonResult = await _dataScope.TestData.CreatePerson();
@@ -27,7 +27,7 @@ public class GetActiveIncidentsTests : IAsyncLifetime
         var approvedCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithApprovedStatus());
 
         // Act
-        var incidents = await _dataverseAdapter.GetActiveIncidents();
+        var incidents = await _crmQueryDispatcher.ExecuteQuery(new GetActiveIncidentsQuery());
 
         // Assert
         Assert.Contains(incidents, i => i.Id == activeCreateNameChangeIncidentResult.IncidentId);

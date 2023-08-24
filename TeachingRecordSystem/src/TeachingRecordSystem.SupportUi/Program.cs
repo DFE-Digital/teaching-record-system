@@ -13,7 +13,6 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
-using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
@@ -151,9 +150,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 
             return sc;
         })
-        .AddSingleton<ITrnGenerationApiClient, TrnGenerationApiClient>() // Purely needed to DI into DataverseAdapter
-        .AddTransient<IOrganizationServiceAsync>(sp => sp.GetRequiredService<ServiceClient>())
-        .AddTransient<IDataverseAdapter, DataverseAdapter>();
+        .AddTransient<IOrganizationServiceAsync>(sp => sp.GetRequiredService<ServiceClient>());
 
     healthCheckBuilder.AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
 }

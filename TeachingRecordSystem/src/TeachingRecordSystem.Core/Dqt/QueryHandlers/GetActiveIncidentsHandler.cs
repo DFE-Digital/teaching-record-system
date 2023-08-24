@@ -1,15 +1,17 @@
+using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.Dqt.Queries;
 
-namespace TeachingRecordSystem.Core.Dqt;
+namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public partial class DataverseAdapter
+public class GetActiveIncidentsHandler : ICrmQueryHandler<GetActiveIncidentsQuery, Incident[]>
 {
-    public async Task<Incident[]> GetActiveIncidents()
+    public async Task<Incident[]> Execute(GetActiveIncidentsQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Incident.Fields.StateCode, ConditionOperator.Equal, (int)IncidentState.Active);
 
-        var query = new QueryExpression(Incident.EntityLogicalName)
+        var queryExpression = new QueryExpression(Incident.EntityLogicalName)
         {
             ColumnSet = new ColumnSet(
                 Incident.Fields.TicketNumber,
@@ -22,10 +24,10 @@ public partial class DataverseAdapter
             }
         };
 
-        AddContactLink(query);
-        AddSubjectLink(query);
+        AddContactLink(queryExpression);
+        AddSubjectLink(queryExpression);
 
-        var result = await _service.RetrieveMultipleAsync(query);
+        var result = await organizationService.RetrieveMultipleAsync(queryExpression);
         return result.Entities.Select(entity => entity.ToEntity<Incident>()).ToArray();
 
         static void AddContactLink(QueryExpression query)
@@ -42,6 +44,7 @@ public partial class DataverseAdapter
                 Contact.Fields.LastName,
                 Contact.Fields.dfeta_StatedFirstName,
                 Contact.Fields.dfeta_StatedLastName);
+
             contactLink.EntityAlias = Contact.EntityLogicalName;
         }
 
@@ -52,9 +55,11 @@ public partial class DataverseAdapter
                 Incident.Fields.SubjectId,
                 Subject.PrimaryIdAttribute,
                 JoinOperator.Inner);
+
             subjectLink.Columns = new ColumnSet(
                 Subject.PrimaryIdAttribute,
                 Subject.Fields.Title);
+
             subjectLink.EntityAlias = Subject.EntityLogicalName;
         }
     }
