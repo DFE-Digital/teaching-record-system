@@ -10737,6 +10737,3708 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	}
 	
 	/// <summary>
+	/// Type that inherits from the IPlugin interface and is contained within a plug-in assembly.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("plugintype")]
+	public partial class PluginType : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the plugintype entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string AssemblyName = "assemblyname";
+			public const string ComponentState = "componentstate";
+			public const string CreatedBy = "createdby";
+			public const string CreatedOn = "createdon";
+			public const string CreatedOnBehalfBy = "createdonbehalfby";
+			public const string Culture = "culture";
+			public const string CustomizationLevel = "customizationlevel";
+			public const string CustomWorkflowActivityInfo = "customworkflowactivityinfo";
+			public const string Description = "description";
+			public const string FriendlyName = "friendlyname";
+			public const string IsManaged = "ismanaged";
+			public const string IsWorkflowActivity = "isworkflowactivity";
+			public const string Major = "major";
+			public const string Minor = "minor";
+			public const string ModifiedBy = "modifiedby";
+			public const string ModifiedOn = "modifiedon";
+			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
+			public const string Name = "name";
+			public const string OrganizationId = "organizationid";
+			public const string OverwriteTime = "overwritetime";
+			public const string PluginAssemblyId = "pluginassemblyid";
+			public const string PluginTypeExportKey = "plugintypeexportkey";
+			public const string PluginTypeId = "plugintypeid";
+			public const string Id = "plugintypeid";
+			public const string PluginTypeIdUnique = "plugintypeidunique";
+			public const string PublicKeyToken = "publickeytoken";
+			public const string SolutionId = "solutionid";
+			public const string SupportingSolutionId = "supportingsolutionid";
+			public const string TypeName = "typename";
+			public const string Version = "version";
+			public const string VersionNumber = "versionnumber";
+			public const string WorkflowActivityGroupName = "workflowactivitygroupname";
+			public const string plugintype_sdkmessageprocessingstep = "plugintype_sdkmessageprocessingstep";
+			public const string plugintypeid_sdkmessageprocessingstep = "plugintypeid_sdkmessageprocessingstep";
+			public const string createdby_plugintype = "createdby_plugintype";
+			public const string lk_plugintype_createdonbehalfby = "lk_plugintype_createdonbehalfby";
+			public const string lk_plugintype_modifiedonbehalfby = "lk_plugintype_modifiedonbehalfby";
+			public const string modifiedby_plugintype = "modifiedby_plugintype";
+		}
+		
+		public const string AlternateKeys = "overwritetime,plugintypeexportkey,componentstate";
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public PluginType() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "PluginType";
+		
+		public const string PrimaryIdAttribute = "plugintypeid";
+		
+		public const string PrimaryNameAttribute = "name";
+		
+		public const string EntityLogicalName = "plugintype";
+		
+		public const string EntityLogicalCollectionName = "plugintypes";
+		
+		public const string EntitySetName = "plugintypes";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Full path name of the plug-in assembly.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("assemblyname")]
+		public string AssemblyName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("assemblyname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("AssemblyName");
+				this.SetAttributeValue("assemblyname", value);
+				this.OnPropertyChanged("AssemblyName");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("componentstate")]
+		public virtual ComponentState? ComponentState
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((ComponentState?)(EntityOptionSetEnum.GetEnum(this, "componentstate")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ComponentState");
+				this.SetAttributeValue("componentstate", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("ComponentState");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who created the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the plug-in type was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the delegate user who created the plugintype.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOnBehalfBy");
+				this.SetAttributeValue("createdonbehalfby", value);
+				this.OnPropertyChanged("CreatedOnBehalfBy");
+			}
+		}
+		
+		/// <summary>
+		/// Culture code for the plug-in assembly.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("culture")]
+		public string Culture
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("culture");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Culture");
+				this.SetAttributeValue("culture", value);
+				this.OnPropertyChanged("Culture");
+			}
+		}
+		
+		/// <summary>
+		/// Customization level of the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customizationlevel")]
+		public System.Nullable<int> CustomizationLevel
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("customizationlevel");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CustomizationLevel");
+				this.SetAttributeValue("customizationlevel", value);
+				this.OnPropertyChanged("CustomizationLevel");
+			}
+		}
+		
+		/// <summary>
+		/// Serialized Custom Activity Type information, including required arguments. For more information, see SandboxCustomActivityInfo.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customworkflowactivityinfo")]
+		public string CustomWorkflowActivityInfo
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("customworkflowactivityinfo");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CustomWorkflowActivityInfo");
+				this.SetAttributeValue("customworkflowactivityinfo", value);
+				this.OnPropertyChanged("CustomWorkflowActivityInfo");
+			}
+		}
+		
+		/// <summary>
+		/// Description of the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("description")]
+		public string Description
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("description");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Description");
+				this.SetAttributeValue("description", value);
+				this.OnPropertyChanged("Description");
+			}
+		}
+		
+		/// <summary>
+		/// User friendly name for the plug-in.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("friendlyname")]
+		public string FriendlyName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("friendlyname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("FriendlyName");
+				this.SetAttributeValue("friendlyname", value);
+				this.OnPropertyChanged("FriendlyName");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ismanaged")]
+		public System.Nullable<bool> IsManaged
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("ismanaged");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsManaged");
+				this.SetAttributeValue("ismanaged", value);
+				this.OnPropertyChanged("IsManaged");
+			}
+		}
+		
+		/// <summary>
+		/// Indicates if the plug-in is a custom activity for workflows.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isworkflowactivity")]
+		public System.Nullable<bool> IsWorkflowActivity
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("isworkflowactivity");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsWorkflowActivity");
+				this.SetAttributeValue("isworkflowactivity", value);
+				this.OnPropertyChanged("IsWorkflowActivity");
+			}
+		}
+		
+		/// <summary>
+		/// Major of the version number of the assembly for the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("major")]
+		public System.Nullable<int> Major
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("major");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Major");
+				this.SetAttributeValue("major", value);
+				this.OnPropertyChanged("Major");
+			}
+		}
+		
+		/// <summary>
+		/// Minor of the version number of the assembly for the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("minor")]
+		public System.Nullable<int> Minor
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("minor");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Minor");
+				this.SetAttributeValue("minor", value);
+				this.OnPropertyChanged("Minor");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who last modified the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the plug-in type was last modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the delegate user who last modified the plugintype.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOnBehalfBy");
+				this.SetAttributeValue("modifiedonbehalfby", value);
+				this.OnPropertyChanged("ModifiedOnBehalfBy");
+			}
+		}
+		
+		/// <summary>
+		/// Name of the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("name")]
+		public string Name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Name");
+				this.SetAttributeValue("name", value);
+				this.OnPropertyChanged("Name");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the organization with which the plug-in type is associated.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("organizationid")]
+		public Microsoft.Xrm.Sdk.EntityReference OrganizationId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("organizationid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OrganizationId");
+				this.SetAttributeValue("organizationid", value);
+				this.OnPropertyChanged("OrganizationId");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overwritetime")]
+		public System.Nullable<System.DateTime> OverwriteTime
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overwritetime");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OverwriteTime");
+				this.SetAttributeValue("overwritetime", value);
+				this.OnPropertyChanged("OverwriteTime");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the plug-in assembly that contains this plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("pluginassemblyid")]
+		public Microsoft.Xrm.Sdk.EntityReference PluginAssemblyId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("pluginassemblyid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("PluginAssemblyId");
+				this.SetAttributeValue("pluginassemblyid", value);
+				this.OnPropertyChanged("PluginAssemblyId");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("plugintypeexportkey")]
+		public string PluginTypeExportKey
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("plugintypeexportkey");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("PluginTypeExportKey");
+				this.SetAttributeValue("plugintypeexportkey", value);
+				this.OnPropertyChanged("PluginTypeExportKey");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("plugintypeid")]
+		public System.Nullable<System.Guid> PluginTypeId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("plugintypeid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("PluginTypeId");
+				this.SetAttributeValue("plugintypeid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("PluginTypeId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("plugintypeid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.PluginTypeId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("plugintypeidunique")]
+		public System.Nullable<System.Guid> PluginTypeIdUnique
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("plugintypeidunique");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("PluginTypeIdUnique");
+				this.SetAttributeValue("plugintypeidunique", value);
+				this.OnPropertyChanged("PluginTypeIdUnique");
+			}
+		}
+		
+		/// <summary>
+		/// Public key token of the assembly for the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("publickeytoken")]
+		public string PublicKeyToken
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("publickeytoken");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("PublicKeyToken");
+				this.SetAttributeValue("publickeytoken", value);
+				this.OnPropertyChanged("PublicKeyToken");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the associated solution.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("solutionid")]
+		public System.Nullable<System.Guid> SolutionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("solutionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SolutionId");
+				this.SetAttributeValue("solutionid", value);
+				this.OnPropertyChanged("SolutionId");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("supportingsolutionid")]
+		public System.Nullable<System.Guid> SupportingSolutionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("supportingsolutionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SupportingSolutionId");
+				this.SetAttributeValue("supportingsolutionid", value);
+				this.OnPropertyChanged("SupportingSolutionId");
+			}
+		}
+		
+		/// <summary>
+		/// Fully qualified type name of the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("typename")]
+		public string TypeName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("typename");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("TypeName");
+				this.SetAttributeValue("typename", value);
+				this.OnPropertyChanged("TypeName");
+			}
+		}
+		
+		/// <summary>
+		/// Version number of the assembly for the plug-in type.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("version")]
+		public string Version
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("version");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Version");
+				this.SetAttributeValue("version", value);
+				this.OnPropertyChanged("Version");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
+		public System.Nullable<long> VersionNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
+			}
+		}
+		
+		/// <summary>
+		/// Group name of workflow custom activity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("workflowactivitygroupname")]
+		public string WorkflowActivityGroupName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("workflowactivitygroupname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("WorkflowActivityGroupName");
+				this.SetAttributeValue("workflowactivitygroupname", value);
+				this.OnPropertyChanged("WorkflowActivityGroupName");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N plugintype_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("plugintype_sdkmessageprocessingstep")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep> plugintype_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("plugintype_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("plugintype_sdkmessageprocessingstep");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("plugintype_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("plugintype_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N plugintypeid_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("plugintypeid_sdkmessageprocessingstep")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep> plugintypeid_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("plugintypeid_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("plugintypeid_sdkmessageprocessingstep");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("plugintypeid_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("plugintypeid_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 createdby_plugintype
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("createdby_plugintype")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser createdby_plugintype
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("createdby_plugintype", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("createdby_plugintype");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("createdby_plugintype", null, value);
+				this.OnPropertyChanged("createdby_plugintype");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_plugintype_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_plugintype_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_plugintype_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_plugintype_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_plugintype_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_plugintype_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_plugintype_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_plugintype_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_plugintype_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_plugintype_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_plugintype_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_plugintype_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_plugintype_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_plugintype_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 modifiedby_plugintype
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("modifiedby_plugintype")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser modifiedby_plugintype
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("modifiedby_plugintype", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("modifiedby_plugintype");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("modifiedby_plugintype", null, value);
+				this.OnPropertyChanged("modifiedby_plugintype");
+			}
+		}
+	}
+	
+	/// <summary>
+	/// Message that is supported by the SDK.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("sdkmessage")]
+	public partial class SdkMessage : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the sdkmessage entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string AutoTransact = "autotransact";
+			public const string Availability = "availability";
+			public const string CategoryName = "categoryname";
+			public const string ComponentState = "componentstate";
+			public const string CreatedBy = "createdby";
+			public const string CreatedOn = "createdon";
+			public const string CreatedOnBehalfBy = "createdonbehalfby";
+			public const string CustomizationLevel = "customizationlevel";
+			public const string ExecutePrivilegeName = "executeprivilegename";
+			public const string Expand = "expand";
+			public const string IntroducedVersion = "introducedversion";
+			public const string IsActive = "isactive";
+			public const string IsManaged = "ismanaged";
+			public const string IsPrivate = "isprivate";
+			public const string IsReadOnly = "isreadonly";
+			public const string IsValidForExecuteAsync = "isvalidforexecuteasync";
+			public const string ModifiedBy = "modifiedby";
+			public const string ModifiedOn = "modifiedon";
+			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
+			public const string Name = "name";
+			public const string OrganizationId = "organizationid";
+			public const string OverwriteTime = "overwritetime";
+			public const string SdkMessageId = "sdkmessageid";
+			public const string Id = "sdkmessageid";
+			public const string SdkMessageIdUnique = "sdkmessageidunique";
+			public const string SolutionId = "solutionid";
+			public const string SupportingSolutionId = "supportingsolutionid";
+			public const string Template = "template";
+			public const string ThrottleSettings = "throttlesettings";
+			public const string VersionNumber = "versionnumber";
+			public const string WorkflowSdkStepEnabled = "workflowsdkstepenabled";
+			public const string sdkmessageid_sdkmessagefilter = "sdkmessageid_sdkmessagefilter";
+			public const string sdkmessageid_sdkmessageprocessingstep = "sdkmessageid_sdkmessageprocessingstep";
+			public const string createdby_sdkmessage = "createdby_sdkmessage";
+			public const string lk_sdkmessage_createdonbehalfby = "lk_sdkmessage_createdonbehalfby";
+			public const string lk_sdkmessage_modifiedonbehalfby = "lk_sdkmessage_modifiedonbehalfby";
+			public const string modifiedby_sdkmessage = "modifiedby_sdkmessage";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public SdkMessage() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "SdkMessage";
+		
+		public const string PrimaryIdAttribute = "sdkmessageid";
+		
+		public const string PrimaryNameAttribute = "name";
+		
+		public const string EntityLogicalName = "sdkmessage";
+		
+		public const string EntityLogicalCollectionName = "sdkmessages";
+		
+		public const string EntitySetName = "sdkmessages";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Information about whether the SDK message is automatically transacted.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("autotransact")]
+		public System.Nullable<bool> AutoTransact
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("autotransact");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("AutoTransact");
+				this.SetAttributeValue("autotransact", value);
+				this.OnPropertyChanged("AutoTransact");
+			}
+		}
+		
+		/// <summary>
+		/// Identifies where a method will be exposed. 0 - Server, 1 - Client, 2 - both.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("availability")]
+		public System.Nullable<int> Availability
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("availability");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Availability");
+				this.SetAttributeValue("availability", value);
+				this.OnPropertyChanged("Availability");
+			}
+		}
+		
+		/// <summary>
+		/// If this is a categorized method, this is the name, otherwise None.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("categoryname")]
+		public string CategoryName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("categoryname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CategoryName");
+				this.SetAttributeValue("categoryname", value);
+				this.OnPropertyChanged("CategoryName");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("componentstate")]
+		public virtual ComponentState? ComponentState
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((ComponentState?)(EntityOptionSetEnum.GetEnum(this, "componentstate")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ComponentState");
+				this.SetAttributeValue("componentstate", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("ComponentState");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who created the SDK message.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the SDK message was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the delegate user who created the sdkmessage.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOnBehalfBy");
+				this.SetAttributeValue("createdonbehalfby", value);
+				this.OnPropertyChanged("CreatedOnBehalfBy");
+			}
+		}
+		
+		/// <summary>
+		/// Customization level of the SDK message.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customizationlevel")]
+		public System.Nullable<int> CustomizationLevel
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("customizationlevel");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CustomizationLevel");
+				this.SetAttributeValue("customizationlevel", value);
+				this.OnPropertyChanged("CustomizationLevel");
+			}
+		}
+		
+		/// <summary>
+		/// Name of the privilege that allows execution of the SDK message
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("executeprivilegename")]
+		public string ExecutePrivilegeName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("executeprivilegename");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ExecutePrivilegeName");
+				this.SetAttributeValue("executeprivilegename", value);
+				this.OnPropertyChanged("ExecutePrivilegeName");
+			}
+		}
+		
+		/// <summary>
+		/// Indicates whether the SDK message should have its requests expanded per primary entity defined in its filters.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("expand")]
+		public System.Nullable<bool> Expand
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("expand");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Expand");
+				this.SetAttributeValue("expand", value);
+				this.OnPropertyChanged("Expand");
+			}
+		}
+		
+		/// <summary>
+		/// Version in which the component is introduced.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("introducedversion")]
+		public string IntroducedVersion
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("introducedversion");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IntroducedVersion");
+				this.SetAttributeValue("introducedversion", value);
+				this.OnPropertyChanged("IntroducedVersion");
+			}
+		}
+		
+		/// <summary>
+		/// Information about whether the SDK message is active.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isactive")]
+		public System.Nullable<bool> IsActive
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("isactive");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsActive");
+				this.SetAttributeValue("isactive", value);
+				this.OnPropertyChanged("IsActive");
+			}
+		}
+		
+		/// <summary>
+		/// Information that specifies whether this component is managed.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ismanaged")]
+		public System.Nullable<bool> IsManaged
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("ismanaged");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsManaged");
+				this.SetAttributeValue("ismanaged", value);
+				this.OnPropertyChanged("IsManaged");
+			}
+		}
+		
+		/// <summary>
+		/// Indicates whether the SDK message is private.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isprivate")]
+		public System.Nullable<bool> IsPrivate
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("isprivate");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsPrivate");
+				this.SetAttributeValue("isprivate", value);
+				this.OnPropertyChanged("IsPrivate");
+			}
+		}
+		
+		/// <summary>
+		/// Identifies whether an SDK message will be ReadOnly or Read Write. false - ReadWrite, true - ReadOnly .
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isreadonly")]
+		public System.Nullable<bool> IsReadOnly
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("isreadonly");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsReadOnly");
+				this.SetAttributeValue("isreadonly", value);
+				this.OnPropertyChanged("IsReadOnly");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isvalidforexecuteasync")]
+		public System.Nullable<bool> IsValidForExecuteAsync
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("isvalidforexecuteasync");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsValidForExecuteAsync");
+				this.SetAttributeValue("isvalidforexecuteasync", value);
+				this.OnPropertyChanged("IsValidForExecuteAsync");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who last modified the SDK message.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the SDK message was last modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the delegate user who last modified the sdkmessage.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOnBehalfBy");
+				this.SetAttributeValue("modifiedonbehalfby", value);
+				this.OnPropertyChanged("ModifiedOnBehalfBy");
+			}
+		}
+		
+		/// <summary>
+		/// Name of the SDK message.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("name")]
+		public string Name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Name");
+				this.SetAttributeValue("name", value);
+				this.OnPropertyChanged("Name");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the organization with which the SDK message is associated.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("organizationid")]
+		public Microsoft.Xrm.Sdk.EntityReference OrganizationId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("organizationid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OrganizationId");
+				this.SetAttributeValue("organizationid", value);
+				this.OnPropertyChanged("OrganizationId");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overwritetime")]
+		public System.Nullable<System.DateTime> OverwriteTime
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overwritetime");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OverwriteTime");
+				this.SetAttributeValue("overwritetime", value);
+				this.OnPropertyChanged("OverwriteTime");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageid")]
+		public System.Nullable<System.Guid> SdkMessageId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("sdkmessageid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageId");
+				this.SetAttributeValue("sdkmessageid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("SdkMessageId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.SdkMessageId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageidunique")]
+		public System.Nullable<System.Guid> SdkMessageIdUnique
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("sdkmessageidunique");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageIdUnique");
+				this.SetAttributeValue("sdkmessageidunique", value);
+				this.OnPropertyChanged("SdkMessageIdUnique");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the associated solution.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("solutionid")]
+		public System.Nullable<System.Guid> SolutionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("solutionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SolutionId");
+				this.SetAttributeValue("solutionid", value);
+				this.OnPropertyChanged("SolutionId");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("supportingsolutionid")]
+		public System.Nullable<System.Guid> SupportingSolutionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("supportingsolutionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SupportingSolutionId");
+				this.SetAttributeValue("supportingsolutionid", value);
+				this.OnPropertyChanged("SupportingSolutionId");
+			}
+		}
+		
+		/// <summary>
+		/// Indicates whether the SDK message is a template.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("template")]
+		public System.Nullable<bool> Template
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("template");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Template");
+				this.SetAttributeValue("template", value);
+				this.OnPropertyChanged("Template");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("throttlesettings")]
+		public string ThrottleSettings
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("throttlesettings");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ThrottleSettings");
+				this.SetAttributeValue("throttlesettings", value);
+				this.OnPropertyChanged("ThrottleSettings");
+			}
+		}
+		
+		/// <summary>
+		/// Number that identifies a specific revision of the SDK message. 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
+		public System.Nullable<long> VersionNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
+			}
+		}
+		
+		/// <summary>
+		/// Whether or not the SDK message can be called from a workflow.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("workflowsdkstepenabled")]
+		public System.Nullable<bool> WorkflowSdkStepEnabled
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("workflowsdkstepenabled");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("WorkflowSdkStepEnabled");
+				this.SetAttributeValue("workflowsdkstepenabled", value);
+				this.OnPropertyChanged("WorkflowSdkStepEnabled");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N sdkmessageid_sdkmessagefilter
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("sdkmessageid_sdkmessagefilter")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter> sdkmessageid_sdkmessagefilter
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("sdkmessageid_sdkmessagefilter", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("sdkmessageid_sdkmessagefilter");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("sdkmessageid_sdkmessagefilter", null, value);
+				this.OnPropertyChanged("sdkmessageid_sdkmessagefilter");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N sdkmessageid_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("sdkmessageid_sdkmessageprocessingstep")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep> sdkmessageid_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("sdkmessageid_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("sdkmessageid_sdkmessageprocessingstep");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("sdkmessageid_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("sdkmessageid_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 createdby_sdkmessage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("createdby_sdkmessage")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser createdby_sdkmessage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("createdby_sdkmessage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("createdby_sdkmessage");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("createdby_sdkmessage", null, value);
+				this.OnPropertyChanged("createdby_sdkmessage");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_sdkmessage_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessage_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_sdkmessage_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessage_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessage_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessage_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessage_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_sdkmessage_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessage_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_sdkmessage_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessage_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessage_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessage_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessage_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 modifiedby_sdkmessage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("modifiedby_sdkmessage")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser modifiedby_sdkmessage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("modifiedby_sdkmessage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("modifiedby_sdkmessage");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("modifiedby_sdkmessage", null, value);
+				this.OnPropertyChanged("modifiedby_sdkmessage");
+			}
+		}
+	}
+	
+	/// <summary>
+	/// Filter that defines which SDK messages are valid for each type of entity.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("sdkmessagefilter")]
+	public partial class SdkMessageFilter : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the sdkmessagefilter entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string Availability = "availability";
+			public const string ComponentState = "componentstate";
+			public const string CreatedBy = "createdby";
+			public const string CreatedOn = "createdon";
+			public const string CreatedOnBehalfBy = "createdonbehalfby";
+			public const string CustomizationLevel = "customizationlevel";
+			public const string IntroducedVersion = "introducedversion";
+			public const string IsCustomProcessingStepAllowed = "iscustomprocessingstepallowed";
+			public const string IsManaged = "ismanaged";
+			public const string IsVisible = "isvisible";
+			public const string ModifiedBy = "modifiedby";
+			public const string ModifiedOn = "modifiedon";
+			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
+			public const string Name = "name";
+			public const string OrganizationId = "organizationid";
+			public const string OverwriteTime = "overwritetime";
+			public const string PrimaryObjectTypeCode = "primaryobjecttypecode";
+			public const string RestrictionLevel = "restrictionlevel";
+			public const string SdkMessageFilterId = "sdkmessagefilterid";
+			public const string Id = "sdkmessagefilterid";
+			public const string SdkMessageFilterIdUnique = "sdkmessagefilteridunique";
+			public const string SdkMessageId = "sdkmessageid";
+			public const string SecondaryObjectTypeCode = "secondaryobjecttypecode";
+			public const string SolutionId = "solutionid";
+			public const string SupportingSolutionId = "supportingsolutionid";
+			public const string VersionNumber = "versionnumber";
+			public const string WorkflowSdkStepEnabled = "workflowsdkstepenabled";
+			public const string sdkmessagefilterid_sdkmessageprocessingstep = "sdkmessagefilterid_sdkmessageprocessingstep";
+			public const string createdby_sdkmessagefilter = "createdby_sdkmessagefilter";
+			public const string lk_sdkmessagefilter_createdonbehalfby = "lk_sdkmessagefilter_createdonbehalfby";
+			public const string lk_sdkmessagefilter_modifiedonbehalfby = "lk_sdkmessagefilter_modifiedonbehalfby";
+			public const string modifiedby_sdkmessagefilter = "modifiedby_sdkmessagefilter";
+			public const string sdkmessageid_sdkmessagefilter = "sdkmessageid_sdkmessagefilter";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public SdkMessageFilter() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "SdkMessageFilter";
+		
+		public const string PrimaryIdAttribute = "sdkmessagefilterid";
+		
+		public const string PrimaryNameAttribute = "name";
+		
+		public const string EntityLogicalName = "sdkmessagefilter";
+		
+		public const string EntityLogicalCollectionName = "sdkmessagefilters";
+		
+		public const string EntitySetName = "sdkmessagefilters";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Identifies where a method will be exposed. 0 - Server, 1 - Client, 2 - both.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("availability")]
+		public System.Nullable<int> Availability
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("availability");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Availability");
+				this.SetAttributeValue("availability", value);
+				this.OnPropertyChanged("Availability");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("componentstate")]
+		public virtual ComponentState? ComponentState
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((ComponentState?)(EntityOptionSetEnum.GetEnum(this, "componentstate")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ComponentState");
+				this.SetAttributeValue("componentstate", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("ComponentState");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who created the SDK message filter.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the SDK message filter was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the delegate user who created the sdkmessagefilter.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOnBehalfBy");
+				this.SetAttributeValue("createdonbehalfby", value);
+				this.OnPropertyChanged("CreatedOnBehalfBy");
+			}
+		}
+		
+		/// <summary>
+		/// Customization level of the SDK message filter.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customizationlevel")]
+		public System.Nullable<int> CustomizationLevel
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("customizationlevel");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CustomizationLevel");
+				this.SetAttributeValue("customizationlevel", value);
+				this.OnPropertyChanged("CustomizationLevel");
+			}
+		}
+		
+		/// <summary>
+		/// Version in which the component is introduced.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("introducedversion")]
+		public string IntroducedVersion
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("introducedversion");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IntroducedVersion");
+				this.SetAttributeValue("introducedversion", value);
+				this.OnPropertyChanged("IntroducedVersion");
+			}
+		}
+		
+		/// <summary>
+		/// Indicates whether a custom SDK message processing step is allowed.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("iscustomprocessingstepallowed")]
+		public System.Nullable<bool> IsCustomProcessingStepAllowed
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("iscustomprocessingstepallowed");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsCustomProcessingStepAllowed");
+				this.SetAttributeValue("iscustomprocessingstepallowed", value);
+				this.OnPropertyChanged("IsCustomProcessingStepAllowed");
+			}
+		}
+		
+		/// <summary>
+		/// Information that specifies whether this component is managed.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ismanaged")]
+		public System.Nullable<bool> IsManaged
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("ismanaged");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsManaged");
+				this.SetAttributeValue("ismanaged", value);
+				this.OnPropertyChanged("IsManaged");
+			}
+		}
+		
+		/// <summary>
+		/// Indicates whether the filter should be visible.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isvisible")]
+		public System.Nullable<bool> IsVisible
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("isvisible");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsVisible");
+				this.SetAttributeValue("isvisible", value);
+				this.OnPropertyChanged("IsVisible");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who last modified the SDK message filter.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the SDK message filter was last modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the delegate user who last modified the sdkmessagefilter.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOnBehalfBy");
+				this.SetAttributeValue("modifiedonbehalfby", value);
+				this.OnPropertyChanged("ModifiedOnBehalfBy");
+			}
+		}
+		
+		/// <summary>
+		/// Name of the SDK message filter.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("name")]
+		public string Name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Name");
+				this.SetAttributeValue("name", value);
+				this.OnPropertyChanged("Name");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the organization with which the SDK message filter is associated.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("organizationid")]
+		public Microsoft.Xrm.Sdk.EntityReference OrganizationId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("organizationid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OrganizationId");
+				this.SetAttributeValue("organizationid", value);
+				this.OnPropertyChanged("OrganizationId");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overwritetime")]
+		public System.Nullable<System.DateTime> OverwriteTime
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overwritetime");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OverwriteTime");
+				this.SetAttributeValue("overwritetime", value);
+				this.OnPropertyChanged("OverwriteTime");
+			}
+		}
+		
+		/// <summary>
+		/// Type of entity with which the SDK message filter is primarily associated.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("primaryobjecttypecode")]
+		public string PrimaryObjectTypeCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("primaryobjecttypecode");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("PrimaryObjectTypeCode");
+				this.SetAttributeValue("primaryobjecttypecode", value);
+				this.OnPropertyChanged("PrimaryObjectTypeCode");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("restrictionlevel")]
+		public System.Nullable<int> RestrictionLevel
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("restrictionlevel");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("RestrictionLevel");
+				this.SetAttributeValue("restrictionlevel", value);
+				this.OnPropertyChanged("RestrictionLevel");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message filter entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessagefilterid")]
+		public System.Nullable<System.Guid> SdkMessageFilterId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("sdkmessagefilterid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageFilterId");
+				this.SetAttributeValue("sdkmessagefilterid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("SdkMessageFilterId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessagefilterid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.SdkMessageFilterId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message filter.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessagefilteridunique")]
+		public System.Nullable<System.Guid> SdkMessageFilterIdUnique
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("sdkmessagefilteridunique");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageFilterIdUnique");
+				this.SetAttributeValue("sdkmessagefilteridunique", value);
+				this.OnPropertyChanged("SdkMessageFilterIdUnique");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the related SDK message.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageid")]
+		public Microsoft.Xrm.Sdk.EntityReference SdkMessageId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("sdkmessageid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageId");
+				this.SetAttributeValue("sdkmessageid", value);
+				this.OnPropertyChanged("SdkMessageId");
+			}
+		}
+		
+		/// <summary>
+		/// Type of entity with which the SDK message filter is secondarily associated.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("secondaryobjecttypecode")]
+		public string SecondaryObjectTypeCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("secondaryobjecttypecode");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SecondaryObjectTypeCode");
+				this.SetAttributeValue("secondaryobjecttypecode", value);
+				this.OnPropertyChanged("SecondaryObjectTypeCode");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the associated solution.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("solutionid")]
+		public System.Nullable<System.Guid> SolutionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("solutionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SolutionId");
+				this.SetAttributeValue("solutionid", value);
+				this.OnPropertyChanged("SolutionId");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("supportingsolutionid")]
+		public System.Nullable<System.Guid> SupportingSolutionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("supportingsolutionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SupportingSolutionId");
+				this.SetAttributeValue("supportingsolutionid", value);
+				this.OnPropertyChanged("SupportingSolutionId");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
+		public System.Nullable<long> VersionNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
+			}
+		}
+		
+		/// <summary>
+		/// Whether or not the SDK message can be called from a workflow.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("workflowsdkstepenabled")]
+		public System.Nullable<bool> WorkflowSdkStepEnabled
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("workflowsdkstepenabled");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("WorkflowSdkStepEnabled");
+				this.SetAttributeValue("workflowsdkstepenabled", value);
+				this.OnPropertyChanged("WorkflowSdkStepEnabled");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N sdkmessagefilterid_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("sdkmessagefilterid_sdkmessageprocessingstep")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep> sdkmessagefilterid_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("sdkmessagefilterid_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("sdkmessagefilterid_sdkmessageprocessingstep");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("sdkmessagefilterid_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("sdkmessagefilterid_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 createdby_sdkmessagefilter
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("createdby_sdkmessagefilter")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser createdby_sdkmessagefilter
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("createdby_sdkmessagefilter", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("createdby_sdkmessagefilter");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("createdby_sdkmessagefilter", null, value);
+				this.OnPropertyChanged("createdby_sdkmessagefilter");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_sdkmessagefilter_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessagefilter_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_sdkmessagefilter_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessagefilter_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessagefilter_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessagefilter_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessagefilter_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_sdkmessagefilter_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessagefilter_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_sdkmessagefilter_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessagefilter_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessagefilter_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessagefilter_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessagefilter_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 modifiedby_sdkmessagefilter
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("modifiedby_sdkmessagefilter")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser modifiedby_sdkmessagefilter
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("modifiedby_sdkmessagefilter", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("modifiedby_sdkmessagefilter");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("modifiedby_sdkmessagefilter", null, value);
+				this.OnPropertyChanged("modifiedby_sdkmessagefilter");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 sdkmessageid_sdkmessagefilter
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("sdkmessageid_sdkmessagefilter")]
+		public TeachingRecordSystem.Core.Dqt.Models.SdkMessage sdkmessageid_sdkmessagefilter
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("sdkmessageid_sdkmessagefilter", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("sdkmessageid_sdkmessagefilter");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("sdkmessageid_sdkmessagefilter", null, value);
+				this.OnPropertyChanged("sdkmessageid_sdkmessagefilter");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum SdkMessageProcessingStepState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Enabled = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Disabled = 1,
+	}
+	
+	/// <summary>
+	/// Stage in the execution pipeline that a plug-in is to execute.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("sdkmessageprocessingstep")]
+	public partial class SdkMessageProcessingStep : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the sdkmessageprocessingstep entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string AsyncAutoDelete = "asyncautodelete";
+			public const string CanUseReadOnlyConnection = "canusereadonlyconnection";
+			public const string Category = "category";
+			public const string ComponentState = "componentstate";
+			public const string Configuration = "configuration";
+			public const string CreatedBy = "createdby";
+			public const string CreatedOn = "createdon";
+			public const string CreatedOnBehalfBy = "createdonbehalfby";
+			public const string CustomizationLevel = "customizationlevel";
+			public const string Description = "description";
+			public const string EnablePluginProfiler = "enablepluginprofiler";
+			public const string EventExpander = "eventexpander";
+			public const string EventHandler = "eventhandler";
+			public const string FilteringAttributes = "filteringattributes";
+			public const string FxExpressionId = "fxexpressionid";
+			public const string ImpersonatingUserId = "impersonatinguserid";
+			public const string IntroducedVersion = "introducedversion";
+			public const string InvocationSource = "invocationsource";
+			public const string IsCustomizable = "iscustomizable";
+			public const string IsHidden = "ishidden";
+			public const string IsManaged = "ismanaged";
+			public const string Mode = "mode";
+			public const string ModifiedBy = "modifiedby";
+			public const string ModifiedOn = "modifiedon";
+			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
+			public const string Name = "name";
+			public const string OrganizationId = "organizationid";
+			public const string OverwriteTime = "overwritetime";
+			public const string PluginTypeId = "plugintypeid";
+			public const string PowerfxRuleId = "powerfxruleid";
+			public const string Rank = "rank";
+			public const string RuntimeIntegrationProperties = "runtimeintegrationproperties";
+			public const string SdkMessageFilterId = "sdkmessagefilterid";
+			public const string SdkMessageId = "sdkmessageid";
+			public const string SdkMessageProcessingStepId = "sdkmessageprocessingstepid";
+			public const string Id = "sdkmessageprocessingstepid";
+			public const string SdkMessageProcessingStepIdUnique = "sdkmessageprocessingstepidunique";
+			public const string SdkMessageProcessingStepSecureConfigId = "sdkmessageprocessingstepsecureconfigid";
+			public const string SolutionId = "solutionid";
+			public const string Stage = "stage";
+			public const string StateCode = "statecode";
+			public const string StatusCode = "statuscode";
+			public const string SupportedDeployment = "supporteddeployment";
+			public const string SupportingSolutionId = "supportingsolutionid";
+			public const string VersionNumber = "versionnumber";
+			public const string createdby_sdkmessageprocessingstep = "createdby_sdkmessageprocessingstep";
+			public const string impersonatinguserid_sdkmessageprocessingstep = "impersonatinguserid_sdkmessageprocessingstep";
+			public const string lk_sdkmessageprocessingstep_createdonbehalfby = "lk_sdkmessageprocessingstep_createdonbehalfby";
+			public const string lk_sdkmessageprocessingstep_modifiedonbehalfby = "lk_sdkmessageprocessingstep_modifiedonbehalfby";
+			public const string modifiedby_sdkmessageprocessingstep = "modifiedby_sdkmessageprocessingstep";
+			public const string plugintype_sdkmessageprocessingstep = "plugintype_sdkmessageprocessingstep";
+			public const string plugintypeid_sdkmessageprocessingstep = "plugintypeid_sdkmessageprocessingstep";
+			public const string sdkmessagefilterid_sdkmessageprocessingstep = "sdkmessagefilterid_sdkmessageprocessingstep";
+			public const string sdkmessageid_sdkmessageprocessingstep = "sdkmessageid_sdkmessageprocessingstep";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public SdkMessageProcessingStep() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "SdkMessageProcessingStep";
+		
+		public const string PrimaryIdAttribute = "sdkmessageprocessingstepid";
+		
+		public const string PrimaryNameAttribute = "name";
+		
+		public const string EntityLogicalName = "sdkmessageprocessingstep";
+		
+		public const string EntityLogicalCollectionName = "sdkmessageprocessingsteps";
+		
+		public const string EntitySetName = "sdkmessageprocessingsteps";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Indicates whether the asynchronous system job is automatically deleted on completion.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("asyncautodelete")]
+		public System.Nullable<bool> AsyncAutoDelete
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("asyncautodelete");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("AsyncAutoDelete");
+				this.SetAttributeValue("asyncautodelete", value);
+				this.OnPropertyChanged("AsyncAutoDelete");
+			}
+		}
+		
+		/// <summary>
+		/// Identifies whether a SDK Message Processing Step type will be ReadOnly or Read Write. false - ReadWrite, true - ReadOnly 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("canusereadonlyconnection")]
+		public System.Nullable<bool> CanUseReadOnlyConnection
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("canusereadonlyconnection");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CanUseReadOnlyConnection");
+				this.SetAttributeValue("canusereadonlyconnection", value);
+				this.OnPropertyChanged("CanUseReadOnlyConnection");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("category")]
+		public string Category
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("category");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Category");
+				this.SetAttributeValue("category", value);
+				this.OnPropertyChanged("Category");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("componentstate")]
+		public virtual ComponentState? ComponentState
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((ComponentState?)(EntityOptionSetEnum.GetEnum(this, "componentstate")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ComponentState");
+				this.SetAttributeValue("componentstate", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("ComponentState");
+			}
+		}
+		
+		/// <summary>
+		/// Step-specific configuration for the plug-in type. Passed to the plug-in constructor at run time.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("configuration")]
+		public string Configuration
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("configuration");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Configuration");
+				this.SetAttributeValue("configuration", value);
+				this.OnPropertyChanged("Configuration");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who created the SDK message processing step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the SDK message processing step was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the delegate user who created the sdkmessageprocessingstep.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOnBehalfBy");
+				this.SetAttributeValue("createdonbehalfby", value);
+				this.OnPropertyChanged("CreatedOnBehalfBy");
+			}
+		}
+		
+		/// <summary>
+		/// Customization level of the SDK message processing step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customizationlevel")]
+		public System.Nullable<int> CustomizationLevel
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("customizationlevel");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CustomizationLevel");
+				this.SetAttributeValue("customizationlevel", value);
+				this.OnPropertyChanged("CustomizationLevel");
+			}
+		}
+		
+		/// <summary>
+		/// Description of the SDK message processing step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("description")]
+		public string Description
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("description");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Description");
+				this.SetAttributeValue("description", value);
+				this.OnPropertyChanged("Description");
+			}
+		}
+		
+		/// <summary>
+		/// EnablePluginProfiler
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("enablepluginprofiler")]
+		public System.Nullable<bool> EnablePluginProfiler
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("enablepluginprofiler");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("EnablePluginProfiler");
+				this.SetAttributeValue("enablepluginprofiler", value);
+				this.OnPropertyChanged("EnablePluginProfiler");
+			}
+		}
+		
+		/// <summary>
+		/// Configuration for sending pipeline events to the Event Expander service.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("eventexpander")]
+		public string EventExpander
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("eventexpander");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("EventExpander");
+				this.SetAttributeValue("eventexpander", value);
+				this.OnPropertyChanged("EventExpander");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the associated event handler.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("eventhandler")]
+		public Microsoft.Xrm.Sdk.EntityReference EventHandler
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("eventhandler");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("EventHandler");
+				this.SetAttributeValue("eventhandler", value);
+				this.OnPropertyChanged("EventHandler");
+			}
+		}
+		
+		/// <summary>
+		/// Comma-separated list of attributes. If at least one of these attributes is modified, the plug-in should execute.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("filteringattributes")]
+		public string FilteringAttributes
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("filteringattributes");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("FilteringAttributes");
+				this.SetAttributeValue("filteringattributes", value);
+				this.OnPropertyChanged("FilteringAttributes");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for fxexpression associated with SdkMessageProcessingStep.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("fxexpressionid")]
+		public Microsoft.Xrm.Sdk.EntityReference FxExpressionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("fxexpressionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("FxExpressionId");
+				this.SetAttributeValue("fxexpressionid", value);
+				this.OnPropertyChanged("FxExpressionId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user to impersonate context when step is executed.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("impersonatinguserid")]
+		public Microsoft.Xrm.Sdk.EntityReference ImpersonatingUserId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("impersonatinguserid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ImpersonatingUserId");
+				this.SetAttributeValue("impersonatinguserid", value);
+				this.OnPropertyChanged("ImpersonatingUserId");
+			}
+		}
+		
+		/// <summary>
+		/// Version in which the form is introduced.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("introducedversion")]
+		public string IntroducedVersion
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("introducedversion");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IntroducedVersion");
+				this.SetAttributeValue("introducedversion", value);
+				this.OnPropertyChanged("IntroducedVersion");
+			}
+		}
+		
+		/// <summary>
+		/// Identifies if a plug-in should be executed from a parent pipeline, a child pipeline, or both.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("invocationsource")]
+		[System.ObsoleteAttribute()]
+		public Microsoft.Xrm.Sdk.OptionSetValue InvocationSource
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("invocationsource");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("InvocationSource");
+				this.SetAttributeValue("invocationsource", value);
+				this.OnPropertyChanged("InvocationSource");
+			}
+		}
+		
+		/// <summary>
+		/// Information that specifies whether this component can be customized.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("iscustomizable")]
+		public Microsoft.Xrm.Sdk.BooleanManagedProperty IsCustomizable
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.BooleanManagedProperty>("iscustomizable");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsCustomizable");
+				this.SetAttributeValue("iscustomizable", value);
+				this.OnPropertyChanged("IsCustomizable");
+			}
+		}
+		
+		/// <summary>
+		/// Information that specifies whether this component should be hidden.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ishidden")]
+		public Microsoft.Xrm.Sdk.BooleanManagedProperty IsHidden
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.BooleanManagedProperty>("ishidden");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsHidden");
+				this.SetAttributeValue("ishidden", value);
+				this.OnPropertyChanged("IsHidden");
+			}
+		}
+		
+		/// <summary>
+		/// Information that specifies whether this component is managed.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ismanaged")]
+		public System.Nullable<bool> IsManaged
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("ismanaged");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsManaged");
+				this.SetAttributeValue("ismanaged", value);
+				this.OnPropertyChanged("IsManaged");
+			}
+		}
+		
+		/// <summary>
+		/// Run-time mode of execution, for example, synchronous or asynchronous.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("mode")]
+		public virtual SdkMessageProcessingStep_Mode? Mode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((SdkMessageProcessingStep_Mode?)(EntityOptionSetEnum.GetEnum(this, "mode")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Mode");
+				this.SetAttributeValue("mode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("Mode");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who last modified the SDK message processing step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the SDK message processing step was last modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the delegate user who last modified the sdkmessageprocessingstep.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOnBehalfBy");
+				this.SetAttributeValue("modifiedonbehalfby", value);
+				this.OnPropertyChanged("ModifiedOnBehalfBy");
+			}
+		}
+		
+		/// <summary>
+		/// Name of SdkMessage processing step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("name")]
+		public string Name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Name");
+				this.SetAttributeValue("name", value);
+				this.OnPropertyChanged("Name");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the organization with which the SDK message processing step is associated.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("organizationid")]
+		public Microsoft.Xrm.Sdk.EntityReference OrganizationId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("organizationid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OrganizationId");
+				this.SetAttributeValue("organizationid", value);
+				this.OnPropertyChanged("OrganizationId");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overwritetime")]
+		public System.Nullable<System.DateTime> OverwriteTime
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overwritetime");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OverwriteTime");
+				this.SetAttributeValue("overwritetime", value);
+				this.OnPropertyChanged("OverwriteTime");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the plug-in type associated with the step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("plugintypeid")]
+		[System.ObsoleteAttribute()]
+		public Microsoft.Xrm.Sdk.EntityReference PluginTypeId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("plugintypeid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("PluginTypeId");
+				this.SetAttributeValue("plugintypeid", value);
+				this.OnPropertyChanged("PluginTypeId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for powerfxrule associated with SdkMessageProcessingStep.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("powerfxruleid")]
+		public Microsoft.Xrm.Sdk.EntityReference PowerfxRuleId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("powerfxruleid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("PowerfxRuleId");
+				this.SetAttributeValue("powerfxruleid", value);
+				this.OnPropertyChanged("PowerfxRuleId");
+			}
+		}
+		
+		/// <summary>
+		/// Processing order within the stage.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("rank")]
+		public System.Nullable<int> Rank
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("rank");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Rank");
+				this.SetAttributeValue("rank", value);
+				this.OnPropertyChanged("Rank");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only. Holds miscellaneous properties related to runtime integration.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("runtimeintegrationproperties")]
+		public string RuntimeIntegrationProperties
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("runtimeintegrationproperties");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("RuntimeIntegrationProperties");
+				this.SetAttributeValue("runtimeintegrationproperties", value);
+				this.OnPropertyChanged("RuntimeIntegrationProperties");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message filter.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessagefilterid")]
+		public Microsoft.Xrm.Sdk.EntityReference SdkMessageFilterId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("sdkmessagefilterid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageFilterId");
+				this.SetAttributeValue("sdkmessagefilterid", value);
+				this.OnPropertyChanged("SdkMessageFilterId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageid")]
+		public Microsoft.Xrm.Sdk.EntityReference SdkMessageId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("sdkmessageid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageId");
+				this.SetAttributeValue("sdkmessageid", value);
+				this.OnPropertyChanged("SdkMessageId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message processing step entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepid")]
+		public System.Nullable<System.Guid> SdkMessageProcessingStepId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("sdkmessageprocessingstepid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageProcessingStepId");
+				this.SetAttributeValue("sdkmessageprocessingstepid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("SdkMessageProcessingStepId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.SdkMessageProcessingStepId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message processing step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepidunique")]
+		public System.Nullable<System.Guid> SdkMessageProcessingStepIdUnique
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("sdkmessageprocessingstepidunique");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageProcessingStepIdUnique");
+				this.SetAttributeValue("sdkmessageprocessingstepidunique", value);
+				this.OnPropertyChanged("SdkMessageProcessingStepIdUnique");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the Sdk message processing step secure configuration.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepsecureconfigid")]
+		public Microsoft.Xrm.Sdk.EntityReference SdkMessageProcessingStepSecureConfigId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("sdkmessageprocessingstepsecureconfigid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageProcessingStepSecureConfigId");
+				this.SetAttributeValue("sdkmessageprocessingstepsecureconfigid", value);
+				this.OnPropertyChanged("SdkMessageProcessingStepSecureConfigId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the associated solution.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("solutionid")]
+		public System.Nullable<System.Guid> SolutionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("solutionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SolutionId");
+				this.SetAttributeValue("solutionid", value);
+				this.OnPropertyChanged("SolutionId");
+			}
+		}
+		
+		/// <summary>
+		/// Stage in the execution pipeline that the SDK message processing step is in.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("stage")]
+		public virtual SdkMessageProcessingStep_Stage? Stage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((SdkMessageProcessingStep_Stage?)(EntityOptionSetEnum.GetEnum(this, "stage")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Stage");
+				this.SetAttributeValue("stage", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("Stage");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the SDK message processing step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepState)(System.Enum.ToObject(typeof(TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// Reason for the status of the SDK message processing step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
+		public virtual SdkMessageProcessingStep_StatusCode? StatusCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((SdkMessageProcessingStep_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StatusCode");
+				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("StatusCode");
+			}
+		}
+		
+		/// <summary>
+		/// Deployment that the SDK message processing step should be executed on; server, client, or both.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("supporteddeployment")]
+		public virtual SdkMessageProcessingStep_SupportedDeployment? SupportedDeployment
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((SdkMessageProcessingStep_SupportedDeployment?)(EntityOptionSetEnum.GetEnum(this, "supporteddeployment")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SupportedDeployment");
+				this.SetAttributeValue("supporteddeployment", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("SupportedDeployment");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("supportingsolutionid")]
+		public System.Nullable<System.Guid> SupportingSolutionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("supportingsolutionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SupportingSolutionId");
+				this.SetAttributeValue("supportingsolutionid", value);
+				this.OnPropertyChanged("SupportingSolutionId");
+			}
+		}
+		
+		/// <summary>
+		/// Number that identifies a specific revision of the SDK message processing step. 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
+		public System.Nullable<long> VersionNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 createdby_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("createdby_sdkmessageprocessingstep")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser createdby_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("createdby_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("createdby_sdkmessageprocessingstep");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("createdby_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("createdby_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 impersonatinguserid_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("impersonatinguserid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("impersonatinguserid_sdkmessageprocessingstep")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser impersonatinguserid_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("impersonatinguserid_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("impersonatinguserid_sdkmessageprocessingstep");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("impersonatinguserid_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("impersonatinguserid_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_sdkmessageprocessingstep_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessageprocessingstep_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_sdkmessageprocessingstep_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessageprocessingstep_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessageprocessingstep_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessageprocessingstep_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessageprocessingstep_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_sdkmessageprocessingstep_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessageprocessingstep_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_sdkmessageprocessingstep_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessageprocessingstep_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessageprocessingstep_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessageprocessingstep_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessageprocessingstep_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 modifiedby_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("modifiedby_sdkmessageprocessingstep")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser modifiedby_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("modifiedby_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("modifiedby_sdkmessageprocessingstep");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("modifiedby_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("modifiedby_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 plugintype_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("eventhandler")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("plugintype_sdkmessageprocessingstep")]
+		public TeachingRecordSystem.Core.Dqt.Models.PluginType plugintype_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.PluginType>("plugintype_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("plugintype_sdkmessageprocessingstep");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.PluginType>("plugintype_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("plugintype_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 plugintypeid_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("plugintypeid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("plugintypeid_sdkmessageprocessingstep")]
+		public TeachingRecordSystem.Core.Dqt.Models.PluginType plugintypeid_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.PluginType>("plugintypeid_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("plugintypeid_sdkmessageprocessingstep");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.PluginType>("plugintypeid_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("plugintypeid_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 sdkmessagefilterid_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessagefilterid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("sdkmessagefilterid_sdkmessageprocessingstep")]
+		public TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter sdkmessagefilterid_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("sdkmessagefilterid_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("sdkmessagefilterid_sdkmessageprocessingstep");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("sdkmessagefilterid_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("sdkmessagefilterid_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 sdkmessageid_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("sdkmessageid_sdkmessageprocessingstep")]
+		public TeachingRecordSystem.Core.Dqt.Models.SdkMessage sdkmessageid_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("sdkmessageid_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("sdkmessageid_sdkmessageprocessingstep");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("sdkmessageid_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("sdkmessageid_sdkmessageprocessingstep");
+			}
+		}
+	}
+	
+	/// <summary>
 	/// Information regarding subjects available in the system.
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -11007,6 +14709,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string LastName = "lastname";
 			public const string annotation_owning_user = "annotation_owning_user";
 			public const string contact_owning_user = "contact_owning_user";
+			public const string createdby_plugintype = "createdby_plugintype";
+			public const string createdby_sdkmessage = "createdby_sdkmessage";
+			public const string createdby_sdkmessagefilter = "createdby_sdkmessagefilter";
+			public const string createdby_sdkmessageprocessingstep = "createdby_sdkmessageprocessingstep";
+			public const string impersonatinguserid_sdkmessageprocessingstep = "impersonatinguserid_sdkmessageprocessingstep";
 			public const string lk_accountbase_createdby = "lk_accountbase_createdby";
 			public const string lk_accountbase_createdonbehalfby = "lk_accountbase_createdonbehalfby";
 			public const string lk_accountbase_modifiedby = "lk_accountbase_modifiedby";
@@ -11095,6 +14802,14 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_incidentresolution_createdonbehalfby = "lk_incidentresolution_createdonbehalfby";
 			public const string lk_incidentresolution_modifiedby = "lk_incidentresolution_modifiedby";
 			public const string lk_incidentresolution_modifiedonbehalfby = "lk_incidentresolution_modifiedonbehalfby";
+			public const string lk_plugintype_createdonbehalfby = "lk_plugintype_createdonbehalfby";
+			public const string lk_plugintype_modifiedonbehalfby = "lk_plugintype_modifiedonbehalfby";
+			public const string lk_sdkmessage_createdonbehalfby = "lk_sdkmessage_createdonbehalfby";
+			public const string lk_sdkmessage_modifiedonbehalfby = "lk_sdkmessage_modifiedonbehalfby";
+			public const string lk_sdkmessagefilter_createdonbehalfby = "lk_sdkmessagefilter_createdonbehalfby";
+			public const string lk_sdkmessagefilter_modifiedonbehalfby = "lk_sdkmessagefilter_modifiedonbehalfby";
+			public const string lk_sdkmessageprocessingstep_createdonbehalfby = "lk_sdkmessageprocessingstep_createdonbehalfby";
+			public const string lk_sdkmessageprocessingstep_modifiedonbehalfby = "lk_sdkmessageprocessingstep_modifiedonbehalfby";
 			public const string lk_subject_createdonbehalfby = "lk_subject_createdonbehalfby";
 			public const string lk_subject_modifiedonbehalfby = "lk_subject_modifiedonbehalfby";
 			public const string lk_subjectbase_createdby = "lk_subjectbase_createdby";
@@ -11107,6 +14822,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_task_createdonbehalfby = "lk_task_createdonbehalfby";
 			public const string lk_task_modifiedby = "lk_task_modifiedby";
 			public const string lk_task_modifiedonbehalfby = "lk_task_modifiedonbehalfby";
+			public const string modifiedby_plugintype = "modifiedby_plugintype";
+			public const string modifiedby_sdkmessage = "modifiedby_sdkmessage";
+			public const string modifiedby_sdkmessagefilter = "modifiedby_sdkmessagefilter";
+			public const string modifiedby_sdkmessageprocessingstep = "modifiedby_sdkmessageprocessingstep";
 			public const string system_user_accounts = "system_user_accounts";
 			public const string system_user_contacts = "system_user_contacts";
 			public const string system_user_incidents = "system_user_incidents";
@@ -11271,6 +14990,106 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("contact_owning_user");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("contact_owning_user", null, value);
 				this.OnPropertyChanged("contact_owning_user");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N createdby_plugintype
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("createdby_plugintype")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.PluginType> createdby_plugintype
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.PluginType>("createdby_plugintype", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("createdby_plugintype");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.PluginType>("createdby_plugintype", null, value);
+				this.OnPropertyChanged("createdby_plugintype");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N createdby_sdkmessage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("createdby_sdkmessage")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessage> createdby_sdkmessage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("createdby_sdkmessage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("createdby_sdkmessage");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("createdby_sdkmessage", null, value);
+				this.OnPropertyChanged("createdby_sdkmessage");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N createdby_sdkmessagefilter
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("createdby_sdkmessagefilter")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter> createdby_sdkmessagefilter
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("createdby_sdkmessagefilter", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("createdby_sdkmessagefilter");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("createdby_sdkmessagefilter", null, value);
+				this.OnPropertyChanged("createdby_sdkmessagefilter");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N createdby_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("createdby_sdkmessageprocessingstep")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep> createdby_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("createdby_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("createdby_sdkmessageprocessingstep");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("createdby_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("createdby_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N impersonatinguserid_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("impersonatinguserid_sdkmessageprocessingstep")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep> impersonatinguserid_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("impersonatinguserid_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("impersonatinguserid_sdkmessageprocessingstep");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("impersonatinguserid_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("impersonatinguserid_sdkmessageprocessingstep");
 			}
 		}
 		
@@ -13035,6 +16854,166 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N lk_plugintype_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_plugintype_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.PluginType> lk_plugintype_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.PluginType>("lk_plugintype_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_plugintype_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.PluginType>("lk_plugintype_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_plugintype_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_plugintype_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_plugintype_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.PluginType> lk_plugintype_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.PluginType>("lk_plugintype_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_plugintype_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.PluginType>("lk_plugintype_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_plugintype_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_sdkmessage_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessage_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessage> lk_sdkmessage_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("lk_sdkmessage_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessage_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("lk_sdkmessage_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessage_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_sdkmessage_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessage_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessage> lk_sdkmessage_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("lk_sdkmessage_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessage_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("lk_sdkmessage_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessage_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_sdkmessagefilter_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessagefilter_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter> lk_sdkmessagefilter_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("lk_sdkmessagefilter_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessagefilter_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("lk_sdkmessagefilter_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessagefilter_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_sdkmessagefilter_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessagefilter_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter> lk_sdkmessagefilter_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("lk_sdkmessagefilter_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessagefilter_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("lk_sdkmessagefilter_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessagefilter_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_sdkmessageprocessingstep_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessageprocessingstep_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep> lk_sdkmessageprocessingstep_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("lk_sdkmessageprocessingstep_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessageprocessingstep_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("lk_sdkmessageprocessingstep_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessageprocessingstep_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_sdkmessageprocessingstep_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessageprocessingstep_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep> lk_sdkmessageprocessingstep_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("lk_sdkmessageprocessingstep_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessageprocessingstep_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("lk_sdkmessageprocessingstep_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessageprocessingstep_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N lk_subject_createdonbehalfby
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subject_createdonbehalfby")]
@@ -13271,6 +17250,86 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("lk_task_modifiedonbehalfby");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Task>("lk_task_modifiedonbehalfby", null, value);
 				this.OnPropertyChanged("lk_task_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N modifiedby_plugintype
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("modifiedby_plugintype")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.PluginType> modifiedby_plugintype
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.PluginType>("modifiedby_plugintype", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("modifiedby_plugintype");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.PluginType>("modifiedby_plugintype", null, value);
+				this.OnPropertyChanged("modifiedby_plugintype");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N modifiedby_sdkmessage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("modifiedby_sdkmessage")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessage> modifiedby_sdkmessage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("modifiedby_sdkmessage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("modifiedby_sdkmessage");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("modifiedby_sdkmessage", null, value);
+				this.OnPropertyChanged("modifiedby_sdkmessage");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N modifiedby_sdkmessagefilter
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("modifiedby_sdkmessagefilter")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter> modifiedby_sdkmessagefilter
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("modifiedby_sdkmessagefilter", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("modifiedby_sdkmessagefilter");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>("modifiedby_sdkmessagefilter", null, value);
+				this.OnPropertyChanged("modifiedby_sdkmessagefilter");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N modifiedby_sdkmessageprocessingstep
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("modifiedby_sdkmessageprocessingstep")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep> modifiedby_sdkmessageprocessingstep
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("modifiedby_sdkmessageprocessingstep", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("modifiedby_sdkmessageprocessingstep");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("modifiedby_sdkmessageprocessingstep", null, value);
+				this.OnPropertyChanged("modifiedby_sdkmessageprocessingstep");
 			}
 		}
 		
@@ -14432,6 +18491,54 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			get
 			{
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.IncidentResolution>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.PluginType"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.PluginType> PluginTypeSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.PluginType>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SdkMessage"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.SdkMessage> SdkMessageSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter> SdkMessageFilterSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SdkMessageFilter>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep> SdkMessageProcessingStepSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>();
 			}
 		}
 		
