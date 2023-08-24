@@ -7,6 +7,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 
 namespace TeachingRecordSystem.Core.Dqt;
@@ -1342,8 +1343,25 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
-    public async Task<Contact[]> FindTeachersByLastNameAndDateOfBirth(string lastName, DateOnly dateOfBirth, string[] columnNames)
+    public async Task<Contact[]> FindTeachersByLastNameAndDateOfBirth(string lastName, DateOnly dateOfBirth, string previousLastName, string[] columnNames)
     {
+        // Find all the permutations of names to match on
+        var lastNames = new[] { lastName, previousLastName };
+        var lastNamesFilter = new FilterExpression(LogicalOperator.Or);
+        foreach (var lName in lastNames)
+        {
+            if (!string.IsNullOrEmpty(lName))
+            {
+                lastNamesFilter.AddCondition(Contact.Fields.LastName, ConditionOperator.Equal, lName);
+            }
+        }
+
+        var nameFilter = new FilterExpression(LogicalOperator.And);
+        if (lastNamesFilter.Conditions.Count > 0)
+        {
+            nameFilter.AddFilter(lastNamesFilter);
+        }
+
         var request = new RetrieveMultipleRequest()
         {
             Query = new QueryExpression()
@@ -1357,7 +1375,10 @@ public partial class DataverseAdapter : IDataverseAdapter
                         new ConditionExpression(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active),
                         new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull),
                         new ConditionExpression(Contact.Fields.BirthDate, ConditionOperator.Equal, dateOfBirth.ToDateTime()),
-                        new ConditionExpression(Contact.Fields.LastName, ConditionOperator.Equal, lastName)
+                    },
+                    Filters =
+                    {
+                        nameFilter
                     }
                 },
                 Orders =

@@ -32,6 +32,8 @@ public class FindTeachersEndpoint : Endpoint<FindTeachersRequest, FindTeachersRe
             s.RequestParam(r => r.FindBy!, "The policy for matching teachers against the request criteria.");
             s.RequestParam(r => r.LastName!, "The teacher's last name.");
             s.RequestParam(r => r.DateOfBirth!, "The teacher's date of birth.");
+            s.RequestParam(r => r.PreviousFirstName!, "The teacher's previous first name.");
+            s.RequestParam(r => r.PreviousLastName!, "The teacher's previous last name.");
         });
     }
 
@@ -40,6 +42,7 @@ public class FindTeachersEndpoint : Endpoint<FindTeachersRequest, FindTeachersRe
         var results = await _dataverseAdapter.FindTeachersByLastNameAndDateOfBirth(
             req.LastName!,
             req.DateOfBirth!.Value,
+            req.PreviousLastName,
             columnNames: new[]
             {
                 Contact.Fields.dfeta_TRN,
@@ -49,7 +52,7 @@ public class FindTeachersEndpoint : Endpoint<FindTeachersRequest, FindTeachersRe
                 Contact.Fields.LastName,
                 Contact.Fields.dfeta_StatedFirstName,
                 Contact.Fields.dfeta_StatedMiddleName,
-                Contact.Fields.dfeta_StatedLastName
+                Contact.Fields.dfeta_StatedLastName,
             });
 
         var sanctions = (await _dataverseAdapter.GetSanctionsByContactIds(results.Select(r => r.Id), liveOnly: true));
