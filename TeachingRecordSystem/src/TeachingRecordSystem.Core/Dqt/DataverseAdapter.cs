@@ -1344,6 +1344,11 @@ public partial class DataverseAdapter : IDataverseAdapter
 
     public async Task<Contact[]> FindTeachersByLastNameAndDateOfBirth(string lastName, DateOnly dateOfBirth, string[] columnNames)
     {
+        //Find all the permutations of names to match on
+        var lastNameFilter = new FilterExpression(LogicalOperator.Or);
+        lastNameFilter.AddCondition(Contact.Fields.LastName, ConditionOperator.Equal, lastName);
+        lastNameFilter.AddCondition(Contact.Fields.dfeta_PreviousLastName, ConditionOperator.Equal, lastName);
+
         var request = new RetrieveMultipleRequest()
         {
             Query = new QueryExpression()
@@ -1357,7 +1362,10 @@ public partial class DataverseAdapter : IDataverseAdapter
                         new ConditionExpression(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active),
                         new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull),
                         new ConditionExpression(Contact.Fields.BirthDate, ConditionOperator.Equal, dateOfBirth.ToDateTime()),
-                        new ConditionExpression(Contact.Fields.LastName, ConditionOperator.Equal, lastName)
+                    },
+                    Filters =
+                    {
+                        lastNameFilter
                     }
                 },
                 Orders =
