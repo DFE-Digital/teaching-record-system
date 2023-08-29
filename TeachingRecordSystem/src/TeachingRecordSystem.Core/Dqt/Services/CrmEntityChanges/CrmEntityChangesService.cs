@@ -39,8 +39,6 @@ public class CrmEntityChangesService : ICrmEntityChangesService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-
         // Ensure only one node is processing changes for this key and entity type at a time
         var @lock = await _distributedLockProvider.TryAcquireLockAsync(
             DistributedLockKeys.EntityChanges(changesKey, entityLogicalName),
@@ -50,6 +48,8 @@ public class CrmEntityChangesService : ICrmEntityChangesService
         {
             yield break;
         }
+
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         await using (@lock)
         {
