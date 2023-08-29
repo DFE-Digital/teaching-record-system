@@ -11322,7 +11322,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
-		/// 
+		/// Uniquely identifies the plug-in type associated with a plugin package when exporting a solution.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("plugintypeexportkey")]
 		public string PluginTypeExportKey
