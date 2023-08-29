@@ -22,8 +22,8 @@ locals {
         "Platform"                             = "PAAS",
         "ReadOnlyMode"                         = var.readonly_mode,
         "DataProtectionKeysContainerName"      = azurerm_storage_container.keys.name,
-        "DqtReporting__RunService"             = var.run_dqt_reporting_service,
-        "RecurringJobs__Enabled"               = var.run_recurring_jobs
+        "DqtReporting:RunService"              = var.run_dqt_reporting_service,
+        "RecurringJobs:Enabled"                = var.run_recurring_jobs
       }
     ))
   }
