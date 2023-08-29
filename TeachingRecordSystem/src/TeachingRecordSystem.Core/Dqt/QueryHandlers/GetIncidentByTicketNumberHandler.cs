@@ -3,9 +3,9 @@ using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
-public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTicketNumberQuery, Incident?>
+public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTicketNumberQuery, (Incident?, dfeta_document[]?)>
 {
-    public async Task<Incident?> Execute(GetIncidentByTicketNumberQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<(Incident?, dfeta_document[]?)> Execute(GetIncidentByTicketNumberQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Incident.Fields.TicketNumber, ConditionOperator.Equal, query.TicketNumber);
@@ -32,7 +32,15 @@ public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTi
         AddDocumentLink(queryExpression);
 
         var result = await organizationService.RetrieveMultipleAsync(queryExpression);
-        return result.Entities.Select(entity => entity.ToEntity<Incident>()).SingleOrDefault();
+        var incidentAndDocuments = result.Entities.Select(entity => entity.ToEntity<Incident>())
+            .Select(i => (Incident: i, Document: i.Extract<dfeta_document>(dfeta_document.EntityLogicalName, dfeta_document.PrimaryIdAttribute)));
+
+        var returnValue = incidentAndDocuments
+            .GroupBy(t => t.Incident.TicketNumber)
+            .Select(g => (g.First().Incident, g.Where(i => i.Document != null).Select(i => i.Document).ToArray()))
+            .FirstOrDefault();
+
+        return returnValue;
 
         static void AddContactLink(QueryExpression query)
         {
@@ -99,11 +107,11 @@ public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTi
                 Annotation.Fields.ObjectId,
                 JoinOperator.Inner);
 
+            // Deliberately not getting the actual base64 document data as part of this query
             annotationLink.Columns = new ColumnSet(
                 Annotation.PrimaryIdAttribute,
                 Annotation.Fields.ObjectId,
                 Annotation.Fields.Subject,
-                Annotation.Fields.DocumentBody,
                 Annotation.Fields.MimeType,
                 Annotation.Fields.FileName);
 

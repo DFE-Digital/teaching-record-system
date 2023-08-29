@@ -22,14 +22,14 @@ public class IndexModel : PageModel
 
     public DateOfBirthChangeRequestInfo? DateOfBirthChangeRequest { get; set; }
 
-    public EvidenceInfo? Evidence { get; set; }
+    public EvidenceInfo[]? Evidence { get; set; }
 
     [FromRoute]
     public string TicketNumber { get; set; } = null!;
 
     public async Task<IActionResult> OnGet()
     {
-        var incident = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
+        var (incident, documents) = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
         if (incident is null)
         {
             return NotFound();
@@ -40,17 +40,15 @@ public class IndexModel : PageModel
             return BadRequest();
         }
 
-        SetModelFromIncident(incident);
+        SetModelFromIncident(incident, documents);
 
         return Page();
     }
 
-    private void SetModelFromIncident(Incident incident)
+    private void SetModelFromIncident(Incident incident, dfeta_document[] documents)
     {
         var customer = incident.Extract<Contact>("contact", Contact.PrimaryIdAttribute);
         var subject = incident.Extract<Subject>("subject", Subject.PrimaryIdAttribute);
-        var document = incident.Extract<dfeta_document>("dfeta_document", dfeta_document.PrimaryIdAttribute);
-        var annotation = document?.Extract<Annotation>("annotation", Annotation.PrimaryIdAttribute);
 
         CaseHeader = new CaseInfo()
         {
@@ -82,14 +80,21 @@ public class IndexModel : PageModel
             };
         }
 
-        if (document is not null && annotation is not null)
+        if (documents is not null)
         {
-            Evidence = new EvidenceInfo()
+            var evidence = new List<EvidenceInfo>();
+            foreach (var document in documents)
             {
-                DocumentId = document!.dfeta_documentId!.Value,
-                DocumentName = annotation.FileName,
-                MimeType = annotation.MimeType
-            };
+                var annotation = document.Extract<Annotation>(Annotation.EntityLogicalName, Annotation.PrimaryIdAttribute);
+                evidence.Add(new EvidenceInfo()
+                {
+                    DocumentId = document!.dfeta_documentId!.Value,
+                    FileName = annotation.FileName,
+                    MimeType = annotation.MimeType
+                });
+            }
+
+            Evidence = evidence.ToArray();
         }
     }
 
@@ -120,7 +125,7 @@ public class IndexModel : PageModel
     public record EvidenceInfo
     {
         public required Guid DocumentId { get; init; }
-        public required string DocumentName { get; init; }
+        public required string FileName { get; init; }
         public required string MimeType { get; init; }
     }
 }
