@@ -58,8 +58,8 @@ module "api_application_configuration" {
     PlatformEnvironment             = var.environment_name
     DistributedLockContainerName    = azurerm_storage_container.locks.name
     DqtReporting__RunService        = var.run_dqt_reporting_service
-    RecurringJobs__Enabled          = "false"
-    ReadOnlyMode                    = "true"
+    RecurringJobs__Enabled          = var.run_recurring_jobs
+    ReadOnlyMode                    = var.readonly_mode
     DataProtectionKeysContainerName = azurerm_storage_container.keys.name
   }
 

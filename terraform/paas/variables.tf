@@ -109,6 +109,18 @@ variable "reporting_db_name" {
   default = ""
 }
 
+variable "run_dqt_reporting_service" {
+  type = bool
+}
+
+variable "run_recurring_jobs" {
+  type = bool
+}
+
+variable "readonly_mode" {
+  type = bool
+}
+
 locals {
   api_routes = flatten([
     cloudfoundry_route.api_public,

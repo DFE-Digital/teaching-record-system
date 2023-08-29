@@ -20,8 +20,10 @@ locals {
         "PlatformEnvironment"                  = var.environment_name,
         "StorageConnectionString"              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app-storage.name};AccountKey=${azurerm_storage_account.app-storage.primary_access_key}",
         "Platform"                             = "PAAS",
-        "ReadOnlyMode"                         = "false",
-        "DataProtectionKeysContainerName"      = azurerm_storage_container.keys.name
+        "ReadOnlyMode"                         = var.readonly_mode,
+        "DataProtectionKeysContainerName"      = azurerm_storage_container.keys.name,
+        "DqtReporting__RunService"             = var.run_dqt_reporting_service,
+        "RecurringJobs__Enabled"               = var.run_recurring_jobs
       }
     ))
   }
