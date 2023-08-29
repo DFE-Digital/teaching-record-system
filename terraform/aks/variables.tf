@@ -68,6 +68,13 @@ variable "deploy_dqt_reporting_server" {
 }
 
 variable "run_dqt_reporting_service" {
-  type    = bool
-  default = false
+  type = bool
+}
+
+variable "run_recurring_jobs" {
+  type = bool
+}
+
+variable "readonly_mode" {
+  type = bool
 }
