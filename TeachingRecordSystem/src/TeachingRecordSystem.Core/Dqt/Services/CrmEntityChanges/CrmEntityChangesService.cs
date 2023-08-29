@@ -89,6 +89,13 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                     request.DataVersion = null;
                     continue;
                 }
+                catch (InsufficientMemoryException) when (request.PageInfo.Count > 1)
+                {
+                    request.PageInfo.Count /= 2;
+                    request.PageInfo.PageNumber = 1;
+                    request.PageInfo.PagingCookie = null;
+                    continue;
+                }
 
                 gotData |= response.EntityChanges.Changes.Count > 0;
 
