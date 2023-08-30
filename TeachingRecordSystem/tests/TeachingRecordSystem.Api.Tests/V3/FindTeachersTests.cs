@@ -8,9 +8,9 @@ public class FindTeachersTests : ApiTestBase
     }
 
     [Theory]
-    [InlineData("")]
-    [InlineData("BadFindBy")]
-    public async Task Get_InvalidFindBy_ReturnsError(string findBy)
+    [InlineData("", "Invalid matching policy.")]
+    [InlineData("BadFindBy", "The value 'BadFindBy' is not valid for FindBy.")]
+    public async Task Get_InvalidFindBy_ReturnsError(string findBy, string expectedErrorMessage)
     {
         // Arrange
         var lastName = "Smith";
@@ -24,7 +24,7 @@ public class FindTeachersTests : ApiTestBase
         var response = await HttpClientWithApiKey.SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, "findBy", $"'{findBy}' is not valid.");
+        await AssertEx.JsonResponseHasValidationErrorForProperty(response, "findBy", expectedErrorMessage);
     }
 
     [Theory]

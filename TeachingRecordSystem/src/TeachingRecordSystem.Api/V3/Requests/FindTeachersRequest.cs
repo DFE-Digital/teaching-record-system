@@ -1,16 +1,16 @@
-using FastEndpoints;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using TeachingRecordSystem.Api.V3.Responses;
 
 namespace TeachingRecordSystem.Api.V3.Requests;
 
 public record FindTeachersRequest : IRequest<FindTeachersResponse>
 {
-    [QueryParam, BindFrom("findBy")]
+    [FromQuery(Name = "findBy")]
     public FindTeachersFindBy FindBy { get; init; }
-    [QueryParam, BindFrom("lastName")]
+    [FromQuery(Name = "lastName")]
     public string? LastName { get; init; }
-    [QueryParam, BindFrom("dateOfBirth")]
+    [FromQuery(Name = "dateOfBirth")]
     public DateOnly? DateOfBirth { get; init; }
 }
 

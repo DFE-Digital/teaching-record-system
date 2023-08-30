@@ -1,10 +1,9 @@
-using FastEndpoints;
 using FluentValidation;
 using TeachingRecordSystem.Api.V3.Requests;
 
 namespace TeachingRecordSystem.Api.V3.Validators;
 
-public class FindTeachersRequestValidator : Validator<FindTeachersRequest>
+public class FindTeachersRequestValidator : AbstractValidator<FindTeachersRequest>
 {
     public FindTeachersRequestValidator()
     {
