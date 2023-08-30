@@ -5,12 +5,19 @@ namespace TeachingRecordSystem.Core.Dqt;
 public class ReferenceDataCache
 {
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private Task<Subject[]>? _subjects;
+    private Task<dfeta_sanctioncode[]>? _getSanctionCodesTask;
+    private Task<Subject[]>? _getSubjectsTask;
     private Task<dfeta_teacherstatus[]>? _getTeacherStatusesTask;
 
     public ReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher)
     {
         _crmQueryDispatcher = crmQueryDispatcher;
+    }
+
+    public async Task<dfeta_sanctioncode> GetSanctionCodeByValue(string value)
+    {
+        var sanctionCodes = await EnsureSanctionCodes();
+        return sanctionCodes.Single(s => s.dfeta_Value == value);
     }
 
     public async Task<Subject> GetSubjectByTitle(string title)
@@ -25,9 +32,14 @@ public class ReferenceDataCache
         return teacherStatuses.Single(ts => ts.dfeta_Value == value);
     }
 
+    private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
+        LazyInitializer.EnsureInitialized(
+            ref _getSanctionCodesTask,
+            () => _crmQueryDispatcher.ExecuteQuery(new GetAllSanctionCodesQuery()));
+
     private Task<Subject[]> EnsureSubjects() =>
         LazyInitializer.EnsureInitialized(
-            ref _subjects,
+            ref _getSubjectsTask,
             () => _crmQueryDispatcher.ExecuteQuery(new GetAllSubjectsQuery()));
 
     private Task<dfeta_teacherstatus[]> EnsureTeacherStatuses() =>
