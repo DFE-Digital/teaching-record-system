@@ -1,4 +1,4 @@
-@page "/cases/{ticketNumber}"
+@page "/cases/{ticketNumber}/{handler?}/{id?}"
 @model TeachingRecordSystem.SupportUi.Pages.Cases.EditCase.IndexModel
 @{
     ViewBag.Title = Model.CaseHeader!.CaseType;
@@ -93,14 +93,14 @@
                         <div class="govuk-grid-column-full govuk-!-margin-bottom-4">
                             @if (evidence.MimeType == "application/pdf")
                             {
-                                <object data="/cases/@Model.TicketNumber/documents/@evidence.DocumentId" type="application/pdf" width="100%" height="500px" class="govuk-!-margin-bottom-2">
+                                <object data="@LinkGenerator.CaseDocument(Model.TicketNumber, evidence.DocumentId)" type="application/pdf" width="100%" height="500px" class="govuk-!-margin-bottom-2">
                                 </object>
                             }
                             else
                             {
-                                <img src="/cases/@Model.TicketNumber/documents/@evidence.DocumentId" alt="evidence.FileName" width="100%" height="auto" class="govuk-!-margin-bottom-2" />
+                                <img src="@LinkGenerator.CaseDocument(Model.TicketNumber, evidence.DocumentId)" alt="evidence.FileName" width="100%" height="auto" class="govuk-!-margin-bottom-2" />
                             }
-                            <a href="/cases/@Model.TicketNumber/documents/@evidence.DocumentId" class="govuk-link" rel="noreferrer noopener" target="_blank">View larger (opens in new tab)</a>
+                            <a href="@LinkGenerator.CaseDocument(Model.TicketNumber, evidence.DocumentId)" class="govuk-link" rel="noreferrer noopener" target="_blank">View larger (opens in new tab)</a>
                         </div>
                     </div>
                 }
@@ -148,6 +148,6 @@
 </div>
 
 <div class="govuk-button-group">
-    <button class="govuk-button">Accept change</button>
-    <button class="govuk-button govuk-button--warning">Reject change</button>
+    <a href="@LinkGenerator.AcceptCase(Model.TicketNumber)" class="govuk-button">Accept change</a>
+    <a href="@LinkGenerator.RejectCase(Model.TicketNumber)" class="govuk-button govuk-button--warning">Reject change</a>
 </div>

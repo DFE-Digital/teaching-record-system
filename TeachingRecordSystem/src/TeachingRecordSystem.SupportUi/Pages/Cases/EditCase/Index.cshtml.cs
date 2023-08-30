@@ -44,6 +44,24 @@ public class IndexModel : PageModel
 
         return Page();
     }
+    public async Task<IActionResult> OnGetDocuments(Guid id)
+    {
+        var document = await _crmQueryDispatcher.ExecuteQuery(new GetDocumentByIdQuery(id));
+        var annotation = document?.Extract<Annotation>("annotation", Annotation.PrimaryIdAttribute);
+
+        if (document is null || annotation is null)
+        {
+            return NotFound();
+        }
+
+        if (document.StateCode != dfeta_documentState.Active)
+        {
+            return BadRequest();
+        }
+
+        var bytes = Convert.FromBase64String(annotation.DocumentBody);
+        return File(bytes, annotation.MimeType);
+    }
 
     private void SetModelFromIncident(Incident incident, dfeta_document[] documents)
     {
