@@ -202,11 +202,13 @@
     "statecode"
   ],
   "dfeta_sanction": [
+    "dfeta_enddate",
+    "dfeta_noreappuntildate",
     "dfeta_personid",
     "dfeta_sanctionid",
     "dfeta_sanctioncodeid",
     "dfeta_spent",
-    "dfeta_enddate",
+    "dfeta_startdate",
     "statecode"
   ],
   "incident": [
