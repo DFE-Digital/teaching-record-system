@@ -1,45 +1,25 @@
-using FastEndpoints;
-using TeachingRecordSystem.Api.Infrastructure.Security;
+using MediatR;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 
-namespace TeachingRecordSystem.Api.V3.Endpoints;
+namespace TeachingRecordSystem.Api.V3.Handlers;
 
-public class FindTeachersEndpoint : Endpoint<FindTeachersRequest, FindTeachersResponse>
+public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeachersResponse>
 {
     private readonly IDataverseAdapter _dataverseAdapter;
 
-    public FindTeachersEndpoint(IDataverseAdapter dataverseAdapter)
+    public FindTeachersHandler(IDataverseAdapter dataverseAdapter)
     {
         _dataverseAdapter = dataverseAdapter;
     }
 
-    public override void Configure()
-    {
-        Version(3);
-        Get("teachers");
-        Options(b => b.WithTags("Teachers"));
-        Policies(AuthorizationPolicies.ApiKey);
-        Description(b => b
-            .WithName("FindTeachers")
-            .Produces<FindTeachersResponse>());
-        Summary(s =>
-        {
-            s.Summary = "Find teachers";
-            s.Description = "Finds teachers with a TRN matching the specified criteria.";
-            s.RequestParam(r => r.FindBy!, "The policy for matching teachers against the request criteria.");
-            s.RequestParam(r => r.LastName!, "The teacher's last name.");
-            s.RequestParam(r => r.DateOfBirth!, "The teacher's date of birth.");
-        });
-    }
-
-    public override async Task HandleAsync(FindTeachersRequest req, CancellationToken ct)
+    public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
     {
         var results = await _dataverseAdapter.FindTeachersByLastNameAndDateOfBirth(
-            req.LastName!,
-            req.DateOfBirth!.Value,
+            request.LastName!,
+            request.DateOfBirth!.Value,
             columnNames: new[]
             {
                 Contact.Fields.dfeta_TRN,
@@ -54,9 +34,9 @@ public class FindTeachersEndpoint : Endpoint<FindTeachersRequest, FindTeachersRe
 
         var sanctions = (await _dataverseAdapter.GetSanctionsByContactIds(results.Select(r => r.Id), liveOnly: true));
 
-        var response = new FindTeachersResponse()
+        return new FindTeachersResponse()
         {
-            Query = req,
+            Query = request,
             Total = results.Length,
             Results = results.Select(r => new FindTeachersResponseResult()
             {
@@ -68,7 +48,5 @@ public class FindTeachersEndpoint : Endpoint<FindTeachersRequest, FindTeachersRe
                 Sanctions = sanctions[r.Id]
             }).ToArray()
         };
-
-        await SendAsync(response);
     }
 }

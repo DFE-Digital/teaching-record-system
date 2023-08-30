@@ -79,4 +79,17 @@ public class TeachersController : ControllerBase
         await _mediator.Send(request);
         return NoContent();
     }
+
+    [HttpGet("")]
+    [OpenApiOperation(
+        operationId: "FindTeachers",
+        summary: "Find teachers",
+        description: "Finds teachers with a TRN matching the specified criteria.")]
+    [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> FindTeachers(FindTeachersRequest request)
+    {
+        var response = await _mediator.Send(request);
+        return Ok(response);
+    }
 }
