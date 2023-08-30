@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Cases.EditCase;
 
-[Authorize(Roles = $"{UserRoles.Helpdesk},{UserRoles.Administrator}")]
+[Authorize(Policy = AuthorizationPolicies.CaseManagement)]
 public class IndexModel : PageModel
 {
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;

@@ -86,6 +86,15 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     });
 }
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(
+        AuthorizationPolicies.CaseManagement,
+        policy => policy
+            .RequireAuthenticatedUser()
+            .RequireRole(UserRoles.Helpdesk, UserRoles.Administrator));
+});
+
 builder.Services
     .AddRazorPages()
     .AddMvcOptions(options =>
