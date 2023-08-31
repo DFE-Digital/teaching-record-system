@@ -1,4 +1,5 @@
 namespace TeachingRecordSystem.Core.Dqt.Tests.QueryTests;
+
 public class GetDocumentByIdTests : IAsyncLifetime
 {
     private readonly CrmClientFixture.TestDataScope _dataScope;

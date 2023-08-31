@@ -30,18 +30,18 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnGet()
     {
-        var (incident, documents) = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
-        if (incident is null)
+        (Incident Incident, dfeta_document[] Documents)? incidentAndDocuments = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
+        if (incidentAndDocuments is null)
         {
             return NotFound();
         }
 
-        if (incident.StateCode != IncidentState.Active)
+        if (incidentAndDocuments.Value.Incident.StateCode != IncidentState.Active)
         {
             return BadRequest();
         }
 
-        SetModelFromIncident(incident, documents);
+        SetModelFromIncidentAndDocuments(incidentAndDocuments.Value.Incident, incidentAndDocuments.Value.Documents);
 
         return Page();
     }
@@ -64,7 +64,7 @@ public class IndexModel : PageModel
         return File(bytes, annotation.MimeType);
     }
 
-    private void SetModelFromIncident(Incident incident, dfeta_document[] documents)
+    private void SetModelFromIncidentAndDocuments(Incident incident, dfeta_document[] documents)
     {
         var customer = incident.Extract<Contact>("contact", Contact.PrimaryIdAttribute);
         var subject = incident.Extract<Subject>("subject", Subject.PrimaryIdAttribute);

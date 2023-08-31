@@ -3,9 +3,10 @@ using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
-public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTicketNumberQuery, (Incident?, dfeta_document[]?)>
+
+public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTicketNumberQuery, (Incident, dfeta_document[])?>
 {
-    public async Task<(Incident?, dfeta_document[]?)> Execute(GetIncidentByTicketNumberQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<(Incident, dfeta_document[])?> Execute(GetIncidentByTicketNumberQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Incident.Fields.TicketNumber, ConditionOperator.Equal, query.TicketNumber);
@@ -32,6 +33,11 @@ public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTi
         AddDocumentLink(queryExpression);
 
         var result = await organizationService.RetrieveMultipleAsync(queryExpression);
+        if (result.Entities.Count == 0)
+        {
+            return null;
+        }
+
         var incidentAndDocuments = result.Entities.Select(entity => entity.ToEntity<Incident>())
             .Select(i => (Incident: i, Document: i.Extract<dfeta_document>(dfeta_document.EntityLogicalName, dfeta_document.PrimaryIdAttribute)));
 

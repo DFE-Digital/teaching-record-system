@@ -1,14 +1,10 @@
-using TeachingRecordSystem.Core.Dqt.Models;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Cases.EditCase;
 
-[Collection(nameof(DisableParallelization))]
 public class IndexTests : TestBase
 {
     public IndexTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        XrmFakedContext.DeleteAllEntities<Incident>();
     }
 
     [Fact]
