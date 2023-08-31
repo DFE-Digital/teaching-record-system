@@ -21,12 +21,17 @@ public partial class CrmTestData
     {
         private const IncidentStatusType DefaultIncidentStatus = IncidentStatusType.Active;
 
-        private static readonly string _defaultEvidenceFileName = "evidence.txt";
-        private static readonly MemoryStream _defaultEvidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
-        private static readonly string _defaultEvidenceFileMimeType = "text/plain";
+        private static readonly string _defaultEvidenceFileName = "evidence1.jpeg";
+        private static readonly MemoryStream _defaultEvidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test image"));
+        private static readonly string _defaultEvidenceFileMimeType = "image/jpeg";
+
+        private static readonly string _additionalEvidenceFileName = "evidence2.pdf";
+        private static readonly MemoryStream _additionalEvidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test PDF"));
+        private static readonly string _additionalEvidenceFileMimeType = "application/pdf";
 
         private Guid? _customerId;
         private IncidentStatusType? _incidentStatusType;
+        private bool _hasMultipleEvidenceFiles = false;
 
         public CreateNameChangeIncidentBuilder WithCustomerId(Guid customerId)
         {
@@ -36,6 +41,12 @@ public partial class CrmTestData
             }
 
             _customerId = customerId;
+            return this;
+        }
+
+        public CreateNameChangeIncidentBuilder WithMultipleEvidenceFiles()
+        {
+            _hasMultipleEvidenceFiles = true;
             return this;
         }
 
@@ -102,33 +113,21 @@ public partial class CrmTestData
                 dfeta_StatedLastName = lastName
             };
 
-            var document = new dfeta_document()
-            {
-                Id = Guid.NewGuid(),
-                dfeta_name = _defaultEvidenceFileName,
-                dfeta_Type = dfeta_DocumentType.ChangeofNameDOBEvidence,
-                dfeta_PersonId = _customerId.Value.ToEntityReference(Contact.EntityLogicalName),
-                dfeta_CaseId = incidentId.ToEntityReference(Incident.EntityLogicalName),
-                StatusCode = dfeta_document_StatusCode.Active
-            };
-
-            var annotationBody = await GetBase64EncodedFileContent(_defaultEvidenceFileContent);
-
-            var annotation = new Annotation()
-            {
-                ObjectId = document.Id.ToEntityReference(dfeta_document.EntityLogicalName),
-                ObjectTypeCode = dfeta_document.EntityLogicalName,
-                Subject = _defaultEvidenceFileName,
-                DocumentBody = annotationBody,
-                MimeType = _defaultEvidenceFileMimeType,
-                FileName = _defaultEvidenceFileName,
-                NoteText = string.Empty
-            };
+            var evidences = new List<CreateNameChangeIncidentEvidence>();
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = incident });
+            var (document, annotation, evidence) = await CreateDocument(_customerId.Value, _defaultEvidenceFileName, _defaultEvidenceFileContent, _defaultEvidenceFileMimeType);
+            evidences.Add(evidence);
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = document });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = annotation });
+            if (_hasMultipleEvidenceFiles)
+            {
+                (document, annotation, evidence) = await CreateDocument(_customerId.Value, _additionalEvidenceFileName, _additionalEvidenceFileContent, _additionalEvidenceFileMimeType);
+                evidences.Add(evidence);
+                txnRequestBuilder.AddRequest(new CreateRequest() { Target = document });
+                txnRequestBuilder.AddRequest(new CreateRequest() { Target = annotation });
+            }
 
             _incidentStatusType ??= DefaultIncidentStatus;
 
@@ -203,10 +202,44 @@ public partial class CrmTestData
                 StatedFirstName = firstName,
                 StatedMiddleName = middleName,
                 StatedLastName = lastName,
-                EvidenceFileName = _defaultEvidenceFileName,
-                EvidenceBase64EncodedFileContent = annotationBody,
-                EvidenceFileMimeType = _defaultEvidenceFileMimeType
+                Evidence = evidences.ToArray()
             };
+
+            async Task<(dfeta_document, Annotation, CreateNameChangeIncidentEvidence)> CreateDocument(Guid customerId, string filename, Stream content, string mimeType)
+            {
+                var document = new dfeta_document()
+                {
+                    Id = Guid.NewGuid(),
+                    dfeta_name = filename,
+                    dfeta_Type = dfeta_DocumentType.ChangeofNameDOBEvidence,
+                    dfeta_PersonId = customerId.ToEntityReference(Contact.EntityLogicalName),
+                    dfeta_CaseId = incidentId.ToEntityReference(Incident.EntityLogicalName),
+                    StatusCode = dfeta_document_StatusCode.Active
+                };
+
+                var annotationBody = await GetBase64EncodedFileContent(content);
+
+                var annotation = new Annotation()
+                {
+                    ObjectId = document.Id.ToEntityReference(dfeta_document.EntityLogicalName),
+                    ObjectTypeCode = dfeta_document.EntityLogicalName,
+                    Subject = filename,
+                    DocumentBody = annotationBody,
+                    MimeType = mimeType,
+                    FileName = filename,
+                    NoteText = string.Empty
+                };
+
+                var evidence = new CreateNameChangeIncidentEvidence()
+                {
+                    DocumentId = document.Id,
+                    FileName = filename,
+                    Base64EncodedFileContent = annotationBody,
+                    MimeType = mimeType
+                };
+
+                return (document, annotation, evidence);
+            }
         }
 
         private enum IncidentStatusType
@@ -233,8 +266,14 @@ public partial class CrmTestData
         public required string StatedFirstName { get; init; }
         public required string? StatedMiddleName { get; init; }
         public required string StatedLastName { get; init; }
-        public required string EvidenceFileName { get; init; }
-        public required string EvidenceBase64EncodedFileContent { get; init; }
-        public required string EvidenceFileMimeType { get; init; }
+        public required CreateNameChangeIncidentEvidence[] Evidence { get; init; }
+    }
+
+    public record CreateNameChangeIncidentEvidence
+    {
+        public required Guid DocumentId { get; init; }
+        public required string FileName { get; init; }
+        public required string Base64EncodedFileContent { get; init; }
+        public required string MimeType { get; init; }
     }
 }

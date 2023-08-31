@@ -14,6 +14,24 @@ public static class TestUsers
         UserType = UserType.Person
     };
 
+    public static User Helpdesk { get; } = new()
+    {
+        Active = true,
+        Name = "Test helpdesk user",
+        Roles = new[] { UserRoles.Helpdesk },
+        UserId = Guid.NewGuid(),
+        UserType = UserType.Person
+    };
+
+    public static User UnusedRole { get; } = new()
+    {
+        Active = true,
+        Name = "Test other user",
+        Roles = new[] { "UnusedRole" },
+        UserId = Guid.NewGuid(),
+        UserType = UserType.Person
+    };
+
     public static User NoRoles { get; } = new()
     {
         Active = true,
@@ -35,6 +53,8 @@ public static class TestUsers
         public Task Execute()
         {
             _dbContext.Users.Add(Administrator);
+            _dbContext.Users.Add(Helpdesk);
+            _dbContext.Users.Add(UnusedRole);
             _dbContext.Users.Add(NoRoles);
 
             return _dbContext.SaveChangesAsync();
