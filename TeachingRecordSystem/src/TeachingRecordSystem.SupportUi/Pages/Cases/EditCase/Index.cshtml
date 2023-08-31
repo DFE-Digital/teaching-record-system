@@ -1,5 +1,153 @@
-@page "/cases/{caseId}"
+@page "/cases/{ticketNumber}/{handler?}/{id?}"
 @model TeachingRecordSystem.SupportUi.Pages.Cases.EditCase.IndexModel
 @{
-    ViewBag.Title = "Edit Case";
+    ViewBag.Title = Model.CaseHeader!.CaseType;
 }
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Cases()" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <table class="govuk-table trs-table--no-border govuk-!-margin-bottom-1">
+            <caption class="govuk-table__caption govuk-table__caption--xl" data-testid="page-title">@ViewBag.Title</caption>
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-font-size-16 govuk-!-width-one-quarter">Case reference</th>
+                    <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-font-size-16 govuk-!-width-one-third">Name</th>
+                    <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-font-size-16">Created on</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                <tr class="govuk-table__row" data-testid="case-header">
+                    <td class="govuk-table__cell trs-table__cell--no-border govuk-!-font-size-16" data-testid="case-header-case-reference">@Model.CaseHeader.CaseReference</td>
+                    <td class="govuk-table__cell trs-table__cell--no-border govuk-!-font-size-16" data-testid="case-header-name">@Model.CaseHeader.Customer</td>
+                    <td class="govuk-table__cell trs-table__cell--no-border govuk-!-font-size-16" data-testid="case-header-created-on">@Model.CaseHeader.CreatedOn.ToString("dd/MM/yyyy")</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <table class="govuk-table">
+            <caption class="govuk-table__caption govuk-table__caption--l">Request</caption>
+            @if (Model.CaseHeader.CaseType == DqtConstants.NameChangeSubjectTitle)
+            {
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">Name</th>
+                        <th scope="col" class="govuk-table__header">Current</th>
+                        <th scope="col" class="govuk-table__header">Request</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row" data-testid="first-name">
+                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="first-name-title">First</td>
+                        <td class="govuk-table__cell" data-testid="first-name-current">@Model.NameChangeRequest!.CurrentFirstName</td>
+                        <td class="govuk-table__cell" data-testid="first-name-new">@Model.NameChangeRequest!.NewFirstName</td>
+                    </tr>
+                    <tr class="govuk-table__row" data-testid="middle-name">
+                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="middle-name-title">Middle</td>
+                        <td class="govuk-table__cell" data-testid="middle-name-current">@Model.NameChangeRequest!.CurrentMiddleName</td>
+                        <td class="govuk-table__cell" data-testid="middle-name-new">@Model.NameChangeRequest!.NewMiddleName</td>
+                    </tr>
+                    <tr class="govuk-table__row" data-testid="last-name">
+                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="last-name-title">Last</td>
+                        <td class="govuk-table__cell" data-testid="last-name-current">@Model.NameChangeRequest!.CurrentLastName</td>
+                        <td class="govuk-table__cell" data-testid="last-name-new">@Model.NameChangeRequest!.NewLastName</td>
+                    </tr>
+                </tbody>
+            }
+            @if (Model.CaseHeader.CaseType == DqtConstants.DateOfBirthChangeSubjectTitle)
+            {
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Current</th>
+                        <th scope="col" class="govuk-table__header">Request</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row" data-testid="date-of-birth">
+                        <td class="govuk-table__cell" data-testid="date-of-birth-current">@Model.DateOfBirthChangeRequest!.CurrentDateOfBirth.ToString("dd/MM/yyyy")</td>
+                        <td class="govuk-table__cell" data-testid="date-of-birth-new">@Model.DateOfBirthChangeRequest!.NewDateOfBirth.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                </tbody>
+            }
+        </table>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-l">Proof</h2>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds-from-desktop">
+                @foreach (var evidence in Model.Evidence!)
+                {
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-full govuk-!-margin-bottom-4">
+                            @if (evidence.MimeType == "application/pdf")
+                            {
+                                <object data="@LinkGenerator.CaseDocument(Model.TicketNumber, evidence.DocumentId)" type="application/pdf" width="100%" height="500px" class="govuk-!-margin-bottom-2" data-testid="pdf-@evidence.DocumentId">
+                                </object>
+                            }
+                            else
+                            {
+                                <img src="@LinkGenerator.CaseDocument(Model.TicketNumber, evidence.DocumentId)" alt="evidence.FileName" width="100%" height="auto" class="govuk-!-margin-bottom-2" data-testid="image-@evidence.DocumentId" />
+                            }
+                            <a href="@LinkGenerator.CaseDocument(Model.TicketNumber, evidence.DocumentId)" class="govuk-link" rel="noreferrer noopener" target="_blank" date-testid="view-larger-@evidence.DocumentId">View larger (opens in new tab)</a>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="govuk-grid-column-one-third-from-desktop">
+                <h3 class="govuk-heading-m">Documents we accept</h3>
+                <ul class="govuk-list govuk-list--spaced">
+                    @if (Model.CaseHeader.CaseType == DqtConstants.NameChangeSubjectTitle)
+                    {
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Marriage</h4>
+                            <span>Marriage certificate</span>
+                        </li>
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Civil Partnership</h4>
+                            <span>Civil agreement certificate</span>
+                        </li>
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Divorce</h4>
+                            <span>Decree absolute and birth certificate</span>
+                        </li>
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Statutory declaration</h4>
+                            <span>Statutory declaration</span>
+                        </li>
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Deed poll</h4>
+                            <span>Deed poll</span>
+                        </li>
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Fix a typo</h4>
+                            <span>Passport</span>
+                        </li>
+                    }
+                    @if (Model.CaseHeader.CaseType == DqtConstants.DateOfBirthChangeSubjectTitle)
+                    {
+                        <li>Birth certificate</li>
+                        <li>Passport</li>
+                        <li>Driving license</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="govuk-button-group">
+    <govuk-button-link href="@LinkGenerator.AcceptCase(Model.TicketNumber)" class="govuk-button">Accept change</govuk-button-link>
+    <govuk-button-link href="@LinkGenerator.RejectCase(Model.TicketNumber)" class="govuk-button govuk-button--warning">Reject change</govuk-button-link>
+</div>

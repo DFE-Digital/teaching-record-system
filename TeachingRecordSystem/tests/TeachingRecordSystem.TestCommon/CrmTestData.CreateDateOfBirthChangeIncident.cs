@@ -22,9 +22,9 @@ public partial class CrmTestData
     {
         private const IncidentStatusType DefaultIncidentStatus = IncidentStatusType.Active;
 
-        private static readonly string _defaultEvidenceFileName = "evidence.txt";
+        private static readonly string _defaultEvidenceFileName = "evidence.jpeg";
         private static readonly MemoryStream _defaultEvidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
-        private static readonly string _defaultEvidenceFileMimeType = "text/plain";
+        private static readonly string _defaultEvidenceFileMimeType = "image/jpeg";
 
         private Guid? _customerId;
         private IncidentStatusType? _incidentStatusType;
@@ -192,9 +192,13 @@ public partial class CrmTestData
                 SubjectId = dateOfBirthChangeSubject.Id,
                 SubjectTitle = subjectTitle,
                 NewDateOfBirth = dateOfBirth,
-                EvidenceFileName = _defaultEvidenceFileName,
-                EvidenceBase64EncodedFileContent = annotationBody,
-                EvidenceFileMimeType = _defaultEvidenceFileMimeType
+                Evidence = new CreateDateOfBirthChangeIncidentEvidence()
+                {
+                    DocumentId = document.Id,
+                    FileName = _defaultEvidenceFileName,
+                    Base64EncodedFileContent = annotationBody,
+                    MimeType = _defaultEvidenceFileMimeType
+                }
             };
         }
 
@@ -217,8 +221,14 @@ public partial class CrmTestData
         public required Guid SubjectId { get; init; }
         public required string SubjectTitle { get; init; }
         public required DateOnly NewDateOfBirth { get; init; }
-        public required string EvidenceFileName { get; init; }
-        public required string EvidenceBase64EncodedFileContent { get; init; }
-        public required string EvidenceFileMimeType { get; init; }
+        public required CreateDateOfBirthChangeIncidentEvidence Evidence { get; init; }
+    }
+
+    public record CreateDateOfBirthChangeIncidentEvidence
+    {
+        public required Guid DocumentId { get; init; }
+        public required string FileName { get; init; }
+        public required string Base64EncodedFileContent { get; init; }
+        public required string MimeType { get; init; }
     }
 }
