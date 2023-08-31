@@ -16,6 +16,7 @@ public class SeedCrmReferenceData : IStartupTask
     public Task Execute()
     {
         AddSubjects();
+        AddSanctionCodes();
 
         return Task.CompletedTask;
     }
@@ -30,6 +31,29 @@ public class SeedCrmReferenceData : IStartupTask
         _xrmFakedContext.CreateEntity(new Subject()
         {
             Title = "Change of Name"
+        });
+    }
+
+    private void AddSanctionCodes()
+    {
+        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
+        {
+            dfeta_Value = "G1"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
+        {
+            dfeta_Value = "A1"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
+        {
+            dfeta_Value = "A17"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
+        {
+            dfeta_Value = "A18"
         });
     }
 }

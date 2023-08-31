@@ -15,8 +15,32 @@ public partial class CrmTestData
 
     public class CreatePersonBuilder
     {
+        private DateOnly? _dateOfBirth;
         private bool? _hasTrn;
+        private string? _lastName;
         private readonly List<Sanction> _sanctions = new();
+
+        public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
+        {
+            if (_dateOfBirth is not null && _dateOfBirth != dateOfBirth)
+            {
+                throw new InvalidOperationException("WithDateOfBirth cannot be changed after it's set.");
+            }
+
+            _dateOfBirth = dateOfBirth;
+            return this;
+        }
+
+        public CreatePersonBuilder WithLastName(string lastName)
+        {
+            if (_lastName is not null && _lastName != lastName)
+            {
+                throw new InvalidOperationException("WithLastName cannot be changed after it's set.");
+            }
+
+            _lastName = lastName;
+            return this;
+        }
 
         public CreatePersonBuilder WithSanction(
             string sanctionCode,
@@ -47,8 +71,8 @@ public partial class CrmTestData
 
             var firstName = testData.GenerateFirstName();
             var middleName = testData.GenerateMiddleName();
-            var lastName = testData.GenerateLastName();
-            var dateOfBirth = testData.GenerateDateOfBirth();
+            var lastName = _lastName ?? testData.GenerateLastName();
+            var dateOfBirth = _dateOfBirth ?? testData.GenerateDateOfBirth();
 
             var personId = Guid.NewGuid();
 
@@ -108,6 +132,19 @@ public partial class CrmTestData
         public required string MiddleName { get; init; }
         public required string LastName { get; init; }
         public required IReadOnlyCollection<Sanction> Sanctions { get; init; }
+
+        public Contact ToContact() => new()
+        {
+            Id = PersonId,
+            FirstName = FirstName,
+            MiddleName = MiddleName,
+            LastName = LastName,
+            dfeta_StatedFirstName = FirstName,
+            dfeta_StatedMiddleName = MiddleName,
+            dfeta_StatedLastName = LastName,
+            BirthDate = DateOfBirth.FromDateOnlyWithDqtBstFix(isLocalTime: false),
+            dfeta_TRN = Trn
+        };
     }
 
     public record Sanction(string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent);

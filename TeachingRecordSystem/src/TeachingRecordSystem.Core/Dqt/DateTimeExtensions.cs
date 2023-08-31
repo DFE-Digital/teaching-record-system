@@ -9,6 +9,7 @@ public static class DateTimeExtensions
         var dt = dateOnly.ToDateTime(new TimeOnly());
         return isLocalTime ? TimeZoneInfo.ConvertTimeFromUtc(dt, _gmt) : dt;
     }
+
     public static DateTime? FromDateOnlyWithDqtBstFix(this DateOnly? dateOnly, bool isLocalTime) =>
         dateOnly.HasValue ? FromDateOnlyWithDqtBstFix(dateOnly.Value, isLocalTime) : null;
 

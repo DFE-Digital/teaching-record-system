@@ -17,6 +17,8 @@ public class GetAllSanctionCodesHandler : ICrmQueryHandler<GetAllSanctionCodesQu
                 dfeta_sanctioncode.Fields.dfeta_Value)
         };
 
+        queryExpression.Criteria.AddCondition(dfeta_sanctioncode.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_sanctioncodeState.Active);
+
         var request = new RetrieveMultipleRequest()
         {
             Query = queryExpression
