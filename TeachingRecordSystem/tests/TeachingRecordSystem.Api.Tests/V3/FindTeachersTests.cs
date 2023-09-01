@@ -54,49 +54,25 @@ public class FindTeachersTests : ApiTestBase
         // Arrange
         var findBy = "LastNameAndDateOfBirth";
         var lastName = "Smith";
-        var dateOfBirth = "1990-01-01";
+        var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var resultWithoutStatedNames = new Contact()
-        {
-            Id = Guid.NewGuid(),
-            FirstName = Faker.Name.First(),
-            MiddleName = Faker.Name.Middle(),
-            LastName = Faker.Name.Last(),
-            dfeta_TRN = "1234567",
-            BirthDate = Faker.Identification.DateOfBirth()
-        };
-
-        var resultWithStatedNames = new Contact()
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "Mary",
-            MiddleName = "Jane",
-            LastName = "Smith",
-            dfeta_StatedFirstName = "Mary Jane",
-            dfeta_StatedMiddleName = null,
-            dfeta_StatedLastName = "Smith",
-            dfeta_TRN = "2345678",
-            BirthDate = Faker.Identification.DateOfBirth()
-        };
+        var person1 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
+        var person2 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A17"));
 
         DataverseAdapterMock
             .Setup(mock => mock.FindTeachersByLastNameAndDateOfBirth(
                 lastName,
-                DateOnly.Parse(dateOfBirth),
+                dateOfBirth,
                 /* columnNames: */ It.IsAny<string[]>()))
-            .ReturnsAsync(new[] { resultWithoutStatedNames, resultWithStatedNames });
-
-        DataverseAdapterMock
-            .Setup(mock => mock.GetSanctionsByContactIds(It.IsAny<IEnumerable<Guid>>(), /* liveOnly: */ true))
-            .ReturnsAsync(new Dictionary<Guid, string[]>()
+            .ReturnsAsync(new[]
             {
-                { resultWithoutStatedNames.Id, new[] { "G1" } },
-                { resultWithStatedNames.Id, new[] { "A17" } }
+                person1.ToContact(),
+                person2.ToContact()
             });
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/v3/teachers?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth}");
+            $"/v3/teachers?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
 
         // Act
         var response = await HttpClientWithApiKey.SendAsync(request);
@@ -117,21 +93,21 @@ public class FindTeachersTests : ApiTestBase
                 {
                     new
                     {
-                        trn = resultWithoutStatedNames.dfeta_TRN,
-                        dateOfBirth = DateOnly.FromDateTime(resultWithoutStatedNames.BirthDate!.Value),
-                        firstName = resultWithoutStatedNames.FirstName,
-                        middleName = resultWithoutStatedNames.MiddleName ?? "",
-                        lastName = resultWithoutStatedNames.LastName,
-                        sanctions = new[] { "G1" }
+                        trn = person1.Trn,
+                        dateOfBirth = person1.DateOfBirth,
+                        firstName = person1.FirstName,
+                        middleName = person1.MiddleName ?? "",
+                        lastName = person1.LastName,
+                        sanctions = person1.Sanctions.Select(s => s.SanctionCode)
                     },
                     new
                     {
-                        trn = resultWithStatedNames.dfeta_TRN,
-                        dateOfBirth = DateOnly.FromDateTime(resultWithStatedNames.BirthDate!.Value),
-                        firstName = resultWithStatedNames.dfeta_StatedFirstName,
-                        middleName = resultWithStatedNames.dfeta_StatedMiddleName ?? "",
-                        lastName = resultWithStatedNames.dfeta_StatedLastName,
-                        sanctions = new[] { "A17" }
+                        trn = person2.Trn,
+                        dateOfBirth = person2.DateOfBirth,
+                        firstName = person2.FirstName,
+                        middleName = person2.MiddleName,
+                        lastName = person2.LastName,
+                        sanctions = person2.Sanctions.Select(s => s.SanctionCode)
                     }
                 }
             });

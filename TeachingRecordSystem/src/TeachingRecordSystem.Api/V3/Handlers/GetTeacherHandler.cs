@@ -6,6 +6,7 @@ using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.V3.Handlers;
 
@@ -14,10 +15,12 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
     private const string QtsAwardedInWalesTeacherStatusValue = "213";
 
     private readonly IDataverseAdapter _dataverseAdapter;
+    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
 
-    public GetTeacherHandler(IDataverseAdapter dataverseAdapter)
+    public GetTeacherHandler(IDataverseAdapter dataverseAdapter, ICrmQueryDispatcher crmQueryDispatcher)
     {
         _dataverseAdapter = dataverseAdapter;
+        _crmQueryDispatcher = crmQueryDispatcher;
     }
 
     public async Task<GetTeacherResponse?> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
@@ -184,12 +187,22 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
         }
 
-        IEnumerable<string>? sanctions = null;
+        IEnumerable<GetTeacherResponseSanction>? sanctions = null;
 
         if (request.Include.HasFlag(GetTeacherRequestIncludes.Sanctions))
         {
-            sanctions = (await _dataverseAdapter.GetSanctionsByContactIds(new[] { teacher.Id }, liveOnly: true))[teacher.Id]
-                .Intersect(Constants.ExposableSanctionCodes);
+            var getSanctionsQuery = new GetSanctionsByContactIdsQuery(
+                new[] { teacher.Id },
+                ActiveOnly: true,
+                ColumnSet: new(dfeta_sanction.Fields.dfeta_StartDate));
+
+            sanctions = (await _crmQueryDispatcher.ExecuteQuery(getSanctionsQuery))[teacher.Id]
+                .Where(s => Constants.ExposableSanctionCodes.Contains(s.SanctionCode))
+                .Select(s => new GetTeacherResponseSanction()
+                {
+                    Code = s.SanctionCode,
+                    StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                });
         }
 
         var firstName = teacher.ResolveFirstName();

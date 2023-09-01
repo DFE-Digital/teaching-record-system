@@ -17,7 +17,8 @@ public class ReferenceDataCache
     public async Task<dfeta_sanctioncode> GetSanctionCodeByValue(string value)
     {
         var sanctionCodes = await EnsureSanctionCodes();
-        return sanctionCodes.Single(s => s.dfeta_Value == value);
+        // build environment has some duplicate sanction codes, which prevent us using Single() here
+        return sanctionCodes.First(s => s.dfeta_Value == value);
     }
 
     public async Task<Subject> GetSubjectByTitle(string title)
