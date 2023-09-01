@@ -1,7 +1,9 @@
 @page "/cases/{ticketNumber}/accept"
 @model TeachingRecordSystem.SupportUi.Pages.Cases.EditCase.AcceptModel
 @{
-    ViewBag.Title = "Accept change";
+    ViewBag.Title = "Are you sure you want to accept this change?";
 }
 
-<p>Accept</p>
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.EditCase(Model.TicketNumber)" />
+}
