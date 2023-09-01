@@ -56,11 +56,11 @@ public class RejectModel : PageModel
         (Incident Incident, dfeta_document[] Documents)? incidentAndDocuments = await GetIncidentAndDocuments();
 
         var requestStatus = "rejected";
-        var flashMessage = "The user's record has not been changed and they have been notified.";
+        var flashMessage = "The user’s record has not been changed and they have been notified.";
         if (RejectionReasonChoice!.Value == CaseRejectionReasonOption.ChangeNoLongerRequired)
         {
             requestStatus = "cancelled";
-            flashMessage = "The user's record has not been changed and they have not been notified.";
+            flashMessage = "The user’s record has not been changed and they have not been notified.";
 
             _ = await _crmQueryDispatcher.ExecuteQuery(new CancelIncidentQuery(incidentAndDocuments.Value.Incident.Id));
         }
@@ -81,7 +81,7 @@ public class RejectModel : PageModel
 
     public enum CaseRejectionReasonOption
     {
-        [Display(Name = "Request and proof don't match")]
+        [Display(Name = "Request and proof don’t match")]
         RequestAndProofDontMatch,
         [Display(Name = "Wrong type of document")]
         WrongTypeOfDocument,

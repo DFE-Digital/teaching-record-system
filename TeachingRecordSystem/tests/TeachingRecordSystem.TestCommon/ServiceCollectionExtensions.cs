@@ -6,10 +6,12 @@ using FakeXrmEasy.Middleware;
 using FakeXrmEasy.Middleware.Crud;
 using FakeXrmEasy.Middleware.Messages;
 using FakeXrmEasy.Middleware.Pipeline;
+using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.TestCommon.Infrastructure.FakeXrmEasy.FakeMessageExecutors;
 using TeachingRecordSystem.TestCommon.Infrastructure.FakeXrmEasy.Plugins;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -22,6 +24,7 @@ public static class ServiceCollectionExtensions
             .New()
             .AddCrud()
             .AddFakeMessageExecutors(Assembly.GetAssembly(typeof(ExecuteTransactionExecutor)))
+            .AddFakeMessageExecutor<CloseIncidentRequest>(new WorkaroundCloseIncidentRequestExecutor())
             .AddPipelineSimulation()
             .UsePipelineSimulation()
             .UseCrud()
