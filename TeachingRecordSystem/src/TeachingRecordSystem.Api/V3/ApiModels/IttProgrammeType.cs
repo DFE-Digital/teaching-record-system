@@ -75,7 +75,10 @@ public enum IttProgrammeType
     ProviderLedUndergrad = 389040022,
 
     [Description("International qualified teacher status")]
-    InternationalQualifiedTeacherStatus = 389040023
+    InternationalQualifiedTeacherStatus = 389040023,
+
+    [Description("High potential ITT")]
+    HighPotentialITT = 389040024
 }
 
 public static class IttProgrammeTypeExtensions
@@ -112,6 +115,7 @@ public static class IttProgrammeTypeExtensions
         IttProgrammeType.ProviderLedPostgrad => "Provider-led (postgrad)",
         IttProgrammeType.ProviderLedUndergrad => "Provider-led (undergrad)",
         IttProgrammeType.InternationalQualifiedTeacherStatus => "International qualified teacher status",
+        IttProgrammeType.HighPotentialITT => "High potential ITT",
         _ => throw new ArgumentException($"Unknown {nameof(IttProgrammeType)}: '{input}'.")
     };
 }
