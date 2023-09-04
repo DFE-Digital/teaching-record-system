@@ -1,8 +1,10 @@
+using System.Collections.Immutable;
+
 namespace TeachingRecordSystem.Api.V3;
 
 public static class Constants
 {
-    public static IReadOnlyCollection<string> ExposableSanctionCodes { get; } = new[]
+    public static ImmutableArray<string> ExposableSanctionCodes { get; } = new[]
     {
         "G1",
         "A18",
@@ -35,5 +37,5 @@ public static class Constants
         "A2",
         "A24",
         "A23",
-    }.AsReadOnly();
+    }.ToImmutableArray();
 }

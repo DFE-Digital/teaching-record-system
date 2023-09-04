@@ -187,7 +187,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
         }
 
-        IEnumerable<GetTeacherResponseSanction>? sanctions = null;
+        IEnumerable<SanctionInfo>? sanctions = null;
 
         if (request.Include.HasFlag(GetTeacherRequestIncludes.Sanctions))
         {
@@ -198,7 +198,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
             sanctions = (await _crmQueryDispatcher.ExecuteQuery(getSanctionsQuery))[teacher.Id]
                 .Where(s => Constants.ExposableSanctionCodes.Contains(s.SanctionCode))
-                .Select(s => new GetTeacherResponseSanction()
+                .Select(s => new SanctionInfo()
                 {
                     Code = s.SanctionCode,
                     StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
