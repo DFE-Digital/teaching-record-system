@@ -25,6 +25,10 @@ public class TrsLinkGenerator
 
     public string RejectCase(string ticketNumber) => GetRequiredPathByPage("/Cases/EditCase/Reject", routeValues: new { ticketNumber });
 
+    public string Persons() => GetRequiredPathByPage("/Persons/Index");
+
+    public string PersonDetail() => GetRequiredPathByPage("/Persons/PersonDetail/Index");
+
     public string Users() => GetRequiredPathByPage("/Users/Index");
 
     public string AddUser() => GetRequiredPathByPage("/Users/AddUser/Index");
