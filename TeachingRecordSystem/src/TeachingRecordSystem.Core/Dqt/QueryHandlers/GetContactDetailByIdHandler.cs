@@ -11,7 +11,7 @@ public class GetContactDetailByIdHandler : ICrmQueryHandler<GetContactDetailById
         var filter = new FilterExpression();
         filter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, query.ContactId);
 
-        var queryExpression = new QueryExpression(Contact.PrimaryIdAttribute)
+        var queryExpression = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = query.ColumnSet,
             Criteria = filter
