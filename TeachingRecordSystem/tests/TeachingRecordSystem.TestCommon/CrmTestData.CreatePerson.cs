@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -135,7 +136,7 @@ public partial class CrmTestData
                 MiddleName = middleName,
                 LastName = lastName,
                 PreviousLastName = _previousLastName,
-                Sanctions = _sanctions
+                Sanctions = _sanctions.ToImmutableArray()
             };
         }
     }
@@ -150,7 +151,7 @@ public partial class CrmTestData
         public required string MiddleName { get; init; }
         public required string LastName { get; init; }
         public required string? PreviousLastName { get; init; }
-        public required IReadOnlyCollection<Sanction> Sanctions { get; init; }
+        public required ImmutableArray<Sanction> Sanctions { get; init; }
 
         public Contact ToContact() => new()
         {

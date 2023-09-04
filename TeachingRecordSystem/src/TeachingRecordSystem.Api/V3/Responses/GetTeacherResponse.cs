@@ -22,7 +22,7 @@ public record GetTeacherResponse
     public required Option<IEnumerable<GetTeacherResponseNpqQualificationsQualification>> NpqQualifications { get; init; }
     public required Option<IEnumerable<GetTeacherResponseMandatoryQualificationsQualification>> MandatoryQualifications { get; init; }
     public required Option<IEnumerable<GetTeacherResponseHigherEducationQualificationsQualification>> HigherEducationQualifications { get; init; }
-    public required Option<IEnumerable<GetTeacherResponseSanction>> Sanctions { get; init; }
+    public required Option<IEnumerable<SanctionInfo>> Sanctions { get; init; }
 }
 
 public record GetTeacherResponseQts
@@ -128,10 +128,4 @@ public record GetTeacherResponseHigherEducationQualificationsQualificationSubjec
 {
     public required string Code { get; init; }
     public required string Name { get; init; }
-}
-
-public record GetTeacherResponseSanction
-{
-    public required string Code { get; init; }
-    public required DateOnly? StartDate { get; init; }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using MediatR;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Api.V3.Requests;
@@ -50,10 +51,17 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
                 FirstName = r.ResolveFirstName(),
                 MiddleName = r.ResolveMiddleName(),
                 LastName = r.ResolveLastName(),
-                Sanctions = sanctions[r.Id].Select(s => s.SanctionCode).ToArray()
+                Sanctions = sanctions[r.Id]
+                    .Where(s => Constants.ExposableSanctionCodes.Contains(s.SanctionCode))
+                    .Select(s => new SanctionInfo()
+                    {
+                        Code = s.SanctionCode,
+                        StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                    })
+                    .ToImmutableArray()
             })
             .OrderBy(c => c.Trn)
-            .ToArray()
+            .ToImmutableArray()
         };
     }
 }
