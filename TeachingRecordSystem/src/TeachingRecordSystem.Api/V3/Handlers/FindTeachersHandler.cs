@@ -20,7 +20,7 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
     public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
     {
         var contacts = await _crmQueryDispatcher.ExecuteQuery(
-            new FindTeachersByLastNameAndDateOfBirthQuery(
+            new GetContactsByLastNameAndDateOfBirthQuery(
                 request.LastName!,
                 request.DateOfBirth!.Value,
                 new ColumnSet(

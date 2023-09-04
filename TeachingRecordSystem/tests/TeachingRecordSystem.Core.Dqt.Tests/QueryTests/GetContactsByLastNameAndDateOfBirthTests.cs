@@ -1,12 +1,13 @@
 using Microsoft.Xrm.Sdk.Query;
 
 namespace TeachingRecordSystem.Core.Dqt.Tests.QueryTests;
-public class FindTeachersByLastNameAndDateOfBirthTests : IAsyncLifetime
+
+public class GetContactsByLastNameAndDateOfBirthTests : IAsyncLifetime
 {
     private readonly CrmClientFixture.TestDataScope _dataScope;
     private readonly CrmQueryDispatcher _crmQueryDispatcher;
 
-    public FindTeachersByLastNameAndDateOfBirthTests(CrmClientFixture crmClientFixture)
+    public GetContactsByLastNameAndDateOfBirthTests(CrmClientFixture crmClientFixture)
     {
         _dataScope = crmClientFixture.CreateTestDataScope();
         _crmQueryDispatcher = crmClientFixture.CreateQueryDispatcher();
@@ -27,10 +28,11 @@ public class FindTeachersByLastNameAndDateOfBirthTests : IAsyncLifetime
         var person2 = await _dataScope.TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
         // Act
-        var results = await _crmQueryDispatcher.ExecuteQuery(new FindTeachersByLastNameAndDateOfBirthQuery(lastName, dateOfBirth, new ColumnSet()));
+        var results = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByLastNameAndDateOfBirthQuery(lastName, dateOfBirth, new ColumnSet()));
 
         // Assert
         Assert.NotNull(results);
-        Assert.Equal(2, results.Count());
+        Assert.Contains(results, r => r.Id == person1.ContactId);
+        Assert.Contains(results, r => r.Id == person2.ContactId);
     }
 }
