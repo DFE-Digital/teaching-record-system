@@ -1342,46 +1342,6 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
-    public async Task<Contact[]> FindTeachersByLastNameAndDateOfBirth(string lastName, DateOnly dateOfBirth, string[] columnNames)
-    {
-        //Find all the permutations of names to match on
-        var lastNameFilter = new FilterExpression(LogicalOperator.Or);
-        lastNameFilter.AddCondition(Contact.Fields.LastName, ConditionOperator.Equal, lastName);
-        lastNameFilter.AddCondition(Contact.Fields.dfeta_PreviousLastName, ConditionOperator.Equal, lastName);
-
-        var request = new RetrieveMultipleRequest()
-        {
-            Query = new QueryExpression()
-            {
-                ColumnSet = new ColumnSet(columnNames),
-                EntityName = Contact.EntityLogicalName,
-                Criteria = new FilterExpression(LogicalOperator.And)
-                {
-                    Conditions =
-                    {
-                        new ConditionExpression(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active),
-                        new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull),
-                        new ConditionExpression(Contact.Fields.BirthDate, ConditionOperator.Equal, dateOfBirth.ToDateTime()),
-                    },
-                    Filters =
-                    {
-                        lastNameFilter
-                    }
-                },
-                Orders =
-                {
-                    new OrderExpression() { AttributeName = Contact.Fields.LastName },
-                    new OrderExpression() { AttributeName = Contact.Fields.FirstName },
-                    new OrderExpression() { AttributeName = Contact.Fields.dfeta_TRN },
-                }
-            }
-        };
-
-        var response = (RetrieveMultipleResponse)await _service.ExecuteAsync(request);
-
-        return response.EntityCollection.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
-    }
-
     public async Task<Contact> GetTeacherByTsPersonId(string tsPersonId, string[] columnNames)
     {
         var filter = new FilterExpression(LogicalOperator.And);

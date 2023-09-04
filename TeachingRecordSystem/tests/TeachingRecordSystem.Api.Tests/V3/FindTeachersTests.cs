@@ -49,7 +49,7 @@ public class FindTeachersTests : ApiTestBase
     }
 
     [Fact]
-    public async Task Get_ValidRequest_ReturnsMappedContacts()
+    public async Task Get_ValidRequestWithMatchesOnLastName_ReturnsMappedContacts()
     {
         // Arrange
         var findBy = "LastNameAndDateOfBirth";
@@ -59,16 +59,60 @@ public class FindTeachersTests : ApiTestBase
         var person1 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
         var person2 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A17"));
 
-        DataverseAdapterMock
-            .Setup(mock => mock.FindTeachersByLastNameAndDateOfBirth(
-                lastName,
-                dateOfBirth,
-                /* columnNames: */ It.IsAny<string[]>()))
-            .ReturnsAsync(new[]
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/v3/teachers?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseEquals(
+            response,
+            new
             {
-                person1.ToContact(),
-                person2.ToContact()
+                total = 2,
+                query = new
+                {
+                    findBy,
+                    lastName,
+                    dateOfBirth
+                },
+                results = new[]
+                {
+                    new
+                    {
+                        trn = person1.Trn,
+                        dateOfBirth = person1.DateOfBirth,
+                        firstName = person1.FirstName,
+                        middleName = person1.MiddleName ?? "",
+                        lastName = person1.LastName,
+                        sanctions = person1.Sanctions.Select(s => s.SanctionCode)
+                    },
+                    new
+                    {
+                        trn = person2.Trn,
+                        dateOfBirth = person2.DateOfBirth,
+                        firstName = person2.FirstName,
+                        middleName = person2.MiddleName,
+                        lastName = person2.LastName,
+                        sanctions = person2.Sanctions.Select(s => s.SanctionCode)
+                    }
+                }
             });
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithMatchOnPreviousName_ReturnsMappedContacts()
+    {
+        // Arrange
+        var findBy = "LastNameAndDateOfBirth";
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = new DateOnly(1990, 1, 1);
+
+        var person1 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
+        var person2 = await TestData.CreatePerson(b => b.WithLastName(TestData.GenerateChangedLastName(lastName)).WithPreviousLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A17"));
+        var person3 = await TestData.CreatePerson(b => b.WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

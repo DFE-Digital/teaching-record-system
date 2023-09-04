@@ -18,6 +18,7 @@ public partial class CrmTestData
         private DateOnly? _dateOfBirth;
         private bool? _hasTrn;
         private string? _lastName;
+        private string? _previousLastName;
         private readonly List<Sanction> _sanctions = new();
 
         public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
@@ -39,6 +40,17 @@ public partial class CrmTestData
             }
 
             _lastName = lastName;
+            return this;
+        }
+
+        public CreatePersonBuilder WithPreviousLastName(string previousLastName)
+        {
+            if (_previousLastName is not null && _previousLastName != previousLastName)
+            {
+                throw new InvalidOperationException("WithPreviousLastName cannot be changed after it's set.");
+            }
+
+            _previousLastName = previousLastName;
             return this;
         }
 
@@ -86,6 +98,11 @@ public partial class CrmTestData
                 dfeta_TRN = trn
             };
 
+            if (_previousLastName is not null)
+            {
+                contact.dfeta_PreviousLastName = _previousLastName;
+            }
+
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = contact });
 
@@ -117,6 +134,7 @@ public partial class CrmTestData
                 FirstName = firstName,
                 MiddleName = middleName,
                 LastName = lastName,
+                PreviousLastName = _previousLastName,
                 Sanctions = _sanctions
             };
         }
@@ -131,6 +149,7 @@ public partial class CrmTestData
         public required string FirstName { get; init; }
         public required string MiddleName { get; init; }
         public required string LastName { get; init; }
+        public required string? PreviousLastName { get; init; }
         public required IReadOnlyCollection<Sanction> Sanctions { get; init; }
 
         public Contact ToContact() => new()
