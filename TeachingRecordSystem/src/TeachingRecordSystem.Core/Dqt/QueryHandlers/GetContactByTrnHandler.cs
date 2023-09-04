@@ -1,5 +1,4 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
-using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
@@ -16,11 +15,6 @@ public class GetContactByTrnHandler : ICrmQueryHandler<GetContactByTrnQuery, Con
         };
         queryByAttribute.AddAttributeValue(Contact.Fields.StateCode, (int)ContactState.Active);
         queryByAttribute.AddAttributeValue(Contact.Fields.dfeta_TRN, query.Trn);
-
-        var request = new RetrieveMultipleRequest()
-        {
-            Query = queryByAttribute
-        };
 
         var response = await organizationService.RetrieveMultipleAsync(queryByAttribute);
 

@@ -16,7 +16,7 @@ public class GetIncidentByTicketNumberTests : IAsyncLifetime
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
     [Fact]
-    public async Task WhenCalled_WithTicketNumberForNonExistentIncident_ReturnsTupleWithNullProperties()
+    public async Task WhenCalled_WithTicketNumberForNonExistentIncident_ReturnsNull()
     {
         // Arrange
         var nonExistentTicketNumber = Guid.NewGuid().ToString();

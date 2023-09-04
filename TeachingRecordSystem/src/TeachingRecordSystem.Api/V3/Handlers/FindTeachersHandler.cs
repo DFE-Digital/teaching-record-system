@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
 using TeachingRecordSystem.Core.Dqt;
@@ -9,43 +10,40 @@ namespace TeachingRecordSystem.Api.V3.Handlers;
 
 public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeachersResponse>
 {
-    private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
 
-    public FindTeachersHandler(IDataverseAdapter dataverseAdapter, ICrmQueryDispatcher crmQueryDispatcher)
+    public FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher)
     {
-        _dataverseAdapter = dataverseAdapter;
         _crmQueryDispatcher = crmQueryDispatcher;
     }
 
     public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
     {
-        var results = await _dataverseAdapter.FindTeachersByLastNameAndDateOfBirth(
-            request.LastName!,
-            request.DateOfBirth!.Value,
-            columnNames: new[]
-            {
-                Contact.Fields.dfeta_TRN,
-                Contact.Fields.BirthDate,
-                Contact.Fields.FirstName,
-                Contact.Fields.MiddleName,
-                Contact.Fields.LastName,
-                Contact.Fields.dfeta_StatedFirstName,
-                Contact.Fields.dfeta_StatedMiddleName,
-                Contact.Fields.dfeta_StatedLastName
-            });
+        var contacts = await _crmQueryDispatcher.ExecuteQuery(
+            new GetContactsByLastNameAndDateOfBirthQuery(
+                request.LastName!,
+                request.DateOfBirth!.Value,
+                new ColumnSet(
+                    Contact.Fields.dfeta_TRN,
+                    Contact.Fields.BirthDate,
+                    Contact.Fields.FirstName,
+                    Contact.Fields.MiddleName,
+                    Contact.Fields.LastName,
+                    Contact.Fields.dfeta_StatedFirstName,
+                    Contact.Fields.dfeta_StatedMiddleName,
+                    Contact.Fields.dfeta_StatedLastName)));
 
         var sanctions = await _crmQueryDispatcher.ExecuteQuery(
             new GetSanctionsByContactIdsQuery(
-                results.Select(r => r.Id),
+                contacts.Select(r => r.Id),
                 ActiveOnly: true,
                 new()));
 
         return new FindTeachersResponse()
         {
             Query = request,
-            Total = results.Length,
-            Results = results.Select(r => new FindTeachersResponseResult()
+            Total = contacts.Length,
+            Results = contacts.Select(r => new FindTeachersResponseResult()
             {
                 Trn = r.dfeta_TRN,
                 DateOfBirth = r.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),
@@ -53,7 +51,9 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
                 MiddleName = r.ResolveMiddleName(),
                 LastName = r.ResolveLastName(),
                 Sanctions = sanctions[r.Id].Select(s => s.SanctionCode).ToArray()
-            }).ToArray()
+            })
+            .OrderBy(c => c.Trn)
+            .ToArray()
         };
     }
 }

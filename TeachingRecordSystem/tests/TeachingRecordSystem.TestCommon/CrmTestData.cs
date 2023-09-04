@@ -50,7 +50,7 @@ public partial class CrmTestData
 
         do
         {
-            newLastName = GenerateFirstName();
+            newLastName = GenerateLastName();
         }
         while (newLastName == currentLastName);
 
