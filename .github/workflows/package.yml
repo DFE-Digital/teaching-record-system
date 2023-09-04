@@ -23,7 +23,7 @@ jobs:
       ui_image_tag: ${{ steps.image_tags.outputs.ui_tag }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: extractions/setup-just@v1
 
