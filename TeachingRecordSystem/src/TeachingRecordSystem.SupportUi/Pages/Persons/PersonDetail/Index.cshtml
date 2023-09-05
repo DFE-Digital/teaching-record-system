@@ -8,32 +8,32 @@
     <govuk-back-link href="@LinkGenerator.Persons()" />
 }
 
-<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<h1 class="govuk-heading-l" data-testid="page-title">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <govuk-tabs>
             <govuk-tabs-item id="general" label="General">
-                <govuk-summary-list>
+                <govuk-summary-list data-testid="personal-details">
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.Person.FullName</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="personal-details-name">@Model.Person.FullName</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : "Not provided")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="personal-details-date-of-birth">@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : "Not provided")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@(!string.IsNullOrEmpty(Model.Person.Trn) ? Model.Person.Trn : "Not provided")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="personal-details-trn">@(!string.IsNullOrEmpty(Model.Person.Trn) ? Model.Person.Trn : "Not provided")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@(!string.IsNullOrEmpty(Model.Person.Email) ? Model.Person.Email : "Not provided")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="personal-details-email">@(!string.IsNullOrEmpty(Model.Person.Email) ? Model.Person.Email : "Not provided")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@(!string.IsNullOrEmpty(Model.Person.MobileNumber) ? Model.Person.MobileNumber : "Not provided")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="personal-details-mobile-number">@(!string.IsNullOrEmpty(Model.Person.MobileNumber) ? Model.Person.MobileNumber : "Not provided")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-tabs-item>
