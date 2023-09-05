@@ -20,6 +20,8 @@ public partial class CrmTestData
         private bool? _hasTrn;
         private string? _lastName;
         private string? _previousLastName;
+        private string? _email;
+        private string? _mobileNumber;
         private readonly List<Sanction> _sanctions = new();
 
         public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
@@ -41,6 +43,28 @@ public partial class CrmTestData
             }
 
             _lastName = lastName;
+            return this;
+        }
+
+        public CreatePersonBuilder WithEmail(string email)
+        {
+            if (_email is not null && _email != email)
+            {
+                throw new InvalidOperationException("WithEmail cannot be changed after it's set.");
+            }
+
+            _email = email;
+            return this;
+        }
+
+        public CreatePersonBuilder WithMobileNumber(string mobileNumber)
+        {
+            if (_mobileNumber is not null && _mobileNumber != mobileNumber)
+            {
+                throw new InvalidOperationException("WithMobileNumber cannot be changed after it's set.");
+            }
+
+            _mobileNumber = mobileNumber;
             return this;
         }
 
@@ -104,6 +128,16 @@ public partial class CrmTestData
                 contact.dfeta_PreviousLastName = _previousLastName;
             }
 
+            if (_email is not null)
+            {
+                contact.EMailAddress1 = _email;
+            }
+
+            if (_mobileNumber is not null)
+            {
+                contact.MobilePhone = _mobileNumber;
+            }
+
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = contact });
 
@@ -136,6 +170,8 @@ public partial class CrmTestData
                 MiddleName = middleName,
                 LastName = lastName,
                 PreviousLastName = _previousLastName,
+                Email = _email,
+                MobileNumber = _mobileNumber,
                 Sanctions = _sanctions.ToImmutableArray()
             };
         }
@@ -151,6 +187,8 @@ public partial class CrmTestData
         public required string MiddleName { get; init; }
         public required string LastName { get; init; }
         public required string? PreviousLastName { get; init; }
+        public required string? Email { get; init; }
+        public required string? MobileNumber { get; init; }
         public required ImmutableArray<Sanction> Sanctions { get; init; }
 
         public Contact ToContact() => new()
@@ -163,7 +201,10 @@ public partial class CrmTestData
             dfeta_StatedMiddleName = MiddleName,
             dfeta_StatedLastName = LastName,
             BirthDate = DateOfBirth.FromDateOnlyWithDqtBstFix(isLocalTime: false),
-            dfeta_TRN = Trn
+            dfeta_TRN = Trn,
+            dfeta_PreviousLastName = PreviousLastName,
+            EMailAddress1 = Email,
+            MobilePhone = MobileNumber
         };
     }
 

@@ -7,6 +7,7 @@ public partial class CrmTestData
 {
     private static readonly object _gate = new();
     private static readonly HashSet<string> _emails = new();
+    private static readonly HashSet<string> _mobileNumbers = new();
 
     private readonly Func<Task<string>> _generateTrn;
 
@@ -86,6 +87,22 @@ public partial class CrmTestData
         }
 
         return email;
+    }
+
+    public string GenerateUniqueMobileNumber()
+    {
+        string mobileNumber;
+
+        lock (_gate)
+        {
+            do
+            {
+                mobileNumber = Faker.Phone.Number();
+            }
+            while (!_mobileNumbers.Add(mobileNumber));
+        }
+
+        return mobileNumber;
     }
 
     public virtual Task<string> GenerateTrn() => _generateTrn();

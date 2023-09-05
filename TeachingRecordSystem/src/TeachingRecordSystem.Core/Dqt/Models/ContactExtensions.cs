@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace TeachingRecordSystem.Core.Dqt.Models;
 
 public static class ContactExtensions
@@ -10,6 +12,37 @@ public static class ContactExtensions
 
     public static string ResolveLastName(this Contact contact) =>
         (contact.HasStatedNames() ? contact.dfeta_StatedLastName : contact.LastName) ?? string.Empty;
+
+    public static string ResolveFullName(this Contact contact, bool includeMiddleName = true)
+    {
+        var fullName = new StringBuilder(contact.ResolveFirstName());
+        if (includeMiddleName)
+        {
+            var middleName = contact.ResolveMiddleName();
+            if (!string.IsNullOrEmpty(middleName))
+            {
+                if (fullName.Length > 0)
+                {
+                    fullName.Append(" ");
+                }
+
+                fullName.Append(middleName);
+            }
+        }
+
+        var lastName = contact.ResolveLastName();
+        if (!string.IsNullOrEmpty(lastName))
+        {
+            if (fullName.Length > 0)
+            {
+                fullName.Append(" ");
+            }
+
+            fullName.Append(lastName);
+        }
+
+        return fullName.ToString();
+    }
 
     private static bool HasStatedNames(this Contact contact) =>
         !string.IsNullOrEmpty(contact.dfeta_StatedFirstName) ||

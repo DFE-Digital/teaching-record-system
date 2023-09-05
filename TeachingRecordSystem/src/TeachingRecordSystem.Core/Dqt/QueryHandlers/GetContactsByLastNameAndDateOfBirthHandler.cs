@@ -13,10 +13,9 @@ public class GetContactsByLastNameAndDateOfBirthHandler : ICrmQueryHandler<GetCo
         lastNameFilter.AddCondition(Contact.Fields.LastName, ConditionOperator.Equal, query.LastName);
         lastNameFilter.AddCondition(Contact.Fields.dfeta_PreviousLastName, ConditionOperator.Equal, query.LastName);
 
-        var queryExpression = new QueryExpression()
+        var queryExpression = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = query.ColumnSet,
-            EntityName = Contact.EntityLogicalName,
             Criteria = new FilterExpression(LogicalOperator.And)
             {
                 Conditions =
