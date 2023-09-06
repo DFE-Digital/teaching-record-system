@@ -7,6 +7,7 @@ WORKDIR /App
 
 # Install Culture prerequisities
 RUN apk add --no-cache \
+        tzdata \
         icu-data-full \
         icu-libs
 
