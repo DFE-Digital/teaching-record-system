@@ -5,5 +5,13 @@ ENV GitSha ${GIT_SHA}
 COPY src/TeachingRecordSystem.SupportUi/bin/Release/net7.0/publish/ App/
 WORKDIR /App
 
+# Install Culture prerequisities
+RUN apk add --no-cache \
+        icu-data-full \
+        icu-libs
+
+# Enable all cultures
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
 ENTRYPOINT ["dotnet", "/App/TeachingRecordSystem.SupportUi.dll"]
 EXPOSE 80
