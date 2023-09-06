@@ -81,6 +81,7 @@ docker-build-cli *ARGS:
 
 # Build the Support UI Docker image
 docker-build-ui *ARGS:
+  @cd {{solution-root}} && npm install -g sass
   @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet publish -c Release
   @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.SupportUi" / "Dockerfile"}} {{ARGS}}
 
