@@ -5,6 +5,10 @@
     <UserSecretsId>TeachingRecordSystemSupportUi</UserSecretsId>
   </PropertyGroup>
 
+  <Target Name="CompileSass" BeforeTargets="Build">
+    <Exec Command="sass -q wwwroot/Styles/site.scss wwwroot/Styles/site.css" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="7.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="7.0.0" />
@@ -16,6 +20,7 @@
     <PackageReference Include="Microsoft.Identity.Web" Version="2.13.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.10" />
     <PackageReference Include="Microsoft.Identity.Web.GraphServiceClientBeta" Version="2.13.2" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
   </ItemGroup>
 
   <ItemGroup>

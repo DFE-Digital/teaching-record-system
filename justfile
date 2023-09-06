@@ -5,9 +5,10 @@ solution-root := "TeachingRecordSystem"
 default:
   @just --list
 
-# Install .NET local tools
+# Install local tools
 install-tools:
   @cd {{solution-root}} && dotnet tool restore
+  npm install -g sass 
 
 # Run the trscli
 cli *ARGS:
@@ -80,6 +81,7 @@ docker-build-cli *ARGS:
 
 # Build the Support UI Docker image
 docker-build-ui *ARGS:
+  npm install -g sass
   @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet publish -c Release
   @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.SupportUi" / "Dockerfile"}} {{ARGS}}
 

@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "defaultProvider": "jsdelivr",
+  "libraries": [
+    {
+      "library": "govuk-frontend@4.5.0",
+      "destination": "wwwroot/lib/govuk-frontend/"
+    }
+  ]
+}

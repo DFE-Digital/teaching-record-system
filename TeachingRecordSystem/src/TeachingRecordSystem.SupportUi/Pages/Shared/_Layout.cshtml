@@ -7,8 +7,7 @@
 }
 
 @section Head {
-    @PageTemplateHelper.GenerateStyleImports()
-    <link rel="stylesheet" asp-href-include="~/Styles/site.css">
+    <link rel="stylesheet" asp-href-include="~/Styles/*.css">
     @RenderSection("Styles", required: false)
     @RenderSection("Scripts", required: false)
 }
