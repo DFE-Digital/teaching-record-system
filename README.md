@@ -30,6 +30,7 @@ Authorization: Bearer your_api_key
 The API is an ASP.NET Core 7 web application. To develop locally you will need the following installed:
 - Visual Studio 2022 (or the .NET 7 SDK an alternative IDE/editor);
 - a local Postgres 13+ instance.
+- [SASS]( https://sass-lang.com/install).
 
 A `justfile` defines various recipes for development. Ensure [just](https://just.systems/) is installed and available on your `$PATH` as well as [PowerShell](https://microsoft.com/PowerShell).
 

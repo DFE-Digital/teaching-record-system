@@ -8,6 +8,7 @@ default:
 # Install .NET local tools
 install-tools:
   @cd {{solution-root}} && dotnet tool restore
+  @cd {{solution-root}} && npm install -g sass 
 
 # Run the trscli
 cli *ARGS:
