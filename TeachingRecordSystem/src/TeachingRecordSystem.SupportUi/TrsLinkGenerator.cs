@@ -1,4 +1,5 @@
 using Flurl;
+using static TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.IndexModel;
 
 namespace TeachingRecordSystem.SupportUi;
 
@@ -29,7 +30,7 @@ public class TrsLinkGenerator
 
     public string Persons() => GetRequiredPathByPage("/Persons/Index");
 
-    public string PersonDetail(Guid personId, string? selectedTab = null) =>
+    public string PersonDetail(Guid personId, PersonSubNavigationTab? selectedTab = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Index", routeValues: new { personId })
             .SetQueryParam("selectedTab", selectedTab);
 
