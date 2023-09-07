@@ -16,19 +16,19 @@
         <nav class="moj-sub-navigation" aria-label="Sub navigation">
             <ul class="moj-sub-navigation__list">
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonPage.General ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonPage.General.ToString())">General</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.General.ToString())">General</a>
                 </li>
 
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonPage.Alerts ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonPage.Alerts.ToString())">Alerts</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.Alerts.ToString())">Alerts</a>
                 </li>
 
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonPage.ChangeLog ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonPage.ChangeLog.ToString())">Change log</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.ChangeLog ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.ChangeLog.ToString())">Change log</a>
                 </li>
             </ul>
         </nav>
-        @if (Model.SelectedTab == IndexModel.PersonPage.General)
+        @if (Model.SelectedTab == IndexModel.PersonSubNavigationTab.General)
         {
             <govuk-summary-card>
                 <govuk-summary-card-title>Personal Details</govuk-summary-card-title>

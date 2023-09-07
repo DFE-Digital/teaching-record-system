@@ -19,13 +19,13 @@ public class IndexModel : PageModel
     public Guid PersonId { get; set; }
 
     [FromQuery]
-    public PersonPage? SelectedTab { get; set; }
+    public PersonSubNavigationTab? SelectedTab { get; set; }
 
     public PersonInfo? Person { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
-        SelectedTab ??= PersonPage.General;
+        SelectedTab ??= PersonSubNavigationTab.General;
 
         var contactDetail = await _crmQueryDispatcher.ExecuteQuery(
             new GetContactDetailByIdQuery(
@@ -78,7 +78,7 @@ public class IndexModel : PageModel
         public required string? MobileNumber { get; init; }
     }
 
-    public enum PersonPage
+    public enum PersonSubNavigationTab
     {
         General,
         Alerts,
