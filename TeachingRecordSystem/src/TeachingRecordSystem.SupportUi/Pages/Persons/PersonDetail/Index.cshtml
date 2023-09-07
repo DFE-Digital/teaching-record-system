@@ -12,8 +12,26 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <govuk-tabs>
-            <govuk-tabs-item id="general" label="General">
+        
+        <nav class="moj-sub-navigation" aria-label="Sub navigation">
+            <ul class="moj-sub-navigation__list">
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonPage.General ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonPage.General.ToString())">General</a>
+                </li>
+
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonPage.Alerts ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonPage.Alerts.ToString())">Alerts</a>
+                </li>
+
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonPage.ChangeLog ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonPage.ChangeLog.ToString())">Change log</a>
+                </li>
+            </ul>
+        </nav>
+        @if (Model.SelectedTab == IndexModel.PersonPage.General)
+        {
+            <govuk-summary-card>
+                <govuk-summary-card-title>Personal Details</govuk-summary-card-title>
                 <govuk-summary-list data-testid="personal-details">
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
@@ -36,7 +54,7 @@
                         <govuk-summary-list-row-value data-testid="personal-details-mobile-number">@(!string.IsNullOrEmpty(Model.Person.MobileNumber) ? Model.Person.MobileNumber : "Not provided")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
-            </govuk-tabs-item>
-        </govuk-tabs>
+            </govuk-summary-card>            
+        }        
      </div>
 </div>

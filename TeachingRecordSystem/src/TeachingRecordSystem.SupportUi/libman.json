@@ -5,6 +5,9 @@
     {
       "library": "govuk-frontend@4.5.0",
       "destination": "wwwroot/lib/govuk-frontend/"
-    }
-  ]
+    },
+    {
+      "library": "@ministryofjustice/frontend@1.8.0",
+      "destination": "wwwroot/lib/ministryofjustice/frontend/"
+    }]
 }
