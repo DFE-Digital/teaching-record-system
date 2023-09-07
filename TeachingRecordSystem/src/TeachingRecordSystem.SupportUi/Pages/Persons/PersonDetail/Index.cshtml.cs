@@ -18,10 +18,15 @@ public class IndexModel : PageModel
     [FromRoute]
     public Guid PersonId { get; set; }
 
+    [FromQuery]
+    public PersonSubNavigationTab? SelectedTab { get; set; }
+
     public PersonInfo? Person { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
+        SelectedTab ??= PersonSubNavigationTab.General;
+
         var contactDetail = await _crmQueryDispatcher.ExecuteQuery(
             new GetContactDetailByIdQuery(
                 PersonId,
@@ -71,5 +76,12 @@ public class IndexModel : PageModel
         public required string? NationalInsuranceNumber { get; init; }
         public required string? Email { get; init; }
         public required string? MobileNumber { get; init; }
+    }
+
+    public enum PersonSubNavigationTab
+    {
+        General,
+        Alerts,
+        ChangeLog
     }
 }

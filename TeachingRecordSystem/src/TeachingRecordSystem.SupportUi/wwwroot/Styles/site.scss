@@ -1,4 +1,10 @@
-@use '../lib/govuk-frontend/govuk/all.scss';
+@import '../lib/govuk-frontend/govuk/all.scss';
+@import "../lib/ministryofjustice/frontend/moj/settings/all";
+@import "../lib/ministryofjustice/frontend/moj/helpers/all";
+@import "../lib/ministryofjustice/frontend/moj/objects/all";
+/* If needing more components then add them individually .. unfortunately the cookie-banner component references node_modules in the @import so we can't just import components/all !!  */
+@import "../lib/ministryofjustice/frontend/moj/components/sub-navigation/sub-navigation";
+@import "../lib/ministryofjustice/frontend/moj/utilities/all";
 
 .trs-table__header--no-border,
 .trs-table__cell--no-border,
