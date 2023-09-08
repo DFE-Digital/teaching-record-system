@@ -4,6 +4,7 @@
 @import "../lib/ministryofjustice/frontend/moj/objects/all";
 /* If needing more components then add them individually .. unfortunately the cookie-banner component references node_modules in the @import so we can't just import components/all !!  */
 @import "../lib/ministryofjustice/frontend/moj/components/sub-navigation/sub-navigation";
+@import "../lib/ministryofjustice/frontend/moj/components/search/search";
 @import "../lib/ministryofjustice/frontend/moj/utilities/all";
 
 .trs-table__header--no-border,

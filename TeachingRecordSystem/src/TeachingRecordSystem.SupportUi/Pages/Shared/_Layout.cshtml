@@ -47,6 +47,10 @@
                                     <a class="govuk-header__link" href="@LinkGenerator.Cases()">Cases</a>
                                 </li>
                             }
+
+                            <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/persons") ? "govuk-header__navigation-item--active" : "")">
+                                <a class="govuk-header__link" href="@LinkGenerator.Persons()">All records</a>
+                            </li>
                             
                             if (User.IsInRole(UserRoles.Administrator))
                             {
