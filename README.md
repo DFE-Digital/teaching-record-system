@@ -20,7 +20,7 @@ Authorization: Bearer your_api_key
 | Production     | https://teacher-qualifications-api.education.gov.uk         |
 | Pre-production | https://preprod-teacher-qualifications-api.education.gov.uk |
 | Test           | https://test-teacher-qualifications-api.education.gov.uk    |
-| Development    | https://qualified-teachers-api-dev.london.cloudapps.digital |
+| Development    | https://trs-dev-api.test.teacherservices.cloud/             |
 
 
 ## Developer setup
@@ -28,7 +28,7 @@ Authorization: Bearer your_api_key
 ### Software requirements
 
 The API is an ASP.NET Core 7 web application. To develop locally you will need the following installed:
-- Visual Studio 2022 (or the .NET 7 SDK an alternative IDE/editor);
+- Visual Studio 2022 (or the .NET 7 SDK and an alternative IDE/editor);
 - a local Postgres 13+ instance.
 - [SASS]( https://sass-lang.com/install).
 
