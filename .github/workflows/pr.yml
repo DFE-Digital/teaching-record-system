@@ -188,24 +188,11 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Extract configuration from tfvars
-      id: config
-      run: |
-        KEY_VAULT_NAME=$(jq -r '.key_vault_name' $TFVARS)
-        if [ -z "$KEY_VAULT_NAME" ]; then
-          echo "::error ::Failed to extract key_vault_name from $TFVARS"
-          exit 1
-        fi
-        echo "key_vault_name=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
-      env:
-        TFVARS: terraform/paas/workspace_variables/dev.tfvars.json
-      shell: bash
-
     - uses: Azure/get-keyvault-secrets@v1
       name: Get secrets
       id: get_secrets
       with:
-        keyvault: ${{ steps.config.outputs.key_vault_name }}
+        keyvault: s165d01-dqtapi-dv-kv
         secrets: INTEGRATION-TEST-CONFIG
 
     - name: Install tools
