@@ -10,7 +10,7 @@ jobs:
     name: Restore DB
     strategy:
       matrix:
-        environment: [test, pre-production, production]
+        environment: [pre-production, production]
       max-parallel: 1
     uses: ./.github/workflows/restore-paas-db-to-aks.yml
     with:
