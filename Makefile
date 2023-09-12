@@ -1,9 +1,16 @@
 .DEFAULT_GOAL		:=help
 SHELL				:=/bin/bash
 
+TERRAFILE_VERSION=0.8
+RG_TAGS={"Product" : "Teacher services cloud"}
+ARM_TEMPLATE_TAG=1.1.10
+
 .PHONY: help
 help: ## Show this help
 	@grep -E '^[a-zA-Z\.\-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	## environments:
+	## - Paas: dev, test, pre-production, production
+	## - AKS:  dev_aks, test_aks, pre-production_aks, production_aks
 
 .PHONY: paas
 paas:
@@ -17,7 +24,6 @@ aks:
 	$(eval PLATFORM=aks)
 	$(eval REGION=UK South)
 	$(eval SERVICE_SHORT=trs)
-	$(eval RG_TAGS=$(shell echo '{"Portfolio": "Early Years and Schools Group", "Parent Business":"Teacher Training and Qualifications", "Product" : "Teaching Record System", "Service Line": "Teaching Workforce", "Service": "Teacher Training and Qualifications", "Service Offering": "Database of Qualified Teachers", "Environment" : "$(ENV_TAG)"}' | jq . ))
 
 .PHONY: dev
 dev: paas
@@ -84,12 +90,21 @@ production_aks: aks
 	$(eval RESOURCE_NAME_PREFIX=s189p01)
 	$(eval ENV_SHORT=pd)
 	$(eval ENV_TAG=prod)
+	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
 
 .PHONY: domain
 domain:
 	$(eval DEPLOY_ENV=production)
 	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-production)
 	$(eval RESOURCE_NAME_PREFIX=s165p01)
+	$(eval ENV_SHORT=pd)
+	$(eval ENV_TAG=prod)
+
+.PHONY: aks_domain
+aks_domain:
+	$(eval DEPLOY_ENV=production)
+	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-production)
+	$(eval RESOURCE_NAME_PREFIX=s189p01)
 	$(eval ENV_SHORT=pd)
 	$(eval ENV_TAG=prod)
 
@@ -106,10 +121,19 @@ set-azure-account: ${environment}
 	echo "Logging on to ${AZURE_SUBSCRIPTION}"
 	az account set -s ${AZURE_SUBSCRIPTION}
 
+set-azure-pd-subscription:
+	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-production)
+	echo "setting subscription to"${AZURE_SUBSCRIPTION}
+	az account set -s ${AZURE_SUBSCRIPTION}
+
 ci:	## Run in automation environment
 	$(eval DISABLE_PASSCODE=true)
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SP_AUTH=true)
+
+bin/terrafile: ## Install terrafile to manage terraform modules
+	curl -sL https://github.com/coretech/terrafile/releases/download/v${TERRAFILE_VERSION}/terrafile_${TERRAFILE_VERSION}_$$(uname)_x86_64.tar.gz \
+		| tar xz -C ./bin terrafile
 
 .PHONY: install-fetch-config
 install-fetch-config: ## Install the fetch-config script, for viewing/editing secrets in Azure Key Vault
@@ -186,7 +210,7 @@ terraform-init:
 	[[ "${SP_AUTH}" != "true" ]] && az account set -s $(AZURE_SUBSCRIPTION) || true
 	terraform -chdir=terraform/$(PLATFORM) init -backend-config workspace_variables/${DEPLOY_ENV}.backend.tfvars -reconfigure
 
-terraform-plan: terraform-init
+terraform-plan: terraform-init # make [env] terraform-plan init
 	terraform -chdir=terraform/$(PLATFORM) plan -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json
 
 terraform-apply: terraform-init
@@ -202,9 +226,27 @@ deploy-azure-resources: set-azure-account # make dev deploy-azure-resources CONF
 validate-azure-resources: set-azure-account # make dev validate-azure-resources
 	az deployment sub create -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}${SERVICE_SHORT}tfstate${ENV_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultNames=['${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-api-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-inf-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-ui-kv']" --what-if
 
-domain-azure-resources: set-azure-account # make domain deploy-custom-domain CONFIRM_DEPLOY=1
+
+domains-init: bin/terrafile set-azure-pd-subscription ## make [env] domains-init -  terraform init for environment dns/afd resources
+	./bin/terrafile -p terraform/domains/environment_domains/vendor/modules -f terraform/domains/environment_domains/config/${DEPLOY_ENV}_Terrafile
+	terraform -chdir=terraform/domains/environment_domains init -reconfigure -upgrade -backend-config=config/${DEPLOY_ENV}_backend.tfvars
+
+domains-plan: domains-init ## terraform plan for environment dns/afd resources
+	terraform -chdir=terraform/domains/environment_domains plan -var-file config/${DEPLOY_ENV}.tfvars.json
+
+domains-apply: domains-init ## terraform apply for environment dns/afd resources, needs CONFIRM_DEPLOY=1 for production
+	terraform -chdir=terraform/domains/environment_domains apply -var-file config/${DEPLOY_ENV}.tfvars.json
+
+domains-infra-init: bin/terrafile set-azure-pd-subscription ## make [domain|aks_domain] domains-infra-init -  terraform init for dns/afd core resources, eg Main FrontDoor resource
+	./bin/terrafile -p terraform/domains/infrastructure/vendor/modules -f terraform/domains/infrastructure/config/trs_Terrafile
+	terraform -chdir=terraform/domains/infrastructure init -reconfigure -upgrade
+
+domains-infra-plan: domains-infra-init ## terraform plan for dns core resources
+	terraform -chdir=terraform/domains/infrastructure plan -var-file config/trs.tfvars.json
+
+domain-azure-resources: set-azure-account # make [domain|aks_domain] domain-azure-resources CONFIRM_DEPLOY=1, creates core DNA/AKS
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
-	az deployment sub create -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-dqtdomains-rg" 'tags=${RG_TAGS}' "environment=${DEPLOY_ENV}" "tfStorageAccountName=${RESOURCE_NAME_PREFIX}dqtdomainstf" "tfStorageContainerName=dqtdomains-tf"  "keyVaultName=${RESOURCE_NAME_PREFIX}-dqtdomain-kv"
+	az deployment sub create -l "UK South" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-trsdomains-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}trsdomainstf" "tfStorageContainerName=trsdomains-tf"  "keyVaultName=${RESOURCE_NAME_PREFIX}-trsdomain-kv"
 
 .PHONY: install-konduit
 install-konduit: ## Install the konduit script, for accessing backend services
