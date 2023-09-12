@@ -19,8 +19,8 @@ Authorization: Bearer your_api_key
 | -------------- | ----------------------------------------------------------- |
 | Production     | https://teacher-qualifications-api.education.gov.uk         |
 | Pre-production | https://preprod-teacher-qualifications-api.education.gov.uk |
-| Test           | https://test-teacher-qualifications-api.education.gov.uk    |
-| Development    | https://trs-dev-api.test.teacherservices.cloud/             |
+| Test           | https://test.teacher-qualifications-api.education.gov.uk/   |
+| Development    | https://dev.teacher-qualifications-api.education.gov.uk/    |
 
 
 ## Developer setup

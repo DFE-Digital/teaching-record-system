@@ -18,28 +18,6 @@ on:
 
 concurrency: deploy_test
 jobs:
-  deploy:
-    name: Deploy to PAAS
-    runs-on: ubuntu-latest
-
-    outputs:
-      api_url: ${{ steps.deploy.outputs.api_url }}
-
-    environment:
-      name: test
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - uses: ./.github/workflows/actions/deploy-paas-environment
-      id: deploy
-      with:
-        environment_name: test
-        api_docker_image: ${{ inputs.api_docker_image }}
-        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-        terraform_vars: test.tfvars.json
-        terraform_backend_vars: test.backend.tfvars
-
   deploy_aks:
     name: Deploy to AKS
     runs-on: ubuntu-latest
