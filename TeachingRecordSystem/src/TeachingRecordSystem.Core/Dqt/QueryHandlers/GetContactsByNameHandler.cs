@@ -17,11 +17,11 @@ public class GetContactsByNameHandler : ICrmQueryHandler<GetContactsByNameQuery,
         var queryExpression = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = query.ColumnSet,
-            Criteria = filter
+            Criteria = filter,
+            TopCount = query.MaxRecordCount
         };
 
         var response = await organizationService.RetrieveMultipleAsync(queryExpression);
-
         return response.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
     }
 }

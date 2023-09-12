@@ -8,55 +8,89 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <div class="moj-search govuk-!-margin-bottom-6">
-            <form action="#" method="post" asp-antiforgery="true">
-                <govuk-input
-                    asp-for="Search"
-                    input-class="moj-search__input"
-                    label-class="moj-search__label govuk-!-font-weight-bold"
-                    id="search"                    
-                    name="search"
-                    type="search">                       
+        <div class="govuk-!-margin-bottom-6">
+            <form trs-action="l => l.Persons()">
+                <div class="moj-search trs-search">
+                    <govuk-input asp-for="Search"
+                                 input-class="moj-search__input"
+                                 label-class="moj-search__label govuk-!-font-weight-bold"
+                                 id="search"
+                                 name="search"
+                                 type="search">
                         <govuk-input-hint class="moj-search__hint">Search by: Name, TRN or date of birth (DD/MM/YYYY)</govuk-input-hint>
-                </govuk-input>
-                <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
+                    </govuk-input>
+                    <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
+                </div>                
             </form>
         </div>
     </div>
 </div>
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
-        <table class="govuk-table">
-            <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header govuk-!-width-one-third">Name</th>
-                    <th scope="col" class="govuk-table__header">Date of birth</th>
-                    <th scope="col" class="govuk-table__header">TRN</th>
-                    <th scope="col" class="govuk-table__header">NiNo</th>
-                    <th scope="col" class="govuk-table__header">Active alert</th>
-                </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-                @if (Model.SearchResults is null || Model.SearchResults.Length == 0)
-                {
-                    <tr class="govuk-table__row" data-testid="no-matches">
-                        <td class="govuk-table__cell" colspan="5">No matching records</td>
-                    </tr>
-                }
-                else
-                {
-                    @foreach (var personInfo in Model.SearchResults!)
+@if (!string.IsNullOrEmpty(Model.Search))
+{
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            @if (Model.TotalKnownPages > 1)
+            {
+                <govuk-pagination>
+                    @if (Model.PreviousPage.HasValue)
                     {
-                        <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
-                            <td class="govuk-table__cell" data-testid="name-@personInfo.PersonId"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId)" class="govuk-link">@personInfo.Name</a></td>
-                            <td class="govuk-table__cell" data-testid="date-of-birth-@personInfo.PersonId">@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString("dd/MM/yyyy") : "N/A")</td>
-                            <td class="govuk-table__cell" data-testid="trn-@personInfo.PersonId">@(!string.IsNullOrEmpty(personInfo.Trn) ? personInfo.Trn : "N/A")</td>
-                            <td class="govuk-table__cell" data-testid="nino-@personInfo.PersonId">@(!string.IsNullOrEmpty(personInfo.NationalInsuranceNumber) ? personInfo.NationalInsuranceNumber : "N/A")</td>
-                            <td class="govuk-table__cell" data-testid="alert-@personInfo.PersonId">@(personInfo.HasActiveAlert ? "Yes" : "No")</td>
+                        <govuk-pagination-previous asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.PreviousPage" />
+                    }                
+
+                    @if (Model.NextPage.HasValue)
+                    {
+                        <govuk-pagination-next asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.NextPage" />
+                    }
+                </govuk-pagination>
+            }
+
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-third">Name</th>
+                        <th scope="col" class="govuk-table__header">Date of birth</th>
+                        <th scope="col" class="govuk-table__header">TRN</th>
+                        <th scope="col" class="govuk-table__header">NiNo</th>
+                        <th scope="col" class="govuk-table__header">Active alert</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @if (Model.SearchResults is null || Model.SearchResults.Length == 0)
+                    {
+                        <tr class="govuk-table__row" data-testid="no-matches">
+                            <td class="govuk-table__cell" colspan="5">No matching records</td>
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
+                    else
+                    {
+                        @foreach (var personInfo in Model.SearchResults!)
+                        {
+                            <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
+                                <td class="govuk-table__cell" data-testid="name-@personInfo.PersonId"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId, search: Model.Search)" class="govuk-link">@personInfo.Name</a></td>
+                                <td class="govuk-table__cell" data-testid="date-of-birth-@personInfo.PersonId">@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString("dd/MM/yyyy") : "-")</td>
+                                <td class="govuk-table__cell" data-testid="trn-@personInfo.PersonId">@(!string.IsNullOrEmpty(personInfo.Trn) ? personInfo.Trn : "-")</td>
+                                <td class="govuk-table__cell" data-testid="nino-@personInfo.PersonId">@(!string.IsNullOrEmpty(personInfo.NationalInsuranceNumber) ? personInfo.NationalInsuranceNumber : "-")</td>
+                                <td class="govuk-table__cell" data-testid="alert-@personInfo.PersonId">@(personInfo.HasActiveAlert ? "Yes" : "No")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            @if (Model.TotalKnownPages > 1)
+            {
+                <govuk-pagination>
+                    @if (Model.PreviousPage.HasValue)
+                    {
+                        <govuk-pagination-previous asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.PreviousPage" />
+                    }             
+
+                    @if (Model.NextPage.HasValue)
+                    {
+                        <govuk-pagination-next asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.NextPage" />
+                    }
+                </govuk-pagination>
+            }
+        </div>
     </div>
-</div>
+}

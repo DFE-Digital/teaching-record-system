@@ -19,6 +19,9 @@ public class IndexModel : PageModel
     public Guid PersonId { get; set; }
 
     [FromQuery]
+    public string? Search { get; set; }
+
+    [FromQuery]
     public PersonSubNavigationTab? SelectedTab { get; set; }
 
     public PersonInfo? Person { get; set; }

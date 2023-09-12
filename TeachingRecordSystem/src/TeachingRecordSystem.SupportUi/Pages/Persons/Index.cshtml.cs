@@ -10,33 +10,75 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons;
 
 public partial class IndexModel : PageModel
 {
+    private const int MaxSearchResultCount = 500;
+    private const int PageSize = 25;
+
     [GeneratedRegex("^\\d{7}$")]
     private static partial Regex TrnRegex();
+
+    private readonly TrsLinkGenerator _linkGenerator;
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
 
-    public IndexModel(ICrmQueryDispatcher crmQueryDispatcher)
+    public IndexModel(
+        TrsLinkGenerator linkGenerator,
+        ICrmQueryDispatcher crmQueryDispatcher)
     {
+        _linkGenerator = linkGenerator;
         _crmQueryDispatcher = crmQueryDispatcher;
     }
 
-    [BindProperty]
+    [BindProperty(SupportsGet = true)]
     [Display(Name = "Search")]
-    [Required(ErrorMessage = "Enter search criteria")]
     public string? Search { get; set; }
+
+    [FromQuery(Name = "PageNumber")]
+    public int? PageNumber { get; set; }
 
     public PersonInfo[]? SearchResults { get; set; }
 
-    public void OnGet()
+    public int TotalKnownPages { get; set; }
+
+    public int? PreviousPage { get; set; }
+
+    public int? NextPage { get; set; }
+
+    public async Task<IActionResult> OnGet()
     {
+        PageNumber ??= 1;
+
+        if (!string.IsNullOrEmpty(Search))
+        {
+            if (PageNumber < 1)
+            {
+                return BadRequest();
+            }
+
+            return await PerformSearch();
+        }
+
+        return Page();
     }
 
     public async Task<IActionResult> OnPost()
     {
+        PageNumber ??= 1;
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
 
+        if (string.IsNullOrEmpty(Search))
+        {
+            ModelState.AddModelError(nameof(Search), "Enter search string");
+            return this.PageWithErrors();
+        }
+
+        return await PerformSearch();
+    }
+
+    private async Task<IActionResult> PerformSearch()
+    {
         var contacts = new Contact[] { };
         var columnSet = new ColumnSet(
             Contact.Fields.dfeta_TRN,
@@ -56,10 +98,9 @@ public partial class IndexModel : PageModel
         // Check if the search string is a date of birth, TRN or one or more names
         if (DateOnly.TryParse(Search, out var dateOfBirth))
         {
-            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByDateOfBirthQuery(dateOfBirth, columnSet));
-
+            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByDateOfBirthQuery(dateOfBirth, MaxSearchResultCount, columnSet));
         }
-        else if (TrnRegex().IsMatch(Search))
+        else if (TrnRegex().IsMatch(Search!))
         {
             var contact = await _crmQueryDispatcher.ExecuteQuery(new GetContactByTrnQuery(Search!, columnSet));
             if (contact != null)
@@ -69,10 +110,25 @@ public partial class IndexModel : PageModel
         }
         else
         {
-            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByNameQuery(Search!, columnSet));
+            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByNameQuery(Search!, MaxSearchResultCount, columnSet));
         }
 
-        SearchResults = contacts.Select(MapContact).ToArray();
+        TotalKnownPages = Math.Max((int)Math.Ceiling((decimal)contacts.Length / PageSize), 1);
+
+        PreviousPage = PageNumber > 1 ? PageNumber - 1 : null;
+        NextPage = PageNumber < TotalKnownPages ? PageNumber + 1 : null;
+
+        SearchResults = contacts
+            .Skip((PageNumber!.Value - 1) * PageSize)
+            .Take(PageSize)
+            .Select(MapContact)
+            .ToArray();
+
+        // if the page number is greater than the total number of pages, redirect to the first page
+        if (PageNumber > TotalKnownPages)
+        {
+            return Redirect(_linkGenerator.Persons(search: Search));
+        }
 
         return Page();
     }

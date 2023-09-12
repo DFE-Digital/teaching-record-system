@@ -11,13 +11,13 @@ public class GetContactsByDateOfBirthHandler : ICrmQueryHandler<GetContactsByDat
         var queryByAttribute = new QueryByAttribute()
         {
             EntityName = Contact.EntityLogicalName,
-            ColumnSet = query.ColumnSet
+            ColumnSet = query.ColumnSet,
+            TopCount = query.MaxRecordCount
         };
         queryByAttribute.AddAttributeValue(Contact.Fields.StateCode, (int)ContactState.Active);
         queryByAttribute.AddAttributeValue(Contact.Fields.BirthDate, query.DateOfBirth.ToDateTime());
 
         var response = await organizationService.RetrieveMultipleAsync(queryByAttribute);
-
         return response.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
     }
 }
