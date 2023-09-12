@@ -38,7 +38,7 @@ variable "origin_hostname" {
 variable "null_host_header" {
   type        = bool
   description = "origin_host_header for the azurerm_cdn_frontdoor_origin"
-
+  default     = false
 }
 
 variable "hosted_zone" {
