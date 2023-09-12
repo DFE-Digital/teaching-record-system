@@ -1,5 +1,6 @@
 #nullable disable
 using FluentValidation;
+using Optional.Unsafe;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
@@ -9,7 +10,7 @@ namespace TeachingRecordSystem.Api.V2.Validators;
 
 public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
 {
-    public UpdateTeacherValidator()
+    public UpdateTeacherValidator(IClock clock)
     {
         RuleFor(r => r.InitialTeacherTraining)
             .NotNull();
@@ -118,5 +119,45 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
         RuleFor(r => r.SlugId)
             .MaximumLength(AttributeConstraints.Contact.SlugId_MaxLength)
             .WithMessage(Properties.StringResources.ErrorMessages_SlugIdMustBe150CharactersOrFewer);
+
+        RuleFor(r => r.FirstName.ValueOrDefault())
+            .NotEmpty()
+            .MaximumLength(AttributeConstraints.Contact.FirstNameMaxLength)
+            .OverridePropertyName(nameof(UpdateTeacherRequest.FirstName))
+            .When(x => x.FirstName.HasValue || x.LastName.HasValue || x.MiddleName.HasValue);
+
+        RuleFor(r => r.MiddleName.ValueOrDefault())
+            .NotEmpty()
+            .MaximumLength(AttributeConstraints.Contact.MiddleNameMaxLength)
+            .OverridePropertyName(nameof(UpdateTeacherRequest.MiddleName))
+            .When(x => x.MiddleName.HasValue);
+
+        RuleFor(r => r.LastName.ValueOrDefault())
+            .NotEmpty()
+            .MaximumLength(AttributeConstraints.Contact.LastNameMaxLength)
+            .OverridePropertyName(nameof(UpdateTeacherRequest.LastName))
+            .When(x => x.LastName.HasValue || x.MiddleName.HasValue || x.FirstName.HasValue);
+
+        RuleFor(r => r.EmailAddress.ValueOrDefault())
+            .EmailAddress()
+            .MaximumLength(AttributeConstraints.Contact.EMailAddress1MaxLength)
+            .OverridePropertyName(nameof(UpdateTeacherRequest.EmailAddress))
+            .When(x => x.EmailAddress.HasValue);
+
+        RuleFor(r => r.GenderCode.ValueOrDefault())
+            .NotEmpty()
+            .IsInEnum()
+            .OverridePropertyName(nameof(UpdateTeacherRequest.GenderCode))
+            .When(x => x.GenderCode.HasValue);
+
+        RuleFor(r => r.DateOfBirth.Map(x => x))
+            .Custom((value, ctx) =>
+            {
+                if (value.ValueOrDefault() >= DateOnly.FromDateTime(clock.UtcNow) || value.ValueOrDefault() < new DateOnly(1940, 1, 1))
+                {
+                    ctx.AddFailure(nameof(UpdateTeacherRequest.DateOfBirth), StringResources.ErrorMessages_BirthDateIsOutOfRange);
+                }
+            })
+            .When(x => x.DateOfBirth.HasValue); ;
     }
 }

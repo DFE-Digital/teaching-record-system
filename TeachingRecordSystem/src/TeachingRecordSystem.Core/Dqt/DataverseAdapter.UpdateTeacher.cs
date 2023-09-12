@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 using Microsoft.Xrm.Sdk.Messages;
+using Optional.Unsafe;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
@@ -27,7 +28,7 @@ public partial class DataverseAdapter
             return (UpdateTeacherResult.Failed(failedReasons), null);
         }
 
-        var (itt, ittLookupFailedReasons) = helper.SelectIttRecord(referenceData.Itt, referenceData.IttProviderId.Value, command.SlugId);
+        var (itt, ittLookupFailedReasons) = helper.SelectIttRecord(referenceData.Itt, referenceData.IttProviderId.Value, command.SlugId.ValueOrDefault());
         var isEarlyYears = command.InitialTeacherTraining.ProgrammeType.IsEarlyYears();
 
         if (isEarlyYears && referenceData.Teacher.dfeta_EYTSDate.HasValue)
@@ -226,16 +227,23 @@ public partial class DataverseAdapter
             });
         }
 
-        if (referenceData.TeacherHusId != command.HusId || referenceData.Teacher.dfeta_SlugId != command.SlugId)
+        if (referenceData.TeacherHusId != command.HusId.ValueOrDefault() || referenceData.Teacher.dfeta_SlugId != command.SlugId.ValueOrDefault() || helper.ShouldUpdatePII(referenceData.Teacher.dfeta_AllowPiiUpdatesFromRegister) == true)
         {
-            var contact = helper.CreateContactEntity();
+            var contact = helper.CreateContactEntity(referenceData.HavePendingPiiChanges, referenceData.Teacher.dfeta_TSPersonID, referenceData.Teacher.dfeta_AllowPiiUpdatesFromRegister);
 
-            txnRequest.Requests.Add(new UpdateRequest()
+            var updateRequest = new UpdateRequest()
             {
-                Target = contact
-            });
-        }
+                Target = contact,
+            };
 
+            //parameter is set so that the PersonPiiUpdated plugin will not
+            //attempt to set the dfeta_allowpiiupdatesfromregister field to false.
+            //teachers created through the api can have their pii data updated as long
+            //as there is no pending pii data changed & the teacher has not logged in
+            //through the TSSP.
+            updateRequest.Parameters.Add("tag", "AllowRegisterPiiUpdates");
+            txnRequest.Requests.Add(updateRequest);
+        }
         await _service.ExecuteAsync(txnRequest);
 
         return (UpdateTeacherResult.Success(helper.TeacherId, null), txnRequest);
@@ -252,7 +260,7 @@ public partial class DataverseAdapter
             _command = command;
             TeacherId = command.TeacherId;
             Trn = command.Trn;
-            SlugId = command.SlugId;
+            SlugId = command.SlugId.ValueOrDefault();
         }
 
         public Guid TeacherId { get; }
@@ -430,19 +438,50 @@ public partial class DataverseAdapter
             }
         }
 
-        public Contact CreateContactEntity()
+        public bool ShouldUpdatePII(bool? allowPiiUpdatesFromRegisterfield)
+        {
+            if (allowPiiUpdatesFromRegisterfield == true && (_command.FirstName.HasValue ||
+                _command.MiddleName.HasValue ||
+                _command.LastName.HasValue ||
+                _command.DateOfBirth.HasValue ||
+                _command.EmailAddress.HasValue ||
+                _command.GenderCode.HasValue))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public Contact CreateContactEntity(bool havePendingPiiChanges, string tspersonid, bool? allowPiiUpdatesFromRegister = false)
         {
             var contact = new Contact()
             {
                 Id = TeacherId,
-                dfeta_HUSID = _command.HusId,
-
             };
 
-            //only allow slugid to be set if its not empty
-            if (!string.IsNullOrEmpty(_command.SlugId))
+            _command.SlugId.MatchSome(value => contact.dfeta_SlugId = value);
+            _command.HusId.MatchSome(value => contact.dfeta_HUSID = value);
+
+            //If teacher was created via TRS api AND
+            //   teacher has not logged into TSSP AND
+            //   teacher does not have an existing pending pii change
+            //Then pii changes are permitted
+            if (havePendingPiiChanges == false && allowPiiUpdatesFromRegister == true)
             {
-                contact.dfeta_SlugId = _command.SlugId;
+                _command.FirstName.MatchSome(value => contact.FirstName = value);
+                _command.MiddleName.MatchSome(value => contact.MiddleName = value);
+                _command.LastName.MatchSome(value => contact.LastName = value);
+                _command.GenderCode.MatchSome(value => contact.GenderCode = value);
+                _command.DateOfBirth.MatchSome(value => contact.BirthDate = value);
+                _command.StatedFirstName.MatchSome(value => contact.dfeta_StatedFirstName = value);
+                _command.StatedLastName.MatchSome(value => contact.dfeta_StatedLastName = value);
+                _command.StatedMiddleName.MatchSome(value => contact.dfeta_StatedMiddleName = value);
+            }
+
+            // make sure teacher doesn't already have an identity.
+            if (string.IsNullOrEmpty(tspersonid))
+            {
+                _command.EmailAddress.MatchSome(value => contact.EMailAddress1 = value);
             }
 
             return contact;
@@ -570,7 +609,7 @@ public partial class DataverseAdapter
                 dfeta_AgeRangeFrom = _command.InitialTeacherTraining.AgeRangeFrom,
                 dfeta_AgeRangeTo = _command.InitialTeacherTraining.AgeRangeTo,
                 dfeta_Result = result,
-                dfeta_TraineeID = _command.HusId,
+                dfeta_TraineeID = _command.HusId.ValueOrDefault(),
                 dfeta_ITTQualificationId = referenceData.IttQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName),
                 dfeta_ittqualificationaim = _command.InitialTeacherTraining.IttQualificationAim
             };
@@ -697,7 +736,9 @@ public partial class DataverseAdapter
                     Contact.Fields.dfeta_EYTSDate,
                     Contact.Fields.dfeta_ActiveSanctions,
                     Contact.Fields.dfeta_HUSID,
-                    Contact.Fields.StateCode
+                    Contact.Fields.StateCode,
+                    Contact.Fields.dfeta_AllowPiiUpdatesFromRegister,
+                    Contact.Fields.dfeta_TSPersonID
                 });
 
             var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
@@ -711,8 +752,8 @@ public partial class DataverseAdapter
                     dfeta_initialteachertraining.Fields.dfeta_SlugId
                 });
 
-            var getIttRecordsBySlugIdTask = !string.IsNullOrEmpty(_command.SlugId) ?
-                _dataverseAdapter.GetInitialTeacherTrainingBySlugId(_command.SlugId, columnNames: new[]
+            var getIttRecordsBySlugIdTask = !string.IsNullOrEmpty(_command.SlugId.ValueOrDefault()) ?
+                _dataverseAdapter.GetInitialTeacherTrainingBySlugId(_command.SlugId.ValueOrDefault(), columnNames: new[]
                 {
                     dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
                     dfeta_initialteachertraining.Fields.dfeta_Result,
@@ -751,6 +792,8 @@ public partial class DataverseAdapter
                     dfeta_hesubject.Fields.dfeta_name,
                     dfeta_hesubject.Fields.dfeta_Value
                 });
+
+            var getHavePendingPiiChanges = _dataverseAdapter.DoesTeacherHavePendingPIIChanges(TeacherId);
 
             var isEarlyYears = _command.InitialTeacherTraining.ProgrammeType.IsEarlyYears();
 
@@ -855,7 +898,7 @@ public partial class DataverseAdapter
                         () => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
                 null;
 
-            var existingTeachersWithHusIdTask = !string.IsNullOrEmpty(_command.HusId) ? _dataverseAdapter.GetTeachersByHusId(_command.HusId, columnNames: new[]
+            var existingTeachersWithHusIdTask = !string.IsNullOrEmpty(_command.HusId.ValueOrDefault()) ? _dataverseAdapter.GetTeachersByHusId(_command.HusId.ValueOrDefault(), columnNames: new[]
             {
                 Contact.Fields.dfeta_TRN,
                 Contact.Fields.dfeta_HUSID,
@@ -882,7 +925,8 @@ public partial class DataverseAdapter
                     existingTeachersWithHusIdTask,
                     getAllEytsTeacherStatusesTask,
                     getAllTeacherStatuses,
-                    getIttRecordsBySlugIdTask
+                    getIttRecordsBySlugIdTask,
+                    getHavePendingPiiChanges
                 }
                 .Where(t => t != null);
 
@@ -916,7 +960,8 @@ public partial class DataverseAdapter
                 QtsRegistrations = getQtsRegistrationsTask?.Result,
                 EarlyYearsTraineeStatusId = getEarlyYearsTraineeStatusId.Id,
                 AorCandidateTeacherStatusId = getAorCandidateTeacherStatusId.Id,
-                TraineeTeacherDmsTeacherStatusId = getTraineeTeacherDmsTeacherStatusId.Id
+                TraineeTeacherDmsTeacherStatusId = getTraineeTeacherDmsTeacherStatusId.Id,
+                HavePendingPiiChanges = getHavePendingPiiChanges.Result
             };
         }
     }
@@ -946,5 +991,6 @@ public partial class DataverseAdapter
         public Guid EarlyYearsTraineeStatusId { get; set; }
         public Guid AorCandidateTeacherStatusId { get; set; }
         public Guid TraineeTeacherDmsTeacherStatusId { get; set; }
+        public bool HavePendingPiiChanges { get; set; }
     }
 }

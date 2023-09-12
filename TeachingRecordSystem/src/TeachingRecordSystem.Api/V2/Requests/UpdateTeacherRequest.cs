@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Optional;
 using TeachingRecordSystem.Api.V2.ApiModels;
 
 namespace TeachingRecordSystem.Api.V2.Requests;
@@ -25,11 +26,24 @@ public class UpdateTeacherRequest : IRequest
     [JsonIgnore]
     public DateOnly? BirthDate { get; set; }
 
-    public string HusId { get; set; }
+    public Option<string> HusId { get; set; }
 
     [FromQuery(Name = "slugId"), Description("Register slug ID")]
     [JsonIgnore]
     public string SlugId { get; set; }
+
+    [Description("Firstname of teacher")]
+    public Option<string> FirstName { get; set; }
+    [Description("Middlename of teacher")]
+    public Option<string> MiddleName { get; set; }
+    [Description("Lastname of teacher")]
+    public Option<string> LastName { get; set; }
+    [Description("EmailAddress of teacher")]
+    public Option<string> EmailAddress { get; set; }
+    [Description("GenderCode of teacher")]
+    public Option<Gender> GenderCode { get; set; }
+    [Description("DateOfBirth of teacher")]
+    public Option<DateOnly> DateOfBirth { get; set; }
 }
 
 public class UpdateTeacherRequestInitialTeacherTraining

@@ -246,6 +246,7 @@ public partial class DataverseAdapter
                 GenderCode = _command.GenderCode,
                 dfeta_HUSID = _command.HusId,
                 dfeta_SlugId = _command.SlugId,
+                dfeta_AllowPiiUpdatesFromRegister = true
             };
 
             // We get a NullReferenceException back from CRM if City is null or empty

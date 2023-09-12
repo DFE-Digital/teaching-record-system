@@ -1477,4 +1477,20 @@ public partial class DataverseAdapter : IDataverseAdapter
     public RequestBuilder CreateSingleRequestBuilder() => RequestBuilder.CreateSingle(_service);
 
     public RequestBuilder CreateTransactionRequestBuilder() => RequestBuilder.CreateTransaction(_service);
+
+    public async Task<bool> DoesTeacherHavePendingPIIChanges(Guid teacherId)
+    {
+        bool pendingNameChange = default, pendingDateOfBirthChange = default;
+        var nameChangeSubject = await GetSubjectByTitle("Change of Name");
+        var dateOfBirthChangeSubject = await GetSubjectByTitle("Change of Date of Birth");
+        var incidents = await GetIncidentsByContactId(
+            teacherId,
+            IncidentState.Active,
+            columnNames: new[] { Incident.Fields.SubjectId, Incident.Fields.StateCode });
+
+        pendingNameChange = incidents.Any(i => i.SubjectId.Id == nameChangeSubject.Id);
+        pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
+
+        return (pendingNameChange || pendingDateOfBirthChange);
+    }
 }

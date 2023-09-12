@@ -2,6 +2,8 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using Optional;
+using Optional.Unsafe;
 
 namespace TeachingRecordSystem.Core.Dqt.Tests.DataverseAdapterTests;
 
@@ -890,6 +892,105 @@ public class UpdateTeacherTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Given_teacher_has_an_identity_ignore_email_address_updates()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+        var tsPersonId = Guid.NewGuid().ToString();
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new Contact()
+            {
+                Id = teacherId,
+                dfeta_AllowPiiUpdatesFromRegister = true,
+                dfeta_TSPersonID = tsPersonId
+            }
+        });
+
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new Contact()
+            {
+                Id = teacherId,
+                dfeta_AllowPiiUpdatesFromRegister = true,
+            }
+        });
+
+        // Act
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusbyassessmentonly
+            },
+            Qualification = null,
+            FirstName = Option.Some(Faker.Name.First()),
+            MiddleName = Option.Some(Faker.Name.Middle()),
+            LastName = Option.Some(Faker.Name.Last()),
+            DateOfBirth = Option.Some(new DateTime(2000, 01, 01)),
+            EmailAddress = Option.Some(Faker.Internet.Email())
+        });
+
+        // Assert
+        Assert.True(result.Succeeded);
+        var contact = txnRequest.AssertSingleUpdateRequest<Contact>();
+        Assert.Null(contact.EMailAddress1);
+    }
+
+    [Fact]
+    public async Task Given_AllowPiiUpdatesFromRegister_is_false_and_pii_data_is_provided_discard_changes_pii_changes()
+    {
+        // Arrange
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
+        await _organizationService.ExecuteAsync(new UpdateRequest()
+        {
+            Target = new Contact()
+            {
+                Id = teacherId,
+                dfeta_AllowPiiUpdatesFromRegister = false,
+            }
+        });
+
+        // Act
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        {
+            TeacherId = teacherId,
+            InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
+            {
+                ProviderUkprn = ittProviderUkprn,
+                ProgrammeStartDate = new DateOnly(2011, 11, 01),
+                ProgrammeEndDate = new DateOnly(2012, 11, 01),
+                ProgrammeType = dfeta_ITTProgrammeType.RegisteredTeacherProgramme,
+                Subject1 = "100366",  // computer science
+                Subject2 = "100403",  // mathematics
+                Subject3 = "100302",  // history
+                AgeRangeFrom = dfeta_AgeRange._11,
+                AgeRangeTo = dfeta_AgeRange._12,
+                IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusbyassessmentonly
+            },
+            Qualification = null,
+            FirstName = Option.Some(Faker.Name.First()),
+            MiddleName = Option.Some(Faker.Name.Middle()),
+            LastName = Option.Some(Faker.Name.Last()),
+            DateOfBirth = Option.Some(new DateTime(2000, 01, 01))
+        });
+
+        // Assert
+        Assert.True(result.Succeeded);
+        txnRequest.AssertDoesNotContainUpdateRequest<Contact>();
+    }
+
+    [Fact]
     public async Task Given_slugid_is_not_provided_do_not_clear_contact_slugid()
     {
         // Arrange
@@ -922,15 +1023,14 @@ public class UpdateTeacherTests : IAsyncLifetime
                 IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusbyassessmentonly
             },
             Qualification = null,
-            SlugId = string.Empty
-        });
+            SlugId = Option.None<string>()
+        }); ;
         var contactRecord = await _dataverseAdapter.GetTeacher(teacherId, columnNames: new[] { Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_SlugId });
 
         // Assert
         Assert.True(result.Succeeded);
         Assert.Equal(UpdateTeacherFailedReasons.None, result.FailedReasons);
-        var contact = txnRequest.AssertSingleUpdateRequest<Contact>();
-        Assert.Null(contact.dfeta_SlugId);
+        txnRequest.AssertDoesNotContainUpdateRequest<Contact>();
         Assert.Equal(slugId, contactRecord.dfeta_SlugId);
     }
 
@@ -2493,7 +2593,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     public void Given_crm_task_is_created_when_multiple_itt_for_slugid_for_ukprn_description_is_correct()
     {
         // Arrange
-        var slugId = Guid.NewGuid().ToString();
+        var slugId = Option.Some(Guid.NewGuid().ToString());
         var teacherId = Guid.NewGuid();
         var trn = "1234567";
         var updateCommand = new UpdateTeacherCommand() { Trn = trn, TeacherId = teacherId, SlugId = slugId };
@@ -2503,7 +2603,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var crmTask = helper.CreateMultipleMatchIttReviewTask();
 
         // Assert
-        Assert.Equal($"Multiple ITT UKPRNs found for TRN {trn}, SlugId {slugId ?? string.Empty}", crmTask.Description);
+        Assert.Equal($"Multiple ITT UKPRNs found for TRN {trn}, SlugId {slugId.ValueOrDefault() ?? string.Empty}", crmTask.Description);
     }
 
     [Fact]
@@ -2639,14 +2739,14 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_contact_slugid_does_not_exist_update_contact_slugid()
     {
         // Arrange
-        var slugId = Guid.NewGuid().ToString();
+        var slugId = Option.Some(Guid.NewGuid().ToString());
         var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
         await _organizationService.ExecuteAsync(new UpdateRequest()
         {
             Target = new dfeta_initialteachertraining()
             {
                 Id = ittId,
-                dfeta_SlugId = slugId,
+                dfeta_SlugId = slugId.ValueOrDefault(),
             }
         });
 
@@ -2675,16 +2775,16 @@ public class UpdateTeacherTests : IAsyncLifetime
         Assert.True(result.Succeeded);
         Assert.Equal(UpdateTeacherFailedReasons.None, result.FailedReasons);
         var contact = txnRequest.AssertSingleUpdateRequest<Contact>();
-        Assert.Equal(slugId, contact.dfeta_SlugId);
+        Assert.Equal(slugId.ValueOrDefault(), contact.dfeta_SlugId);
     }
 
     [Fact]
     public async Task Given_update_with_multiple_itt_records_with_same_slugid_request_fails()
     {
         // Arrange
-        var slugId = Guid.NewGuid().ToString();
-        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId);
-        var (_, _, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId);
+        var slugId = Option.Some(Guid.NewGuid().ToString());
+        var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId.ValueOrDefault());
+        var (_, _, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId.ValueOrDefault());
 
         // Act
         var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -2825,7 +2925,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
         var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
         var updateIttSubject3Id = await _dataverseAdapter.GetIttSubjectByCode("100302");  // history
-        var husId = new Random().NextInt64(2000000000000, 2999999999999).ToString();
+        var husId = Option.Some(new Random().NextInt64(2000000000000, 2999999999999).ToString());
         var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
         var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
 
@@ -2947,7 +3047,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     {
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
-        var husId = new Random().NextInt64(2000000000000, 2999999999999).ToString();
+        var husId = Option.Some(new Random().NextInt64(2000000000000, 2999999999999).ToString());
 
         // Act
         var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -2973,15 +3073,15 @@ public class UpdateTeacherTests : IAsyncLifetime
 
         // Assert
         var contact = txnRequest.AssertSingleUpdateRequest<Contact>();
-        Assert.Equal(husId, contact.dfeta_HUSID);
+        Assert.Equal(husId.ValueOrDefault(), contact.dfeta_HUSID);
     }
 
     [Fact]
     public async Task Given_update_with_slugid_falls_back_to_matching_using_ittproviderukprn_retuns_record()
     {
         // Arrange
-        var slugId = Guid.NewGuid().ToString();
-        var (teacherId, ukprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId);
+        var slugId = Option.Some(Guid.NewGuid().ToString());
+        var (teacherId, ukprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId.ValueOrDefault());
         await _organizationService.ExecuteAsync(new UpdateRequest()
         {
             Target = new dfeta_initialteachertraining()
@@ -3022,8 +3122,8 @@ public class UpdateTeacherTests : IAsyncLifetime
     {
         // Arrange
         var ukprn = "10000571";
-        var slugId = Guid.NewGuid().ToString();
-        var (teacherId, _, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId);
+        var slugId = Option.Some(Guid.NewGuid().ToString());
+        var (teacherId, _, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId.ValueOrDefault());
         await _organizationService.ExecuteAsync(new UpdateRequest()
         {
             Target = new dfeta_initialteachertraining()
@@ -3065,7 +3165,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         // Arrange
         var ukprn = "10000571";
         var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
-        var husId = new Random().NextInt64(2000000000000, 2999999999999).ToString();
+        var husId = Option.Some(new Random().NextInt64(2000000000000, 2999999999999).ToString());
 
         // Act
         var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
@@ -3097,10 +3197,10 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_update_using_slugid_and_changed_ittproviderukprn_updates_itt_providerukprn()
     {
         // Arrange
-        var slugId = Guid.NewGuid().ToString();
+        var slugId = Option.Some(Guid.NewGuid().ToString());
         var ukprn = "10000571";
-        var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId);
-        var husId = new Random().NextInt64(2000000000000, 2999999999999).ToString();
+        var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId.ValueOrDefault());
+        var husId = Option.Some(new Random().NextInt64(2000000000000, 2999999999999).ToString());
         var ukproviderukprnid = await _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, Array.Empty<string>(), true);
 
         // Act

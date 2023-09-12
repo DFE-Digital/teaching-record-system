@@ -3,6 +3,8 @@ using FluentValidation;
 using FluentValidation.Results;
 using Medallion.Threading;
 using MediatR;
+using Optional;
+using Optional.Unsafe;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.Validation;
@@ -28,8 +30,8 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
     {
         await using var trnLock = await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Trn(request.Trn), _lockTimeout);
 
-        await using var husidLock = !string.IsNullOrEmpty(request.HusId) ?
-            (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId), _lockTimeout) :
+        await using var husidLock = !string.IsNullOrEmpty(request.HusId.ValueOrDefault()) ?
+            (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId.ValueOrDefault()), _lockTimeout) :
             NoopAsyncDisposable.Instance;
 
         var teachers = await GetTeacherByTrnDobOrSlugId(request.Trn, request.BirthDate, request.SlugId);
@@ -43,6 +45,9 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
             throw new ErrorException(ErrorRegistry.MultipleTeachersFound());
         }
 
+        var firstAndMiddleNames = $"{request.FirstName.ValueOr("")} {request.MiddleName.ValueOr("")}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var firstName = firstAndMiddleNames.FirstOrDefault();
+        var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
         var updateTeacherResult = await _dataverseAdapter.UpdateTeacher(new UpdateTeacherCommand()
         {
             TeacherId = teachers[0].Id,
@@ -77,7 +82,16 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
                 } :
                 null,
             HusId = request.HusId,
-            SlugId = request.SlugId
+            SlugId = Option.Some(request.SlugId),
+            FirstName = request.FirstName,
+            MiddleName = request.MiddleName,
+            LastName = request.LastName,
+            EmailAddress = request.EmailAddress,
+            GenderCode = request.GenderCode.Map(x => x.ConvertToContact_GenderCode()),
+            DateOfBirth = request.DateOfBirth.Map(x => x.ToDateTime()),
+            StatedFirstName = Option.Some(firstName),
+            StatedMiddleName = Option.Some(middleName),
+            StatedLastName = request.LastName
         });
 
         if (!updateTeacherResult.Succeeded)
