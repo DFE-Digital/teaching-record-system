@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons;
 public partial class IndexModel : PageModel
 {
     private const int MaxSearchResultCount = 500;
-    private const int PageSize = 25;
+    private const int PageSize = 15;
 
     [GeneratedRegex("^\\d{7}$")]
     private static partial Regex TrnRegex();
@@ -31,7 +31,7 @@ public partial class IndexModel : PageModel
     [Display(Name = "Search")]
     public string? Search { get; set; }
 
-    [FromQuery(Name = "PageNumber")]
+    [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
     public PersonInfo[]? SearchResults { get; set; }
@@ -59,27 +59,9 @@ public partial class IndexModel : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPost()
-    {
-        PageNumber ??= 1;
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
-        if (string.IsNullOrEmpty(Search))
-        {
-            ModelState.AddModelError(nameof(Search), "Enter search string");
-            return this.PageWithErrors();
-        }
-
-        return await PerformSearch();
-    }
-
     private async Task<IActionResult> PerformSearch()
     {
-        var contacts = new Contact[] { };
+        Contact[]? contacts = null;
         var columnSet = new ColumnSet(
             Contact.Fields.dfeta_TRN,
             Contact.Fields.BirthDate,
@@ -113,7 +95,7 @@ public partial class IndexModel : PageModel
             contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByNameQuery(Search!, MaxSearchResultCount, columnSet));
         }
 
-        TotalKnownPages = Math.Max((int)Math.Ceiling((decimal)contacts.Length / PageSize), 1);
+        TotalKnownPages = Math.Max((int)Math.Ceiling((decimal)contacts!.Length / PageSize), 1);
 
         PreviousPage = PageNumber > 1 ? PageNumber - 1 : null;
         NextPage = PageNumber < TotalKnownPages ? PageNumber + 1 : null;
@@ -141,8 +123,7 @@ public partial class IndexModel : PageModel
             Name = contact.ResolveFullName(includeMiddleName: true),
             DateOfBirth = contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
             Trn = contact.dfeta_TRN,
-            NationalInsuranceNumber = contact.dfeta_NINumber,
-            HasActiveAlert = contact.dfeta_ActiveSanctions ?? false
+            NationalInsuranceNumber = contact.dfeta_NINumber
         };
     }
 
@@ -153,6 +134,5 @@ public partial class IndexModel : PageModel
         public required DateOnly? DateOfBirth { get; init; }
         public required string? Trn { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
-        public required bool HasActiveAlert { get; init; }
     }
 }

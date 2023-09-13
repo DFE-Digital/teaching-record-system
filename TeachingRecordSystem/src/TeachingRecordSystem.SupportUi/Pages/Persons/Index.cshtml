@@ -9,13 +9,11 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <div class="govuk-!-margin-bottom-6">
-            <form trs-action="l => l.Persons()" data-testid="search-form">
+            <form trs-action="l => l.Persons()" method="get" data-testid="search-form">
                 <div class="moj-search trs-search">
                     <govuk-input asp-for="Search"
                                  input-class="moj-search__input"
                                  label-class="moj-search__label govuk-!-font-weight-bold"
-                                 id="search"
-                                 name="search"
                                  data-testid="search-input"
                                  type="search">
                         <govuk-input-hint class="moj-search__hint">Search by: Name, TRN or date of birth (DD/MM/YYYY)</govuk-input-hint>
@@ -52,14 +50,13 @@
                         <th scope="col" class="govuk-table__header">Date of birth</th>
                         <th scope="col" class="govuk-table__header">TRN</th>
                         <th scope="col" class="govuk-table__header">NiNo</th>
-                        <th scope="col" class="govuk-table__header">Active alert</th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
                     @if (Model.SearchResults is null || Model.SearchResults.Length == 0)
                     {
                         <tr class="govuk-table__row" data-testid="no-matches">
-                            <td class="govuk-table__cell" colspan="5">No matching records</td>
+                            <td class="govuk-table__cell" colspan="4">No matching records</td>
                         </tr>
                     }
                     else
@@ -67,11 +64,10 @@
                         @foreach (var personInfo in Model.SearchResults!)
                         {
                             <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
-                                <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId, search: Model.Search)" class="govuk-link">@personInfo.Name</a></td>
+                                <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId, search: Model.Search, pageNumber: Model.PageNumber)" class="govuk-link">@personInfo.Name</a></td>
                                 <td class="govuk-table__cell" data-testid="date-of-birth">@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString("dd/MM/yyyy") : "-")</td>
                                 <td class="govuk-table__cell" data-testid="trn">@(!string.IsNullOrEmpty(personInfo.Trn) ? personInfo.Trn : "-")</td>
                                 <td class="govuk-table__cell" data-testid="nino">@(!string.IsNullOrEmpty(personInfo.NationalInsuranceNumber) ? personInfo.NationalInsuranceNumber : "-")</td>
-                                <td class="govuk-table__cell" data-testid="alert">@(personInfo.HasActiveAlert ? "Yes" : "No")</td>
                             </tr>
                         }
                     }
@@ -84,7 +80,7 @@
                     @if (Model.PreviousPage.HasValue)
                     {
                         <govuk-pagination-previous asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.PreviousPage" />
-                    }             
+                    }
 
                     @if (Model.NextPage.HasValue)
                     {

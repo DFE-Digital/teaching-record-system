@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Persons(Model.Search)" />
+    <govuk-back-link href="@LinkGenerator.Persons(Model.Search, Model.PageNumber)" />
 }
 
 <h1 class="govuk-heading-l" data-testid="page-title">@ViewBag.Title</h1>
@@ -16,15 +16,15 @@
         <nav class="moj-sub-navigation" aria-label="Sub navigation">
             <ul class="moj-sub-navigation__list">
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.General)">General</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.General, Model.Search, Model.PageNumber)">General</a>
                 </li>
 
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.Alerts)">Alerts</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.Alerts, Model.Search, Model.PageNumber)">Alerts</a>
                 </li>
 
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.ChangeLog ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.ChangeLog)">Change log</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.ChangeLog ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.ChangeLog, Model.Search, Model.PageNumber)">Change log</a>
                 </li>
             </ul>
         </nav>

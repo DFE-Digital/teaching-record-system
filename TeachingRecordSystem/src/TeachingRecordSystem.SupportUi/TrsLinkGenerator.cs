@@ -1,4 +1,3 @@
-using Flurl;
 using static TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.IndexModel;
 
 namespace TeachingRecordSystem.SupportUi;
@@ -28,15 +27,10 @@ public class TrsLinkGenerator
 
     public string RejectCase(string ticketNumber) => GetRequiredPathByPage("/Cases/EditCase/Reject", routeValues: new { ticketNumber });
 
-    public string Persons(string? search = null, int? pageNumber = null) =>
-        GetRequiredPathByPage("/Persons/Index")
-            .SetQueryParam("search", search)
-            .SetQueryParam("pagenumber", pageNumber);
+    public string Persons(string? search = null, int? pageNumber = null) => GetRequiredPathByPage("/Persons/Index", routeValues: new { search, pageNumber });
 
-    public string PersonDetail(Guid personId, PersonSubNavigationTab? selectedTab = null, string? search = null) =>
-        GetRequiredPathByPage("/Persons/PersonDetail/Index", routeValues: new { personId })
-            .SetQueryParam("selectedTab", selectedTab)
-            .SetQueryParam("search", search);
+    public string PersonDetail(Guid personId, PersonSubNavigationTab? selectedTab = null, string? search = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/Index", routeValues: new { personId, selectedTab, search, pageNumber });
 
     public string Users() => GetRequiredPathByPage("/Users/Index");
 
