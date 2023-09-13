@@ -18,6 +18,8 @@ public partial class CrmTestData
     {
         private DateOnly? _dateOfBirth;
         private bool? _hasTrn;
+        private string? _firstName;
+        private string? _middleName;
         private string? _lastName;
         private string? _previousLastName;
         private string? _email;
@@ -32,6 +34,28 @@ public partial class CrmTestData
             }
 
             _dateOfBirth = dateOfBirth;
+            return this;
+        }
+
+        public CreatePersonBuilder WithFirstName(string firstName)
+        {
+            if (_firstName is not null && _firstName != firstName)
+            {
+                throw new InvalidOperationException("WithFirstName cannot be changed after it's set.");
+            }
+
+            _firstName = firstName;
+            return this;
+        }
+
+        public CreatePersonBuilder WithMiddleName(string middleName)
+        {
+            if (_middleName is not null && _middleName != middleName)
+            {
+                throw new InvalidOperationException("WithMiddleName cannot be changed after it's set.");
+            }
+
+            _middleName = middleName;
             return this;
         }
 
@@ -106,8 +130,8 @@ public partial class CrmTestData
             var hasTrn = _hasTrn ?? true;
             var trn = hasTrn ? await testData.GenerateTrn() : null;
 
-            var firstName = testData.GenerateFirstName();
-            var middleName = testData.GenerateMiddleName();
+            var firstName = _firstName ?? testData.GenerateFirstName();
+            var middleName = _middleName ?? testData.GenerateMiddleName();
             var lastName = _lastName ?? testData.GenerateLastName();
             var dateOfBirth = _dateOfBirth ?? testData.GenerateDateOfBirth();
 

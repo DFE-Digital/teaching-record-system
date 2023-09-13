@@ -9,13 +9,14 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <div class="govuk-!-margin-bottom-6">
-            <form trs-action="l => l.Persons()">
+            <form trs-action="l => l.Persons()" data-testid="search-form">
                 <div class="moj-search trs-search">
                     <govuk-input asp-for="Search"
                                  input-class="moj-search__input"
                                  label-class="moj-search__label govuk-!-font-weight-bold"
                                  id="search"
                                  name="search"
+                                 data-testid="search-input"
                                  type="search">
                         <govuk-input-hint class="moj-search__hint">Search by: Name, TRN or date of birth (DD/MM/YYYY)</govuk-input-hint>
                     </govuk-input>
@@ -27,7 +28,7 @@
 </div>
 @if (!string.IsNullOrEmpty(Model.Search))
 {
-    <div class="govuk-grid-row">
+    <div class="govuk-grid-row" data-testid="search-results">
         <div class="govuk-grid-column-full">
             @if (Model.TotalKnownPages > 1)
             {
@@ -66,11 +67,11 @@
                         @foreach (var personInfo in Model.SearchResults!)
                         {
                             <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
-                                <td class="govuk-table__cell" data-testid="name-@personInfo.PersonId"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId, search: Model.Search)" class="govuk-link">@personInfo.Name</a></td>
-                                <td class="govuk-table__cell" data-testid="date-of-birth-@personInfo.PersonId">@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString("dd/MM/yyyy") : "-")</td>
-                                <td class="govuk-table__cell" data-testid="trn-@personInfo.PersonId">@(!string.IsNullOrEmpty(personInfo.Trn) ? personInfo.Trn : "-")</td>
-                                <td class="govuk-table__cell" data-testid="nino-@personInfo.PersonId">@(!string.IsNullOrEmpty(personInfo.NationalInsuranceNumber) ? personInfo.NationalInsuranceNumber : "-")</td>
-                                <td class="govuk-table__cell" data-testid="alert-@personInfo.PersonId">@(personInfo.HasActiveAlert ? "Yes" : "No")</td>
+                                <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId, search: Model.Search)" class="govuk-link">@personInfo.Name</a></td>
+                                <td class="govuk-table__cell" data-testid="date-of-birth">@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString("dd/MM/yyyy") : "-")</td>
+                                <td class="govuk-table__cell" data-testid="trn">@(!string.IsNullOrEmpty(personInfo.Trn) ? personInfo.Trn : "-")</td>
+                                <td class="govuk-table__cell" data-testid="nino">@(!string.IsNullOrEmpty(personInfo.NationalInsuranceNumber) ? personInfo.NationalInsuranceNumber : "-")</td>
+                                <td class="govuk-table__cell" data-testid="alert">@(personInfo.HasActiveAlert ? "Yes" : "No")</td>
                             </tr>
                         }
                     }
