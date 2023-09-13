@@ -21,7 +21,6 @@ public class GetContactsByDateOfBirthTests : IAsyncLifetime
     public async Task ReturnsMatchingContactsFromCrm()
     {
         // Arrange
-        var name = "smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
         var maxRecordCount = 3;
 
