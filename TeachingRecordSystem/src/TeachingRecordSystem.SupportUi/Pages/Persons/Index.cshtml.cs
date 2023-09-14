@@ -32,6 +32,9 @@ public partial class IndexModel : PageModel
     public string? Search { get; set; }
 
     [BindProperty(SupportsGet = true)]
+    public ContactSearchSortByOption SortBy { get; set; }
+
+    [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
     public PersonInfo[]? SearchResults { get; set; }
@@ -72,15 +75,12 @@ public partial class IndexModel : PageModel
             Contact.Fields.dfeta_StatedFirstName,
             Contact.Fields.dfeta_StatedMiddleName,
             Contact.Fields.dfeta_StatedLastName,
-            Contact.Fields.EMailAddress1,
-            Contact.Fields.MobilePhone,
-            Contact.Fields.dfeta_NINumber,
-            Contact.Fields.dfeta_ActiveSanctions);
+            Contact.Fields.dfeta_NINumber);
 
         // Check if the search string is a date of birth, TRN or one or more names
         if (DateOnly.TryParse(Search, out var dateOfBirth))
         {
-            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByDateOfBirthQuery(dateOfBirth, MaxSearchResultCount, columnSet));
+            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByDateOfBirthQuery(dateOfBirth, SortBy, MaxSearchResultCount, columnSet));
         }
         else if (TrnRegex().IsMatch(Search!))
         {
@@ -92,7 +92,7 @@ public partial class IndexModel : PageModel
         }
         else
         {
-            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByNameQuery(Search!, MaxSearchResultCount, columnSet));
+            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByNameQuery(Search!, SortBy, MaxSearchResultCount, columnSet));
         }
 
         TotalKnownPages = Math.Max((int)Math.Ceiling((decimal)contacts!.Length / PageSize), 1);

@@ -1,4 +1,5 @@
 @page "/persons"
+@using TeachingRecordSystem.Core.Dqt.Models;
 @model TeachingRecordSystem.SupportUi.Pages.Persons.IndexModel
 @{
     ViewBag.Title = "All records";
@@ -10,7 +11,7 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <div class="govuk-!-margin-bottom-6">
             <form trs-action="l => l.Persons()" method="get" data-testid="search-form">
-                <div class="moj-search trs-search">
+                <div class="moj-search trs-search govuk-!-margin-bottom-4">
                     <govuk-input asp-for="Search"
                                  input-class="moj-search__input"
                                  label-class="moj-search__label govuk-!-font-weight-bold"
@@ -19,7 +20,16 @@
                         <govuk-input-hint class="moj-search__hint">Search by: Name, TRN or date of birth (DD/MM/YYYY)</govuk-input-hint>
                     </govuk-input>
                     <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
-                </div>                
+                </div>
+                <govuk-select asp-for="SortBy">
+                    <govuk-select-label>Sort by</govuk-select-label>
+                    <govuk-select-item value="@ContactSearchSortByOption.LastNameAscending">@ContactSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@ContactSearchSortByOption.LastNameDescending">@ContactSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@ContactSearchSortByOption.FirstNameAscending">@ContactSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@ContactSearchSortByOption.FirstNameDescending">@ContactSearchSortByOption.FirstNameDescending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthAscending">@ContactSearchSortByOption.DateOfBirthAscending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthDescending">@ContactSearchSortByOption.DateOfBirthDescending.GetDisplayName()</govuk-select-item>
+                </govuk-select>
             </form>
         </div>
     </div>
@@ -33,12 +43,12 @@
                 <govuk-pagination>
                     @if (Model.PreviousPage.HasValue)
                     {
-                        <govuk-pagination-previous asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.PreviousPage" />
+                        <govuk-pagination-previous asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.PreviousPage" asp-route-sortby="@Model.SortBy" />
                     }                
 
                     @if (Model.NextPage.HasValue)
                     {
-                        <govuk-pagination-next asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.NextPage" />
+                        <govuk-pagination-next asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.NextPage" asp-route-sortby="@Model.SortBy" />
                     }
                 </govuk-pagination>
             }
@@ -64,7 +74,7 @@
                         @foreach (var personInfo in Model.SearchResults!)
                         {
                             <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
-                                <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId, search: Model.Search, pageNumber: Model.PageNumber)" class="govuk-link">@personInfo.Name</a></td>
+                                <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId, search: Model.Search, sortBy: Model.SortBy, pageNumber: Model.PageNumber)" class="govuk-link">@personInfo.Name</a></td>
                                 <td class="govuk-table__cell" data-testid="date-of-birth">@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString("dd/MM/yyyy") : "-")</td>
                                 <td class="govuk-table__cell" data-testid="trn">@(!string.IsNullOrEmpty(personInfo.Trn) ? personInfo.Trn : "-")</td>
                                 <td class="govuk-table__cell" data-testid="nino">@(!string.IsNullOrEmpty(personInfo.NationalInsuranceNumber) ? personInfo.NationalInsuranceNumber : "-")</td>
@@ -79,12 +89,12 @@
                 <govuk-pagination>
                     @if (Model.PreviousPage.HasValue)
                     {
-                        <govuk-pagination-previous asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.PreviousPage" />
+                        <govuk-pagination-previous asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.PreviousPage" asp-route-sortby="@Model.SortBy" />
                     }
 
                     @if (Model.NextPage.HasValue)
                     {
-                        <govuk-pagination-next asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.NextPage" />
+                        <govuk-pagination-next asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.NextPage" asp-route-sortby="@Model.SortBy" />
                     }
                 </govuk-pagination>
             }

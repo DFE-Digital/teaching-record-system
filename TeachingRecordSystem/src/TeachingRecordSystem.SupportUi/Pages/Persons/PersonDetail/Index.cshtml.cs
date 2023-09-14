@@ -25,6 +25,9 @@ public class IndexModel : PageModel
     public int? PageNumber { get; set; }
 
     [FromQuery]
+    public ContactSearchSortByOption SortBy { get; set; }
+
+    [FromQuery]
     public PersonSubNavigationTab? SelectedTab { get; set; }
 
     public PersonInfo? Person { get; set; }
