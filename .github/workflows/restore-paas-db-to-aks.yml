@@ -10,7 +10,6 @@ on:
       environment:
         type: choice
         options:
-          - pre-production
           - production
 
 env:

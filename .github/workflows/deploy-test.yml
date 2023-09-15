@@ -12,9 +12,6 @@ on:
       ui_docker_image:
         type: string
         required: true
-    outputs:
-      api_url:
-        value: ${{ jobs.deploy.outputs.api_url }}
 
 concurrency: deploy_test
 jobs:
