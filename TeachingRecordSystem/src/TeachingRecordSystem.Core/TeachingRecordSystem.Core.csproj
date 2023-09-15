@@ -14,6 +14,7 @@
     <None Remove="Dqt\Services\DqtReporting\Migrations\0005_ContactSlugId.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0006_Incident_msdyn_copilotengaged.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0007_ContactAllowpiiUpdatesFromRegister.sql" />
+    <None Remove="Dqt\Services\DqtReporting\Migrations\0008_EvergreenMissingColumns.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +25,7 @@
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0005_ContactSlugId.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0006_Incident_msdyn_copilotengaged.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0007_ContactAllowpiiUpdatesFromRegister.sql" />
+    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0008_EvergreenMissingColumns.sql" />
   </ItemGroup>
 
   <ItemGroup>
