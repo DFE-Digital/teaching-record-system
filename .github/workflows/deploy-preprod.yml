@@ -12,9 +12,6 @@ on:
       ui_docker_image:
         type: string
         required: true
-    outputs:
-      api_url:
-        value: ${{ jobs.deploy.outputs.api_url }}
   workflow_dispatch:
 
 concurrency: deploy_preprod
@@ -24,30 +21,6 @@ jobs:
     if: inputs.api_docker_image == ''
     uses: ./.github/workflows/package.yml
     secrets: inherit
-
-  deploy:
-    name: Deploy to PAAS
-    needs: package
-    if: always() && (needs.package.result == 'success' || needs.package.result == 'skipped')
-    runs-on: ubuntu-latest
-
-    outputs:
-      api_url: ${{ steps.deploy.outputs.api_url }}
-
-    environment:
-      name: pre-production
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - uses: ./.github/workflows/actions/deploy-paas-environment
-      id: deploy
-      with:
-        environment_name: pre-production
-        api_docker_image: ${{ inputs.api_docker_image || needs.package.outputs.api_docker_image }}
-        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-        terraform_vars: pre-production.tfvars.json
-        terraform_backend_vars: pre-production.backend.tfvars
 
   deploy_aks:
     name: Deploy to AKS
