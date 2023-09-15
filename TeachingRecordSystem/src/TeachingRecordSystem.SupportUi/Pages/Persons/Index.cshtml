@@ -22,7 +22,6 @@
                     <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
                 </div>
                 <govuk-select asp-for="SortBy">
-                    <govuk-select-label>Sort by</govuk-select-label>
                     <govuk-select-item value="@ContactSearchSortByOption.LastNameAscending">@ContactSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
                     <govuk-select-item value="@ContactSearchSortByOption.LastNameDescending">@ContactSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
                     <govuk-select-item value="@ContactSearchSortByOption.FirstNameAscending">@ContactSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
@@ -38,21 +37,6 @@
 {
     <div class="govuk-grid-row" data-testid="search-results">
         <div class="govuk-grid-column-full">
-            @if (Model.TotalKnownPages > 1)
-            {
-                <govuk-pagination>
-                    @if (Model.PreviousPage.HasValue)
-                    {
-                        <govuk-pagination-previous asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.PreviousPage" asp-route-sortby="@Model.SortBy" />
-                    }                
-
-                    @if (Model.NextPage.HasValue)
-                    {
-                        <govuk-pagination-next asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.NextPage" asp-route-sortby="@Model.SortBy" />
-                    }
-                </govuk-pagination>
-            }
-
             <table class="govuk-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -91,6 +75,21 @@
                     {
                         <govuk-pagination-previous asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@Model.PreviousPage" asp-route-sortby="@Model.SortBy" />
                     }
+
+                    @if (Model.DisplayPageNumbers)
+                    {
+                        @for (int i = 0; i < Model.PaginationPages!.Length; i++)
+                        {
+                            var item = Model.PaginationPages[i];
+
+                            if (i > 0 && Model.PaginationPages[i - 1] != item - 1)
+                            {
+                                <govuk-pagination-ellipsis />
+                            }
+
+                            <govuk-pagination-item asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@item" is-current="@(item == Model.PageNumber)">@item</govuk-pagination-item>
+                        }
+                    }                    
 
                     @if (Model.NextPage.HasValue)
                     {

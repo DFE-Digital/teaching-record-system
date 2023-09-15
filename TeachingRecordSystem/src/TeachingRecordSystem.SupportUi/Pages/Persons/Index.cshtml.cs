@@ -32,18 +32,23 @@ public partial class IndexModel : PageModel
     public string? Search { get; set; }
 
     [BindProperty(SupportsGet = true)]
+    [Display(Name = "Sort by")]
     public ContactSearchSortByOption SortBy { get; set; }
 
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
-    public PersonInfo[]? SearchResults { get; set; }
+    public int[]? PaginationPages { get; set; }
 
     public int TotalKnownPages { get; set; }
+
+    public bool DisplayPageNumbers { get; set; }
 
     public int? PreviousPage { get; set; }
 
     public int? NextPage { get; set; }
+
+    public PersonInfo[]? SearchResults { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -99,6 +104,18 @@ public partial class IndexModel : PageModel
 
         PreviousPage = PageNumber > 1 ? PageNumber - 1 : null;
         NextPage = PageNumber < TotalKnownPages ? PageNumber + 1 : null;
+
+        if (contacts.Length < MaxSearchResultCount)
+        {
+            DisplayPageNumbers = true;
+            PaginationPages = Enumerable.Range(-2, 5).Select(offset => PageNumber!.Value + offset)
+            .Append(1)
+            .Append(TotalKnownPages)
+            .Where(page => page <= TotalKnownPages && page >= 1)
+            .Distinct()
+            .Order()
+            .ToArray();
+        }
 
         SearchResults = contacts
             .Skip((PageNumber!.Value - 1) * PageSize)
