@@ -18,8 +18,32 @@ public class GetContactsByNameHandler : ICrmQueryHandler<GetContactsByNameQuery,
         {
             ColumnSet = query.ColumnSet,
             Criteria = filter,
-            TopCount = query.MaxRecordCount
+            TopCount = query.MaxRecordCount,
         };
+
+        switch (query.SortBy)
+        {
+            case ContactSearchSortByOption.LastNameAscending:
+                queryExpression.AddOrder(Contact.Fields.LastName, OrderType.Ascending);
+                break;
+            case ContactSearchSortByOption.LastNameDescending:
+                queryExpression.AddOrder(Contact.Fields.LastName, OrderType.Descending);
+                break;
+            case ContactSearchSortByOption.FirstNameAscending:
+                queryExpression.AddOrder(Contact.Fields.FirstName, OrderType.Ascending);
+                break;
+            case ContactSearchSortByOption.FirstNameDescending:
+                queryExpression.AddOrder(Contact.Fields.FirstName, OrderType.Descending);
+                break;
+            case ContactSearchSortByOption.DateOfBirthAscending:
+                queryExpression.AddOrder(Contact.Fields.BirthDate, OrderType.Ascending);
+                break;
+            case ContactSearchSortByOption.DateOfBirthDescending:
+                queryExpression.AddOrder(Contact.Fields.BirthDate, OrderType.Descending);
+                break;
+            default:
+                break;
+        }
 
         var response = await organizationService.RetrieveMultipleAsync(queryExpression);
         return response.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
