@@ -109,12 +109,12 @@ public partial class IndexModel : PageModel
         {
             DisplayPageNumbers = true;
             PaginationPages = Enumerable.Range(-2, 5).Select(offset => PageNumber!.Value + offset)
-            .Append(1)
-            .Append(TotalKnownPages)
-            .Where(page => page <= TotalKnownPages && page >= 1)
-            .Distinct()
-            .Order()
-            .ToArray();
+                .Append(1)
+                .Append(TotalKnownPages)
+                .Where(page => page <= TotalKnownPages && page >= 1)
+                .Distinct()
+                .Order()
+                .ToArray();
         }
 
         SearchResults = contacts
