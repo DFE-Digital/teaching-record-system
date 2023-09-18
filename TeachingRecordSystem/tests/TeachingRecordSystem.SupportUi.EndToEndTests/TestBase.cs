@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
+using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
@@ -13,6 +14,8 @@ public abstract class TestBase
     }
 
     public HostFixture HostFixture { get; }
+
+    public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
     protected void SetCurrentUser(User user)
     {
