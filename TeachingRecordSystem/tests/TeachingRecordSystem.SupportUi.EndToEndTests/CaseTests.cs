@@ -9,12 +9,23 @@ public class CaseTests : TestBase
     {
     }
 
-    [Fact]
-    public async Task SelectCaseAndApprove()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task SelectCaseAndApprove(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
-        var caseReference = createIncidentResult.TicketNumber;
+        string caseReference;
+        if (isNameChange)
+        {
+            var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            caseReference = createIncidentResult.TicketNumber;
+        }
+        else
+        {
+            var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            caseReference = createIncidentResult.TicketNumber;
+        }
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -40,12 +51,23 @@ public class CaseTests : TestBase
         await page.AssertFlashMessage("The request has been accepted");
     }
 
-    [Fact]
-    public async Task SelectCaseAndReject()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task SelectCaseAndReject(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
-        var caseReference = createIncidentResult.TicketNumber;
+        string caseReference;
+        if (isNameChange)
+        {
+            var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            caseReference = createIncidentResult.TicketNumber;
+        }
+        else
+        {
+            var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            caseReference = createIncidentResult.TicketNumber;
+        }
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -73,12 +95,23 @@ public class CaseTests : TestBase
         await page.AssertFlashMessage("The request has been rejected");
     }
 
-    [Fact]
-    public async Task SelectCaseAndCancel()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task SelectCaseAndCancel(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
-        var caseReference = createIncidentResult.TicketNumber;
+        string caseReference;
+        if (isNameChange)
+        {
+            var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            caseReference = createIncidentResult.TicketNumber;
+        }
+        else
+        {
+            var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            caseReference = createIncidentResult.TicketNumber;
+        }
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
