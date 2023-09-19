@@ -4,7 +4,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Requests;
 
@@ -13,7 +12,6 @@ namespace TeachingRecordSystem.Api.V3.Controllers;
 [ApiController]
 [Route("certificates")]
 [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
-[SupportsReadOnlyMode]
 public class CertificatesController : Controller
 {
     private readonly IMediator _mediator;
