@@ -15,10 +15,8 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using Prometheus;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
-using TeachingRecordSystem.Api.Infrastructure.Configuration;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Json;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
@@ -56,15 +54,12 @@ public class Program
 
         if (builder.Environment.IsProduction())
         {
-            builder.Configuration
-                .AddJsonEnvironmentVariable("AppConfig")
-                .AddJsonEnvironmentVariable("VCAP_APPLICATION", configurationKeyPrefix: "VCAP_APPLICATION");
+            builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
         }
 
         var platformEnvironmentName = configuration["PlatformEnvironment"];
         builder.ConfigureLogging(platformEnvironmentName);
 
-        var platform = configuration.GetRequiredValue("Platform");
         var pgConnectionString = configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
@@ -265,11 +260,6 @@ public class Program
         services.AddRedis(env, configuration, healthCheckBuilder);
         services.AddRateLimiting(env, configuration);
 
-        if (platform == "PAAS")
-        {
-            MetricLabels.ConfigureLabels(builder.Configuration);
-        }
-
         if (builder.Environment.IsProduction())
         {
             builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -294,11 +284,6 @@ public class Program
         }
 
         app.UseRouting();
-
-        if (platform == "PAAS")
-        {
-            app.UseHttpMetrics();
-        }
 
         app.UseHealthChecks("/status");
 
@@ -332,11 +317,6 @@ public class Program
         });
 
         app.MapWebHookEndpoints();
-
-        if (platform == "PAAS")
-        {
-            app.MapMetrics();
-        }
 
         app.MapControllers();
 

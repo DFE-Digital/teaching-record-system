@@ -23,7 +23,6 @@
     <PackageReference Include="Moq" Version="4.20.69" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.20.0" />
     <PackageReference Include="NSwag.Examples" Version="1.0.10" />
-    <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
     <PackageReference Include="RedisRateLimiting.AspNetCore" Version="1.0.8" />
     <PackageReference Include="Sentry.AspNetCore" Version="3.35.0" />
     <PackageReference Include="Sentry.Serilog" Version="3.35.0" />
@@ -47,12 +46,6 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>StringResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="entrypoint.sh">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
