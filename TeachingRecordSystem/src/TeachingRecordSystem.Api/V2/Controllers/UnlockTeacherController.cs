@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 
@@ -9,7 +8,6 @@ namespace TeachingRecordSystem.Api.V2.Controllers;
 
 [ApiController]
 [Route("unlock-teacher")]
-[SupportsReadOnlyMode]
 public class UnlockTeacherController : ControllerBase
 {
     private readonly IMediator _mediator;

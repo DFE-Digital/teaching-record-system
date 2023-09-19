@@ -8,7 +8,6 @@ namespace TeachingRecordSystem.Api.V2.Controllers;
 
 [ApiController]
 [Route("npq-qualifications")]
-[SupportsReadOnlyMode]
 public class NpqQualificationsController : ControllerBase
 {
     private readonly IMediator _mediator;

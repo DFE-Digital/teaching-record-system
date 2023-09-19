@@ -75,9 +75,6 @@ variable "run_recurring_jobs" {
   type = bool
 }
 
-variable "readonly_mode" {
-  type = bool
-}
 variable "api_replicas" {
   type    = number
   default = 1

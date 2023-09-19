@@ -25,7 +25,6 @@ public class TeachersController : Controller
         summary: "Find teachers",
         description: "Returns teachers matching the specified criteria")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
-    [SupportsReadOnlyMode]
     public async Task<IActionResult> FindTeachers(FindTeachersRequest request)
     {
         var response = await _mediator.Send(request);
@@ -38,7 +37,6 @@ public class TeachersController : Controller
         summary: "Get teacher",
         description: "Gets an individual teacher by their TRN")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
-    [SupportsReadOnlyMode]
     public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)
     {
         var response = await _mediator.Send(request);

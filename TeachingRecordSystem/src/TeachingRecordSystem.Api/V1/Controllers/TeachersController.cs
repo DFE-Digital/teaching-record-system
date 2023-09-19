@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
 using TeachingRecordSystem.Api.V1.Requests;
 using TeachingRecordSystem.Api.V1.Responses;
@@ -10,7 +9,6 @@ namespace TeachingRecordSystem.Api.V1.Controllers;
 
 [ApiController]
 [Route("teachers")]
-[SupportsReadOnlyMode]
 public class TeachersController : ControllerBase
 {
     private readonly IMediator _mediator;
