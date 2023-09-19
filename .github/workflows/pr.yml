@@ -6,7 +6,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false  # temporary - can corrupt PAAS Terraform state if deployments are cancelled
+  cancel-in-progress: true
 
 permissions:
   checks: write
@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: [paas, aks]
+        platform: [aks]
 
     steps:
     - uses: actions/checkout@v4

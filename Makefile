@@ -9,55 +9,13 @@ ARM_TEMPLATE_TAG=1.1.10
 help: ## Show this help
 	@grep -E '^[a-zA-Z\.\-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	## environments:
-	## - Paas: dev, test, pre-production, production
 	## - AKS:  dev_aks, test_aks, pre-production_aks, production_aks
-
-.PHONY: paas
-paas:
-	$(eval PLATFORM=paas)
-	$(eval REGION=West Europe)
-	$(eval SERVICE_SHORT=dqtapi)
-	$(eval RG_TAGS=$(shell echo '{"Portfolio": "Early Years and Schools Group", "Parent Business":"Teacher Training and Qualifications", "Product" : "Database of Qualified Teachers", "Service Line": "Teaching Workforce", "Service": "Teacher Training and Qualifications", "Service Offering": "Database of Qualified Teachers", "Environment" : "$(ENV_TAG)"}' | jq . ))
 
 .PHONY: aks
 aks:
 	$(eval PLATFORM=aks)
 	$(eval REGION=UK South)
 	$(eval SERVICE_SHORT=trs)
-
-.PHONY: dev
-dev: paas
-	$(eval DEPLOY_ENV=dev)
-	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-development)
-	$(eval RESOURCE_NAME_PREFIX=s165d01)
-	$(eval ENV_SHORT=dv)
-	$(eval ENV_TAG=dev)
-
-.PHONY: test
-test: paas
-	$(eval DEPLOY_ENV=test)
-	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
-	$(eval RESOURCE_NAME_PREFIX=s165t01)
-	$(eval ENV_SHORT=ts)
-	$(eval ENV_TAG=test)
-
-.PHONY: pre-production
-pre-production: paas
-	$(eval DEPLOY_ENV=pre-production)
-	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-test)
-	$(eval RESOURCE_NAME_PREFIX=s165t01)
-	$(eval ENV_SHORT=pp)
-	$(eval ENV_TAG=pre-prod)
-
-.PHONY: production
-production: paas
-	$(eval DEPLOY_ENV=production)
-	$(eval AZURE_SUBSCRIPTION=s165-teachingqualificationsservice-production)
-	$(eval RESOURCE_NAME_PREFIX=s165p01)
-	$(eval ENV_SHORT=pd)
-	$(eval ENV_TAG=prod)
-	$(eval AZURE_BACKUP_STORAGE_ACCOUNT_NAME=s165p01dqtapidbbackup)
-	$(eval AZURE_BACKUP_STORAGE_CONTAINER_NAME=dqt-api)
 
 .PHONY: dev_aks
 dev_aks: aks
