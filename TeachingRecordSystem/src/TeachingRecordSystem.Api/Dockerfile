@@ -12,5 +12,5 @@ RUN apt-get update; apt-get install -y ttf-mscorefonts-installer fontconfig
 
 ENV PATH="${PATH}:/TrsCli"
 
-ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
+ENTRYPOINT ["dotnet", "/App/TeachingRecordSystem.Api.dll"]
 EXPOSE 80

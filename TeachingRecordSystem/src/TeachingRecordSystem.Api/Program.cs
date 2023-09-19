@@ -288,14 +288,6 @@ public class Program
 
         var app = builder.Build();
 
-        // If we've been invoked with `config` as an argument, return the corresponding config key and exit
-        if (args.Length == 2 && args[0] == "config")
-        {
-            var configKey = args[1];
-            Console.WriteLine(app.Configuration[configKey]);
-            return;
-        }
-
         if (app.Environment.IsProduction())
         {
             app.UseForwardedHeaders();

@@ -1,7 +1,7 @@
 locals {
   reporting_db_username          = var.deploy_dqt_reporting_server ? "u${random_string.reporting_server_username[0].result}" : null
   reporting_db_password          = var.deploy_dqt_reporting_server ? random_string.reporting_server_password[0].result : null
-  reporting_db_connection_string = var.deploy_dqt_reporting_server ? "Data Source=tcp:${azurerm_mssql_server.reporting_server[0].fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.reporting_db[0].name};Persist Security Info=False;User ID=${local.reporting_db_username};Password=${local.reporting_db_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" : ""
+  reporting_db_connection_string = var.deploy_dqt_reporting_server ? "Data Source=tcp:${azurerm_mssql_server.reporting_server[0].fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.reporting_db[0].name};Persist Security Info=False;User ID=${local.reporting_db_username};Password=${local.reporting_db_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" : module.infrastructure_secrets.map.DQT-REPORTING-CONNECTION-STRING
 }
 
 resource "random_string" "reporting_server_username" {
@@ -57,8 +57,6 @@ resource "azurerm_mssql_database" "reporting_db" {
 }
 
 resource "kubernetes_job" "reporting_migrations" {
-  count = length(azurerm_mssql_server.reporting_server)
-
   metadata {
     name      = "${var.service_name}-${var.environment_name}-reporting-migrations"
     namespace = var.namespace
