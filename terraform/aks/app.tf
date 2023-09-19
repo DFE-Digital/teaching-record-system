@@ -91,6 +91,7 @@ module "api_application" {
   docker_image = var.api_docker_image
   web_port     = 80
   probe_path   = "/health"
+  replicas     = var.api_replicas
 }
 
 module "ui_application_configuration" {
@@ -134,4 +135,5 @@ module "ui_application" {
   docker_image = var.ui_docker_image
   web_port     = 80
   probe_path   = "/health"
+  replicas     = var.ui_replicas
 }
