@@ -78,3 +78,31 @@ variable "run_recurring_jobs" {
 variable "readonly_mode" {
   type = bool
 }
+variable "api_replicas" {
+  type    = number
+  default = 1
+}
+variable "ui_replicas" {
+  type    = number
+  default = 1
+}
+variable "postgres_flexible_server_sku" {
+  type    = string
+  default = "B_Standard_B1ms"
+}
+variable "postgres_enable_high_availability" {
+  type    = bool
+  default = false
+}
+variable "redis_capacity" {
+  type    = number
+  default = 1
+}
+variable "redis_family" {
+  type    = string
+  default = "C"
+}
+variable "redis_sku_name" {
+  type    = string
+  default = "Standard"
+}

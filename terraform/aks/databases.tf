@@ -12,6 +12,10 @@ module "redis" {
 
   use_azure               = var.deploy_azure_backing_services
   azure_enable_monitoring = var.enable_monitoring
+  server_version          = 6
+  azure_capacity          = var.redis_capacity
+  azure_family            = var.redis_family
+  azure_sku_name          = var.redis_sku_name
 }
 
 module "postgres" {
@@ -26,7 +30,10 @@ module "postgres" {
 
   cluster_configuration_map = module.cluster_data.configuration_map
 
-  use_azure               = var.deploy_azure_backing_services
-  azure_enable_monitoring = var.enable_monitoring
-  azure_extensions        = ["pg_stat_statements"]
+  use_azure                      = var.deploy_azure_backing_services
+  azure_enable_monitoring        = var.enable_monitoring
+  azure_extensions               = ["pg_stat_statements"]
+  server_version                 = 14
+  azure_sku_name                 = var.postgres_flexible_server_sku
+  azure_enable_high_availability = var.postgres_enable_high_availability
 }
