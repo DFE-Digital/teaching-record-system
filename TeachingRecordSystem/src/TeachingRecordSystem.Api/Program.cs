@@ -307,13 +307,6 @@ public class Program
             await context.Response.WriteAsync("OK");
         });
 
-        app.MapGet("/_readonlymode", async context =>
-        {
-            var configuration = context.RequestServices.GetRequiredService<IConfiguration>();
-            var readOnlyMode = configuration.GetValue<bool>("ReadOnlyMode");
-            await context.Response.WriteAsync(readOnlyMode.ToString());
-        });
-
         app.MapWebHookEndpoints();
 
         app.MapControllers();
