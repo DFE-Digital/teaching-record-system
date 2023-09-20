@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.Dqt.Models;
-using static TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.IndexModel;
+using TeachingRecordSystem.SupportUi.Pages.Common;
 
 namespace TeachingRecordSystem.SupportUi;
 
@@ -33,6 +33,9 @@ public class TrsLinkGenerator
 
     public string PersonDetail(Guid personId, PersonSubNavigationTab? selectedTab = null, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Index", routeValues: new { personId, selectedTab, search, sortBy, pageNumber });
+
+    public string PersonAlerts(Guid personId, PersonSubNavigationTab? selectedTab = null, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/Alerts", routeValues: new { personId, selectedTab, search, sortBy, pageNumber });
 
     public string Users() => GetRequiredPathByPage("/Users/Index");
 

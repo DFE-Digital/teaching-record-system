@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.SupportUi.Pages.Common;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
@@ -85,12 +86,5 @@ public class IndexModel : PageModel
         public required string? NationalInsuranceNumber { get; init; }
         public required string? Email { get; init; }
         public required string? MobileNumber { get; init; }
-    }
-
-    public enum PersonSubNavigationTab
-    {
-        General,
-        Alerts,
-        ChangeLog
     }
 }

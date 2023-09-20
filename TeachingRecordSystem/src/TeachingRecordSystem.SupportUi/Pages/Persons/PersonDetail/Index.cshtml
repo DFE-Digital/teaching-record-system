@@ -1,4 +1,5 @@
 @page "/persons/{personId}"
+@using TeachingRecordSystem.SupportUi.Pages.Common;
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.IndexModel
 @{
     ViewBag.Title = @Model.Person!.Name;
@@ -16,19 +17,19 @@
         <nav class="moj-sub-navigation" aria-label="Sub navigation">
             <ul class="moj-sub-navigation__list">
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.General, Model.Search, Model.SortBy, Model.PageNumber)">General</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == PersonSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, PersonSubNavigationTab.General, Model.Search, Model.SortBy, Model.PageNumber)">General</a>
                 </li>
 
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.Alerts, Model.Search, Model.SortBy, Model.PageNumber)">Alerts</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == PersonSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonAlerts(Model.PersonId, PersonSubNavigationTab.Alerts, Model.Search, Model.SortBy, Model.PageNumber)">Alerts</a>
                 </li>
 
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.ChangeLog ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.ChangeLog, Model.Search, Model.SortBy, Model.PageNumber)">Change log</a>
+                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == PersonSubNavigationTab.ChangeLog ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, PersonSubNavigationTab.ChangeLog, Model.Search, Model.SortBy, Model.PageNumber)">Change log</a>
                 </li>
             </ul>
         </nav>
-        @if (Model.SelectedTab == IndexModel.PersonSubNavigationTab.General)
+        @if (Model.SelectedTab == PersonSubNavigationTab.General)
         {
             <govuk-summary-card>
                 <govuk-summary-card-title>Personal Details</govuk-summary-card-title>

@@ -1,0 +1,14 @@
+@page "/persons/{personId}/alerts"
+@using TeachingRecordSystem.SupportUi.Pages.Common;
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.AlertsModel
+@{
+    Layout = "Shared/PersonLayout";
+    ViewBag.SelectedTab = PersonSubNavigationTab.Alerts;
+    ViewBag.PersonId = Model.PersonId;
+    ViewBag.Search = Model.Search;
+    ViewBag.SortBy = Model.SortBy;
+    ViewBag.PageNumber = Model.PageNumber;
+    ViewBag.Title = "Alerts";
+}
+
+<p>Alerts Baby</p>
