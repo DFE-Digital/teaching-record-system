@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.SupportUi.Pages.Common;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
@@ -28,15 +27,10 @@ public class IndexModel : PageModel
     [FromQuery]
     public ContactSearchSortByOption SortBy { get; set; }
 
-    [FromQuery]
-    public PersonSubNavigationTab? SelectedTab { get; set; }
-
     public PersonInfo? Person { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
-        SelectedTab ??= PersonSubNavigationTab.General;
-
         var contactDetail = await _crmQueryDispatcher.ExecuteQuery(
             new GetContactDetailByIdQuery(
                 PersonId,

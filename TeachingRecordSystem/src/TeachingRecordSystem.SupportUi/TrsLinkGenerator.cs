@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.SupportUi.Pages.Common;
 
 namespace TeachingRecordSystem.SupportUi;
 
@@ -18,6 +17,10 @@ public class TrsLinkGenerator
 
     public string SignedOut() => GetRequiredPathByPage("/SignedOut");
 
+    public string Alert(Guid alertId) => GetRequiredPathByPage("/Alerts/Alert/Index", routeValues: new { alertId });
+
+    public string CloseAlert(Guid alertId) => GetRequiredPathByPage("/Alerts/Alert/Close", routeValues: new { alertId });
+
     public string Cases() => GetRequiredPathByPage("/Cases/Index");
 
     public string EditCase(string ticketNumber) => GetRequiredPathByPage("/Cases/EditCase/Index", routeValues: new { ticketNumber });
@@ -31,11 +34,16 @@ public class TrsLinkGenerator
     public string Persons(string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/Index", routeValues: new { search, sortBy, pageNumber });
 
-    public string PersonDetail(Guid personId, PersonSubNavigationTab? selectedTab = null, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
-        GetRequiredPathByPage("/Persons/PersonDetail/Index", routeValues: new { personId, selectedTab, search, sortBy, pageNumber });
+    public string PersonDetail(Guid personId, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/Index", routeValues: new { personId, search, sortBy, pageNumber });
 
-    public string PersonAlerts(Guid personId, PersonSubNavigationTab? selectedTab = null, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
-        GetRequiredPathByPage("/Persons/PersonDetail/Alerts", routeValues: new { personId, selectedTab, search, sortBy, pageNumber });
+    public string PersonAlerts(Guid personId, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/Alerts", routeValues: new { personId, search, sortBy, pageNumber });
+
+    public string PersonAddAlert(Guid personId) => GetRequiredPathByPage("/Persons/PersonDetail/AddAlert", routeValues: new { personId });
+
+    public string PersonChangeLog(Guid personId, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/ChangeLog", routeValues: new { personId, search, sortBy, pageNumber });
 
     public string Users() => GetRequiredPathByPage("/Users/Index");
 
