@@ -47,12 +47,7 @@ public class IndexModel : PageModel
                     Contact.Fields.MobilePhone,
                     Contact.Fields.dfeta_NINumber)));
 
-        if (contactDetail is null)
-        {
-            return NotFound();
-        }
-
-        Person = MapContact(contactDetail.Contact);
+        Person = MapContact(contactDetail!.Contact);
 
         return Page();
     }

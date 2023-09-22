@@ -46,12 +46,7 @@ public class AlertsModel : PageModel
                     Contact.Fields.dfeta_StatedMiddleName,
                     Contact.Fields.dfeta_StatedLastName)));
 
-        if (contactDetail is null)
-        {
-            return NotFound();
-        }
-
-        Name = contactDetail.Contact.ResolveFullName(includeMiddleName: false);
+        Name = contactDetail!.Contact.ResolveFullName(includeMiddleName: false);
 
         var sanctions = await _crmQueryDispatcher.ExecuteQuery(new GetSanctionDetailsByContactIdQuery(PersonId));
 
