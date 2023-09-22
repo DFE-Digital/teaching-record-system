@@ -96,7 +96,7 @@ public class AlertsTests : TestBase
         Assert.NotNull(currentAlert);
         Assert.Equal(sanctionStartDate.ToString("dd/MM/yyyy"), currentAlert.GetElementByTestId($"current-alert-start-date-{person.Sanctions[0].SanctionId}")!.TextContent);
         var details = currentAlert.GetElementByTestId($"current-alert-details-{person.Sanctions[0].SanctionId}");
-        Assert.NotNull(details);        
+        Assert.NotNull(details);
 
         var previousAlerts = doc.GetElementByTestId("previous-alerts");
         Assert.Null(previousAlerts);
@@ -133,7 +133,7 @@ public class AlertsTests : TestBase
         Assert.NotNull(details);
 
         var previousAlerts = doc.GetElementByTestId("previous-alerts");
-        Assert.NotNull(previousAlerts);        
+        Assert.NotNull(previousAlerts);
 
         var previousAlert = previousAlerts.GetElementByTestId($"previous-alert-{person.Sanctions[1].SanctionId}");
         Assert.NotNull(previousAlert);
