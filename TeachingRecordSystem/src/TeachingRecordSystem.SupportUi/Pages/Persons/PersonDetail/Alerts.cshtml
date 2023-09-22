@@ -33,7 +33,16 @@ else
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="current-alert-details-@alert.AlertId">@alert.Details</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="current-alert-details-@alert.AlertId">
+                        @if (!string.IsNullOrEmpty(@alert.Details))
+                        {
+                            @foreach (var line in @alert.Details.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None))
+                            {
+                                <span>@line</span>
+                                <br />
+                            }
+                        }                        
+                        </govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             </govuk-summary-list>
         </govuk-summary-card>
