@@ -58,7 +58,7 @@ public class AlertsModel : PageModel
             .ToArray();
 
         PreviousAlerts = allAlerts
-            .Where(alert => alert.Status == AlertStatus.Active)
+            .Where(alert => alert.Status != AlertStatus.Active)
             .OrderBy(a => a.StartDate)
             .ToArray();
 
