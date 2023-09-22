@@ -25,7 +25,7 @@ public class AlertsModel : PageModel
     public int? PageNumber { get; set; }
 
     [FromQuery]
-    public ContactSearchSortByOption SortBy { get; set; }
+    public ContactSearchSortByOption? SortBy { get; set; }
 
     public string? Name { get; set; }
 
@@ -58,7 +58,7 @@ public class AlertsModel : PageModel
             .ToArray();
 
         PreviousAlerts = allAlerts
-            .Where(alert => alert.Status != AlertStatus.Active)
+            .Except(CurrentAlerts)
             .OrderBy(a => a.StartDate)
             .ToArray();
 
@@ -67,18 +67,9 @@ public class AlertsModel : PageModel
 
     private AlertInfo MapSanction(SanctionDetailResult sanction)
     {
-        var alertStatus = AlertStatus.Inactive;
-        if (sanction.Sanction.StateCode == dfeta_sanctionState.Active)
-        {
-            if (sanction.Sanction.dfeta_EndDate is null)
-            {
-                alertStatus = AlertStatus.Active;
-            }
-            else
-            {
-                alertStatus = AlertStatus.Closed;
-            }
-        }
+        var alertStatus = sanction.Sanction.StateCode == dfeta_sanctionState.Inactive ? AlertStatus.Inactive :
+            sanction.Sanction.dfeta_EndDate is null ? AlertStatus.Active :
+            AlertStatus.Closed;
 
         return new AlertInfo()
         {

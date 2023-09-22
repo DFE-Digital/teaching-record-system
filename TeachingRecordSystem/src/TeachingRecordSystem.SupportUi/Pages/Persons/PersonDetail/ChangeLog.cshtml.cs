@@ -25,7 +25,7 @@ public class ChangeLogModel : PageModel
     public int? PageNumber { get; set; }
 
     [FromQuery]
-    public ContactSearchSortByOption SortBy { get; set; }
+    public ContactSearchSortByOption? SortBy { get; set; }
 
     public string? Name { get; set; }
 

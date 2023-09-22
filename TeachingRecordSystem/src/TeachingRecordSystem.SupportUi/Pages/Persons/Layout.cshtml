@@ -5,12 +5,12 @@
     var selectedTab = (PersonSubNavigationTab)ViewBag.SelectedTab;
     var personId = (Guid)ViewBag.PersonId;
     var search = (string)ViewBag.Search;
-    var sortBy = (ContactSearchSortByOption)ViewBag.SortBy;
-    var pageNumber = (int)ViewBag.PageNumber;
+    var sortBy = (ContactSearchSortByOption?)ViewBag.SortBy;
+    var pageNumber = (int?)ViewBag.PageNumber;
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Persons(search, sortBy, pageNumber)" />
+    <govuk-back-link href="@LinkGenerator.Persons(search, sortBy, pageNumber)">Back to find a record</govuk-back-link>
 }
 
 <h1 class="govuk-heading-l" data-testid="page-title">@ViewBag.Title</h1>

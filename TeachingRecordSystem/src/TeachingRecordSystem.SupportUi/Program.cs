@@ -99,11 +99,11 @@ builder.Services
     .AddRazorPages(options =>
     {
         options.Conventions.AddFolderApplicationModelConvention(
-                "/Persons/PersonDetail",
-                model =>
-                {
-                    model.Filters.Add(new CheckPersonExistsFilter());
-                });
+            "/Persons/PersonDetail",
+            model =>
+            {
+                model.Filters.Add(new CheckPersonExistsFilter());
+            });
     })
     .AddMvcOptions(options =>
     {
