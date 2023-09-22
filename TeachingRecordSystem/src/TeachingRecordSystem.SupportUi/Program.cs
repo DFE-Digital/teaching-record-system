@@ -102,7 +102,7 @@ builder.Services
                 "/Persons/PersonDetail",
                 model =>
                 {
-                    model.Filters.Add(new CheckPersonExistsFilter());                    
+                    model.Filters.Add(new CheckPersonExistsFilter());
                 });
     })
     .AddMvcOptions(options =>

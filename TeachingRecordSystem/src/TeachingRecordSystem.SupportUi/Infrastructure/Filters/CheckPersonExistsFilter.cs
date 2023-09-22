@@ -20,7 +20,7 @@ public class CheckPersonExistsFilter : IAsyncPageFilter
                 context.Result = new NotFoundResult();
                 return;
             }
-        }        
+        }
 
         await next();
     }

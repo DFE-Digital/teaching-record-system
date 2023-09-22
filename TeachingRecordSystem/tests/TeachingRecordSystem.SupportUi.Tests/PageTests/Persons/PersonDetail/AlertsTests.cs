@@ -6,7 +6,7 @@ public class AlertsTests : TestBase
         : base(hostFixture)
     {
     }
-    
+
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {

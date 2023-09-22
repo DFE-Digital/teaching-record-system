@@ -1,6 +1,3 @@
-using static TeachingRecordSystem.TestCommon.CrmTestData;
-using TeachingRecordSystem.TestCommon;
-
 namespace TeachingRecordSystem.Core.Dqt.Tests.QueryTests;
 
 public class GetSanctionDetailsByContactIdTests : IAsyncLifetime
