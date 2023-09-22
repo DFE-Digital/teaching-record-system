@@ -14,7 +14,8 @@ public class GetAllSanctionCodesHandler : ICrmQueryHandler<GetAllSanctionCodesQu
             EntityName = dfeta_sanctioncode.EntityLogicalName,
             ColumnSet = new ColumnSet(
                 dfeta_sanctioncode.Fields.dfeta_sanctioncodeId,
-                dfeta_sanctioncode.Fields.dfeta_Value)
+                dfeta_sanctioncode.Fields.dfeta_Value,
+                dfeta_sanctioncode.Fields.dfeta_name)
         };
 
         queryExpression.Criteria.AddCondition(dfeta_sanctioncode.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_sanctioncodeState.Active);

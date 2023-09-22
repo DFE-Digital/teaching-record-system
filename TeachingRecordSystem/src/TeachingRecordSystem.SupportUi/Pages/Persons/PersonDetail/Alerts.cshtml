@@ -15,25 +15,25 @@
 
 @if (Model.CurrentAlerts is null || Model.CurrentAlerts.Length == 0)
 {
-    <p class="govuk-body">No current alerts</p>
+    <p class="govuk-body" data-testid="no-current-alerts">No current alerts</p>
 }
 else
 {
     @foreach (var alert in Model.CurrentAlerts)
     {
-        <govuk-summary-card>
-            <govuk-summary-card-title>@alert.Description</govuk-summary-card-title>
+        <govuk-summary-card data-testid="current-alert-@alert.AlertId">
+            <govuk-summary-card-title data-testid="current-alert-title-@alert.AlertId">@alert.Description</govuk-summary-card-title>
             <govuk-summary-card-actions>
                 <govuk-summary-card-action href="@LinkGenerator.CloseAlert(alert.AlertId)" visually-hidden-text="Close">Close</govuk-summary-card-action>
             </govuk-summary-card-actions>
-            <govuk-summary-list data-testid="alert-details-@alert.AlertId">
+            <govuk-summary-list>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="alert-details-start-date-@alert.AlertId">@alert.StartDate!.Value.ToString("dd/MM/yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="current-alert-start-date-@alert.AlertId">@(alert.StartDate.HasValue ? alert.StartDate.Value.ToString("dd/MM/yyyy") : "-")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="alert-details-start-date-@alert.Details">@alert.Details</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="current-alert-details-@alert.AlertId">@alert.Details</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             </govuk-summary-list>
         </govuk-summary-card>
@@ -44,7 +44,7 @@ else
 
 @if (Model.PreviousAlerts is not null && Model.PreviousAlerts.Length > 0)
 {
-    <table class="govuk-table">
+    <table class="govuk-table" data-testid="previous-alerts">
         <caption class="govuk-table__caption govuk-table__caption--m">Previous alerts</caption>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
@@ -59,7 +59,7 @@ else
             {
                 <tr class="govuk-table__row" data-testid="previous-alert-@alert.AlertId">
                     <td class="govuk-table__cell" data-testid="previous-alert-description-@alert.AlertId"><a href="@LinkGenerator.Alert(alert.AlertId)" class="govuk-link">@alert.Description</a></td>
-                    <td class="govuk-table__cell" data-testid="previous-alert-start-date-@alert.AlertId">@alert.StartDate!.Value.ToString("dd/MM/yyyy")</td>
+                    <td class="govuk-table__cell" data-testid="previous-alert-start-date-@alert.AlertId">@(alert.StartDate.HasValue ? alert.StartDate.Value.ToString("dd/MM/yyyy") : "-")</td>
                     <td class="govuk-table__cell" data-testid="previous-alert-end-date--@alert.AlertId">@(alert.EndDate.HasValue ? alert.EndDate.Value.ToString("dd/MM/yyyy") : "-")</td>
                     <td class="govuk-table__cell" data-testid="previous-alert-status-@alert.AlertId">@alert.Status</td>
                 </tr>
