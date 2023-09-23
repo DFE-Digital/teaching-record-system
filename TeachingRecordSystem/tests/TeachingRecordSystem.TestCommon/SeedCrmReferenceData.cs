@@ -38,22 +38,26 @@ public class SeedCrmReferenceData : IStartupTask
     {
         _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
         {
-            dfeta_Value = "G1"
+            dfeta_Value = "G1",
+            dfeta_name = "G1 Description"
         });
 
         _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
         {
-            dfeta_Value = "A1"
+            dfeta_Value = "A1",
+            dfeta_name = "A1 Description"
         });
 
         _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
         {
-            dfeta_Value = "A17"
+            dfeta_Value = "A17",
+            dfeta_name = "A17 Description"
         });
 
         _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
         {
-            dfeta_Value = "A18"
+            dfeta_Value = "A18",
+            dfeta_name = "A18 Description"
         });
     }
 }

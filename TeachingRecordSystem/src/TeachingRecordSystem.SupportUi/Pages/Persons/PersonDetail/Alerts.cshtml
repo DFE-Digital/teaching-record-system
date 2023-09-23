@@ -73,7 +73,7 @@ else
                 <tr class="govuk-table__row" data-testid="previous-alert-@alert.AlertId">
                     <td class="govuk-table__cell" data-testid="previous-alert-description-@alert.AlertId"><a href="@LinkGenerator.Alert(alert.AlertId)" class="govuk-link">@alert.Description</a></td>
                     <td class="govuk-table__cell" data-testid="previous-alert-start-date-@alert.AlertId">@(alert.StartDate.HasValue ? alert.StartDate.Value.ToString("dd/MM/yyyy") : "-")</td>
-                    <td class="govuk-table__cell" data-testid="previous-alert-end-date--@alert.AlertId">@(alert.EndDate.HasValue ? alert.EndDate.Value.ToString("dd/MM/yyyy") : "-")</td>
+                    <td class="govuk-table__cell" data-testid="previous-alert-end-date-@alert.AlertId">@(alert.EndDate.HasValue ? alert.EndDate.Value.ToString("dd/MM/yyyy") : "-")</td>
                     <td class="govuk-table__cell" data-testid="previous-alert-status-@alert.AlertId">@alert.Status</td>
                 </tr>
             }
