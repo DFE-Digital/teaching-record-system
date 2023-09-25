@@ -24,6 +24,7 @@
     "address1_postalcode",
     "birthdate",
     "contactid",
+    "createdon",
     "dfeta_activesanctions",
     "dfeta_eytsdate",
     "dfeta_husid",
@@ -138,6 +139,14 @@
   "dfeta_ittqualification": [
     "dfeta_name",
     "dfeta_value",
+    "statecode"
+  ],
+  "dfeta_previousname": [
+    "dfeta_changedon",
+    "dfeta_name",
+    "dfeta_personid",
+    "dfeta_previousnameid",
+    "dfeta_type",
     "statecode"
   ],
   "dfeta_qtsregistration": [

@@ -1182,6 +1182,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string BirthDate = "birthdate";
 			public const string ContactId = "contactid";
 			public const string Id = "contactid";
+			public const string CreatedOn = "createdon";
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
 			public const string dfeta_AllowPiiUpdatesFromRegister = "dfeta_allowpiiupdatesfromregister";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
@@ -1227,6 +1228,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_contact_dfeta_inductionperiod = "dfeta_contact_dfeta_inductionperiod";
 			public const string dfeta_contact_dfeta_initialteachertraining = "dfeta_contact_dfeta_initialteachertraining";
 			public const string dfeta_contact_dfeta_initialteachertraining1 = "dfeta_contact_dfeta_initialteachertraining1";
+			public const string dfeta_contact_dfeta_previousname = "dfeta_contact_dfeta_previousname";
 			public const string dfeta_contact_dfeta_qtsregistration = "dfeta_contact_dfeta_qtsregistration";
 			public const string dfeta_contact_dfeta_qtsregistration1 = "dfeta_contact_dfeta_qtsregistration1";
 			public const string dfeta_contact_dfeta_qualification = "dfeta_contact_dfeta_qualification";
@@ -1471,6 +1473,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			set
 			{
 				this.ContactId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the contact was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 		
@@ -2386,6 +2408,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_contact_dfeta_initialteachertraining1");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("dfeta_contact_dfeta_initialteachertraining1", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining1");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_contact_dfeta_previousname
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_previousname")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> dfeta_contact_dfeta_previousname
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("dfeta_contact_dfeta_previousname", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_contact_dfeta_previousname");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("dfeta_contact_dfeta_previousname", null, value);
+				this.OnPropertyChanged("dfeta_contact_dfeta_previousname");
 			}
 		}
 		
@@ -6873,6 +6915,373 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("lk_dfeta_ittsubject_modifiedonbehalfby");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittsubject_modifiedonbehalfby", null, value);
 				this.OnPropertyChanged("lk_dfeta_ittsubject_modifiedonbehalfby");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_previousnameState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_previousname")]
+	public partial class dfeta_previousname : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_previousname entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string dfeta_ChangedOn = "dfeta_changedon";
+			public const string dfeta_name = "dfeta_name";
+			public const string dfeta_PersonId = "dfeta_personid";
+			public const string dfeta_previousnameId = "dfeta_previousnameid";
+			public const string Id = "dfeta_previousnameid";
+			public const string dfeta_Type = "dfeta_type";
+			public const string StateCode = "statecode";
+			public const string dfeta_contact_dfeta_previousname = "dfeta_contact_dfeta_previousname";
+			public const string lk_dfeta_previousname_createdby = "lk_dfeta_previousname_createdby";
+			public const string lk_dfeta_previousname_createdonbehalfby = "lk_dfeta_previousname_createdonbehalfby";
+			public const string lk_dfeta_previousname_modifiedby = "lk_dfeta_previousname_modifiedby";
+			public const string lk_dfeta_previousname_modifiedonbehalfby = "lk_dfeta_previousname_modifiedonbehalfby";
+			public const string user_dfeta_previousname = "user_dfeta_previousname";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_previousname() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "dfeta_previousname";
+		
+		public const string PrimaryIdAttribute = "dfeta_previousnameid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_previousname";
+		
+		public const string EntityLogicalCollectionName = "dfeta_previousnames";
+		
+		public const string EntitySetName = "dfeta_previousnames";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_changedon")]
+		public System.Nullable<System.DateTime> dfeta_ChangedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_changedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_ChangedOn");
+				this.SetAttributeValue("dfeta_changedon", value);
+				this.OnPropertyChanged("dfeta_ChangedOn");
+			}
+		}
+		
+		/// <summary>
+		/// The name of the custom entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
+		public string dfeta_name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_name");
+				this.SetAttributeValue("dfeta_name", value);
+				this.OnPropertyChanged("dfeta_name");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for Person associated with Previous Name.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_PersonId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_personid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_PersonId");
+				this.SetAttributeValue("dfeta_personid", value);
+				this.OnPropertyChanged("dfeta_PersonId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_previousnameid")]
+		public System.Nullable<System.Guid> dfeta_previousnameId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_previousnameid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_previousnameId");
+				this.SetAttributeValue("dfeta_previousnameid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_previousnameId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_previousnameid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_previousnameId = value;
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_type")]
+		public virtual dfeta_NameType? dfeta_Type
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_NameType?)(EntityOptionSetEnum.GetEnum(this, "dfeta_type")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Type");
+				this.SetAttributeValue("dfeta_type", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("dfeta_Type");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the Previous Name
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousnameState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((TeachingRecordSystem.Core.Dqt.Models.dfeta_previousnameState)(System.Enum.ToObject(typeof(TeachingRecordSystem.Core.Dqt.Models.dfeta_previousnameState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_contact_dfeta_previousname
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_previousname")]
+		public TeachingRecordSystem.Core.Dqt.Models.Contact dfeta_contact_dfeta_previousname
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Contact>("dfeta_contact_dfeta_previousname", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_contact_dfeta_previousname");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Contact>("dfeta_contact_dfeta_previousname", null, value);
+				this.OnPropertyChanged("dfeta_contact_dfeta_previousname");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_previousname_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_previousname_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_previousname_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_previousname_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_previousname_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_previousname_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_previousname_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_previousname_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_previousname
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_previousname")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_previousname
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_previousname", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_previousname");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_previousname", null, value);
+				this.OnPropertyChanged("user_dfeta_previousname");
 			}
 		}
 	}
@@ -15073,6 +15482,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_ittsubject_createdonbehalfby = "lk_dfeta_ittsubject_createdonbehalfby";
 			public const string lk_dfeta_ittsubject_modifiedby = "lk_dfeta_ittsubject_modifiedby";
 			public const string lk_dfeta_ittsubject_modifiedonbehalfby = "lk_dfeta_ittsubject_modifiedonbehalfby";
+			public const string lk_dfeta_previousname_createdby = "lk_dfeta_previousname_createdby";
+			public const string lk_dfeta_previousname_createdonbehalfby = "lk_dfeta_previousname_createdonbehalfby";
+			public const string lk_dfeta_previousname_modifiedby = "lk_dfeta_previousname_modifiedby";
+			public const string lk_dfeta_previousname_modifiedonbehalfby = "lk_dfeta_previousname_modifiedonbehalfby";
 			public const string lk_dfeta_qtsregistration_createdby = "lk_dfeta_qtsregistration_createdby";
 			public const string lk_dfeta_qtsregistration_createdonbehalfby = "lk_dfeta_qtsregistration_createdonbehalfby";
 			public const string lk_dfeta_qtsregistration_modifiedby = "lk_dfeta_qtsregistration_modifiedby";
@@ -15138,6 +15551,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string user_dfeta_induction = "user_dfeta_induction";
 			public const string user_dfeta_inductionperiod = "user_dfeta_inductionperiod";
 			public const string user_dfeta_initialteachertraining = "user_dfeta_initialteachertraining";
+			public const string user_dfeta_previousname = "user_dfeta_previousname";
 			public const string user_dfeta_qtsregistration = "user_dfeta_qtsregistration";
 			public const string user_dfeta_qualification = "user_dfeta_qualification";
 			public const string user_dfeta_sanction = "user_dfeta_sanction";
@@ -16517,6 +16931,86 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N lk_dfeta_previousname_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> lk_dfeta_previousname_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_previousname_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> lk_dfeta_previousname_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_previousname_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> lk_dfeta_previousname_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_previousname_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> lk_dfeta_previousname_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N lk_dfeta_qtsregistration_createdby
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qtsregistration_createdby")]
@@ -17817,6 +18311,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N user_dfeta_previousname
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_previousname")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> user_dfeta_previousname
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("user_dfeta_previousname", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_previousname");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("user_dfeta_previousname", null, value);
+				this.OnPropertyChanged("user_dfeta_previousname");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N user_dfeta_qtsregistration
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_qtsregistration")]
@@ -18698,6 +19212,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			get
 			{
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> dfeta_previousnameSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>();
 			}
 		}
 		
