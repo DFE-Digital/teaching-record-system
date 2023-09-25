@@ -108,9 +108,10 @@ public partial class CrmTestData
             DateOnly? startDate = null,
             DateOnly? endDate = null,
             DateOnly? reviewDate = null,
-            bool spent = false)
+            bool spent = false,
+            string details = "lorem ipsum")
         {
-            _sanctions.Add(new(sanctionCode, startDate, endDate, reviewDate, spent));
+            _sanctions.Add(new(Guid.NewGuid(), sanctionCode, startDate, endDate, reviewDate, spent, details));
             return this;
         }
 
@@ -173,6 +174,7 @@ public partial class CrmTestData
                 {
                     Target = new dfeta_sanction()
                     {
+                        Id = sanction.SanctionId,
                         dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
                         dfeta_SanctionCodeId = sanctionCode.Id.ToEntityReference(dfeta_sanctioncode.EntityLogicalName),
                         dfeta_StartDate = sanction.StartDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
@@ -232,5 +234,5 @@ public partial class CrmTestData
         };
     }
 
-    public record Sanction(string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent);
+    public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string Details);
 }

@@ -1,60 +1,38 @@
 @page "/persons/{personId}"
+@using TeachingRecordSystem.SupportUi.Pages.Common;
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.IndexModel
 @{
-    ViewBag.Title = @Model.Person!.Name;
+    Layout = "Layout";
+    ViewBag.SelectedTab = PersonSubNavigationTab.General;
+    ViewBag.PersonId = Model.PersonId;
+    ViewBag.Search = Model.Search;
+    ViewBag.SortBy = Model.SortBy;
+    ViewBag.PageNumber = Model.PageNumber;    
+    ViewBag.Title = Model.Person!.Name;
 }
 
-@section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Persons(Model.Search, Model.SortBy, Model.PageNumber)" />
-}
-
-<h1 class="govuk-heading-l" data-testid="page-title">@ViewBag.Title</h1>
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
-        
-        <nav class="moj-sub-navigation" aria-label="Sub navigation">
-            <ul class="moj-sub-navigation__list">
-                <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.General, Model.Search, Model.SortBy, Model.PageNumber)">General</a>
-                </li>
-
-                <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.Alerts, Model.Search, Model.SortBy, Model.PageNumber)">Alerts</a>
-                </li>
-
-                <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(Model.SelectedTab == IndexModel.PersonSubNavigationTab.ChangeLog ? "page" : null)" href="@LinkGenerator.PersonDetail(Model.PersonId, IndexModel.PersonSubNavigationTab.ChangeLog, Model.Search, Model.SortBy, Model.PageNumber)">Change log</a>
-                </li>
-            </ul>
-        </nav>
-        @if (Model.SelectedTab == IndexModel.PersonSubNavigationTab.General)
-        {
-            <govuk-summary-card>
-                <govuk-summary-card-title>Personal Details</govuk-summary-card-title>
-                <govuk-summary-list data-testid="personal-details">
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="personal-details-name">@Model.Person.FullName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="personal-details-date-of-birth">@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : "Not provided")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="personal-details-trn">@(!string.IsNullOrEmpty(Model.Person.Trn) ? Model.Person.Trn : "Not provided")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="personal-details-email">@(!string.IsNullOrEmpty(Model.Person.Email) ? Model.Person.Email : "Not provided")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="personal-details-mobile-number">@(!string.IsNullOrEmpty(Model.Person.MobileNumber) ? Model.Person.MobileNumber : "Not provided")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                </govuk-summary-list>
-            </govuk-summary-card>            
-        }        
-     </div>
-</div>
+<govuk-summary-card>
+    <govuk-summary-card-title>Personal Details</govuk-summary-card-title>
+    <govuk-summary-list data-testid="personal-details">
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value data-testid="personal-details-name">@Model.Person.FullName</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value data-testid="personal-details-date-of-birth">@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : "Not provided")</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value data-testid="personal-details-trn">@(!string.IsNullOrEmpty(Model.Person.Trn) ? Model.Person.Trn : "Not provided")</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value data-testid="personal-details-email">@(!string.IsNullOrEmpty(Model.Person.Email) ? Model.Person.Email : "Not provided")</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value data-testid="personal-details-mobile-number">@(!string.IsNullOrEmpty(Model.Person.MobileNumber) ? Model.Person.MobileNumber : "Not provided")</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+    </govuk-summary-list>
+</govuk-summary-card>

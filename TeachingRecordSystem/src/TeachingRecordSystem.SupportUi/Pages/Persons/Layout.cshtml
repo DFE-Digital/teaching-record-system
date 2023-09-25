@@ -1,0 +1,37 @@
+@using TeachingRecordSystem.Core.Dqt.Models;
+@using TeachingRecordSystem.SupportUi.Pages.Common;
+@{
+    Layout = "_Layout";
+    var selectedTab = (PersonSubNavigationTab)ViewBag.SelectedTab;
+    var personId = (Guid)ViewBag.PersonId;
+    var search = (string)ViewBag.Search;
+    var sortBy = (ContactSearchSortByOption?)ViewBag.SortBy;
+    var pageNumber = (int?)ViewBag.PageNumber;
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Persons(search, sortBy, pageNumber)">Back to find a record</govuk-back-link>
+}
+
+<h1 class="govuk-heading-l" data-testid="page-title">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <nav class="moj-sub-navigation" aria-label="Sub navigation">
+            <ul class="moj-sub-navigation__list">
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.PersonDetail(personId, search, sortBy, pageNumber)">General</a>
+                </li>
+
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonAlerts(personId, search, sortBy, pageNumber)">Alerts</a>
+                </li>
+
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.ChangeLog ? "page" : null)" href="@LinkGenerator.PersonChangeLog(personId, search, sortBy, pageNumber)">Change log</a>
+                </li>
+            </ul>
+        </nav>
+        @RenderBody()
+    </div>
+</div>

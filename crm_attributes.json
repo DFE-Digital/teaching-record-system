@@ -52,7 +52,7 @@
     "statecode",
     "telephone1",
     "dfeta_slugid",
-    "dfeta_allowpiiupdatesfromregister"
+    "dfeta_allowpiiupdatesfromregister",
     "dfeta_previouslastname"
   ],
   "dfeta_businesseventaudit":[
@@ -198,8 +198,9 @@
     "statecode"
   ],
   "dfeta_sanctioncode" : [
-    "dfeta_value",
+    "dfeta_name",
     "dfeta_sanctioncodeid",
+    "dfeta_value",
     "statecode"
   ],
   "dfeta_sanction": [
@@ -208,6 +209,7 @@
     "dfeta_personid",
     "dfeta_sanctionid",
     "dfeta_sanctioncodeid",
+    "dfeta_sanctiondetails",
     "dfeta_spent",
     "dfeta_startdate",
     "statecode"

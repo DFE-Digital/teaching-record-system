@@ -1,0 +1,14 @@
+@page "/persons/{personId}/changelog"
+@using TeachingRecordSystem.SupportUi.Pages.Common;
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ChangeLogModel
+@{
+    Layout = "Layout";
+    ViewBag.SelectedTab = PersonSubNavigationTab.ChangeLog;
+    ViewBag.PersonId = Model.PersonId;
+    ViewBag.Search = Model.Search;
+    ViewBag.SortBy = Model.SortBy;
+    ViewBag.PageNumber = Model.PageNumber;
+    ViewBag.Title = Model.Name;
+}
+
+<p class="govuk-body">Change log goes here</p>

@@ -96,7 +96,15 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services
-    .AddRazorPages()
+    .AddRazorPages(options =>
+    {
+        options.Conventions.AddFolderApplicationModelConvention(
+            "/Persons/PersonDetail",
+            model =>
+            {
+                model.Filters.Add(new CheckPersonExistsFilter());
+            });
+    })
     .AddMvcOptions(options =>
     {
         var policy = new AuthorizationPolicyBuilder()

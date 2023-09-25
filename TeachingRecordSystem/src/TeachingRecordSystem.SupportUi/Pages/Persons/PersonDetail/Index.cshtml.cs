@@ -25,17 +25,12 @@ public class IndexModel : PageModel
     public int? PageNumber { get; set; }
 
     [FromQuery]
-    public ContactSearchSortByOption SortBy { get; set; }
-
-    [FromQuery]
-    public PersonSubNavigationTab? SelectedTab { get; set; }
+    public ContactSearchSortByOption? SortBy { get; set; }
 
     public PersonInfo? Person { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
-        SelectedTab ??= PersonSubNavigationTab.General;
-
         var contactDetail = await _crmQueryDispatcher.ExecuteQuery(
             new GetContactDetailByIdQuery(
                 PersonId,
@@ -52,12 +47,7 @@ public class IndexModel : PageModel
                     Contact.Fields.MobilePhone,
                     Contact.Fields.dfeta_NINumber)));
 
-        if (contactDetail is null)
-        {
-            return NotFound();
-        }
-
-        Person = MapContact(contactDetail.Contact);
+        Person = MapContact(contactDetail!.Contact);
 
         return Page();
     }
@@ -85,12 +75,5 @@ public class IndexModel : PageModel
         public required string? NationalInsuranceNumber { get; init; }
         public required string? Email { get; init; }
         public required string? MobileNumber { get; init; }
-    }
-
-    public enum PersonSubNavigationTab
-    {
-        General,
-        Alerts,
-        ChangeLog
     }
 }

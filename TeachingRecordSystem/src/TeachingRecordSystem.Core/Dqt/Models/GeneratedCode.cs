@@ -56,6 +56,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_account_dfeta_initialteachertraining = "dfeta_account_dfeta_initialteachertraining";
 			public const string dfeta_account_dfeta_qualification_he = "dfeta_account_dfeta_qualification_he";
 			public const string incident_customer_accounts = "incident_customer_accounts";
+			public const string Referencedmsa_account_managingpartner = "Referencedmsa_account_managingpartner";
+			public const string msa_contact_managingpartner = "msa_contact_managingpartner";
 			public const string Referencingaccount_master_account = "account_master_account";
 			public const string Referencingaccount_parent_account = "account_parent_account";
 			public const string account_primary_contact = "account_primary_contact";
@@ -63,6 +65,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_accountbase_createdonbehalfby = "lk_accountbase_createdonbehalfby";
 			public const string lk_accountbase_modifiedby = "lk_accountbase_modifiedby";
 			public const string lk_accountbase_modifiedonbehalfby = "lk_accountbase_modifiedonbehalfby";
+			public const string Referencingmsa_account_managingpartner = "msa_account_managingpartner";
 			public const string system_user_accounts = "system_user_accounts";
 			public const string user_accounts = "user_accounts";
 		}
@@ -426,6 +429,46 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N msa_account_managingpartner
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("msa_account_managingpartner", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Account> Referencedmsa_account_managingpartner
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("msa_account_managingpartner", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedmsa_account_managingpartner");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Account>("msa_account_managingpartner", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedmsa_account_managingpartner");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N msa_contact_managingpartner
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("msa_contact_managingpartner")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Contact> msa_contact_managingpartner
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("msa_contact_managingpartner", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("msa_contact_managingpartner");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("msa_contact_managingpartner", null, value);
+				this.OnPropertyChanged("msa_contact_managingpartner");
+			}
+		}
+		
+		/// <summary>
 		/// N:1 account_master_account
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("masterid")]
@@ -569,6 +612,27 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("lk_accountbase_modifiedonbehalfby");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_accountbase_modifiedonbehalfby", null, value);
 				this.OnPropertyChanged("lk_accountbase_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 msa_account_managingpartner
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("msa_managingpartnerid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("msa_account_managingpartner", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public TeachingRecordSystem.Core.Dqt.Models.Account Referencingmsa_account_managingpartner
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Account>("msa_account_managingpartner", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingmsa_account_managingpartner");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Account>("msa_account_managingpartner", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingmsa_account_managingpartner");
 			}
 		}
 		
@@ -1180,6 +1244,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_contact_modifiedonbehalfby = "lk_contact_modifiedonbehalfby";
 			public const string lk_contactbase_createdby = "lk_contactbase_createdby";
 			public const string lk_contactbase_modifiedby = "lk_contactbase_modifiedby";
+			public const string msa_contact_managingpartner = "msa_contact_managingpartner";
 			public const string system_user_contacts = "system_user_contacts";
 		}
 		
@@ -2672,6 +2737,27 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("lk_contactbase_modifiedby");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_contactbase_modifiedby", null, value);
 				this.OnPropertyChanged("lk_contactbase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 msa_contact_managingpartner
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("msa_managingpartnerid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("msa_contact_managingpartner")]
+		public TeachingRecordSystem.Core.Dqt.Models.Account msa_contact_managingpartner
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Account>("msa_contact_managingpartner", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("msa_contact_managingpartner");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Account>("msa_contact_managingpartner", null, value);
+				this.OnPropertyChanged("msa_contact_managingpartner");
 			}
 		}
 		
@@ -8398,6 +8484,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_NoReAppuntildate = "dfeta_noreappuntildate";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_SanctionCodeId = "dfeta_sanctioncodeid";
+			public const string dfeta_SanctionDetails = "dfeta_sanctiondetails";
 			public const string dfeta_sanctionId = "dfeta_sanctionid";
 			public const string Id = "dfeta_sanctionid";
 			public const string dfeta_Spent = "dfeta_spent";
@@ -8533,6 +8620,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_SanctionCodeId");
 				this.SetAttributeValue("dfeta_sanctioncodeid", value);
 				this.OnPropertyChanged("dfeta_SanctionCodeId");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_sanctiondetails")]
+		public string dfeta_SanctionDetails
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_sanctiondetails");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_SanctionDetails");
+				this.SetAttributeValue("dfeta_sanctiondetails", value);
+				this.OnPropertyChanged("dfeta_SanctionDetails");
 			}
 		}
 		
@@ -8846,6 +8953,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string dfeta_name = "dfeta_name";
 			public const string dfeta_sanctioncodeId = "dfeta_sanctioncodeid";
 			public const string Id = "dfeta_sanctioncodeid";
 			public const string dfeta_Value = "dfeta_value";
@@ -8897,6 +9005,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// The name of the custom entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
+		public string dfeta_name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_name");
+				this.SetAttributeValue("dfeta_name", value);
+				this.OnPropertyChanged("dfeta_name");
 			}
 		}
 		
