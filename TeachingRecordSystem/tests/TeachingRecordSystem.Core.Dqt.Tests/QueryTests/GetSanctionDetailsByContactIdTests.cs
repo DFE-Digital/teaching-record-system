@@ -43,9 +43,7 @@ public class GetSanctionDetailsByContactIdTests : IAsyncLifetime
 
         // Assert
         Assert.Equal(2, sanctions.Length);
-        Assert.Collection(
-            sanctions,
-            s => Assert.Equal(sanction1CodeName, s.Description),
-            s => Assert.Equal(sanction2CodeName, s.Description));
+        Assert.Contains(sanction1CodeName, sanctions.Select(s => s.Description));
+        Assert.Contains(sanction2CodeName, sanctions.Select(s => s.Description));
     }
 }
