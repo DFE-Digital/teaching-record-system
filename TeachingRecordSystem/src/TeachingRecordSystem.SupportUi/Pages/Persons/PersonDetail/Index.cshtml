@@ -35,7 +35,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>@(i == 0 ? "Previous name(s)" : string.Empty)</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="personal-details-previous-names">@Model.Person.PreviousNames[i]</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="personal-details-previous-names-@i">@Model.Person.PreviousNames[i]</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
         }

@@ -24,7 +24,10 @@ public partial class CrmTestData
         private string? _previousLastName;
         private string? _email;
         private string? _mobileNumber;
+        private bool? _hasNationalInsuranceNumber;
+        private Contact_GenderCode? _gender;
         private readonly List<Sanction> _sanctions = new();
+        private readonly List<PreviousName> _previousNames = new();
 
         public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
         {
@@ -92,14 +95,32 @@ public partial class CrmTestData
             return this;
         }
 
-        public CreatePersonBuilder WithPreviousLastName(string previousLastName)
+        public CreatePersonBuilder WithPreviousFirstName(
+            string previousFirstName,
+            DateOnly? changedOn = null)
         {
-            if (_previousLastName is not null && _previousLastName != previousLastName)
-            {
-                throw new InvalidOperationException("WithPreviousLastName cannot be changed after it's set.");
-            }
+            changedOn ??= DateOnly.FromDateTime(DateTime.UtcNow);
+            _previousNames.Add(new(Guid.NewGuid(), dfeta_NameType.FirstName, previousFirstName, changedOn.Value));
+            return this;
+        }
 
+        public CreatePersonBuilder WithPreviousMiddleName(
+            string previousMiddleName,
+            DateOnly? changedOn = null)
+        {
+            changedOn ??= DateOnly.FromDateTime(DateTime.UtcNow);
+            _previousNames.Add(new(Guid.NewGuid(), dfeta_NameType.MiddleName, previousMiddleName, changedOn.Value));
+            return this;
+        }
+
+        public CreatePersonBuilder WithPreviousLastName(
+            string previousLastName,
+            DateOnly? changedOn = null)
+        {
+            changedOn ??= DateOnly.FromDateTime(DateTime.UtcNow);
+            _previousNames.Add(new(Guid.NewGuid(), dfeta_NameType.LastName, previousLastName, changedOn.Value));
             _previousLastName = previousLastName;
+
             return this;
         }
 
@@ -126,6 +147,28 @@ public partial class CrmTestData
             return this;
         }
 
+        public CreatePersonBuilder WithGender(Contact_GenderCode gender)
+        {
+            if (_gender is not null && _gender != gender)
+            {
+                throw new InvalidOperationException("WithGender cannot be changed after it's set.");
+            }
+
+            _gender = gender;
+            return this;
+        }
+
+        public CreatePersonBuilder WithNationalInsuranceNumber(bool? hasNationalInsuranceNumber = true)
+        {
+            if (_hasNationalInsuranceNumber is not null && _hasNationalInsuranceNumber != hasNationalInsuranceNumber)
+            {
+                throw new InvalidOperationException("WithNationalInsuranceNumber cannot be changed after it's set.");
+            }
+
+            _hasNationalInsuranceNumber = hasNationalInsuranceNumber;
+            return this;
+        }
+
         public async Task<CreatePersonResult> Execute(CrmTestData testData)
         {
             var hasTrn = _hasTrn ?? true;
@@ -135,6 +178,7 @@ public partial class CrmTestData
             var middleName = _middleName ?? testData.GenerateMiddleName();
             var lastName = _lastName ?? testData.GenerateLastName();
             var dateOfBirth = _dateOfBirth ?? testData.GenerateDateOfBirth();
+            var gender = _gender ?? testData.GenerateGender();
 
             var personId = Guid.NewGuid();
 
@@ -145,7 +189,8 @@ public partial class CrmTestData
                 MiddleName = middleName,
                 LastName = lastName,
                 BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
-                dfeta_TRN = trn
+                dfeta_TRN = trn,
+                GenderCode = gender
             };
 
             if (_previousLastName is not null)
@@ -161,6 +206,11 @@ public partial class CrmTestData
             if (_mobileNumber is not null)
             {
                 contact.MobilePhone = _mobileNumber;
+            }
+
+            if (_hasNationalInsuranceNumber ?? false)
+            {
+                contact.dfeta_NINumber = testData.GenerateNationalInsuranceNumber();
             }
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
@@ -185,6 +235,21 @@ public partial class CrmTestData
                 });
             }
 
+            foreach (var previousName in _previousNames)
+            {
+                txnRequestBuilder.AddRequest(new CreateRequest()
+                {
+                    Target = new dfeta_previousname()
+                    {
+                        Id = previousName.PreviousNameId,
+                        dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
+                        dfeta_Type = previousName.NameType,
+                        dfeta_name = previousName.Name,
+                        dfeta_ChangedOn = previousName.ChangedOn.FromDateOnlyWithDqtBstFix(isLocalTime: true)
+                    }
+                });
+            }
+
             await txnRequestBuilder.Execute();
 
             return new CreatePersonResult()
@@ -198,7 +263,10 @@ public partial class CrmTestData
                 PreviousLastName = _previousLastName,
                 Email = _email,
                 MobileNumber = _mobileNumber,
-                Sanctions = _sanctions.ToImmutableArray()
+                Gender = gender.ToString(),
+                NationalInsuranceNumber = contact.dfeta_NINumber,
+                Sanctions = _sanctions.ToImmutableArray(),
+                PreviousNames = _previousNames.ToImmutableArray()
             };
         }
     }
@@ -215,7 +283,10 @@ public partial class CrmTestData
         public required string? PreviousLastName { get; init; }
         public required string? Email { get; init; }
         public required string? MobileNumber { get; init; }
+        public required string Gender { get; init; }
+        public required string? NationalInsuranceNumber { get; init; }
         public required ImmutableArray<Sanction> Sanctions { get; init; }
+        public required ImmutableArray<PreviousName> PreviousNames { get; init; }
 
         public Contact ToContact() => new()
         {
@@ -230,9 +301,13 @@ public partial class CrmTestData
             dfeta_TRN = Trn,
             dfeta_PreviousLastName = PreviousLastName,
             EMailAddress1 = Email,
-            MobilePhone = MobileNumber
+            MobilePhone = MobileNumber,
+            dfeta_NINumber = NationalInsuranceNumber,
+            GenderCode = Enum.Parse<Contact_GenderCode>(Gender)
         };
     }
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string Details);
+
+    public record PreviousName(Guid PreviousNameId, dfeta_NameType NameType, string Name, DateOnly ChangedOn);
 }
