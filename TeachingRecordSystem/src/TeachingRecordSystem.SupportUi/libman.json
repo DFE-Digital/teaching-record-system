@@ -3,7 +3,7 @@
   "defaultProvider": "jsdelivr",
   "libraries": [
     {
-      "library": "govuk-frontend@4.6.0",
+      "library": "govuk-frontend@4.7.0",
       "destination": "wwwroot/lib/govuk-frontend/"
     },
     {
