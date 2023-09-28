@@ -1,4 +1,5 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
@@ -8,47 +9,53 @@ public class GetContactDetailByIdHandler : ICrmQueryHandler<GetContactDetailById
 {
     public async Task<ContactDetail?> Execute(GetContactDetailByIdQuery query, IOrganizationServiceAsync organizationService)
     {
-        var filter = new FilterExpression();
-        filter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, query.ContactId);
-
-        var queryExpression = new QueryExpression(Contact.EntityLogicalName)
+        var contactFilter = new FilterExpression();
+        contactFilter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, query.ContactId);
+        var contactQueryExpression = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = query.ColumnSet,
-            Criteria = filter
+            Criteria = contactFilter
         };
 
-        var previousNameLink = queryExpression.AddLink(
-            dfeta_previousname.EntityLogicalName,
-            Contact.PrimaryIdAttribute,
-            dfeta_previousname.Fields.dfeta_PersonId,
-            JoinOperator.LeftOuter);
-
-        previousNameLink.Columns = new ColumnSet(
-            dfeta_previousname.PrimaryIdAttribute,
-            dfeta_previousname.Fields.dfeta_ChangedOn,
-            dfeta_previousname.Fields.dfeta_name,
-            dfeta_previousname.Fields.dfeta_Type);
-        previousNameLink.EntityAlias = dfeta_previousname.EntityLogicalName;
+        var contactRequest = new RetrieveMultipleRequest()
+        {
+            Query = contactQueryExpression
+        };
 
         var previousNameFilter = new FilterExpression();
+        previousNameFilter.AddCondition(dfeta_previousname.Fields.dfeta_PersonId, ConditionOperator.Equal, query.ContactId);
         previousNameFilter.AddCondition(dfeta_previousname.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_documentState.Active);
         previousNameFilter.AddCondition(dfeta_previousname.Fields.dfeta_Type, ConditionOperator.NotEqual, (int)dfeta_NameType.Title);
-        previousNameLink.LinkCriteria = previousNameFilter;
+        var previousNameQueryExpression = new QueryExpression(dfeta_previousname.EntityLogicalName)
+        {
+            ColumnSet = new ColumnSet(
+                dfeta_previousname.PrimaryIdAttribute,
+                dfeta_previousname.Fields.CreatedOn,
+                dfeta_previousname.Fields.dfeta_ChangedOn,
+                dfeta_previousname.Fields.dfeta_name,
+                dfeta_previousname.Fields.dfeta_Type),
+            Criteria = previousNameFilter
+        };
 
-        var response = await organizationService.RetrieveMultipleAsync(queryExpression);
-        if (response.Entities.Count == 0)
+        var previousNameRequest = new RetrieveMultipleRequest()
+        {
+            Query = previousNameQueryExpression
+        };
+
+        var requestBuilder = RequestBuilder.CreateMultiple(organizationService);
+        var contactResponse = requestBuilder.AddRequest<RetrieveMultipleResponse>(contactRequest);
+        var previousNameResponse = requestBuilder.AddRequest<RetrieveMultipleResponse>(previousNameRequest);
+
+        await requestBuilder.Execute();
+
+        var contact = (await contactResponse.GetResponseAsync()).EntityCollection.Entities.FirstOrDefault()?.ToEntity<Contact>();
+        var previousNames = (await previousNameResponse.GetResponseAsync()).EntityCollection.Entities.Select(e => e.ToEntity<dfeta_previousname>()).ToArray();
+
+        if (contact is null)
         {
             return null;
         }
 
-        var contactAndPreviousNames = response.Entities.Select(e => e.ToEntity<Contact>())
-            .Select(c => (Contact: c, PreviousName: c.Extract<dfeta_previousname>(dfeta_previousname.EntityLogicalName, dfeta_previousname.PrimaryIdAttribute)));
-
-        var contactDetail = contactAndPreviousNames
-            .GroupBy(c => c.Contact.Id)
-            .Select(g => new ContactDetail(g.First().Contact, PreviousNames: g.Where(c => c.PreviousName != null).Select(c => c.PreviousName).ToArray()))
-            .FirstOrDefault();
-
-        return contactDetail;
+        return new ContactDetail(contact, previousNames);
     }
 }

@@ -29,7 +29,7 @@
             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
             <govuk-summary-list-row-value data-testid="personal-details-name">@Model.Person.FullName</govuk-summary-list-row-value>
         </govuk-summary-list-row>
-        @if (Model.Person.PreviousNames is not null && Model.Person.PreviousNames.Length > 0)
+        @if (Model.Person.PreviousNames.Length > 0)
         {
             @for (int i = 0; i < Model.Person.PreviousNames.Length; i++)
             {

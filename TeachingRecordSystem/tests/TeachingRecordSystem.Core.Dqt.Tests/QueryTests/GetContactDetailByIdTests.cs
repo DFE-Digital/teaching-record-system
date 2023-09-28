@@ -49,9 +49,11 @@ public class GetContactDetailByIdTests : IAsyncLifetime
     public async Task WhenCalled_WithContactIdForExistingContactWithPreviousName_ReturnsContactDetailIncludingPreviousNames()
     {
         // Arrange
-        var previousFirstName = _dataScope.TestData.GenerateFirstName();
-        var previousMiddleName = _dataScope.TestData.GenerateMiddleName();
-        var person = await _dataScope.TestData.CreatePerson(b => b.WithPreviousFirstName(previousFirstName).WithPreviousMiddleName(previousMiddleName));
+        var updatedFirstName = _dataScope.TestData.GenerateFirstName();
+        var updatedMiddleName = _dataScope.TestData.GenerateMiddleName();
+        var updatedLastName = _dataScope.TestData.GenerateLastName();
+        var person = await _dataScope.TestData.CreatePerson();
+        await _dataScope.TestData.UpdatePerson(b => b.WithPersonId(person.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
 
         // Act
         var results = await _crmQueryDispatcher.ExecuteQuery(new GetContactDetailByIdQuery(person.ContactId, new ColumnSet()));
@@ -59,6 +61,6 @@ public class GetContactDetailByIdTests : IAsyncLifetime
         // Assert
         Assert.NotNull(results);
         Assert.Equal(results.Contact.Id, person.ContactId);
-        Assert.Equal(2, results.PreviousNames.Length);
+        Assert.Equal(3, results.PreviousNames.Length);
     }
 }

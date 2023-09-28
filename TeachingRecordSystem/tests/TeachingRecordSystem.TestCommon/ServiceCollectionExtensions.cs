@@ -46,6 +46,7 @@ public static class ServiceCollectionExtensions
         fakedXrmContext.InitializeMetadata(typeof(Contact).Assembly);
 
         AssignTicketNumberToIncidentPlugin.Register(fakedXrmContext);
+        PersonNameChangedPlugin.Register(fakedXrmContext);
 
         services.AddSingleton<IXrmFakedContext>(fakedXrmContext);
         services.AddSingleton<IOrganizationServiceAsync>(fakedXrmContext.GetAsyncOrganizationService());

@@ -142,6 +142,7 @@
     "statecode"
   ],
   "dfeta_previousname": [
+    "createdon",
     "dfeta_changedon",
     "dfeta_name",
     "dfeta_personid",
@@ -251,6 +252,7 @@
   "sdkmessage": [],
   "sdkmessagefilter": [],
   "sdkmessageprocessingstep": [],
+  "sdkmessageprocessingstepimage": [],
   "subject": [
     "description",
     "statecode",

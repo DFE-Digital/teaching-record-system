@@ -2381,9 +2381,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
-#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 	public enum powerpagelanguages
-#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 	{
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
@@ -2682,6 +2680,23 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Server Only", 0)]
 		ServerOnly = 0,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum SdkMessageProcessingStepImage_ImageType
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Both", 2)]
+		Both = 2,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("PostImage", 1)]
+		PostImage = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("PreImage", 0)]
+		PreImage = 0,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
