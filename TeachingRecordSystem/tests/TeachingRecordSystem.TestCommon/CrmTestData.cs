@@ -1,5 +1,6 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -106,6 +107,10 @@ public partial class CrmTestData
     }
 
     public virtual Task<string> GenerateTrn() => _generateTrn();
+
+    public Contact_GenderCode GenerateGender() => Faker.Enum.Random<Contact_GenderCode>();
+
+    public string GenerateNationalInsuranceNumber() => Faker.Identification.UkNationalInsuranceNumber();
 
     public static async Task<string> GetBase64EncodedFileContent(Stream file)
     {

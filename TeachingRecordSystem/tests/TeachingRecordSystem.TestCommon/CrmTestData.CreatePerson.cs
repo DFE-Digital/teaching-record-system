@@ -21,9 +21,10 @@ public partial class CrmTestData
         private string? _firstName;
         private string? _middleName;
         private string? _lastName;
-        private string? _previousLastName;
         private string? _email;
         private string? _mobileNumber;
+        private bool? _hasNationalInsuranceNumber;
+        private Contact_GenderCode? _gender;
         private readonly List<Sanction> _sanctions = new();
 
         public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
@@ -92,17 +93,6 @@ public partial class CrmTestData
             return this;
         }
 
-        public CreatePersonBuilder WithPreviousLastName(string previousLastName)
-        {
-            if (_previousLastName is not null && _previousLastName != previousLastName)
-            {
-                throw new InvalidOperationException("WithPreviousLastName cannot be changed after it's set.");
-            }
-
-            _previousLastName = previousLastName;
-            return this;
-        }
-
         public CreatePersonBuilder WithSanction(
             string sanctionCode,
             DateOnly? startDate = null,
@@ -126,6 +116,28 @@ public partial class CrmTestData
             return this;
         }
 
+        public CreatePersonBuilder WithGender(Contact_GenderCode gender)
+        {
+            if (_gender is not null && _gender != gender)
+            {
+                throw new InvalidOperationException("WithGender cannot be changed after it's set.");
+            }
+
+            _gender = gender;
+            return this;
+        }
+
+        public CreatePersonBuilder WithNationalInsuranceNumber(bool? hasNationalInsuranceNumber = true)
+        {
+            if (_hasNationalInsuranceNumber is not null && _hasNationalInsuranceNumber != hasNationalInsuranceNumber)
+            {
+                throw new InvalidOperationException("WithNationalInsuranceNumber cannot be changed after it's set.");
+            }
+
+            _hasNationalInsuranceNumber = hasNationalInsuranceNumber;
+            return this;
+        }
+
         public async Task<CreatePersonResult> Execute(CrmTestData testData)
         {
             var hasTrn = _hasTrn ?? true;
@@ -135,6 +147,7 @@ public partial class CrmTestData
             var middleName = _middleName ?? testData.GenerateMiddleName();
             var lastName = _lastName ?? testData.GenerateLastName();
             var dateOfBirth = _dateOfBirth ?? testData.GenerateDateOfBirth();
+            var gender = _gender ?? testData.GenerateGender();
 
             var personId = Guid.NewGuid();
 
@@ -145,13 +158,9 @@ public partial class CrmTestData
                 MiddleName = middleName,
                 LastName = lastName,
                 BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
-                dfeta_TRN = trn
+                dfeta_TRN = trn,
+                GenderCode = gender
             };
-
-            if (_previousLastName is not null)
-            {
-                contact.dfeta_PreviousLastName = _previousLastName;
-            }
 
             if (_email is not null)
             {
@@ -161,6 +170,11 @@ public partial class CrmTestData
             if (_mobileNumber is not null)
             {
                 contact.MobilePhone = _mobileNumber;
+            }
+
+            if (_hasNationalInsuranceNumber ?? false)
+            {
+                contact.dfeta_NINumber = testData.GenerateNationalInsuranceNumber();
             }
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
@@ -195,9 +209,10 @@ public partial class CrmTestData
                 FirstName = firstName,
                 MiddleName = middleName,
                 LastName = lastName,
-                PreviousLastName = _previousLastName,
                 Email = _email,
                 MobileNumber = _mobileNumber,
+                Gender = gender.ToString(),
+                NationalInsuranceNumber = contact.dfeta_NINumber,
                 Sanctions = _sanctions.ToImmutableArray()
             };
         }
@@ -212,9 +227,10 @@ public partial class CrmTestData
         public required string FirstName { get; init; }
         public required string MiddleName { get; init; }
         public required string LastName { get; init; }
-        public required string? PreviousLastName { get; init; }
         public required string? Email { get; init; }
         public required string? MobileNumber { get; init; }
+        public required string Gender { get; init; }
+        public required string? NationalInsuranceNumber { get; init; }
         public required ImmutableArray<Sanction> Sanctions { get; init; }
 
         public Contact ToContact() => new()
@@ -228,9 +244,10 @@ public partial class CrmTestData
             dfeta_StatedLastName = LastName,
             BirthDate = DateOfBirth.FromDateOnlyWithDqtBstFix(isLocalTime: false),
             dfeta_TRN = Trn,
-            dfeta_PreviousLastName = PreviousLastName,
             EMailAddress1 = Email,
-            MobilePhone = MobileNumber
+            MobilePhone = MobileNumber,
+            dfeta_NINumber = NationalInsuranceNumber,
+            GenderCode = Enum.Parse<Contact_GenderCode>(Gender)
         };
     }
 
