@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Identity.Web;
@@ -19,6 +21,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.Redis;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services;
+using TeachingRecordSystem.SupportUi.TagHelpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -177,7 +180,8 @@ builder.Services
     .AddTransient<CheckUserExistsFilter>()
     .AddSingleton<IClock, Clock>()
     .AddSupportUiServices(builder.Configuration, builder.Environment)
-    .AddSingleton<ReferenceDataCache>();
+    .AddSingleton<ReferenceDataCache>()
+    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
 
 var app = builder.Build();
 
