@@ -129,9 +129,10 @@ public class FindTeachersTests : ApiTestBase
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
         var person1 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
-        var person2 = await TestData.CreatePerson(b => b.WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
+        var person2 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
         var person3 = await TestData.CreatePerson(b => b.WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
-        await TestData.UpdatePerson(b => b.WithPersonId(person2.PersonId).WithUpdatedName(person2.FirstName, person2.MiddleName, lastName));
+        var updatedLastName = TestData.GenerateChangedLastName(lastName);
+        await TestData.UpdatePerson(b => b.WithPersonId(person2.PersonId).WithUpdatedName(person2.FirstName, person2.MiddleName, updatedLastName));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -176,7 +177,7 @@ public class FindTeachersTests : ApiTestBase
                         dateOfBirth = person2.DateOfBirth,
                         firstName = person2.FirstName,
                         middleName = person2.MiddleName,
-                        lastName = person2.LastName,
+                        lastName = updatedLastName,
                         sanctions = new[]
                         {
                             new
