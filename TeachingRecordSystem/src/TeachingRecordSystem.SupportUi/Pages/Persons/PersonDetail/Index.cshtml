@@ -41,27 +41,27 @@
         }
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-date-of-birth"><span use-empty-fallback>@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : string.Empty)</span></govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-date-of-birth" use-empty-fallback>@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : string.Empty)</govuk-summary-list-row-value>
         </govuk-summary-list-row>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-gender"><span use-empty-fallback>@Model.Person.Gender</span></govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-gender" use-empty-fallback>@Model.Person.Gender</govuk-summary-list-row-value>
         </govuk-summary-list-row>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-trn"><span use-empty-fallback>@Model.Person.Trn</span></govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-trn" use-empty-fallback>@Model.Person.Trn</govuk-summary-list-row-value>
         </govuk-summary-list-row>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-nino"><span use-empty-fallback>@Model.Person.NationalInsuranceNumber</span></govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-nino" use-empty-fallback>@Model.Person.NationalInsuranceNumber</govuk-summary-list-row-value>
         </govuk-summary-list-row>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-email"><span use-empty-fallback>@Model.Person.Email</span></govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-email" use-empty-fallback>@Model.Person.Email</govuk-summary-list-row-value>
         </govuk-summary-list-row>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-mobile-number"><span use-empty-fallback>@Model.Person.MobileNumber</span></govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-mobile-number" use-empty-fallback>@Model.Person.MobileNumber</govuk-summary-list-row-value>
         </govuk-summary-list-row>
     </govuk-summary-list>
 </govuk-summary-card>

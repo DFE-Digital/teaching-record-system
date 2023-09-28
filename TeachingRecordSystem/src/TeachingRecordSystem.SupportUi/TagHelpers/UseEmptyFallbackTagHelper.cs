@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace TeachingRecordSystem.SupportUi.TagHelpers;
 
-[HtmlTargetElement("span", Attributes = "use-empty-fallback")]
+[HtmlTargetElement("*", Attributes = "use-empty-fallback")]
 public class UseEmptyFallbackTagHelper : TagHelper
 {
+    public override int Order => -1;
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         var content = await output.GetChildContentAsync();

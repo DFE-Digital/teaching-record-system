@@ -2381,7 +2381,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
+#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 	public enum powerpagelanguages
+#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 	{
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
