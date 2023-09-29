@@ -7,8 +7,19 @@
     ViewBag.PersonId = Model.PersonId;
     ViewBag.Search = Model.Search;
     ViewBag.SortBy = Model.SortBy;
-    ViewBag.PageNumber = Model.PageNumber;    
+    ViewBag.PageNumber = Model.PageNumber;
     ViewBag.Title = Model.Person!.Name;
+}
+
+@if (Model.Person.HasAlerts)
+{
+    <govuk-notification-banner>
+        <p class="govuk-notification-banner__heading">
+            Alert on record.
+            <a class="govuk-notification-banner__link" href="@LinkGenerator.PersonAlerts(Model.PersonId, Model.Search, Model.SortBy, Model.PageNumber)">View alert</a>.
+        </p>
+    </govuk-notification-banner>
+
 }
 
 <govuk-summary-card>
@@ -18,21 +29,43 @@
             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
             <govuk-summary-list-row-value data-testid="personal-details-name">@Model.Person.FullName</govuk-summary-list-row-value>
         </govuk-summary-list-row>
+        @if (Model.Person.PreviousNames.Length > 0)
+        {
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Previous name(s)</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>
+                    <ul class="govuk-list">
+            @for (int i = 0; i < Model.Person.PreviousNames.Length; i++)
+            {
+                        <li data-testid="personal-details-previous-names-@i">@Model.Person.PreviousNames[i]</li>                
+            }
+                    </ul>
+                </govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        }
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-date-of-birth">@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : "Not provided")</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-date-of-birth" use-empty-fallback>@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : string.Empty)</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value data-testid="personal-details-gender" use-empty-fallback>@Model.Person.Gender</govuk-summary-list-row-value>
         </govuk-summary-list-row>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-trn">@(!string.IsNullOrEmpty(Model.Person.Trn) ? Model.Person.Trn : "Not provided")</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-trn" use-empty-fallback>@Model.Person.Trn</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value data-testid="personal-details-nino" use-empty-fallback>@Model.Person.NationalInsuranceNumber</govuk-summary-list-row-value>
         </govuk-summary-list-row>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-email">@(!string.IsNullOrEmpty(Model.Person.Email) ? Model.Person.Email : "Not provided")</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-email" use-empty-fallback>@Model.Person.Email</govuk-summary-list-row-value>
         </govuk-summary-list-row>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-mobile-number">@(!string.IsNullOrEmpty(Model.Person.MobileNumber) ? Model.Person.MobileNumber : "Not provided")</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-mobile-number" use-empty-fallback>@Model.Person.MobileNumber</govuk-summary-list-row-value>
         </govuk-summary-list-row>
     </govuk-summary-list>
 </govuk-summary-card>

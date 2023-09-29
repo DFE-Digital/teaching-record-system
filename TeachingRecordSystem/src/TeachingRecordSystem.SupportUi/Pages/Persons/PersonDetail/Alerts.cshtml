@@ -29,7 +29,7 @@ else
             <govuk-summary-list>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="current-alert-start-date-@alert.AlertId">@(alert.StartDate.HasValue ? alert.StartDate.Value.ToString("dd/MM/yyyy") : "-")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="current-alert-start-date-@alert.AlertId" use-empty-fallback>@(alert.StartDate.HasValue ? alert.StartDate.Value.ToString("dd/MM/yyyy") : string.Empty)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
@@ -72,8 +72,8 @@ else
             {
                 <tr class="govuk-table__row" data-testid="previous-alert-@alert.AlertId">
                     <td class="govuk-table__cell" data-testid="previous-alert-description-@alert.AlertId"><a href="@LinkGenerator.Alert(alert.AlertId)" class="govuk-link">@alert.Description</a></td>
-                    <td class="govuk-table__cell" data-testid="previous-alert-start-date-@alert.AlertId">@(alert.StartDate.HasValue ? alert.StartDate.Value.ToString("dd/MM/yyyy") : "-")</td>
-                    <td class="govuk-table__cell" data-testid="previous-alert-end-date-@alert.AlertId">@(alert.EndDate.HasValue ? alert.EndDate.Value.ToString("dd/MM/yyyy") : "-")</td>
+                    <td class="govuk-table__cell" data-testid="previous-alert-start-date-@alert.AlertId" use-empty-fallback>@(alert.StartDate.HasValue ? alert.StartDate.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
+                    <td class="govuk-table__cell" data-testid="previous-alert-end-date-@alert.AlertId" use-empty-fallback>@(alert.EndDate.HasValue ? alert.EndDate.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
                     <td class="govuk-table__cell" data-testid="previous-alert-status-@alert.AlertId">@alert.Status</td>
                 </tr>
             }

@@ -23,7 +23,7 @@ public static class ContactExtensions
             {
                 if (fullName.Length > 0)
                 {
-                    fullName.Append(" ");
+                    fullName.Append(' ');
                 }
 
                 fullName.Append(middleName);
@@ -35,7 +35,7 @@ public static class ContactExtensions
         {
             if (fullName.Length > 0)
             {
-                fullName.Append(" ");
+                fullName.Append(' ');
             }
 
             fullName.Append(lastName);
