@@ -14,8 +14,8 @@ public partial class CrmTestData
 
     public class UpdatePersonBuilder
     {
-        Guid? _personId = null;
-        (string FirstName, string MiddleName, string LastName)? _updatedName = null;
+        private Guid? _personId = null;
+        private (string FirstName, string MiddleName, string LastName)? _updatedName = null;
 
         public UpdatePersonBuilder WithPersonId(Guid personId)
         {
@@ -41,7 +41,12 @@ public partial class CrmTestData
 
         public async Task Execute(CrmTestData testData)
         {
-            if (_personId is not null && _updatedName is not null)
+            if (_personId is null)
+            {
+                throw new InvalidOperationException("WithPersonId has not been set");
+            }
+
+            if (_updatedName is not null)
             {
                 await testData.OrganizationService.ExecuteAsync(new UpdateRequest()
                 {
