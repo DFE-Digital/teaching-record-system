@@ -1,16 +1,15 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
-public class IndexModel : PageModel
+public class ConfirmModel : PageModel
 {
     private readonly TrsLinkGenerator _linkGenerator;
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
 
-    public IndexModel(
+    public ConfirmModel(
         TrsLinkGenerator linkGenerator,
         ICrmQueryDispatcher crmQueryDispatcher)
     {
@@ -21,9 +20,10 @@ public class IndexModel : PageModel
     [FromRoute]
     public Guid AlertId { get; set; }
 
-    [BindProperty(SupportsGet = true)]
-    [Display(Name = "End date")]
-    public DateOnly? EndDate { get; set; }
+    [FromQuery]
+    public DateOnly EndDate { get; set; }
+
+    public string? AlertType { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -35,16 +35,13 @@ public class IndexModel : PageModel
             return NotFound();
         }
 
+        AlertType = alert.Description;
+
         return Page();
     }
 
     public async Task<IActionResult> OnPost()
     {
-        if (EndDate is null)
-        {
-            ModelState.AddModelError(nameof(EndDate), "Add an end date");
-        }
-
         var alert = await _crmQueryDispatcher.ExecuteQuery(new GetSanctionDetailsBySanctionIdQuery(AlertId));
         if (alert is null
             || alert.Sanction.StateCode != Core.Dqt.Models.dfeta_sanctionState.Active
@@ -53,20 +50,12 @@ public class IndexModel : PageModel
             return NotFound();
         }
 
-        if (EndDate <= alert.Sanction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true))
-        {
-            ModelState.AddModelError(nameof(EndDate), "End date must be after the start date");
-        }
+        var personId = alert.Sanction.dfeta_PersonId.Id;
 
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
+        await _crmQueryDispatcher.ExecuteQuery(new CloseSanctionQuery(AlertId, EndDate));
 
+        TempData.SetFlashSuccess("Alert closed");
 
-
-
-
-        return Redirect(_linkGenerator.AlertCloseConfirm(AlertId, EndDate!.Value));
+        return Redirect(_linkGenerator.PersonDetail(personId));
     }
 }

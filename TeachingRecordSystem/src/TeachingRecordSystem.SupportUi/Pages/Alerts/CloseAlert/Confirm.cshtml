@@ -1,0 +1,26 @@
+@page "/alerts/{alertId}/close/confirm"
+@model TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert.ConfirmModel
+@{
+    ViewBag.Title = "Confirm closing alert";
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.AlertCloseConfirm(Model.AlertId, Model.EndDate)" method="post" asp-antiforgery="true">
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.AlertType</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.EndDate.ToString("dd/MM/yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <govuk-button type="submit">Confirm</govuk-button>
+        </form>
+    </div>
+</div>

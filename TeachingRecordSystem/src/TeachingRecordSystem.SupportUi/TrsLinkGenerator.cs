@@ -4,6 +4,8 @@ namespace TeachingRecordSystem.SupportUi;
 
 public class TrsLinkGenerator
 {
+    protected const string DateOnlyFormat = "yyyy-MM-dd";
+
     private readonly LinkGenerator _linkGenerator;
 
     public TrsLinkGenerator(LinkGenerator linkGenerator)
@@ -19,7 +21,9 @@ public class TrsLinkGenerator
 
     public string Alert(Guid alertId) => GetRequiredPathByPage("/Alerts/Alert/Index", routeValues: new { alertId });
 
-    public string CloseAlert(Guid alertId) => GetRequiredPathByPage("/Alerts/Alert/Close", routeValues: new { alertId });
+    public string AlertClose(Guid alertId) => GetRequiredPathByPage("/Alerts/CloseAlert/Index", routeValues: new { alertId });
+
+    public string AlertCloseConfirm(Guid alertId, DateOnly endDate) => GetRequiredPathByPage("/Alerts/CloseAlert/Confirm", routeValues: new { alertId, EndDate = endDate.ToString(DateOnlyFormat) });
 
     public string Cases() => GetRequiredPathByPage("/Cases/Index");
 
