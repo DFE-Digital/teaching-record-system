@@ -1,4 +1,4 @@
-﻿@page "/users/add/confirm"
+@page "/users/add/confirm"
 @using TeachingRecordSystem.Core;
 @model TeachingRecordSystem.SupportUi.Pages.Users.AddUser.ConfirmModel
 @{
@@ -7,7 +7,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form trs-action="l => l.AddUser(Model.UserId!)">
+        <form action="@LinkGenerator.AddUser(Model.UserId!)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input asp-for="Email" type="email" disabled />
