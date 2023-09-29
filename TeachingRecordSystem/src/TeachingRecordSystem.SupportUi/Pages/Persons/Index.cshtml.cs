@@ -21,8 +21,7 @@ public partial class IndexModel : PageModel
 
     public IndexModel(
         TrsLinkGenerator linkGenerator,
-        ICrmQueryDispatcher crmQueryDispatcher,
-        IConfiguration configuration)
+        ICrmQueryDispatcher crmQueryDispatcher)
     {
         _linkGenerator = linkGenerator;
         _crmQueryDispatcher = crmQueryDispatcher;
