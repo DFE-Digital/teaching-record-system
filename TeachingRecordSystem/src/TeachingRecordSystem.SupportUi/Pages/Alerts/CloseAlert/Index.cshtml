@@ -1,0 +1,22 @@
+@page "/alerts/{alertId}/close"
+@model IndexModel
+@{
+    ViewBag.Title = "Close alert";
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.CloseAlert(Model.AlertId)" method="post" asp-antiforgery="true">
+            <govuk-date-input asp-for="EndDate">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>
+
