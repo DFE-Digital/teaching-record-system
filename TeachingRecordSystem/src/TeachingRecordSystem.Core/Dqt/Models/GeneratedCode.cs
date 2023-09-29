@@ -1182,6 +1182,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string BirthDate = "birthdate";
 			public const string ContactId = "contactid";
 			public const string Id = "contactid";
+			public const string CreatedOn = "createdon";
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
 			public const string dfeta_AllowPiiUpdatesFromRegister = "dfeta_allowpiiupdatesfromregister";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
@@ -1227,6 +1228,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_contact_dfeta_inductionperiod = "dfeta_contact_dfeta_inductionperiod";
 			public const string dfeta_contact_dfeta_initialteachertraining = "dfeta_contact_dfeta_initialteachertraining";
 			public const string dfeta_contact_dfeta_initialteachertraining1 = "dfeta_contact_dfeta_initialteachertraining1";
+			public const string dfeta_contact_dfeta_previousname = "dfeta_contact_dfeta_previousname";
 			public const string dfeta_contact_dfeta_qtsregistration = "dfeta_contact_dfeta_qtsregistration";
 			public const string dfeta_contact_dfeta_qtsregistration1 = "dfeta_contact_dfeta_qtsregistration1";
 			public const string dfeta_contact_dfeta_qualification = "dfeta_contact_dfeta_qualification";
@@ -1471,6 +1473,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			set
 			{
 				this.ContactId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the contact was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 		
@@ -2386,6 +2408,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_contact_dfeta_initialteachertraining1");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("dfeta_contact_dfeta_initialteachertraining1", null, value);
 				this.OnPropertyChanged("dfeta_contact_dfeta_initialteachertraining1");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_contact_dfeta_previousname
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_previousname")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> dfeta_contact_dfeta_previousname
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("dfeta_contact_dfeta_previousname", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_contact_dfeta_previousname");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("dfeta_contact_dfeta_previousname", null, value);
+				this.OnPropertyChanged("dfeta_contact_dfeta_previousname");
 			}
 		}
 		
@@ -6873,6 +6915,394 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("lk_dfeta_ittsubject_modifiedonbehalfby");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_ittsubject_modifiedonbehalfby", null, value);
 				this.OnPropertyChanged("lk_dfeta_ittsubject_modifiedonbehalfby");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_previousnameState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_previousname")]
+	public partial class dfeta_previousname : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_previousname entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string CreatedOn = "createdon";
+			public const string dfeta_ChangedOn = "dfeta_changedon";
+			public const string dfeta_name = "dfeta_name";
+			public const string dfeta_PersonId = "dfeta_personid";
+			public const string dfeta_previousnameId = "dfeta_previousnameid";
+			public const string Id = "dfeta_previousnameid";
+			public const string dfeta_Type = "dfeta_type";
+			public const string StateCode = "statecode";
+			public const string dfeta_contact_dfeta_previousname = "dfeta_contact_dfeta_previousname";
+			public const string lk_dfeta_previousname_createdby = "lk_dfeta_previousname_createdby";
+			public const string lk_dfeta_previousname_createdonbehalfby = "lk_dfeta_previousname_createdonbehalfby";
+			public const string lk_dfeta_previousname_modifiedby = "lk_dfeta_previousname_modifiedby";
+			public const string lk_dfeta_previousname_modifiedonbehalfby = "lk_dfeta_previousname_modifiedonbehalfby";
+			public const string user_dfeta_previousname = "user_dfeta_previousname";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_previousname() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "dfeta_previousname";
+		
+		public const string PrimaryIdAttribute = "dfeta_previousnameid";
+		
+		public const string PrimaryNameAttribute = "dfeta_name";
+		
+		public const string EntityLogicalName = "dfeta_previousname";
+		
+		public const string EntityLogicalCollectionName = "dfeta_previousnames";
+		
+		public const string EntitySetName = "dfeta_previousnames";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the record was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_changedon")]
+		public System.Nullable<System.DateTime> dfeta_ChangedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_changedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_ChangedOn");
+				this.SetAttributeValue("dfeta_changedon", value);
+				this.OnPropertyChanged("dfeta_ChangedOn");
+			}
+		}
+		
+		/// <summary>
+		/// The name of the custom entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_name")]
+		public string dfeta_name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_name");
+				this.SetAttributeValue("dfeta_name", value);
+				this.OnPropertyChanged("dfeta_name");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for Person associated with Previous Name.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_PersonId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_personid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_PersonId");
+				this.SetAttributeValue("dfeta_personid", value);
+				this.OnPropertyChanged("dfeta_PersonId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_previousnameid")]
+		public System.Nullable<System.Guid> dfeta_previousnameId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_previousnameid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_previousnameId");
+				this.SetAttributeValue("dfeta_previousnameid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_previousnameId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_previousnameid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_previousnameId = value;
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_type")]
+		public virtual dfeta_NameType? dfeta_Type
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_NameType?)(EntityOptionSetEnum.GetEnum(this, "dfeta_type")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Type");
+				this.SetAttributeValue("dfeta_type", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("dfeta_Type");
+			}
+		}
+		
+		/// <summary>
+		/// Status of the Previous Name
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousnameState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((TeachingRecordSystem.Core.Dqt.Models.dfeta_previousnameState)(System.Enum.ToObject(typeof(TeachingRecordSystem.Core.Dqt.Models.dfeta_previousnameState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_contact_dfeta_previousname
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_personid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_dfeta_previousname")]
+		public TeachingRecordSystem.Core.Dqt.Models.Contact dfeta_contact_dfeta_previousname
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Contact>("dfeta_contact_dfeta_previousname", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_contact_dfeta_previousname");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Contact>("dfeta_contact_dfeta_previousname", null, value);
+				this.OnPropertyChanged("dfeta_contact_dfeta_previousname");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_previousname_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_previousname_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_previousname_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_previousname_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_previousname_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_previousname_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_previousname_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_previousname_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_previousname_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_previousname
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_previousname")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_previousname
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_previousname", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_previousname");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_previousname", null, value);
+				this.OnPropertyChanged("user_dfeta_previousname");
 			}
 		}
 	}
@@ -13532,6 +13962,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string SupportedDeployment = "supporteddeployment";
 			public const string SupportingSolutionId = "supportingsolutionid";
 			public const string VersionNumber = "versionnumber";
+			public const string sdkmessageprocessingstepid_sdkmessageprocessingstepimage = "sdkmessageprocessingstepid_sdkmessageprocessingstepimage";
 			public const string createdby_sdkmessageprocessingstep = "createdby_sdkmessageprocessingstep";
 			public const string impersonatinguserid_sdkmessageprocessingstep = "impersonatinguserid_sdkmessageprocessingstep";
 			public const string lk_sdkmessageprocessingstep_createdonbehalfby = "lk_sdkmessageprocessingstep_createdonbehalfby";
@@ -14507,6 +14938,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N sdkmessageprocessingstepid_sdkmessageprocessingstepimage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("sdkmessageprocessingstepid_sdkmessageprocessingstepimage")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage> sdkmessageprocessingstepid_sdkmessageprocessingstepimage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>("sdkmessageprocessingstepid_sdkmessageprocessingstepimage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("sdkmessageprocessingstepid_sdkmessageprocessingstepimage");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>("sdkmessageprocessingstepid_sdkmessageprocessingstepimage", null, value);
+				this.OnPropertyChanged("sdkmessageprocessingstepid_sdkmessageprocessingstepimage");
+			}
+		}
+		
+		/// <summary>
 		/// N:1 createdby_sdkmessageprocessingstep
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
@@ -14692,6 +15143,745 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("sdkmessageid_sdkmessageprocessingstep");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SdkMessage>("sdkmessageid_sdkmessageprocessingstep", null, value);
 				this.OnPropertyChanged("sdkmessageid_sdkmessageprocessingstep");
+			}
+		}
+	}
+	
+	/// <summary>
+	/// Copy of an entity's attributes before or after the core system operation.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("sdkmessageprocessingstepimage")]
+	public partial class SdkMessageProcessingStepImage : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the sdkmessageprocessingstepimage entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string Attributes1 = "attributes";
+			public const string ComponentState = "componentstate";
+			public const string CreatedBy = "createdby";
+			public const string CreatedOn = "createdon";
+			public const string CreatedOnBehalfBy = "createdonbehalfby";
+			public const string CustomizationLevel = "customizationlevel";
+			public const string Description = "description";
+			public const string EntityAlias = "entityalias";
+			public const string ImageType = "imagetype";
+			public const string IntroducedVersion = "introducedversion";
+			public const string IsCustomizable = "iscustomizable";
+			public const string IsManaged = "ismanaged";
+			public const string MessagePropertyName = "messagepropertyname";
+			public const string ModifiedBy = "modifiedby";
+			public const string ModifiedOn = "modifiedon";
+			public const string ModifiedOnBehalfBy = "modifiedonbehalfby";
+			public const string Name = "name";
+			public const string OrganizationId = "organizationid";
+			public const string OverwriteTime = "overwritetime";
+			public const string RelatedAttributeName = "relatedattributename";
+			public const string SdkMessageProcessingStepId = "sdkmessageprocessingstepid";
+			public const string SdkMessageProcessingStepImageId = "sdkmessageprocessingstepimageid";
+			public const string Id = "sdkmessageprocessingstepimageid";
+			public const string SdkMessageProcessingStepImageIdUnique = "sdkmessageprocessingstepimageidunique";
+			public const string SolutionId = "solutionid";
+			public const string SupportingSolutionId = "supportingsolutionid";
+			public const string VersionNumber = "versionnumber";
+			public const string createdby_sdkmessageprocessingstepimage = "createdby_sdkmessageprocessingstepimage";
+			public const string lk_sdkmessageprocessingstepimage_createdonbehalfby = "lk_sdkmessageprocessingstepimage_createdonbehalfby";
+			public const string lk_sdkmessageprocessingstepimage_modifiedonbehalfby = "lk_sdkmessageprocessingstepimage_modifiedonbehalfby";
+			public const string modifiedby_sdkmessageprocessingstepimage = "modifiedby_sdkmessageprocessingstepimage";
+			public const string sdkmessageprocessingstepid_sdkmessageprocessingstepimage = "sdkmessageprocessingstepid_sdkmessageprocessingstepimage";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public SdkMessageProcessingStepImage() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "SdkMessageProcessingStepImage";
+		
+		public const string PrimaryIdAttribute = "sdkmessageprocessingstepimageid";
+		
+		public const string PrimaryNameAttribute = "name";
+		
+		public const string EntityLogicalName = "sdkmessageprocessingstepimage";
+		
+		public const string EntityLogicalCollectionName = "sdkmessageprocessingstepimages";
+		
+		public const string EntitySetName = "sdkmessageprocessingstepimages";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Comma-separated list of attributes that are to be passed into the SDK message processing step image.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("attributes")]
+		public string Attributes1
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("attributes");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Attributes1");
+				this.SetAttributeValue("attributes", value);
+				this.OnPropertyChanged("Attributes1");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("componentstate")]
+		public virtual ComponentState? ComponentState
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((ComponentState?)(EntityOptionSetEnum.GetEnum(this, "componentstate")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ComponentState");
+				this.SetAttributeValue("componentstate", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("ComponentState");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who created the SDK message processing step image.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the SDK message processing step image was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the delegate user who created the sdkmessageprocessingstepimage.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOnBehalfBy");
+				this.SetAttributeValue("createdonbehalfby", value);
+				this.OnPropertyChanged("CreatedOnBehalfBy");
+			}
+		}
+		
+		/// <summary>
+		/// Customization level of the SDK message processing step image.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("customizationlevel")]
+		public System.Nullable<int> CustomizationLevel
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<int>>("customizationlevel");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CustomizationLevel");
+				this.SetAttributeValue("customizationlevel", value);
+				this.OnPropertyChanged("CustomizationLevel");
+			}
+		}
+		
+		/// <summary>
+		/// Description of the SDK message processing step image.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("description")]
+		public string Description
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("description");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Description");
+				this.SetAttributeValue("description", value);
+				this.OnPropertyChanged("Description");
+			}
+		}
+		
+		/// <summary>
+		/// Key name used to access the pre-image or post-image property bags in a step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("entityalias")]
+		public string EntityAlias
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("entityalias");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("EntityAlias");
+				this.SetAttributeValue("entityalias", value);
+				this.OnPropertyChanged("EntityAlias");
+			}
+		}
+		
+		/// <summary>
+		/// Type of image requested.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("imagetype")]
+		public virtual SdkMessageProcessingStepImage_ImageType? ImageType
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((SdkMessageProcessingStepImage_ImageType?)(EntityOptionSetEnum.GetEnum(this, "imagetype")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ImageType");
+				this.SetAttributeValue("imagetype", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("ImageType");
+			}
+		}
+		
+		/// <summary>
+		/// Version in which the form is introduced.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("introducedversion")]
+		public string IntroducedVersion
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("introducedversion");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IntroducedVersion");
+				this.SetAttributeValue("introducedversion", value);
+				this.OnPropertyChanged("IntroducedVersion");
+			}
+		}
+		
+		/// <summary>
+		/// Information that specifies whether this component can be customized.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("iscustomizable")]
+		public Microsoft.Xrm.Sdk.BooleanManagedProperty IsCustomizable
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.BooleanManagedProperty>("iscustomizable");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsCustomizable");
+				this.SetAttributeValue("iscustomizable", value);
+				this.OnPropertyChanged("IsCustomizable");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("ismanaged")]
+		public System.Nullable<bool> IsManaged
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("ismanaged");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsManaged");
+				this.SetAttributeValue("ismanaged", value);
+				this.OnPropertyChanged("IsManaged");
+			}
+		}
+		
+		/// <summary>
+		/// Name of the property on the Request message.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("messagepropertyname")]
+		public string MessagePropertyName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("messagepropertyname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("MessagePropertyName");
+				this.SetAttributeValue("messagepropertyname", value);
+				this.OnPropertyChanged("MessagePropertyName");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who last modified the SDK message processing step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the SDK message processing step was last modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the delegate user who last modified the sdkmessageprocessingstepimage.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedOnBehalfBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedonbehalfby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOnBehalfBy");
+				this.SetAttributeValue("modifiedonbehalfby", value);
+				this.OnPropertyChanged("ModifiedOnBehalfBy");
+			}
+		}
+		
+		/// <summary>
+		/// Name of SdkMessage processing step image.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("name")]
+		public string Name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Name");
+				this.SetAttributeValue("name", value);
+				this.OnPropertyChanged("Name");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the organization with which the SDK message processing step is associated.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("organizationid")]
+		public Microsoft.Xrm.Sdk.EntityReference OrganizationId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("organizationid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OrganizationId");
+				this.SetAttributeValue("organizationid", value);
+				this.OnPropertyChanged("OrganizationId");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("overwritetime")]
+		public System.Nullable<System.DateTime> OverwriteTime
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("overwritetime");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("OverwriteTime");
+				this.SetAttributeValue("overwritetime", value);
+				this.OnPropertyChanged("OverwriteTime");
+			}
+		}
+		
+		/// <summary>
+		/// Name of the related entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("relatedattributename")]
+		public string RelatedAttributeName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("relatedattributename");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("RelatedAttributeName");
+				this.SetAttributeValue("relatedattributename", value);
+				this.OnPropertyChanged("RelatedAttributeName");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message processing step.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepid")]
+		public Microsoft.Xrm.Sdk.EntityReference SdkMessageProcessingStepId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("sdkmessageprocessingstepid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageProcessingStepId");
+				this.SetAttributeValue("sdkmessageprocessingstepid", value);
+				this.OnPropertyChanged("SdkMessageProcessingStepId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message processing step image entity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepimageid")]
+		public System.Nullable<System.Guid> SdkMessageProcessingStepImageId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("sdkmessageprocessingstepimageid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageProcessingStepImageId");
+				this.SetAttributeValue("sdkmessageprocessingstepimageid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("SdkMessageProcessingStepImageId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepimageid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.SdkMessageProcessingStepImageId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the SDK message processing step image.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepimageidunique")]
+		public System.Nullable<System.Guid> SdkMessageProcessingStepImageIdUnique
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("sdkmessageprocessingstepimageidunique");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SdkMessageProcessingStepImageIdUnique");
+				this.SetAttributeValue("sdkmessageprocessingstepimageidunique", value);
+				this.OnPropertyChanged("SdkMessageProcessingStepImageIdUnique");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the associated solution.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("solutionid")]
+		public System.Nullable<System.Guid> SolutionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("solutionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SolutionId");
+				this.SetAttributeValue("solutionid", value);
+				this.OnPropertyChanged("SolutionId");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("supportingsolutionid")]
+		public System.Nullable<System.Guid> SupportingSolutionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("supportingsolutionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SupportingSolutionId");
+				this.SetAttributeValue("supportingsolutionid", value);
+				this.OnPropertyChanged("SupportingSolutionId");
+			}
+		}
+		
+		/// <summary>
+		/// Number that identifies a specific revision of the step image. 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
+		public System.Nullable<long> VersionNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 createdby_sdkmessageprocessingstepimage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("createdby_sdkmessageprocessingstepimage")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser createdby_sdkmessageprocessingstepimage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("createdby_sdkmessageprocessingstepimage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("createdby_sdkmessageprocessingstepimage");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("createdby_sdkmessageprocessingstepimage", null, value);
+				this.OnPropertyChanged("createdby_sdkmessageprocessingstepimage");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_sdkmessageprocessingstepimage_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessageprocessingstepimage_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_sdkmessageprocessingstepimage_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessageprocessingstepimage_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessageprocessingstepimage_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessageprocessingstepimage_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessageprocessingstepimage_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_sdkmessageprocessingstepimage_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessageprocessingstepimage_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_sdkmessageprocessingstepimage_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessageprocessingstepimage_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessageprocessingstepimage_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_sdkmessageprocessingstepimage_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessageprocessingstepimage_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 modifiedby_sdkmessageprocessingstepimage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("modifiedby_sdkmessageprocessingstepimage")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser modifiedby_sdkmessageprocessingstepimage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("modifiedby_sdkmessageprocessingstepimage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("modifiedby_sdkmessageprocessingstepimage");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("modifiedby_sdkmessageprocessingstepimage", null, value);
+				this.OnPropertyChanged("modifiedby_sdkmessageprocessingstepimage");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 sdkmessageprocessingstepid_sdkmessageprocessingstepimage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("sdkmessageprocessingstepid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("sdkmessageprocessingstepid_sdkmessageprocessingstepimage")]
+		public TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep sdkmessageprocessingstepid_sdkmessageprocessingstepimage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("sdkmessageprocessingstepid_sdkmessageprocessingstepimage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("sdkmessageprocessingstepid_sdkmessageprocessingstepimage");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("sdkmessageprocessingstepid_sdkmessageprocessingstepimage", null, value);
+				this.OnPropertyChanged("sdkmessageprocessingstepid_sdkmessageprocessingstepimage");
 			}
 		}
 	}
@@ -15016,6 +16206,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string createdby_sdkmessage = "createdby_sdkmessage";
 			public const string createdby_sdkmessagefilter = "createdby_sdkmessagefilter";
 			public const string createdby_sdkmessageprocessingstep = "createdby_sdkmessageprocessingstep";
+			public const string createdby_sdkmessageprocessingstepimage = "createdby_sdkmessageprocessingstepimage";
 			public const string impersonatinguserid_sdkmessageprocessingstep = "impersonatinguserid_sdkmessageprocessingstep";
 			public const string lk_accountbase_createdby = "lk_accountbase_createdby";
 			public const string lk_accountbase_createdonbehalfby = "lk_accountbase_createdonbehalfby";
@@ -15073,6 +16264,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_ittsubject_createdonbehalfby = "lk_dfeta_ittsubject_createdonbehalfby";
 			public const string lk_dfeta_ittsubject_modifiedby = "lk_dfeta_ittsubject_modifiedby";
 			public const string lk_dfeta_ittsubject_modifiedonbehalfby = "lk_dfeta_ittsubject_modifiedonbehalfby";
+			public const string lk_dfeta_previousname_createdby = "lk_dfeta_previousname_createdby";
+			public const string lk_dfeta_previousname_createdonbehalfby = "lk_dfeta_previousname_createdonbehalfby";
+			public const string lk_dfeta_previousname_modifiedby = "lk_dfeta_previousname_modifiedby";
+			public const string lk_dfeta_previousname_modifiedonbehalfby = "lk_dfeta_previousname_modifiedonbehalfby";
 			public const string lk_dfeta_qtsregistration_createdby = "lk_dfeta_qtsregistration_createdby";
 			public const string lk_dfeta_qtsregistration_createdonbehalfby = "lk_dfeta_qtsregistration_createdonbehalfby";
 			public const string lk_dfeta_qtsregistration_modifiedby = "lk_dfeta_qtsregistration_modifiedby";
@@ -15113,6 +16308,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_sdkmessagefilter_modifiedonbehalfby = "lk_sdkmessagefilter_modifiedonbehalfby";
 			public const string lk_sdkmessageprocessingstep_createdonbehalfby = "lk_sdkmessageprocessingstep_createdonbehalfby";
 			public const string lk_sdkmessageprocessingstep_modifiedonbehalfby = "lk_sdkmessageprocessingstep_modifiedonbehalfby";
+			public const string lk_sdkmessageprocessingstepimage_createdonbehalfby = "lk_sdkmessageprocessingstepimage_createdonbehalfby";
+			public const string lk_sdkmessageprocessingstepimage_modifiedonbehalfby = "lk_sdkmessageprocessingstepimage_modifiedonbehalfby";
 			public const string lk_subject_createdonbehalfby = "lk_subject_createdonbehalfby";
 			public const string lk_subject_modifiedonbehalfby = "lk_subject_modifiedonbehalfby";
 			public const string lk_subjectbase_createdby = "lk_subjectbase_createdby";
@@ -15129,6 +16326,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string modifiedby_sdkmessage = "modifiedby_sdkmessage";
 			public const string modifiedby_sdkmessagefilter = "modifiedby_sdkmessagefilter";
 			public const string modifiedby_sdkmessageprocessingstep = "modifiedby_sdkmessageprocessingstep";
+			public const string modifiedby_sdkmessageprocessingstepimage = "modifiedby_sdkmessageprocessingstepimage";
 			public const string system_user_accounts = "system_user_accounts";
 			public const string system_user_contacts = "system_user_contacts";
 			public const string system_user_incidents = "system_user_incidents";
@@ -15138,6 +16336,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string user_dfeta_induction = "user_dfeta_induction";
 			public const string user_dfeta_inductionperiod = "user_dfeta_inductionperiod";
 			public const string user_dfeta_initialteachertraining = "user_dfeta_initialteachertraining";
+			public const string user_dfeta_previousname = "user_dfeta_previousname";
 			public const string user_dfeta_qtsregistration = "user_dfeta_qtsregistration";
 			public const string user_dfeta_qualification = "user_dfeta_qualification";
 			public const string user_dfeta_sanction = "user_dfeta_sanction";
@@ -15373,6 +16572,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("createdby_sdkmessageprocessingstep");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>("createdby_sdkmessageprocessingstep", null, value);
 				this.OnPropertyChanged("createdby_sdkmessageprocessingstep");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N createdby_sdkmessageprocessingstepimage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("createdby_sdkmessageprocessingstepimage")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage> createdby_sdkmessageprocessingstepimage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>("createdby_sdkmessageprocessingstepimage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("createdby_sdkmessageprocessingstepimage");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>("createdby_sdkmessageprocessingstepimage", null, value);
+				this.OnPropertyChanged("createdby_sdkmessageprocessingstepimage");
 			}
 		}
 		
@@ -16517,6 +17736,86 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N lk_dfeta_previousname_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> lk_dfeta_previousname_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_previousname_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> lk_dfeta_previousname_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_previousname_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> lk_dfeta_previousname_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_previousname_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_previousname_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> lk_dfeta_previousname_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_previousname_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("lk_dfeta_previousname_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_previousname_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N lk_dfeta_qtsregistration_createdby
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_qtsregistration_createdby")]
@@ -17317,6 +18616,46 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N lk_sdkmessageprocessingstepimage_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessageprocessingstepimage_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage> lk_sdkmessageprocessingstepimage_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>("lk_sdkmessageprocessingstepimage_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessageprocessingstepimage_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>("lk_sdkmessageprocessingstepimage_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessageprocessingstepimage_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_sdkmessageprocessingstepimage_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessageprocessingstepimage_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage> lk_sdkmessageprocessingstepimage_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>("lk_sdkmessageprocessingstepimage_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_sdkmessageprocessingstepimage_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>("lk_sdkmessageprocessingstepimage_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_sdkmessageprocessingstepimage_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N lk_subject_createdonbehalfby
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_subject_createdonbehalfby")]
@@ -17637,6 +18976,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N modifiedby_sdkmessageprocessingstepimage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("modifiedby_sdkmessageprocessingstepimage")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage> modifiedby_sdkmessageprocessingstepimage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>("modifiedby_sdkmessageprocessingstepimage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("modifiedby_sdkmessageprocessingstepimage");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>("modifiedby_sdkmessageprocessingstepimage", null, value);
+				this.OnPropertyChanged("modifiedby_sdkmessageprocessingstepimage");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N system_user_accounts
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("system_user_accounts")]
@@ -17813,6 +19172,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("user_dfeta_initialteachertraining");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("user_dfeta_initialteachertraining", null, value);
 				this.OnPropertyChanged("user_dfeta_initialteachertraining");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_dfeta_previousname
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_previousname")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> user_dfeta_previousname
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("user_dfeta_previousname", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_previousname");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>("user_dfeta_previousname", null, value);
+				this.OnPropertyChanged("user_dfeta_previousname");
 			}
 		}
 		
@@ -18702,6 +20081,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname> dfeta_previousnameSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_previousname>();
+			}
+		}
+		
+		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration"/> entities.
 		/// </summary>
 		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration> dfeta_qtsregistrationSet
@@ -18842,6 +20233,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			get
 			{
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStep>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage> SdkMessageProcessingStepImageSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SdkMessageProcessingStepImage>();
 			}
 		}
 		
