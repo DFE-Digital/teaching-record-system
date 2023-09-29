@@ -59,9 +59,9 @@
                         {
                             <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
                                 <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId, search: Model.Search, sortBy: Model.SortBy, pageNumber: Model.PageNumber)" class="govuk-link">@personInfo.Name</a></td>
-                                <td class="govuk-table__cell" data-testid="date-of-birth">@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString("dd/MM/yyyy") : "-")</td>
-                                <td class="govuk-table__cell" data-testid="trn">@(!string.IsNullOrEmpty(personInfo.Trn) ? personInfo.Trn : "-")</td>
-                                <td class="govuk-table__cell" data-testid="nino">@(!string.IsNullOrEmpty(personInfo.NationalInsuranceNumber) ? personInfo.NationalInsuranceNumber : "-")</td>
+                                <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
+                                <td class="govuk-table__cell" data-testid="trn"><span use-empty-fallback>@personInfo.Trn</span></td>
+                                <td class="govuk-table__cell" data-testid="nino"><span use-empty-fallback>@personInfo.NationalInsuranceNumber</span></td>
                             </tr>
                         }
                     }
