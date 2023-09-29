@@ -159,6 +159,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     if: ${{ needs.build.outputs.run_crm_integration_tests == 'true' }}
+    concurrency: dqt-tests
 
     env:
       MSSQL_DB: dqtreports
