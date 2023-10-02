@@ -4,11 +4,15 @@
     ViewBag.Title = "Close alert";
 }
 
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonDetail(Model.PersonId!.Value)">Back</govuk-back-link>
+}
+
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.AlertClose(Model.AlertId)" method="post" asp-antiforgery="true">
+        <form action="@LinkGenerator.AlertClose(Model.AlertId, endDate: null)" method="post" asp-antiforgery="true">
             <govuk-date-input asp-for="EndDate">
                 <govuk-date-input-fieldset>
                     <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />

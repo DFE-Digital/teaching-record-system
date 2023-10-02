@@ -4,6 +4,10 @@
     ViewBag.Title = "Confirm closing alert";
 }
 
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.AlertClose(Model.AlertId, Model.EndDate)">Back</govuk-back-link>
+}
+
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">

@@ -20,7 +20,7 @@ public class ConfirmModel : PageModel
     [FromRoute]
     public Guid AlertId { get; set; }
 
-    [FromQuery]
+    [FromQuery(Name = "endDate")]
     public DateOnly EndDate { get; set; }
 
     public string? AlertType { get; set; }

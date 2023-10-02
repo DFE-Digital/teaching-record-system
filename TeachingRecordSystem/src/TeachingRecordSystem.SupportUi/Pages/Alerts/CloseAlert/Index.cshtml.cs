@@ -25,6 +25,8 @@ public class IndexModel : PageModel
     [Display(Name = "End date")]
     public DateOnly? EndDate { get; set; }
 
+    public Guid? PersonId { get; set; }
+
     public async Task<IActionResult> OnGet()
     {
         var alert = await _crmQueryDispatcher.ExecuteQuery(new GetSanctionDetailsBySanctionIdQuery(AlertId));
@@ -34,6 +36,8 @@ public class IndexModel : PageModel
         {
             return NotFound();
         }
+
+        PersonId = alert.Sanction.dfeta_PersonId.Id;
 
         return Page();
     }
@@ -53,6 +57,8 @@ public class IndexModel : PageModel
             return NotFound();
         }
 
+        PersonId = alert.Sanction.dfeta_PersonId.Id;
+
         if (EndDate <= alert.Sanction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true))
         {
             ModelState.AddModelError(nameof(EndDate), "End date must be after the start date");
@@ -62,10 +68,6 @@ public class IndexModel : PageModel
         {
             return this.PageWithErrors();
         }
-
-
-
-
 
         return Redirect(_linkGenerator.AlertCloseConfirm(AlertId, EndDate!.Value));
     }
