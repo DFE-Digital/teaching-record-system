@@ -46,7 +46,7 @@ public class CalculateActiveSanctionsPlugin : IPlugin
                 {
                     Conditions =
                     {
-                        new ConditionExpression(dfeta_sanction.Fields.StateCode, ConditionOperator.Equal, dfeta_sanctionState.Active),
+                        new ConditionExpression(dfeta_sanction.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_sanctionState.Active),
                         new ConditionExpression(dfeta_sanction.Fields.dfeta_PersonId, ConditionOperator.Equal, personId),
                         new ConditionExpression(dfeta_sanction.Fields.dfeta_Spent, ConditionOperator.NotEqual, true)
                     }
