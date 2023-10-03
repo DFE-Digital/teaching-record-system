@@ -20,8 +20,7 @@ build:
 
 # Test the .NET solution
 test:
-  @cd {{solution-root / "tests" / "TeachingRecordSystem.Core.Tests"}} && dotnet test
-  @cd {{solution-root / "tests" / "TeachingRecordSystem.Api.Tests"}} && dotnet fixie
+  @cd {{solution-root}} && dotnet test
 
 # Format the .NET solution and Terraform code
 format:
