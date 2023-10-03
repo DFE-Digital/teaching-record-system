@@ -27,7 +27,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         bool expectEysCertificateUrl)
     {
         // Arrange
-        var contact = CreateContact(trn);
+        var contact = await CreateContact(trn);
 
         dfeta_qtsregistration[]? qtsRegistrations = null;
         if (qualifiedInWales)
@@ -94,7 +94,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         bool expectCertificateUrls)
     {
         // Arrange
-        var contact = CreateContact(trn, hasMultiWordFirstName: true);
+        var contact = await CreateContact(trn, hasMultiWordFirstName: true);
 
         await ConfigureMocks(trn, contact);
 
@@ -144,7 +144,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         bool expectCertificateUrls)
     {
         // Arrange
-        var contact = CreateContact(trn);
+        var contact = await CreateContact(trn);
         var induction = CreateInduction();
         var inductionPeriods = CreateInductionPeriods();
 
@@ -194,7 +194,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         string trn)
     {
         // Arrange
-        var contact = CreateContact(trn);
+        var contact = await CreateContact(trn);
         var itt = CreateItt(contact);
 
         await ConfigureMocks(trn, contact, itt);
@@ -261,7 +261,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         bool expectCertificateUrls)
     {
         // Arrange
-        var contact = CreateContact(trn);
+        var contact = await CreateContact(trn);
 
         var npqQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.NPQLL, null, dfeta_qualificationState.Active, null);
         var npqQualificationInactive = CreateQualification(dfeta_qualification_dfeta_Type.NPQSL, new DateTime(2022, 5, 6), dfeta_qualificationState.Inactive, null);
@@ -313,7 +313,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         string trn)
     {
         // Arrange
-        var contact = CreateContact(trn);
+        var contact = await CreateContact(trn);
 
         var mandatoryQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, null, dfeta_qualificationState.Active, "Visual Impairment");
         var mandatoryQualificationNoSpecialism = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 2, 3), dfeta_qualificationState.Active, null);
@@ -357,7 +357,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         string trn)
     {
         // Arrange
-        var contact = CreateContact(trn);
+        var contact = await CreateContact(trn);
         var qualification1AwardDate = new DateTime(2022, 4, 6);
         var qualification1Name = "My HE Qual 1";
         var qualification1Subject1 = (Code: "Qualification1Subject1", Name: "Qualification 1 Subject 1");
@@ -471,7 +471,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         string trn)
     {
         // Arrange
-        var contact = CreateContact(trn);
+        var contact = await CreateContact(trn);
 
         var incidents = new[]
         {
@@ -501,7 +501,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         string trn)
     {
         // Arrange
-        var contact = CreateContact(trn);
+        var contact = await CreateContact(trn);
 
         var incidents = new[]
         {
@@ -531,7 +531,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         string trn)
     {
         // Arrange
-        var contact = CreateContact(trn);
+        var contact = await CreateContact(trn);
 
         var sanctions = new (string SanctionCode, DateOnly? StartDate)[]
         {
@@ -661,6 +661,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
 
             await TestData.OrganizationService.CreateAsync(new dfeta_sanction()
             {
+                Id = Guid.NewGuid(),
                 dfeta_PersonId = contact.Id.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_SanctionCodeId = sanctionCode.Id.ToEntityReference(dfeta_sanctioncode.EntityLogicalName),
                 dfeta_Spent = false,
@@ -669,7 +670,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         }
     }
 
-    private static Contact CreateContact(string trn, bool hasMultiWordFirstName = false)
+    private async Task<Contact> CreateContact(string trn, bool hasMultiWordFirstName = false)
     {
         var contactId = Guid.NewGuid();
         var firstName1 = Faker.Name.First();
@@ -699,6 +700,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
             dfeta_EYTSDate = eytsDate.ToDateTime(),
             EMailAddress1 = email
         };
+
+        await TestData.OrganizationService.CreateAsync(teacher);
 
         return teacher;
     }
