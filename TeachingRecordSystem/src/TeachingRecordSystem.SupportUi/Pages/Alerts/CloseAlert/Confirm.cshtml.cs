@@ -56,6 +56,6 @@ public class ConfirmModel : PageModel
 
         TempData.SetFlashSuccess("Alert closed");
 
-        return Redirect(_linkGenerator.PersonDetail(personId));
+        return Redirect(_linkGenerator.PersonAlerts(personId));
     }
 }

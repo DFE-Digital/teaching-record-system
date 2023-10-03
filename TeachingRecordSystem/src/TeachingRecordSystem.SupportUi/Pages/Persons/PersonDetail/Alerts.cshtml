@@ -24,7 +24,7 @@ else
         <govuk-summary-card data-testid="current-alert-@alert.AlertId">
             <govuk-summary-card-title data-testid="current-alert-title-@alert.AlertId">@alert.Description</govuk-summary-card-title>
             <govuk-summary-card-actions>
-                <govuk-summary-card-action href="@LinkGenerator.AlertClose(alert.AlertId, endDate: null)" visually-hidden-text="Close">Close</govuk-summary-card-action>
+                <govuk-summary-card-action href="@LinkGenerator.AlertClose(alert.AlertId, endDate: null)" visually-hidden-text="alert" data-testid="close-@alert.AlertId">Change</govuk-summary-card-action>
             </govuk-summary-card-actions>
             <govuk-summary-list>
                 <govuk-summary-list-row>
