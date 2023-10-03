@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
@@ -27,39 +28,16 @@ public class IndexModel : PageModel
 
     public Guid? PersonId { get; set; }
 
-    public async Task<IActionResult> OnGet()
-    {
-        var alert = await _crmQueryDispatcher.ExecuteQuery(new GetSanctionDetailsBySanctionIdQuery(AlertId));
-        if (alert is null
-            || alert.Sanction.StateCode != Core.Dqt.Models.dfeta_sanctionState.Active
-            || alert.Sanction.dfeta_EndDate is not null)
-        {
-            return NotFound();
-        }
+    public DateOnly? StartDate { get; set; }
 
-        PersonId = alert.Sanction.dfeta_PersonId.Id;
-
-        return Page();
-    }
-
-    public async Task<IActionResult> OnPost()
+    public IActionResult OnPost()
     {
         if (EndDate is null)
         {
             ModelState.AddModelError(nameof(EndDate), "Add an end date");
         }
 
-        var alert = await _crmQueryDispatcher.ExecuteQuery(new GetSanctionDetailsBySanctionIdQuery(AlertId));
-        if (alert is null
-            || alert.Sanction.StateCode != Core.Dqt.Models.dfeta_sanctionState.Active
-            || alert.Sanction.dfeta_EndDate is not null)
-        {
-            return NotFound();
-        }
-
-        PersonId = alert.Sanction.dfeta_PersonId.Id;
-
-        if (EndDate <= alert.Sanction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true))
+        if (EndDate <= StartDate)
         {
             ModelState.AddModelError(nameof(EndDate), "End date must be after the start date");
         }
@@ -70,5 +48,22 @@ public class IndexModel : PageModel
         }
 
         return Redirect(_linkGenerator.AlertCloseConfirm(AlertId, EndDate!.Value));
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        var alert = await _crmQueryDispatcher.ExecuteQuery(new GetSanctionDetailsBySanctionIdQuery(AlertId));
+        if (alert is null
+            || alert.Sanction.StateCode != Core.Dqt.Models.dfeta_sanctionState.Active
+            || alert.Sanction.dfeta_EndDate is not null)
+        {
+            context.Result = NotFound();
+            return;
+        }
+
+        PersonId = alert.Sanction.dfeta_PersonId.Id;
+        StartDate = alert.Sanction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true);
+
+        await next();
     }
 }

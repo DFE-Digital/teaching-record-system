@@ -13,7 +13,7 @@ public class CloseSanctionHandler : ICrmQueryHandler<CloseSanctionQuery, bool>
             Target = new dfeta_sanction()
             {
                 Id = query.SanctionId,
-                dfeta_EndDate = query.EndDate.ToDateTime(),
+                dfeta_EndDate = query.EndDate.FromDateOnlyWithDqtBstFix(isLocalTime: true),
                 dfeta_Spent = true
             }
         });

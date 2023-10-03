@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
@@ -25,37 +26,31 @@ public class ConfirmModel : PageModel
 
     public string? AlertType { get; set; }
 
-    public async Task<IActionResult> OnGet()
-    {
-        var alert = await _crmQueryDispatcher.ExecuteQuery(new GetSanctionDetailsBySanctionIdQuery(AlertId));
-        if (alert is null
-            || alert.Sanction.StateCode != Core.Dqt.Models.dfeta_sanctionState.Active
-            || alert.Sanction.dfeta_EndDate is not null)
-        {
-            return NotFound();
-        }
-
-        AlertType = alert.Description;
-
-        return Page();
-    }
+    public Guid? PersonId { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
-        var alert = await _crmQueryDispatcher.ExecuteQuery(new GetSanctionDetailsBySanctionIdQuery(AlertId));
-        if (alert is null
-            || alert.Sanction.StateCode != Core.Dqt.Models.dfeta_sanctionState.Active
-            || alert.Sanction.dfeta_EndDate is not null)
-        {
-            return NotFound();
-        }
-
-        var personId = alert.Sanction.dfeta_PersonId.Id;
-
         await _crmQueryDispatcher.ExecuteQuery(new CloseSanctionQuery(AlertId, EndDate));
 
         TempData.SetFlashSuccess("Alert closed");
 
-        return Redirect(_linkGenerator.PersonAlerts(personId));
+        return Redirect(_linkGenerator.PersonAlerts(PersonId!.Value));
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        var alert = await _crmQueryDispatcher.ExecuteQuery(new GetSanctionDetailsBySanctionIdQuery(AlertId));
+        if (alert is null
+            || alert.Sanction.StateCode != Core.Dqt.Models.dfeta_sanctionState.Active
+            || alert.Sanction.dfeta_EndDate is not null)
+        {
+            context.Result = NotFound();
+            return;
+        }
+
+        AlertType = alert.Description;
+        PersonId = alert.Sanction.dfeta_PersonId.Id;
+
+        await next();
     }
 }
