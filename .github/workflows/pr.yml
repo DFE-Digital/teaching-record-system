@@ -125,9 +125,6 @@ jobs:
   validate_terraform:
     name: Validate Terraform
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        platform: [paas, aks]
 
     steps:
     - uses: actions/checkout@v4
@@ -138,20 +135,20 @@ jobs:
 
     - name: Check formatting
       run: terraform fmt -check -diff
-      working-directory: terraform/${{ matrix.platform }}
+      working-directory: terraform/aks
 
     - name: Validate
       run: |
         terraform init -backend=false
         terraform validate -no-color
-      working-directory: terraform/${{ matrix.platform }}
+      working-directory: terraform/aks
 
     - name: Lint
       uses: reviewdog/action-tflint@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         tflint_rulesets: azurerm
-        working_directory: terraform/${{ matrix.platform }}
+        working_directory: terraform/aks
       continue-on-error: true  # temporary- we're getting sporadic 503 errors here in action setup
 
   dqt_tests:
