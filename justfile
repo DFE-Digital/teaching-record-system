@@ -8,7 +8,7 @@ default:
 # Install local tools
 install-tools:
   @cd {{solution-root}} && dotnet tool restore
-  npm install -g sass 
+  npm install -g sass
 
 # Run the trscli
 cli *ARGS:
@@ -27,7 +27,6 @@ test:
 format:
   @cd {{solution-root}} && dotnet format
   @terraform fmt terraform/aks
-  @terraform fmt terraform/paas
 
 # Format any un-committed .tf or .cs files
 format-changed:
