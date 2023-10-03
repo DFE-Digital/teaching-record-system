@@ -18,6 +18,7 @@ using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
+using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Redis;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services;
@@ -116,6 +117,8 @@ builder.Services
         options.Filters.Add(new AuthorizeFilter(policy));
 
         options.Filters.Add(new CheckUserExistsFilter());
+
+        options.ModelBinderProviders.Insert(2, new DateOnlyModelBinderProvider());
     })
     .AddCookieTempDataProvider(options =>
     {
