@@ -26,6 +26,11 @@ public static class PageExtensions
         await page.GetByTestId($"close-{alertId}").ClickAsync();
     }
 
+    public static async Task ClickViewAlertPersonAlertsPage(this IPage page, Guid alertId)
+    {
+        await page.GetByTestId($"view-alert-link-{alertId}").ClickAsync();
+    }
+
     public static async Task ClickOpenCasesLinkInNavigationBar(this IPage page)
     {
         await page.ClickAsync("a:text-is('Open cases')");
@@ -61,6 +66,11 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/persons/{personId}/alerts");
     }
 
+    public static async Task AssertOnAlertDetailPage(this IPage page, Guid alertId)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}");
+    }
+
     public static async Task AssertOnCloseAlertPage(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/close");
@@ -94,6 +104,12 @@ public static class PageExtensions
 
     public static Task ClickContinueButton(this IPage page)
         => ClickButton(page, "Continue");
+
+    public static Task ClickDeactivateButton(this IPage page)
+        => ClickButton(page, "Mark alert as inactive");
+
+    public static Task ClickReactivateButton(this IPage page)
+        => ClickButton(page, "Remove inactive status");
 
     private static Task ClickButton(this IPage page, string text) =>
         page.ClickAsync($".govuk-button:text-is('{text}')");

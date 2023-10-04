@@ -8,7 +8,7 @@
     <govuk-back-link href="@LinkGenerator.PersonAlerts(Model.PersonId!.Value)">Back</govuk-back-link>
 }
 
-<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
@@ -22,9 +22,9 @@
             </thead>
             <tbody class="govuk-table__body">
                 <tr class="govuk-table__row" data-testid="alert-header">
-                    <td class="govuk-table__cell trs-table__cell--no-border" data-testid="start-date-@Model.Alert.AlertId" use-empty-fallback>@(Model.Alert.StartDate.HasValue ? Model.Alert.StartDate.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
-                    <td class="govuk-table__cell trs-table__cell--no-border" data-testid="end-date-@Model.Alert.AlertId" use-empty-fallback>@(Model.Alert.EndDate.HasValue ? Model.Alert.EndDate.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
-                    <td class="govuk-table__cell trs-table__cell--no-border" data-testid="status-@Model.Alert.AlertId">@Model.Alert.Status</td>
+                    <td class="govuk-table__cell trs-table__cell--no-border" data-testid="start-date" use-empty-fallback>@(Model.Alert.StartDate.HasValue ? Model.Alert.StartDate.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
+                    <td class="govuk-table__cell trs-table__cell--no-border" data-testid="end-date" use-empty-fallback>@(Model.Alert.EndDate.HasValue ? Model.Alert.EndDate.Value.ToString("dd/MM/yyyy") : string.Empty)</td>
+                    <td class="govuk-table__cell trs-table__cell--no-border" data-testid="status">@Model.Alert.Status</td>
                 </tr>
             </tbody>
         </table>
@@ -38,7 +38,7 @@
         <h3 class="govuk-heading-s">Details</h3>
         @if (!string.IsNullOrEmpty(@Model.Alert.Details))
         {
-            <p class="govuk-body">
+            <p class="govuk-body" data-testid="alert-details">
             @{var lines = @Model.Alert.Details.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
             @for (int i = 0; i < lines.Length; i++)
             {
@@ -50,16 +50,15 @@
             }
             }
             </p>
-        }
-        <a href="#" class="govuk-link" rel="noreferrer noopener" target="_blank" date-testid="see-full-case-details">See full case details (opens in new tab)</a>
+        }        
         <form action="@LinkGenerator.Alert(Model.AlertId)" method="post">
             @if (Model.IsActive)
             {
-                <govuk-button type="submit" class="govuk-!-margin-top-9">Mark alert as inactive</govuk-button>
+                <govuk-button type="submit" class="govuk-!-margin-top-9" data-testid="deactivate-button">Mark alert as inactive</govuk-button>
             }
             else
             {
-                <govuk-button type="submit" class="govuk-button--warning govuk-!-margin-top-9">Remove inactive status</govuk-button>
+                <govuk-button type="submit" class="govuk-button--warning govuk-!-margin-top-9" data-testid="reactivate-button">Remove inactive status</govuk-button>
             }
         </form>
     </div>

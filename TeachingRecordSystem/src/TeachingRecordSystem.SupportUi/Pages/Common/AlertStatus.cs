@@ -1,11 +1,8 @@
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
+namespace TeachingRecordSystem.SupportUi.Pages.Common;
 
-public partial class AlertsModel
+public enum AlertStatus
 {
-    public enum AlertStatus
-    {
-        Active,
-        Inactive,
-        Closed
-    }
+    Active,
+    Inactive,
+    Closed
 }

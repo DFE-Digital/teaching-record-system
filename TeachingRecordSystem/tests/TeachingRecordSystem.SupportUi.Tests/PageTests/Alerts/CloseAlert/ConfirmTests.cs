@@ -11,9 +11,9 @@ public class ConfirmTests : TestBase
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
-        var nonExistentActivityId = Guid.NewGuid().ToString();
+        var nonExistentAlertId = Guid.NewGuid().ToString();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{nonExistentActivityId}/close/confirm");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{nonExistentAlertId}/close/confirm");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -29,7 +29,7 @@ public class ConfirmTests : TestBase
         var sanctionCode = "G1";
         var sanctionCodeName = (await TestData.ReferenceDataCache.GetSanctionCodeByValue(sanctionCode)).dfeta_name;
         var startDate = new DateOnly(2021, 01, 01);
-        var endDate = new DateOnly(2020, 01, 01);
+        var endDate = new DateOnly(2022, 03, 05);
         var person = await TestData.CreatePerson(x => x.WithSanction(sanctionCode, startDate: startDate));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{person.Sanctions.Single().SanctionId}/close/confirm?endDate={endDate:yyyy-MM-dd}");
