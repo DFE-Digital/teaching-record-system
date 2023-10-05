@@ -18,6 +18,7 @@ using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
+using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Redis;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
@@ -177,6 +178,13 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 
     healthCheckBuilder.AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
 }
+
+builder.Services
+    .AddTransient<FormFlow.State.IUserInstanceStateProvider, DbUserInstanceStateProvider>()
+    .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
+    .AddFormFlow(options =>
+    {
+    });
 
 builder.Services
     .AddTransient<TrsLinkGenerator>()
