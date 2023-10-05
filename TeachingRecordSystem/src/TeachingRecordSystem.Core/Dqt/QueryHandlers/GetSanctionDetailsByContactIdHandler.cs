@@ -21,6 +21,7 @@ public class GetSanctionDetailsByContactIdHandler : ICrmQueryHandler<GetSanction
                 dfeta_sanction.Fields.dfeta_StartDate,
                 dfeta_sanction.Fields.dfeta_EndDate,
                 dfeta_sanction.Fields.dfeta_Spent,
+                dfeta_sanction.Fields.dfeta_DetailsLink,
                 dfeta_sanction.Fields.StateCode),
             Criteria = filter
         };

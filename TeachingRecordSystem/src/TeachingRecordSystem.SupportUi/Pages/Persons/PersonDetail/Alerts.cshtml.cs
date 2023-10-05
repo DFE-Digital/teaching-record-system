@@ -77,6 +77,7 @@ public partial class AlertsModel : PageModel
             AlertId = sanction.Sanction.Id,
             Description = sanction.Description,
             Details = sanction.Sanction.dfeta_SanctionDetails,
+            DetailsLink = sanction.Sanction.dfeta_DetailsLink,
             StartDate = sanction.Sanction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             EndDate = sanction.Sanction.dfeta_EndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             Status = alertStatus
