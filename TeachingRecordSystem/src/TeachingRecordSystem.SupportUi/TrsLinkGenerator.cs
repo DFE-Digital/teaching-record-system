@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.WebUtilities;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 
@@ -22,9 +23,11 @@ public class TrsLinkGenerator
 
     public string Alert(Guid alertId) => GetRequiredPathByPage("/Alerts/Alert/Index", routeValues: new { alertId });
 
-    public string AlertClose(Guid alertId, DateOnly? endDate) => GetRequiredPathByPage("/Alerts/CloseAlert/Index", routeValues: new { alertId, endDate = endDate?.ToString(DateOnlyFormat) });
+    public string AlertClose(Guid alertId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/CloseAlert/Index", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
-    public string AlertCloseConfirm(Guid alertId, DateOnly endDate) => GetRequiredPathByPage("/Alerts/CloseAlert/Confirm", routeValues: new { alertId, endDate = endDate.ToString(DateOnlyFormat) });
+    public string AlertCloseConfirm(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/CloseAlert/Confirm", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
     public string Cases() => GetRequiredPathByPage("/Cases/Index");
 
@@ -58,6 +61,15 @@ public class TrsLinkGenerator
 
     public string EditUser(Guid userId) => GetRequiredPathByPage("/Users/EditUser", routeValues: new { userId });
 
-    private string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null) =>
-        _linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
+    private string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
+    {
+        var url = _linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
+
+        if (journeyInstanceId?.UniqueKey is string journeyInstanceUniqueKey)
+        {
+            url = QueryHelpers.AddQueryString(url, FormFlow.Constants.UniqueKeyQueryParameterName, journeyInstanceUniqueKey);
+        }
+
+        return url;
+    }
 }
