@@ -99,9 +99,10 @@ public partial class CrmTestData
             DateOnly? endDate = null,
             DateOnly? reviewDate = null,
             bool spent = false,
-            string details = "lorem ipsum")
+            string details = "lorem ipsum",
+            bool isActive = true)
         {
-            _sanctions.Add(new(Guid.NewGuid(), sanctionCode, startDate, endDate, reviewDate, spent, details));
+            _sanctions.Add(new(Guid.NewGuid(), sanctionCode, startDate, endDate, reviewDate, spent, details, isActive));
             return this;
         }
 
@@ -194,9 +195,22 @@ public partial class CrmTestData
                         dfeta_StartDate = sanction.StartDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
                         dfeta_EndDate = sanction.EndDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
                         dfeta_NoReAppuntildate = sanction.ReviewDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
-                        dfeta_Spent = sanction.Spent
+                        dfeta_Spent = sanction.Spent,
+                        dfeta_SanctionDetails = sanction.Details
                     }
                 });
+
+                if (!sanction.IsActive)
+                {
+                    txnRequestBuilder.AddRequest(new UpdateRequest()
+                    {
+                        Target = new dfeta_sanction()
+                        {
+                            Id = sanction.SanctionId,
+                            StateCode = dfeta_sanctionState.Inactive
+                        }
+                    });
+                }
             }
 
             await txnRequestBuilder.Execute();
@@ -251,5 +265,5 @@ public partial class CrmTestData
         };
     }
 
-    public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string Details);
+    public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string Details, bool IsActive);
 }

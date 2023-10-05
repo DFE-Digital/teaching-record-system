@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.SupportUi.Pages.Common;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-public class AlertsModel : PageModel
+public partial class AlertsModel : PageModel
 {
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
 
@@ -80,22 +81,5 @@ public class AlertsModel : PageModel
             EndDate = sanction.Sanction.dfeta_EndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             Status = alertStatus
         };
-    }
-
-    public record AlertInfo
-    {
-        public required Guid AlertId { get; init; }
-        public required string Description { get; init; }
-        public required string Details { get; init; }
-        public required DateOnly? StartDate { get; init; }
-        public required DateOnly? EndDate { get; init; }
-        public required AlertStatus Status { get; init; }
-    }
-
-    public enum AlertStatus
-    {
-        Active,
-        Inactive,
-        Closed
     }
 }
