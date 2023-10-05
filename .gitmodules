@@ -1,0 +1,3 @@
+[submodule "TeachingRecordSystem/lib/formflow"]
+	path = TeachingRecordSystem/lib/formflow
+	url = https://github.com/gunndabad/formflow.git

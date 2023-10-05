@@ -1,5 +1,9 @@
 using FakeXrmEasy.Abstractions;
+using FormFlow;
+using FormFlow.State;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
@@ -41,6 +45,42 @@ public abstract class TestBase
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
     public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
+
+    public async Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
+            string journeyName,
+            TState state,
+            params KeyValuePair<string, object>[] keys)
+        where TState : notnull
+    {
+        await using var scope = HostFixture.Services.CreateAsyncScope();
+        var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
+        var options = scope.ServiceProvider.GetRequiredService<IOptions<FormFlowOptions>>();
+
+        var journeyDescriptor = options.Value.JourneyRegistry.GetJourneyByName(journeyName) ??
+            throw new ArgumentException("Journey not found.", nameof(journeyName));
+
+        var keysDict = keys.ToDictionary(k => k.Key, k => new StringValues(k.Value.ToString()));
+
+        if (journeyDescriptor.AppendUniqueKey)
+        {
+            keysDict.Add(Constants.UniqueKeyQueryParameterName, new StringValues(Guid.NewGuid().ToString()));
+        }
+
+        var instanceId = new JourneyInstanceId(journeyDescriptor.JourneyName, keysDict);
+
+        var stateType = typeof(TState);
+
+        var instance = await stateProvider.CreateInstanceAsync(instanceId, stateType, state, properties: null);
+        return (JourneyInstance<TState>)instance;
+    }
+
+    public async Task<JourneyInstance<TState>> ReloadJourneyInstance<TState>(JourneyInstance<TState> journeyInstance)
+    {
+        await using var scope = HostFixture.Services.CreateAsyncScope();
+        var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
+        var reloadedInstance = await stateProvider.GetInstanceAsync(journeyInstance.InstanceId, typeof(TState));
+        return (JourneyInstance<TState>)reloadedInstance!;
+    }
 
     protected Guid GetCurrentUserId()
     {
