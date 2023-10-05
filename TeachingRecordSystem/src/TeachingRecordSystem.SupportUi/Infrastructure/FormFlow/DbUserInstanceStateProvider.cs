@@ -9,18 +9,18 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 
 public class DbUserInstanceStateProvider : IUserInstanceStateProvider
 {
-    private readonly TrsDbContext _dbContext;
+    private readonly IDbContextFactory<TrsDbContext> _dbContextFactory;
     private readonly ICurrentUserIdProvider _currentUserIdProvider;
     private readonly IClock _clock;
     private readonly IOptions<JsonOptions> _jsonOptionsAccessor;
 
     public DbUserInstanceStateProvider(
-        TrsDbContext dbContext,
+        IDbContextFactory<TrsDbContext> dbContextFactory,
         ICurrentUserIdProvider currentUserIdProvider,
         IClock clock,
         IOptions<JsonOptions> jsonOptionsAccessor)
     {
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
         _currentUserIdProvider = currentUserIdProvider;
         _clock = clock;
         _jsonOptionsAccessor = jsonOptionsAccessor;
@@ -28,9 +28,11 @@ public class DbUserInstanceStateProvider : IUserInstanceStateProvider
 
     public async Task CompleteInstanceAsync(JourneyInstanceId instanceId, Type stateType)
     {
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
         var userId = _currentUserIdProvider.GetCurrentUserId();
 
-        var instance = await _dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId) ??
+        var instance = await dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId) ??
             throw new ArgumentException("Instance does not exist.");
 
         if (instance.Completed is not null)
@@ -39,7 +41,7 @@ public class DbUserInstanceStateProvider : IUserInstanceStateProvider
         }
 
         instance.Completed = _clock.UtcNow;
-        await _dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task<JourneyInstance> CreateInstanceAsync(
@@ -53,6 +55,8 @@ public class DbUserInstanceStateProvider : IUserInstanceStateProvider
             throw new NotSupportedException("Specifying properties is not supported.");
         }
 
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
         var userId = _currentUserIdProvider.GetCurrentUserId();
 
         var serializedState = SerializeState(stateType, state);
@@ -64,28 +68,32 @@ public class DbUserInstanceStateProvider : IUserInstanceStateProvider
             Created = _clock.UtcNow,
             Updated = _clock.UtcNow
         };
-        _dbContext.JourneyStates.Add(instance);
-        await _dbContext.SaveChangesAsync();
+        dbContext.JourneyStates.Add(instance);
+        await dbContext.SaveChangesAsync();
 
         return JourneyInstance.Create(this, instanceId, stateType, state, PropertiesBuilder.CreateEmpty(), completed: false);
     }
 
     public async Task DeleteInstanceAsync(JourneyInstanceId instanceId, Type stateType)
     {
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
         var userId = _currentUserIdProvider.GetCurrentUserId();
 
-        var instance = await _dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId) ??
+        var instance = await dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId) ??
             throw new ArgumentException("Instance does not exist.");
 
-        _dbContext.JourneyStates.Remove(instance);
-        await _dbContext.SaveChangesAsync();
+        dbContext.JourneyStates.Remove(instance);
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task<JourneyInstance?> GetInstanceAsync(JourneyInstanceId instanceId, Type stateType)
     {
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
         var userId = _currentUserIdProvider.GetCurrentUserId();
 
-        var instance = await _dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId);
+        var instance = await dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId);
 
         if (instance is null)
         {
@@ -99,15 +107,17 @@ public class DbUserInstanceStateProvider : IUserInstanceStateProvider
 
     public async Task UpdateInstanceStateAsync(JourneyInstanceId instanceId, Type stateType, object state)
     {
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
         var userId = _currentUserIdProvider.GetCurrentUserId();
 
-        var instance = await _dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId) ??
+        var instance = await dbContext.JourneyStates.SingleOrDefaultAsync(j => j.InstanceId == instanceId && j.UserId == userId) ??
             throw new ArgumentException("Instance does not exist.");
 
         var serializedState = SerializeState(stateType, state);
         instance.State = serializedState;
         instance.Updated = _clock.UtcNow;
-        await _dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
     }
 
     private string SerializeState(Type stateType, object state) =>

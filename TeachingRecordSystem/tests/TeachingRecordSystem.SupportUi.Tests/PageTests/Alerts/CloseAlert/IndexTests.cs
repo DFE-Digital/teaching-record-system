@@ -1,5 +1,7 @@
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.CloseAlert;
+using FormFlow;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.CloseAlert;
 
 public class IndexTests : TestBase
 {
@@ -12,9 +14,11 @@ public class IndexTests : TestBase
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange        
-        var nonExistentActivityId = Guid.NewGuid().ToString();
+        var alertId = Guid.NewGuid();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{nonExistentActivityId}/close");
+        var journeyInstance = await CreateJourneyInstance(alertId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -28,8 +32,11 @@ public class IndexTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(x => x.WithSanction("G1", endDate: new DateOnly(2023, 09, 21)));
+        var alertId = person.Sanctions.Single().SanctionId;
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{person.Sanctions.Single().SanctionId}/close");
+        var journeyInstance = await CreateJourneyInstance(alertId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -43,8 +50,11 @@ public class IndexTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(x => x.WithSanction("G1"));
+        var alertId = person.Sanctions.Single().SanctionId;
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{person.Sanctions.Single().SanctionId}/close");
+        var journeyInstance = await CreateJourneyInstance(alertId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -56,16 +66,17 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithEndDateInQueryParam_PopulatesEndDateFromQueryParam()
+    public async Task Get_ValidRequestWithEndDateInJourneyState_PopulatesEndDateFromJourneyState()
     {
         // Arrange
         var startDate = new DateOnly(2021, 01, 01);
         var endDate = new DateOnly(2020, 01, 01);
         var person = await TestData.CreatePerson(x => x.WithSanction("G1", startDate: startDate));
+        var alertId = person.Sanctions.Single().SanctionId;
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"/alerts/{person.Sanctions.Single().SanctionId}/close?endDate={endDate:yyyy-MM-dd}");
+        var journeyInstance = await CreateJourneyInstance(alertId, new CloseAlertState() { EndDate = endDate });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -82,10 +93,11 @@ public class IndexTests : TestBase
     {
         // Arrange        
         var person = await TestData.CreatePerson(x => x.WithSanction("G1"));
+        var alertId = person.Sanctions.Single().SanctionId;
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/alerts/{person.Sanctions.Single().SanctionId}/close")
+        var journeyInstance = await CreateJourneyInstance(alertId);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -104,10 +116,11 @@ public class IndexTests : TestBase
         var startDate = new DateOnly(2021, 01, 01);
         var endDate = new DateOnly(2020, 01, 01);
         var person = await TestData.CreatePerson(x => x.WithSanction("G1", startDate: startDate));
+        var alertId = person.Sanctions.Single().SanctionId;
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/alerts/{person.Sanctions.Single().SanctionId}/close")
+        var journeyInstance = await CreateJourneyInstance(alertId);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -131,10 +144,11 @@ public class IndexTests : TestBase
         var startDate = new DateOnly(2021, 01, 01);
         var endDate = new DateOnly(2022, 08, 03);
         var person = await TestData.CreatePerson(x => x.WithSanction("G1", startDate: startDate));
+        var alertId = person.Sanctions.Single().SanctionId;
 
-        var request = new HttpRequestMessage(
-            HttpMethod.Post,
-            $"/alerts/{person.Sanctions.Single().SanctionId}/close")
+        var journeyInstance = await CreateJourneyInstance(alertId);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -149,6 +163,12 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/alerts/{person.Sanctions.Single().SanctionId}/close/confirm?endDate={endDate:yyyy-MM-dd}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/alerts/{alertId}/close/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
+
+    private async Task<JourneyInstance<CloseAlertState>> CreateJourneyInstance(Guid alertId, CloseAlertState? state = null) =>
+        await CreateJourneyInstance(
+            JourneyNames.CloseAlert,
+            state ?? new CloseAlertState(),
+            new KeyValuePair<string, object>("alertId", alertId));
 }

@@ -5,14 +5,14 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.AlertClose(Model.AlertId, Model.EndDate)">Back</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.AlertClose(Model.AlertId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
 }
 
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.AlertCloseConfirm(Model.AlertId, Model.EndDate)" method="post">
+        <form action="@LinkGenerator.AlertCloseConfirm(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-summary-list>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>

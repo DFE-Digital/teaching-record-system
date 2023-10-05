@@ -187,6 +187,11 @@ builder.Services
     .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
     .AddFormFlow(options =>
     {
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.CloseAlert,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert.CloseAlertState),
+            requestDataKeys: new[] { "alertId" },
+            appendUniqueKey: true));
     });
 
 builder.Services

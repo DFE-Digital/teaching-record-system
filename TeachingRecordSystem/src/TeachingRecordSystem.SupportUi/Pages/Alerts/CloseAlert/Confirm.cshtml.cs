@@ -5,6 +5,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
+[Journey(JourneyNames.CloseAlert), RequireJourneyInstance]
 public class ConfirmModel : PageModel
 {
     private readonly TrsLinkGenerator _linkGenerator;
@@ -18,19 +19,21 @@ public class ConfirmModel : PageModel
         _crmQueryDispatcher = crmQueryDispatcher;
     }
 
+    public JourneyInstance<CloseAlertState>? JourneyInstance { get; set; }
+
     [FromRoute]
     public Guid AlertId { get; set; }
-
-    [FromQuery(Name = "endDate")]
-    public DateOnly EndDate { get; set; }
 
     public string? AlertType { get; set; }
 
     public Guid? PersonId { get; set; }
 
+    public DateOnly EndDate { get; set; }
+
     public async Task<IActionResult> OnPost()
     {
         await _crmQueryDispatcher.ExecuteQuery(new CloseSanctionQuery(AlertId, EndDate));
+        await JourneyInstance!.CompleteAsync();
 
         TempData.SetFlashSuccess("Alert closed");
 
@@ -48,8 +51,15 @@ public class ConfirmModel : PageModel
             return;
         }
 
+        if (!JourneyInstance!.State.IsComplete)
+        {
+            context.Result = Redirect(_linkGenerator.AlertClose(AlertId, JourneyInstance!.InstanceId));
+            return;
+        }
+
         AlertType = alert.Description;
         PersonId = alert.Sanction.dfeta_PersonId.Id;
+        EndDate = JourneyInstance!.State.EndDate.Value;
 
         await next();
     }
