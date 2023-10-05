@@ -36,15 +36,7 @@ else
                     <govuk-summary-list-row-value data-testid="current-alert-details-@alert.AlertId">
                         @if (!string.IsNullOrEmpty(@alert.Details))
                         {
-                            var lines = @alert.Details.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                            @for (int i = 0; i < lines.Length; i++)
-                            {
-                                <span>@lines[i]</span>
-                                @if (i < lines.Length - 1)
-                                {
-                                    <br />
-                                }
-                            }
+                            <multi-line-text text="@alert.Details" />                  
                         }
                         </govuk-summary-list-row-value>
                 </govuk-summary-list-row>

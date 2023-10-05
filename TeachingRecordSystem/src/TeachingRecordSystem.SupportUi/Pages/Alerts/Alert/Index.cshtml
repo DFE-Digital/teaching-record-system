@@ -38,28 +38,19 @@
         <h3 class="govuk-heading-s">Details</h3>
         @if (!string.IsNullOrEmpty(@Model.Alert.Details))
         {
-            <p class="govuk-body" data-testid="alert-details">
-            @{var lines = @Model.Alert.Details.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            @for (int i = 0; i < lines.Length; i++)
-            {
-                <span>@lines[i]</span>
-                @if (i < lines.Length - 1)
-                {
-                    <br />
-                }
-            }
-            }
-            </p>
-        }        
-        <form action="@LinkGenerator.Alert(Model.AlertId)" method="post">
+            <multi-line-text data-testid="alert-details" text="@Model.Alert.Details"/>
+        }               
             @if (Model.IsActive)
             {
-                <govuk-button type="submit" class="govuk-!-margin-top-9" data-testid="deactivate-button">Mark alert as inactive</govuk-button>
+                <form asp-page-handler="SetInactive" method="post">
+                    <govuk-button type="submit" class="govuk-!-margin-top-9" data-testid="deactivate-button">Mark alert as inactive</govuk-button>
+                </form>
             }
             else
             {
-                <govuk-button type="submit" class="govuk-button--warning govuk-!-margin-top-9" data-testid="reactivate-button">Remove inactive status</govuk-button>
-            }
-        </form>
+                <form asp-page-handler="SetActive" method="post">
+                    <govuk-button type="submit" class="govuk-button--warning govuk-!-margin-top-9" data-testid="reactivate-button">Remove inactive status</govuk-button>
+                </form>
+            }        
     </div>
 </div>

@@ -29,12 +29,22 @@ public class IndexModel : PageModel
 
     public Guid? PersonId { get; set; }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostSetActive()
     {
-        await _crmQueryDispatcher.ExecuteQuery(new UpdateSanctionStateQuery(AlertId, IsActive ? dfeta_sanctionState.Inactive : dfeta_sanctionState.Active));
+        await _crmQueryDispatcher.ExecuteQuery(new UpdateSanctionStateQuery(AlertId, dfeta_sanctionState.Active));
 
-        IsActive = !IsActive;
-        TempData.SetFlashSuccess($"{(IsActive ? "Inactive status removed" : "Status changed to inactive")}");
+        IsActive = true;
+        TempData.SetFlashSuccess("Inactive status removed");
+
+        return Redirect(_linkGenerator.Alert(AlertId));
+    }
+
+    public async Task<IActionResult> OnPostSetInactive()
+    {
+        await _crmQueryDispatcher.ExecuteQuery(new UpdateSanctionStateQuery(AlertId, dfeta_sanctionState.Inactive));
+
+        IsActive = false;
+        TempData.SetFlashSuccess("Status changed to inactive");
 
         return Redirect(_linkGenerator.Alert(AlertId));
     }
