@@ -8,8 +8,10 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Events.Processing;
+using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
+using TeachingRecordSystem.SupportUi.Tests.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
@@ -69,6 +71,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
             services.AddSingleton<TestData>();
             services.AddFakeXrm();
+            services.AddTransient<ICurrentUserIdProvider, TestUserCurrentUserIdProvider>();
         });
     }
 
