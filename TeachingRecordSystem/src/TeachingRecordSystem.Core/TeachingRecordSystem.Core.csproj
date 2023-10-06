@@ -16,6 +16,7 @@
     <None Remove="Dqt\Services\DqtReporting\Migrations\0007_ContactAllowpiiUpdatesFromRegister.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0008_EvergreenMissingColumns.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0009_EvergreenMissingColumns2.sql" />
+    <None Remove="Dqt\Services\DqtReporting\Migrations\0010_SanctionDetailsLink.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +29,7 @@
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0007_ContactAllowpiiUpdatesFromRegister.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0008_EvergreenMissingColumns.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0009_EvergreenMissingColumns2.sql" />
+    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0010_SanctionDetailsLink.sql" />
   </ItemGroup>
 
   <ItemGroup>
