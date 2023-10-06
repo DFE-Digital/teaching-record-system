@@ -43,7 +43,7 @@
 
         @if (!string.IsNullOrEmpty(Model.Alert.DetailsLink))
         {
-            <a href="@Model.Alert.DetailsLink" class="govuk-link" rel="noreferrer noopener" target="_blank" date-testid="see-full-case-details">See full case details (opens in new tab)</a>
+            <a href="@Model.Alert.DetailsLink" class="govuk-link" rel="noreferrer noopener" target="_blank" date-testid="full-case-details-link">See full case details (opens in new tab)</a>
         }
 
         @if (Model.IsActive)

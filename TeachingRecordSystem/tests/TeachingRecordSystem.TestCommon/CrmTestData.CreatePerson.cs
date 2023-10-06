@@ -100,9 +100,10 @@ public partial class CrmTestData
             DateOnly? reviewDate = null,
             bool spent = false,
             string details = "lorem ipsum",
+            string? detailsLink = null,
             bool isActive = true)
         {
-            _sanctions.Add(new(Guid.NewGuid(), sanctionCode, startDate, endDate, reviewDate, spent, details, isActive));
+            _sanctions.Add(new(Guid.NewGuid(), sanctionCode, startDate, endDate, reviewDate, spent, details, detailsLink, isActive));
             return this;
         }
 
@@ -184,20 +185,26 @@ public partial class CrmTestData
             foreach (var sanction in _sanctions)
             {
                 var sanctionCode = await testData.ReferenceDataCache.GetSanctionCodeByValue(sanction.SanctionCode);
+                var crmSanction = new dfeta_sanction()
+                {
+                    Id = sanction.SanctionId,
+                    dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
+                    dfeta_SanctionCodeId = sanctionCode.Id.ToEntityReference(dfeta_sanctioncode.EntityLogicalName),
+                    dfeta_StartDate = sanction.StartDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                    dfeta_EndDate = sanction.EndDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                    dfeta_NoReAppuntildate = sanction.ReviewDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                    dfeta_Spent = sanction.Spent,
+                    dfeta_SanctionDetails = sanction.Details
+                };
+
+                if (!string.IsNullOrWhiteSpace(sanction.DetailsLink))
+                {
+                    crmSanction.dfeta_DetailsLink = sanction.DetailsLink;
+                }
 
                 txnRequestBuilder.AddRequest(new CreateRequest()
                 {
-                    Target = new dfeta_sanction()
-                    {
-                        Id = sanction.SanctionId,
-                        dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
-                        dfeta_SanctionCodeId = sanctionCode.Id.ToEntityReference(dfeta_sanctioncode.EntityLogicalName),
-                        dfeta_StartDate = sanction.StartDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
-                        dfeta_EndDate = sanction.EndDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
-                        dfeta_NoReAppuntildate = sanction.ReviewDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
-                        dfeta_Spent = sanction.Spent,
-                        dfeta_SanctionDetails = sanction.Details
-                    }
+                    Target = crmSanction
                 });
 
                 if (!sanction.IsActive)
@@ -265,5 +272,5 @@ public partial class CrmTestData
         };
     }
 
-    public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string Details, bool IsActive);
+    public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string Details, string? DetailsLink, bool IsActive);
 }

@@ -25,18 +25,18 @@ public class IndexTests : TestBase
     }
 
     [Theory]
-    [InlineData("2021-01-01", "2022-03-05", true, true, AlertStatus.Closed)]
-    [InlineData("2021-01-01", null, false, true, AlertStatus.Active)]
-    [InlineData("2021-01-01", null, false, false, AlertStatus.Inactive)]
-    [InlineData("2021-01-01", "2022-03-05", true, false, AlertStatus.Inactive)]
-    public async Task Get_ValidRequest_RendersExpectedContent(string startDateString, string? endDateString, bool isSpent, bool isActive, AlertStatus expectedAlertStatus)
+    [InlineData("2021-01-01", "2022-03-05", "http://www.gov.uk", true, true, AlertStatus.Closed)]
+    [InlineData("2021-01-01", null, null, false, true, AlertStatus.Active)]
+    [InlineData("2021-01-01", null, "http://www.gov.uk", false, false, AlertStatus.Inactive)]
+    [InlineData("2021-01-01", "2022-03-05", null, true, false, AlertStatus.Inactive)]
+    public async Task Get_ValidRequest_RendersExpectedContent(string startDateString, string? endDateString, string? detailsLink, bool isSpent, bool isActive, AlertStatus expectedAlertStatus)
     {
         // Arrange
         var sanctionCode = "G1";
         var sanctionCodeName = (await TestData.ReferenceDataCache.GetSanctionCodeByValue(sanctionCode)).dfeta_name;
         var startDate = DateOnly.Parse(startDateString);
         DateOnly? endDate = endDateString is not null ? DateOnly.Parse(endDateString) : null;
-        var person = await TestData.CreatePerson(x => x.WithSanction(sanctionCode, startDate: startDate, endDate: endDate, spent: isSpent, isActive: isActive));
+        var person = await TestData.CreatePerson(x => x.WithSanction(sanctionCode, startDate: startDate, endDate: endDate, spent: isSpent, detailsLink: detailsLink, isActive: isActive));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{person.Sanctions.Single().SanctionId}");
 
@@ -56,6 +56,14 @@ public class IndexTests : TestBase
         Assert.Equal(endDate is not null ? endDate.Value.ToString("dd/MM/yyyy") : "-", alertHeader.GetElementByTestId("end-date")!.TextContent);
         Assert.Equal(expectedAlertStatus.ToString(), alertHeader.GetElementByTestId("status")!.TextContent);
         Assert.NotNull(doc.GetElementByTestId("alert-details"));
+        if (detailsLink is not null)
+        {
+            Assert.Equal(detailsLink, doc.GetElementByTestId("full-case-details-link")!.GetAttribute("href"));
+        }
+        else
+        {
+            Assert.Null(doc.GetElementByTestId("full-case-details-link"));
+        }
         if (isActive)
         {
             Assert.NotNull(doc.GetElementByTestId("deactivate-button"));
