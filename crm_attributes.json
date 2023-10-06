@@ -214,6 +214,7 @@
     "statecode"
   ],
   "dfeta_sanction": [
+    "dfeta_detailslink",
     "dfeta_enddate",
     "dfeta_noreappuntildate",
     "dfeta_personid",

@@ -8910,6 +8910,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string dfeta_DetailsLink = "dfeta_detailslink";
 			public const string dfeta_EndDate = "dfeta_enddate";
 			public const string dfeta_NoReAppuntildate = "dfeta_noreappuntildate";
 			public const string dfeta_PersonId = "dfeta_personid";
@@ -8970,6 +8971,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_detailslink")]
+		public string dfeta_DetailsLink
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_detailslink");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_DetailsLink");
+				this.SetAttributeValue("dfeta_detailslink", value);
+				this.OnPropertyChanged("dfeta_DetailsLink");
 			}
 		}
 		
