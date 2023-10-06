@@ -1,3 +1,6 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -30,12 +33,53 @@ public class IndexModel : PageModel
     [FromQuery]
     public Guid PersonId { get; set; }
 
+    [BindProperty]
+    [Display(Name = "Alert type")]
     public Guid? AlertTypeId { get; set; }
+
+    [BindProperty]    
+    public string? Details { get; set; }
+
+    [BindProperty]
+    public string? Link { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Start date")]
+    public DateOnly? StartDate { get; set; }
 
     public AlertType[]? AlertTypes { get; set; }
 
-    public void OnGet()
+    public async Task<IActionResult> OnPost()
     {
+        if (AlertTypeId is null)
+        {
+            ModelState.AddModelError(nameof(AlertTypeId), "Add an alert type");
+        }
+
+        if (string.IsNullOrWhiteSpace(Details))
+        {
+            ModelState.AddModelError(nameof(Details), "Add details");
+        }
+
+        if (StartDate is null)
+        {
+            ModelState.AddModelError(nameof(StartDate), "Add a start date");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
+        }
+
+        await JourneyInstance!.UpdateStateAsync(s =>
+        {
+            s.AlertTypeId = AlertTypeId;
+            s.Details = Details;
+            s.Link = Link;
+            s.StartDate = StartDate;
+        });
+
+        return Redirect(_linkGenerator.AlertAddConfirm(PersonId, JourneyInstance!.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -52,6 +96,11 @@ public class IndexModel : PageModel
             .Select(MapSanctionCode)
             .OrderBy(a => a.Name)
             .ToArray();
+
+        AlertTypeId ??= JourneyInstance!.State.AlertTypeId;
+        Details ??= JourneyInstance!.State.Details;
+        Link ??= JourneyInstance!.State.Link;
+        StartDate ??= JourneyInstance!.State.StartDate;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

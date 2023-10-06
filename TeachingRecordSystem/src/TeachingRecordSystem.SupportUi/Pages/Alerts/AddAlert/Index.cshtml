@@ -1,10 +1,11 @@
 @page "/alerts/add"
 @model IndexModel
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
     ViewBag.Title = "Add an alert";
 }
 
-@* @section Styles
+@section Styles
     {
     <link rel="stylesheet" href="~/Styles/Components/accessible-autocomplete.min.css" asp-append-version="true" />
 }
@@ -14,39 +15,33 @@
     <script src="~/Scripts/Components/accessible-autocomplete.min.js"></script>
     <script asp-add-nonce="true">
         window.onload = function () {
-            const inputName = '@nameof(Model.AlertTypeId)';
-            const input = document.querySelector(`input[name=${inputName}`);
-            const value = input.value;
-            const container = input.parentElement;
-
-            accessibleAutocomplete({
-                element: container,
-                id: inputName,
-                source: @Html.Raw(Json.Serialize(Model.IttProviderNames)),
-                defaultValue: value,
-                showNoOptionsFound: false,
-            })
-
-            container.removeChild(input);
-            const accessibleAutocompleteInput = container.querySelector('input');
-            accessibleAutocompleteInput.name = inputName;
+            accessibleAutocomplete.enhanceSelectElement({
+                selectElement: document.querySelector('#@nameof(Model.AlertTypeId)')
+            })            
         }
     </script>
-} *@
+}
 
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form method="post">
-            <govuk-select asp-for="AlertTypeId">
-                <govuk-select-label is-page-heading="false" class="govuk-label--m">Alert type</govuk-select-label>
+            <govuk-select asp-for="AlertTypeId" label-class="govuk-label--m">
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var alertType in Model.AlertTypes!)
                 {
                     <govuk-select-item value="@alertType.AlertTypeId">@alertType.Name</govuk-select-item>
                 }
             </govuk-select>
+            <govuk-textarea asp-for="Details" label-class="govuk-label--m">
+                <govuk-textarea-hint>You can enter up to 4000 characters</govuk-textarea-hint>
+            </govuk-textarea>
+            <govuk-date-input asp-for="StartDate">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
 
             <govuk-button type="submit">Continue</govuk-button>
         </form>

@@ -26,6 +26,9 @@ public class TrsLinkGenerator
     public string AlertAdd(Guid personId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/AddAlert/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
+    public string AlertAddConfirm(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/AddAlert/Confirm", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
     public string AlertClose(Guid alertId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/CloseAlert/Index", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
