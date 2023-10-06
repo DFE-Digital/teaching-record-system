@@ -23,6 +23,9 @@ public class TrsLinkGenerator
 
     public string Alert(Guid alertId) => GetRequiredPathByPage("/Alerts/Alert/Index", routeValues: new { alertId });
 
+    public string AlertAdd(Guid personId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/AddAlert/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
     public string AlertClose(Guid alertId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/CloseAlert/Index", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
@@ -48,7 +51,7 @@ public class TrsLinkGenerator
     public string PersonAlerts(Guid personId, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Alerts", routeValues: new { personId, search, sortBy, pageNumber });
 
-    public string PersonAddAlert(Guid personId) => GetRequiredPathByPage("/Persons/PersonDetail/AddAlert", routeValues: new { personId });
+    public string PersonAddAlert(Guid personId) => GetRequiredPathByPage("/Alerts/AddAlert/Index", routeValues: new { personId });
 
     public string PersonChangeLog(Guid personId, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/ChangeLog", routeValues: new { personId, search, sortBy, pageNumber });
