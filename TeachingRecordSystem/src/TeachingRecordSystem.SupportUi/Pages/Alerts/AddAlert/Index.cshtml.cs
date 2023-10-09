@@ -1,6 +1,4 @@
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -37,7 +35,7 @@ public class IndexModel : PageModel
     [Display(Name = "Alert type")]
     public Guid? AlertTypeId { get; set; }
 
-    [BindProperty]    
+    [BindProperty]
     public string? Details { get; set; }
 
     [BindProperty]
@@ -59,6 +57,13 @@ public class IndexModel : PageModel
         if (string.IsNullOrWhiteSpace(Details))
         {
             ModelState.AddModelError(nameof(Details), "Add details");
+        }
+
+        if (!string.IsNullOrEmpty(Link) &&
+            (!Uri.TryCreate(Link, UriKind.Absolute, out var uri) ||
+                (uri.Scheme != "http" && uri.Scheme != "https")))
+        {
+            ModelState.AddModelError(nameof(Link), "Enter a valid URL");
         }
 
         if (StartDate is null)

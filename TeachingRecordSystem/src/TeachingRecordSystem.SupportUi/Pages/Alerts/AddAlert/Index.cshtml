@@ -22,6 +22,10 @@
     </script>
 }
 
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonAlerts(Model.PersonId)">Back</govuk-back-link>
+}
+
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
@@ -34,9 +38,15 @@
                     <govuk-select-item value="@alertType.AlertTypeId">@alertType.Name</govuk-select-item>
                 }
             </govuk-select>
+
             <govuk-textarea asp-for="Details" label-class="govuk-label--m">
                 <govuk-textarea-hint>You can enter up to 4000 characters</govuk-textarea-hint>
             </govuk-textarea>
+
+            <govuk-input asp-for="Link" label-class="govuk-label--m">
+                <govuk-input-hint>Optional</govuk-input-hint>
+            </govuk-input>
+
             <govuk-date-input asp-for="StartDate">
                 <govuk-date-input-fieldset>
                     <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
