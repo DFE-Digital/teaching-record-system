@@ -20,9 +20,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="details">
-                        <multi-line-text text="@Model.Details" />
-                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="details"><multi-line-text text="@Model.Details" /></govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 @if (!string.IsNullOrWhiteSpace(Model.Link))
                 {
