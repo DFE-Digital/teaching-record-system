@@ -5,13 +5,11 @@
     ViewBag.Title = "Add an alert";
 }
 
-@section Styles
-    {
+@section Styles {
     <link rel="stylesheet" href="~/Styles/Components/accessible-autocomplete.min.css" asp-append-version="true" />
 }
 
-@section Scripts
-    {
+@section Scripts {
     <script src="~/Scripts/Components/accessible-autocomplete.min.js"></script>
     <script asp-add-nonce="true">
         window.onload = function () {
@@ -39,13 +37,9 @@
                 }
             </govuk-select>
 
-            <govuk-textarea asp-for="Details" label-class="govuk-label--m">
-                <govuk-textarea-hint>You can enter up to 4000 characters</govuk-textarea-hint>
-            </govuk-textarea>
+            <govuk-textarea asp-for="Details" label-class="govuk-label--m"/>
 
-            <govuk-input asp-for="Link" label-class="govuk-label--m">
-                <govuk-input-hint>Optional</govuk-input-hint>
-            </govuk-input>
+            <govuk-input asp-for="Link" label-class="govuk-label--m"/>
 
             <govuk-date-input asp-for="StartDate">
                 <govuk-date-input-fieldset>
