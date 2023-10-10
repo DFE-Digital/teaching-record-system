@@ -107,7 +107,7 @@ public class IndexModel : PageModel
         Link ??= JourneyInstance!.State.Link;
         StartDate ??= JourneyInstance!.State.StartDate;
 
-        await base.OnPageHandlerExecutionAsync(context, next);
+        await next();
     }
 
     private AlertType MapSanctionCode(dfeta_sanctioncode sanctionCode) =>
