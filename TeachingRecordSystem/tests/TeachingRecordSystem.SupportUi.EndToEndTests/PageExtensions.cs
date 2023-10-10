@@ -21,6 +21,11 @@ public static class PageExtensions
         await page.GotoAsync($"/persons/{personId}/alerts");
     }
 
+    public static async Task ClickAddAlertPersonAlertsPage(this IPage page)
+    {
+        await page.GetByTestId($"add-alert").ClickAsync();
+    }
+
     public static async Task ClickCloseAlertPersonAlertsPage(this IPage page, Guid alertId)
     {
         await page.GetByTestId($"close-{alertId}").ClickAsync();
@@ -66,6 +71,16 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/persons/{personId}/alerts");
     }
 
+    public static async Task AssertOnAddAlertPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/add");
+    }
+
+    public static async Task AssertOnAddAlertConfirmPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/add/confirm");
+    }
+
     public static async Task AssertOnAlertDetailPage(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}");
@@ -92,6 +107,17 @@ public static class PageExtensions
         await page.FillAsync("label:text-is('Month')", date.Month.ToString());
         await page.FillAsync("label:text-is('Year')", date.Year.ToString());
     }
+
+    public static async Task SubmitAddAlertIndexPage(this IPage page, Guid personId, string alertType, string details, string link, DateOnly startDate)
+    {
+        await page.AssertOnAddAlertPage();
+        await page.FillAsync("label:text-is('Alert type')", alertType);
+        await page.FillAsync("label:text-is('Details')", details);
+        await page.FillAsync("label:text-is('Link')", link);
+        await page.FillDateInput(startDate);
+        await page.ClickContinueButton();
+    }
+
 
     public static Task ClickAcceptChangeButton(this IPage page)
         => ClickButton(page, "Accept change");

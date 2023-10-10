@@ -21,6 +21,18 @@ public class ReferenceDataCache
         return sanctionCodes.First(s => s.dfeta_Value == value);
     }
 
+    public async Task<dfeta_sanctioncode> GetSanctionCodeById(Guid sanctionCodeId)
+    {
+        var sanctionCodes = await EnsureSanctionCodes();
+        return sanctionCodes.Single(s => s.dfeta_sanctioncodeId == sanctionCodeId);
+    }
+
+    public async Task<dfeta_sanctioncode[]> GetSanctionCodes()
+    {
+        var sanctionCodes = await EnsureSanctionCodes();
+        return sanctionCodes.ToArray();
+    }
+
     public async Task<Subject> GetSubjectByTitle(string title)
     {
         var subjects = await EnsureSubjects();

@@ -1,0 +1,41 @@
+@page "/alerts/add/confirm"
+@model TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.ConfirmModel
+@{
+    ViewBag.Title = "Confirm alert information";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.AlertAdd(Model.PersonId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form method="post">
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="alert-type">@Model.AlertType</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="details"><multi-line-text text="@Model.Details" /></govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                @if (!string.IsNullOrWhiteSpace(Model.Link))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="link">@Model.Link</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate!.Value.ToString("dd/MM/yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <govuk-button type="submit">Confirm</govuk-button>
+        </form>
+    </div>
+</div>
