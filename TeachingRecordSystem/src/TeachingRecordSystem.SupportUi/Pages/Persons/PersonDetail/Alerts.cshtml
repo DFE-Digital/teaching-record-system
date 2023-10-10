@@ -45,7 +45,7 @@ else
     }
 }
 
-<govuk-button-link href="@LinkGenerator.PersonAddAlert(Model.PersonId)" class="govuk-button">Add an alert</govuk-button-link>
+<govuk-button-link href="@LinkGenerator.PersonAddAlert(Model.PersonId)" class="govuk-button" data-testid="add-alert">Add an alert</govuk-button-link>
 
 @if (Model.PreviousAlerts is not null && Model.PreviousAlerts.Length > 0)
 {

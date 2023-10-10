@@ -75,4 +75,37 @@ public class AlertTests : TestBase
 
         await page.AssertFlashMessage(expectedFlashMessage);
     }
+
+    [Fact]
+    public async Task AddAlert()
+    {
+        var sanctionCodeValue = "G1";
+        var sanctionCode = await TestData.ReferenceDataCache.GetSanctionCodeByValue(sanctionCodeValue);
+        var details = "These are some test details";
+        var link = "http://www.gov.uk";
+        var startDate = new DateOnly(2021, 10, 01);
+        var createPersonResult = await TestData.CreatePerson();
+        var personId = createPersonResult.ContactId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonAlertsPage(personId);
+
+        await page.AssertOnPersonAlertsPage(personId);
+
+        await page.ClickAddAlertPersonAlertsPage();
+
+        await page.AssertOnAddAlertPage();
+
+        await page.SubmitAddAlertIndexPage(personId, sanctionCode.dfeta_name, details, link, startDate);
+
+        await page.AssertOnAddAlertConfirmPage();
+
+        await page.ClickConfirmButton();
+
+        await page.AssertOnPersonAlertsPage(personId);
+
+        await page.AssertFlashMessage("Alert added");
+    }
 }
