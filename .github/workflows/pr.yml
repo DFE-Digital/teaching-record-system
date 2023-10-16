@@ -217,13 +217,12 @@ jobs:
 
   package:
     name: Package application
-    needs: [build, validate_terraform]
     uses: ./.github/workflows/package.yml
     secrets: inherit
 
   deploy_dev:
     name: Deploy dev environment
-    needs: package
+    needs: [build, validate_terraform, package]
     uses: ./.github/workflows/deploy-dev.yml
     with:
       api_docker_image: ${{ needs.package.outputs.api_docker_image }}
