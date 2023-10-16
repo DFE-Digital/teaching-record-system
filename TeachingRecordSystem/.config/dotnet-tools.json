@@ -2,12 +2,6 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "fixie.console": {
-      "version": "3.3.0",
-      "commands": [
-        "fixie"
-      ]
-    },
     "dotnet-format": {
       "version": "7.4.441804",
       "commands": [
