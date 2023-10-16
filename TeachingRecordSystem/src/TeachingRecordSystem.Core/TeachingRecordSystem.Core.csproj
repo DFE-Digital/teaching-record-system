@@ -17,6 +17,7 @@
     <None Remove="Dqt\Services\DqtReporting\Migrations\0008_EvergreenMissingColumns.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0009_EvergreenMissingColumns2.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0010_SanctionDetailsLink.sql" />
+    <None Remove="Dqt\Services\DqtReporting\Migrations\0011_AddHighProfileProgrammeType.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +31,7 @@
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0008_EvergreenMissingColumns.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0009_EvergreenMissingColumns2.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0010_SanctionDetailsLink.sql" />
+    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0011_AddHighProfileProgrammeType.sql" />
   </ItemGroup>
 
   <ItemGroup>
