@@ -41,7 +41,7 @@ If you're working on infrastructure you will also need:
 
 ### Local tools setup
 
-dotnet-format and fixie are required for linting and running tests, respectively. A `just` recipe will install them:
+dotnet-format is required for linting. A `just` recipe will install it:
 ```shell
 just install-tools
 ```
