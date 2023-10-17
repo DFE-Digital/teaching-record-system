@@ -206,6 +206,7 @@ builder.Services
     .AddSingleton<IClock, Clock>()
     .AddSupportUiServices(builder.Configuration, builder.Environment)
     .AddSingleton<ReferenceDataCache>()
+    .AddSingleton<SanctionTextLookup>()
     .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
 
 var app = builder.Build();
