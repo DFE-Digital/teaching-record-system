@@ -5,4 +5,5 @@ public record AlertType
     public required Guid AlertTypeId { get; init; }
     public required string Name { get; init; }
     public required string Value { get; init; }
+    public required string DefaultText { get; init; }
 }

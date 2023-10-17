@@ -98,7 +98,7 @@ public class AlertTests : TestBase
 
         await page.AssertOnAddAlertPage();
 
-        await page.SubmitAddAlertIndexPage(personId, sanctionCode.dfeta_name, details, link, startDate);
+        await page.SubmitAddAlertIndexPage(sanctionCode.dfeta_name, details, link, startDate);
 
         await page.AssertOnAddAlertConfirmPage();
 

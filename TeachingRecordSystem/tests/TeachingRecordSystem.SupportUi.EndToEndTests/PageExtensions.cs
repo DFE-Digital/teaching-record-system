@@ -108,7 +108,7 @@ public static class PageExtensions
         await page.FillAsync("label:text-is('Year')", date.Year.ToString());
     }
 
-    public static async Task SubmitAddAlertIndexPage(this IPage page, Guid personId, string alertType, string details, string link, DateOnly startDate)
+    public static async Task SubmitAddAlertIndexPage(this IPage page, string alertType, string details, string link, DateOnly startDate)
     {
         await page.AssertOnAddAlertPage();
         await page.FillAsync("label:text-is('Alert type')", alertType);

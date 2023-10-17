@@ -14,8 +14,30 @@
     <script asp-add-nonce="true">
         window.onload = function () {
             accessibleAutocomplete.enhanceSelectElement({
-                selectElement: document.querySelector('#@nameof(Model.AlertTypeId)')
-            })            
+                selectElement: document.querySelector('#@nameof(Model.AlertTypeId)'),
+                onConfirm: function (selected) {
+                    if (!selected) {
+                        return;
+                    }
+
+                    var selectElement = document.querySelector('#@nameof(Model.AlertTypeId)-select');
+                    var selectOptions = Array.from(selectElement.options);
+                    var detailsElement = document.querySelector('#@nameof(Model.Details)');
+                    var previousAlertValue = detailsElement.dataset.alertvalue;
+                    var previousSelectedOption = previousAlertValue ? selectOptions.find(option => option.dataset.alertvalue === previousAlertValue) : undefined;
+                    var selectedOption = selectOptions.find(option => (option.textContent || option.innerText) === selected);
+                    // Need to do this as it doesn't get set if implementing an onConfirm function with enhanceSelectElement
+                    selectedOption.selected = true;
+
+                    if (!previousSelectedOption ||
+                            (detailsElement.value == "") ||
+                            (previousSelectedOption && detailsElement.value === previousSelectedOption.dataset.defaulttext)) {
+                        detailsElement.value = selectedOption.dataset.defaulttext;
+                    }
+
+                    detailsElement.dataset.alertvalue = selectedOption.dataset.alertvalue;                    
+                },
+            })
         }
     </script>
 }
@@ -33,7 +55,7 @@
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var alertType in Model.AlertTypes!)
                 {
-                    <govuk-select-item value="@alertType.AlertTypeId">@alertType.Name</govuk-select-item>
+                    <govuk-select-item data-defaulttext="@alertType.DefaultText" data-alertvalue="@alertType.Value" value="@alertType.AlertTypeId">@alertType.Name</govuk-select-item>
                 }
             </govuk-select>
 
@@ -51,4 +73,3 @@
         </form>
     </div>
 </div>
-

@@ -15,15 +15,18 @@ public class IndexModel : PageModel
     private readonly TrsLinkGenerator _linkGenerator;
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly ReferenceDataCache _referenceDataCache;
+    private readonly SanctionTextLookup _sanctionTextLookup;
 
     public IndexModel(
         TrsLinkGenerator linkGenerator,
         ICrmQueryDispatcher crmQueryDispatcher,
-        ReferenceDataCache referenceDataCache)
+        ReferenceDataCache referenceDataCache,
+        SanctionTextLookup sanctionTextLookup)
     {
         _linkGenerator = linkGenerator;
         _crmQueryDispatcher = crmQueryDispatcher;
         _referenceDataCache = referenceDataCache;
+        _sanctionTextLookup = sanctionTextLookup;
     }
 
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
@@ -117,6 +120,7 @@ public class IndexModel : PageModel
         {
             AlertTypeId = sanctionCode.dfeta_sanctioncodeId!.Value,
             Value = sanctionCode.dfeta_Value,
-            Name = sanctionCode.dfeta_name
+            Name = sanctionCode.dfeta_name,
+            DefaultText = _sanctionTextLookup.GetSanctionDefaultText(sanctionCode.dfeta_Value) ?? string.Empty
         };
 }
