@@ -76,12 +76,14 @@ public class AlertTests : TestBase
         await page.AssertFlashMessage(expectedFlashMessage);
     }
 
-    [Fact]
-    public async Task AddAlert()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task AddAlert(bool setDetailsManually)
     {
         var sanctionCodeValue = "G1";
         var sanctionCode = await TestData.ReferenceDataCache.GetSanctionCodeByValue(sanctionCodeValue);
-        var details = "These are some test details";
+        var details = setDetailsManually ? "These are some test details" : null;
         var link = "http://www.gov.uk";
         var startDate = new DateOnly(2021, 10, 01);
         var createPersonResult = await TestData.CreatePerson();
