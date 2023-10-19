@@ -59,5 +59,11 @@ public class SeedCrmReferenceData : IStartupTask
             dfeta_Value = "A18",
             dfeta_name = "A18 Description"
         });
+
+        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
+        {
+            dfeta_Value = "B1",
+            dfeta_name = "B1 Description"
+        });
     }
 }

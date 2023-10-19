@@ -38,4 +38,27 @@ public static class Constants
         "A24",
         "A23",
     }.ToImmutableArray();
+
+    public static ImmutableArray<string> ProhibitionSanctionCodes { get; } = new[]
+    {
+        "G1",
+        "B1",
+        "G2",
+        "B6",
+        "T2",
+        "B3",
+        "B5",
+        "T3",
+        "T5",
+        "T4",
+        "T1",
+        "A25B",
+        "A25A",
+        "A21B",
+        "A21A",
+        "A5B",
+        "A5A",
+        "A1B",
+        "A1A",
+    }.ToImmutableArray();
 }

@@ -135,4 +135,13 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
 
         return ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(HttpClientWithApiKey, baseUrl, trn);
     }
+
+    [Fact]
+    public Task Get_ValidRequestWithAlerts_ReturnsExpectedSanctionsContent()
+    {
+        var trn = "1234567";
+        var baseUrl = $"/v3/teachers/{trn}";
+
+        return ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(HttpClientWithApiKey, baseUrl, trn);
+    }
 }

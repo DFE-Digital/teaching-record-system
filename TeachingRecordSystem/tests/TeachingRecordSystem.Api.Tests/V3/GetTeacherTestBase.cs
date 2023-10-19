@@ -568,6 +568,49 @@ public abstract class GetTeacherTestBase : ApiTestBase
             responseSanctions);
     }
 
+    protected async Task ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(
+        HttpClient httpClient,
+        string baseUrl,
+        string trn)
+    {
+        // Arrange
+        var contact = await CreateContact(trn);
+
+        var sanctions = new (string SanctionCode, DateOnly? StartDate)[]
+        {
+            new("B1", null),
+            new("G1", new DateOnly(2022, 4, 1)),
+        };
+        Debug.Assert(sanctions.Select(s => s.SanctionCode).All(TeachingRecordSystem.Api.V3.Constants.ProhibitionSanctionCodes.Contains));
+
+        await ConfigureMocks(trn, contact, sanctions: sanctions);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Alerts");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responseAlerts = jsonResponse.RootElement.GetProperty("alerts");
+
+        AssertEx.JsonObjectEquals(
+            new[]
+            {
+                new
+                {
+                    alertType = "Prohibition",
+                    dqtSanctionCode = sanctions[0].SanctionCode
+                },
+                new
+                {
+                    alertType = "Prohibition",
+                    dqtSanctionCode = sanctions[1].SanctionCode
+                }
+            },
+            responseAlerts);
+    }
+
     private async Task ConfigureMocks(
         string trn,
         Contact contact,
