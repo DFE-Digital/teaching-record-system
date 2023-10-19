@@ -24,6 +24,7 @@ public enum GetTeacherRequestIncludes
     PendingDetailChanges = 1 << 4,
     HigherEducationQualifications = 1 << 5,
     Sanctions = 1 << 6,
+    Alerts = 1 << 7,
 
-    All = Induction | InitialTeacherTraining | NpqQualifications | MandatoryQualifications | PendingDetailChanges | HigherEducationQualifications | Sanctions
+    All = Induction | InitialTeacherTraining | NpqQualifications | MandatoryQualifications | PendingDetailChanges | HigherEducationQualifications | Sanctions | Alerts
 }

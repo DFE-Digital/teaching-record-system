@@ -187,22 +187,16 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             pendingDateOfBirthChange = incidents.Any(i => i.SubjectId.Id == dateOfBirthChangeSubject.Id);
         }
 
-        IEnumerable<SanctionInfo>? sanctions = null;
+        SanctionResult[]? sanctions = null;
 
-        if (request.Include.HasFlag(GetTeacherRequestIncludes.Sanctions))
+        if (request.Include.HasFlag(GetTeacherRequestIncludes.Sanctions) || request.Include.HasFlag(GetTeacherRequestIncludes.Alerts))
         {
             var getSanctionsQuery = new GetSanctionsByContactIdsQuery(
                 new[] { teacher.Id },
                 ActiveOnly: true,
                 ColumnSet: new(dfeta_sanction.Fields.dfeta_StartDate));
 
-            sanctions = (await _crmQueryDispatcher.ExecuteQuery(getSanctionsQuery))[teacher.Id]
-                .Where(s => Constants.ExposableSanctionCodes.Contains(s.SanctionCode))
-                .Select(s => new SanctionInfo()
-                {
-                    Code = s.SanctionCode,
-                    StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
-                });
+            sanctions = (await _crmQueryDispatcher.ExecuteQuery(getSanctionsQuery))[teacher.Id];
         }
 
         var firstName = teacher.ResolveFirstName();
@@ -260,7 +254,22 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Option.Some(MapHigherEducationQualifications(qualifications!)) :
                 default,
             Sanctions = request.Include.HasFlag(GetTeacherRequestIncludes.Sanctions) ?
-                Option.Some(sanctions!) :
+                Option.Some(sanctions!
+                    .Where(s => Constants.ExposableSanctionCodes.Contains(s.SanctionCode))
+                    .Select(s => new SanctionInfo()
+                    {
+                        Code = s.SanctionCode,
+                        StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                    })) :
+                default,
+            Alerts = request.Include.HasFlag(GetTeacherRequestIncludes.Alerts) ?
+                Option.Some(sanctions!
+                    .Where(s => Constants.ProhibitionSanctionCodes.Contains(s.SanctionCode))
+                    .Select(s => new AlertInfo()
+                    {
+                        AlertType = AlertType.Prohibition,
+                        DqtSanctionCode = s.SanctionCode
+                    })) :
                 default
         };
     }

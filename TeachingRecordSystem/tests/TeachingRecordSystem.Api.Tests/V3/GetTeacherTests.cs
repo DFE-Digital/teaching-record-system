@@ -132,4 +132,14 @@ public class GetTeacherTests : GetTeacherTestBase
 
         return ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(httpClient, baseUrl, trn);
     }
+
+    [Fact]
+    public Task Get_ValidRequestWithAlerts_ReturnsExpectedSanctionsContent()
+    {
+        var trn = "1234567";
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var baseUrl = "v3/teacher";
+
+        return ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(httpClient, baseUrl, trn);
+    }
 }
