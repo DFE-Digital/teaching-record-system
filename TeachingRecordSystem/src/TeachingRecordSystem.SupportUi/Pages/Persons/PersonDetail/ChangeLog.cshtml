@@ -11,4 +11,40 @@
     ViewBag.Title = Model.Name;
 }
 
-<p class="govuk-body">Change log goes here</p>
+@if (Model.TimelineItems is null || Model.TimelineItems.Length == 0)
+{
+    <p class="govuk-body" data-testid="no-timeline_items">No changes</p>
+}
+else
+{
+    var itemNumber = 0;
+    <div class="moj-timeline">
+        @foreach (var timelineItem in Model.TimelineItems)
+        {
+            itemNumber++;
+            <div class="moj-timeline__item govuk-!-padding-bottom-2">
+                <div class="moj-timeline__header">
+                    <h2 class="moj-timeline__title" data-testid="timeline-item-title-@itemNumber">@timelineItem.Title</h2>
+                    <p class="moj-timeline__byline" data-testid="timeline-item-user-@itemNumber">by @timelineItem.User</p>
+                    @if (timelineItem.Status is not null)
+                    {
+                        var tagClass = timelineItem.Status switch
+                        {
+                            ChangeLogModel.TimelineItemStatus.Overdue => "govuk-tag--red",
+                            ChangeLogModel.TimelineItemStatus.Closed => "govuk-tag--grey",
+                            _ => "govuk-tag"
+                        };
+                        <govuk-tag class="@tagClass" data-testid="timeline-item-status-@itemNumber">@timelineItem.Status</govuk-tag>
+                    }
+                </div>
+                <p class="moj-timeline__date" data-testid="timeline-item-time-@itemNumber">
+                    <time datetime="@timelineItem.Time.ToUniversalTime().ToString("O")">@timelineItem.Time.ToString("dd MMMMM yyyy 'at' h:mm tt")</time>
+                </p>
+                <div class="moj-timeline__description">
+                    <p class="govuk-body" data-testid="timeline-item-summary-@itemNumber">@timelineItem.Summary</p>
+                    <p class="govuk-body" data-testid="timeline-item-description-@itemNumber">@timelineItem.Description</p>
+                </div>
+            </div>
+        }
+    </div>
+}

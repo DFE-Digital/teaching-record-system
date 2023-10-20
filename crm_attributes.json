@@ -9,6 +9,8 @@
     "documentbody",
     "filename",
     "mimetype",
+    "modifiedby",
+    "modifiedon",
     "notetext",
     "objectid",
     "objecttypecode",
@@ -245,7 +247,10 @@
   ],
   "incidentresolution": [
     "activityid",
+    "createdby",
     "incidentid",
+    "modifiedby",
+    "modifiedon",
     "statecode",
     "subject"
   ],
@@ -264,12 +269,14 @@
     "azureactivedirectoryobjectid",
     "isdisabled",
     "firstname",
-    "lastname"
+    "lastname"    
   ],
   "task": [
     "category",
     "description",
     "dfeta_potentialduplicateid",
+    "modifiedby",
+    "modifiedon",
     "regardingobjectid",
     "scheduledend",
     "statecode",
