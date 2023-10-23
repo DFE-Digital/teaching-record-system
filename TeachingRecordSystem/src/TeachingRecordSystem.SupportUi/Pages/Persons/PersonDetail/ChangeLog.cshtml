@@ -11,17 +11,15 @@
     ViewBag.Title = Model.Name;
 }
 
-@if (Model.TimelineItems is null || Model.TimelineItems.Length == 0)
+@if (Model.TimelineItems!.Length == 0)
 {
     <p class="govuk-body" data-testid="no-changes">No changes</p>
 }
 else
 {
-    var itemNumber = 0;
     <div class="moj-timeline">
         @foreach (var timelineItem in Model.TimelineItems)
         {
-            itemNumber++;
             <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item">
                 <div class="moj-timeline__header">
                     <h2 class="moj-timeline__title" data-testid="timeline-item-title">@timelineItem.Title</h2>
@@ -32,7 +30,7 @@ else
                         {
                             ChangeLogModel.TimelineItemStatus.Overdue => "govuk-tag--red",
                             ChangeLogModel.TimelineItemStatus.Closed => "govuk-tag--grey",
-                            _ => "govuk-tag"
+                            _ => null
                         };
                         <govuk-tag class="@tagClass" data-testid="timeline-item-status">@timelineItem.Status</govuk-tag>
                     }

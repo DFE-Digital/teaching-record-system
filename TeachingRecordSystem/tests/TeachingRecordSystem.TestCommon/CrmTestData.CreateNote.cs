@@ -21,7 +21,7 @@ public partial class CrmTestData
 
         public CreateNoteBuilder WithPersonId(Guid personId)
         {
-            if (_personId is not null)
+            if (_personId is not null && _personId != personId)
             {
                 throw new InvalidOperationException("WithPersonId has already been set");
             }
@@ -32,7 +32,7 @@ public partial class CrmTestData
 
         public CreateNoteBuilder WithSubject(string subject)
         {
-            if (_subject is not null)
+            if (_subject is not null && _subject != subject)
             {
                 throw new InvalidOperationException("WithSubject has already been set");
             }
@@ -43,7 +43,7 @@ public partial class CrmTestData
 
         public CreateNoteBuilder WithDescription(string description)
         {
-            if (_description is not null)
+            if (_description is not null && _description != description)
             {
                 throw new InvalidOperationException("WithDescription has already been set");
             }
