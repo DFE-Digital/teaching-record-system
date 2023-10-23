@@ -6,6 +6,7 @@
     "statecode"
   ],
   "annotation": [
+    "annotationid",
     "documentbody",
     "filename",
     "mimetype",
@@ -239,6 +240,7 @@
     "dfeta_statedfirstname",
     "dfeta_statedlastname",
     "dfeta_statedmiddlename",
+    "incidentid",
     "subjectid",
     "statecode",
     "statuscode",
@@ -269,9 +271,11 @@
     "azureactivedirectoryobjectid",
     "isdisabled",
     "firstname",
-    "lastname"    
+    "lastname",
+    "systemuserid" 
   ],
   "task": [
+    "activityid",
     "category",
     "description",
     "dfeta_potentialduplicateid",

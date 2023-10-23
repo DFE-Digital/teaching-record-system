@@ -9,10 +9,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 public class ChangeLogModel : PageModel
 {
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
+    private readonly IClock _clock;
 
-    public ChangeLogModel(ICrmQueryDispatcher crmQueryDispatcher)
+    public ChangeLogModel(
+        ICrmQueryDispatcher crmQueryDispatcher,
+        IClock clock)
     {
         _crmQueryDispatcher = crmQueryDispatcher;
+        _clock = clock;
     }
 
     [FromRoute]
@@ -84,7 +88,7 @@ public class ChangeLogModel : PageModel
     {
         var user = crmTask.Extract<SystemUser>(SystemUser.EntityLogicalName, SystemUser.PrimaryIdAttribute);
 
-        var titleAction = crmTask.StateCode == TaskState.Completed ? "completed" : crmTask.StateCode == TaskState.Canceled ? "cancelled" : "modified" ;
+        var titleAction = crmTask.StateCode == TaskState.Completed ? "completed" : crmTask.StateCode == TaskState.Canceled ? "cancelled" : "modified";
 
         return new TimelineItem
         {
@@ -93,7 +97,7 @@ public class ChangeLogModel : PageModel
             Time = crmTask.ModifiedOn.WithDqtBstFix(isLocalTime: true)!.Value,
             Summary = crmTask.Subject,
             Description = crmTask.Description,
-            Status = crmTask.ScheduledEnd.HasValue && crmTask.ScheduledEnd.Value < DateTime.Now ? TimelineItemStatus.Overdue : crmTask.StateCode == TaskState.Open ? TimelineItemStatus.Active : TimelineItemStatus.Closed
+            Status = crmTask.ScheduledEnd.HasValue && crmTask.ScheduledEnd.Value < _clock.UtcNow ? TimelineItemStatus.Overdue : crmTask.StateCode == TaskState.Open ? TimelineItemStatus.Active : TimelineItemStatus.Closed
         };
     }
 
@@ -119,7 +123,7 @@ public class ChangeLogModel : PageModel
             Description = description,
             Status = null
         };
-    }    
+    }
 
     public record TimelineItem
     {
