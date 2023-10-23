@@ -6,9 +6,12 @@
     "statecode"
   ],
   "annotation": [
+    "annotationid",
     "documentbody",
     "filename",
     "mimetype",
+    "modifiedby",
+    "modifiedon",
     "notetext",
     "objectid",
     "objecttypecode",
@@ -237,6 +240,7 @@
     "dfeta_statedfirstname",
     "dfeta_statedlastname",
     "dfeta_statedmiddlename",
+    "incidentid",
     "subjectid",
     "statecode",
     "statuscode",
@@ -245,7 +249,10 @@
   ],
   "incidentresolution": [
     "activityid",
+    "createdby",
     "incidentid",
+    "modifiedby",
+    "modifiedon",
     "statecode",
     "subject"
   ],
@@ -264,12 +271,16 @@
     "azureactivedirectoryobjectid",
     "isdisabled",
     "firstname",
-    "lastname"
+    "lastname",
+    "systemuserid" 
   ],
   "task": [
+    "activityid",
     "category",
     "description",
     "dfeta_potentialduplicateid",
+    "modifiedby",
+    "modifiedon",
     "regardingobjectid",
     "scheduledend",
     "statecode",

@@ -692,9 +692,13 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string AnnotationId = "annotationid";
+			public const string Id = "annotationid";
 			public const string DocumentBody = "documentbody";
 			public const string FileName = "filename";
 			public const string MimeType = "mimetype";
+			public const string ModifiedBy = "modifiedby";
+			public const string ModifiedOn = "modifiedon";
 			public const string NoteText = "notetext";
 			public const string ObjectId = "objectid";
 			public const string ObjectTypeCode = "objecttypecode";
@@ -757,6 +761,49 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// Unique identifier of the note.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("annotationid")]
+		public System.Nullable<System.Guid> AnnotationId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("annotationid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("AnnotationId");
+				this.SetAttributeValue("annotationid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("AnnotationId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("annotationid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.AnnotationId = value;
+			}
+		}
+		
+		/// <summary>
 		/// Contents of the note's attachment.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("documentbody")]
@@ -813,6 +860,46 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("MimeType");
 				this.SetAttributeValue("mimetype", value);
 				this.OnPropertyChanged("MimeType");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who last modified the note.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the note was last modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 		
@@ -10255,6 +10342,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_StatedFirstName = "dfeta_statedfirstname";
 			public const string dfeta_StatedLastName = "dfeta_statedlastname";
 			public const string dfeta_StatedMiddleName = "dfeta_statedmiddlename";
+			public const string IncidentId = "incidentid";
+			public const string Id = "incidentid";
 			public const string StateCode = "statecode";
 			public const string StatusCode = "statuscode";
 			public const string SubjectId = "subjectid";
@@ -10542,6 +10631,49 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_StatedMiddleName");
 				this.SetAttributeValue("dfeta_statedmiddlename", value);
 				this.OnPropertyChanged("dfeta_StatedMiddleName");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the case.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("incidentid")]
+		public System.Nullable<System.Guid> IncidentId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("incidentid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IncidentId");
+				this.SetAttributeValue("incidentid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("IncidentId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("incidentid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.IncidentId = value;
 			}
 		}
 		
@@ -11103,7 +11235,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		{
 			public const string ActivityId = "activityid";
 			public const string Id = "activityid";
+			public const string CreatedBy = "createdby";
 			public const string IncidentId = "incidentid";
+			public const string ModifiedBy = "modifiedby";
+			public const string ModifiedOn = "modifiedon";
 			public const string StateCode = "statecode";
 			public const string Subject = "subject";
 			public const string IncidentResolution_Annotation = "IncidentResolution_Annotation";
@@ -11203,6 +11338,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// Unique identifier of the user who created the case resolution activity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
+		}
+		
+		/// <summary>
 		/// Unique identifier of the case.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("incidentid")]
@@ -11219,6 +11374,46 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("IncidentId");
 				this.SetAttributeValue("incidentid", value);
 				this.OnPropertyChanged("IncidentId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who last modified the case resolution activity.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the case resolution activity was last modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 		
@@ -16222,6 +16417,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string FirstName = "firstname";
 			public const string IsDisabled = "isdisabled";
 			public const string LastName = "lastname";
+			public const string SystemUserId = "systemuserid";
+			public const string Id = "systemuserid";
 			public const string annotation_owning_user = "annotation_owning_user";
 			public const string contact_owning_user = "contact_owning_user";
 			public const string createdby_plugintype = "createdby_plugintype";
@@ -16494,6 +16691,49 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("LastName");
 				this.SetAttributeValue("lastname", value);
 				this.OnPropertyChanged("LastName");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for the user.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("systemuserid")]
+		public System.Nullable<System.Guid> SystemUserId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("systemuserid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SystemUserId");
+				this.SetAttributeValue("systemuserid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("SystemUserId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("systemuserid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.SystemUserId = value;
 			}
 		}
 		
@@ -19490,9 +19730,13 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string ActivityId = "activityid";
+			public const string Id = "activityid";
 			public const string Category = "category";
 			public const string Description = "description";
 			public const string dfeta_potentialduplicateid = "dfeta_potentialduplicateid";
+			public const string ModifiedBy = "modifiedby";
+			public const string ModifiedOn = "modifiedon";
 			public const string RegardingObjectId = "regardingobjectid";
 			public const string ScheduledEnd = "scheduledend";
 			public const string StateCode = "statecode";
@@ -19554,6 +19798,49 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// Unique identifier of the task.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("activityid")]
+		public System.Nullable<System.Guid> ActivityId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("activityid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ActivityId");
+				this.SetAttributeValue("activityid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("ActivityId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("activityid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.ActivityId = value;
+			}
+		}
+		
+		/// <summary>
 		/// Type a category to identify the task type, such as lead gathering or customer follow up, to tie the task to a business group or function.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("category")]
@@ -19610,6 +19897,46 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_potentialduplicateid");
 				this.SetAttributeValue("dfeta_potentialduplicateid", value);
 				this.OnPropertyChanged("dfeta_potentialduplicateid");
+			}
+		}
+		
+		/// <summary>
+		/// Shows who last updated the record.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		public Microsoft.Xrm.Sdk.EntityReference ModifiedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("modifiedby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedBy");
+				this.SetAttributeValue("modifiedby", value);
+				this.OnPropertyChanged("ModifiedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Shows the date and time when the record was last updated. The date and time are displayed in the time zone selected in Microsoft Dynamics 365 options.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 		

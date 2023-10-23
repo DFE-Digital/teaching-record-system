@@ -830,7 +830,7 @@ public partial class DataverseAdapter : IDataverseAdapter
 
         var returnValue = inductionAndPeriods
             .GroupBy(t => t.Induction.Id)
-            .Select(g => (g.First().Induction, g.Where(i => i.InductionPeriod != null).Select(i => i.InductionPeriod).ToArray()))
+            .Select(g => (g.First().Induction, g.Where(i => i.InductionPeriod != null).Select(i => i.InductionPeriod).OrderBy(p => p.dfeta_StartDate).ToArray()))
             .OrderBy(i => i.Induction.CreatedOn ?? DateTime.MinValue)
             .FirstOrDefault();
 

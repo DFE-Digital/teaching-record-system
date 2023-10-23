@@ -50,7 +50,18 @@ public static class ServiceCollectionExtensions
         CalculateActiveSanctionsPlugin.Register(fakedXrmContext);
 
         services.AddSingleton<IXrmFakedContext>(fakedXrmContext);
-        services.AddSingleton<IOrganizationServiceAsync>(fakedXrmContext.GetAsyncOrganizationService());
+        var organizationService = fakedXrmContext.GetAsyncOrganizationService();
+        services.AddSingleton<IOrganizationServiceAsync>(organizationService);
+
+        var systemUser = new SystemUser()
+        {
+            Id = Guid.NewGuid(),
+            FirstName = "Test",
+            LastName = "User",
+        };
+
+        organizationService.Create(systemUser);
+        fakedXrmContext.CallerProperties.CallerId = systemUser.ToEntityReference();
 
         services.AddSingleton<SeedCrmReferenceData>();
         services.AddStartupTask<SeedCrmReferenceData>();
