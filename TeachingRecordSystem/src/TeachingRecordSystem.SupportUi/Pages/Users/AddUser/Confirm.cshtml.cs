@@ -11,14 +11,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 public class ConfirmModel : PageModel
 {
     private readonly TrsDbContext _dbContext;
-    private readonly IUserService _userService;
+    private readonly IAadUserService _userService;
     private readonly IClock _clock;
     private readonly TrsLinkGenerator _linkGenerator;
     private Services.AzureActiveDirectory.User? _user;
 
     public ConfirmModel(
         TrsDbContext dbContext,
-        IUserService userService,
+        IAadUserService userService,
         IClock clock,
         TrsLinkGenerator linkGenerator)
     {

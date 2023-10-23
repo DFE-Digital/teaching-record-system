@@ -9,10 +9,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 [Authorize(Roles = UserRoles.Administrator)]
 public class IndexModel : PageModel
 {
-    private readonly IUserService _userService;
+    private readonly IAadUserService _userService;
     private readonly TrsLinkGenerator _trsLinkGenerator;
 
-    public IndexModel(IUserService userService, TrsLinkGenerator trsLinkGenerator)
+    public IndexModel(IAadUserService userService, TrsLinkGenerator trsLinkGenerator)
     {
         _userService = userService;
         _trsLinkGenerator = trsLinkGenerator;

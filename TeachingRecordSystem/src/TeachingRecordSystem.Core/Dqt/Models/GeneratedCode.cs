@@ -16220,6 +16220,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		{
 			public const string AzureActiveDirectoryObjectId = "azureactivedirectoryobjectid";
 			public const string FirstName = "firstname";
+			public const string IsDisabled = "isdisabled";
 			public const string LastName = "lastname";
 			public const string annotation_owning_user = "annotation_owning_user";
 			public const string contact_owning_user = "contact_owning_user";
@@ -16453,6 +16454,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("FirstName");
 				this.SetAttributeValue("firstname", value);
 				this.OnPropertyChanged("FirstName");
+			}
+		}
+		
+		/// <summary>
+		/// Information about whether the user is enabled.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isdisabled")]
+		public System.Nullable<bool> IsDisabled
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("isdisabled");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsDisabled");
+				this.SetAttributeValue("isdisabled", value);
+				this.OnPropertyChanged("IsDisabled");
 			}
 		}
 		

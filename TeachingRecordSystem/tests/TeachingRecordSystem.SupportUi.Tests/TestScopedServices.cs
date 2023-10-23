@@ -31,5 +31,5 @@ public class TestScopedServices
 
     public Mock<IDataverseAdapter> DataverseAdapterMock { get; }
 
-    public Mock<IUserService> AzureActiveDirectoryUserServiceMock { get; }
+    public Mock<IAadUserService> AzureActiveDirectoryUserServiceMock { get; }
 }

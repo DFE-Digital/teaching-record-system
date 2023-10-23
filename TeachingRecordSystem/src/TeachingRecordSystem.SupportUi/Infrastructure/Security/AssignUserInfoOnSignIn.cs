@@ -86,6 +86,7 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
 
                 var request = new QueryByAttribute(SystemUser.EntityLogicalName);
                 request.AddAttributeValue(SystemUser.Fields.AzureActiveDirectoryObjectId, new Guid(aadUserId));
+                request.AddAttributeValue(SystemUser.Fields.IsDisabled, false);
 
                 var response = await serviceClient.RetrieveMultipleAsync(request);
 

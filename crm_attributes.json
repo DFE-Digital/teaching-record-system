@@ -262,6 +262,7 @@
   ],
   "systemuser": [
     "azureactivedirectoryobjectid",
+    "isdisabled",
     "firstname",
     "lastname"
   ],
