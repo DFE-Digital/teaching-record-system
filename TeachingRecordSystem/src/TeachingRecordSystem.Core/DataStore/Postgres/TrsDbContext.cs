@@ -41,6 +41,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<Person> Persons => Set<Person>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
     {
         if (connectionString != null)
