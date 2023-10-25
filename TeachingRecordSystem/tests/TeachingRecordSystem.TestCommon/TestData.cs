@@ -7,20 +7,22 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData : CrmTestData
 {
-    private static int _lastTrn = 4000000;
+    private readonly FakeTrnGenerator _trnGenerator;
 
     public TestData(
         IDbContextFactory<TrsDbContext> dbContextFactory,
         IOrganizationServiceAsync organizationService,
-        ReferenceDataCache referenceDataCache)
+        ReferenceDataCache referenceDataCache,
+        FakeTrnGenerator trnGenerator)
         : base(organizationService, referenceDataCache, generateTrn: () => throw new NotImplementedException())
     {
         DbContextFactory = dbContextFactory;
+        _trnGenerator = trnGenerator;
     }
 
     protected IDbContextFactory<TrsDbContext> DbContextFactory { get; }
 
-    public override Task<string> GenerateTrn() => Task.FromResult(Interlocked.Increment(ref _lastTrn).ToString());
+    public override Task<string> GenerateTrn() => Task.FromResult(_trnGenerator.GenerateTrn());
 
     protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {
