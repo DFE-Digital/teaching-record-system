@@ -165,6 +165,18 @@ jobs:
       MSSQL_PASSWORD: SuperS3cretPassw0rd
 
     services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: trs
+          POSTGRES_DB: trs
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
       mssql:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
@@ -213,6 +225,7 @@ jobs:
         dotnet_test_args: >-
           --no-build
           -e DqtReporting__ReportingDbConnectionString="Data Source=(local); Initial Catalog=${{ env.MSSQL_DB }}; User=sa; Password=${{ env.MSSQL_PASSWORD }}; TrustServerCertificate=True"
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
         config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
 
   package:

@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Services.CrmDataSync;
 
-namespace TeachingRecordSystem.Core.Tests.Services.CrmDataSync;
+namespace TeachingRecordSystem.Core.Dqt.Tests.Services.CrmDataSync;
 
 public class CrmDataSyncHelperTests
 {
