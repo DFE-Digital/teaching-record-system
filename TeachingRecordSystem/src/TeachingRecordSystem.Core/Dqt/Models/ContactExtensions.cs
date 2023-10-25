@@ -44,7 +44,7 @@ public static class ContactExtensions
         return fullName.ToString();
     }
 
-    private static bool HasStatedNames(this Contact contact) =>
+    public static bool HasStatedNames(this Contact contact) =>
         !string.IsNullOrEmpty(contact.dfeta_StatedFirstName) ||
         !string.IsNullOrEmpty(contact.dfeta_StatedLastName);
 }
