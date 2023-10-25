@@ -73,6 +73,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
                     services.AddSingleton<TestData>();
                     services.AddFakeXrm();
+                    services.AddSingleton<FakeTrnGenerator>();
                 });
             });
 

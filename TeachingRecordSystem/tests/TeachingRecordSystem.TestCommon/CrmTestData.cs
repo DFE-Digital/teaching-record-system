@@ -22,7 +22,8 @@ public partial class CrmTestData
         _generateTrn = generateTrn;
     }
 
-    public IOrganizationServiceAsync OrganizationService;
+    public IOrganizationServiceAsync OrganizationService { get; }
+
     public ReferenceDataCache ReferenceDataCache { get; }
 
     public DateOnly GenerateDateOfBirth() => DateOnly.FromDateTime(Faker.Identification.DateOfBirth());

@@ -72,6 +72,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<TestData>();
             services.AddFakeXrm();
             services.AddTransient<ICurrentUserIdProvider, TestUserCurrentUserIdProvider>();
+            services.AddSingleton<FakeTrnGenerator>();
         });
     }
 

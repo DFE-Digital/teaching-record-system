@@ -12,6 +12,8 @@ public class Person
     public string? NationalInsuranceNumber { get; set; }
 
     public Guid? DqtContactId { get; init; }
+    public DateTime? DqtFirstSync { get; set; }
+    public DateTime? DqtLastSync { get; set; }
     public int? DqtState { get; set; }
     public string? DqtFirstName { get; set; }
     public string? DqtMiddleName { get; set; }

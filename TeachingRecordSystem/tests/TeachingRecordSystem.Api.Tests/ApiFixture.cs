@@ -52,6 +52,7 @@ public class ApiFixture : WebApplicationFactory<Program>
             services.AddTestScoped<ICertificateGenerator>(tss => tss.CertificateGeneratorMock.Object);
             services.AddSingleton<TestData>();
             services.AddFakeXrm();
+            services.AddSingleton<FakeTrnGenerator>();
 
             services.AddHttpClient("EvidenceFiles")
                 .AddHttpMessageHandler(_ => EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())

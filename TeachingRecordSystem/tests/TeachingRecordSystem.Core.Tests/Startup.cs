@@ -16,5 +16,6 @@ public class Startup
                 DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
 
                 services.AddSingleton<DbFixture>();
+                services.AddSingleton<FakeTrnGenerator>();
             });
 }
