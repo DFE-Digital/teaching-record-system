@@ -96,6 +96,11 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                     request.PageInfo.PagingCookie = null;
                     continue;
                 }
+                catch (Exception ex) when (ex.IsCrmRateLimitException(out var retryAfter))
+                {
+                    await Task.Delay(retryAfter, cancellationToken);
+                    continue;
+                }
 
                 gotData |= response.EntityChanges.Changes.Count > 0;
 
