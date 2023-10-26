@@ -111,7 +111,7 @@ builder.Services
             model =>
             {
                 model.Filters.Add(new CheckPersonExistsFilter());
-            });        
+            });
     })
     .AddMvcOptions(options =>
     {

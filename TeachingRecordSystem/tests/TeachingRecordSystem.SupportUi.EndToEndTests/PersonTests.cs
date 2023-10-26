@@ -28,7 +28,7 @@ public class PersonTests : TestBase
         await page.AssertOnPersonEditNamePage(personId);
 
         await page.FillNameInputs(newFirstName, newMiddleName, newLastName);
-        
+
         await page.ClickContinueButton();
 
         await page.AssertOnPersonEditNameConfirmPage(personId);

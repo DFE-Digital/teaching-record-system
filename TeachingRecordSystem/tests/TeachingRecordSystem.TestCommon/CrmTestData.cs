@@ -57,7 +57,7 @@ public partial class CrmTestData
     }
 
     public string GenerateMiddleName() => Faker.Name.Middle();
-    
+
     public string GenerateChangedMiddleName(string currentMiddleName)
     {
         string newMiddleName;

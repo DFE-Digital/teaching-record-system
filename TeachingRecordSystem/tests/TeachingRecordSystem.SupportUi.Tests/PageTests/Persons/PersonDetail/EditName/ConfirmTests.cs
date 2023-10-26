@@ -1,4 +1,3 @@
-using FakeXrmEasy;
 using FormFlow;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditName;
@@ -155,7 +154,7 @@ public class ConfirmTests : TestBase
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
     }
-    
+
 
     private async Task<JourneyInstance<EditNameState>> CreateJourneyInstance(Guid personId, EditNameState? state = null) =>
         await CreateJourneyInstance(

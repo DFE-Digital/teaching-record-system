@@ -73,7 +73,7 @@ public class IndexTests : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var doc = await response.GetDocument();        
+        var doc = await response.GetDocument();
         Assert.Equal(newFirstName, doc.GetElementById("FirstName")!.GetAttribute("value"));
         Assert.Equal(newMiddleName, doc.GetElementById("MiddleName")!.GetAttribute("value"));
         Assert.Equal(newLastName, doc.GetElementById("LastName")!.GetAttribute("value"));
@@ -134,7 +134,7 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/persons/{person.PersonId}/edit-name/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);        
+        Assert.Equal($"/persons/{person.PersonId}/edit-name/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     public static TheoryData<string, string, string, string, string> InvalidNamesData { get; } = new()

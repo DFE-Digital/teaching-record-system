@@ -20,7 +20,7 @@ public static class PageExtensions
     {
         await page.GotoAsync($"/persons/{personId}/alerts");
     }
-    
+
     public static async Task GoToPersonDetailPage(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/persons/{personId}");
@@ -108,7 +108,7 @@ public static class PageExtensions
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/close/confirm");
     }
-    
+
     public static async Task AssertOnPersonEditNamePage(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/edit-name");
@@ -130,7 +130,7 @@ public static class PageExtensions
         await page.FillAsync("label:text-is('Month')", date.Month.ToString());
         await page.FillAsync("label:text-is('Year')", date.Year.ToString());
     }
-    
+
     public static async Task FillNameInputs(this IPage page, string firstName, string middleName, string lastName)
     {
         await page.FillAsync("text=First Name", firstName);
