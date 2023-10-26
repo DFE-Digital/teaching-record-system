@@ -1,5 +1,4 @@
 #nullable disable
-using Microsoft.Xrm.Sdk.Metadata;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
@@ -88,8 +87,6 @@ public interface IDataverseAdapter
     Task<Subject> GetSubjectByTitle(string title);
 
     Task<Incident[]> GetIncidentsByContactId(Guid contactId, IncidentState? state, string[] columnNames);
-
-    Task<EntityMetadata> GetEntityMetadata(string entityLogicalName, EntityFilters entityFilters = EntityFilters.Default);
 
     Task<Contact[]> GetTeachersByInitialTeacherTrainingSlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);
 

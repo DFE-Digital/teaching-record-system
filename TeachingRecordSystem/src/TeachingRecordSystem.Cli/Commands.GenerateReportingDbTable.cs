@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xrm.Sdk.Metadata;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Cli;
@@ -23,7 +25,16 @@ public static partial class Commands
             async (string crmConnectionString, string entityType) =>
             {
                 var serviceClient = new ServiceClient(crmConnectionString);
-                var entityMetadata = await DataverseAdapter.GetEntityMetadata(serviceClient, entityType, EntityFilters.Default | EntityFilters.Attributes);
+
+                var services = new ServiceCollection()
+                    .AddCrmQueries()
+                    .AddSingleton<IOrganizationServiceAsync>(serviceClient)
+                    .BuildServiceProvider();
+
+                var crmQueryDispatcher = services.GetRequiredService<ICrmQueryDispatcher>();
+
+                var entityMetadata = await crmQueryDispatcher.ExecuteQuery(
+                    new GetEntityMetadataQuery(entityType, EntityFilters.Default | EntityFilters.Attributes));
                 var entityTableMapping = EntityTableMapping.Create(entityMetadata);
                 var sql = entityTableMapping.GetCreateTableSql();
                 await Console.Out.WriteLineAsync(sql);
