@@ -28,6 +28,9 @@
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
             <govuk-summary-list-row-value data-testid="personal-details-name">@Model.Person.FullName</govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action href="@LinkGenerator.PersonEditName(Model.PersonId, null)" visually-hidden-text="change name" data-testid="name-change-link">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
         @if (Model.Person.PreviousNames.Length > 0)
         {

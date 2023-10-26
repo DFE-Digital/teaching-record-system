@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-public class CheckPersonExistsFilter : IAsyncPageFilter
+public class CheckPersonExistsFilter : IAsyncResourceFilter, IOrderedFilter
 {
-    public async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public int Order => -200;
+
+    public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
         var personId = context.RouteData.Values["personId"] as string;
         if (personId is not null)
@@ -24,6 +25,4 @@ public class CheckPersonExistsFilter : IAsyncPageFilter
 
         await next();
     }
-
-    public Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context) => Task.CompletedTask;
 }

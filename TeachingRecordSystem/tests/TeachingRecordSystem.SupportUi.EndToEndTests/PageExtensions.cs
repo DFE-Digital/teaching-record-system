@@ -20,6 +20,14 @@ public static class PageExtensions
     {
         await page.GotoAsync($"/persons/{personId}/alerts");
     }
+    
+    public static async Task GoToPersonDetailPage(this IPage page, Guid personId)
+    {
+        await page.GotoAsync($"/persons/{personId}");
+    }
+
+    public static Task ClickLinkForElementWithTestId(this IPage page, string testId) =>
+        page.GetByTestId(testId).ClickAsync();
 
     public static async Task ClickAddAlertPersonAlertsPage(this IPage page)
     {
@@ -66,6 +74,11 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/cases/{caseReference}/reject");
     }
 
+    public static async Task AssertOnPersonDetailPage(this IPage page, Guid personId)
+    {
+        await page.WaitForUrlPathAsync($"/persons/{personId}");
+    }
+
     public static async Task AssertOnPersonAlertsPage(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/alerts");
@@ -95,6 +108,16 @@ public static class PageExtensions
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/close/confirm");
     }
+    
+    public static async Task AssertOnPersonEditNamePage(this IPage page, Guid personId)
+    {
+        await page.WaitForUrlPathAsync($"/persons/{personId}/edit-name");
+    }
+
+    public static async Task AssertOnPersonEditNameConfirmPage(this IPage page, Guid personId)
+    {
+        await page.WaitForUrlPathAsync($"/persons/{personId}/edit-name/confirm");
+    }
 
     public static async Task AssertFlashMessage(this IPage page, string expectedHeader)
     {
@@ -106,6 +129,13 @@ public static class PageExtensions
         await page.FillAsync("label:text-is('Day')", date.Day.ToString());
         await page.FillAsync("label:text-is('Month')", date.Month.ToString());
         await page.FillAsync("label:text-is('Year')", date.Year.ToString());
+    }
+    
+    public static async Task FillNameInputs(this IPage page, string firstName, string middleName, string lastName)
+    {
+        await page.FillAsync("text=First Name", firstName);
+        await page.FillAsync("text=Middle Name", middleName);
+        await page.FillAsync("text=Last Name", lastName);
     }
 
     public static async Task SubmitAddAlertIndexPage(this IPage page, string alertType, string? details, string link, DateOnly startDate)
