@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Npgsql;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
@@ -60,7 +61,11 @@ public class Program
         var platformEnvironmentName = configuration["PlatformEnvironment"];
         builder.ConfigureLogging(platformEnvironmentName);
 
-        var pgConnectionString = configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
+        string pgConnectionString = new NpgsqlConnectionStringBuilder(configuration.GetRequiredValue("ConnectionStrings:DefaultConnection"))
+        {
+            // We rely on error details to get the offending duplicate key values in the TrsDataSyncHelper
+            IncludeErrorDetail = true
+        }.ConnectionString;
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })

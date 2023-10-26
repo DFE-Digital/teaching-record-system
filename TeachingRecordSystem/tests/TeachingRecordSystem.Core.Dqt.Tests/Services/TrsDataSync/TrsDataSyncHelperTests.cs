@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Core.Dqt.Services.CrmDataSync;
+using TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
 
-namespace TeachingRecordSystem.Core.Dqt.Tests.Services.CrmDataSync;
+namespace TeachingRecordSystem.Core.Dqt.Tests.Services.TrsDataSync;
 
-public class CrmDataSyncHelperTests
+public class TrsDataSyncHelperTests
 {
     private readonly DbFixture _dbFixture;
     private readonly FakeTrnGenerator _trnGenerator;
 
-    public CrmDataSyncHelperTests(DbFixture dbFixture, FakeTrnGenerator trnGenerator)
+    public TrsDataSyncHelperTests(DbFixture dbFixture, FakeTrnGenerator trnGenerator)
     {
         _dbFixture = dbFixture;
         _trnGenerator = trnGenerator;
@@ -19,7 +19,7 @@ public class CrmDataSyncHelperTests
     {
         // Arrange
         var clock = new TestableClock();
-        var helper = new CrmDataSyncHelper(_dbFixture.GetDbContextFactory(), clock);
+        var helper = new TrsDataSyncHelper(_dbFixture.GetDbContextFactory(), clock);
 
         var contactId = Guid.NewGuid();
         var trn = _trnGenerator.GenerateTrn();
@@ -47,12 +47,12 @@ public class CrmDataSyncHelperTests
         };
 
         // Act
-        await helper.SyncContact(contact);
+        await helper.SyncContact(contact, ignoreInvalid: false);
 
         // Assert
         await _dbFixture.WithDbContext(async dbContext =>
         {
-            var person = await dbContext.Persons.SingleAsync(p => p.DqtContactId == contact.Id);
+            var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contact.Id);
             Assert.NotNull(person);
             Assert.Equal(contactId, person.PersonId);
             Assert.Equal(contactId, person.DqtContactId);
@@ -74,7 +74,7 @@ public class CrmDataSyncHelperTests
     {
         // Arrange
         var clock = new TestableClock();
-        var helper = new CrmDataSyncHelper(_dbFixture.GetDbContextFactory(), clock);
+        var helper = new TrsDataSyncHelper(_dbFixture.GetDbContextFactory(), clock);
 
         var contactId = Guid.NewGuid();
         var trn = _trnGenerator.GenerateTrn();
@@ -134,12 +134,12 @@ public class CrmDataSyncHelperTests
         };
 
         // Act
-        await helper.SyncContact(contact);
+        await helper.SyncContact(contact, ignoreInvalid: false);
 
         // Assert
         await _dbFixture.WithDbContext(async dbContext =>
         {
-            var person = await dbContext.Persons.SingleAsync(p => p.DqtContactId == contact.Id);
+            var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contact.Id);
             Assert.NotNull(person);
             Assert.Equal(newFirstName, person.FirstName);
             Assert.Equal(newMiddleName, person.MiddleName);
@@ -150,6 +150,56 @@ public class CrmDataSyncHelperTests
             Assert.Equal((int)ContactState.Inactive, person.DqtState);
             Assert.Equal(initialSyncTime, person.DqtFirstSync);
             Assert.Equal(clock.UtcNow, person.DqtLastSync);
+        });
+    }
+
+    [Fact]
+    public async Task DeleteEntities_RemovesRowFromDb()
+    {
+        // Arrange
+        var clock = new TestableClock();
+        var helper = new TrsDataSyncHelper(_dbFixture.GetDbContextFactory(), clock);
+
+        var contactId = Guid.NewGuid();
+        var trn = _trnGenerator.GenerateTrn();
+
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = Faker.Identification.DateOfBirth();
+        var email = Faker.Internet.Email();
+        var nino = Faker.Identification.UkNationalInsuranceNumber();
+        var syncTime = clock.UtcNow;
+
+        await _dbFixture.WithDbContext(async dbContext =>
+        {
+            dbContext.Persons.Add(new()
+            {
+                PersonId = contactId,
+                Trn = trn,
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = DateOnly.FromDateTime(dateOfBirth),
+                EmailAddress = email,
+                NationalInsuranceNumber = nino,
+                DqtContactId = contactId,
+                DqtState = (int)ContactState.Active,
+                DqtFirstSync = syncTime,
+                DqtLastSync = syncTime
+            });
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        // Act
+        await helper.DeleteEntities(Contact.EntityLogicalName, new[] { contactId });
+
+        // Assert
+        await _dbFixture.WithDbContext(async dbContext =>
+        {
+            var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contactId);
+            Assert.Null(person);
         });
     }
 }
