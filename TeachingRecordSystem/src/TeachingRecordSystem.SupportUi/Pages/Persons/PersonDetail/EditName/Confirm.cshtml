@@ -11,7 +11,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-        <form method="post">
+        <form action="@LinkGenerator.PersonEditNameConfirm(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-summary-list>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Current</govuk-summary-list-row-key>

@@ -47,6 +47,13 @@ public class ConfirmModel : PageModel
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        var state = JourneyInstance!.State;
+        if (!state.IsComplete)
+        {
+            context.Result = Redirect(_linkGenerator.PersonEditName(PersonId, JourneyInstance!.InstanceId));
+            return;
+        }
+
         var person = await _crmQueryDispatcher.ExecuteQuery(
             new GetContactDetailByIdQuery(
                 PersonId,
@@ -55,14 +62,6 @@ public class ConfirmModel : PageModel
                     Contact.Fields.FirstName,
                     Contact.Fields.MiddleName,
                     Contact.Fields.LastName)));
-
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(_linkGenerator.PersonEditName(PersonId, JourneyInstance!.InstanceId));
-            return;
-        }
-
-        var state = JourneyInstance!.State;
 
         CurrentValue = string.IsNullOrEmpty(person!.Contact.MiddleName)
             ? $"{person.Contact.FirstName} {person.Contact.LastName}"

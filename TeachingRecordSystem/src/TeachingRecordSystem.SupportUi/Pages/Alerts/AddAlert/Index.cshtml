@@ -50,7 +50,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form method="post">
+        <form action="@LinkGenerator.AlertAdd(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-select asp-for="AlertTypeId" label-class="govuk-label--m">
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var alertType in Model.AlertTypes!)
