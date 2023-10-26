@@ -1,35 +1,29 @@
 using System.Collections.Concurrent;
 using Microsoft.ApplicationInsights;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
 using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
-using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 
 namespace TeachingRecordSystem.Core.Dqt.Tests.Services.DqtReporting;
 
 public class DqtReportingFixture
 {
-    private readonly ServiceClient _serviceClient;
-    private readonly IMemoryCache _memoryCache;
+    private readonly CrmClientFixture _crmClientFixture;
 
-    public DqtReportingFixture(IConfiguration configuration, ServiceClient serviceClient, IMemoryCache memoryCache)
+    public DqtReportingFixture(CrmClientFixture crmClientFixture)
     {
-        _serviceClient = serviceClient;
-        _memoryCache = memoryCache;
-        ReportingDbConnectionString = configuration.GetRequiredValue("DqtReporting:ReportingDbConnectionString");
+        _crmClientFixture = crmClientFixture;
+        ReportingDbConnectionString = crmClientFixture.Configuration.GetRequiredValue("DqtReporting:ReportingDbConnectionString");
 
         var migrator = new Migrator(ReportingDbConnectionString);
         migrator.DropAllTables();
         migrator.MigrateDb();
     }
 
-    public IClock Clock { get; } = new TestableClock();
+    public IClock Clock => _crmClientFixture.Clock;
 
     public string ReportingDbConnectionString { get; }
 
@@ -59,10 +53,6 @@ public class DqtReportingFixture
         using var crmEntityChangesService = new TestableCrmEntityChangesService();
         var changesObserver = crmEntityChangesService.GetChangedItemsObserver(Contact.EntityLogicalName);
 
-        var trnGenerationApiClient = Mock.Of<ITrnGenerationApiClient>();
-
-        var dataverseAdapter = new DataverseAdapter(_serviceClient, Clock, _memoryCache, trnGenerationApiClient);
-
         var telemetryClient = new TelemetryClient(new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration());
 
         var logger = new NullLogger<DqtReportingService>();
@@ -70,7 +60,7 @@ public class DqtReportingFixture
         var service = new DqtReportingService(
             options,
             crmEntityChangesService,
-            dataverseAdapter,
+            _crmClientFixture.CreateQueryDispatcher(),
             Clock,
             telemetryClient,
             logger);

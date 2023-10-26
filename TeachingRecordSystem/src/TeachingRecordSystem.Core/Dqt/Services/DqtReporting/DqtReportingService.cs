@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
 
 namespace TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
@@ -26,7 +27,7 @@ public partial class DqtReportingService : BackgroundService
 
     private readonly DqtReportingOptions _options;
     private readonly ICrmEntityChangesService _crmEntityChangesService;
-    private readonly IDataverseAdapter _dataverseAdapter;
+    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly IClock _clock;
     private readonly TelemetryClient _telemetryClient;
     private readonly ILogger<DqtReportingService> _logger;
@@ -35,14 +36,14 @@ public partial class DqtReportingService : BackgroundService
     public DqtReportingService(
         IOptions<DqtReportingOptions> optionsAccessor,
         ICrmEntityChangesService crmEntityChangesService,
-        IDataverseAdapter dataverseAdapter,
+        ICrmQueryDispatcher crmQueryDispatcher,
         IClock clock,
         TelemetryClient telemetryClient,
         ILogger<DqtReportingService> logger)
     {
         _options = optionsAccessor.Value;
         _crmEntityChangesService = crmEntityChangesService;
-        _dataverseAdapter = dataverseAdapter;
+        _crmQueryDispatcher = crmQueryDispatcher;
         _clock = clock;
         _telemetryClient = telemetryClient;
         _logger = logger;
@@ -97,7 +98,8 @@ public partial class DqtReportingService : BackgroundService
 
                 try
                 {
-                    var entityMetadata = await _dataverseAdapter.GetEntityMetadata(entity, EntityFilters.Default | EntityFilters.Attributes);
+                    var entityMetadata = await _crmQueryDispatcher.ExecuteQuery(
+                        new GetEntityMetadataQuery(entity, EntityFilters.Default | EntityFilters.Attributes));
 
                     if (entityMetadata.ChangeTrackingEnabled != true)
                     {
