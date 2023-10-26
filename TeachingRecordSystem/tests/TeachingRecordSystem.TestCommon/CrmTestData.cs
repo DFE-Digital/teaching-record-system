@@ -43,7 +43,33 @@ public partial class CrmTestData
 
     public string GenerateFirstName() => Faker.Name.First();
 
+    public string GenerateChangedFirstName(string currentFirstName)
+    {
+        string newFirstName;
+
+        do
+        {
+            newFirstName = GenerateLastName();
+        }
+        while (newFirstName == currentFirstName);
+
+        return newFirstName;
+    }
+
     public string GenerateMiddleName() => Faker.Name.Middle();
+
+    public string GenerateChangedMiddleName(string currentMiddleName)
+    {
+        string newMiddleName;
+
+        do
+        {
+            newMiddleName = GenerateMiddleName();
+        }
+        while (newMiddleName == currentMiddleName);
+
+        return newMiddleName;
+    }
 
     public string GenerateLastName() => Faker.Name.Last();
 

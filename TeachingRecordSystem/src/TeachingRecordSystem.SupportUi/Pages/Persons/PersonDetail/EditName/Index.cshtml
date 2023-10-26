@@ -1,0 +1,22 @@
+@page "/persons/{personId}/edit-name"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditName.IndexModel
+@{
+    ViewBag.Title = "Edit name";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonDetail(Model.PersonId)">Back</govuk-back-link>
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.PersonEditName(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-input asp-for="FirstName" data-testid="first-name" label-class="govuk-label--m" />
+            <govuk-input asp-for="MiddleName" data-testid="middle-name" label-class="govuk-label--m" />
+            <govuk-input asp-for="LastName" data-testid="last-name" label-class="govuk-label--m" />
+            <govuk-button type ="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

@@ -198,6 +198,12 @@ builder.Services
             typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert.CloseAlertState),
             requestDataKeys: new[] { "alertId" },
             appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.EditName,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditName.EditNameState),
+            requestDataKeys: new[] { "personId" },
+            appendUniqueKey: true));
     });
 
 builder.Services
