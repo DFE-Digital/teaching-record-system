@@ -1,6 +1,4 @@
-#nullable enable
 using System.Data;
-using System.ServiceModel;
 using System.Text;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -70,13 +68,6 @@ public partial class DqtReportingService : BackgroundService
                     (sqlException.IsTransient || sqlException.Message.StartsWith("Execution Timeout Expired.")))
             {
                 _logger.LogWarning(ex, "Transient SQL exception thrown.");
-                continue;
-            }
-            catch (ProcessChangesException ex) when (ex.InnerException!.IsCrmRateLimitException(out var retryAfter))
-            {
-                _logger.LogWarning(ex, "Hit CRM rate limit error.");
-
-                await Task.Delay(retryAfter, stoppingToken);
                 continue;
             }
             catch (ProcessChangesException ex)
@@ -153,7 +144,7 @@ public partial class DqtReportingService : BackgroundService
                 }
                 catch (Exception ex)
                 {
-                    throw new ProcessChangesException($"Failed processing changes for '{entityType}' entity.", ex);
+                    throw new ProcessChangesException(entityType, ex);
                 }
             });
     }
@@ -383,21 +374,4 @@ file class ProcessChangesException : Exception
 
     private static string GetMessage(string entityType) =>
         $"Failed processing changes for '{entityType}' entity.";
-}
-
-file static class ExceptionExtensions
-{
-    public static bool IsCrmRateLimitException(this Exception exception, out TimeSpan retryAfter)
-    {
-        if (exception is FaultException<OrganizationServiceFault> fault &&
-            fault.Detail.ErrorDetails.TryGetValue("Retry-After", out var retryAfterObj) &&
-            retryAfterObj is TimeSpan retryAfterTs)
-        {
-            retryAfter = retryAfterTs;
-            return true;
-        }
-
-        retryAfter = default;
-        return false;
-    }
 }
