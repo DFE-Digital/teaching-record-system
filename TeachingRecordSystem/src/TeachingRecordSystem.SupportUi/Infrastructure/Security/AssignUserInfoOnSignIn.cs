@@ -6,6 +6,7 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
@@ -55,11 +56,7 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
                 return;
             }
 
-            if (user.Email?.Equals(email, StringComparison.OrdinalIgnoreCase) != true)
-            {
-                user.Email = email;
-                await dbContext.SaveChangesAsync();
-            }
+            await SyncAadUserInfo();
 
             var claims = user.Roles.Select(r => new Claim(ClaimTypes.Role, r))
                 .Append(new Claim(CustomClaims.UserId, user.UserId.ToString()))
@@ -96,6 +93,28 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
                 }
 
                 return response.Entities.Single().Id;
+            }
+
+            async Task SyncAadUserInfo()
+            {
+                // The GraphServiceClient used within AadUserService needs HttpContext.User assigned so it can retrieve the access token;
+                // temporarily assign HttpContext.User for this service call then reset it when we're done.
+
+                var oldPrincipal = ctx.HttpContext.User;
+                ctx.HttpContext.User = ctx.Principal!;
+
+                try
+                {
+                    var aadUserService = ctx.HttpContext.RequestServices.GetRequiredService<IAadUserService>();
+                    var azureAdUser = (await aadUserService.GetUserById(aadUserId))!;
+                    user.Email = azureAdUser.Email;
+                    user.Name = azureAdUser.Name;
+                    await dbContext.SaveChangesAsync();
+                }
+                finally
+                {
+                    ctx.HttpContext.User = oldPrincipal;
+                }
             }
         };
     }
