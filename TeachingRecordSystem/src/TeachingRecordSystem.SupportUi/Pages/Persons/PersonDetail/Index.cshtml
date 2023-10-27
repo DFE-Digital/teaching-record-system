@@ -49,6 +49,9 @@
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
             <govuk-summary-list-row-value data-testid="personal-details-date-of-birth" use-empty-fallback>@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : string.Empty)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action href="@LinkGenerator.PersonEditDateOfBirth(Model.PersonId, null)" visually-hidden-text="change date of birth" data-testid="date-of-birth-change-link">Change</govuk-summary-list-row-action>
+                </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>

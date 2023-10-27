@@ -39,4 +39,35 @@ public class PersonTests : TestBase
 
         await page.AssertFlashMessage("Record has been updated");
     }
+
+    [Fact]
+    public async Task EditDateOfBirth()
+    {
+        var person = await TestData.CreatePerson();
+        var personId = person.ContactId;
+        var newDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth);
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonDetailPage(personId);
+
+        await page.AssertOnPersonDetailPage(personId);
+
+        await page.ClickLinkForElementWithTestId("date-of-birth-change-link");
+
+        await page.AssertOnPersonEditDateOfBirthPage(personId);
+
+        await page.FillDateInput(newDateOfBirth);
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnPersonEditDateOfBirthConfirmPage(personId);
+
+        await page.ClickConfirmButton();
+
+        await page.AssertOnPersonDetailPage(personId);
+
+        await page.AssertFlashMessage("Record has been updated");
+    }
 }

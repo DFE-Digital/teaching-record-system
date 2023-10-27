@@ -1,0 +1,25 @@
+@page "/persons/{personId}/edit-date-of-birth"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDateOfBirth.IndexModel
+@{
+    ViewBag.Title = "Change date of birth";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonDetail(Model.PersonId)">Back</govuk-back-link>
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.PersonEditDateOfBirth(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-date-input asp-for="DateOfBirth">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

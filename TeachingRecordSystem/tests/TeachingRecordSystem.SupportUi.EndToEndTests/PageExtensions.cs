@@ -119,6 +119,16 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/persons/{personId}/edit-name/confirm");
     }
 
+    public static async Task AssertOnPersonEditDateOfBirthPage(this IPage page, Guid personId)
+    {
+        await page.WaitForUrlPathAsync($"/persons/{personId}/edit-date-of-birth");
+    }
+
+    public static async Task AssertOnPersonEditDateOfBirthConfirmPage(this IPage page, Guid personId)
+    {
+        await page.WaitForUrlPathAsync($"/persons/{personId}/edit-date-of-birth/confirm");
+    }
+
     public static async Task AssertFlashMessage(this IPage page, string expectedHeader)
     {
         Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader}')"));

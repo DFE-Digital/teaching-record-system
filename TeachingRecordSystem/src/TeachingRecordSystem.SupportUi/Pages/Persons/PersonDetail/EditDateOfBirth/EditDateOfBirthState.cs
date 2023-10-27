@@ -1,0 +1,34 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
+using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt.Queries;
+
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDateOfBirth;
+
+public class EditDateOfBirthState
+{
+    public bool Initialized { get; set; }
+
+    public DateOnly? DateOfBirth { get; set; }
+
+    [JsonIgnore]
+    [MemberNotNullWhen(true, nameof(DateOfBirth))]
+    public bool IsComplete => DateOfBirth.HasValue;
+
+    public async Task EnsureInitialized(ICrmQueryDispatcher crmQueryDispatcher, Guid personId)
+    {
+        if (Initialized)
+        {
+            return;
+        }
+
+        var person = await crmQueryDispatcher.ExecuteQuery(
+            new GetContactDetailByIdQuery(
+                personId,
+                new ColumnSet(
+                    Contact.PrimaryIdAttribute,
+                    Contact.Fields.BirthDate)));
+        DateOfBirth = person!.Contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false);
+        Initialized = true;
+    }
+}
