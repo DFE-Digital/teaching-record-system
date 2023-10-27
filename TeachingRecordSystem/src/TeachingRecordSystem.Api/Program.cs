@@ -298,7 +298,9 @@ public class Program
 
         if (env.IsProduction())
         {
-            app.UseRateLimiter();
+            // Apply rate limiting to authenticated endpoints
+            // (i.e. everywhere except health check, status endpoints etc.)
+            app.UseWhen(ctx => ctx.User.Identity?.IsAuthenticated == true, x => x.UseRateLimiter());
         }
 
         app.Use((ctx, next) =>
