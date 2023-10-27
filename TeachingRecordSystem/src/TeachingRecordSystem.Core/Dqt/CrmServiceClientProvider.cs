@@ -21,7 +21,7 @@ public class CrmServiceClientProvider : ICrmServiceClientProvider
 
     public IOrganizationServiceAsync2 GetClient(string name)
     {
-        return _options.Get(name).ServiceClient!;
+        return _options.Get(name).ServiceClient ?? throw new ArgumentException($"No client found with name: '{name}'.", nameof(name));
     }
 }
 

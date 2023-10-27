@@ -1298,6 +1298,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Merged = "merged";
 			public const string MiddleName = "middlename";
 			public const string MobilePhone = "mobilephone";
+			public const string ModifiedOn = "modifiedon";
 			public const string StateCode = "statecode";
 			public const string Telephone1 = "telephone1";
 			public const string account_primary_contact = "account_primary_contact";
@@ -2140,6 +2141,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("MobilePhone");
 				this.SetAttributeValue("mobilephone", value);
 				this.OnPropertyChanged("MobilePhone");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the contact was last modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 		

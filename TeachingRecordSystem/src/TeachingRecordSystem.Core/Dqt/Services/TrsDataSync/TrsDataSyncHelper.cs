@@ -114,6 +114,8 @@ public class TrsDataSyncHelper
             WriteValueOrNull(person.NationalInsuranceNumber, NpgsqlDbType.Char);
             WriteNullableValueOrNull(person.DqtContactId, NpgsqlDbType.Uuid);
             WriteNullableValueOrNull(person.DqtState, NpgsqlDbType.Integer);
+            WriteNullableValueOrNull(person.DqtCreatedOn, NpgsqlDbType.TimestampTz);
+            WriteNullableValueOrNull(person.DqtModifiedOn, NpgsqlDbType.TimestampTz);
             WriteValueOrNull(person.DqtFirstName, NpgsqlDbType.Varchar);
             WriteValueOrNull(person.DqtMiddleName, NpgsqlDbType.Varchar);
             WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
@@ -139,13 +141,27 @@ public class TrsDataSyncHelper
 
             // ex.Detail will be something like "Key (trn)=(1000336) already exists."
             var trn = ex.Detail!.Substring("Key (trn)=(".Length, 7);
-            Debug.Assert(trn.All(c => char.IsAsciiDigit(c)));
+
+            if (trn.Length != 7 || !trn.All(char.IsAsciiDigit))
+            {
+                Debug.Fail("Failed parsing TRN from exception message.");
+                throw;
+            }
+
+            var entitiesExceptFailedOne = entities.Where(e => e.dfeta_TRN != trn).ToArray();
+
+            // Be extra sure we've actually removed a record (otherwise we'll go in an endless loop and stack overflow)
+            if (!(entitiesExceptFailedOne.Length < entities.Count))
+            {
+                Debug.Fail("No entities removed from collection.");
+                throw;
+            }
 
             await txn.DisposeAsync();
             await connection.DisposeAsync();
             await dbContext.DisposeAsync();
 
-            await SyncContacts(entities.Where(e => e.dfeta_TRN != trn).ToArray(), ignoreInvalid, cancellationToken);
+            await SyncContacts(entitiesExceptFailedOne, ignoreInvalid, cancellationToken);
 
             return;
         }
@@ -200,6 +216,8 @@ public class TrsDataSyncHelper
             "national_insurance_number",
             "dqt_contact_id",
             "dqt_state",
+            "dqt_created_on",
+            "dqt_modified_on",
             "dqt_first_name",
             "dqt_middle_name",
             "dqt_last_name"
@@ -226,6 +244,8 @@ public class TrsDataSyncHelper
         {
             Contact.Fields.ContactId,
             Contact.Fields.StateCode,
+            Contact.Fields.CreatedOn,
+            Contact.Fields.ModifiedOn,
             Contact.Fields.dfeta_TRN,
             Contact.Fields.FirstName,
             Contact.Fields.MiddleName,
@@ -259,6 +279,8 @@ public class TrsDataSyncHelper
         NationalInsuranceNumber = contact.dfeta_NINumber.NormalizeString(),
         DqtContactId = contact.Id,
         DqtState = (int)contact.StateCode!,
+        DqtCreatedOn = contact.CreatedOn!.Value,
+        DqtModifiedOn = contact.ModifiedOn!.Value,
         DqtFirstName = contact.FirstName ?? string.Empty,
         DqtMiddleName = contact.MiddleName ?? string.Empty,
         DqtLastName = contact.LastName ?? string.Empty

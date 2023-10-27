@@ -15,6 +15,8 @@ public class Person
     public DateTime? DqtFirstSync { get; set; }
     public DateTime? DqtLastSync { get; set; }
     public int? DqtState { get; set; }
+    public DateTime? DqtCreatedOn { get; set; }
+    public DateTime? DqtModifiedOn { get; set; }
     public string? DqtFirstName { get; set; }
     public string? DqtMiddleName { get; set; }
     public string? DqtLastName { get; set; }
