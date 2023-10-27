@@ -31,6 +31,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
 using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
+using TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.AccessYourQualifications;
@@ -241,10 +242,12 @@ public class Program
         services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
         services.AddDqtReporting(builder.Configuration);
+        services.AddTrsSyncService(builder.Configuration);
         services.AddBackgroundJobs(env, configuration);
         services.AddEmail(env, configuration);
         services.AddCrmQueries();
         services.AddSingleton<ReferenceDataCache>();
+        services.AddSingleton<TrsDataSyncHelper>();
 
         // Filter telemetry emitted by DqtReportingService
         services.AddApplicationInsightsTelemetry()

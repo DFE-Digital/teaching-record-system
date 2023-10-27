@@ -53,6 +53,7 @@
     "merged",
     "middlename",
     "mobilephone",
+    "modifiedon",
     "statecode",
     "telephone1",
     "dfeta_slugid",
@@ -272,7 +273,7 @@
     "isdisabled",
     "firstname",
     "lastname",
-    "systemuserid" 
+    "systemuserid"
   ],
   "task": [
     "activityid",
