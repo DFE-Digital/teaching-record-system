@@ -10,7 +10,6 @@ public class EntityChangesJournalMapping : IEntityTypeConfiguration<EntityChange
     {
         builder.Property(p => p.Key).IsRequired();
         builder.Property(p => p.EntityLogicalName).IsRequired();
-        builder.Property(p => p.DataToken).IsRequired();
         builder.HasKey(p => new { p.Key, p.EntityLogicalName });
     }
 }
