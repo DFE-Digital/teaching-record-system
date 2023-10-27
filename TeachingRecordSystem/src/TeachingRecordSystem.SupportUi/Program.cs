@@ -204,6 +204,12 @@ builder.Services
             typeof(TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditName.EditNameState),
             requestDataKeys: new[] { "personId" },
             appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.EditDateOfBirth,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDateOfBirth.EditDateOfBirthState),
+            requestDataKeys: new[] { "personId" },
+            appendUniqueKey: true));
     });
 
 builder.Services
