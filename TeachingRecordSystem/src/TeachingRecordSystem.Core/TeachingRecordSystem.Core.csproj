@@ -19,6 +19,7 @@
     <None Remove="Dqt\Services\DqtReporting\Migrations\0010_SanctionDetailsLink.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0011_AddHighProfileProgrammeType.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0012_FixProgrammeTypeCasing.sql" />
+    <None Remove="Dqt\Services\DqtReporting\Migrations\0013_PreviousNameTransactionId.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +35,7 @@
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0010_SanctionDetailsLink.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0011_AddHighProfileProgrammeType.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0012_FixProgrammeTypeCasing.sql" />
+    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0013_PreviousNameTransactionId.sql" />
   </ItemGroup>
 
   <ItemGroup>
