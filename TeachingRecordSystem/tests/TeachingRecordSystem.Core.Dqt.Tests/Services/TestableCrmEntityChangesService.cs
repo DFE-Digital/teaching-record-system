@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Reactive.Linq;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
@@ -40,13 +41,22 @@ public sealed class TestableCrmEntityChangesService : ICrmEntityChangesService, 
         string serviceClientName,
         string entityLogicalName,
         ColumnSet columns,
+        DateTime? modifiedSince,
         int pageSize = 1000,
         CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
 
         var subject = _entityTypeSubjects.GetOrAdd(entityLogicalName, _ => new System.Reactive.Subjects.ReplaySubject<IChangedItem[]>());
-        return subject.ToAsyncEnumerable();
+
+        return subject
+            .Select(batch => batch
+                .Where(e => !modifiedSince.HasValue || e is not NewOrUpdatedItem ||
+                (e is NewOrUpdatedItem newOrUpdatedItem && newOrUpdatedItem.NewOrUpdatedEntity.GetAttributeValue<DateTime>("modifiedon") >= modifiedSince.Value))
+                .ToArray()
+            )
+            .Where(batch => batch.Length > 0)
+            .ToAsyncEnumerable();
     }
 
     private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);

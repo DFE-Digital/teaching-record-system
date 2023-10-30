@@ -51,6 +51,25 @@ public class TrsDataSyncHelper
         }
     }
 
+    public async Task<DateTime?> GetLastModifiedOnForEntity(string entityLogicalName)
+    {
+        var entitySyncInfo = GetEntitySyncInfo(entityLogicalName);
+
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
+        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
+        await connection.OpenAsync();
+
+        using (var createTempTableCommand = connection.CreateCommand())
+        {
+            createTempTableCommand.CommandText = entitySyncInfo.GetLastModifiedOnStatement;
+            await using var reader = await createTempTableCommand.ExecuteReaderAsync();
+            var read = reader.Read();
+            Debug.Assert(read);
+            return reader.IsDBNull(0) ? null : reader.GetDateTime(0);
+        }
+    }
+
     public string[] GetSyncedAttributeNames(string entityLogicalName)
     {
         var entitySyncInfo = GetEntitySyncInfo(entityLogicalName);
@@ -203,6 +222,7 @@ public class TrsDataSyncHelper
     private static EntitySyncInfo GetEntitySyncInfoForContact()
     {
         var tempTableName = "temp_person_import";
+        var tableName = "persons";
 
         var columnNames = new[]
         {
@@ -227,18 +247,20 @@ public class TrsDataSyncHelper
 
         var columnList = string.Join(", ", columnNames);
 
-        var createTempTableStatement = $"CREATE TEMP TABLE {tempTableName} (LIKE persons INCLUDING DEFAULTS)";
+        var createTempTableStatement = $"CREATE TEMP TABLE {tempTableName} (LIKE {tableName} INCLUDING DEFAULTS)";
 
         var copyStatement = $"COPY {tempTableName} ({columnList}) FROM STDIN (FORMAT BINARY)";
 
         var mergeStatement =
             $"""
-            INSERT INTO persons ({columnList}, dqt_first_sync, dqt_last_sync)
+            INSERT INTO {tableName} ({columnList}, dqt_first_sync, dqt_last_sync)
             SELECT {columnList}, {NowParameterName}, {NowParameterName} FROM {tempTableName}
             ON CONFLICT (person_id) DO UPDATE SET dqt_last_sync = {NowParameterName}, {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
             """;
 
-        var deleteStatement = $"DELETE FROM persons WHERE dqt_contact_id = ANY({IdsParameterName})";
+        var deleteStatement = $"DELETE FROM {tableName} WHERE dqt_contact_id = ANY({IdsParameterName})";
+
+        var getLastModifiedOnStatement = $"SELECT MAX(dqt_modified_on) FROM {tableName}";
 
         var attributeNames = new[]
         {
@@ -263,6 +285,7 @@ public class TrsDataSyncHelper
             copyStatement,
             mergeStatement,
             deleteStatement,
+            getLastModifiedOnStatement,
             attributeNames,
             helper => (entities, ignoreInvalid, ct) => helper.SyncContacts(entities.Select(e => e.ToEntity<Contact>()).ToArray(), ignoreInvalid, ct));
     }
@@ -291,6 +314,7 @@ public class TrsDataSyncHelper
         string CopyStatement,
         string InsertStatement,
         string DeleteStatement,
+        string GetLastModifiedOnStatement,
         string[] AttributeNames,
         Func<TrsDataSyncHelper, SyncEntitiesHandler> GetSyncHandler);
 }

@@ -87,7 +87,9 @@ public class TrsDataSyncService : BackgroundService
 
         var columns = new ColumnSet(_trsDataSyncHelper.GetSyncedAttributeNames(entityLogicalName));
 
-        var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, CrmClientName, entityLogicalName, columns, PageSize)
+        var modifiedSince = await _trsDataSyncHelper.GetLastModifiedOnForEntity(entityLogicalName);
+
+        var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, CrmClientName, entityLogicalName, columns, modifiedSince, PageSize)
             .WithCancellation(cancellationToken);
 
         await foreach (var changes in changesEnumerable)
