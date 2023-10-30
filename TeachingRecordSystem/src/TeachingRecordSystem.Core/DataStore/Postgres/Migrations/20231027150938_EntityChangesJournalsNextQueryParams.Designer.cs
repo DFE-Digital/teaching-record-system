@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -11,9 +12,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231027150938_EntityChangesJournalsNextQueryParams")]
+    partial class EntityChangesJournalsNextQueryParams
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,14 +38,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<string>("DataToken")
                         .HasColumnType("text")
                         .HasColumnName("data_token");
-
-                    b.Property<DateTime?>("LastUpdated")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_updated");
-
-                    b.Property<string>("LastUpdatedBy")
-                        .HasColumnType("text")
-                        .HasColumnName("last_updated_by");
 
                     b.Property<int?>("NextQueryPageNumber")
                         .HasColumnType("integer")

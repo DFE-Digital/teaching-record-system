@@ -14,15 +14,18 @@ public class CrmEntityChangesService : ICrmEntityChangesService
     private readonly IDbContextFactory<TrsDbContext> _dbContextFactory;
     private readonly ICrmServiceClientProvider _crmServiceClientProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
+    private readonly IClock _clock;
 
     public CrmEntityChangesService(
         IDbContextFactory<TrsDbContext> dbContextFactory,
         ICrmServiceClientProvider crmServiceClientProvider,
-        IDistributedLockProvider distributedLockProvider)
+        IDistributedLockProvider distributedLockProvider,
+        IClock clock)
     {
         _dbContextFactory = dbContextFactory;
         _crmServiceClientProvider = crmServiceClientProvider;
         _distributedLockProvider = distributedLockProvider;
+        _clock = clock;
     }
 
     public async IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
@@ -53,9 +56,6 @@ public class CrmEntityChangesService : ICrmEntityChangesService
 
         await using (@lock)
         {
-            var entityChangesJournal = await dbContext.EntityChangesJournals
-                .SingleOrDefaultAsync(t => t.Key == changesKey && t.EntityLogicalName == entityLogicalName);
-
             var organizationService = _crmServiceClientProvider.GetClient(changesKey);
 
             var request = new RetrieveEntityChangesRequest()
@@ -66,19 +66,44 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                 {
                     Count = pageSize,
                     PageNumber = 1
-                },
-                DataVersion = entityChangesJournal?.DataToken
+                }
             };
 
-            var gotData = false;
+            var entityChangesJournal = await dbContext.EntityChangesJournals
+                .SingleOrDefaultAsync(t => t.Key == changesKey && t.EntityLogicalName == entityLogicalName);
+
+            if (entityChangesJournal is not null)
+            {
+                request.DataVersion = entityChangesJournal.DataToken;
+
+                if (entityChangesJournal.NextQueryPageSize == pageSize)
+                {
+                    request.PageInfo.PageNumber = entityChangesJournal.NextQueryPageNumber ?? 1;
+                    request.PageInfo.PagingCookie = entityChangesJournal.NextQueryPagingCookie;
+                }
+            }
+
+            var queryCount = 0;
 
             while (true)
             {
+                // Persist the paging information to the DB so that if we restart we can pick up where we left off.
+                // This is particularly important for when we have to a do a full sync as we're often deploying so regularly we can't quite catch up.
+                if (queryCount > 0)
+                {
+                    await UpsertEntityChangesJournal(
+                        request.DataVersion,
+                        request.PageInfo.PageNumber,
+                        request.PageInfo.Count,
+                        request.PageInfo.PagingCookie);
+                }
+
                 cancellationToken.ThrowIfCancellationRequested();
 
                 RetrieveEntityChangesResponse response;
                 try
                 {
+                    queryCount++;
                     response = (RetrieveEntityChangesResponse)await organizationService.ExecuteAsync(request);
                 }
                 catch (FaultException<OrganizationServiceFault> fault) when (fault.Detail.ErrorCode == -2147204270)  // ExpiredVersionStamp
@@ -91,6 +116,11 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                 }
                 catch (Exception ex) when ((ex is InsufficientMemoryException || ex is OutOfMemoryException) && request.PageInfo.Count > 1)
                 {
+                    // REVIEW: We could be a little smarter here; we need to query with a smaller page size to prevent us running out of memory.
+                    // We need to make sure we don't miss anything but we don't want to be re-processing data we've already processed either.
+                    // If we're halving the page size then doubling the page number could work but I don't know whether that will work with
+                    // a PagingCookie that used a different page size.
+
                     request.PageInfo.Count /= 2;
                     request.PageInfo.PageNumber = 1;
                     request.PageInfo.PagingCookie = null;
@@ -102,8 +132,6 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                     continue;
                 }
 
-                gotData |= response.EntityChanges.Changes.Count > 0;
-
                 if (response.EntityChanges.Changes.Count > 0)
                 {
                     yield return response.EntityChanges.Changes.ToArray();
@@ -111,21 +139,11 @@ public class CrmEntityChangesService : ICrmEntityChangesService
 
                 if (!response.EntityChanges.MoreRecords)
                 {
-                    if (gotData && entityChangesJournal is not null)
-                    {
-                        entityChangesJournal.DataToken = response.EntityChanges.DataToken;
-                        await dbContext.SaveChangesAsync();
-                    }
-                    else if (entityChangesJournal is null)
-                    {
-                        dbContext.EntityChangesJournals.Add(new()
-                        {
-                            Key = changesKey,
-                            EntityLogicalName = entityLogicalName,
-                            DataToken = response.EntityChanges.DataToken
-                        });
-                        await dbContext.SaveChangesAsync();
-                    }
+                    await UpsertEntityChangesJournal(
+                        response.EntityChanges.DataToken,
+                        nextQueryPageNumber: null,
+                        nextQueryPageSize: null,
+                        nextQueryPagingCookie: null);
 
                     break;
                 }
@@ -133,6 +151,29 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                 request.PageInfo.PageNumber++;
                 request.PageInfo.PagingCookie = response.EntityChanges.PagingCookie;
             }
+        }
+
+        Task UpsertEntityChangesJournal(
+            string? dataToken,
+            int? nextQueryPageNumber,
+            int? nextQueryPageSize,
+            string? nextQueryPagingCookie)
+        {
+            var hostName = System.Net.Dns.GetHostName();
+
+            return dbContext.Database.ExecuteSqlAsync(
+                $"""
+                INSERT INTO entity_changes_journals
+                (key, entity_logical_name, data_token, last_updated, last_updated_by, next_query_page_number, next_query_page_size, next_query_paging_cookie)
+                VALUES ({changesKey}, {entityLogicalName}, {dataToken}, {_clock.UtcNow}, {hostName}, {nextQueryPageNumber}, {nextQueryPageSize}, {nextQueryPagingCookie})
+                ON CONFLICT (key, entity_logical_name) DO UPDATE SET
+                data_token = EXCLUDED.data_token,
+                last_updated = EXCLUDED.last_updated,
+                last_updated_by = EXCLUDED.last_updated_by,
+                next_query_page_number = EXCLUDED.next_query_page_number,
+                next_query_page_size = EXCLUDED.next_query_page_size,
+                next_query_paging_cookie = EXCLUDED.next_query_paging_cookie
+                """);
         }
     }
 }
