@@ -33,6 +33,7 @@ public class CrmEntityChangesService : ICrmEntityChangesService
         string crmClientName,
         string entityLogicalName,
         ColumnSet columns,
+        DateTime? modifiedSince,
         int pageSize,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
@@ -52,15 +53,20 @@ public class CrmEntityChangesService : ICrmEntityChangesService
             yield break;
         }
 
+        // If we're filtering out records that came before modifiedSince, ensure we have the modifiedon attribute
+        var columnSet =
+            modifiedSince.HasValue && !columns.Columns.Contains("modifiedon") ? new ColumnSet(columns.Columns.Append("modifiedon").ToArray()) :
+            columns;
+
         using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         await using (@lock)
         {
-            var organizationService = _crmServiceClientProvider.GetClient(changesKey);
+            var organizationService = _crmServiceClientProvider.GetClient(crmClientName);
 
             var request = new RetrieveEntityChangesRequest()
             {
-                Columns = columns,
+                Columns = columnSet,
                 EntityName = entityLogicalName,
                 PageInfo = new()
                 {
@@ -132,9 +138,17 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                     continue;
                 }
 
-                if (response.EntityChanges.Changes.Count > 0)
+                // Filter out any changes that came before modifiedSince (if it's non-null).
+                // Note that this is a greater than *or equal to* operator since it's possible there are multiple changes at exactly the same time
+                // and we want to ensure we don't miss any of them.
+                var changes = response.EntityChanges.Changes
+                    .Where(e => !modifiedSince.HasValue || e is not NewOrUpdatedItem ||
+                        (e is NewOrUpdatedItem newOrUpdatedItem && newOrUpdatedItem.NewOrUpdatedEntity.GetAttributeValue<DateTime>("modifiedon") >= modifiedSince.Value))
+                    .ToArray();
+
+                if (changes.Length > 0)
                 {
-                    yield return response.EntityChanges.Changes.ToArray();
+                    yield return changes;
                 }
 
                 if (!response.EntityChanges.MoreRecords)

@@ -171,7 +171,8 @@ public partial class DqtReportingService : BackgroundService
 
         try
         {
-            var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, CrmClientName, entityLogicalName, columns, PageSize)
+            // We don't populate modifiedSince here since it's so slow to query in the reporting DB
+            var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, CrmClientName, entityLogicalName, columns, modifiedSince: null, PageSize)
                 .WithCancellation(cancellationToken);
 
             await foreach (var changes in changesEnumerable)

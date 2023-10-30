@@ -10,6 +10,7 @@ public interface ICrmEntityChangesService
         string crmClientName,
         string entityLogicalName,
         ColumnSet columns,
+        DateTime? modifiedSince,
         int pageSize = 1000,
         CancellationToken cancellationToken = default);
 }
