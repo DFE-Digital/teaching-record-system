@@ -21,8 +21,7 @@ public partial class DqtReportingService : BackgroundService
     public const string ProcessChangesOperationName = "DqtReporting: process changes";
 
     private const int MaxParameters = 1024;
-    private const int DefaultPageSize = 500;
-    private const int AnnotationEntityPageSize = 50;
+    private const int PageSize = 500;
     private const int MaxUpsertBatchSize = 100;
     private const int MaxEntityTypesToProcessConcurrently = 10;
 
@@ -158,17 +157,21 @@ public partial class DqtReportingService : BackgroundService
 
         var columns = new ColumnSet(allColumns: true);
 
-        var pageSize = DefaultPageSize;
-
-        // annotation has binary data in it so the rows are large; reduce the page size to try to prevent memory exceptions
+        // annotation has binary data in it that causes extremely large response messages.
+        // We don't need that data so exclude the offending attribute.
         if (entityLogicalName == Annotation.EntityLogicalName)
         {
-            pageSize = AnnotationEntityPageSize;
+            columns = new ColumnSet(
+                _entityMetadata[Annotation.EntityLogicalName].EntityMetadata.Attributes
+                .Where(a => a.AttributeOf is null)
+                .Select(a => a.LogicalName)
+                .Except(new[] { Annotation.Fields.DocumentBody })
+                .ToArray());
         }
 
         try
         {
-            var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, CrmClientName, entityLogicalName, columns, pageSize)
+            var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, CrmClientName, entityLogicalName, columns, PageSize)
                 .WithCancellation(cancellationToken);
 
             await foreach (var changes in changesEnumerable)
