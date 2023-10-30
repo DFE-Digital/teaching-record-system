@@ -24,7 +24,7 @@
     <PackageReference Include="NSwag.AspNetCore" Version="13.20.0" />
     <PackageReference Include="NSwag.Examples" Version="1.0.10" />
     <PackageReference Include="RedisRateLimiting.AspNetCore" Version="1.0.8" />
-    <PackageReference Include="Sentry.AspNetCore" Version="3.35.0" />
+    <PackageReference Include="Sentry.AspNetCore" Version="3.40.1" />
     <PackageReference Include="Sentry.Serilog" Version="3.35.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
