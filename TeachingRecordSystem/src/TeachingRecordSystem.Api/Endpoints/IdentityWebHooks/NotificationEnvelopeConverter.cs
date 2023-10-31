@@ -104,6 +104,9 @@ public class NotificationEnvelopeConverter : JsonConverter<NotificationEnvelope>
                         case UserUpdatedMessage.MessageTypeName:
                             message = JsonSerializer.Deserialize<UserUpdatedMessage>(ref reader, options);
                             break;
+                        case UserMergedMessage.MessageTypeName:
+                            message = JsonSerializer.Deserialize<UserMergedMessage>(ref reader, options);
+                            break;
                         default:
                             throw new JsonException($"{nameof(NotificationEnvelope.MessageType)} '{messageType}' is not supported");
                     }
