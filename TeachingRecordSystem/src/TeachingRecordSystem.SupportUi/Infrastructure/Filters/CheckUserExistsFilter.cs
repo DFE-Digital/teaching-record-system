@@ -5,9 +5,11 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-public class CheckUserExistsFilter : IAsyncPageFilter
+public class CheckUserExistsFilter : IAsyncResourceFilter, IOrderedFilter
 {
-    public async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public int Order => int.MinValue;
+
+    public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
         var user = context.HttpContext.User;
 
@@ -27,6 +29,4 @@ public class CheckUserExistsFilter : IAsyncPageFilter
             await next();
         }
     }
-
-    public Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context) => Task.CompletedTask;
 }
