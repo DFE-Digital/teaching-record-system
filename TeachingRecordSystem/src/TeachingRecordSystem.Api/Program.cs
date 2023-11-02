@@ -225,7 +225,7 @@ public class Program
             services.AddSingleton<IDistributedLockProvider>(new FileDistributedSynchronizationProvider(new DirectoryInfo(lockFileDirectory)));
         }
 
-        if (env.IsProduction())
+        if (!env.IsUnitTests() && !env.IsEndToEndTests())
         {
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
