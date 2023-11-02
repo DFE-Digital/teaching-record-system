@@ -46,7 +46,7 @@ resource "azurerm_mssql_database" "reporting_db" {
   name        = "${var.azure_resource_prefix}${var.service_short_name}${var.environment_short_name}repsqldb"
   server_id   = azurerm_mssql_server.reporting_server[count.index].id
   collation   = "SQL_Latin1_General_CP1_CI_AS"
-  max_size_gb = 10
+  max_size_gb = 30
   sku_name    = "S0"
 
   lifecycle {
