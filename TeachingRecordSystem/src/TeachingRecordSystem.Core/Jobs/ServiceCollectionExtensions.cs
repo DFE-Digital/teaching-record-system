@@ -83,6 +83,11 @@ public static class ServiceCollectionExtensions
 
                 recurringJobManager.RemoveIfExists("MopUpQtsAwardeesJob");
 
+                recurringJobManager.AddOrUpdate<SyncAllContactsFromCrmJob>(
+                    nameof(SyncAllContactsFromCrmJob),
+                    job => job.Execute(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }
