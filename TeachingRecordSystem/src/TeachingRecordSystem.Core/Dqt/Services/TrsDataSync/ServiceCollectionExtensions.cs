@@ -12,14 +12,20 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        if (configuration.GetValue<bool>("TrsSyncService:RunService"))
+        var runService = configuration.GetValue<bool>("TrsSyncService:RunService");
+
+        if (runService ||
+            configuration.GetValue<bool>("TrsSyncService:RegisterServiceClient"))
         {
             services.AddOptions<TrsDataSyncServiceOptions>()
                 .Bind(configuration.GetSection("TrsSyncService"))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            services.AddSingleton<IHostedService, TrsDataSyncService>();
+            if (runService)
+            {
+                services.AddSingleton<IHostedService, TrsDataSyncService>();
+            }
 
             services.AddServiceClient(
                 TrsDataSyncService.CrmClientName,
