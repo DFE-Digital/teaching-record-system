@@ -76,6 +76,15 @@ public static class ServiceCollectionExtensions
                     return Task.CompletedTask;
                 });
             }
+
+            services.AddStartupTask(sp =>
+            {
+                var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
+
+                recurringJobManager.RemoveIfExists("MopUpQtsAwardeesJob");
+
+                return Task.CompletedTask;
+            });
         }
 
         if (environment.IsProduction())
