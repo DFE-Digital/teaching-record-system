@@ -1,7 +1,5 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
@@ -13,8 +11,7 @@ public class CheckUserExistsFilter : IAsyncResourceFilter, IOrderedFilter
     {
         var user = context.HttpContext.User;
 
-        if (user.Identity?.IsAuthenticated == true &&
-            (!user.Claims.Any(c => c.Type == CustomClaims.UserId) || !user.Claims.Any(c => c.Type == ClaimTypes.Role)))
+        if (user.Identity?.IsAuthenticated == true && !user.IsActiveTrsUser())
         {
             var viewResult = new ViewResult()
             {
