@@ -50,7 +50,7 @@ public static class ServiceCollectionExtensions
 
                 services.AddStartupTask(sp =>
                 {
-                    var recurringJobManager = sp.GetRequiredService<RecurringJobManager>();
+                    var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
                     var options = sp.GetRequiredService<IOptions<RecurringJobsOptions>>().Value;
 
                     recurringJobManager.AddOrUpdate<BatchSendQtsAwardedEmailsJob>(
