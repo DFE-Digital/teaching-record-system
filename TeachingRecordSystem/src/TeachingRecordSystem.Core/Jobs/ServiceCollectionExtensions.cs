@@ -1,6 +1,8 @@
+using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 
 namespace TeachingRecordSystem.Core.Jobs;
@@ -12,9 +14,9 @@ public static class ServiceCollectionExtensions
         IHostEnvironment environment,
         IConfiguration configuration)
     {
-        if (configuration.GetValue<bool>("RecurringJobs:Enabled"))
+        if ((!environment.IsUnitTests() && !environment.IsEndToEndTests()))
         {
-            if ((!environment.IsUnitTests() && !environment.IsEndToEndTests()))
+            if (configuration.GetValue<bool>("RecurringJobs:Enabled"))
             {
                 services.AddOptions<RecurringJobsOptions>()
                     .Bind(configuration.GetSection("RecurringJobs"))
@@ -37,7 +39,6 @@ public static class ServiceCollectionExtensions
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
-                services.AddSingleton<IHostedService, RegisterRecurringJobsHostedService>();
                 services.AddTransient<SendQtsAwardedEmailJob>();
                 services.AddTransient<QtsAwardedEmailJobDispatcher>();
                 services.AddTransient<SendInternationalQtsAwardedEmailJob>();
@@ -46,16 +47,44 @@ public static class ServiceCollectionExtensions
                 services.AddTransient<EytsAwardedEmailJobDispatcher>();
                 services.AddTransient<SendInductionCompletedEmailJob>();
                 services.AddTransient<InductionCompletedEmailJobDispatcher>();
-            }
 
-            if (environment.IsProduction())
-            {
-                services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
+                services.AddStartupTask(sp =>
+                {
+                    var recurringJobManager = sp.GetRequiredService<RecurringJobManager>();
+                    var options = sp.GetRequiredService<IOptions<RecurringJobsOptions>>().Value;
+
+                    recurringJobManager.AddOrUpdate<BatchSendQtsAwardedEmailsJob>(
+                        nameof(BatchSendQtsAwardedEmailsJob),
+                        job => job.Execute(CancellationToken.None),
+                        options.BatchSendQtsAwardedEmails.JobSchedule);
+
+                    recurringJobManager.AddOrUpdate<BatchSendInternationalQtsAwardedEmailsJob>(
+                        nameof(BatchSendInternationalQtsAwardedEmailsJob),
+                        job => job.Execute(CancellationToken.None),
+                        options.BatchSendInternationalQtsAwardedEmails.JobSchedule);
+
+                    recurringJobManager.AddOrUpdate<BatchSendEytsAwardedEmailsJob>(
+                        nameof(BatchSendEytsAwardedEmailsJob),
+                        job => job.Execute(CancellationToken.None),
+                        options.BatchSendEytsAwardedEmails.JobSchedule);
+
+                    recurringJobManager.AddOrUpdate<BatchSendInductionCompletedEmailsJob>(
+                        nameof(BatchSendInductionCompletedEmailsJob),
+                        job => job.Execute(CancellationToken.None),
+                        options.BatchSendInductionCompletedEmails.JobSchedule);
+
+                    return Task.CompletedTask;
+                });
             }
-            else
-            {
-                services.AddSingleton<IBackgroundJobScheduler, ExecuteImmediatelyJobScheduler>();
-            }
+        }
+
+        if (environment.IsProduction())
+        {
+            services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
+        }
+        else
+        {
+            services.AddSingleton<IBackgroundJobScheduler, ExecuteImmediatelyJobScheduler>();
         }
 
         return services;
