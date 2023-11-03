@@ -50,13 +50,13 @@ function Set-Configuration {
 
 Set-Configuration
 
-function Preprend-NullableDisable {
+function Preprend-Annotations {
     [CmdletBinding()]
     param (
         [string]$File
     )
 
-    "#nullable disable`r`n" + (Get-Content -Raw $File) | Set-Content -Path $File
+    "#nullable disable`r`n" + "#pragma warning disable CS8981`r`n" + (Get-Content -Raw $File) | Set-Content -Path $File
 }
 
 $namespace = "TeachingRecordSystem.Core.Dqt.Models"
@@ -80,7 +80,7 @@ $crmSvcUtil = Join-Path -Path $coreToolsFolder -ChildPath "CrmSvcUtil.exe"
     /namingservice:"DLaB.CrmSvcUtilExtensions.NamingService,DLaB.CrmSvcUtilExtensions" `
     /metadataproviderservice:"DLaB.CrmSvcUtilExtensions.Entity.MetadataProviderService,DLaB.CrmSvcUtilExtensions"
 
-Preprend-NullableDisable $entitiesOutput
+Preprend-Annotations $entitiesOutput
 
 # option sets
 if ($IncludeOptionSets -eq $true) {
@@ -95,5 +95,5 @@ if ($IncludeOptionSets -eq $true) {
         /namingservice:"DLaB.CrmSvcUtilExtensions.NamingService,DLaB.CrmSvcUtilExtensions" `
         /metadataproviderservice:"DLaB.CrmSvcUtilExtensions.BaseMetadataProviderService,DLaB.CrmSvcUtilExtensions"
 
-    Preprend-NullableDisable $optionSetsOutput
+    Preprend-Annotations $optionSetsOutput
 }

@@ -231,7 +231,7 @@ public class Program
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(pgConnectionString));
+                .UsePostgreSqlStorage(o => o.UseNpgsqlConnection(pgConnectionString)));
 
             services.AddHangfireServer();
         }
