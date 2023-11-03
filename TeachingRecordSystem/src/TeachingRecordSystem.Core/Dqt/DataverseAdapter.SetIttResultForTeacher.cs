@@ -382,17 +382,20 @@ public partial class DataverseAdapter
                 }
                 else
                 {
-                    switch (itt.dfeta_Result)
+                    if (itt.dfeta_ProgrammeType.HasValue)
                     {
-                        case dfeta_ITTResult.InTraining:
-                        case dfeta_ITTResult.Withdrawn:
-                        case dfeta_ITTResult.Deferred:
-                        case dfeta_ITTResult.Pass:
-                        case dfeta_ITTResult.Fail:
-                            {
-                                matching.Add(itt);
-                                break;
-                            }
+                        switch (itt.dfeta_Result)
+                        {
+                            case dfeta_ITTResult.InTraining:
+                            case dfeta_ITTResult.Withdrawn:
+                            case dfeta_ITTResult.Deferred:
+                            case dfeta_ITTResult.Pass:
+                            case dfeta_ITTResult.Fail:
+                                {
+                                    matching.Add(itt);
+                                    break;
+                                }
+                        }
                     }
                 }
             }
