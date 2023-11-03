@@ -170,17 +170,20 @@ public partial class DataverseAdapter
                 });
                 Debug.Assert(teacherStatus != null);
 
+                if (!lookupData.Teacher.dfeta_QTSDate.HasValue)
+                {
+                    txnRequest.Requests.Add(new CreateRequest()
+                    {
+                        Target = new dfeta_induction()
+                        {
+                            dfeta_PersonId = teacherId.ToEntityReference(Contact.EntityLogicalName),
+                            dfeta_InductionStatus = dfeta_InductionStatus.RequiredtoComplete
+                        }
+                    });
+                }
+
                 qtsUpdate.dfeta_TeacherStatusId = teacherStatus.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
                 qtsUpdate.dfeta_QTSDate = qtsDate.Value.ToDateTime();
-
-                txnRequest.Requests.Add(new CreateRequest()
-                {
-                    Target = new dfeta_induction()
-                    {
-                        dfeta_PersonId = teacherId.ToEntityReference(Contact.EntityLogicalName),
-                        dfeta_InductionStatus = dfeta_InductionStatus.RequiredtoComplete
-                    }
-                });
             }
         }
         else
