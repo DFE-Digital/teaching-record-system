@@ -655,6 +655,35 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
         Assert.Equal(SetIttResultForTeacherFailedReason.NoMatchingIttRecord, result.FailedReason);
     }
 
+    [Fact]
+    public async Task Given_valid_request_with_existing_qts_date_do_not_recreate_induction_record()
+    {
+        // Arrange
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, false, iqts: true);
+
+        var ittResult = dfeta_ITTResult.Pass;
+        var assessmentDate = _clock.Today;
+        var teacherStatusId = (await _dataverseAdapter.GetTeacherStatus("90", null)).Id;
+
+        // Act
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        var (result2, transactionRequest2) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.True(result2.Succeeded);
+        transactionRequest2.AssertDoesNotContainCreateRequest<dfeta_induction>();
+    }
+
     public static class SelectIttRecordTestData
     {
         public static readonly Guid TeacherId = Guid.NewGuid();
