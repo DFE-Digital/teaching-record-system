@@ -262,6 +262,7 @@
   "sdkmessagefilter": [],
   "sdkmessageprocessingstep": [],
   "sdkmessageprocessingstepimage": [],
+  "sdkmessageprocessingstepsecureconfig": [],
   "subject": [
     "description",
     "statecode",
