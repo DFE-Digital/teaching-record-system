@@ -28,10 +28,20 @@ public class SyncAllContactsFromCrmJob
         var serviceClient = _crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
         var columns = new ColumnSet(_trsDataSyncHelper.GetSyncedAttributeNames(Contact.EntityLogicalName));
 
+        // Ensure this is kept in sync with the predicate in TrsDataSyncHelper.SyncContacts
+        var filter = new FilterExpression(LogicalOperator.And)
+        {
+            Conditions =
+            {
+                new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull),
+                new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.NotEqual, ""),
+            }
+        };
+
         var query = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = columns,
-            NoLock = true,  // Any changes that we miss because of this be picked up by the change log sync
+            Criteria = filter,
             Orders =
             {
                 new OrderExpression(Contact.Fields.CreatedOn, OrderType.Ascending)
