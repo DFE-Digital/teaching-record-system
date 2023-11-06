@@ -55,7 +55,7 @@ public record GetTeacherResponseInductionPeriod
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
     public required int? Terms { get; init; }
-    public required GetTeacherResponseInductionPeriodAppropriateBody AppropriateBody { get; init; }
+    public required GetTeacherResponseInductionPeriodAppropriateBody? AppropriateBody { get; init; }
 }
 
 public record GetTeacherResponseInductionPeriodAppropriateBody

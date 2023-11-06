@@ -318,10 +318,12 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             StartDate = inductionPeriod.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             EndDate = inductionPeriod.dfeta_EndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             Terms = inductionPeriod.dfeta_Numberofterms,
-            AppropriateBody = new GetTeacherResponseInductionPeriodAppropriateBody()
-            {
-                Name = appropriateBody.Name
-            }
+            AppropriateBody = appropriateBody is not null ?
+                new GetTeacherResponseInductionPeriodAppropriateBody()
+                {
+                    Name = appropriateBody.Name
+                } :
+                null
         };
     }
 
