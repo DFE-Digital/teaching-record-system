@@ -89,7 +89,8 @@ public class TrsDataSyncHelper
     {
         var entitySyncInfo = GetEntitySyncInfo(Contact.EntityLogicalName);
 
-        // For now, only sync records that have TRNs
+        // For now, only sync records that have TRNs.
+        // Keep this in sync with the filter in the SyncAllContactsFromCrmJob job.
         var toSync = entities.Where(e => !string.IsNullOrEmpty(e.dfeta_TRN));
 
         if (ignoreInvalid)
