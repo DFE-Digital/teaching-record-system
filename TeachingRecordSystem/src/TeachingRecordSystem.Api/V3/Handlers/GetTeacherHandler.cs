@@ -417,23 +417,23 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         return subjects;
     }
 
-    private static IEnumerable<GetTeacherResponseNpqQualificationsQualification> MapNpqQualifications(dfeta_qualification[] qualifications, AccessMode accessMode) =>
+    private static IEnumerable<GetTeacherResponseNpqQualification> MapNpqQualifications(dfeta_qualification[] qualifications, AccessMode accessMode) =>
         qualifications
             ?.Where(q => q.dfeta_Type.HasValue
                 && q.dfeta_Type.Value.IsNpq()
                 && q.StateCode == dfeta_qualificationState.Active
                 && q.dfeta_CompletionorAwardDate.HasValue)
-            .Select(q => new GetTeacherResponseNpqQualificationsQualification()
+            .Select(q => new GetTeacherResponseNpqQualification()
             {
                 Awarded = q.dfeta_CompletionorAwardDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                Type = new GetTeacherResponseNpqQualificationsQualificationType()
+                Type = new GetTeacherResponseNpqQualificationType()
                 {
                     Code = MapNpqQualificationType(q.dfeta_Type!.Value),
                     Name = q.dfeta_Type.Value.GetName(),
                 },
                 CertificateUrl = accessMode == AccessMode.IdentityAccessToken ? $"/v3/certificates/npq/{q.Id}" : null
             })
-            .ToArray() ?? Array.Empty<GetTeacherResponseNpqQualificationsQualification>();
+            .ToArray() ?? Array.Empty<GetTeacherResponseNpqQualification>();
 
     private static NpqQualificationType MapNpqQualificationType(dfeta_qualification_dfeta_Type qualificationType) =>
         qualificationType switch
@@ -450,7 +450,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             _ => throw new NotImplementedException($"Qualification Type {qualificationType} is not currently supported.")
         };
 
-    private static IEnumerable<GetTeacherResponseMandatoryQualificationsQualification> MapMandatoryQualifications(dfeta_qualification[] qualifications) =>
+    private static IEnumerable<GetTeacherResponseMandatoryQualification> MapMandatoryQualifications(dfeta_qualification[] qualifications) =>
         qualifications
             ?.Where(q => q.dfeta_Type.HasValue
                 && q.dfeta_Type.Value == dfeta_qualification_dfeta_Type.MandatoryQualification
@@ -462,14 +462,14 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Specialism = mq.Extract<dfeta_specialism>(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute)
             })
             .Where(mq => mq.Specialism != null)
-            .Select(mq => new GetTeacherResponseMandatoryQualificationsQualification()
+            .Select(mq => new GetTeacherResponseMandatoryQualification()
             {
                 Awarded = mq.Awarded,
                 Specialism = mq.Specialism.dfeta_name
             })
-            .ToArray() ?? Array.Empty<GetTeacherResponseMandatoryQualificationsQualification>();
+            .ToArray() ?? Array.Empty<GetTeacherResponseMandatoryQualification>();
 
-    private static IEnumerable<GetTeacherResponseHigherEducationQualificationsQualification> MapHigherEducationQualifications(dfeta_qualification[] qualifications) =>
+    private static IEnumerable<GetTeacherResponseHigherEducationQualification> MapHigherEducationQualifications(dfeta_qualification[] qualifications) =>
         qualifications
             ?.Where(q =>
                 q.dfeta_Type.HasValue &&
@@ -484,11 +484,11 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 var heSubject2 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}2", dfeta_hesubject.PrimaryIdAttribute);
                 var heSubject3 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}3", dfeta_hesubject.PrimaryIdAttribute);
 
-                var heSubjects = new List<GetTeacherResponseHigherEducationQualificationsQualificationSubject>();
+                var heSubjects = new List<GetTeacherResponseHigherEducationQualificationSubject>();
 
                 if (heSubject1 != null)
                 {
-                    heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
+                    heSubjects.Add(new GetTeacherResponseHigherEducationQualificationSubject
                     {
                         Code = heSubject1.dfeta_Value,
                         Name = heSubject1.dfeta_name,
@@ -497,7 +497,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
                 if (heSubject2 != null)
                 {
-                    heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
+                    heSubjects.Add(new GetTeacherResponseHigherEducationQualificationSubject
                     {
                         Code = heSubject2.dfeta_Value,
                         Name = heSubject2.dfeta_name,
@@ -506,19 +506,19 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
                 if (heSubject3 != null)
                 {
-                    heSubjects.Add(new GetTeacherResponseHigherEducationQualificationsQualificationSubject
+                    heSubjects.Add(new GetTeacherResponseHigherEducationQualificationSubject
                     {
                         Code = heSubject3.dfeta_Value,
                         Name = heSubject3.dfeta_name,
                     });
                 }
 
-                return new GetTeacherResponseHigherEducationQualificationsQualification
+                return new GetTeacherResponseHigherEducationQualification
                 {
                     Name = heQualification.dfeta_name,
                     Awarded = q.dfeta_CompletionorAwardDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     Subjects = heSubjects.ToArray()
                 };
             })
-            .ToArray() ?? Array.Empty<GetTeacherResponseHigherEducationQualificationsQualification>();
+            .ToArray() ?? Array.Empty<GetTeacherResponseHigherEducationQualification>();
 }
