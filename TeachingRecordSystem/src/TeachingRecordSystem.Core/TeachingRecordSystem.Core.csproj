@@ -21,6 +21,7 @@
     <None Remove="Dqt\Services\DqtReporting\Migrations\0012_FixProgrammeTypeCasing.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0013_PreviousNameTransactionId.sql" />
     <None Remove="Dqt\Services\DqtReporting\Migrations\0014_Contact_dfeta_allowidsigninwithprohibitions.sql" />
+    <None Remove="Dqt\Services\DqtReporting\Migrations\0015_ContactTrnIndex.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,6 +39,7 @@
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0012_FixProgrammeTypeCasing.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0013_PreviousNameTransactionId.sql" />
     <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0014_Contact_dfeta_allowidsigninwithprohibitions.sql" />
+    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0015_ContactTrnIndex.sql" />
   </ItemGroup>
 
   <ItemGroup>
