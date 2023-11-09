@@ -59,7 +59,8 @@
     "telephone1",
     "dfeta_slugid",
     "dfeta_allowpiiupdatesfromregister",
-    "dfeta_previouslastname"
+    "dfeta_previouslastname",
+    "dfeta_AllowIDSignInWithProhibitions"
   ],
   "dfeta_businesseventaudit":[
     "createdon",

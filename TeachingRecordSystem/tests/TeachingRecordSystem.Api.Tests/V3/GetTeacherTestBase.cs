@@ -568,12 +568,16 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 new
                 {
                     alertType = "Prohibition",
-                    dqtSanctionCode = sanctions[0].SanctionCode
+                    dqtSanctionCode = sanctions[0].SanctionCode,
+                    startDate = sanctions[0].StartDate,
+                    endDate = (DateOnly?)null
                 },
                 new
                 {
                     alertType = "Prohibition",
-                    dqtSanctionCode = sanctions[1].SanctionCode
+                    dqtSanctionCode = sanctions[1].SanctionCode,
+                    startDate = sanctions[1].StartDate,
+                    endDate = (DateOnly?)null
                 }
             },
             responseAlerts);
