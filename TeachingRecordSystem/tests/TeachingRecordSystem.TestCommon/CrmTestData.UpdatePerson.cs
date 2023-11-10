@@ -15,7 +15,7 @@ public partial class CrmTestData
     public class UpdatePersonBuilder
     {
         private Guid? _personId = null;
-        private (string FirstName, string MiddleName, string LastName)? _updatedName = null;
+        private (string FirstName, string? MiddleName, string LastName)? _updatedName = null;
 
         public UpdatePersonBuilder WithPersonId(Guid personId)
         {
@@ -28,7 +28,7 @@ public partial class CrmTestData
             return this;
         }
 
-        public UpdatePersonBuilder WithUpdatedName(string firstName, string middleName, string lastName)
+        public UpdatePersonBuilder WithUpdatedName(string firstName, string? middleName, string lastName)
         {
             if (_updatedName is not null)
             {

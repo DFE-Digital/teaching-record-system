@@ -23,8 +23,10 @@ public partial class CrmTestData
         private string? _lastName;
         private string? _email;
         private string? _mobileNumber;
-        private bool? _hasNationalInsuranceNumber;
         private Contact_GenderCode? _gender;
+        private bool? _hasNationalInsuranceNumber;
+        private DateOnly? _qtsDate;
+        private DateOnly? _eytsDate;
         private readonly List<Sanction> _sanctions = new();
 
         public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
@@ -140,13 +142,37 @@ public partial class CrmTestData
             return this;
         }
 
+        public CreatePersonBuilder WithQtsDate(DateOnly qtsDate)
+        {
+            if (_qtsDate is not null && _qtsDate != qtsDate)
+            {
+                throw new InvalidOperationException("WithQtsDate cannot be changed after it's set.");
+            }
+
+            _qtsDate = qtsDate;
+            return this;
+        }
+
+        public CreatePersonBuilder WithEytsDate(DateOnly eytsDate)
+        {
+            if (_eytsDate is not null && _eytsDate != eytsDate)
+            {
+                throw new InvalidOperationException("WithEytsDate cannot be changed after it's set.");
+            }
+
+            _eytsDate = eytsDate;
+            return this;
+        }
+
         public async Task<CreatePersonResult> Execute(CrmTestData testData)
         {
             var hasTrn = _hasTrn ?? true;
             var trn = hasTrn ? await testData.GenerateTrn() : null;
-
-            var firstName = _firstName ?? testData.GenerateFirstName();
-            var middleName = _middleName ?? testData.GenerateMiddleName();
+            var statedFirstName = _firstName ?? testData.GenerateFirstName();
+            var statedMiddleName = _middleName ?? testData.GenerateMiddleName();
+            var firstAndMiddleNames = $"{statedFirstName} {statedMiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var firstName = firstAndMiddleNames.First();
+            var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
             var lastName = _lastName ?? testData.GenerateLastName();
             var dateOfBirth = _dateOfBirth ?? testData.GenerateDateOfBirth();
             var gender = _gender ?? testData.GenerateGender();
@@ -159,6 +185,9 @@ public partial class CrmTestData
                 FirstName = firstName,
                 MiddleName = middleName,
                 LastName = lastName,
+                dfeta_StatedFirstName = statedFirstName,
+                dfeta_StatedMiddleName = statedMiddleName,
+                dfeta_StatedLastName = lastName,
                 BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
                 dfeta_TRN = trn,
                 GenderCode = gender
@@ -177,6 +206,16 @@ public partial class CrmTestData
             if (_hasNationalInsuranceNumber ?? false)
             {
                 contact.dfeta_NINumber = testData.GenerateNationalInsuranceNumber();
+            }
+
+            if (_qtsDate is not null)
+            {
+                contact.dfeta_QTSDate = _qtsDate.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true);
+            }
+
+            if (_eytsDate is not null)
+            {
+                contact.dfeta_EYTSDate = _eytsDate.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true);
             }
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
@@ -230,10 +269,15 @@ public partial class CrmTestData
                 FirstName = firstName,
                 MiddleName = middleName,
                 LastName = lastName,
+                StatedFirstName = statedFirstName,
+                StatedMiddleName = statedMiddleName,
+                StatedLastName = lastName,
                 Email = _email,
                 MobileNumber = _mobileNumber,
                 Gender = gender.ToString(),
                 NationalInsuranceNumber = contact.dfeta_NINumber,
+                QtsDate = _qtsDate,
+                EytsDate = _eytsDate,
                 Sanctions = _sanctions.ToImmutableArray()
             };
         }
@@ -248,10 +292,15 @@ public partial class CrmTestData
         public required string FirstName { get; init; }
         public required string MiddleName { get; init; }
         public required string LastName { get; init; }
+        public required string StatedFirstName { get; init; }
+        public required string StatedMiddleName { get; init; }
+        public required string StatedLastName { get; init; }
         public required string? Email { get; init; }
         public required string? MobileNumber { get; init; }
         public required string Gender { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
+        public required DateOnly? QtsDate { get; init; }
+        public required DateOnly? EytsDate { get; init; }
         public required ImmutableArray<Sanction> Sanctions { get; init; }
 
         public Contact ToContact() => new()
@@ -260,14 +309,16 @@ public partial class CrmTestData
             FirstName = FirstName,
             MiddleName = MiddleName,
             LastName = LastName,
-            dfeta_StatedFirstName = FirstName,
-            dfeta_StatedMiddleName = MiddleName,
-            dfeta_StatedLastName = LastName,
+            dfeta_StatedFirstName = StatedFirstName,
+            dfeta_StatedMiddleName = StatedMiddleName,
+            dfeta_StatedLastName = StatedLastName,
             BirthDate = DateOfBirth.FromDateOnlyWithDqtBstFix(isLocalTime: false),
             dfeta_TRN = Trn,
             EMailAddress1 = Email,
             MobilePhone = MobileNumber,
             dfeta_NINumber = NationalInsuranceNumber,
+            dfeta_QTSDate = QtsDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+            dfeta_EYTSDate = EytsDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
             GenderCode = Enum.Parse<Contact_GenderCode>(Gender)
         };
     }
