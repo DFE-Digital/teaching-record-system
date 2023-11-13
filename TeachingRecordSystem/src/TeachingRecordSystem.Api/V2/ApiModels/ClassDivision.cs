@@ -56,6 +56,9 @@ public enum ClassDivision
 
     [Description("Upper second class honours")]
     UpperSecondClassHonours = 389040001,
+
+    [Description("Other")]
+    Other = 389040017,
 }
 
 public static class ClassDivisionExtensions

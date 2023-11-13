@@ -1209,6 +1209,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		Ordinary_includingdivisionsofordinaryifanydegreeawardedafterfollowinganonhonourscourse = 389040009,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Other", 17, "#0000ff")]
+		Other = 389040017,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Pass", 13)]
 		Pass = 389040013,
 		
