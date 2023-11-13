@@ -19,9 +19,9 @@ public record GetTeacherResponse
     public required GetTeacherResponseEyts? Eyts { get; init; }
     public required Option<GetTeacherResponseInduction?> Induction { get; init; }
     public required Option<IEnumerable<GetTeacherResponseInitialTeacherTraining>> InitialTeacherTraining { get; init; }
-    public required Option<IEnumerable<GetTeacherResponseNpqQualificationsQualification>> NpqQualifications { get; init; }
-    public required Option<IEnumerable<GetTeacherResponseMandatoryQualificationsQualification>> MandatoryQualifications { get; init; }
-    public required Option<IEnumerable<GetTeacherResponseHigherEducationQualificationsQualification>> HigherEducationQualifications { get; init; }
+    public required Option<IEnumerable<GetTeacherResponseNpqQualification>> NpqQualifications { get; init; }
+    public required Option<IEnumerable<GetTeacherResponseMandatoryQualification>> MandatoryQualifications { get; init; }
+    public required Option<IEnumerable<GetTeacherResponseHigherEducationQualification>> HigherEducationQualifications { get; init; }
     public required Option<IEnumerable<SanctionInfo>> Sanctions { get; init; }
     public required Option<IEnumerable<AlertInfo>> Alerts { get; init; }
 }
@@ -98,34 +98,34 @@ public record GetTeacherResponseInitialTeacherTrainingSubject
     public required string Name { get; init; }
 }
 
-public record GetTeacherResponseNpqQualificationsQualification
+public record GetTeacherResponseNpqQualification
 {
     public required DateOnly Awarded { get; init; }
-    public required GetTeacherResponseNpqQualificationsQualificationType Type { get; init; }
+    public required GetTeacherResponseNpqQualificationType Type { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string? CertificateUrl { get; init; }
 }
 
-public record GetTeacherResponseNpqQualificationsQualificationType
+public record GetTeacherResponseNpqQualificationType
 {
     public required NpqQualificationType Code { get; init; }
     public required string Name { get; init; }
 }
 
-public record GetTeacherResponseMandatoryQualificationsQualification
+public record GetTeacherResponseMandatoryQualification
 {
     public required DateOnly Awarded { get; init; }
     public required string Specialism { get; init; }
 }
 
-public record GetTeacherResponseHigherEducationQualificationsQualification
+public record GetTeacherResponseHigherEducationQualification
 {
     public required string Name { get; init; }
     public required DateOnly? Awarded { get; init; }
-    public required IEnumerable<GetTeacherResponseHigherEducationQualificationsQualificationSubject> Subjects { get; init; }
+    public required IEnumerable<GetTeacherResponseHigherEducationQualificationSubject> Subjects { get; init; }
 }
 
-public record GetTeacherResponseHigherEducationQualificationsQualificationSubject
+public record GetTeacherResponseHigherEducationQualificationSubject
 {
     public required string Code { get; init; }
     public required string Name { get; init; }
