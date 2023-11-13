@@ -16,6 +16,9 @@ public partial class CrmTestData
 
     public class CreatePersonBuilder
     {
+        private const string TeacherStatusQualifiedTeacherAssessmentOnlyRoute = "100";
+        private const string EaryYearsStatusProfessionalStatus = "222";
+
         private DateOnly? _dateOfBirth;
         private bool? _hasTrn;
         private string? _firstName;
@@ -26,7 +29,9 @@ public partial class CrmTestData
         private Contact_GenderCode? _gender;
         private bool? _hasNationalInsuranceNumber;
         private DateOnly? _qtsDate;
+        private string? _teacherStatus;
         private DateOnly? _eytsDate;
+        private string? _earlyYearsStatus;
         private readonly List<Sanction> _sanctions = new();
 
         public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
@@ -142,25 +147,27 @@ public partial class CrmTestData
             return this;
         }
 
-        public CreatePersonBuilder WithQtsDate(DateOnly qtsDate)
+        public CreatePersonBuilder WithQts(DateOnly qtsDate, string teacherStatus = TeacherStatusQualifiedTeacherAssessmentOnlyRoute)
         {
-            if (_qtsDate is not null && _qtsDate != qtsDate)
+            if ((_qtsDate is not null && _qtsDate != qtsDate) || (_teacherStatus is not null && _teacherStatus != teacherStatus))
             {
-                throw new InvalidOperationException("WithQtsDate cannot be changed after it's set.");
+                throw new InvalidOperationException("WithQts cannot be changed after it's set.");
             }
 
             _qtsDate = qtsDate;
+            _teacherStatus = teacherStatus;
             return this;
         }
 
-        public CreatePersonBuilder WithEytsDate(DateOnly eytsDate)
+        public CreatePersonBuilder WithEyts(DateOnly eytsDate, string earlyYearsStatus = EaryYearsStatusProfessionalStatus)
         {
-            if (_eytsDate is not null && _eytsDate != eytsDate)
+            if ((_eytsDate is not null && _eytsDate != eytsDate) || (_earlyYearsStatus is not null && _earlyYearsStatus != earlyYearsStatus))
             {
-                throw new InvalidOperationException("WithEytsDate cannot be changed after it's set.");
+                throw new InvalidOperationException("WithEyts cannot be changed after it's set.");
             }
 
             _eytsDate = eytsDate;
+            _earlyYearsStatus = earlyYearsStatus;
             return this;
         }
 
@@ -208,18 +215,56 @@ public partial class CrmTestData
                 contact.dfeta_NINumber = testData.GenerateNationalInsuranceNumber();
             }
 
-            if (_qtsDate is not null)
-            {
-                contact.dfeta_QTSDate = _qtsDate.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true);
-            }
-
-            if (_eytsDate is not null)
-            {
-                contact.dfeta_EYTSDate = _eytsDate.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true);
-            }
-
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = contact });
+
+            if (_qtsDate is not null && _teacherStatus is not null)
+            {
+                var teacherStatus = await testData.ReferenceDataCache.GetTeacherStatusByValue(_teacherStatus);
+                var qtsRegistrationId = Guid.NewGuid();
+                txnRequestBuilder.AddRequest(new CreateRequest()
+                {
+                    Target = new dfeta_qtsregistration()
+                    {
+                        Id = qtsRegistrationId,
+                        dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName)
+                    }
+                });
+                // Plugin which updates Contact with QTS Date only fires on Update or Delete
+                txnRequestBuilder.AddRequest(new UpdateRequest()
+                {
+                    Target = new dfeta_qtsregistration()
+                    {
+                        Id = qtsRegistrationId,
+                        dfeta_QTSDate = _qtsDate.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                        dfeta_TeacherStatusId = teacherStatus.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
+                    }
+                });
+            }
+
+            if (_eytsDate is not null && _earlyYearsStatus is not null)
+            {
+                var earlyYearsStatus = await testData.ReferenceDataCache.GetEarlyYearsStatusByValue(_earlyYearsStatus);
+                var eytsRegistrationId = Guid.NewGuid();
+                txnRequestBuilder.AddRequest(new CreateRequest()
+                {
+                    Target = new dfeta_qtsregistration()
+                    {
+                        Id = eytsRegistrationId,
+                        dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName)
+                    }
+                });
+                // Plugin which updates Contact with EYTS Date only fires on Update or Delete
+                txnRequestBuilder.AddRequest(new UpdateRequest()
+                {
+                    Target = new dfeta_qtsregistration()
+                    {
+                        Id = eytsRegistrationId,
+                        dfeta_EYTSDate = _eytsDate.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                        dfeta_EarlyYearsStatusId = earlyYearsStatus.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
+                    }
+                });
+            }
 
             foreach (var sanction in _sanctions)
             {

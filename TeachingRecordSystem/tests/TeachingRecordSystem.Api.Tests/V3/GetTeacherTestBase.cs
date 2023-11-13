@@ -8,6 +8,7 @@ namespace TeachingRecordSystem.Api.Tests.V3;
 
 public abstract class GetTeacherTestBase : ApiTestBase
 {
+    private const string QualifiedTeacherTrainedTeacherStatusValue = "71";
     private const string QtsAwardedInWalesTeacherStatusValue = "213";
     private readonly Guid _qtsAwardedInWalesTeacherStatusId = Guid.NewGuid();
 
@@ -22,25 +23,11 @@ public abstract class GetTeacherTestBase : ApiTestBase
         HttpClient httpClient,
         string baseUrl,
         Contact contact,
-        bool qualifiedInWales,
         bool expectQtsCertificateUrl,
         bool expectEysCertificateUrl)
     {
-        // Arrange        
-        dfeta_qtsregistration[]? qtsRegistrations = null;
-        if (qualifiedInWales)
-        {
-            qtsRegistrations = new[]
-            {
-                new dfeta_qtsregistration()
-                {
-                    dfeta_QTSDate = contact.dfeta_QTSDate,
-                    dfeta_TeacherStatusId = _qtsAwardedInWalesTeacherStatusId.ToEntityReference(dfeta_teacherstatus.EntityLogicalName)
-                }
-            };
-        }
-
-        await ConfigureMocks(contact, qtsRegistrations: qtsRegistrations);
+        // Arrange
+        await ConfigureMocks(contact);
 
         var request = new HttpRequestMessage(HttpMethod.Get, baseUrl);
 
@@ -637,7 +624,9 @@ public abstract class GetTeacherTestBase : ApiTestBase
             responsePreviousNames);
     }
 
-    protected async Task<Contact> CreateContact(bool hasMultiWordFirstName = false)
+    protected async Task<Contact> CreateContact(
+        bool hasMultiWordFirstName = false,
+        bool qualifiedInWales = false)
     {
         var qtsDate = new DateOnly(1997, 4, 23);
         var eytsDate = new DateOnly(1995, 5, 14);
@@ -646,8 +635,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
         var person = await TestData.CreatePerson(
             b => b.WithFirstName(firstName)
                 .WithTrn()
-                .WithQtsDate(qtsDate)
-                .WithEytsDate(eytsDate));
+                .WithQts(qtsDate, qualifiedInWales ? QtsAwardedInWalesTeacherStatusValue : QualifiedTeacherTrainedTeacherStatusValue)
+                .WithEyts(eytsDate));
 
         return person.ToContact();
     }
@@ -659,7 +648,6 @@ public abstract class GetTeacherTestBase : ApiTestBase
         dfeta_inductionperiod[]? inductionPeriods = null,
         dfeta_qualification[]? qualifications = null,
         Incident[]? incidents = null,
-        dfeta_qtsregistration[]? qtsRegistrations = null,
         (string FirstName, string? MiddleName, string LastName)[]? updatedNames = null,
         (string SanctionCode, DateOnly? StartDate)[]? sanctions = null)
     {
@@ -719,19 +707,12 @@ public abstract class GetTeacherTestBase : ApiTestBase
             .Setup(mock => mock.GetTeacherStatus(
                 It.Is<string>(s => s == QtsAwardedInWalesTeacherStatusValue),
                 It.IsAny<RequestBuilder>()))
-            .ReturnsAsync(new dfeta_teacherstatus()
-            {
-                Id = _qtsAwardedInWalesTeacherStatusId
-            });
+            .Returns(async (string s, RequestBuilder b) => await TestData.ReferenceDataCache.GetTeacherStatusByValue(s));
 
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherStatus(
-                It.Is<string>(s => s != QtsAwardedInWalesTeacherStatusValue),
-                It.IsAny<RequestBuilder>()))
-            .ReturnsAsync(new dfeta_teacherstatus()
-            {
-                Id = Guid.NewGuid()
-            });
+        using var ctx = new DqtCrmServiceContext(TestData.OrganizationService);
+        var qtsRegistrations = ctx.dfeta_qtsregistrationSet
+            .Where(c => c.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == contact.Id)
+            .ToArray();
 
         DataverseAdapterMock
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(

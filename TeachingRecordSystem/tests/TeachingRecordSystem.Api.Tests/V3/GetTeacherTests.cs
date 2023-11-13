@@ -26,21 +26,21 @@ public class GetTeacherTests : GetTeacherTestBase
     [Fact]
     public async Task Get_ValidRequest_ReturnsExpectedResponse()
     {
-        var contact = await CreateContact();
+        var contact = await CreateContact(qualifiedInWales: false);
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, qualifiedInWales: false, expectQtsCertificateUrl: true, expectEysCertificateUrl: true);
+        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: true, expectEysCertificateUrl: true);
     }
 
     [Fact]
     public async Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse()
     {
-        var contact = await CreateContact();
+        var contact = await CreateContact(qualifiedInWales: true);
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, qualifiedInWales: true, expectQtsCertificateUrl: false, expectEysCertificateUrl: true);
+        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: true);
     }
 
     [Fact]

@@ -8,6 +8,7 @@ public class ReferenceDataCache
     private Task<dfeta_sanctioncode[]>? _getSanctionCodesTask;
     private Task<Subject[]>? _getSubjectsTask;
     private Task<dfeta_teacherstatus[]>? _getTeacherStatusesTask;
+    private Task<dfeta_earlyyearsstatus[]>? _getEarlyYearsStatusesTask;
 
     public ReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher)
     {
@@ -45,6 +46,12 @@ public class ReferenceDataCache
         return teacherStatuses.Single(ts => ts.dfeta_Value == value);
     }
 
+    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusByValue(string value)
+    {
+        var earlyYearsStatuses = await EnsureEarlyYearsStatuses();
+        return earlyYearsStatuses.Single(ey => ey.dfeta_Value == value);
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
@@ -59,4 +66,10 @@ public class ReferenceDataCache
         LazyInitializer.EnsureInitialized(
             ref _getTeacherStatusesTask,
             () => _crmQueryDispatcher.ExecuteQuery(new GetAllTeacherStatusesQuery()));
+
+    // ensure early years statuses
+    private Task<dfeta_earlyyearsstatus[]> EnsureEarlyYearsStatuses() =>
+        LazyInitializer.EnsureInitialized(
+            ref _getEarlyYearsStatusesTask,
+            () => _crmQueryDispatcher.ExecuteQuery(new GetAllEarlyYearsStatusesQuery()));
 }
