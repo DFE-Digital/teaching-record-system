@@ -31,32 +31,35 @@
     </div>
 </div>
 
-<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+@if (!string.IsNullOrEmpty(Model.Alert.Details) && !string.IsNullOrEmpty(Model.Alert.DetailsLink))
+{   
+    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
-        <h3 class="govuk-heading-s">Details</h3>
-        @if (!string.IsNullOrEmpty(Model.Alert.Details))
-        {
-            <multi-line-text data-testid="alert-details" text="@Model.Alert.Details"/>
-        }
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <h3 class="govuk-heading-s">Details</h3>
+            @if (!string.IsNullOrEmpty(Model.Alert.Details))
+            {
+                <multi-line-text data-testid="alert-details" text="@Model.Alert.Details" />
+            }
 
-        @if (!string.IsNullOrEmpty(Model.Alert.DetailsLink))
-        {
-            <a href="@Model.Alert.DetailsLink" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="full-case-details-link">See full case details (opens in new tab)</a>
-        }
+            @if (!string.IsNullOrEmpty(Model.Alert.DetailsLink))
+            {
+                <a href="@Model.Alert.DetailsLink" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="full-case-details-link">See full case details (opens in new tab)</a>
+            }
 
-        @if (Model.IsActive)
-        {
-            <form asp-page-handler="SetInactive" method="post">
-                <govuk-button type="submit" class="govuk-!-margin-top-9" data-testid="deactivate-button">Mark alert as inactive</govuk-button>
-            </form>
-        }
-        else
-        {
-            <form asp-page-handler="SetActive" method="post">
-                <govuk-button type="submit" class="govuk-button--warning govuk-!-margin-top-9" data-testid="reactivate-button">Remove inactive status</govuk-button>
-            </form>
-        }
+            @if (Model.IsActive)
+            {
+                <form asp-page-handler="SetInactive" method="post">
+                    <govuk-button type="submit" class="govuk-!-margin-top-9" data-testid="deactivate-button">Mark alert as inactive</govuk-button>
+                </form>
+            }
+            else
+            {
+                <form asp-page-handler="SetActive" method="post">
+                    <govuk-button type="submit" class="govuk-button--warning govuk-!-margin-top-9" data-testid="reactivate-button">Remove inactive status</govuk-button>
+                </form>
+            }
+        </div>
     </div>
-</div>
+}
