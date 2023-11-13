@@ -17,6 +17,8 @@ public class SeedCrmReferenceData : IStartupTask
     {
         AddSubjects();
         AddSanctionCodes();
+        AddTeacherStatuses();
+        AddEarlyYearsStatuses();
 
         return Task.CompletedTask;
     }
@@ -64,6 +66,58 @@ public class SeedCrmReferenceData : IStartupTask
         {
             dfeta_Value = "B1",
             dfeta_name = "B1 Description"
+        });
+    }
+
+    private void AddTeacherStatuses()
+    {
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "71",
+            dfeta_name = "Qualified Teacher (trained)",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "100",
+            dfeta_name = "Qualified Teacher: Assessment Only Route",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "90",
+            dfeta_name = "Qualified teacher: by virtue of achieving international qualified teacher status",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "213",
+            dfeta_name = "Qualified Teacher: QTS awarded in Wales",
+            dfeta_QTSDateRequired = true
+        });
+    }
+
+    private void AddEarlyYearsStatuses()
+    {
+        _xrmFakedContext.CreateEntity(new dfeta_earlyyearsstatus()
+        {
+            dfeta_Value = "220",
+            dfeta_name = "Early Years Trainee",
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_earlyyearsstatus()
+        {
+            dfeta_Value = "221",
+            dfeta_name = "Early Years Teacher Status"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_earlyyearsstatus()
+        {
+            dfeta_Value = "222",
+            dfeta_name = "Early Years Professional Status"
         });
     }
 }

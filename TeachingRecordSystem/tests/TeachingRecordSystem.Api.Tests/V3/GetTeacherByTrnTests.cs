@@ -38,110 +38,119 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     }
 
     [Fact]
-    public Task Get_ValidRequest_ReturnsExpectedResponse()
+    public async Task Get_ValidRequest_ReturnsExpectedResponse()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact(qualifiedInWales: false);
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, trn, qualifiedInWales: false, expectQtsCertificateUrl: false, expectEysCertificateUrl: false);
+        await ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false);
     }
 
     [Fact]
-    public Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse()
+    public async Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact(qualifiedInWales: true);
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, trn, qualifiedInWales: true, expectQtsCertificateUrl: false, expectEysCertificateUrl: false);
+        await ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false);
     }
 
     [Fact]
-    public Task Get_ValidRequestForContactWithMultiWordFirstName_ReturnsExpectedResponse()
+    public async Task Get_ValidRequestForContactWithMultiWordFirstName_ReturnsExpectedResponse()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, trn, expectCertificateUrls: false);
+        await ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectCertificateUrls: false);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
+    public async Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestWithInduction_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, trn, expectCertificateUrls: false);
+        await ValidRequestWithInduction_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, contact, expectCertificateUrls: false);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent()
+    public async Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(HttpClientWithApiKey, baseUrl, trn);
+        await ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(HttpClientWithApiKey, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent()
+    public async Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(HttpClientWithApiKey, baseUrl, trn, expectCertificateUrls: false);
+        await ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(HttpClientWithApiKey, baseUrl, contact, expectCertificateUrls: false);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
+    public async Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(HttpClientWithApiKey, baseUrl, trn);
+        await ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(HttpClientWithApiKey, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent()
+    public async Task Get_ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(HttpClientWithApiKey, baseUrl, trn);
+        await ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(HttpClientWithApiKey, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue()
+    public async Task Get_ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(HttpClientWithApiKey, baseUrl, trn);
+        await ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(HttpClientWithApiKey, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue()
+    public async Task Get_ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(HttpClientWithApiKey, baseUrl, trn);
+        await ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(HttpClientWithApiKey, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithSanctions_ReturnsExpectedSanctionsContent()
+    public async Task Get_ValidRequestWithSanctions_ReturnsExpectedSanctionsContent()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(HttpClientWithApiKey, baseUrl, trn);
+        await ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(HttpClientWithApiKey, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithAlerts_ReturnsExpectedSanctionsContent()
+    public async Task Get_ValidRequestWithAlerts_ReturnsExpectedSanctionsContent()
     {
-        var trn = "1234567";
-        var baseUrl = $"/v3/teachers/{trn}";
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        return ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(HttpClientWithApiKey, baseUrl, trn);
+        await ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(HttpClientWithApiKey, baseUrl, contact);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithPreviousNames_ReturnsExpectedPreviousNamesContent()
+    {
+        var contact = await CreateContact();
+        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
+
+        await ValidRequestWithPreviousNames_ReturnsExpectedPreviousNamesContent(HttpClientWithApiKey, baseUrl, contact);
     }
 }

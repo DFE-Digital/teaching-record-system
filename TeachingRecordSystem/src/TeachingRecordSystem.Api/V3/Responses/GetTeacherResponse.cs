@@ -24,6 +24,7 @@ public record GetTeacherResponse
     public required Option<IEnumerable<GetTeacherResponseHigherEducationQualification>> HigherEducationQualifications { get; init; }
     public required Option<IEnumerable<SanctionInfo>> Sanctions { get; init; }
     public required Option<IEnumerable<AlertInfo>> Alerts { get; init; }
+    public required Option<IEnumerable<NameInfo>> PreviousNames { get; init; }
 }
 
 public record GetTeacherResponseQts

@@ -8,6 +8,7 @@ namespace TeachingRecordSystem.Api.Tests.V3;
 
 public abstract class GetTeacherTestBase : ApiTestBase
 {
+    private const string QualifiedTeacherTrainedTeacherStatusValue = "71";
     private const string QtsAwardedInWalesTeacherStatusValue = "213";
     private readonly Guid _qtsAwardedInWalesTeacherStatusId = Guid.NewGuid();
 
@@ -21,28 +22,12 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestForTeacher_ReturnsExpectedContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn,
-        bool qualifiedInWales,
+        Contact contact,
         bool expectQtsCertificateUrl,
         bool expectEysCertificateUrl)
     {
         // Arrange
-        var contact = await CreateContact(trn);
-
-        dfeta_qtsregistration[]? qtsRegistrations = null;
-        if (qualifiedInWales)
-        {
-            qtsRegistrations = new[]
-            {
-                new dfeta_qtsregistration()
-                {
-                    dfeta_QTSDate = contact.dfeta_QTSDate,
-                    dfeta_TeacherStatusId = _qtsAwardedInWalesTeacherStatusId.ToEntityReference(dfeta_teacherstatus.EntityLogicalName)
-                }
-            };
-        }
-
-        await ConfigureMocks(trn, contact, qtsRegistrations: qtsRegistrations);
+        await ConfigureMocks(contact);
 
         var request = new HttpRequestMessage(HttpMethod.Get, baseUrl);
 
@@ -55,7 +40,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             firstName = contact.FirstName,
             lastName = contact.LastName,
             middleName = contact.MiddleName,
-            trn = trn,
+            trn = contact.dfeta_TRN,
             dateOfBirth = contact.BirthDate?.ToString("yyyy-MM-dd"),
             nationalInsuranceNumber = contact.dfeta_NINumber,
             qts = new
@@ -90,13 +75,11 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn,
+        Contact contact,
         bool expectCertificateUrls)
     {
         // Arrange
-        var contact = await CreateContact(trn, hasMultiWordFirstName: true);
-
-        await ConfigureMocks(trn, contact);
+        await ConfigureMocks(contact);
 
         var request = new HttpRequestMessage(HttpMethod.Get, baseUrl);
 
@@ -109,7 +92,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             firstName = contact.dfeta_StatedFirstName,
             lastName = contact.dfeta_StatedLastName,
             middleName = contact.dfeta_StatedMiddleName,
-            trn = trn,
+            trn = contact.dfeta_TRN,
             dateOfBirth = contact.BirthDate?.ToString("yyyy-MM-dd"),
             nationalInsuranceNumber = contact.dfeta_NINumber,
             qts = new
@@ -140,15 +123,14 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestWithInduction_ReturnsExpectedInductionContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn,
+        Contact contact,
         bool expectCertificateUrls)
     {
         // Arrange
-        var contact = await CreateContact(trn);
         var induction = CreateInduction();
         var inductionPeriods = CreateInductionPeriods();
 
-        await ConfigureMocks(trn, contact, induction: induction, inductionPeriods: inductionPeriods);
+        await ConfigureMocks(contact, induction: induction, inductionPeriods: inductionPeriods);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Induction");
 
@@ -191,13 +173,12 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        Contact contact)
     {
         // Arrange
-        var contact = await CreateContact(trn);
         var itt = CreateItt(contact);
 
-        await ConfigureMocks(trn, contact, itt);
+        await ConfigureMocks(contact, itt);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=InitialTeacherTraining");
 
@@ -257,12 +238,10 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn,
+        Contact contact,
         bool expectCertificateUrls)
     {
         // Arrange
-        var contact = await CreateContact(trn);
-
         var npqQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.NPQLL, null, dfeta_qualificationState.Active, null);
         var npqQualificationInactive = CreateQualification(dfeta_qualification_dfeta_Type.NPQSL, new DateTime(2022, 5, 6), dfeta_qualificationState.Inactive, null);
         var npqQualificationValid = CreateQualification(dfeta_qualification_dfeta_Type.NPQEYL, new DateTime(2022, 3, 4), dfeta_qualificationState.Active, null);
@@ -274,7 +253,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             npqQualificationValid
         };
 
-        await ConfigureMocks(trn, contact, qualifications: qualifications);
+        await ConfigureMocks(contact, qualifications: qualifications);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=NpqQualifications");
 
@@ -310,11 +289,9 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        Contact contact)
     {
         // Arrange
-        var contact = await CreateContact(trn);
-
         var mandatoryQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, null, dfeta_qualificationState.Active, "Visual Impairment");
         var mandatoryQualificationNoSpecialism = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 2, 3), dfeta_qualificationState.Active, null);
         var mandatoryQualificationValid = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 4, 6), dfeta_qualificationState.Active, "Hearing");
@@ -328,7 +305,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             mandatoryQualificationInactive
         };
 
-        await ConfigureMocks(trn, contact, qualifications: qualifications);
+        await ConfigureMocks(contact, qualifications: qualifications);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=MandatoryQualifications");
 
@@ -354,10 +331,9 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        Contact contact)
     {
         // Arrange
-        var contact = await CreateContact(trn);
         var qualification1AwardDate = new DateTime(2022, 4, 6);
         var qualification1Name = "My HE Qual 1";
         var qualification1Subject1 = (Code: "Qualification1Subject1", Name: "Qualification 1 Subject 1");
@@ -418,7 +394,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             heQualificationInactive
         };
 
-        await ConfigureMocks(trn, contact, qualifications: qualifications);
+        await ConfigureMocks(contact, qualifications: qualifications);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=HigherEducationQualifications");
 
@@ -468,11 +444,9 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        Contact contact)
     {
         // Arrange
-        var contact = await CreateContact(trn);
-
         var incidents = new[]
         {
             new Incident()
@@ -483,7 +457,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             }
         };
 
-        await ConfigureMocks(trn, contact, incidents: incidents);
+        await ConfigureMocks(contact, incidents: incidents);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=PendingDetailChanges");
 
@@ -498,11 +472,9 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        Contact contact)
     {
         // Arrange
-        var contact = await CreateContact(trn);
-
         var incidents = new[]
         {
             new Incident()
@@ -513,7 +485,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             }
         };
 
-        await ConfigureMocks(trn, contact, incidents: incidents);
+        await ConfigureMocks(contact, incidents: incidents);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=PendingDetailChanges");
 
@@ -528,11 +500,9 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        Contact contact)
     {
         // Arrange
-        var contact = await CreateContact(trn);
-
         var sanctions = new (string SanctionCode, DateOnly? StartDate)[]
         {
             new("A18", null),
@@ -540,7 +510,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         };
         Debug.Assert(sanctions.Select(s => s.SanctionCode).All(TeachingRecordSystem.Api.V3.Constants.ExposableSanctionCodes.Contains));
 
-        await ConfigureMocks(trn, contact, sanctions: sanctions);
+        await ConfigureMocks(contact, sanctions: sanctions);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Sanctions");
 
@@ -571,11 +541,9 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(
         HttpClient httpClient,
         string baseUrl,
-        string trn)
+        Contact contact)
     {
         // Arrange
-        var contact = await CreateContact(trn);
-
         var sanctions = new (string SanctionCode, DateOnly? StartDate)[]
         {
             new("B1", null),
@@ -583,7 +551,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         };
         Debug.Assert(sanctions.Select(s => s.SanctionCode).All(TeachingRecordSystem.Api.V3.Constants.ProhibitionSanctionCodes.Contains));
 
-        await ConfigureMocks(trn, contact, sanctions: sanctions);
+        await ConfigureMocks(contact, sanctions: sanctions);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Alerts");
 
@@ -611,15 +579,76 @@ public abstract class GetTeacherTestBase : ApiTestBase
             responseAlerts);
     }
 
+    protected async Task ValidRequestWithPreviousNames_ReturnsExpectedPreviousNamesContent(
+        HttpClient httpClient,
+        string baseUrl,
+        Contact contact)
+    {
+        // Arrange
+        var updatedFirstName = TestData.GenerateFirstName();
+        var updatedMiddleName = TestData.GenerateMiddleName();
+        var updatedLastName = TestData.GenerateLastName();
+        var updatedNames = new[]
+        {
+            (FirstName: updatedFirstName, MiddleName: updatedMiddleName, LastName: contact.LastName),
+            (FirstName: updatedFirstName, MiddleName: updatedMiddleName, LastName: updatedLastName)
+        };
+
+        await ConfigureMocks(contact, updatedNames: updatedNames!);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=PreviousNames");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responsePreviousNames = jsonResponse.RootElement.GetProperty("previousNames");
+
+        AssertEx.JsonObjectEquals(
+            new[]
+            {
+                new
+                {
+                    firstName = updatedFirstName,
+                    middleName = updatedMiddleName,
+                    lastName = contact.LastName,
+                },
+                new
+                {
+                    firstName = contact.FirstName,
+                    middleName = contact.MiddleName,
+                    lastName = contact.LastName,
+                }
+            },
+            responsePreviousNames);
+    }
+
+    protected async Task<Contact> CreateContact(
+        bool hasMultiWordFirstName = false,
+        bool qualifiedInWales = false)
+    {
+        var qtsDate = new DateOnly(1997, 4, 23);
+        var eytsDate = new DateOnly(1995, 5, 14);
+        var firstName = hasMultiWordFirstName ? $"{Faker.Name.First()} {Faker.Name.First()}" : Faker.Name.First();
+
+        var person = await TestData.CreatePerson(
+            b => b.WithFirstName(firstName)
+                .WithTrn()
+                .WithQts(qtsDate, qualifiedInWales ? QtsAwardedInWalesTeacherStatusValue : QualifiedTeacherTrainedTeacherStatusValue)
+                .WithEyts(eytsDate));
+
+        return person.ToContact();
+    }
+
     private async Task ConfigureMocks(
-        string trn,
         Contact contact,
         dfeta_initialteachertraining? itt = null,
         dfeta_induction? induction = null,
         dfeta_inductionperiod[]? inductionPeriods = null,
         dfeta_qualification[]? qualifications = null,
         Incident[]? incidents = null,
-        dfeta_qtsregistration[]? qtsRegistrations = null,
+        (string FirstName, string? MiddleName, string LastName)[]? updatedNames = null,
         (string SanctionCode, DateOnly? StartDate)[]? sanctions = null)
     {
         DataverseAdapterMock
@@ -639,7 +668,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             });
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+            .Setup(mock => mock.GetTeacherByTrn(contact.dfeta_TRN, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
         DataverseAdapterMock
@@ -678,19 +707,12 @@ public abstract class GetTeacherTestBase : ApiTestBase
             .Setup(mock => mock.GetTeacherStatus(
                 It.Is<string>(s => s == QtsAwardedInWalesTeacherStatusValue),
                 It.IsAny<RequestBuilder>()))
-            .ReturnsAsync(new dfeta_teacherstatus()
-            {
-                Id = _qtsAwardedInWalesTeacherStatusId
-            });
+            .Returns(async (string s, RequestBuilder b) => await TestData.ReferenceDataCache.GetTeacherStatusByValue(s));
 
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherStatus(
-                It.Is<string>(s => s != QtsAwardedInWalesTeacherStatusValue),
-                It.IsAny<RequestBuilder>()))
-            .ReturnsAsync(new dfeta_teacherstatus()
-            {
-                Id = Guid.NewGuid()
-            });
+        using var ctx = new DqtCrmServiceContext(TestData.OrganizationService);
+        var qtsRegistrations = ctx.dfeta_qtsregistrationSet
+            .Where(c => c.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == contact.Id)
+            .ToArray();
 
         DataverseAdapterMock
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(
@@ -711,42 +733,12 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 dfeta_StartDate = sanction.StartDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true)
             });
         }
-    }
 
-    private async Task<Contact> CreateContact(string trn, bool hasMultiWordFirstName = false)
-    {
-        var contactId = Guid.NewGuid();
-        var firstName1 = Faker.Name.First();
-        var firstName2 = Faker.Name.First();
-        var lastName = Faker.Name.Last();
-        var middleName = Faker.Name.Middle();
-        var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
-        var nino = Faker.Identification.UkNationalInsuranceNumber();
-        var email = Faker.Internet.Email();
-
-        var qtsDate = new DateOnly(1997, 4, 23);
-        var eytsDate = new DateOnly(1995, 5, 14);
-
-        var teacher = new Contact()
+        foreach (var updatedName in updatedNames ?? Array.Empty<(string, string?, string)>())
         {
-            Id = contactId,
-            dfeta_TRN = trn,
-            FirstName = firstName1,
-            MiddleName = hasMultiWordFirstName ? $"{firstName2} {middleName}" : middleName,
-            LastName = lastName,
-            dfeta_StatedFirstName = hasMultiWordFirstName ? $"{firstName1} {firstName2}" : firstName1,
-            dfeta_StatedMiddleName = middleName,
-            dfeta_StatedLastName = lastName,
-            BirthDate = dateOfBirth.ToDateTime(),
-            dfeta_NINumber = nino,
-            dfeta_QTSDate = qtsDate.ToDateTime(),
-            dfeta_EYTSDate = eytsDate.ToDateTime(),
-            EMailAddress1 = email
-        };
-
-        await TestData.OrganizationService.CreateAsync(teacher);
-
-        return teacher;
+            await TestData.UpdatePerson(b => b.WithPersonId(contact.Id).WithUpdatedName(updatedName.FirstName, updatedName.MiddleName, updatedName.LastName));
+            await Task.Delay(2000);
+        }
     }
 
     private static dfeta_initialteachertraining CreateItt(Contact teacher)

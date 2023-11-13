@@ -48,6 +48,7 @@ public static class ServiceCollectionExtensions
         AssignTicketNumberToIncidentPlugin.Register(fakedXrmContext);
         PersonNameChangedPlugin.Register(fakedXrmContext);
         CalculateActiveSanctionsPlugin.Register(fakedXrmContext);
+        QtsRegistrationUpdatedPlugin.Register(fakedXrmContext);
 
         services.AddSingleton<IXrmFakedContext>(fakedXrmContext);
         var organizationService = fakedXrmContext.GetAsyncOrganizationService();

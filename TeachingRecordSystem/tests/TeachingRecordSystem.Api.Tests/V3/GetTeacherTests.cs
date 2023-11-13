@@ -24,122 +24,132 @@ public class GetTeacherTests : GetTeacherTestBase
     }
 
     [Fact]
-    public Task Get_ValidRequest_ReturnsExpectedResponse()
+    public async Task Get_ValidRequest_ReturnsExpectedResponse()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact(qualifiedInWales: false);
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, trn, qualifiedInWales: false, expectQtsCertificateUrl: true, expectEysCertificateUrl: true);
+        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: true, expectEysCertificateUrl: true);
     }
 
     [Fact]
-    public Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse()
+    public async Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact(qualifiedInWales: true);
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, trn, qualifiedInWales: true, expectQtsCertificateUrl: false, expectEysCertificateUrl: true);
+        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: true);
     }
 
     [Fact]
-    public Task Get_ValidRequestForContactWithMultiWordFirstName_ReturnsExpectedResponse()
+    public async Task Get_ValidRequestForContactWithMultiWordFirstName_ReturnsExpectedResponse()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact(hasMultiWordFirstName: true);
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
+        await ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(httpClient, baseUrl, contact, expectCertificateUrls: true);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
+    public async Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact();
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestWithInduction_ReturnsExpectedInductionContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
+        await ValidRequestWithInduction_ReturnsExpectedInductionContent(httpClient, baseUrl, contact, expectCertificateUrls: true);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent()
+    public async Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact();
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(httpClient, baseUrl, trn);
+        await ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(httpClient, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent()
+    public async Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact();
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(httpClient, baseUrl, trn, expectCertificateUrls: true);
+        await ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(httpClient, baseUrl, contact, expectCertificateUrls: true);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
+    public async Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact();
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(httpClient, baseUrl, trn);
+        await ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(httpClient, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent()
+    public async Task Get_ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact();
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        return ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(httpClient, baseUrl, trn);
+        await ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(httpClient, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue()
+    public async Task Get_ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact();
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "v3/teacher";
 
-        return ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(httpClient, baseUrl, trn);
+        await ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(httpClient, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue()
+    public async Task Get_ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact();
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "v3/teacher";
 
-        return ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(httpClient, baseUrl, trn);
+        await ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(httpClient, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithSanctions_ReturnsExpectedSanctionsContent()
+    public async Task Get_ValidRequestWithSanctions_ReturnsExpectedSanctionsContent()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact();
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "v3/teacher";
 
-        return ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(httpClient, baseUrl, trn);
+        await ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(httpClient, baseUrl, contact);
     }
 
     [Fact]
-    public Task Get_ValidRequestWithAlerts_ReturnsExpectedSanctionsContent()
+    public async Task Get_ValidRequestWithAlerts_ReturnsExpectedSanctionsContent()
     {
-        var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var contact = await CreateContact();
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "v3/teacher";
 
-        return ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(httpClient, baseUrl, trn);
+        await ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(httpClient, baseUrl, contact);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithPreviousNames_ReturnsExpectedPreviousNamesContent()
+    {
+        var contact = await CreateContact();
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
+        var baseUrl = "v3/teacher";
+
+        await ValidRequestWithPreviousNames_ReturnsExpectedPreviousNamesContent(httpClient, baseUrl, contact);
     }
 }

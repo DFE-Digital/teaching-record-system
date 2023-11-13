@@ -1,5 +1,6 @@
 using System.Text;
 using MediatR;
+using Microsoft.Xrm.Sdk.Query;
 using Optional;
 using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.Api.V3.Requests;
@@ -16,36 +17,42 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
+    private readonly TimeSpan _concurrentNameChangeWindow;
 
-    public GetTeacherHandler(IDataverseAdapter dataverseAdapter, ICrmQueryDispatcher crmQueryDispatcher)
+    public GetTeacherHandler(
+        IDataverseAdapter dataverseAdapter,
+        ICrmQueryDispatcher crmQueryDispatcher,
+        IConfiguration configuration)
     {
         _dataverseAdapter = dataverseAdapter;
         _crmQueryDispatcher = crmQueryDispatcher;
+        _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue<int>("ConcurrentNameChangeWindowSeconds", 5));
     }
 
     public async Task<GetTeacherResponse?> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
-        var teacher = await _dataverseAdapter.GetTeacherByTrn(
-            request.Trn,
-            columnNames: new[]
-            {
-                Contact.Fields.FirstName,
-                Contact.Fields.MiddleName,
-                Contact.Fields.LastName,
-                Contact.Fields.dfeta_StatedFirstName,
-                Contact.Fields.dfeta_StatedMiddleName,
-                Contact.Fields.dfeta_StatedLastName,
-                Contact.Fields.BirthDate,
-                Contact.Fields.dfeta_NINumber,
-                Contact.Fields.dfeta_QTSDate,
-                Contact.Fields.dfeta_EYTSDate,
-                Contact.Fields.EMailAddress1
-            });
+        var contactDetail = await _crmQueryDispatcher.ExecuteQuery(
+            new GetContactDetailByTrnQuery(
+                request.Trn,
+                new ColumnSet(
+                    Contact.Fields.FirstName,
+                    Contact.Fields.MiddleName,
+                    Contact.Fields.LastName,
+                    Contact.Fields.dfeta_StatedFirstName,
+                    Contact.Fields.dfeta_StatedMiddleName,
+                    Contact.Fields.dfeta_StatedLastName,
+                    Contact.Fields.BirthDate,
+                    Contact.Fields.dfeta_NINumber,
+                    Contact.Fields.dfeta_QTSDate,
+                    Contact.Fields.dfeta_EYTSDate,
+                    Contact.Fields.EMailAddress1)));
 
-        if (teacher is null)
+        if (contactDetail is null)
         {
             return null;
         }
+
+        var teacher = contactDetail.Contact;
 
         dfeta_induction? induction = default;
         dfeta_inductionperiod[]? inductionPeriods = default;
@@ -199,6 +206,60 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             sanctions = (await _crmQueryDispatcher.ExecuteQuery(getSanctionsQuery))[teacher.Id];
         }
 
+        List<NameInfo>? previousNames = null;
+
+        if (request.Include.HasFlag(GetTeacherRequestIncludes.PreviousNames))
+        {
+            previousNames = new List<NameInfo>();
+            var currentFirstName = contactDetail.Contact.FirstName;
+            var currentMiddleName = contactDetail.Contact.MiddleName;
+            var currentLastName = contactDetail.Contact.LastName;
+            DateTime? createdOnBaseline = null;
+
+            foreach (var previousName in contactDetail.PreviousNames.OrderByDescending(p => p.CreatedOn))
+            {
+                if (createdOnBaseline is null)
+                {
+                    createdOnBaseline = previousName.CreatedOn;
+                }
+                else if (createdOnBaseline - previousName.CreatedOn > _concurrentNameChangeWindow)
+                {
+                    previousNames.Add(new NameInfo()
+                    {
+                        FirstName = currentFirstName,
+                        MiddleName = currentMiddleName ?? string.Empty,
+                        LastName = currentLastName
+                    });
+                    createdOnBaseline = previousName.CreatedOn;
+                }
+
+                switch (previousName.dfeta_Type)
+                {
+                    case dfeta_NameType.FirstName:
+                        currentFirstName = previousName.dfeta_name;
+                        break;
+                    case dfeta_NameType.MiddleName:
+                        currentMiddleName = previousName.dfeta_name;
+                        break;
+                    case dfeta_NameType.LastName:
+                        currentLastName = previousName.dfeta_name;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (createdOnBaseline is not null)
+            {
+                previousNames.Add(new NameInfo()
+                {
+                    FirstName = currentFirstName,
+                    MiddleName = currentMiddleName ?? string.Empty,
+                    LastName = currentLastName
+                });
+            }
+        }
+
         var firstName = teacher.ResolveFirstName();
         var middleName = teacher.ResolveMiddleName();
         var lastName = teacher.ResolveLastName();
@@ -270,6 +331,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                         AlertType = AlertType.Prohibition,
                         DqtSanctionCode = s.SanctionCode
                     })) :
+                default,
+            PreviousNames = request.Include.HasFlag(GetTeacherRequestIncludes.PreviousNames) ?
+                Option.Some(previousNames!.Select(n => n)) :
                 default
         };
     }
