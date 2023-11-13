@@ -16,7 +16,7 @@ public partial class CrmTestData
 
     public class CreatePersonBuilder
     {
-        private const string TeacherStatusQualifiedTeacherAssessmentOnlyRoute = "100";
+        private const string TeacherStatusQualifiedTeacherTrained = "71";
         private const string EaryYearsStatusProfessionalStatus = "222";
 
         private DateOnly? _dateOfBirth;
@@ -147,7 +147,7 @@ public partial class CrmTestData
             return this;
         }
 
-        public CreatePersonBuilder WithQts(DateOnly qtsDate, string teacherStatus = TeacherStatusQualifiedTeacherAssessmentOnlyRoute)
+        public CreatePersonBuilder WithQts(DateOnly qtsDate, string teacherStatus = TeacherStatusQualifiedTeacherTrained)
         {
             if ((_qtsDate is not null && _qtsDate != qtsDate) || (_teacherStatus is not null && _teacherStatus != teacherStatus))
             {

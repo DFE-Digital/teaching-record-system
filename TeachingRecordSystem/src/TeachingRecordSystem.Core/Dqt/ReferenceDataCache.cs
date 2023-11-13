@@ -67,7 +67,6 @@ public class ReferenceDataCache
             ref _getTeacherStatusesTask,
             () => _crmQueryDispatcher.ExecuteQuery(new GetAllTeacherStatusesQuery()));
 
-    // ensure early years statuses
     private Task<dfeta_earlyyearsstatus[]> EnsureEarlyYearsStatuses() =>
         LazyInitializer.EnsureInitialized(
             ref _getEarlyYearsStatusesTask,
