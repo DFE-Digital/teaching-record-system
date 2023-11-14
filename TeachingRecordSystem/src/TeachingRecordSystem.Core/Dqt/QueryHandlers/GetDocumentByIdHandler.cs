@@ -39,9 +39,14 @@ public class GetDocumentByIdHandler : ICrmQueryHandler<GetDocumentByIdQuery, dfe
                 Annotation.Fields.Subject,
                 Annotation.Fields.DocumentBody,
                 Annotation.Fields.MimeType,
-                Annotation.Fields.FileName);
+                Annotation.Fields.FileName,
+                Annotation.Fields.IsDocument);
 
             annotationLink.EntityAlias = Annotation.EntityLogicalName;
+
+            var annotationFilter = new FilterExpression();
+            annotationFilter.AddCondition(Annotation.Fields.IsDocument, ConditionOperator.Equal, true);
+            annotationLink.LinkCriteria = annotationFilter;
         }
     }
 }

@@ -119,9 +119,14 @@ public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTi
                 Annotation.Fields.ObjectId,
                 Annotation.Fields.Subject,
                 Annotation.Fields.MimeType,
-                Annotation.Fields.FileName);
+                Annotation.Fields.FileName,
+                Annotation.Fields.IsDocument);
 
             annotationLink.EntityAlias = $"{dfeta_document.EntityLogicalName}.{Annotation.EntityLogicalName}";
+
+            var annotationFilter = new FilterExpression();
+            annotationFilter.AddCondition(Annotation.Fields.IsDocument, ConditionOperator.Equal, true);
+            annotationLink.LinkCriteria = annotationFilter;
         }
     }
 }
