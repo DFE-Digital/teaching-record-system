@@ -11,6 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Cases;
 public class IndexModel : PageModel
 {
     private const int PageSize = 15;
+    private const int MaxCrmResultCount = 5000;
     private readonly TrsLinkGenerator _linkGenerator;
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
 
@@ -29,7 +30,9 @@ public class IndexModel : PageModel
 
     public int[]? PaginationPages { get; set; }
 
-    public int TotalPages { get; set; }
+    public int TotalKnownPages { get; set; }
+
+    public bool DisplayPageNumbers { get; set; }
 
     public int? PreviousPage { get; set; }
 
@@ -44,35 +47,34 @@ public class IndexModel : PageModel
 
         PageNumber ??= 1;
 
-        var incidents = await _crmQueryDispatcher.ExecuteQuery(new GetActiveIncidentsQuery());
-        var allCases = incidents
-            .OrderBy(i => i.CreatedOn);
+        var incidentsResult = await _crmQueryDispatcher.ExecuteQuery(new GetActiveIncidentsQuery(PageNumber.Value, PageSize));
+        TotalKnownPages = Math.Max((int)Math.Ceiling((double)incidentsResult.TotalRecordCount / PageSize), 1);
 
-        var totalCases = allCases.Count();
-        TotalPages = Math.Max((int)Math.Ceiling((double)totalCases / PageSize), 1);
-
-        if (PageNumber > TotalPages)
+        if (PageNumber > TotalKnownPages)
         {
             // Redirect to first page
             return Redirect(_linkGenerator.Cases());
         }
 
-        // In the pagination control, show the first page, last page, current page and two pages either side of the current page
-        PaginationPages = Enumerable.Range(-2, 5).Select(offset => PageNumber.Value + offset)
-            .Append(1)
-            .Append(TotalPages)
-            .Where(page => page <= TotalPages && page >= 1)
-            .Distinct()
-            .Order()
-            .ToArray();
+        if (incidentsResult.TotalRecordCount < MaxCrmResultCount)
+        {
+            DisplayPageNumbers = true;
+            // In the pagination control, show the first page, last page, current page and two pages either side of the current page
+            PaginationPages = Enumerable.Range(-2, 5).Select(offset => PageNumber.Value + offset)
+                .Append(1)
+                .Append(TotalKnownPages)
+                .Where(page => page <= TotalKnownPages && page >= 1)
+                .Distinct()
+                .Order()
+                .ToArray();
+        }
 
         PreviousPage = PageNumber > 1 ? PageNumber - 1 : null;
-        NextPage = PageNumber < TotalPages ? PageNumber + 1 : null;
+        NextPage = PageNumber < TotalKnownPages ? PageNumber + 1 : null;
 
-        Cases = allCases
-            .Skip((PageNumber.Value - 1) * PageSize)
-            .Take(PageSize)
+        Cases = incidentsResult.Incidents
             .Select(MapIncident)
+            .OrderBy(c => c.CreatedOn)
             .ToArray();
 
         return Page();

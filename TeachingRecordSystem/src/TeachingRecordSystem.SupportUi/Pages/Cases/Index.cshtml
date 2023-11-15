@@ -36,7 +36,7 @@
     </tbody>
 </table>
 
-@if (Model.TotalPages > 1)
+@if (Model.TotalKnownPages > 1)
 {
     <govuk-pagination>
         @if (Model.PreviousPage.HasValue)
@@ -44,17 +44,20 @@
             <govuk-pagination-previous asp-page="Index" asp-route-pagenumber="@Model.PreviousPage" />
         }
 
-        @for (int i = 0; i < Model.PaginationPages!.Length; i++)
+        @if (Model.DisplayPageNumbers)
         {
-            var item = Model.PaginationPages[i];
-
-            if (i > 0 && Model.PaginationPages[i - 1] != item - 1)
+            @for (int i = 0; i < Model.PaginationPages!.Length; i++)
             {
-                <govuk-pagination-ellipsis />
-            }
+                var item = Model.PaginationPages[i];
 
-            <govuk-pagination-item asp-page="Index" asp-route-pagenumber="@item" is-current="@(item == Model.PageNumber)">@item</govuk-pagination-item>
-        }
+                if (i > 0 && Model.PaginationPages[i - 1] != item - 1)
+                {
+                    <govuk-pagination-ellipsis />
+                }
+
+                <govuk-pagination-item asp-page="Index" asp-route-pagenumber="@item" is-current="@(item == Model.PageNumber)">@item</govuk-pagination-item>
+            }
+        }        
 
         @if (Model.NextPage.HasValue)
         {
