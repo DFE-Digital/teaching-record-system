@@ -1,10 +1,13 @@
 using System.Security.Cryptography;
 using JustEat.HttpClientInterception;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
@@ -41,9 +44,16 @@ public class ApiFixture : WebApplicationFactory<Program>
         {
             DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
 
+            // Replace ApiKeyAuthenticationHandler with a mechanism we can control from tests
+            services.Configure<AuthenticationOptions>(options =>
+            {
+                options.SchemeMap[ApiKeyAuthenticationHandler.AuthenticationScheme].HandlerType = typeof(TestAuthenticationHandler);
+            });
+
             // Add controllers defined in this test assembly
             services.AddMvc().AddApplicationPart(typeof(ApiFixture).Assembly);
 
+            services.AddSingleton<CurrentApiClientProvider>();
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClientMock.Object);

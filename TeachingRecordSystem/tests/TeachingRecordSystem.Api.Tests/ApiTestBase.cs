@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Json;
+using TeachingRecordSystem.Api.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Certificates;
@@ -20,11 +21,11 @@ public abstract class ApiTestBase
     {
         ApiFixture = apiFixture;
         _testServices = TestScopedServices.Reset();
+        SetCurrentApiClient("tests");
 
         {
-            var key = apiFixture.Services.GetRequiredService<IConfiguration>()["ApiClients:tests:ApiKey:0"];
             HttpClientWithApiKey = apiFixture.CreateClient();
-            HttpClientWithApiKey.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
+            HttpClientWithApiKey.DefaultRequestHeaders.Add("X-Use-CurrentClientIdProvider", "true");  // Signal for TestAuthenticationHandler to run
         }
     }
 
@@ -77,6 +78,12 @@ public abstract class ApiTestBase
         httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
 
         return httpClient;
+    }
+
+    protected void SetCurrentApiClient(string clientId)
+    {
+        var currentUserProvider = ApiFixture.Services.GetRequiredService<CurrentApiClientProvider>();
+        currentUserProvider.CurrentApiClientId = clientId;
     }
 
     public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
