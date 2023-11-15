@@ -1,8 +1,10 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
+using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 
@@ -10,6 +12,7 @@ namespace TeachingRecordSystem.Api.V2.Controllers;
 
 [ApiController]
 [Route("teachers/{trn}/itt-outcome")]
+[Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
 public class IttOutcomeController : ControllerBase
 {
     private readonly IMediator _mediator;

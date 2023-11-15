@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
@@ -9,6 +11,31 @@ public class FindTeachersTests : ApiTestBase
         : base(apiFixture)
     {
         XrmFakedContext.DeleteAllEntities<Contact>();
+        SetCurrentApiClient(new[] { RoleNames.GetPerson });
+    }
+
+    [Theory, RoleNamesData(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson })]
+    public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+
+        var findBy = "LastNameAndDateOfBirth";
+        var lastName = "Smith";
+        var dateOfBirth = new DateOnly(1990, 1, 1);
+
+        var person1 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
+        var person2 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/v3/teachers?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Theory]

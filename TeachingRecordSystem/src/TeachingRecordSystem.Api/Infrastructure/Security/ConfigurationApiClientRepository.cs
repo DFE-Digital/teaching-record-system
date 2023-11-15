@@ -24,8 +24,8 @@ public class ConfigurationApiClientRepository : IApiClientRepository
                 var client = new ApiClient()
                 {
                     ClientId = clientId,
-                    ApiKey = new List<string>()
-
+                    ApiKey = new List<string>(),
+                    Roles = new List<string>()
                 };
                 kvp.Bind(client);
                 if (!client.ApiKey.Any() && !string.IsNullOrEmpty(apiKey))

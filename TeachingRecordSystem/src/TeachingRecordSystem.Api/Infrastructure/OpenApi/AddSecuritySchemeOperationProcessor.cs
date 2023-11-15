@@ -24,7 +24,7 @@ public class AddSecuritySchemeOperationProcessor : IOperationProcessor
             var authorizationPolicy = authorizeAttributes.Single().Policy;
             OpenApiSecurityRequirement? requirement;
 
-            if (authorizationPolicy == AuthorizationPolicies.ApiKey)
+            if (AuthorizationPolicies.IsApiKeyAuthentication(authorizationPolicy!))
             {
                 requirement = new OpenApiSecurityRequirement()
                 {

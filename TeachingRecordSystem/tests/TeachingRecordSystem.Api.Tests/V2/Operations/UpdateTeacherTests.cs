@@ -1,7 +1,9 @@
 #nullable disable
 using System.Net;
 using Optional;
+using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Properties;
+using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.Validation;
@@ -12,7 +14,39 @@ public class UpdateTeacherTests : ApiTestBase
 {
     public UpdateTeacherTests(ApiFixture apiFixture) : base(apiFixture)
     {
+        SetCurrentApiClient(new[] { RoleNames.UpdatePerson });
     }
+
+    [Theory, RoleNamesData(except: new[] { RoleNames.UpdatePerson })]
+    public async Task UpdateTeacher_ClientDoesNotHaveSecurityRoles_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+        var trn = "123456";
+        var contact = new Contact() { Id = Guid.NewGuid() };
+        var contactList = new[] { contact };
+        var result = UpdateTeacherResult.Success(Guid.NewGuid(), "some trn");
+        var dob = new DateOnly(1987, 01, 01);
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+                .ReturnsAsync(contactList);
+
+        DataverseAdapterMock
+            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+                .ReturnsAsync(result);
+
+        var request = CreateRequest(req => req.Qualification = null);
+
+        // Act
+        var response = await HttpClientWithApiKey.PatchAsync(
+            $"v2/teachers/update/{trn}?birthdate={dob:yyyy-MM-dd}",
+            request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
 
     [Fact]
     public async Task Given_missing_initialteachertraining_providerukprn_returns_error()

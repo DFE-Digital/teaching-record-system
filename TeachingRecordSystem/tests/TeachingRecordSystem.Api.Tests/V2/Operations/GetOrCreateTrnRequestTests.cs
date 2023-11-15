@@ -1,5 +1,7 @@
 #nullable disable
+using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Properties;
+using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -11,6 +13,48 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
 {
     public GetOrCreateTrnRequestTests(ApiFixture apiFixture) : base(apiFixture)
     {
+        SetCurrentApiClient(new[] { RoleNames.UpdatePerson });
+    }
+
+    [Theory, RoleNamesData(new[] { RoleNames.UpdatePerson })]
+    public async Task GetOrCreateTrn_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+        var requestId = Guid.NewGuid().ToString();
+        var teacherId = Guid.NewGuid();
+        var trn = "1234567";
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
+            .ReturnsAsync(new Contact()
+            {
+                Id = teacherId,
+                dfeta_TRN = trn
+            });
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Add(new TrnRequest()
+            {
+                ClientId = ClientId,
+                RequestId = requestId,
+                TeacherId = teacherId
+            });
+
+            await dbContext.SaveChangesAsync();
+        });
+        var slugId = Guid.NewGuid().ToString();
+        var request = CreateRequest(req =>
+        {
+            req.SlugId = slugId;
+        });
+
+        // Act
+        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

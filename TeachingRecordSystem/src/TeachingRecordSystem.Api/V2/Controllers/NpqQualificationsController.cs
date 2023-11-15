@@ -1,13 +1,16 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
+using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.Requests;
 
 namespace TeachingRecordSystem.Api.V2.Controllers;
 
 [ApiController]
 [Route("npq-qualifications")]
+[Authorize(Policy = AuthorizationPolicies.UpdateNpq)]
 public class NpqQualificationsController : ControllerBase
 {
     private readonly IMediator _mediator;

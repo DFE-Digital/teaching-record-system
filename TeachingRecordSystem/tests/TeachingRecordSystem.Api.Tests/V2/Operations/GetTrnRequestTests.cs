@@ -1,5 +1,7 @@
 #nullable disable
 using System.Net;
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 
@@ -9,6 +11,21 @@ public class GetTrnRequestTests : ApiTestBase
 {
     public GetTrnRequestTests(ApiFixture apiFixture) : base(apiFixture)
     {
+        SetCurrentApiClient(new[] { RoleNames.UpdatePerson });
+    }
+
+    [Theory, RoleNamesData(new[] { RoleNames.UpdatePerson })]
+    public async Task GetTrnRequest_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+        var requestId = Guid.NewGuid().ToString();
+
+        // Act
+        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]
