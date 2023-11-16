@@ -22,10 +22,10 @@ public class GetIncidentByTicketNumberTests : IAsyncLifetime
         var nonExistentTicketNumber = Guid.NewGuid().ToString();
 
         // Act
-        (Incident Incident, dfeta_document[] Documents)? incidentAndDocuments = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(nonExistentTicketNumber));
+        var incidentDetail = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(nonExistentTicketNumber));
 
         // Assert
-        Assert.Null(incidentAndDocuments);
+        Assert.Null(incidentDetail);
     }
 
     [Fact]
@@ -36,11 +36,11 @@ public class GetIncidentByTicketNumberTests : IAsyncLifetime
         var createNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
 
         // Act
-        (Incident Incident, dfeta_document[] Documents)? incidentAndDocuments = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(createNameChangeIncidentResult.TicketNumber));
+        var incidentDetail = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(createNameChangeIncidentResult.TicketNumber));
 
         // Assert
-        Assert.NotNull(incidentAndDocuments);
-        Assert.Single(incidentAndDocuments.Value.Documents);
+        Assert.NotNull(incidentDetail);
+        Assert.Single(incidentDetail.IncidentDocuments);
     }
 
     [Fact]
@@ -51,10 +51,10 @@ public class GetIncidentByTicketNumberTests : IAsyncLifetime
         var createNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithMultipleEvidenceFiles());
 
         // Act
-        (Incident Incident, dfeta_document[] Documents)? incidentAndDocuments = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(createNameChangeIncidentResult.TicketNumber));
+        var incidentDetail = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(createNameChangeIncidentResult.TicketNumber));
 
         // Assert
-        Assert.NotNull(incidentAndDocuments);
-        Assert.Equal(2, incidentAndDocuments.Value.Documents.Length);
+        Assert.NotNull(incidentDetail);
+        Assert.Equal(2, incidentDetail.IncidentDocuments.Length);
     }
 }

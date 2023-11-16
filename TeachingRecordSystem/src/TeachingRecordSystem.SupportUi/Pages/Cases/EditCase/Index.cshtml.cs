@@ -30,18 +30,18 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnGet()
     {
-        (Incident Incident, dfeta_document[] Documents)? incidentAndDocuments = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
-        if (incidentAndDocuments is null)
+        var incidentDetail = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
+        if (incidentDetail is null)
         {
             return NotFound();
         }
 
-        if (incidentAndDocuments.Value.Incident.StateCode != IncidentState.Active)
+        if (incidentDetail.Incident.StateCode != IncidentState.Active)
         {
             return BadRequest();
         }
 
-        SetModelFromIncidentAndDocuments(incidentAndDocuments.Value.Incident, incidentAndDocuments.Value.Documents);
+        SetModelFromIncidentDetail(incidentDetail);
 
         return Page();
     }
@@ -64,14 +64,16 @@ public class IndexModel : PageModel
         return File(bytes, annotation.MimeType);
     }
 
-    private void SetModelFromIncidentAndDocuments(Incident incident, dfeta_document[] documents)
+    private void SetModelFromIncidentDetail(IncidentDetail incidentDetail)
     {
-        var customer = incident.Extract<Contact>("contact", Contact.PrimaryIdAttribute);
-        var subject = incident.Extract<Subject>("subject", Subject.PrimaryIdAttribute);
+        var incident = incidentDetail.Incident;
+        var customer = incidentDetail.Contact;
+        var subject = incidentDetail.Subject;
+        var incidentDocuments = incidentDetail.IncidentDocuments;
 
         CaseHeader = new CaseInfo()
         {
-            CaseReference = incident.TicketNumber,
+            CaseReference = incidentDetail.Incident.TicketNumber,
             Customer = customer.dfeta_StatedFirstName is not null ? $"{customer.dfeta_StatedFirstName} {customer.dfeta_StatedLastName}" : $"{customer.FirstName} {customer.LastName}",
             CaseType = subject.Title,
             CreatedOn = incident.CreatedOn!.Value
@@ -99,17 +101,16 @@ public class IndexModel : PageModel
             };
         }
 
-        if (documents is not null)
+        if (incidentDocuments.Length > 0)
         {
             var evidence = new List<EvidenceInfo>();
-            foreach (var document in documents)
+            foreach (var incidentDocument in incidentDocuments)
             {
-                var annotation = document.Extract<Annotation>(Annotation.EntityLogicalName, Annotation.PrimaryIdAttribute);
                 evidence.Add(new EvidenceInfo()
                 {
-                    DocumentId = document!.dfeta_documentId!.Value,
-                    FileName = annotation.FileName,
-                    MimeType = annotation.MimeType
+                    DocumentId = incidentDocument.Document.dfeta_documentId!.Value,
+                    FileName = incidentDocument.Annotation.FileName,
+                    MimeType = incidentDocument.Annotation.MimeType
                 });
             }
 
