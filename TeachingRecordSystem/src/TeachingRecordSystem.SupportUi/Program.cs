@@ -275,9 +275,10 @@ app.MapGet("/health", async context =>
     await context.Response.WriteAsync("OK");
 });
 
-app.MapGet("", async context =>
+app.MapGet("", context =>
 {
     context.Response.Redirect("/persons");
+    return Task.CompletedTask;
 });
 
 app.MapRazorPages();
