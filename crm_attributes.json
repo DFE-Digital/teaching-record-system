@@ -9,6 +9,7 @@
     "annotationid",
     "documentbody",
     "filename",
+    "isdocument",
     "mimetype",
     "modifiedby",
     "modifiedon",

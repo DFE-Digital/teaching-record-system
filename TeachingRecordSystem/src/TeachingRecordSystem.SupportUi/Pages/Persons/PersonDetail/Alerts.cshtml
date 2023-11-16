@@ -40,6 +40,15 @@ else
                         }
                         </govuk-summary-list-row-value>
                 </govuk-summary-list-row>
+                @if (!string.IsNullOrEmpty(@alert.DetailsLink))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="current-alert-details-link-@alert.AlertId">
+                            <a href="@alert.DetailsLink" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="full-case-details-link">See full case details (opens in new tab)</a>
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
             </govuk-summary-list>
         </govuk-summary-card>
     }

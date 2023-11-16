@@ -116,6 +116,7 @@ public partial class CrmTestData
                 DocumentBody = annotationBody,
                 MimeType = _defaultEvidenceFileMimeType,
                 FileName = _defaultEvidenceFileName,
+                IsDocument = true,
                 NoteText = string.Empty
             };
 

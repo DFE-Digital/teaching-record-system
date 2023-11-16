@@ -27,13 +27,13 @@ public class GetActiveIncidentsTests : IAsyncLifetime
         var approvedCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithApprovedStatus());
 
         // Act
-        var incidents = await _crmQueryDispatcher.ExecuteQuery(new GetActiveIncidentsQuery());
+        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveIncidentsQuery(1, 15));
 
-        // Assert
-        Assert.Contains(incidents, i => i.Id == activeCreateNameChangeIncidentResult.IncidentId);
-        Assert.Contains(incidents, i => i.Id == activeCreateDateOfBirthChangeIncidentResult.IncidentId);
-        Assert.DoesNotContain(incidents, i => i.Id == cancelledCreateNameChangeIncidentResult.IncidentId);
-        Assert.DoesNotContain(incidents, i => i.Id == rejectedCreateNameChangeIncidentResult.IncidentId);
-        Assert.DoesNotContain(incidents, i => i.Id == approvedCreateDateOfBirthChangeIncidentResult.IncidentId);
+        // Assert        
+        Assert.Contains(result.Incidents, i => i.Id == activeCreateNameChangeIncidentResult.IncidentId);
+        Assert.Contains(result.Incidents, i => i.Id == activeCreateDateOfBirthChangeIncidentResult.IncidentId);
+        Assert.DoesNotContain(result.Incidents, i => i.Id == cancelledCreateNameChangeIncidentResult.IncidentId);
+        Assert.DoesNotContain(result.Incidents, i => i.Id == rejectedCreateNameChangeIncidentResult.IncidentId);
+        Assert.DoesNotContain(result.Incidents, i => i.Id == approvedCreateDateOfBirthChangeIncidentResult.IncidentId);
     }
 }

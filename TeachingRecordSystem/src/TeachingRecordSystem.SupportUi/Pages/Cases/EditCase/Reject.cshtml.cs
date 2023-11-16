@@ -32,13 +32,13 @@ public class RejectModel : PageModel
 
     public async Task<IActionResult> OnGet()
     {
-        (Incident Incident, dfeta_document[] Documents)? incidentAndDocuments = await GetIncidentAndDocuments();
-        if (incidentAndDocuments is null)
+        var incidentDetail = await GetIncidentDetail();
+        if (incidentDetail is null)
         {
             return NotFound();
         }
 
-        if (incidentAndDocuments.Value.Incident.StateCode != IncidentState.Active)
+        if (incidentDetail.Incident.StateCode != IncidentState.Active)
         {
             return BadRequest();
         }
@@ -53,7 +53,7 @@ public class RejectModel : PageModel
             return this.PageWithErrors();
         }
 
-        (Incident Incident, dfeta_document[] Documents)? incidentAndDocuments = await GetIncidentAndDocuments();
+        var incidentDetail = await GetIncidentDetail();
 
         var requestStatus = "rejected";
         var flashMessage = "The user’s record has not been changed and they have been notified.";
@@ -62,11 +62,11 @@ public class RejectModel : PageModel
             requestStatus = "cancelled";
             flashMessage = "The user’s record has not been changed and they have not been notified.";
 
-            _ = await _crmQueryDispatcher.ExecuteQuery(new CancelIncidentQuery(incidentAndDocuments.Value.Incident.Id));
+            _ = await _crmQueryDispatcher.ExecuteQuery(new CancelIncidentQuery(incidentDetail!.Incident.Id));
         }
         else
         {
-            _ = await _crmQueryDispatcher.ExecuteQuery(new RejectIncidentQuery(incidentAndDocuments.Value.Incident.Id, RejectionReasonChoice.Value.GetDisplayName()!));
+            _ = await _crmQueryDispatcher.ExecuteQuery(new RejectIncidentQuery(incidentDetail!.Incident.Id, RejectionReasonChoice.Value.GetDisplayName()!));
         }
 
         TempData.SetFlashSuccess(
@@ -76,7 +76,7 @@ public class RejectModel : PageModel
         return Redirect(_linkGenerator.Cases());
     }
 
-    private Task<(Incident Incident, dfeta_document[] Documents)?> GetIncidentAndDocuments() =>
+    private Task<IncidentDetail?> GetIncidentDetail() =>
         _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
 
     public enum CaseRejectionReasonOption

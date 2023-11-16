@@ -4,9 +4,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetActiveIncidentsHandler : ICrmQueryHandler<GetActiveIncidentsQuery, Incident[]>
+public class GetActiveIncidentsHandler : ICrmQueryHandler<GetActiveIncidentsQuery, GetIncidentsResult>
 {
-    public async Task<Incident[]> Execute(GetActiveIncidentsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<GetIncidentsResult> Execute(GetActiveIncidentsQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Incident.Fields.StateCode, ConditionOperator.Equal, (int)IncidentState.Active);
@@ -20,7 +20,13 @@ public class GetActiveIncidentsHandler : ICrmQueryHandler<GetActiveIncidentsQuer
             Criteria = filter,
             Orders =
             {
-                new OrderExpression(Incident.Fields.CreatedOn, OrderType.Descending)
+                new OrderExpression(Incident.Fields.CreatedOn, OrderType.Ascending)
+            },
+            PageInfo = new()
+            {
+                PageNumber = query.PageNumber,
+                Count = query.PageSize,
+                ReturnTotalRecordCount = true
             }
         };
 
@@ -28,7 +34,9 @@ public class GetActiveIncidentsHandler : ICrmQueryHandler<GetActiveIncidentsQuer
         AddSubjectLink(queryExpression);
 
         var result = await organizationService.RetrieveMultipleAsync(queryExpression);
-        return result.Entities.Select(entity => entity.ToEntity<Incident>()).ToArray();
+        var incidents = result.Entities.Select(entity => entity.ToEntity<Incident>()).ToArray();
+
+        return new GetIncidentsResult(incidents, result.TotalRecordCount);
 
         static void AddContactLink(QueryExpression query)
         {

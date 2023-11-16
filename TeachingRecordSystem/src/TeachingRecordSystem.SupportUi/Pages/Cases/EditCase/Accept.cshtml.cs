@@ -30,27 +30,27 @@ public class AcceptModel : PageModel
 
     public async Task<IActionResult> OnGet()
     {
-        (Incident Incident, dfeta_document[] Documents)? incidentAndDocuments = await GetIncidentAndDocuments();
-        if (incidentAndDocuments is null)
+        var incidentDetail = await GetIncidentDetail();
+        if (incidentDetail is null)
         {
             return NotFound();
         }
 
-        if (incidentAndDocuments.Value.Incident.StateCode != IncidentState.Active)
+        if (incidentDetail.Incident.StateCode != IncidentState.Active)
         {
             return BadRequest();
         }
 
-        SetModelFromIncident(incidentAndDocuments.Value.Incident);
+        SetModelFromIncidentDetail(incidentDetail);
 
         return Page();
     }
 
     public async Task<IActionResult> OnPost()
     {
-        (Incident Incident, dfeta_document[] Documents)? incidentAndDocuments = await GetIncidentAndDocuments();
+        var incidentDetail = await GetIncidentDetail();
 
-        _ = await _crmQueryDispatcher.ExecuteQuery(new ApproveIncidentQuery(incidentAndDocuments.Value.Incident.Id));
+        _ = await _crmQueryDispatcher.ExecuteQuery(new ApproveIncidentQuery(incidentDetail!.Incident.Id));
 
         TempData.SetFlashSuccess(
             $"The request has been accepted",
@@ -59,10 +59,11 @@ public class AcceptModel : PageModel
         return Redirect(_linkGenerator.Cases());
     }
 
-    private void SetModelFromIncident(Incident incident)
+    private void SetModelFromIncidentDetail(IncidentDetail incidentDetail)
     {
-        var customer = incident.Extract<Contact>("contact", Contact.PrimaryIdAttribute);
-        var subject = incident.Extract<Subject>("subject", Subject.PrimaryIdAttribute);
+        var incident = incidentDetail.Incident;
+        var customer = incidentDetail.Contact;
+        var subject = incidentDetail.Subject;
 
         if (subject.Title == DqtConstants.NameChangeSubjectTitle)
         {
@@ -77,6 +78,6 @@ public class AcceptModel : PageModel
         }
     }
 
-    private Task<(Incident Incident, dfeta_document[] Documents)?> GetIncidentAndDocuments() =>
+    private Task<IncidentDetail?> GetIncidentDetail() =>
         _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
 }

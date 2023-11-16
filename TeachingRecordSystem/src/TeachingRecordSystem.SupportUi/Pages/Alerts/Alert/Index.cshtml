@@ -30,20 +30,23 @@
         </table>
     </div>
 </div>
-
+   
 <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <h3 class="govuk-heading-s">Details</h3>
-        @if (!string.IsNullOrEmpty(Model.Alert.Details))
+        @if (!string.IsNullOrEmpty(Model.Alert.Details) || !string.IsNullOrEmpty(Model.Alert.DetailsLink))
         {
-            <multi-line-text data-testid="alert-details" text="@Model.Alert.Details"/>
-        }
+            <h3 class="govuk-heading-s">Details</h3>
+            @if (!string.IsNullOrEmpty(Model.Alert.Details))
+            {
+                <multi-line-text data-testid="alert-details" text="@Model.Alert.Details" />
+            }
 
-        @if (!string.IsNullOrEmpty(Model.Alert.DetailsLink))
-        {
-            <a href="@Model.Alert.DetailsLink" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="full-case-details-link">See full case details (opens in new tab)</a>
+            @if (!string.IsNullOrEmpty(Model.Alert.DetailsLink))
+            {
+                <a href="@Model.Alert.DetailsLink" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="full-case-details-link">See full case details (opens in new tab)</a>
+            }        
         }
 
         @if (Model.IsActive)

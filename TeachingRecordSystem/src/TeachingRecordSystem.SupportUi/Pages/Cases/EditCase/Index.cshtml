@@ -14,16 +14,16 @@
             <caption class="govuk-table__caption govuk-table__caption--xl" data-testid="page-title">@ViewBag.Title</caption>
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-font-size-16 govuk-!-width-one-quarter">Case reference</th>
-                    <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-font-size-16 govuk-!-width-one-third">Name</th>
-                    <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-font-size-16">Created on</th>
+                    <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-width-one-quarter">Case reference</th>
+                    <th scope="col" class="govuk-table__header trs-table__header--no-border govuk-!-width-one-third">Name</th>
+                    <th scope="col" class="govuk-table__header trs-table__header--no-border">Created on</th>
                 </tr>
             </thead>
             <tbody class="govuk-table__body">
                 <tr class="govuk-table__row" data-testid="case-header">
-                    <td class="govuk-table__cell trs-table__cell--no-border govuk-!-font-size-16" data-testid="case-header-case-reference">@Model.CaseHeader.CaseReference</td>
-                    <td class="govuk-table__cell trs-table__cell--no-border govuk-!-font-size-16" data-testid="case-header-name">@Model.CaseHeader.Customer</td>
-                    <td class="govuk-table__cell trs-table__cell--no-border govuk-!-font-size-16" data-testid="case-header-created-on">@Model.CaseHeader.CreatedOn.ToString("dd/MM/yyyy")</td>
+                    <td class="govuk-table__cell trs-table__cell--no-border" data-testid="case-header-case-reference">@Model.CaseHeader.CaseReference</td>
+                    <td class="govuk-table__cell trs-table__cell--no-border" data-testid="case-header-name">@Model.CaseHeader.Customer</td>
+                    <td class="govuk-table__cell trs-table__cell--no-border" data-testid="case-header-created-on">@Model.CaseHeader.CreatedOn.ToString("dd/MM/yyyy")</td>
                 </tr>
             </tbody>
         </table>

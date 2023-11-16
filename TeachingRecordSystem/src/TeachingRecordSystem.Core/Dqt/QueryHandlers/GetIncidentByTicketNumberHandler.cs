@@ -4,9 +4,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTicketNumberQuery, (Incident, dfeta_document[])?>
+public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTicketNumberQuery, IncidentDetail?>
 {
-    public async Task<(Incident, dfeta_document[])?> Execute(GetIncidentByTicketNumberQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<IncidentDetail?> Execute(GetIncidentByTicketNumberQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Incident.Fields.TicketNumber, ConditionOperator.Equal, query.TicketNumber);
@@ -39,11 +39,20 @@ public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTi
         }
 
         var incidentAndDocuments = result.Entities.Select(entity => entity.ToEntity<Incident>())
-            .Select(i => (Incident: i, Document: i.Extract<dfeta_document>(dfeta_document.EntityLogicalName, dfeta_document.PrimaryIdAttribute)));
+            .Select(i =>
+                (Incident: i,
+                Document: i.Extract<dfeta_document>(dfeta_document.EntityLogicalName, dfeta_document.PrimaryIdAttribute),
+                Annotation: i.Extract<Annotation>(Annotation.EntityLogicalName, Annotation.PrimaryIdAttribute)));
 
         var returnValue = incidentAndDocuments
             .GroupBy(t => t.Incident.TicketNumber)
-            .Select(g => (g.First().Incident, g.Where(i => i.Document != null).Select(i => i.Document).ToArray()))
+            .Select(g => (g.First().Incident, DocumentsAndAnnotations: g.Where(i => i.Document != null).Select(i => (Document: i.Document, Annotation: i.Annotation))))
+            .Select(i =>
+                new IncidentDetail(
+                        i.Incident,
+                        i.Incident.Extract<Contact>("contact", Contact.PrimaryIdAttribute),
+                        i.Incident.Extract<Subject>("subject", Subject.PrimaryIdAttribute),
+                        i.DocumentsAndAnnotations.Select(da => new IncidentDocument(da.Document, da.Annotation)).ToArray()))
             .FirstOrDefault();
 
         return returnValue;
@@ -119,9 +128,14 @@ public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTi
                 Annotation.Fields.ObjectId,
                 Annotation.Fields.Subject,
                 Annotation.Fields.MimeType,
-                Annotation.Fields.FileName);
+                Annotation.Fields.FileName,
+                Annotation.Fields.IsDocument);
 
-            annotationLink.EntityAlias = $"{dfeta_document.EntityLogicalName}.{Annotation.EntityLogicalName}";
+            annotationLink.EntityAlias = Annotation.EntityLogicalName;
+
+            var annotationFilter = new FilterExpression();
+            annotationFilter.AddCondition(Annotation.Fields.IsDocument, ConditionOperator.Equal, true);
+            annotationLink.LinkCriteria = annotationFilter;
         }
     }
 }

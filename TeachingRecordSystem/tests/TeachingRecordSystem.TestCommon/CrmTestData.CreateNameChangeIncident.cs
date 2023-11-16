@@ -227,6 +227,7 @@ public partial class CrmTestData
                     DocumentBody = annotationBody,
                     MimeType = mimeType,
                     FileName = filename,
+                    IsDocument = true,
                     NoteText = string.Empty
                 };
 

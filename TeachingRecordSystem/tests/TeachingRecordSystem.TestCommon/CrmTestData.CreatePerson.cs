@@ -106,7 +106,7 @@ public partial class CrmTestData
             DateOnly? endDate = null,
             DateOnly? reviewDate = null,
             bool spent = false,
-            string details = "lorem ipsum",
+            string? details = null,
             string? detailsLink = null,
             bool isActive = true)
         {
@@ -368,5 +368,5 @@ public partial class CrmTestData
         };
     }
 
-    public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string Details, string? DetailsLink, bool IsActive);
+    public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);
 }

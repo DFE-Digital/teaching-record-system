@@ -38,7 +38,6 @@ public class IndexModel : PageModel
     public Guid? AlertTypeId { get; set; }
 
     [BindProperty]
-    [Display(Description = "You can enter up to 4000 characters")]
     public string? Details { get; set; }
 
     [BindProperty]

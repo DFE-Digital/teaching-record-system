@@ -18,7 +18,7 @@ public class GetContactsByNameHandler : ICrmQueryHandler<GetContactsByNameQuery,
         {
             ColumnSet = query.ColumnSet,
             Criteria = filter,
-            TopCount = query.MaxRecordCount,
+            TopCount = query.MaxRecordCount
         };
 
         switch (query.SortBy)

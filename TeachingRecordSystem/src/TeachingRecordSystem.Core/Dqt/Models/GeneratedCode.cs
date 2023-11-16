@@ -697,6 +697,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Id = "annotationid";
 			public const string DocumentBody = "documentbody";
 			public const string FileName = "filename";
+			public const string IsDocument = "isdocument";
 			public const string MimeType = "mimetype";
 			public const string ModifiedBy = "modifiedby";
 			public const string ModifiedOn = "modifiedon";
@@ -841,6 +842,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("FileName");
 				this.SetAttributeValue("filename", value);
 				this.OnPropertyChanged("FileName");
+			}
+		}
+		
+		/// <summary>
+		/// Specifies whether the note is an attachment.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("isdocument")]
+		public System.Nullable<bool> IsDocument
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("isdocument");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("IsDocument");
+				this.SetAttributeValue("isdocument", value);
+				this.OnPropertyChanged("IsDocument");
 			}
 		}
 		
