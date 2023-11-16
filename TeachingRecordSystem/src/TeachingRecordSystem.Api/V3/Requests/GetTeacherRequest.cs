@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using MediatR;
+using TeachingRecordSystem.Api.Infrastructure.OpenApi;
 using TeachingRecordSystem.Api.V3.Responses;
 
 namespace TeachingRecordSystem.Api.V3.Requests;
@@ -26,6 +27,9 @@ public enum GetTeacherRequestIncludes
     Sanctions = 1 << 6,
     Alerts = 1 << 7,
     PreviousNames = 1 << 8,
+
+    [ExcludeFromSchema]
+    _AllowIdSignInWithProhibitions = 1 << 9,
 
     All = Induction | InitialTeacherTraining | NpqQualifications | MandatoryQualifications | PendingDetailChanges | HigherEducationQualifications | Sanctions | Alerts | PreviousNames
 }

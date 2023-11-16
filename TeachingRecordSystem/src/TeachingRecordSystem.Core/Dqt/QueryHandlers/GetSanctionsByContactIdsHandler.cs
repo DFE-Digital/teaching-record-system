@@ -29,11 +29,9 @@ public class GetSanctionsByContactIdsHandler : ICrmQueryHandler<GetSanctionsByCo
 
         if (query.ActiveOnly)
         {
-            queryExpression.Criteria.AddCondition(dfeta_sanction.Fields.dfeta_Spent, ConditionOperator.Equal, false);
-            queryExpression.Criteria.AddCondition(dfeta_sanction.Fields.dfeta_EndDate, ConditionOperator.Null);
+            queryExpression.Criteria.AddCondition(dfeta_sanction.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_sanctionState.Active);
         }
 
-        queryExpression.Criteria.AddCondition(dfeta_sanction.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_sanctionState.Active);
         queryExpression.Criteria.AddCondition(dfeta_sanction.Fields.dfeta_PersonId, ConditionOperator.In, contactIdsArray.Cast<object>().ToArray());  // https://community.dynamics.com/crm/b/crmbusiness/posts/crm-2011-odd-error-with-query-expression-and-conditionoperator-in
 
         var sanctionCodeLink = queryExpression.AddLink(

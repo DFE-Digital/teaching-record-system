@@ -1293,6 +1293,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Id = "contactid";
 			public const string CreatedOn = "createdon";
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
+			public const string dfeta_AllowIDSignInWithProhibitions = "dfeta_allowidsigninwithprohibitions";
 			public const string dfeta_AllowPiiUpdatesFromRegister = "dfeta_allowpiiupdatesfromregister";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_HUSID = "dfeta_husid";
@@ -1623,6 +1624,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_ActiveSanctions");
 				this.SetAttributeValue("dfeta_activesanctions", value);
 				this.OnPropertyChanged("dfeta_ActiveSanctions");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_allowidsigninwithprohibitions")]
+		public System.Nullable<bool> dfeta_AllowIDSignInWithProhibitions
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_allowidsigninwithprohibitions");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_AllowIDSignInWithProhibitions");
+				this.SetAttributeValue("dfeta_allowidsigninwithprohibitions", value);
+				this.OnPropertyChanged("dfeta_AllowIDSignInWithProhibitions");
 			}
 		}
 		

@@ -45,7 +45,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     Contact.Fields.dfeta_NINumber,
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_EYTSDate,
-                    Contact.Fields.EMailAddress1)));
+                    Contact.Fields.EMailAddress1,
+                    Contact.Fields.dfeta_AllowIDSignInWithProhibitions)));
 
         if (contactDetail is null)
         {
@@ -201,7 +202,10 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             var getSanctionsQuery = new GetSanctionsByContactIdsQuery(
                 new[] { teacher.Id },
                 ActiveOnly: true,
-                ColumnSet: new(dfeta_sanction.Fields.dfeta_StartDate));
+                ColumnSet: new(
+                    dfeta_sanction.Fields.dfeta_StartDate,
+                    dfeta_sanction.Fields.dfeta_EndDate,
+                    dfeta_sanction.Fields.dfeta_Spent));
 
             sanctions = (await _crmQueryDispatcher.ExecuteQuery(getSanctionsQuery))[teacher.Id];
         }
@@ -275,6 +279,10 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         var qtsAwardedInWales = qtsRegistrations.Any(qts => qts.dfeta_QTSDate is not null && qts.dfeta_TeacherStatusId.Id == qtsAwardedInWalesStatus.Id);
 
+        var allowIdSignInWithProhibitions = request.Include.HasFlag(GetTeacherRequestIncludes._AllowIdSignInWithProhibitions) ?
+            Option.Some(teacher.dfeta_AllowIDSignInWithProhibitions == true) :
+            default;
+
         return new GetTeacherResponse()
         {
             Trn = request.Trn,
@@ -317,6 +325,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             Sanctions = request.Include.HasFlag(GetTeacherRequestIncludes.Sanctions) ?
                 Option.Some(sanctions!
                     .Where(s => Constants.ExposableSanctionCodes.Contains(s.SanctionCode))
+                    .Where(s => s.Sanction.dfeta_EndDate is null && s.Sanction.dfeta_Spent != true)
                     .Select(s => new SanctionInfo()
                     {
                         Code = s.SanctionCode,
@@ -329,12 +338,15 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     .Select(s => new AlertInfo()
                     {
                         AlertType = AlertType.Prohibition,
-                        DqtSanctionCode = s.SanctionCode
+                        DqtSanctionCode = s.SanctionCode,
+                        StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        EndDate = s.Sanction.dfeta_EndDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
                     })) :
                 default,
             PreviousNames = request.Include.HasFlag(GetTeacherRequestIncludes.PreviousNames) ?
                 Option.Some(previousNames!.Select(n => n)) :
-                default
+                default,
+            AllowIdSignInWithProhibitions = allowIdSignInWithProhibitions
         };
     }
 
