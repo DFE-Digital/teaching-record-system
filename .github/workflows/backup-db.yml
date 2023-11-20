@@ -1,0 +1,88 @@
+name: Backup production database
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * *" # 04:00 UTC
+
+jobs:
+  backup:
+    name: Backup database
+    runs-on: ubuntu-latest
+
+    environment: production_aks
+
+    env:
+      RESOURCE_GROUP: s189p01-trs-pd-rg
+      KEYVAULT_NAME: s189p01-trs-pd-inf-kv
+      CLUSTER_NAME: s189p01-tsc-production-aks
+      CLUSTER_RESOURCE_GROUP: s189p01-tsc-pd-rg
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+          terraform_wrapper: false
+
+      - uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Get k8s credentials
+        run: az aks get-credentials -g ${{ env.CLUSTER_RESOURCE_GROUP }} -n ${{ env.CLUSTER_NAME }}
+
+      - name: Install konduit
+        run: make install-konduit
+
+      - name: Dump database
+        run: bin/konduit.sh -k ${{ env.KEYVAULT_NAME }} -d trs trs-production-ui -- pg_dump -E utf8 --compress=1 --clean --if-exists --no-owner --verbose -f backup.sql.gz
+
+      - uses: DFE-Digital/github-actions/set-arm-environment-variables@master
+        with:
+          azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get backup storage account
+        id: azure-backup-storage
+        run: |
+          make ci production_aks terraform-init
+          echo "account-name=$(terraform -chdir=terraform/aks output -raw postgres_azure_backup_storage_account_name)" >> $GITHUB_OUTPUT
+          echo "container-name=$(terraform -chdir=terraform/aks output -raw postgres_azure_backup_storage_container_name)" >> $GITHUB_OUTPUT
+
+      - name: Get storage account connection string
+        run: |
+          STORAGE_CONN_STR=$(az storage account show-connection-string -g ${{ env.RESOURCE_GROUP }} -n ${{ steps.azure-backup-storage.outputs.account-name }} --query 'connectionString')
+          echo "::add-mask::$STORAGE_CONN_STR"
+          echo "AZURE_STORAGE_CONNECTION_STRING=$STORAGE_CONN_STR" >> $GITHUB_ENV
+
+      - name: Upload backup
+        run: |
+          az config set extension.use_dynamic_install=yes_without_prompt
+          az config set core.only_show_errors=true
+          az storage azcopy blob upload \
+            --container ${{ steps.azure-backup-storage.outputs.container-name }} \
+            --source backup.sql.gz \
+            --destination $(date +"%F-%H").sql.gz
+
+      - name: Get Slack webhook
+        uses: Azure/get-keyvault-secrets@v1
+        if: failure()
+        id: key-vault-secrets
+        with:
+          keyvault: ${{ env.KEYVAULT_NAME }}
+          secrets: "SLACK-WEBHOOK"
+
+      - name: Notify Slack channel on job failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_USERNAME: CI Deployment
+          SLACK_TITLE: Database backup failure
+          SLACK_MESSAGE: Production database backup job failed
+          SLACK_WEBHOOK: ${{ steps.key-vault-secrets.outputs.SLACK-WEBHOOK }}
+          SLACK_COLOR: failure
+          SLACK_FOOTER: Sent from backup job in backup-db workflow
