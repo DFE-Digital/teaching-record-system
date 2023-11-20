@@ -23,6 +23,7 @@ public class ApiFixture : WebApplicationFactory<Program>
     {
         _configuration = configuration;
         JwtSigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()), SecurityAlgorithms.RsaSha256);
+        _ = Services;  // Start the host
     }
 
     public HttpClientInterceptorOptions EvidenceFilesHttpClientInterceptorOptions { get; } = new();
@@ -58,11 +59,19 @@ public class ApiFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClientMock.Object);
             services.AddTestScoped<IOptions<AccessYourQualificationsOptions>>(tss => tss.AccessYourQualificationsOptions);
-            services.AddTestScoped<IOptions<GetAnIdentityOptions>>(tss => tss.GetAnIdentityOptions);
             services.AddTestScoped<ICertificateGenerator>(tss => tss.CertificateGeneratorMock.Object);
             services.AddSingleton<TestData>();
             services.AddFakeXrm();
             services.AddSingleton<FakeTrnGenerator>();
+
+            services.Configure<GetAnIdentityOptions>(options =>
+            {
+                options.TokenEndpoint = "dummy";
+                options.ClientId = "dummy";
+                options.ClientSecret = "dummy";
+                options.BaseAddress = "dummy";
+                options.WebHookClientSecret = "dummy";
+            });
 
             services.AddHttpClient("EvidenceFiles")
                 .AddHttpMessageHandler(_ => EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())
