@@ -8,14 +8,14 @@ public class GetAnIdentityOptions
     public required string TokenEndpoint { get; set; }
 
     [Required]
-    public required string ClientId { get; init; }
+    public required string ClientId { get; set; }
 
     [Required]
-    public required string ClientSecret { get; init; }
+    public required string ClientSecret { get; set; }
 
     [Required]
-    public required string BaseAddress { get; init; }
+    public required string BaseAddress { get; set; }
 
     [Required]
-    public required string WebHookClientSecret { get; init; }
+    public required string WebHookClientSecret { get; set; }
 }

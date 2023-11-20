@@ -1,8 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks.Messages;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Tests.Endpoints.IdentityWebHooks;
 
@@ -12,6 +14,8 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
        : base(apiFixture)
     {
     }
+
+    private IOptions<GetAnIdentityOptions> GetAnIdentityOptions => ApiFixture.Services.GetRequiredService<IOptions<GetAnIdentityOptions>>();
 
     [Fact]
     public async Task Post_WithNoSignatureInHeader_ReturnsUnauthorised()

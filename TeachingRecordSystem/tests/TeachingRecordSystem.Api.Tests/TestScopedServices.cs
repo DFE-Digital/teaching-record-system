@@ -17,15 +17,6 @@ public class TestScopedServices
         DataverseAdapterMock = new();
         GetAnIdentityApiClientMock = new();
 
-        GetAnIdentityOptions = Options.Create(new GetAnIdentityOptions()
-        {
-            TokenEndpoint = "dummy",
-            ClientId = "dummy",
-            ClientSecret = "dummy",
-            BaseAddress = "dummy",
-            WebHookClientSecret = "dummy"
-        });
-
         AccessYourQualificationsOptions = Options.Create(new AccessYourQualificationsOptions()
         {
             BaseAddress = "https://aytq.com",
@@ -52,8 +43,6 @@ public class TestScopedServices
     public Mock<IDataverseAdapter> DataverseAdapterMock { get; }
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
-
-    public IOptions<GetAnIdentityOptions> GetAnIdentityOptions { get; }
 
     public IOptions<AccessYourQualificationsOptions> AccessYourQualificationsOptions { get; }
 

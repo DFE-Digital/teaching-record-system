@@ -2,7 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using FakeXrmEasy.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Json;
 using TeachingRecordSystem.Api.Tests.Infrastructure.Security;
@@ -40,8 +39,6 @@ public abstract class ApiTestBase
     public TestableClock Clock => _testServices.Clock;
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => _testServices.GetAnIdentityApiClientMock;
-
-    public IOptions<GetAnIdentityOptions> GetAnIdentityOptions => _testServices.GetAnIdentityOptions;
 
     public HttpClient HttpClientWithApiKey { get; }
 
