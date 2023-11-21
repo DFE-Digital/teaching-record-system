@@ -230,6 +230,16 @@ public partial class CrmTestData
                         dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName)
                     }
                 });
+
+                txnRequestBuilder.AddRequest(new CreateRequest()
+                {
+                    Target = new dfeta_initialteachertraining()
+                    {
+                        dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
+                        dfeta_Result = dfeta_ITTResult.Pass,
+                    }
+                });
+
                 // Plugin which updates Contact with QTS Date only fires on Update or Delete
                 txnRequestBuilder.AddRequest(new UpdateRequest()
                 {
@@ -254,6 +264,7 @@ public partial class CrmTestData
                         dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName)
                     }
                 });
+
                 // Plugin which updates Contact with EYTS Date only fires on Update or Delete
                 txnRequestBuilder.AddRequest(new UpdateRequest()
                 {

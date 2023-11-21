@@ -26,6 +26,11 @@ public static class PageExtensions
         await page.GotoAsync($"/persons/{personId}");
     }
 
+    public static async Task GoToAddMqPage(this IPage page, Guid personId)
+    {
+        await page.GotoAsync($"/mqs/add?personId={personId}");
+    }
+
     public static Task ClickLinkForElementWithTestId(this IPage page, string testId) =>
         page.GetByTestId(testId).ClickAsync();
 
@@ -129,6 +134,31 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/persons/{personId}/edit-date-of-birth/confirm");
     }
 
+    public static async Task AssertOnAddMqProviderPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/add/provider");
+    }
+
+    public static async Task AssertOnAddMqSpecialismPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/add/specialism");
+    }
+
+    public static async Task AssertOnAddMqStartDatePage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/add/start-date");
+    }
+
+    public static async Task AssertOnAddMqResultPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/add/result");
+    }
+
+    public static async Task AssertOnAddMqCheckAnswersPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/add/check-answers");
+    }
+
     public static async Task AssertFlashMessage(this IPage page, string expectedHeader)
     {
         Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader}')"));
@@ -181,6 +211,6 @@ public static class PageExtensions
     public static Task ClickReactivateButton(this IPage page)
         => ClickButton(page, "Remove inactive status");
 
-    private static Task ClickButton(this IPage page, string text) =>
+    public static Task ClickButton(this IPage page, string text) =>
         page.ClickAsync($".govuk-button:text-is('{text}')");
 }

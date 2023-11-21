@@ -45,11 +45,47 @@ public class TrsLinkGenerator
 
     public string RejectCase(string ticketNumber) => GetRequiredPathByPage("/Cases/EditCase/Reject", routeValues: new { ticketNumber });
 
+    public string MqAdd(Guid personId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/Index", routeValues: new { personId });
+
+    public string MqAddProvider(Guid personId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/Provider", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqAddProviderCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/Provider", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqAddSpecialism(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/Specialism", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqAddSpecialismCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/Specialism", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqAddStartDate(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/StartDate", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqAddStartDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/StartDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqAddResult(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/Result", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqAddResultCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/Result", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqAddCheckAnswers(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/CheckAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqAddCheckAnswersCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/AddMq/CheckAnswers", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
     public string Persons(string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/Index", routeValues: new { search, sortBy, pageNumber });
 
     public string PersonDetail(Guid personId, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Index", routeValues: new { personId, search, sortBy, pageNumber });
+
+    public string PersonQualifications(Guid personId, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/Qualifications", routeValues: new { personId, search, sortBy, pageNumber });
 
     public string PersonAlerts(Guid personId, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Alerts", routeValues: new { personId, search, sortBy, pageNumber });

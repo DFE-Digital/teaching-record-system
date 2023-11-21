@@ -5,10 +5,12 @@ namespace TeachingRecordSystem.Core.Dqt;
 public class ReferenceDataCache
 {
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
+    private Task<dfeta_mqestablishment[]>? _mqEstablishmentsTask;
     private Task<dfeta_sanctioncode[]>? _getSanctionCodesTask;
     private Task<Subject[]>? _getSubjectsTask;
     private Task<dfeta_teacherstatus[]>? _getTeacherStatusesTask;
     private Task<dfeta_earlyyearsstatus[]>? _getEarlyYearsStatusesTask;
+    private Task<dfeta_specialism[]>? _getSpecialismsTask;
 
     public ReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher)
     {
@@ -52,6 +54,32 @@ public class ReferenceDataCache
         return earlyYearsStatuses.Single(ey => ey.dfeta_Value == value);
     }
 
+    public async Task<dfeta_specialism[]> GetSpecialisms()
+    {
+        var specialisms = await EnsureSpecialisms();
+        return specialisms.ToArray();
+    }
+
+    public async Task<dfeta_specialism> GetSpecialismByValue(string value)
+    {
+        var specialisms = await EnsureSpecialisms();
+        // build environment has some duplicate Specialisms, which prevent us using Single() here
+        return specialisms.First(s => s.dfeta_Value == value);
+    }
+
+    public async Task<dfeta_mqestablishment[]> GetMqEstablishments()
+    {
+        var mqEstablishments = await EnsureMqEstablishments();
+        return mqEstablishments.ToArray();
+    }
+
+    public async Task<dfeta_mqestablishment> GetMqEstablishmentByValue(string value)
+    {
+        var mqEstablishments = await EnsureMqEstablishments();
+        // build environment has some duplicate MQ Establishments, which prevent us using Single() here
+        return mqEstablishments.First(s => s.dfeta_Value == value);
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
@@ -71,4 +99,14 @@ public class ReferenceDataCache
         LazyInitializer.EnsureInitialized(
             ref _getEarlyYearsStatusesTask,
             () => _crmQueryDispatcher.ExecuteQuery(new GetAllEarlyYearsStatusesQuery()));
+
+    private Task<dfeta_specialism[]> EnsureSpecialisms() =>
+        LazyInitializer.EnsureInitialized(
+            ref _getSpecialismsTask,
+            () => _crmQueryDispatcher.ExecuteQuery(new GetAllSpecialismsQuery()));
+
+    private Task<dfeta_mqestablishment[]> EnsureMqEstablishments() =>
+        LazyInitializer.EnsureInitialized(
+            ref _mqEstablishmentsTask,
+            () => _crmQueryDispatcher.ExecuteQuery(new GetAllMqEstablishmentsQuery()));
 }

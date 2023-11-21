@@ -115,6 +115,12 @@ builder.Services
             {
                 model.Filters.Add(new CheckPersonExistsFilter());
             });
+        options.Conventions.AddFolderApplicationModelConvention(
+            "/Mqs",
+            model =>
+            {
+                model.Filters.Add(new CheckPersonExistsFilter());
+            });
     })
     .AddMvcOptions(options =>
     {
@@ -211,6 +217,12 @@ builder.Services
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditDateOfBirth,
             typeof(TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDateOfBirth.EditDateOfBirthState),
+            requestDataKeys: new[] { "personId" },
+            appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.AddMq,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.AddMqState),
             requestDataKeys: new[] { "personId" },
             appendUniqueKey: true));
     });
