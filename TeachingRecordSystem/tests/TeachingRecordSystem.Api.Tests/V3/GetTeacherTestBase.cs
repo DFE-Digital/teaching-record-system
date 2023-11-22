@@ -682,7 +682,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
-                false))
+                /*activeOnly: */true))
             .ReturnsAsync(itt != null ? new[] { itt } : Array.Empty<dfeta_initialteachertraining>());
 
         DataverseAdapterMock

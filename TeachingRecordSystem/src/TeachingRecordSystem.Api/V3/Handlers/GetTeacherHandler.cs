@@ -119,7 +119,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     dfeta_ittqualification.PrimaryIdAttribute,
                     dfeta_ittqualification.Fields.dfeta_name
                 },
-                false);
+                activeOnly: true);
         }
 
         dfeta_qualification[]? qualifications = default;
