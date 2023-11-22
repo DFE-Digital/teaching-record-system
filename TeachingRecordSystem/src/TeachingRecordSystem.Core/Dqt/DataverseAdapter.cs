@@ -165,7 +165,6 @@ public partial class DataverseAdapter : IDataverseAdapter
         bool activeOnly = true) =>
         GetInitialTeacherTrainingByTeacher(teacherId, columnNames, establishmentColumnNames, subjectColumnNames, qualificationColumnNames, requestBuilder: null, activeOnly);
 
-
     public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingBySlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
@@ -260,7 +259,7 @@ public partial class DataverseAdapter : IDataverseAdapter
                 Account.EntityLogicalName,
                 dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
                 Account.PrimaryIdAttribute,
-                JoinOperator.Inner);
+                JoinOperator.LeftOuter);
 
             establishmentLink.Columns = new ColumnSet(establishmentColumnNames);
 
@@ -297,7 +296,6 @@ public partial class DataverseAdapter : IDataverseAdapter
         };
 
         var result = await requestBuilder.AddRequest<RetrieveMultipleResponse>(request).GetResponseAsync();
-
 
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>()).ToArray();
 
