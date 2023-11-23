@@ -133,9 +133,9 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                     } :
                     null,
                 HusId = request.HusId,
-                TeacherType = EnumHelper.ConvertToEnum<Requests.CreateTeacherType, Core.Dqt.Models.CreateTeacherType>(request.TeacherType),
+                TeacherType = EnumHelper.ConvertToEnumByValue<Requests.CreateTeacherType, Core.Dqt.Models.CreateTeacherType>(request.TeacherType),
                 RecognitionRoute = request.RecognitionRoute.HasValue ?
-                    EnumHelper.ConvertToEnum<Requests.CreateTeacherRecognitionRoute, TeachingRecordSystem.Core.Dqt.Models.CreateTeacherRecognitionRoute>(request.RecognitionRoute.Value) :
+                    EnumHelper.ConvertToEnumByValue<Requests.CreateTeacherRecognitionRoute, TeachingRecordSystem.Core.Dqt.Models.CreateTeacherRecognitionRoute>(request.RecognitionRoute.Value) :
                     null,
                 QtsDate = request.QtsDate,
                 InductionRequired = request.InductionRequired,

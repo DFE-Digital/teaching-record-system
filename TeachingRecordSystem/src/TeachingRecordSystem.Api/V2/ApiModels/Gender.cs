@@ -15,8 +15,8 @@ public enum Gender
 public static class GenderExtensions
 {
     public static Contact_GenderCode ConvertToContact_GenderCode(this Gender input) =>
-        input.ConvertToEnum<Gender, Contact_GenderCode>();
+        input.ConvertToEnumByValue<Gender, Contact_GenderCode>();
 
     public static bool TryConvertToContact_GenderCode(this Gender input, out Contact_GenderCode result) =>
-        input.TryConvertToEnum(out result);
+        input.TryConvertToEnumByValue(out result);
 }

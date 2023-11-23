@@ -142,7 +142,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
         {
             startDate = induction.dfeta_StartDate?.ToString("yyyy-MM-dd"),
             endDate = induction.dfeta_CompletionDate?.ToString("yyyy-MM-dd"),
-            status = induction.dfeta_InductionStatus.ToString(),
+            status = induction.dfeta_InductionStatus?.ToString(),
+            statusDescription = induction.dfeta_InductionStatus?.GetDescription(),
             certificateUrl = "/v3/certificates/induction",
             periods = new[]
             {
@@ -199,7 +200,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                         name = itt.GetAttributeValue<AliasedValue>($"qualification.{dfeta_ittqualification.Fields.dfeta_name}").Value
                     },
                     programmeType = itt.dfeta_ProgrammeType.ToString(),
-                    programmeTypeDescription = itt.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
+                    programmeTypeDescription = itt.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
                     startDate = itt.dfeta_ProgrammeStartDate?.ToString("yyyy-MM-dd"),
                     endDate = itt.dfeta_ProgrammeEndDate?.ToString("yyyy-MM-dd"),
                     result = itt.dfeta_Result?.ToString(),

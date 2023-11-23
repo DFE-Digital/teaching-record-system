@@ -85,8 +85,8 @@ public enum IttProgrammeType
 public static class IttProgrammeTypeExtensions
 {
     public static dfeta_ITTProgrammeType ConvertToIttProgrammeType(this IttProgrammeType input) =>
-        input.ConvertToEnum<IttProgrammeType, dfeta_ITTProgrammeType>();
+        input.ConvertToEnumByValue<IttProgrammeType, dfeta_ITTProgrammeType>();
 
     public static bool TryConvertToIttProgrammeType(this IttProgrammeType input, out dfeta_ITTProgrammeType result) =>
-        input.TryConvertToEnum(out result);
+        input.TryConvertToEnumByValue(out result);
 }

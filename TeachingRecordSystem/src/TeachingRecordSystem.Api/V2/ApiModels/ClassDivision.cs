@@ -61,8 +61,8 @@ public enum ClassDivision
 public static class ClassDivisionExtensions
 {
     public static dfeta_classdivision ConvertToClassDivision(this ClassDivision input) =>
-        input.ConvertToEnum<ClassDivision, dfeta_classdivision>();
+        input.ConvertToEnumByValue<ClassDivision, dfeta_classdivision>();
 
     public static bool TryConvertToClassDivision(this ClassDivision input, out dfeta_classdivision result) =>
-        input.TryConvertToEnum(out result);
+        input.TryConvertToEnumByValue(out result);
 }

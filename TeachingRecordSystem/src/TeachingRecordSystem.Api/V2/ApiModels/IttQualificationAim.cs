@@ -13,5 +13,5 @@ public enum IttQualificationAim
 public static class IttQualificationAimExtensions
 {
     public static dfeta_ITTQualificationAim ConvertToIttQualficationAim(this IttQualificationAim input) =>
-        input.ConvertToEnum<IttQualificationAim, dfeta_ITTQualificationAim>();
+        input.ConvertToEnumByValue<IttQualificationAim, dfeta_ITTQualificationAim>();
 }
