@@ -26,6 +26,11 @@ public static class PageExtensions
         await page.GotoAsync($"/persons/{personId}");
     }
 
+    public static async Task GoToPersonQualificationsPage(this IPage page, Guid personId)
+    {
+        await page.GotoAsync($"/persons/{personId}/qualifications");
+    }
+
     public static async Task GoToAddMqPage(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/mqs/add?personId={personId}");
@@ -87,6 +92,11 @@ public static class PageExtensions
     public static async Task AssertOnPersonAlertsPage(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/alerts");
+    }
+
+    public static async Task AssertOnPersonQualificationsPage(this IPage page, Guid personId)
+    {
+        await page.WaitForUrlPathAsync($"/persons/{personId}/qualifications");
     }
 
     public static async Task AssertOnAddAlertPage(this IPage page)

@@ -53,7 +53,7 @@ public class ProviderModel : PageModel
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonDetail(PersonId));
+        return Redirect(_linkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

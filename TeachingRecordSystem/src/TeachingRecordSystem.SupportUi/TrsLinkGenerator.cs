@@ -90,8 +90,6 @@ public class TrsLinkGenerator
     public string PersonAlerts(Guid personId, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Alerts", routeValues: new { personId, search, sortBy, pageNumber });
 
-    public string PersonAddAlert(Guid personId) => GetRequiredPathByPage("/Alerts/AddAlert/Index", routeValues: new { personId });
-
     public string PersonChangeLog(Guid personId, string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/ChangeLog", routeValues: new { personId, search, sortBy, pageNumber });
 
