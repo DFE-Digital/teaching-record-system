@@ -174,7 +174,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Subject2Code = subject2?.dfeta_Value,
                 Subject3Code = subject3?.dfeta_Value,
                 HeQualificationName = heQualification?.dfeta_name,
-                ClassDivision = qualification.dfeta_HE_ClassDivision?.ConvertToEnum<dfeta_classdivision, ClassDivision>()
+                ClassDivision = qualification.dfeta_HE_ClassDivision?.ConvertToEnumByValue<dfeta_classdivision, ClassDivision>()
             };
         }
     }

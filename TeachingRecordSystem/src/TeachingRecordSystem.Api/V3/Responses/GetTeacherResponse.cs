@@ -47,6 +47,7 @@ public record GetTeacherResponseInduction
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
     public required InductionStatus? Status { get; init; }
+    public required string? StatusDescription { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string? CertificateUrl { get; init; }
     public required IEnumerable<GetTeacherResponseInductionPeriod> Periods { get; init; }

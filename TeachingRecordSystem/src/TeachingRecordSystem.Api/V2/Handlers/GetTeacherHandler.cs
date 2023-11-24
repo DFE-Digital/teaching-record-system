@@ -97,18 +97,25 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     Value = earlyYearsStatus.dfeta_Value
                 } :
                 null,
-            InitialTeacherTraining = itt.Select(i => new GetTeacherResponseInitialTeacherTraining()
+            InitialTeacherTraining = itt.Select(i =>
             {
-                ProgrammeEndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                ProgrammeStartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>(),
-                Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
-                Provider = new()
+                var provider = i.Extract<Account>("establishment", Account.PrimaryIdAttribute);
+
+                return new GetTeacherResponseInitialTeacherTraining()
                 {
-                    Ukprn = i.Extract<Account>("establishment", Account.PrimaryIdAttribute).dfeta_UKPRN
-                },
-                HusId = i.dfeta_TraineeID,
-                Active = i.StateCode == dfeta_initialteachertrainingState.Active
+                    ProgrammeEndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    ProgrammeStartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>(),
+                    Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
+                    Provider = provider is not null ?
+                        new()
+                        {
+                            Ukprn = provider.dfeta_UKPRN
+                        } :
+                        null,
+                    HusId = i.dfeta_TraineeID,
+                    Active = i.StateCode == dfeta_initialteachertrainingState.Active
+                };
             })
         };
     }

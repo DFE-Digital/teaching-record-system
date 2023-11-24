@@ -119,7 +119,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     dfeta_ittqualification.PrimaryIdAttribute,
                     dfeta_ittqualification.Fields.dfeta_name
                 },
-                false);
+                activeOnly: true);
         }
 
         dfeta_qualification[]? qualifications = default;
@@ -303,8 +303,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Option.Some(itt!.Select(i => new GetTeacherResponseInitialTeacherTraining()
                 {
                     Qualification = MapIttQualification(i),
-                    ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>(),
-                    ProgrammeTypeDescription = i.dfeta_ProgrammeType?.ConvertToEnum<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
+                    ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>(),
+                    ProgrammeTypeDescription = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
                     StartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     EndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
@@ -374,14 +374,15 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             {
                 StartDate = induction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 EndDate = induction.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                Status = MapInductionStatus(induction.dfeta_InductionStatus),
+                Status = induction.dfeta_InductionStatus?.ConvertToInductionStatus(),
+                StatusDescription = induction.dfeta_InductionStatus?.GetDescription(),
                 CertificateUrl =
                     (induction.dfeta_InductionStatus == dfeta_InductionStatus.Pass || induction.dfeta_InductionStatus == dfeta_InductionStatus.PassedinWales) &&
                         induction.dfeta_CompletionDate is not null &&
                         accessMode == AccessMode.IdentityAccessToken ?
                     "/v3/certificates/induction" :
                     null,
-                Periods = inductionperiods.Select(p => MapInductionPeriod(p)).ToArray()
+                Periods = inductionperiods.Select(MapInductionPeriod).ToArray()
             } :
             null;
 
@@ -402,22 +403,6 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 null
         };
     }
-
-    private static InductionStatus? MapInductionStatus(dfeta_InductionStatus? inductionStatus) =>
-        inductionStatus switch
-        {
-            dfeta_InductionStatus.Exempt => InductionStatus.Exempt,
-            dfeta_InductionStatus.Fail => InductionStatus.Fail,
-            dfeta_InductionStatus.FailedinWales => InductionStatus.FailedinWales,
-            dfeta_InductionStatus.InductionExtended => InductionStatus.InductionExtended,
-            dfeta_InductionStatus.InProgress => InductionStatus.InProgress,
-            dfeta_InductionStatus.NotYetCompleted => InductionStatus.NotYetCompleted,
-            dfeta_InductionStatus.Pass => InductionStatus.Pass,
-            dfeta_InductionStatus.PassedinWales => InductionStatus.PassedinWales,
-            dfeta_InductionStatus.RequiredtoComplete => InductionStatus.RequiredtoComplete,
-            null => (InductionStatus?)null,
-            _ => throw new NotImplementedException($"{nameof(InductionStatus)}: {inductionStatus} is not currently supported.")
-        };
 
     private static GetTeacherResponseInitialTeacherTrainingQualification? MapIttQualification(dfeta_initialteachertraining initialTeacherTraining)
     {
