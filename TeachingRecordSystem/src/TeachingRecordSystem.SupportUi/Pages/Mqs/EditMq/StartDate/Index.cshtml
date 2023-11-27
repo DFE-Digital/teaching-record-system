@@ -1,0 +1,28 @@
+@page "/mqs/{qualificationId}/start-date/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate.IndexModel
+@{
+    ViewBag.Title = "Start date";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonQualifications(Model.PersonId!.Value)">Back</govuk-back-link>
+}
+
+<span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.MqEditStartDate(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-date-input asp-for="StartDate">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqEditStartDateCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

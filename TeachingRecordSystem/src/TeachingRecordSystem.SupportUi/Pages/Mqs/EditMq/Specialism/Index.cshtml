@@ -1,0 +1,35 @@
+@page "/mqs/{qualificationId}/specialism/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism.IndexModel
+@{
+    ViewBag.Title = "Specialism";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonQualifications(Model.PersonId!.Value)">Back</govuk-back-link>
+}
+
+<span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
+<h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.MqEditSpecialism(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-radios asp-for="SpecialismValue" data-testid="specialism-list">
+                @if (Model.Specialisms is not null)
+                {
+                    @foreach (var specialism in Model.Specialisms)
+                    {
+                        <govuk-radios-item value="@specialism.dfeta_Value">
+                            @specialism.dfeta_name
+                        </govuk-radios-item>
+                    }
+                }
+            </govuk-radios>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqEditSpecialismCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

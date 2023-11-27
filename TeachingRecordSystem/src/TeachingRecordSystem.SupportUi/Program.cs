@@ -116,7 +116,7 @@ builder.Services
                 model.Filters.Add(new CheckPersonExistsFilter());
             });
         options.Conventions.AddFolderApplicationModelConvention(
-            "/Mqs",
+            "/Mqs/AddMq",
             model =>
             {
                 model.Filters.Add(new CheckPersonExistsFilter());
@@ -224,6 +224,30 @@ builder.Services
             JourneyNames.AddMq,
             typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.AddMqState),
             requestDataKeys: new[] { "personId" },
+            appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.EditMqProvider,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider.EditMqProviderState),
+            requestDataKeys: new[] { "qualificationId" },
+            appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.EditMqSpecialism,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism.EditMqSpecialismState),
+            requestDataKeys: new[] { "qualificationId" },
+            appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.EditMqStartDate,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate.EditMqStartDateState),
+            requestDataKeys: new[] { "qualificationId" },
+            appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.EditMqResult,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result.EditMqResultState),
+            requestDataKeys: new[] { "qualificationId" },
             appendUniqueKey: true));
     });
 
