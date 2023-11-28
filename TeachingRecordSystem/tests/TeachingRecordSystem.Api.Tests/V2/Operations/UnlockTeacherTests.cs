@@ -1,5 +1,7 @@
 #nullable disable
 using System.Net;
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
@@ -7,6 +9,37 @@ public class UnlockTeacherTests : ApiTestBase
 {
     public UnlockTeacherTests(ApiFixture apiFixture) : base(apiFixture)
     {
+        SetCurrentApiClient(new[] { RoleNames.UnlockPerson });
+    }
+
+    [Theory, RoleNamesData(except: new[] { RoleNames.UnlockPerson })]
+    public async Task UnlockTeacher_ClientDoesNotHaveSecurityRoles_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        var teacherId = Guid.NewGuid();
+        SetCurrentApiClient(roles);
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
+            .ReturnsAsync(new Contact()
+            {
+                Id = teacherId,
+                dfeta_ActiveSanctions = false,
+                dfeta_loginfailedcounter = 3
+            });
+
+        DataverseAdapterMock
+            .Setup(mock => mock.UnlockTeacherRecord(teacherId))
+            .ReturnsAsync(true)
+            .Verifiable();
+
+        var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

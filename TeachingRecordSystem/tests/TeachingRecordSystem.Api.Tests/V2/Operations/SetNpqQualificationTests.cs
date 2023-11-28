@@ -1,4 +1,6 @@
 #nullable disable
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 
@@ -8,6 +10,38 @@ public class SetNpqQualificationTests : ApiTestBase
 {
     public SetNpqQualificationTests(ApiFixture apiFixture) : base(apiFixture)
     {
+        SetCurrentApiClient(new[] { RoleNames.UpdateNpq });
+    }
+
+    [Theory, RoleNamesData(except: new[] { RoleNames.UpdateNpq })]
+    public async Task UnlockTeacher_ClientDoesNotHaveSecurityRoles_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+
+        Clock.UtcNow = new DateTime(2023, 10, 31);
+        var result = SetNpqQualificationResult.Success();
+        var trn = "1234567";
+        var contact = new Contact()
+        {
+            dfeta_TRN = trn
+        };
+
+        DataverseAdapterMock
+           .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+           .ReturnsAsync(contact);
+
+        DataverseAdapterMock
+           .Setup(mock => mock.SetNpqQualification(It.IsAny<SetNpqQualificationCommand>()))
+           .ReturnsAsync(result);
+
+        // Act
+        var response = await HttpClientWithApiKey.PutAsync(
+            $"v2/npq-qualifications?trn={trn}",
+            CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year - 1, Clock.UtcNow.Month, Clock.UtcNow.Day)));
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

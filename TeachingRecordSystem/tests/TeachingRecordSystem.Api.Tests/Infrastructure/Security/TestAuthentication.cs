@@ -30,10 +30,11 @@ public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticatio
         }
 
         var currentApiClientId = _currentApiClientProvider.CurrentApiClientId;
+        var currentRoles = _currentApiClientProvider.Roles!;
 
         if (currentApiClientId is not null)
         {
-            var principal = ApiKeyAuthenticationHandler.CreatePrincipal(currentApiClientId);
+            var principal = ApiKeyAuthenticationHandler.CreatePrincipal(currentApiClientId, currentRoles);
 
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
@@ -51,11 +52,19 @@ public class TestAuthenticationOptions : AuthenticationSchemeOptions { }
 public class CurrentApiClientProvider
 {
     private readonly AsyncLocal<string> _currentApiClientId = new();
+    private readonly AsyncLocal<string[]> _roles = new();
 
     [DisallowNull]
     public string? CurrentApiClientId
     {
         get => _currentApiClientId.Value;
         set => _currentApiClientId.Value = value;
+    }
+
+    [DisallowNull]
+    public string[]? Roles
+    {
+        get => _roles.Value;
+        set => _roles.Value = value;
     }
 }

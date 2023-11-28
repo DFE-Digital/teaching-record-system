@@ -46,7 +46,7 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthentic
             return Task.FromResult(AuthenticateResult.Fail($"No client found with specified API key."));
         }
 
-        var principal = CreatePrincipal(client.ClientId);
+        var principal = CreatePrincipal(client.ClientId, client.Roles!);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
         LogContext.PushProperty("ClientId", client.ClientId);
@@ -54,13 +54,17 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthentic
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 
-    public static ClaimsPrincipal CreatePrincipal(string clientId)
+    public static ClaimsPrincipal CreatePrincipal(string clientId, IEnumerable<string> roles)
     {
         var identity = new ClaimsIdentity(new[]
         {
             new Claim(ClaimTypes.Name, clientId)
         });
 
+        foreach (var role in roles)
+        {
+            identity.AddClaim(new Claim(ClaimTypes.Role, role));
+        }
         return new ClaimsPrincipal(identity);
     }
 }

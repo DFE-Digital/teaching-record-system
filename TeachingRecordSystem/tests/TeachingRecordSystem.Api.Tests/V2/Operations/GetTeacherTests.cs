@@ -1,6 +1,8 @@
 #nullable disable
 using Microsoft.Xrm.Sdk;
+using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Properties;
+using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
@@ -10,6 +12,27 @@ public class GetTeacherTests : ApiTestBase
     public GetTeacherTests(ApiFixture apiFixture)
         : base(apiFixture)
     {
+        SetCurrentApiClient(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson });
+    }
+
+    [Theory, RoleNamesData(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson })]
+    public async Task GetTeacher_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+        var trn = "1234567";
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacherByTrn(trn, It.IsAny<string[]>(), true))
+            .ReturnsAsync((Contact)null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Theory]
@@ -338,3 +361,4 @@ public class GetTeacherTests : ApiTestBase
             });
     }
 }
+

@@ -1,7 +1,9 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
+using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V1.Requests;
 using TeachingRecordSystem.Api.V1.Responses;
 
@@ -9,6 +11,7 @@ namespace TeachingRecordSystem.Api.V1.Controllers;
 
 [ApiController]
 [Route("teachers")]
+[Authorize(Policy = AuthorizationPolicies.ApiKey)]
 public class TeachersController : ControllerBase
 {
     private readonly IMediator _mediator;

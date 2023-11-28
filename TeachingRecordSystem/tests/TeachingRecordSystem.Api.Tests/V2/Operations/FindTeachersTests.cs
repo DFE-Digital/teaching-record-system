@@ -1,4 +1,6 @@
 #nullable disable
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
@@ -7,7 +9,27 @@ public class FindTeachersTests : ApiTestBase
 {
     public FindTeachersTests(ApiFixture apiFixture) : base(apiFixture)
     {
+        SetCurrentApiClient(new[] { RoleNames.GetPerson });
     }
+
+    [Theory, RoleNamesData(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson })]
+    public async Task FindTeachers_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+        DataverseAdapterMock
+            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+            .ReturnsAsync(Array.Empty<Contact>());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find");
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
 
     [Fact]
     public async Task Given_no_results_returns_ok()

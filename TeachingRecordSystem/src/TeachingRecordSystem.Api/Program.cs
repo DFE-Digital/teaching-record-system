@@ -137,6 +137,30 @@ public class Program
                     .AddAuthenticationSchemes(BasicAuthenticationDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser()
                 );
+
+            options.AddPolicy(
+                AuthorizationPolicies.GetPerson,
+                policy => policy
+                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                    .RequireRole(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson }));
+
+            options.AddPolicy(
+                AuthorizationPolicies.UpdatePerson,
+                policy => policy
+                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                    .RequireRole(new[] { RoleNames.UpdatePerson }));
+
+            options.AddPolicy(
+                AuthorizationPolicies.UpdateNpq,
+                policy => policy
+                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                    .RequireRole(new[] { RoleNames.UpdateNpq }));
+
+            options.AddPolicy(
+                AuthorizationPolicies.UnlockPerson,
+                policy => policy
+                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                    .RequireRole(new[] { RoleNames.UnlockPerson }));
         });
 
         services

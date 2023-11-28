@@ -20,7 +20,7 @@ public abstract class ApiTestBase
     {
         ApiFixture = apiFixture;
         _testServices = TestScopedServices.Reset();
-        SetCurrentApiClient("tests");
+        SetCurrentApiClient(Array.Empty<string>());
 
         {
             HttpClientWithApiKey = apiFixture.CreateClient();
@@ -77,10 +77,11 @@ public abstract class ApiTestBase
         return httpClient;
     }
 
-    protected void SetCurrentApiClient(string clientId)
+    protected void SetCurrentApiClient(IEnumerable<string> roles, string clientId = "tests")
     {
         var currentUserProvider = ApiFixture.Services.GetRequiredService<CurrentApiClientProvider>();
         currentUserProvider.CurrentApiClientId = clientId;
+        currentUserProvider.Roles = roles.ToArray();
     }
 
     public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)

@@ -1,6 +1,8 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 
@@ -8,6 +10,7 @@ namespace TeachingRecordSystem.Api.V2.Controllers;
 
 [ApiController]
 [Route("trn-requests")]
+[Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
 public class TrnRequestsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -38,6 +41,7 @@ public class TrnRequestsController : ControllerBase
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+
     public async Task<IActionResult> GetOrCreateTrnRequest([FromBody] GetOrCreateTrnRequest request)
     {
         var response = await _mediator.Send(request);

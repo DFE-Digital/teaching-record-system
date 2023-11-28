@@ -1,7 +1,10 @@
 #nullable disable
 using System.Net;
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
+
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
@@ -9,6 +12,35 @@ public class SetIttOutcomeTests : ApiTestBase
 {
     public SetIttOutcomeTests(ApiFixture apiFixture) : base(apiFixture)
     {
+        SetCurrentApiClient(new[] { RoleNames.UpdatePerson });
+    }
+
+    [Theory, RoleNamesData(new[] { RoleNames.UpdatePerson })]
+    public async Task IttOutcome_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+        var trn = "1234567";
+        var dob = new DateOnly(1987, 1, 1);
+
+        var requestBody = new SetIttOutcomeRequest()
+        {
+            BirthDate = dob,
+            IttProviderUkprn = "1001234",
+            Outcome = IttOutcome.Pass,
+            AssessmentDate = new DateOnly(1987, 1, 1)
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/v2/teachers/{trn}/itt-outcome")
+        {
+            Content = CreateJsonContent(requestBody)
+        };
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

@@ -2,6 +2,8 @@ using System.Text;
 using JustEat.HttpClientInterception;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
@@ -11,6 +13,7 @@ public class CreateNameChangeTests : ApiTestBase
     public CreateNameChangeTests(ApiFixture apiFixture)
         : base(apiFixture)
     {
+        SetCurrentApiClient(new[] { RoleNames.UpdatePerson });
     }
 
     [Theory]
@@ -48,6 +51,57 @@ public class CreateNameChangeTests : ApiTestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Theory, RoleNamesData(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson })]
+    public async Task PostNameChanges_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+        var trn = await TestData.GenerateTrn();
+        var newFirstName = TestData.GenerateFirstName();
+        var newMiddleName = TestData.GenerateMiddleName();
+        var newLastName = TestData.GenerateLastName();
+
+        var evidenceFileName = "evidence.txt";
+        var evidenceFileUrl = Faker.Internet.SecureUrl();
+        var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
+
+        ApiFixture.ConfigureEvidenceFilesHttpClient(options =>
+        {
+            var builder = new HttpRequestInterceptionBuilder();
+
+            var evidenceFileUri = new Uri(evidenceFileUrl);
+
+            builder
+                .Requests()
+                .ForGet()
+                .ForHttps()
+                .ForHost(evidenceFileUri.Host)
+                .ForPath(evidenceFileUri.LocalPath.TrimStart('/'))
+                .Responds()
+                .WithContentStream(() => new MemoryStream(evidenceFileContent))
+                .RegisterWith(options);
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/name-changes")
+        {
+            Content = CreateJsonContent(new
+            {
+                trn,
+                firstName = newFirstName,
+                middleName = newMiddleName,
+                lastName = newLastName,
+                evidenceFileName,
+                evidenceFileUrl
+            })
+        };
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

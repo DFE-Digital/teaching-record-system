@@ -2,6 +2,8 @@ using System.Text;
 using JustEat.HttpClientInterception;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
@@ -11,6 +13,53 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
     public CreateDateOfBirthChangeTests(ApiFixture apiFixture)
         : base(apiFixture)
     {
+        SetCurrentApiClient(new[] { RoleNames.UpdatePerson });
+    }
+
+    [Theory, RoleNamesData(new[] { RoleNames.UpdatePerson })]
+    public async Task PostCreateDateOfBirthChange_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    {
+        // Arrange
+        SetCurrentApiClient(roles);
+        var trn = await TestData.GenerateTrn();
+        var newDateOfBirth = TestData.GenerateDateOfBirth();
+        var evidenceFileName = "evidence.txt";
+        var evidenceFileUrl = Faker.Internet.SecureUrl();
+        var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
+
+        ApiFixture.ConfigureEvidenceFilesHttpClient(options =>
+        {
+            var builder = new HttpRequestInterceptionBuilder();
+
+            var evidenceFileUri = new Uri(evidenceFileUrl);
+
+            builder
+                .Requests()
+                .ForGet()
+                .ForHttps()
+                .ForHost(evidenceFileUri.Host)
+                .ForPath(evidenceFileUri.LocalPath.TrimStart('/'))
+                .Responds()
+                .WithContentStream(() => new MemoryStream(evidenceFileContent))
+                .RegisterWith(options);
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/date-of-birth-changes")
+        {
+            Content = CreateJsonContent(new
+            {
+                trn,
+                dateOfBirth = newDateOfBirth,
+                evidenceFileName,
+                evidenceFileUrl
+            })
+        };
+
+        // Act
+        var response = await HttpClientWithApiKey.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Theory]

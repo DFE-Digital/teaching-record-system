@@ -1,5 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 
@@ -20,9 +20,10 @@ public class AuthorizationPolicyConvention : IActionModelConvention
             throw new Exception("Controller does not have a version assigned.");
         }
 
-        if (version is 1 or 2)
+        if (!action.Attributes.Any(att => att is AuthorizeAttribute) &&
+            !action.Controller.Attributes.Any(att => att is AuthorizeAttribute))
         {
-            action.Filters.Add(new AuthorizeFilter(Security.AuthorizationPolicies.ApiKey));
+            throw new Exception("Action does not have assigned authorize attribute");
         }
     }
 }
