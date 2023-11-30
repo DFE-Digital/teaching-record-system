@@ -19,13 +19,16 @@ Request body structure:
     "lastName": "",
     "dateOfBirth": "",
     "email": "",
+    "nationalInsuranceNumber": ""
   }
 }
 ```
 
 The `requestId`, `person.firstName`, `person.lastName` and `person.dateOfBirth` properties are all mandatory.
 
-`requestId`, `person.firstName`, `person.middleName`, `person.lastName` and `person.email` cannot be greater than 100 characters in length. `person.dateOfBirth` must be formatted `yyyy-MM-dd`.
+`requestId`, `person.firstName`, `person.middleName`, `person.lastName` and `person.email` cannot be greater than 100 characters in length.
+`person.dateOfBirth` must be formatted `yyyy-MM-dd`.
+`person.nationalInsuranceNumber` must be 9 characters in length, if provided.
 
 If there has already been a request submitted with the given `requestId`, a `409 Conflict` status code will be returned.
 
@@ -41,6 +44,7 @@ Response body structure:
     "lastName": "",
     "dateOfBirth": "",
     "email": "",
+    "nationalInsuranceNumber": ""
   },
   "status": "Pending|Completed",
   "trn": ""
@@ -65,6 +69,7 @@ Response body structure:
     "lastName": "",
     "dateOfBirth": "",
     "email": "",
+    "nationalInsuranceNumber": ""
   },
   "status": "Pending|Completed",
   "trn": ""
