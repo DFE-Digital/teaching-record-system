@@ -90,6 +90,7 @@ module "api_application" {
   web_port     = 80
   probe_path   = "/health"
   replicas     = var.api_replicas
+  max_memory   = var.api_max_memory
 }
 
 module "ui_application_configuration" {
