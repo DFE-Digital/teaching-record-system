@@ -6,31 +6,31 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="7.1.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="7.0.1" />
-    <PackageReference Include="Azure.Extensions.AspNetCore.DataProtection.Blobs" Version="1.3.2" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.6" />
-    <PackageReference Include="Hangfire.PostgreSql" Version="1.20.4" />
-    <PackageReference Include="idunno.Authentication.Basic" Version="2.3.1" />
-    <PackageReference Include="MediatR" Version="12.1.1" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.13" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.13" />
-    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.1" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.13" />
-    <PackageReference Include="Moq" Version="4.20.69" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.20.0" />
-    <PackageReference Include="NSwag.Examples" Version="1.0.11" />
-    <PackageReference Include="RedisRateLimiting.AspNetCore" Version="1.0.9" />
-    <PackageReference Include="Sentry.AspNetCore" Version="3.40.1" />
-    <PackageReference Include="Sentry.Serilog" Version="3.40.1" />
-    <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
-    <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="7.0.1" />
-    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.0" />
-    <PackageReference Include="SerilogTimings" Version="3.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+    <PackageReference Include="AspNetCore.HealthChecks.Redis" />
+    <PackageReference Include="Azure.Extensions.AspNetCore.DataProtection.Blobs" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="FluentValidation.AspNetCore" />
+    <PackageReference Include="Hangfire.AspNetCore" />
+    <PackageReference Include="Hangfire.PostgreSql" />
+    <PackageReference Include="idunno.Authentication.Basic" />
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.Extensions.Azure" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="NSwag.AspNetCore" />
+    <PackageReference Include="NSwag.Examples" />
+    <PackageReference Include="RedisRateLimiting.AspNetCore" />
+    <PackageReference Include="Sentry.AspNetCore" />
+    <PackageReference Include="Sentry.Serilog" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Formatting.Compact" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" />
+    <PackageReference Include="SerilogTimings" />
   </ItemGroup>
 
   <ItemGroup>
