@@ -329,9 +329,9 @@ public class Program
 
         app.Use((ctx, next) =>
         {
-            ctx.Response.Headers.Add("X-Frame-Options", "deny");
-            ctx.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-            ctx.Response.Headers.Add("X-XSS-Protection", "0");
+            ctx.Response.Headers.Append("X-Frame-Options", "deny");
+            ctx.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+            ctx.Response.Headers.Append("X-XSS-Protection", "0");
 
             return next();
         });
