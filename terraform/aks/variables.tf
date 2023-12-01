@@ -79,30 +79,42 @@ variable "api_replicas" {
   type    = number
   default = 1
 }
+
+variable "api_max_memory" {
+  type    = string
+  default = "1Gi"
+}
+
 variable "ui_replicas" {
   type    = number
   default = 1
 }
+
 variable "postgres_flexible_server_sku" {
   type    = string
   default = "B_Standard_B1ms"
 }
+
 variable "postgres_enable_high_availability" {
   type    = bool
   default = false
 }
+
 variable "redis_capacity" {
   type    = number
   default = 1
 }
+
 variable "redis_family" {
   type    = string
   default = "C"
 }
+
 variable "redis_sku_name" {
   type    = string
   default = "Standard"
 }
+
 variable "statuscake_extra_urls" {
   type        = list(string)
   description = "List of extra URLs for StatusCake, on top of the internal teacherservices.cloud ones"
