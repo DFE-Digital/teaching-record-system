@@ -1,9 +1,7 @@
-using Sentry.Extensibility;
 using Serilog;
-using TeachingRecordSystem.Api.Infrastructure.ApplicationInsights;
 using TeachingRecordSystem.Hosting;
 
-namespace TeachingRecordSystem.Api.Infrastructure.Logging;
+namespace TeachingRecordSystem.SupportUi.Infrastructure.Logging;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -14,10 +12,7 @@ public static class WebApplicationBuilderExtensions
             builder.WebHost.UseSentry(dsn: builder.Configuration.GetRequiredValue("Sentry:Dsn"));
         }
 
-        builder.Services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
-
-        builder.Services.AddApplicationInsightsTelemetry()
-            .AddApplicationInsightsTelemetryProcessor<RedactedUrlTelemetryProcessor>();
+        builder.Services.AddApplicationInsightsTelemetry();
 
         // We want all logging to go through Serilog so that our filters are always applied
         builder.Logging.ClearProviders();

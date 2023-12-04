@@ -25,12 +25,7 @@
     <PackageReference Include="NSwag.Examples" />
     <PackageReference Include="RedisRateLimiting.AspNetCore" />
     <PackageReference Include="Sentry.AspNetCore" />
-    <PackageReference Include="Sentry.Serilog" />
     <PackageReference Include="Serilog.AspNetCore" />
-    <PackageReference Include="Serilog.Formatting.Compact" />
-    <PackageReference Include="Serilog.Settings.Configuration" />
-    <PackageReference Include="Serilog.Sinks.ApplicationInsights" />
-    <PackageReference Include="SerilogTimings" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +45,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.Hosting\TeachingRecordSystem.Hosting.csproj" />
   </ItemGroup>
 
 </Project>
