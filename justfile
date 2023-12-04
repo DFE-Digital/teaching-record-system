@@ -83,6 +83,12 @@ docker-build-ui *ARGS:
   @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet publish -c Release
   @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.SupportUi" / "Dockerfile"}} {{ARGS}}
 
+# Build the worker Docker image
+docker-build-worker *ARGS:
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Worker"}} && dotnet publish -c Release
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet publish -c Release
+  @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.Worker" / "Dockerfile"}} {{ARGS}}
+
 # Set a configuration entry in user secrets for the API project
 set-api-secret key value:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet user-secrets set "{{key}}" "{{value}}"

@@ -241,4 +241,5 @@ jobs:
       api_docker_image: ${{ needs.package.outputs.api_docker_image }}
       cli_docker_image: ${{ needs.package.outputs.cli_docker_image }}
       ui_docker_image: ${{ needs.package.outputs.ui_docker_image }}
+      worker_docker_image: ${{ needs.package.outputs.worker_docker_image }}
     secrets: inherit

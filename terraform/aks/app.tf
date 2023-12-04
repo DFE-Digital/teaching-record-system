@@ -136,3 +136,44 @@ module "ui_application" {
   probe_path   = "/health"
   replicas     = var.ui_replicas
 }
+
+module "worker_application_configuration" {
+  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
+
+  namespace              = var.namespace
+  environment            = var.environment_name
+  azure_resource_prefix  = var.azure_resource_prefix
+  service_short          = var.service_short_name
+  config_short           = var.environment_short_name
+  secret_key_vault_short = "worker"
+
+  config_variables = {
+    PlatformEnvironment = var.environment_name
+  }
+
+  secret_variables = {
+    ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
+    StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+  }
+}
+
+module "worker_application" {
+  source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+  depends_on = [kubernetes_job.migrations, kubernetes_job.reporting_migrations]
+
+  name   = "worker"
+  is_web = false
+
+  namespace    = var.namespace
+  environment  = var.environment_name
+  service_name = var.service_name
+
+  cluster_configuration_map = module.cluster_data.configuration_map
+
+  kubernetes_config_map_name = module.worker_application_configuration.kubernetes_config_map_name
+  kubernetes_secret_name     = module.worker_application_configuration.kubernetes_secret_name
+
+  docker_image = var.worker_docker_image
+  replicas     = var.worker_replicas
+  max_memory   = var.worker_max_memory
+}

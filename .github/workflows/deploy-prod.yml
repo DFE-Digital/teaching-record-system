@@ -12,6 +12,9 @@ on:
       ui_docker_image:
         type: string
         required: true
+      worker_docker_image:
+        type: string
+        required: true
 
 concurrency: deploy_prod
 jobs:
@@ -32,4 +35,5 @@ jobs:
         api_docker_image: ${{ inputs.api_docker_image }}
         cli_docker_image: ${{ inputs.cli_docker_image }}
         ui_docker_image: ${{ inputs.ui_docker_image }}
+        worker_docker_image: ${{ inputs.worker_docker_image }}
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}

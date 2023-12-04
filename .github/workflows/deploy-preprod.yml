@@ -11,6 +11,8 @@ on:
         required: true
       ui_docker_image:
         type: string
+      worker_docker_image:
+        type: string
         required: true
   workflow_dispatch:
 
@@ -41,4 +43,5 @@ jobs:
         api_docker_image: ${{ inputs.api_docker_image || needs.package.outputs.api_docker_image }}
         cli_docker_image: ${{ inputs.cli_docker_image || needs.package.outputs.cli_docker_image }}
         ui_docker_image: ${{ inputs.ui_docker_image || needs.package.outputs.ui_docker_image }}
+        worker_docker_image: ${{ inputs.worker_docker_image || needs.package.outputs.worker_docker_image }}
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
