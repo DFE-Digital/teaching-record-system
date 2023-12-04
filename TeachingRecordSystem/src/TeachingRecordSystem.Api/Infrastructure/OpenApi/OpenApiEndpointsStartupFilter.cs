@@ -34,7 +34,7 @@ public class OpenApiEndpointsStartupFilter : IStartupFilter
             });
         }
 
-        app.UseSwaggerUi3(settings =>
+        app.UseSwaggerUi(settings =>
         {
             foreach (var version in Api.Constants.Versions)
             {

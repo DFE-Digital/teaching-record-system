@@ -16,19 +16,19 @@ public static class ServiceCollectionExtensions
                 settings.Version = OpenApiDocumentHelper.GetVersionName(version);
                 settings.Title = "Teaching Record System API";
                 settings.ApiGroupNames = new[] { OpenApiDocumentHelper.GetVersionName(version) };
-                settings.AddExamples(provider);
-                settings.TypeNameGenerator = new GeneratedCrmTypeNameGenerator(settings.TypeNameGenerator);
+                //settings.AddExamples(provider);   // Broken with the current NSwag.Examples library
+                settings.SchemaSettings.TypeNameGenerator = new GeneratedCrmTypeNameGenerator(settings.SchemaSettings.TypeNameGenerator);
 
                 settings.DocumentProcessors.Add(new PopulateResponseDescriptionOperationProcessor());
 
-                settings.SchemaProcessors.Add(new RemoveCompositeValuesFromFlagsEnumSchemaProcessor());
-                settings.SchemaProcessors.Add(new RemoveExcludedEnumOptionsSchemaProcessor());
+                settings.SchemaSettings.SchemaProcessors.Add(new RemoveCompositeValuesFromFlagsEnumSchemaProcessor());
+                settings.SchemaSettings.SchemaProcessors.Add(new RemoveExcludedEnumOptionsSchemaProcessor());
 
                 settings.OperationProcessors.Add(new ResponseContentTypeOperationProcessor());
                 settings.OperationProcessors.Add(new PopulateResponseDescriptionOperationProcessor());
                 settings.OperationProcessors.Add(new AssignBinaryContentTypeFromProducesOperationProcessor());
 
-                settings.SchemaGenerator = new HandleOptionJsonSchemaGenerator(settings);
+                settings.SchemaSettings.ReflectionService = new UnwrapOptionTypesReflectionService();
 
                 settings.AddSecurity(SecuritySchemes.ApiKey, new NSwag.OpenApiSecurityScheme()
                 {

@@ -16,9 +16,8 @@ public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticatio
         CurrentUserProvider currentUserProvider,
         IOptionsMonitor<TestAuthenticationOptions> options,
         ILoggerFactory logger,
-        UrlEncoder encoder,
-        ISystemClock clock)
-        : base(options, logger, encoder, clock)
+        UrlEncoder encoder)
+        : base(options, logger, encoder)
     {
         _currentUserProvider = currentUserProvider;
     }

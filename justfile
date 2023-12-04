@@ -12,7 +12,7 @@ install-tools:
 
 # Run the trscli
 cli *ARGS:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Debug" / "net7.0" / "trscli.dll"}} {{ARGS}}
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Debug" / "net8.0" / "trscli.dll"}} {{ARGS}}
 
 # Build the .NET solution
 build:
@@ -118,7 +118,7 @@ set-ui-e2e-tests-secret key value:
   @cd {{solution-root / "tests" / "TeachingRecordSystem.SupportUi.EndToEndTests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
 
 create-admin email name:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Debug" / "net7.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Debug" / "net8.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
 
 make *ARGS:
   @make {{ARGS}}

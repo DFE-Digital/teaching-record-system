@@ -11,7 +11,7 @@ public class GeneratedCrmTypeNameGenerator : ITypeNameGenerator
         _innerGenerator = innerGenerator;
     }
 
-    public string Generate(JsonSchema schema, string typeNameHint, IEnumerable<string> reservedTypeNames)
+    public string Generate(JsonSchema schema, string? typeNameHint, IEnumerable<string> reservedTypeNames)
     {
         var name = _innerGenerator.Generate(schema, typeNameHint, reservedTypeNames);
 
@@ -19,7 +19,7 @@ public class GeneratedCrmTypeNameGenerator : ITypeNameGenerator
         // e.g. for the 'dfeta_inductionState' type use 'InductionState' in the API spec
         if (name.StartsWith("dfeta_", StringComparison.OrdinalIgnoreCase))
         {
-            var prefixTrimmedTypeName = name.Substring("dfeta_".Length);
+            var prefixTrimmedTypeName = name["dfeta_".Length..];
             return prefixTrimmedTypeName[0..1].ToUpper() + prefixTrimmedTypeName[1..];
         }
 
