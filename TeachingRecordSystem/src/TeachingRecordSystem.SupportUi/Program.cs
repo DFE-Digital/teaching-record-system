@@ -20,6 +20,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Conventions;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
+using TeachingRecordSystem.SupportUi.Infrastructure.Logging;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Redis;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
@@ -34,6 +35,8 @@ if (builder.Environment.IsProduction())
 {
     builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
 }
+
+builder.ConfigureLogging();
 
 var pgConnectionString = builder.Configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
 

@@ -54,7 +54,7 @@ module "api_application_configuration" {
   secret_key_vault_short = "api"
 
   config_variables = {
-    PlatformEnvironment             = var.environment_name
+    SENTRY_ENVIRONMENT              = var.environment_name
     DistributedLockContainerName    = azurerm_storage_container.locks.name
     DqtReporting__RunService        = var.run_dqt_reporting_service
     RecurringJobs__Enabled          = var.run_recurring_jobs
@@ -67,6 +67,7 @@ module "api_application_configuration" {
     ConnectionStrings__Redis                  = module.redis.connection_string
     StorageConnectionString                   = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
     DqtReporting__ReportingDbConnectionString = local.reporting_db_connection_string
+    Sentry__Dsn                               = module.infrastructure_secrets.map.SENTRY-DSN
   }
 }
 
@@ -104,14 +105,16 @@ module "ui_application_configuration" {
   secret_key_vault_short = "ui"
 
   config_variables = {
-    PlatformEnvironment             = var.environment_name
+    SENTRY_ENVIRONMENT              = var.environment_name
     DataProtectionKeysContainerName = azurerm_storage_container.keys.name
   }
 
   secret_variables = {
-    ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
-    ConnectionStrings__Redis             = "${module.redis.connection_string},defaultDatabase=1"
-    StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+    ApplicationInsights__ConnectionString = azurerm_application_insights.app.connection_string
+    ConnectionStrings__DefaultConnection  = module.postgres.dotnet_connection_string
+    ConnectionStrings__Redis              = "${module.redis.connection_string},defaultDatabase=1"
+    StorageConnectionString               = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+    Sentry__Dsn                           = module.infrastructure_secrets.map.SENTRY-DSN
   }
 }
 
@@ -148,12 +151,14 @@ module "worker_application_configuration" {
   secret_key_vault_short = "worker"
 
   config_variables = {
-    PlatformEnvironment = var.environment_name
+    SENTRY_ENVIRONMENT = var.environment_name
   }
 
   secret_variables = {
-    ConnectionStrings__DefaultConnection = module.postgres.dotnet_connection_string
-    StorageConnectionString              = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+    ApplicationInsights__ConnectionString = azurerm_application_insights.app.connection_string
+    ConnectionStrings__DefaultConnection  = module.postgres.dotnet_connection_string
+    StorageConnectionString               = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+    Sentry__Dsn                           = module.infrastructure_secrets.map.SENTRY-DSN
   }
 }
 

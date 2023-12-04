@@ -59,8 +59,7 @@ public class Program
             builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
         }
 
-        var platformEnvironmentName = configuration["PlatformEnvironment"];
-        builder.ConfigureLogging(platformEnvironmentName);
+        builder.ConfigureLogging();
 
         string pgConnectionString = new NpgsqlConnectionStringBuilder(configuration.GetRequiredValue("ConnectionStrings:DefaultConnection"))
         {
