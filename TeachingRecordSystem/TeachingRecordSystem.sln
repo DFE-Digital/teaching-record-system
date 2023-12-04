@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Suppor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormFlow", "lib\formflow\src\FormFlow\FormFlow.csproj", "{DA3F55CA-6B95-4A85-A3D6-2997C3149A63}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeachingRecordSystem.Worker", "src\TeachingRecordSystem.Worker\TeachingRecordSystem.Worker.csproj", "{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -178,6 +180,18 @@ Global
 		{DA3F55CA-6B95-4A85-A3D6-2997C3149A63}.Release|x64.Build.0 = Release|Any CPU
 		{DA3F55CA-6B95-4A85-A3D6-2997C3149A63}.Release|x86.ActiveCfg = Release|Any CPU
 		{DA3F55CA-6B95-4A85-A3D6-2997C3149A63}.Release|x86.Build.0 = Release|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Debug|x64.Build.0 = Debug|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Debug|x86.Build.0 = Debug|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Release|x64.ActiveCfg = Release|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Release|x64.Build.0 = Release|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Release|x86.ActiveCfg = Release|Any CPU
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -194,6 +208,7 @@ Global
 		{EB46905A-F7B4-4BDC-B376-6091264D6303} = {91DCFC76-6636-4AC1-B81C-7F8AE1F22116}
 		{407EB5A5-8B4F-4F7D-80BA-E39AB6AD013C} = {91DCFC76-6636-4AC1-B81C-7F8AE1F22116}
 		{DA3F55CA-6B95-4A85-A3D6-2997C3149A63} = {837E2941-F1CC-41EF-A652-B605101B2E84}
+		{E7D4BCFD-E610-41E2-B209-0BE13799C7A8} = {837E2941-F1CC-41EF-A652-B605101B2E84}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61D239F9-888B-4D01-84BC-9276C92383EA}

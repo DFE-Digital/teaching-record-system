@@ -62,6 +62,10 @@ variable "ui_docker_image" {
   type = string
 }
 
+variable "worker_docker_image" {
+  type = string
+}
+
 variable "deploy_dqt_reporting_server" {
   type    = bool
   default = false
@@ -88,6 +92,16 @@ variable "api_max_memory" {
 variable "ui_replicas" {
   type    = number
   default = 1
+}
+
+variable "worker_replicas" {
+  type    = number
+  default = 1
+}
+
+variable "worker_max_memory" {
+  type    = string
+  default = "1Gi"
 }
 
 variable "postgres_flexible_server_sku" {

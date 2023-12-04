@@ -9,6 +9,8 @@ on:
         value: ${{ jobs.package.outputs.cli_image_tag }}
       ui_docker_image:
         value: ${{ jobs.package.outputs.ui_image_tag }}
+      worker_docker_image:
+        value: ${{ jobs.package.outputs.worker_image_tag }}
 
 jobs:
   package:
@@ -21,6 +23,7 @@ jobs:
       api_image_tag: ${{ steps.image_tags.outputs.api_tag }}
       cli_image_tag: ${{ steps.image_tags.outputs.cli_tag }}
       ui_image_tag: ${{ steps.image_tags.outputs.ui_tag }}
+      worker_image_tag: ${{ steps.image_tags.outputs.worker_tag }}
 
     steps:
       - uses: actions/checkout@v4
@@ -35,6 +38,7 @@ jobs:
           echo "api_tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):api-$GITHUB_SHA" >> $GITHUB_OUTPUT
           echo "cli_tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):cli-$GITHUB_SHA" >> $GITHUB_OUTPUT
           echo "ui_tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):ui-$GITHUB_SHA" >> $GITHUB_OUTPUT
+          echo "worker_tag=$CONTAINER_REGISTRY/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):worker-$GITHUB_SHA" >> $GITHUB_OUTPUT
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -65,7 +69,15 @@ jobs:
             just docker-build-ui --build-arg GIT_SHA=$GITHUB_SHA --tag $UI_TAG
             docker push $UI_TAG
           fi
+
+          if skopeo inspect "docker://$WORKER_TAG" >/dev/null 2>&1; then
+            echo "::notice::Skipping worker build - tag already exists"
+          else
+            just docker-build-worker --build-arg GIT_SHA=$GITHUB_SHA --tag $WORKER_TAG
+            docker push $WORKER_TAG
+          fi
         env:
           API_TAG: ${{ steps.image_tags.outputs.api_tag }}
           CLI_TAG: ${{ steps.image_tags.outputs.cli_tag }}
           UI_TAG: ${{ steps.image_tags.outputs.ui_tag }}
+          WORKER_TAG: ${{ steps.image_tags.outputs.worker_tag }}

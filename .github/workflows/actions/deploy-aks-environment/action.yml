@@ -13,6 +13,9 @@ inputs:
   ui_docker_image:
     description: 'The Support UI Docker image to deploy to the environment'
     required: true
+  worker_docker_image:
+    description: 'The worker worker Docker image to deploy to the environment'
+    required: true
   azure_credentials:
     description: 'JSON object containing a service principal that can deploy to the environment'
     required: true
@@ -39,4 +42,5 @@ runs:
         TF_VAR_api_docker_image: ${{ inputs.api_docker_image }}
         TF_VAR_cli_docker_image: ${{ inputs.cli_docker_image }}
         TF_VAR_ui_docker_image: ${{ inputs.ui_docker_image }}
+        TF_VAR_worker_docker_image: ${{ inputs.worker_docker_image }}
       shell: bash
