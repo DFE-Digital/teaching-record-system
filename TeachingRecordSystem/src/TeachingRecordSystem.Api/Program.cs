@@ -1,18 +1,13 @@
 using System.Security.Claims;
-using Azure.Storage.Blobs;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using Hangfire.PostgreSql;
 using idunno.Authentication.Basic;
-using Medallion.Threading;
-using Medallion.Threading.Azure;
-using Medallion.Threading.FileSystem;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Npgsql;
@@ -30,8 +25,8 @@ using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
-using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
 using TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
+using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.AccessYourQualifications;
@@ -223,30 +218,9 @@ public class Program
 
         services.AddDatabaseDeveloperPageExceptionFilter();
 
-        if (!env.IsUnitTests())
-        {
-            services.AddAzureClients(clientBuilder =>
-            {
-                clientBuilder.AddBlobServiceClient(configuration.GetRequiredValue("StorageConnectionString"));
-            });
-        }
+        builder.AddBlobStorage();
 
-        if (env.IsProduction())
-        {
-            var containerName = configuration.GetRequiredValue("DistributedLockContainerName");
-
-            services.AddSingleton<IDistributedLockProvider>(sp =>
-            {
-                var blobServiceClient = sp.GetRequiredService<BlobServiceClient>();
-                var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-                return new AzureBlobLeaseDistributedSynchronizationProvider(blobContainerClient);
-            });
-        }
-        else
-        {
-            var lockFileDirectory = Path.Combine(Path.GetTempPath(), "qtlocks");
-            services.AddSingleton<IDistributedLockProvider>(new FileDistributedSynchronizationProvider(new DirectoryInfo(lockFileDirectory)));
-        }
+        builder.AddDistributedLocks();
 
         if (!env.IsUnitTests() && !env.IsEndToEndTests())
         {
@@ -264,17 +238,12 @@ public class Program
         services.AddAccessYourQualifications(configuration, env);
         services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
-        services.AddDqtReporting(builder.Configuration);
         services.AddTrsSyncService(builder.Configuration);
         services.AddBackgroundJobs(env, configuration);
         services.AddEmail(env, configuration);
         services.AddCrmQueries();
         services.AddSingleton<ReferenceDataCache>();
         services.AddSingleton<TrsDataSyncHelper>();
-
-        // Filter telemetry emitted by DqtReportingService
-        services.AddApplicationInsightsTelemetry()
-            .AddApplicationInsightsTelemetryProcessor<IgnoreDependencyTelemetryProcessor>();
 
         if (!env.IsUnitTests())
         {

@@ -6,26 +6,24 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 
 namespace TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
 
-public static class ServiceCollectionExtensions
+public static class HostApplicationBuilderExtensions
 {
-    public static IServiceCollection AddDqtReporting(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static IHostApplicationBuilder AddDqtReporting(this IHostApplicationBuilder builder)
     {
-        if (configuration.GetValue<bool>("DqtReporting:RunService"))
+        if (builder.Configuration.GetValue<bool>("DqtReporting:RunService"))
         {
-            services.AddOptions<DqtReportingOptions>()
-                .Bind(configuration.GetSection("DqtReporting"))
+            builder.Services.AddOptions<DqtReportingOptions>()
+                .Bind(builder.Configuration.GetSection("DqtReporting"))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            services.AddSingleton<IHostedService, DqtReportingService>();
+            builder.Services.AddSingleton<IHostedService, DqtReportingService>();
 
-            services.AddServiceClient(
+            builder.Services.AddServiceClient(
                 DqtReportingService.CrmClientName,
                 sp => new ServiceClient(sp.GetRequiredService<IOptions<DqtReportingOptions>>().Value.CrmConnectionString));
         }
 
-        return services;
+        return builder;
     }
 }
