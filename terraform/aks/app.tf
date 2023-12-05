@@ -56,24 +56,22 @@ module "api_application_configuration" {
   config_variables = {
     SENTRY_ENVIRONMENT              = var.environment_name
     DistributedLockContainerName    = azurerm_storage_container.locks.name
-    DqtReporting__RunService        = var.run_dqt_reporting_service
     RecurringJobs__Enabled          = var.run_recurring_jobs
     DataProtectionKeysContainerName = azurerm_storage_container.keys.name
   }
 
   secret_variables = {
-    ApplicationInsights__ConnectionString     = azurerm_application_insights.app.connection_string
-    ConnectionStrings__DefaultConnection      = module.postgres.dotnet_connection_string
-    ConnectionStrings__Redis                  = module.redis.connection_string
-    StorageConnectionString                   = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
-    DqtReporting__ReportingDbConnectionString = local.reporting_db_connection_string
-    Sentry__Dsn                               = module.infrastructure_secrets.map.SENTRY-DSN
+    ApplicationInsights__ConnectionString = azurerm_application_insights.app.connection_string
+    ConnectionStrings__DefaultConnection  = module.postgres.dotnet_connection_string
+    ConnectionStrings__Redis              = module.redis.connection_string
+    StorageConnectionString               = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+    Sentry__Dsn                           = module.infrastructure_secrets.map.SENTRY-DSN
   }
 }
 
 module "api_application" {
   source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
-  depends_on = [kubernetes_job.migrations, kubernetes_job.reporting_migrations]
+  depends_on = [kubernetes_job.migrations]
 
   name   = "api"
   is_web = true
@@ -151,14 +149,17 @@ module "worker_application_configuration" {
   secret_key_vault_short = "worker"
 
   config_variables = {
-    SENTRY_ENVIRONMENT = var.environment_name
+    SENTRY_ENVIRONMENT           = var.environment_name
+    DistributedLockContainerName = azurerm_storage_container.locks.name
+    DqtReporting__RunService     = var.run_dqt_reporting_service
   }
 
   secret_variables = {
-    ApplicationInsights__ConnectionString = azurerm_application_insights.app.connection_string
-    ConnectionStrings__DefaultConnection  = module.postgres.dotnet_connection_string
-    StorageConnectionString               = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
-    Sentry__Dsn                           = module.infrastructure_secrets.map.SENTRY-DSN
+    ApplicationInsights__ConnectionString     = azurerm_application_insights.app.connection_string
+    ConnectionStrings__DefaultConnection      = module.postgres.dotnet_connection_string
+    StorageConnectionString                   = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+    Sentry__Dsn                               = module.infrastructure_secrets.map.SENTRY-DSN
+    DqtReporting__ReportingDbConnectionString = local.reporting_db_connection_string
   }
 }
 
