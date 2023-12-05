@@ -19,9 +19,14 @@ RUN apk add --no-cache \
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # Install Postgres client
-RUN apk add postgresql14-client
+RUN apk --no-cache add postgresql14-client
 
 # Fix for invoking trscli
-RUN apk add libc6-compat
+RUN apk --no-cache add libc6-compat
+
+# Install fonts for PDF generation
+RUN apk --no-cache add msttcorefonts-installer fontconfig && \
+    update-ms-fonts && \
+    fc-cache -f
 
 ENV PATH="${PATH}:/Apps/TrsCli"
