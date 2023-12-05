@@ -27,8 +27,8 @@ Authorization: Bearer your_api_key
 
 ### Software requirements
 
-The API is an ASP.NET Core 7 web application. To develop locally you will need the following installed:
-- Visual Studio 2022 (or the .NET 7 SDK and an alternative IDE/editor);
+The API is an ASP.NET Core 8 web application. To develop locally you will need the following installed:
+- Visual Studio 2022 (or the .NET 8 SDK and an alternative IDE/editor);
 - a local Postgres 13+ instance.
 - [SASS]( https://sass-lang.com/install).
 
