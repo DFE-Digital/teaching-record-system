@@ -66,6 +66,10 @@ watch-api:
 watch-ui:
   @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet watch
 
+# Run the Worker project in Development mode and watch for file changes
+watch-worker:
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Worker"}} && dotnet watch
+
 # Build the API Docker image
 docker-build-api *ARGS:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet publish -c Release

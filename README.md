@@ -48,7 +48,7 @@ just install-tools
 
 ### Database setup
 
-Install Postgres then set a connection string configuration entry in user secrets for the `TeachingRecordSystem.Api` and `TeachingRecordSystem.SupportUi` projects.
+Install Postgres then set a connection string configuration entry in user secrets.
 In addition, set a connection string for a different database for the test projects.
 
 e.g.
