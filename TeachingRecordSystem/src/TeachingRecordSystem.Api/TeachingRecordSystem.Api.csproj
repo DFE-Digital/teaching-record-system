@@ -7,7 +7,6 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" />
-    <PackageReference Include="Azure.Extensions.AspNetCore.DataProtection.Blobs" />
     <PackageReference Include="FluentValidation.AspNetCore" />
     <PackageReference Include="Hangfire.AspNetCore" />
     <PackageReference Include="Hangfire.PostgreSql" />
@@ -43,6 +42,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.Hosting\TeachingRecordSystem.Hosting.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.ServiceDefaults\TeachingRecordSystem.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>
