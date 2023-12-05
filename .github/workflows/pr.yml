@@ -238,8 +238,5 @@ jobs:
     needs: [build, validate_terraform, package]
     uses: ./.github/workflows/deploy-dev.yml
     with:
-      api_docker_image: ${{ needs.package.outputs.api_docker_image }}
-      cli_docker_image: ${{ needs.package.outputs.cli_docker_image }}
-      ui_docker_image: ${{ needs.package.outputs.ui_docker_image }}
-      worker_docker_image: ${{ needs.package.outputs.worker_docker_image }}
+      docker_image: ${{ needs.package.outputs.docker_image }}
     secrets: inherit

@@ -40,7 +40,7 @@ jobs:
         run: make install-konduit
 
       - name: Dump database
-        run: bin/konduit.sh -k ${{ env.KEYVAULT_NAME }} -d trs trs-production-ui -- pg_dump -E utf8 --compress=1 --clean --if-exists --no-owner --verbose -f backup.sql.gz
+        run: bin/konduit.sh -k ${{ env.KEYVAULT_NAME }} -d trs trs-production-worker -- pg_dump -E utf8 --compress=1 --clean --if-exists --no-owner --verbose -f backup.sql.gz
 
       - uses: DFE-Digital/github-actions/set-arm-environment-variables@master
         with:
