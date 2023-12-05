@@ -747,7 +747,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             .Returns(async (string s, RequestBuilder b) => await TestData.ReferenceDataCache.GetTeacherStatusByValue(s));
 
         using var ctx = new DqtCrmServiceContext(TestData.OrganizationService);
-        var qtsRegistrationss = ctx.dfeta_qtsregistrationSet
+        var qtsRegs = ctx.dfeta_qtsregistrationSet
             .Where(c => c.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == contact.Id)
             .ToArray();
 
@@ -755,7 +755,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(
                 contact.Id,
                 It.IsAny<string[]>()))
-            .ReturnsAsync(qtsRegistrationss ?? Array.Empty<dfeta_qtsregistration>());
+            .ReturnsAsync(qtsRegs ?? Array.Empty<dfeta_qtsregistration>());
 
         var allEytsStatuses = await TestData.ReferenceDataCache.GetEytsStatuses();
         var distinctEyts = qtsRegistrations?.Where(x => !string.IsNullOrEmpty(x.EytsStatusValue)).Select(x => x.EytsStatusValue).Distinct().ToArray();

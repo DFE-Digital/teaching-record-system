@@ -234,7 +234,7 @@ public partial class TestData
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = contact });
 
             IInnerRequestHandle<RetrieveResponse>? getQtsRegistationTask = null;
-            var qts = _qtsRegistrations.Where(x => x.TeacherStatusValue != null);
+            var qts = _qtsRegistrations.Where(x => x.TeacherStatusValue != null && x.QtsDate != null);
             foreach (var item in qts)
             {
                 var teacherStatus = await testData.ReferenceDataCache.GetTeacherStatusByValue(item.TeacherStatusValue!);
@@ -266,6 +266,7 @@ public partial class TestData
                         Id = qtsRegistrationId,
                         dfeta_QTSDate = item.QtsDate!.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true),
                         dfeta_TeacherStatusId = teacherStatus.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
+                        CreatedOn = item.CreatedOn
                     }
                 });
 
@@ -276,7 +277,7 @@ public partial class TestData
                 });
             }
 
-            var eyts = _qtsRegistrations.Where(x => x.EytsStatusValue != null);
+            var eyts = _qtsRegistrations.Where(x => x.EytsStatusValue != null && x.EytsDate != null);
             IInnerRequestHandle<RetrieveResponse>? getEytsRegistationTask = null;
             foreach (var item in eyts)
             {
@@ -300,6 +301,7 @@ public partial class TestData
                         Id = eytsRegistrationId,
                         dfeta_EYTSDate = item.EytsDate!.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true),
                         dfeta_EarlyYearsStatusId = earlyYearsStatus.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
+                        CreatedOn = item.CreatedOn
                     }
                 });
 
@@ -472,8 +474,7 @@ public partial class TestData
                 dfeta_MQ_Status = status?.GetDqtStatus()
                 QtsDate = getQtsRegistationTask != null ? getQtsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_QTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
-                Sanctions = _sanctions.ToImmutableArray()
-
+                Sanctions = _sanctions.ToImmutableArray(),
                 MandatoryQualifications = _mandatoryQualifications.ToImmutableArray()
             };
 
