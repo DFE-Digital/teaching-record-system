@@ -5,7 +5,6 @@
 
     <IsPackable>false</IsPackable>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
-    <UserSecretsId>TeachingRecordSystemApiTests</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

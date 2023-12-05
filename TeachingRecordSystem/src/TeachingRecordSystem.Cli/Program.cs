@@ -4,7 +4,7 @@ global using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Cli;
 
 var configuration = new ConfigurationBuilder()
-    .AddUserSecrets("TeachingRecordSystemApi")
+    .AddUserSecrets(typeof(Program).Assembly)
     .Build();
 
 var rootCommand = new RootCommand("Development tools for the Teaching Record System.")
@@ -16,3 +16,5 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
 };
 
 return await rootCommand.InvokeAsync(args);
+
+public partial class Program { }

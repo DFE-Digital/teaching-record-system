@@ -6,7 +6,6 @@
     <IsPackable>false</IsPackable>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
     <IsTestProject>true</IsTestProject>
-    <UserSecretsId>TeachingRecordSystemSupportUiEndToEndTests</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
