@@ -72,28 +72,11 @@ watch-ui:
 watch-worker:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Worker"}} && dotnet watch
 
-# Build the API Docker image
-docker-build-api *ARGS:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet publish -c Release
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet publish -c Release
-  @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.Api" / "Dockerfile"}} {{ARGS}}
-
-# Build the CLI Docker image
-docker-build-cli *ARGS:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet publish -c Release
-  @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.Cli" / "Dockerfile"}} {{ARGS}}
-
-# Build the Support UI Docker image
-docker-build-ui *ARGS:
+# Build the Docker image
+docker-build *ARGS:
   npm install -g sass
-  @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet publish -c Release
-  @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.SupportUi" / "Dockerfile"}} {{ARGS}}
-
-# Build the worker Docker image
-docker-build-worker *ARGS:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Worker"}} && dotnet publish -c Release
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet publish -c Release
-  @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.Worker" / "Dockerfile"}} {{ARGS}}
+  @cd {{solution-root}} && dotnet publish -c Release
+  @cd {{solution-root}} && docker build . {{ARGS}}
 
 # Set a configuration entry in user secrets for running the apps
 set-secret key value:

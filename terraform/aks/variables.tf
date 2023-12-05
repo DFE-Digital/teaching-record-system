@@ -50,19 +50,7 @@ variable "deploy_azure_backing_services" {
   default = true
 }
 
-variable "api_docker_image" {
-  type = string
-}
-
-variable "cli_docker_image" {
-  type = string
-}
-
-variable "ui_docker_image" {
-  type = string
-}
-
-variable "worker_docker_image" {
+variable "docker_image" {
   type = string
 }
 

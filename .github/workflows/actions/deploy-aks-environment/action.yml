@@ -4,17 +4,8 @@ inputs:
   environment_name:
     description: 'The name of the environment'
     required: true
-  api_docker_image:
-    description: 'The API Docker image to deploy to the environment'
-    required: true
-  cli_docker_image:
-    description: 'The CLI Docker image to deploy to the environment'
-    required: true
-  ui_docker_image:
-    description: 'The Support UI Docker image to deploy to the environment'
-    required: true
-  worker_docker_image:
-    description: 'The worker worker Docker image to deploy to the environment'
+  docker_image:
+    description: 'The Docker image to deploy to the environment'
     required: true
   azure_credentials:
     description: 'JSON object containing a service principal that can deploy to the environment'
@@ -39,8 +30,5 @@ runs:
         make ci ${{ inputs.environment_name }}_aks terraform-apply
       env:
         TF_VAR_azure_sp_credentials_json: ${{ inputs.azure_credentials }}
-        TF_VAR_api_docker_image: ${{ inputs.api_docker_image }}
-        TF_VAR_cli_docker_image: ${{ inputs.cli_docker_image }}
-        TF_VAR_ui_docker_image: ${{ inputs.ui_docker_image }}
-        TF_VAR_worker_docker_image: ${{ inputs.worker_docker_image }}
+        TF_VAR_docker_image: ${{ inputs.docker_image }}
       shell: bash

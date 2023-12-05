@@ -23,7 +23,7 @@ resource "kubernetes_job" "migrations" {
       spec {
         container {
           name    = "cli"
-          image   = var.cli_docker_image
+          image   = var.docker_image
           command = ["trscli"]
           args    = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
 
@@ -85,7 +85,8 @@ module "api_application" {
   kubernetes_config_map_name = module.api_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.api_application_configuration.kubernetes_secret_name
 
-  docker_image = var.api_docker_image
+  docker_image = var.docker_image
+  command      = ["/bin/ash", "-c", "cd /Apps/Api/; dotnet TeachingRecordSystem.Api.dll;"]
   web_port     = 80
   probe_path   = "/health"
   replicas     = var.api_replicas
@@ -132,7 +133,8 @@ module "ui_application" {
   kubernetes_config_map_name = module.ui_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.ui_application_configuration.kubernetes_secret_name
 
-  docker_image = var.ui_docker_image
+  docker_image = var.docker_image
+  command      = ["/bin/ash", "-c", "cd /Apps/SupportUi/; dotnet TeachingRecordSystem.SupportUi.dll;"]
   web_port     = 80
   probe_path   = "/health"
   replicas     = var.ui_replicas
@@ -179,7 +181,8 @@ module "worker_application" {
   kubernetes_config_map_name = module.worker_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.worker_application_configuration.kubernetes_secret_name
 
-  docker_image = var.worker_docker_image
+  docker_image = var.docker_image
+  command      = ["/bin/ash", "-c", "cd /Apps/Worker/; dotnet TeachingRecordSystem.Worker.dll;"]
   replicas     = var.worker_replicas
   max_memory   = var.worker_max_memory
 }

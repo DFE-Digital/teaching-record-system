@@ -68,7 +68,7 @@ resource "kubernetes_job" "reporting_migrations" {
       spec {
         container {
           name    = "cli"
-          image   = var.cli_docker_image
+          image   = var.docker_image
           command = ["trscli"]
           args    = ["migrate-reporting-db", "--connection-string", "$(CONNECTION_STRING)"]
 
