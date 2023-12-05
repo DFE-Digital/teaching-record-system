@@ -21,7 +21,7 @@ public partial class DqtReportingService : BackgroundService
     public const string ProcessChangesOperationName = "DqtReporting: process changes";
 
     private const int MaxParameters = 1024;
-    private const int PageSize = 300;
+    private const int PageSize = 500;
     private const int MaxUpsertBatchSize = 100;
     private const int MaxEntityTypesToProcessConcurrently = 10;
 
@@ -230,7 +230,7 @@ public partial class DqtReportingService : BackgroundService
         var entityTableMapping = _entityMetadata[entityLogicalName].EntityTableMapping;
         string tempTableName = $"#import-{entityLogicalName}";
 
-        var dataTable = CreateDataTable();
+        using var dataTable = CreateDataTable();
 
         using var conn = new SqlConnection(_options.ReportingDbConnectionString);
         await conn.OpenAsync();
