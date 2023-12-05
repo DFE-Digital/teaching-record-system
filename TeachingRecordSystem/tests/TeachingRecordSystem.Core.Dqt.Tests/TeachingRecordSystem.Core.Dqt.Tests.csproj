@@ -5,7 +5,6 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <UserSecretsId>TeachingRecordSystemDqtTests</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

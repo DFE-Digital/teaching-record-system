@@ -48,19 +48,13 @@ just install-tools
 
 ### Database setup
 
-Install Postgres then set a connection string configuration entry in user secrets.
-In addition, set a connection string for a different database for the test projects.
+Install Postgres then set a connection string configuration entry in user secrets for running the apps and another for running the tests.
+Note you should use a different database for tests as the test database will be cleared down whenever tests are run.
 
 e.g.
 ```shell
-just set-api-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
-just set-ui-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
-
-just set-core-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
-just set-api-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
-just set-dqt-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
-just set-ui-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
-just set-ui-e2e-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
+just set-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
+just set-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
 ```
 
 To set up the initial database schema run:
@@ -75,15 +69,15 @@ The databases will be created automatically when running the tests.
 
 This solution contains a service that synchronises changes from CRM into a SQL Server database used for reporting (this replaces the now-deprecated Data Export Service). By default this is disabled for local development. For the tests to pass, you will need a test database and a connection string defined in user secrets e.g.
 ```shell
-just set-dqt-tests-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReportingTests;Integrated Security=Yes;TrustServerCertificate=True"
+just set-tests-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReportingTests;Integrated Security=Yes;TrustServerCertificate=True"
 ```
 
-To run the service locally, override the configuration option to run the service and ensure a connection string is provided for the `Api` project e.g.
+To run the service locally, override the configuration option to run the service and ensure a connection string is provided e.g.
 ```shell
-just set-api-secret DqtReporting:RunService true
-just set-api-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReporting;Integrated Security=Yes;TrustServerCertificate=True"
+just set-secret DqtReporting:RunService true
+just set-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReporting;Integrated Security=Yes;TrustServerCertificate=True"
 ```
-The service will run as a background service of the `Api` project.
+The service will now run as a background service of the `Worker` project.
 
 
 ### Admin user setup
@@ -96,40 +90,20 @@ just create-admin "your.name@education.gov.uk" "Your Name"
 
 ### External dependencies
 
+There are several external dependencies required for local development; these are listed below.
+Ask a developer on the team for the user secrets for these dependencies.
+
 #### Dynamics CRM
 
-The `build` CRM environment is used for local development and automated tests. Connection information should be stored in user secrets in the `ConnectionStrings:Crm` key. Secrets must be added for both the `Api` project and the `Dqt.Tests` project.
-In addition, the `SupportUi` project needs the `CrmUrl` configuration entry defining; the Azure AD secrets are used for authentication.
-
-Secrets can be set using `just` recipes e.g.
-```shell
-just set-api-secret ConnectionStrings:Crm "the_connection_string"
-just set-dqt-tests-secret ConnectionStrings:Crm "the_connection_string"
-just set-dqt-tests-secret BuildEnvLockBlobUri "lock_blob_uri"
-just set-dqt-tests-secret BuildEnvLockBlobSasToken "lock_blob_sas_token"
-just set-ui-secret CrmUrl "the_environment_url"
-```
-Ask a developer on the team for the user secrets for this environment.
+The `build` CRM environment is used for local development and automated tests.
 
 #### TRN Generation API
 
-The DQT API calls a TRN Generation API to generate a TRNs. Configuration should be stored in user secrets in the `TrnGenerationApi:BaseAddress` and `TrnGeneration:ApiKey` keys. Secrets must be added for both the `Api` project and the `Dqt.Tests` project. Secrets can be set using `just` recipes e.g.
-```shell
-just set-api-secret TrnGenerationApi:BaseAddress "https://the-trn-generation-url"
-just set-api-secret TrnGenerationApi:ApiKey "the-api-key"
-just set-dqt-tests-secret TrnGenerationApi:BaseAddress "https://the-trn-generation-url"
-just set-dqt-tests-secret TrnGenerationApi:ApiKey "the-api-key"
-```
-Ask a developer on the team for the user secrets for this environment.
+The API calls the TRN Generation API to generate a TRNs.
 
 #### Azure AD
 
-Azure AD is used for authentication for the Support UI. The client ID and secret for local development should be stored in user secrets.
-```shell
-just set-ui-secret AzureAd:ClientId "the_client_id"
-just set-ui-secret AzureAd:ClientSecret "the_client_secret"
-```
-Ask a developer on the team for the user secrets for this environment.
+Azure AD is used for authenticating users in the Support UI.
 
 
 ## CRM code generation
@@ -145,39 +119,8 @@ The tool is a .NET Framework application and requires .NET 4.6.
 
 ## Environment configuration
 
-Environment-specific configuration is stored in Key Vault inside a single JSON-encoded key named 'APP-CONFIG'.
+Environment-specific configuration is stored in Key Vault inside a single JSON-encoded key named 'AppConfig'.
 This is retrieved via Terraform at deployment time and is set as an environment variable so it can be accessed by the application.
-
-A helper script is provided to simplify adding or amending configuration for a specific environment - `Set-AppConfigSecret.ps1`.
-For this to run successfully you will need the Azure CLI. You need to be authenticated to access the s165 subscriptions before running the script.
-
-By default the script runs read-only; it calculates the new JSON configuration and print out the result to the console. To commit the change add the `-Commit` switch.
-
-### Example - adding an API client
-
-```shell
-./scripts/Set-AppConfigSecret -EnvironmentName dev -AzureSubscription s165-teachingqualificationsservice-development -ConfigKey ApiClients:new_client:ApiKey -ConfigValue super-secret-key
-```
-
-```diff
- {
-   "ApiClients": {
-     "client1": {
-       "ApiKey": "key1"
-     },
-     "client2": {
-       "ApiKey": "key2"
--    }
-+    },
-+    "new_client": {
-+      "ApiKey": "super_secret_key"
-+    }
-+  },
-   "CrmClientId": "...",
-   "CrmClientSecret": "...",
-   "CrmUrl": "..."
- }
-```
 
 
 ## Formatting

@@ -1,6 +1,8 @@
 set shell := ["pwsh", "-nop", "-c"]
 
 solution-root := "TeachingRecordSystem"
+user-secrets-id := "TeachingRecordSystem"
+test-user-secrets-id := "TeachingRecordSystemTests"
 
 default:
   @just --list
@@ -93,33 +95,13 @@ docker-build-worker *ARGS:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet publish -c Release
   @cd {{solution-root}} && docker build . -f {{"src" / "TeachingRecordSystem.Worker" / "Dockerfile"}} {{ARGS}}
 
-# Set a configuration entry in user secrets for the API project
-set-api-secret key value:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Api"}} && dotnet user-secrets set "{{key}}" "{{value}}"
+# Set a configuration entry in user secrets for running the apps
+set-secret key value:
+  @dotnet user-secrets set "{{key}}" "{{value}}" --id {{user-secrets-id}}
 
-# Set a configuration entry in user secrets for the Support UI project
-set-ui-secret key value:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet user-secrets set "{{key}}" "{{value}}"
-
-# Set a configuration entry in user secrets for the API tests project
-set-api-tests-secret key value:
-  @cd {{solution-root / "tests" / "TeachingRecordSystem.Api.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
-
-# Set a configuration entry in user secrets for the Core tests project
-set-core-tests-secret key value:
-  @cd {{solution-root / "tests" / "TeachingRecordSystem.Core.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
-
-# Set a configuration entry in user secrets for the DQT tests project
-set-dqt-tests-secret key value:
-  @cd {{solution-root / "tests" / "TeachingRecordSystem.Core.Dqt.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
-
-# Set a configuration entry in user secrets for the UI tests project
-set-ui-tests-secret key value:
-  @cd {{solution-root / "tests" / "TeachingRecordSystem.SupportUi.Tests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
-
-# Set a configuration entry in user secrets for the UI end-to-end tests project
-set-ui-e2e-tests-secret key value:
-  @cd {{solution-root / "tests" / "TeachingRecordSystem.SupportUi.EndToEndTests"}} && dotnet user-secrets set "{{key}}" "{{value}}"
+# Set a configuration entry in user secrets for tests
+set-tests-secret key value:
+  @dotnet user-secrets set "{{key}}" "{{value}}" --id {{test-user-secrets-id}}
 
 create-admin email name:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Debug" / "net8.0" / "trscli.dll"}} create-admin --email {{email}} --name {{quote(name)}}
