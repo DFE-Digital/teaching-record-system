@@ -54,10 +54,7 @@ jobs:
     needs: [package]
     uses: ./.github/workflows/deploy-test.yml
     with:
-      api_docker_image: ${{ needs.package.outputs.api_docker_image }}
-      cli_docker_image: ${{ needs.package.outputs.cli_docker_image }}
-      ui_docker_image: ${{ needs.package.outputs.ui_docker_image }}
-      worker_docker_image: ${{ needs.package.outputs.worker_docker_image }}
+      docker_image: ${{ needs.package.outputs.docker_image }}
     secrets: inherit
 
   deploy_preprod:
@@ -66,10 +63,7 @@ jobs:
     if: needs.check_environments.outputs.deploy_preprod == 'true'
     uses: ./.github/workflows/deploy-preprod.yml
     with:
-      api_docker_image: ${{ needs.package.outputs.api_docker_image }}
-      cli_docker_image: ${{ needs.package.outputs.cli_docker_image }}
-      ui_docker_image: ${{ needs.package.outputs.ui_docker_image }}
-      worker_docker_image: ${{ needs.package.outputs.worker_docker_image }}
+      docker_image: ${{ needs.package.outputs.docker_image }}
     secrets: inherit
 
   deploy_prod:
@@ -78,8 +72,5 @@ jobs:
     if: always() && (needs.deploy_preprod.result == 'success' || needs.deploy_preprod.result == 'skipped')
     uses: ./.github/workflows/deploy-prod.yml
     with:
-      api_docker_image: ${{ needs.package.outputs.api_docker_image }}
-      cli_docker_image: ${{ needs.package.outputs.cli_docker_image }}
-      ui_docker_image: ${{ needs.package.outputs.ui_docker_image }}
-      worker_docker_image: ${{ needs.package.outputs.worker_docker_image }}
+      docker_image: ${{ needs.package.outputs.docker_image }}
     secrets: inherit
