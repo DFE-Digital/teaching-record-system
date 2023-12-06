@@ -1,3 +1,4 @@
+using AngleSharp.Html.Dom;
 using FormFlow;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
@@ -46,11 +47,9 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await response.GetDocument();
-        var providerList = doc.GetElementByTestId("provider-list");
-        var radioButtons = providerList!.GetElementsByTagName("input");
-        var selectedProvider = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
+        var selectedProvider = doc.GetElementById("MqEstablishmentValue") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
-        Assert.Equal(databaseMqEstablishmentValue, selectedProvider.GetAttribute("value"));
+        Assert.Equal(databaseMqEstablishmentValue, selectedProvider.Value);
     }
 
     [Fact]
@@ -81,11 +80,9 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await response.GetDocument();
-        var providerList = doc.GetElementByTestId("provider-list");
-        var radioButtons = providerList!.GetElementsByTagName("input");
-        var selectedProvider = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
+        var selectedProvider = doc.GetElementById("MqEstablishmentValue") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
-        Assert.Equal(journeyMqEstablishmentValue, selectedProvider.GetAttribute("value"));
+        Assert.Equal(journeyMqEstablishmentValue, selectedProvider.Value);
     }
 
     [Fact]

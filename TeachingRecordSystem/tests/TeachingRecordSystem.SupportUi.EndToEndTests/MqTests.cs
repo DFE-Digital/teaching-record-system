@@ -31,8 +31,9 @@ public class MqTests : TestBase
 
         await page.AssertOnAddMqProviderPage();
 
-        await page.CheckAsync($"label:text-is('{mqEstablishment.dfeta_name}')");
+        await page.FillAsync($"label:text-is('Training provider')", mqEstablishment.dfeta_name);
 
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButton();
 
         await page.AssertOnAddMqSpecialismPage();
@@ -84,10 +85,9 @@ public class MqTests : TestBase
 
         await page.AssertOnEditMqProviderPage(qualificationId);
 
-        await page.IsCheckedAsync($"label:text-is('{oldMqEstablishment.dfeta_name}')");
+        await page.FillAsync($"label:text-is('Training provider')", newMqEstablishment.dfeta_name);
 
-        await page.CheckAsync($"label:text-is('{newMqEstablishment.dfeta_name}')");
-
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButton();
 
         await page.AssertOnEditMqProviderConfirmPage(qualificationId);
