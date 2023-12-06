@@ -22,7 +22,8 @@ public class Migrator
             .LogScriptOutput()
             .WithTransaction()
             .JournalToSqlTable("dbo", "__SchemaVersions")
-            .WithScripts(new DqtReportingMigrationsScriptProvider());
+            .WithScripts(new DqtReportingMigrationsScriptProvider())
+            .WithExecutionTimeout(TimeSpan.FromMinutes(3));
 
         if (logger is not null)
         {
