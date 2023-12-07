@@ -194,7 +194,7 @@ public class EditUserTests : TestBase
             {
                 var userCreatedEvent = Assert.IsType<UserUpdatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
-                Assert.Equal(userCreatedEvent.UpdatedByUserId, GetCurrentUserId());
+                Assert.Equal(userCreatedEvent.SourceUserId, GetCurrentUserId());
                 Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
                 Assert.Equal(newName, userCreatedEvent.User.Name);
                 Assert.Equal(updatedUser.Email, userCreatedEvent.User.Email);
@@ -247,9 +247,8 @@ public class EditUserTests : TestBase
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.DeactivatedByUserId, GetCurrentUserId());
+            Assert.Equal(userCreatedEvent.SourceUserId, GetCurrentUserId());
             Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
-            Assert.Equal(UserDeactivatedEventChanges.Deactivated, userCreatedEvent.Changes);
         });
 
         var redirectResponse = await response.FollowRedirect(HttpClient);
@@ -295,7 +294,7 @@ public class EditUserTests : TestBase
         {
             var userCreatedEvent = Assert.IsType<UserActivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.ActivatedByUserId, GetCurrentUserId());
+            Assert.Equal(userCreatedEvent.SourceUserId, GetCurrentUserId());
             Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
         });
 

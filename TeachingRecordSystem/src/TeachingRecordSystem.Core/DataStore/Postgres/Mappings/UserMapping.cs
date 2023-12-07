@@ -24,7 +24,7 @@ public class UserMapping : IEntityTypeConfiguration<User>
     {
         yield return new()
         {
-            UserId = Guid.Parse("a81394d1-a498-46d8-af3e-e077596ab303"),
+            UserId = User.SystemUserId,
             UserType = UserType.Application,
             Name = "System",
             Active = true,

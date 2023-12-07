@@ -1,8 +1,8 @@
 namespace TeachingRecordSystem.Core.Events;
 
-public record InternationalQtsAwardedEmailSentEvent : EventBase
+public record InternationalQtsAwardedEmailSentEvent : EventBase, IEventWithPersonId
 {
-    public required Guid InternationalQtsAwardedEmailsJobId { get; set; }
-    public required Guid PersonId { get; set; }
-    public required string EmailAddress { get; set; }
+    public required Guid InternationalQtsAwardedEmailsJobId { get; init; }
+    public required Guid PersonId { get; init; }
+    public required string EmailAddress { get; init; }
 }
