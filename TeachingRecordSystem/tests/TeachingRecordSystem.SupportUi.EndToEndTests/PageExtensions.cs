@@ -209,6 +209,16 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/result/confirm");
     }
 
+    public static async Task AssertOnDeleteMqPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete");
+    }
+
+    public static async Task AssertOnDeleteMqConfirmPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete/confirm");
+    }
+
     public static async Task AssertFlashMessage(this IPage page, string expectedHeader)
     {
         Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader}')"));

@@ -1,0 +1,45 @@
+@page "/mqs/{qualificationId}/delete/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq.IndexModel
+@{
+    ViewBag.Title = "Delete qualification";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonQualifications(Model.PersonId!.Value)">Back</govuk-back-link>
+}
+
+<span class="govuk-caption-l">Delete qualification - @Model.PersonName</span>
+<h1 class="govuk-heading-l" data-testid="title">Mandatory qualification@(!string.IsNullOrEmpty(Model.Specialism) ? $" for {Model.Specialism!.ToLowerInvariant()}" : "")</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.MqDelete(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-radios asp-for="DeletionReason" data-testid="deletion-reason-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend>
+                        <h3 class="govuk-heading-m">Reason for deleting</h3>
+                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@MqDeletionReasonOption.AddedInError">
+                        @MqDeletionReasonOption.AddedInError.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MqDeletionReasonOption.ProviderRequest">
+                        @MqDeletionReasonOption.ProviderRequest.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MqDeletionReasonOption.UnableToConfirmIfTheDataIsCorrect">
+                        @MqDeletionReasonOption.UnableToConfirmIfTheDataIsCorrect.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MqDeletionReasonOption.AnotherReason">
+                        @MqDeletionReasonOption.AnotherReason.GetDisplayName()
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>                
+            </govuk-radios>
+
+            <govuk-character-count asp-for="DeletionReasonDetail" label-class="govuk-label--m" max-length="3000" />
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqDeleteCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

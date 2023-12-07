@@ -22,7 +22,7 @@ else
         <govuk-summary-card data-testid="mq-@mq.QualificationId">
             <govuk-summary-card-title>Mandatory qualification@(!string.IsNullOrEmpty(mq.Specialism) ? $" for {mq.Specialism!.ToLowerInvariant()}" : "")</govuk-summary-card-title>
             <govuk-summary-card-actions>
-                <govuk-summary-card-action href="#" visually-hidden-text="remove qualification" data-testid="remove-mq-@mq.QualificationId">Remove qualification</govuk-summary-card-action>
+                <govuk-summary-card-action href="@LinkGenerator.MqDelete(mq.QualificationId, null)" visually-hidden-text="delete qualification" data-testid="delete-link-@mq.QualificationId">Delete qualification</govuk-summary-card-action>
             </govuk-summary-card-actions>
             <govuk-summary-list>                
                 <govuk-summary-list-row>

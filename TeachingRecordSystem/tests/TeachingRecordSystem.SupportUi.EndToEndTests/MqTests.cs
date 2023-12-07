@@ -1,4 +1,6 @@
+using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
@@ -203,5 +205,40 @@ public class MqTests : TestBase
         await page.AssertOnPersonQualificationsPage(personId);
 
         await page.AssertFlashMessage("Mandatory qualification changed");
+    }
+
+    [Fact]
+    public async Task DeleteMq()
+    {
+        var deletionReason = MqDeletionReasonOption.ProviderRequest;
+        var deletionReasonDetail = "My deletion reason detail";
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var personId = person.PersonId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPage(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPage(person.PersonId);
+
+        await page.ClickLinkForElementWithTestId($"delete-link-{qualificationId}");
+
+        await page.AssertOnDeleteMqPage(qualificationId);
+
+        await page.CheckAsync($"label:text-is('{deletionReason.GetDisplayName()}')");
+
+        await page.FillAsync("label:text-is('More detail about the reason for deleting')", deletionReasonDetail);
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnDeleteMqConfirmPage(qualificationId);
+
+        await page.ClickButton("Delete qualification");
+
+        await page.AssertOnPersonQualificationsPage(personId);
+
+        await page.AssertFlashMessage("Mandatory qualification deleted");
     }
 }
