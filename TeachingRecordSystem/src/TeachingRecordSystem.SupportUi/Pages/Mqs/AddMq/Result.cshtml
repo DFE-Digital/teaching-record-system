@@ -1,0 +1,52 @@
+@page "/mqs/add/result"
+@using TeachingRecordSystem.Core.Dqt.Models;
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.ResultModel
+@{
+    ViewBag.Title = "Result";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.MqAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId)" />
+}
+
+<span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
+<h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.MqAddResult(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-radios asp-for="Result" data-testid="result-options">
+                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Deferred" data-testid="result-deferred">
+                    Deferred
+                </govuk-radios-item>
+                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Extended" data-testid="result-extended">
+                    Extended
+                </govuk-radios-item>
+                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Failed" data-testid="result-failed">
+                    Failed
+                </govuk-radios-item>
+                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.InProgress" data-testid="result-in-progress">
+                    In Progress
+                </govuk-radios-item>
+                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Passed" data-testid="result-passed">
+                    Passed
+                    <govuk-radios-item-conditional>
+                        <govuk-date-input asp-for="EndDate">
+                            <govuk-date-input-fieldset>
+                                <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
+                            </govuk-date-input-fieldset>
+                        </govuk-date-input>
+                    </govuk-radios-item-conditional>
+                </govuk-radios-item>
+                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Withdrawn">
+                    Withdrawn
+                </govuk-radios-item>                    
+            </govuk-radios>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqAddResultCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

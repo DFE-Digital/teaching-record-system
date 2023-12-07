@@ -1,0 +1,62 @@
+@page "/mqs/add/check-answers/{handler?}"
+@using TeachingRecordSystem.Core.Dqt.Models;
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.CheckAnswersModel
+@{
+    ViewBag.Title = "Check details and confirm mandatory qualification";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.MqAddResult(Model.PersonId, Model.JourneyInstance!.InstanceId)" />
+}
+
+<span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
+<h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full-from-desktop">
+        <form action="@LinkGenerator.MqAddCheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="provider">@Model.MqEstablishment!.dfeta_name</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.MqAddProvider(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="specialism">@Model.Specialism!.dfeta_name</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.MqAddSpecialism(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate!.Value.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.MqAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Result</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="result">@Model.Result</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.MqAddResult(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.MqAddResult(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Confirm mandatory qualification</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqAddCheckAnswersCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>            
+        </form>
+    </div>
+</div>    

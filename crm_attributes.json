@@ -147,6 +147,12 @@
     "dfeta_value",
     "statecode"
   ],
+  "dfeta_mqestablishment": [
+    "dfeta_mqestablishmentid",
+    "dfeta_name",
+    "dfeta_value",
+    "statecode"
+  ],
   "dfeta_previousname": [
     "createdon",
     "dfeta_changedon",
@@ -176,6 +182,7 @@
     "dfeta_he_hesubject1id",
     "dfeta_he_hesubject2id",
     "dfeta_he_hesubject3id",
+    "dfeta_name",
     "dfeta_personid",
     "dfeta_type",
     "statecode",
@@ -198,11 +205,16 @@
     "dfeta_npqml_awarded",
     "dfeta_npqsl_awarded",
     "dfeta_createdbyapi",
-    "dfeta_mq_specialismid",
     "dfeta_mq_date",
+    "dfeta_mq_mqestablishmentid",
+    "dfeta_mq_specialismid",
+    "dfeta_mq_status",
+    "dfeta_mqstartdate",
+    "dfeta_trsdeletedevent",
     "CreatedOn"
   ],
   "dfeta_specialism": [
+    "dfeta_specialismid",
     "dfeta_name",
     "dfeta_value",
     "statecode"

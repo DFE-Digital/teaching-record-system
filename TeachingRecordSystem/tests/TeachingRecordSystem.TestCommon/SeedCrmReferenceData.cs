@@ -19,6 +19,8 @@ public class SeedCrmReferenceData : IStartupTask
         AddSanctionCodes();
         AddTeacherStatuses();
         AddEarlyYearsStatuses();
+        AddMqEstablishments();
+        AddSpecialisms();
 
         return Task.CompletedTask;
     }
@@ -118,6 +120,54 @@ public class SeedCrmReferenceData : IStartupTask
         {
             dfeta_Value = "222",
             dfeta_name = "Early Years Professional Status"
+        });
+    }
+
+    private void AddMqEstablishments()
+    {
+        _xrmFakedContext.CreateEntity(new dfeta_mqestablishment()
+        {
+            dfeta_Value = "955",
+            dfeta_name = "University of Birmingham"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_mqestablishment()
+        {
+            dfeta_Value = "957",
+            dfeta_name = "University of Edinburgh"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_mqestablishment()
+        {
+            dfeta_Value = "959",
+            dfeta_name = "University of Leeds"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_mqestablishment()
+        {
+            dfeta_Value = "961",
+            dfeta_name = "University of Manchester"
+        });
+    }
+
+    private void AddSpecialisms()
+    {
+        _xrmFakedContext.CreateEntity(new dfeta_specialism()
+        {
+            dfeta_Value = "Hearing",
+            dfeta_name = "Hearing"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_specialism()
+        {
+            dfeta_Value = "Multi-Sensory",
+            dfeta_name = "Multi_Sensory Impairment"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_specialism()
+        {
+            dfeta_Value = "Visual",
+            dfeta_name = "Visual Impairment"
         });
     }
 }
