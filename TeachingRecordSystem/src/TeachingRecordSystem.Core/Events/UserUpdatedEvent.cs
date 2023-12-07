@@ -3,7 +3,6 @@ namespace TeachingRecordSystem.Core.Events;
 public record UserUpdatedEvent : EventBase
 {
     public required User User { get; init; }
-    public required Guid UpdatedByUserId { get; init; }
     public required UserUpdatedEventChanges Changes { get; init; }
 }
 

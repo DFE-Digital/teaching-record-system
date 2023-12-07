@@ -86,7 +86,7 @@ public class ConfirmModel : PageModel
         _dbContext.AddEvent(new UserAddedEvent()
         {
             User = Core.Events.User.FromModel(newUser),
-            AddedByUserId = User.GetUserId(),
+            SourceUserId = User.GetUserId(),
             CreatedUtc = _clock.UtcNow
         });
 
