@@ -5,9 +5,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Event
 {
-    private static readonly JsonSerializerOptions _serializerOptions = new();
+    public static JsonSerializerOptions JsonSerializerOptions { get; } = new();
 
-    public long EventId { get; set; }
+    public long EventId { get; }
     public required string EventName { get; init; }
     public required DateTime Created { get; init; }
     public required string Payload { get; init; }
@@ -16,7 +16,7 @@ public class Event
     public static Event FromEventBase(EventBase @event)
     {
         var eventName = @event.GetType().Name;
-        var payload = JsonSerializer.Serialize(@event, inputType: @event.GetType(), _serializerOptions);
+        var payload = JsonSerializer.Serialize(@event, inputType: @event.GetType(), JsonSerializerOptions);
 
         return new Event()
         {
@@ -32,6 +32,6 @@ public class Event
         var eventType = Type.GetType(eventTypeName) ??
             throw new Exception($"Could not find event type '{eventTypeName}'.");
 
-        return (EventBase)JsonSerializer.Deserialize(Payload, eventType, _serializerOptions)!;
+        return (EventBase)JsonSerializer.Deserialize(Payload, eventType, JsonSerializerOptions)!;
     }
 }
