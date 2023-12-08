@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using TeachingRecordSystem.Api.V2.ApiModels;
 
 namespace TeachingRecordSystem.Api.V2.Requests;
 
@@ -17,5 +16,5 @@ public class SetNpqQualificationRequest : IRequest
     public string Trn { get; set; }
 
     [Required]
-    public QualificationType? QualificationType { get; set; }
+    public ApiModels.QualificationType? QualificationType { get; set; }
 }

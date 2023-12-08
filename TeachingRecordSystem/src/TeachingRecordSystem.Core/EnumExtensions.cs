@@ -9,7 +9,7 @@ public static class EnumExtensions
     {
         var displayAttribute = enumValue.GetType()
           .GetMember(enumValue.ToString())
-          .First()
+          .Single()
           .GetCustomAttribute<DisplayAttribute>();
 
         return displayAttribute is null ? enumValue.ToString() : displayAttribute.GetName();

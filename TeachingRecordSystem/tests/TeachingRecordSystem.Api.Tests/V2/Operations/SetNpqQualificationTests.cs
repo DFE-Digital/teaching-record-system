@@ -1,7 +1,6 @@
 #nullable disable
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Tests.Attributes;
-using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
@@ -154,7 +153,7 @@ public class SetNpqQualificationTests : ApiTestBase
         // Act
         var response = await HttpClientWithApiKey.PutAsync(
             $"v2/npq-qualifications?trn={trn}",
-            CreateRequest(req => req.QualificationType = (QualificationType)(-1)));
+            CreateRequest(req => req.QualificationType = (TeachingRecordSystem.Api.V2.ApiModels.QualificationType)(-1)));
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);

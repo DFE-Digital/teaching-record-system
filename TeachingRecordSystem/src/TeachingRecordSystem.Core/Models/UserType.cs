@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Core;
+namespace TeachingRecordSystem.Core.Models;
 
 public enum UserType
 {
