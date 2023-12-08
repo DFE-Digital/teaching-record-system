@@ -1,3 +1,4 @@
+using AngleSharp.Html.Dom;
 using FormFlow;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
@@ -62,11 +63,9 @@ public class ProviderTests : TestBase
 
         // Assert
         var doc = await response.GetDocument();
-        var providerList = doc.GetElementByTestId("provider-list");
-        var radioButtons = providerList!.GetElementsByTagName("input");
-        var selectedProvider = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
+        var selectedProvider = doc.GetElementById("MqEstablishmentValue") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
-        Assert.Equal(mqEstablishmentValue, selectedProvider.GetAttribute("value"));
+        Assert.Equal(mqEstablishmentValue, selectedProvider.Value);
     }
 
     [Fact]

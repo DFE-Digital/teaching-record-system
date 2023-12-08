@@ -28,7 +28,7 @@ public class ProviderModel : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Training Provider")]
+    [Display(Name = "Training provider")]
     public string? MqEstablishmentValue { get; set; }
 
     public dfeta_mqestablishment[]? MqEstablishments { get; set; }
