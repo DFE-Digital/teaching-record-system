@@ -12,6 +12,8 @@ using Microsoft.Identity.Web;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Infrastructure;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
@@ -234,6 +236,8 @@ builder.Services
             appendUniqueKey: true));
     });
 
+builder.AddBlobStorage();
+
 builder.Services
     .AddTransient<TrsLinkGenerator>()
     .AddTransient<CheckUserExistsFilter>()
@@ -241,7 +245,8 @@ builder.Services
     .AddSupportUiServices(builder.Configuration, builder.Environment)
     .AddSingleton<ReferenceDataCache>()
     .AddSingleton<SanctionTextLookup>()
-    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
+    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
+    .AddFileService();
 
 var app = builder.Build();
 

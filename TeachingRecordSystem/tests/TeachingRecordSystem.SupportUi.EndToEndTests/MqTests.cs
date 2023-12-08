@@ -1,3 +1,4 @@
+using Microsoft.Playwright;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Models;
@@ -231,6 +232,17 @@ public class MqTests : TestBase
         await page.CheckAsync($"label:text-is('{deletionReason.GetDisplayName()}')");
 
         await page.FillAsync("label:text-is('More detail about the reason for deleting')", deletionReasonDetail);
+
+        await page.CheckAsync($"label:text-is('Yes')");
+
+        await page.SetInputFilesAsync(
+            "label:text-is('Upload a file')",
+            new FilePayload()
+            {
+                Name = "evidence.jpg",
+                MimeType = "image/jpeg",
+                Buffer = TestCommon.TestData.JpegImage
+            });
 
         await page.ClickContinueButton();
 

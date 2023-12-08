@@ -55,7 +55,11 @@ public class IndexTests : TestBase
             new DeleteMqState()
             {
                 DeletionReason = deletionReason,
-                DeletionReasonDetail = "My deletion reason detail"
+                DeletionReasonDetail = "My deletion reason detail",
+                UploadEvidence = true,
+                EvidenceFileId = Guid.NewGuid(),
+                EvidenceFileName = "MyEvidenceFile.png",
+                EvidenceFileSizeDescription = "1MB"
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -68,10 +72,16 @@ public class IndexTests : TestBase
 
         var doc = await response.GetDocument();
         var deletionReasonOptions = doc.GetElementByTestId("deletion-reason-options");
-        var radioButtons = deletionReasonOptions!.GetElementsByTagName("input");
-        var selectedDeletionReason = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
+        var deletionReasonRadioButtons = deletionReasonOptions!.GetElementsByTagName("input");
+        var selectedDeletionReason = deletionReasonRadioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedDeletionReason);
         Assert.Equal(deletionReason.ToString(), selectedDeletionReason.GetAttribute("value"));
+        var uploadEvidenceRadioButtons = doc.GetElementByTestId("upload-evidence-options")!.GetElementsByTagName("input");
+        var selectedUploadEvidence = uploadEvidenceRadioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
+        Assert.NotNull(selectedUploadEvidence);
+        Assert.Equal("True", selectedUploadEvidence.GetAttribute("value"));
+        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
+        Assert.NotNull(uploadedEvidenceLink);
     }
 
     [Fact]
@@ -101,6 +111,9 @@ public class IndexTests : TestBase
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
+            {
+                { "UploadEvidence", "False" }
+            }
         };
 
         // Act
@@ -111,8 +124,9 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Post_WhenDeletionReasonIsSelected_RedirectsToConfirmPage()
+    public async Task Post_WhenNoUploadEvidenceOptionIsSelected_ReturnsError()
     {
+        // Arrange
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
         var qualification = person.MandatoryQualifications.Single();
         var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
@@ -121,9 +135,81 @@ public class IndexTests : TestBase
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "DeletionReason", MqDeletionReasonOption.ProviderRequest.ToString() },
-                { "DeletionReasonDetail", "My deletion reason detail" }
+                 { "DeletionReason", MqDeletionReasonOption.ProviderRequest.ToString() },
             }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "UploadEvidence", "Select yes if you want to upload evidence");
+    }
+
+    [Fact]
+    public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var qualification = person.MandatoryQualifications.Single();
+        var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                 { "DeletionReason", MqDeletionReasonOption.ProviderRequest.ToString() },
+                 { "UploadEvidence", "True" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "Select a file");
+    }
+
+    [Fact]
+    public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var qualification = person.MandatoryQualifications.Single();
+        var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
+
+        var multipartContent = CreateFormFileUpload(".cs");
+        multipartContent.Add(new StringContent(MqDeletionReasonOption.ProviderRequest.ToString()), "DeletionReason");
+        multipartContent.Add(new StringContent("My deletion reason detail"), "DeletionReasonDetail");
+        multipartContent.Add(new StringContent("True"), "UploadEvidence");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = multipartContent
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+    }
+
+    [Fact]
+    public async Task Post_ValidInput_RedirectsToConfirmPage()
+    {
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var qualification = person.MandatoryQualifications.Single();
+        var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
+
+        var multipartContent = CreateFormFileUpload(".png");
+        multipartContent.Add(new StringContent(MqDeletionReasonOption.ProviderRequest.ToString()), "DeletionReason");
+        multipartContent.Add(new StringContent("My deletion reason detail"), "DeletionReasonDetail");
+        multipartContent.Add(new StringContent("True"), "UploadEvidence");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = multipartContent
         };
 
         // Act
@@ -161,4 +247,17 @@ public class IndexTests : TestBase
             JourneyNames.DeleteMq,
             state ?? new DeleteMqState(),
             new KeyValuePair<string, object>("qualificationId", qualificationId));
+
+    private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
+    {
+        var byteArrayContent = new ByteArrayContent(new byte[] { });
+        byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
+
+        var multipartContent = new MultipartFormDataContent
+        {
+            { byteArrayContent, "EvidenceFile", $"evidence{fileExtension}" }
+        };
+
+        return multipartContent;
+    }
 }
