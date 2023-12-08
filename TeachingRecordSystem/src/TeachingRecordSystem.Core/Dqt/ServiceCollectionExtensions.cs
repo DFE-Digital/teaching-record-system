@@ -10,9 +10,9 @@ public static partial class ServiceCollectionExtensions
             .FromAssembliesOf(typeof(ICrmQuery<>))
             .AddClasses(classes => classes.AssignableTo(typeof(ICrmQueryHandler<,>)))
                 .AsImplementedInterfaces()
-                .WithSingletonLifetime());
+                .WithTransientLifetime());
 
-        services.AddSingleton<ICrmQueryDispatcher, CrmQueryDispatcher>();
+        services.AddTransient<ICrmQueryDispatcher, CrmQueryDispatcher>();
 
         return services;
     }
