@@ -14,7 +14,7 @@ public class MqTests : TestBase
     {
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        var specialism = await TestData.ReferenceDataCache.GetSpecialismByValue("Hearing");
+        var specialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
         var startDate = new DateOnly(2021, 3, 1);
         var result = dfeta_qualification_dfeta_MQ_Status.Passed;
         var endDate = new DateOnly(2021, 11, 5);
@@ -23,7 +23,11 @@ public class MqTests : TestBase
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToAddMqPage(personId);
+        await page.GoToPersonQualificationsPage(personId);
+
+        await page.AssertOnPersonQualificationsPage(personId);
+
+        await page.ClickButton("Add a mandatory qualification");
 
         await page.AssertOnAddMqProviderPage();
 
@@ -55,8 +59,7 @@ public class MqTests : TestBase
 
         await page.ClickButton("Confirm mandatory qualification");
 
-        // This will be changed to PersonQualifications once that page has been created in another trello card
-        await page.AssertOnPersonDetailPage(personId);
+        await page.AssertOnPersonQualificationsPage(personId);
 
         await page.AssertFlashMessage("Mandatory qualification added");
     }

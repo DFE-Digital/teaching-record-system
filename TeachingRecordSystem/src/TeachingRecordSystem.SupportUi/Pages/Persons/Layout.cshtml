@@ -24,6 +24,10 @@
                 </li>
 
                 <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator.PersonQualifications(personId, search, sortBy, pageNumber)">Qualifications</a>
+                </li>
+
+                <li class="moj-sub-navigation__item">
                     <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonAlerts(personId, search, sortBy, pageNumber)">Alerts</a>
                 </li>
 

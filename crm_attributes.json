@@ -204,6 +204,7 @@
     "dfeta_npqltd_awarded",
     "dfeta_npqml_awarded",
     "dfeta_npqsl_awarded",
+    "dfeta_qualificationid",
     "dfeta_createdbyapi",
     "dfeta_mq_date",
     "dfeta_mq_mqestablishmentid",

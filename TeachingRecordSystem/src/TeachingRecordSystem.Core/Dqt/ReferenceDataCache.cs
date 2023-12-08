@@ -54,17 +54,23 @@ public class ReferenceDataCache
         return earlyYearsStatuses.Single(ey => ey.dfeta_Value == value);
     }
 
-    public async Task<dfeta_specialism[]> GetSpecialisms()
+    public async Task<dfeta_specialism[]> GetMqSpecialisms()
     {
         var specialisms = await EnsureSpecialisms();
         return specialisms.ToArray();
     }
 
-    public async Task<dfeta_specialism> GetSpecialismByValue(string value)
+    public async Task<dfeta_specialism> GetMqSpecialismByValue(string value)
     {
         var specialisms = await EnsureSpecialisms();
         // build environment has some duplicate Specialisms, which prevent us using Single() here
         return specialisms.First(s => s.dfeta_Value == value);
+    }
+
+    public async Task<dfeta_specialism> GetMqSpecialismById(Guid specialismId)
+    {
+        var specialisms = await EnsureSpecialisms();
+        return specialisms.Single(s => s.dfeta_specialismId == specialismId);
     }
 
     public async Task<dfeta_mqestablishment[]> GetMqEstablishments()
@@ -78,6 +84,12 @@ public class ReferenceDataCache
         var mqEstablishments = await EnsureMqEstablishments();
         // build environment has some duplicate MQ Establishments, which prevent us using Single() here
         return mqEstablishments.First(s => s.dfeta_Value == value);
+    }
+
+    public async Task<dfeta_mqestablishment> GetMqEstablishmentById(Guid mqEstablishmentId)
+    {
+        var mqEstablishments = await EnsureMqEstablishments();
+        return mqEstablishments.Single(s => s.dfeta_mqestablishmentId == mqEstablishmentId);
     }
 
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>

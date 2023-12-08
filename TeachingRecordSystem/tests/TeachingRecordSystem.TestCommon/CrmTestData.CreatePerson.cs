@@ -33,6 +33,7 @@ public partial class CrmTestData
         private DateOnly? _eytsDate;
         private string? _earlyYearsStatus;
         private readonly List<Sanction> _sanctions = new();
+        private readonly List<MandatoryQualification> _mandatoryQualifications = new();
 
         public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
         {
@@ -111,6 +112,17 @@ public partial class CrmTestData
             bool isActive = true)
         {
             _sanctions.Add(new(Guid.NewGuid(), sanctionCode, startDate, endDate, reviewDate, spent, details, detailsLink, isActive));
+            return this;
+        }
+
+        public CreatePersonBuilder WithMandatoryQualification(
+            string? providerValue = null,
+            string? specialismValue = null,
+            DateOnly? startDate = null,
+            DateOnly? endDate = null,
+            dfeta_qualification_dfeta_MQ_Status? result = null)
+        {
+            _mandatoryQualifications.Add(new(Guid.NewGuid(), providerValue, specialismValue, startDate, endDate, result));
             return this;
         }
 
@@ -315,6 +327,28 @@ public partial class CrmTestData
                 }
             }
 
+            foreach (var mandatoryQualification in _mandatoryQualifications)
+            {
+                var mqEstablishment = !string.IsNullOrEmpty(mandatoryQualification.ProviderValue) ? await testData.ReferenceDataCache.GetMqEstablishmentByValue(mandatoryQualification.ProviderValue) : null;
+                var specialism = !string.IsNullOrEmpty(mandatoryQualification.SpecialismValue) ? await testData.ReferenceDataCache.GetMqSpecialismByValue(mandatoryQualification.SpecialismValue) : null;
+                var qualification = new dfeta_qualification()
+                {
+                    Id = mandatoryQualification.QualificationId,
+                    dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
+                    dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
+                    dfeta_MQ_MQEstablishmentId = mqEstablishment is not null ? mqEstablishment.Id.ToEntityReference(dfeta_mqestablishment.EntityLogicalName) : null,
+                    dfeta_MQ_SpecialismId = specialism is not null ? specialism.Id.ToEntityReference(dfeta_specialism.EntityLogicalName) : null,
+                    dfeta_MQStartDate = mandatoryQualification.StartDate.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                    dfeta_MQ_Date = mandatoryQualification.EndDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                    dfeta_MQ_Status = mandatoryQualification.Result
+                };
+
+                txnRequestBuilder.AddRequest(new CreateRequest()
+                {
+                    Target = qualification
+                });
+            }
+
             await txnRequestBuilder.Execute();
 
             return new CreatePersonResult()
@@ -334,7 +368,8 @@ public partial class CrmTestData
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 QtsDate = _qtsDate,
                 EytsDate = _eytsDate,
-                Sanctions = _sanctions.ToImmutableArray()
+                Sanctions = _sanctions.ToImmutableArray(),
+                MandatoryQualifications = _mandatoryQualifications.ToImmutableArray()
             };
         }
     }
@@ -358,6 +393,7 @@ public partial class CrmTestData
         public required DateOnly? QtsDate { get; init; }
         public required DateOnly? EytsDate { get; init; }
         public required ImmutableArray<Sanction> Sanctions { get; init; }
+        public required ImmutableArray<MandatoryQualification> MandatoryQualifications { get; init; }
 
         public Contact ToContact() => new()
         {
@@ -380,4 +416,6 @@ public partial class CrmTestData
     }
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);
+
+    public record MandatoryQualification(Guid QualificationId, string? ProviderValue, string? SpecialismValue, DateOnly? StartDate, DateOnly? EndDate, dfeta_qualification_dfeta_MQ_Status? Result);
 }

@@ -51,14 +51,14 @@ public class SpecialismModel : PageModel
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonDetail(PersonId));
+        return Redirect(_linkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var personDetail = (ContactDetail?)context.HttpContext.Items["CurrentPersonDetail"];
 
-        var specialisms = await _referenceDataCache.GetSpecialisms();
+        var specialisms = await _referenceDataCache.GetMqSpecialisms();
         Specialisms = specialisms
             .OrderBy(e => e.dfeta_name)
             .ToArray();

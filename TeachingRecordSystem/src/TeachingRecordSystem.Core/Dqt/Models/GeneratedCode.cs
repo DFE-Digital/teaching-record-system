@@ -8314,6 +8314,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_npqsl_awarded = "dfeta_npqsl_awarded";
 			public const string dfeta_npqsl_date = "dfeta_npqsl_date";
 			public const string dfeta_PersonId = "dfeta_personid";
+			public const string dfeta_qualificationId = "dfeta_qualificationid";
+			public const string Id = "dfeta_qualificationid";
 			public const string dfeta_TrsDeletedEvent = "dfeta_trsdeletedevent";
 			public const string dfeta_Type = "dfeta_type";
 			public const string StateCode = "statecode";
@@ -9093,6 +9095,49 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_PersonId");
 				this.SetAttributeValue("dfeta_personid", value);
 				this.OnPropertyChanged("dfeta_PersonId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qualificationid")]
+		public System.Nullable<System.Guid> dfeta_qualificationId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_qualificationid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_qualificationId");
+				this.SetAttributeValue("dfeta_qualificationid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_qualificationId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qualificationid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_qualificationId = value;
 			}
 		}
 		

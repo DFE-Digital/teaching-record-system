@@ -58,8 +58,7 @@ public class CheckAnswersModel : PageModel
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification added");
 
-        // This is temporarily set to PersonDetail rather than PersonQualifications until that page has been created in another trello card
-        return Redirect(_linkGenerator.PersonDetail(PersonId));
+        return Redirect(_linkGenerator.PersonQualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancel()
@@ -79,7 +78,7 @@ public class CheckAnswersModel : PageModel
 
         PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
         MqEstablishment = await _referenceDataCache.GetMqEstablishmentByValue(JourneyInstance!.State.MqEstablishmentValue!);
-        Specialism = await _referenceDataCache.GetSpecialismByValue(JourneyInstance!.State.SpecialismValue!);
+        Specialism = await _referenceDataCache.GetMqSpecialismByValue(JourneyInstance!.State.SpecialismValue!);
         StartDate = JourneyInstance!.State.StartDate;
         Result = JourneyInstance!.State.Result;
         EndDate = JourneyInstance!.State.EndDate;

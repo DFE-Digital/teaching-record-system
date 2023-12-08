@@ -1,0 +1,68 @@
+@page "/persons/{personId}/qualifications"
+@using TeachingRecordSystem.SupportUi.Pages.Common;
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.QualificationsModel
+@{
+    Layout = "Layout";
+    ViewBag.SelectedTab = PersonSubNavigationTab.Qualifications;
+    ViewBag.PersonId = Model.PersonId;
+    ViewBag.Search = Model.Search;
+    ViewBag.SortBy = Model.SortBy;
+    ViewBag.PageNumber = Model.PageNumber;
+    ViewBag.Title = Model.Name;
+}
+
+@if (Model.MandatoryQualifications is null || Model.MandatoryQualifications.Length == 0)
+{
+    <p class="govuk-body" data-testid="no-mandatory-qualifications">No mandatory qualifications</p>
+}
+else
+{
+    @foreach (var mq in Model.MandatoryQualifications)
+    {
+        <govuk-summary-card data-testid="mq-@mq.QualificationId">
+            <govuk-summary-card-title>Mandatory qualification@(!string.IsNullOrEmpty(mq.Specialism) ? $" for {mq.Specialism!.ToLowerInvariant()}" : "")</govuk-summary-card-title>
+            <govuk-summary-card-actions>
+                <govuk-summary-card-action href="#" visually-hidden-text="remove qualification" data-testid="remove-mq-@mq.QualificationId">Remove qualification</govuk-summary-card-action>
+            </govuk-summary-card-actions>
+            <govuk-summary-list>                
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="mq-provider-@mq.QualificationId">@(!string.IsNullOrEmpty(mq.Provider) ? mq.Provider : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="#" visually-hidden-text="change training provider">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="mq-specialism-@mq.QualificationId">@(!string.IsNullOrEmpty(mq.Specialism) ? mq.Specialism : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="#" visually-hidden-text="change specialism">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="mq-start-date-@mq.QualificationId">@(mq.StartDate.HasValue ? mq.StartDate!.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="#" visually-hidden-text="change start date">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Result</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="mq-result-@mq.QualificationId">@(mq.Result.HasValue ? mq.Result!.ToString() : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="#" visually-hidden-text="change result">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="mq-end-date-@mq.QualificationId">@(mq.EndDate.HasValue ? mq.EndDate!.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="#" visually-hidden-text="change end date">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+        </govuk-summary-card>        
+    }
+}
+
+<govuk-button-link href="@LinkGenerator.MqAdd(Model.PersonId)" class="govuk-button" data-testid="add-mandatory-qualification">Add a mandatory qualification</govuk-button-link>
