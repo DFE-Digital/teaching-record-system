@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
@@ -43,6 +44,10 @@ public class TrsDbContext : DbContext
 
     public DbSet<Person> Persons => Set<Person>();
 
+    public DbSet<Qualification> Qualifications => Set<Qualification>();
+
+    public DbSet<MandatoryQualification> MandatoryQualifications => Set<MandatoryQualification>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
     {
         if (connectionString != null)
@@ -61,6 +66,11 @@ public class TrsDbContext : DbContext
     public void AddEvent(EventBase @event)
     {
         Events.Add(Event.FromEventBase(@event));
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Conventions.Remove<ForeignKeyIndexConvention>();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

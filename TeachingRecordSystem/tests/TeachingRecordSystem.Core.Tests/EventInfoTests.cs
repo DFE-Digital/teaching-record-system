@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.Events;
+using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.Core.Tests;
 
