@@ -11,7 +11,7 @@ public class CheckUserExistsFilter : IAsyncResourceFilter, IOrderedFilter
     {
         var user = context.HttpContext.User;
 
-        if (user.Identity?.IsAuthenticated == true && !user.IsActiveTrsUser())
+        if (user.Identity?.IsAuthenticated == true && !user.IsActiveTrsUser() && context.HttpContext.Request.Path != "/sign-out")
         {
             var viewResult = new ViewResult()
             {
