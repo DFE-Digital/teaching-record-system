@@ -10,14 +10,9 @@ using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOptions>
+public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenIdConnectOptions>
 {
-    private readonly string _name;
-
-    public AssignUserInfoOnSignIn(string name)
-    {
-        _name = name;
-    }
+    private readonly string _name = name;
 
     public void Configure(string? name, OpenIdConnectOptions options)
     {
@@ -56,16 +51,15 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
                 return;
             }
 
-            await SyncAadUserInfo();
+            await SyncUserInfo();
 
             var claims = user.Roles.Select(r => new Claim(ClaimTypes.Role, r))
                 .Append(new Claim(CustomClaims.UserId, user.UserId.ToString()))
                 .Append(new Claim(ClaimTypes.Name, user.Name));
 
-            var crmUserId = await GetCrmUserId();
-            if (crmUserId.HasValue)
+            if (user.DqtUserId is Guid dqtUserId)
             {
-                claims = claims.Append(new Claim(CustomClaims.CrmUserId, crmUserId.Value.ToString()));
+                claims = claims.Append(new Claim(CustomClaims.DqtUserId, dqtUserId.ToString()));
             }
 
             var identityWithRoles = new ClaimsIdentity(
@@ -77,9 +71,9 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
 
             ctx.Principal = new ClaimsPrincipal(identityWithRoles);
 
-            async Task<Guid?> GetCrmUserId()
+            async Task<Guid?> GetDqtUserId()
             {
-                using var serviceClient = ctx.HttpContext.RequestServices.GetRequiredService<ServiceClient>();
+                using var serviceClient = ctx.HttpContext.RequestServices.GetRequiredKeyedService<ServiceClient>("WithoutImpersonation");
 
                 var request = new QueryByAttribute(SystemUser.EntityLogicalName);
                 request.AddAttributeValue(SystemUser.Fields.AzureActiveDirectoryObjectId, new Guid(aadUserId));
@@ -95,7 +89,7 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
                 return response.Entities.Single().Id;
             }
 
-            async Task SyncAadUserInfo()
+            async Task SyncUserInfo()
             {
                 // The GraphServiceClient used within AadUserService needs HttpContext.User assigned so it can retrieve the access token;
                 // temporarily assign HttpContext.User for this service call then reset it when we're done.
@@ -109,6 +103,7 @@ public class AssignUserInfoOnSignIn : IConfigureNamedOptions<OpenIdConnectOption
                     var azureAdUser = (await aadUserService.GetUserById(aadUserId))!;
                     user.Email = azureAdUser.Email;
                     user.Name = azureAdUser.Name;
+                    user.DqtUserId ??= await GetDqtUserId();
                     await dbContext.SaveChangesAsync();
                 }
                 finally
