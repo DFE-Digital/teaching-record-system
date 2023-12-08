@@ -12,5 +12,6 @@ public interface ICrmEntityChangesService
         ColumnSet columns,
         DateTime? modifiedSince,
         int pageSize = 1000,
+        bool rollUpChanges = true,
         CancellationToken cancellationToken = default);
 }

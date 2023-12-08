@@ -28,7 +28,7 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
         var newItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, newContact);
 
         // Act
-        await _fixture.PublishChangedItemAndConsume(newItem);
+        await _fixture.PublishChangedItemsAndConsume(newItem);
 
         // Assert
         var row = await GetRowById(Contact.EntityLogicalName, contactId);
@@ -65,7 +65,7 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
         var newItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, updatedContact);
 
         // Act
-        await _fixture.PublishChangedItemAndConsume(newItem);
+        await _fixture.PublishChangedItemsAndConsume(newItem);
 
         // Assert
         var row = await GetRowById(Contact.EntityLogicalName, contactId);
@@ -97,12 +97,62 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
             new EntityReference(Contact.EntityLogicalName, contactId));
 
         // Act
-        await _fixture.PublishChangedItemAndConsume(removedItem);
+        await _fixture.PublishChangedItemsAndConsume(removedItem);
 
         // Assert
         var row = await GetRowById(Contact.EntityLogicalName, contactId);
         Assert.Null(row);
         await AssertInDeleteLog(Contact.EntityLogicalName, contactId, expectedDeleted: _fixture.Clock.UtcNow);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ProcessChangesForEntityType_SameRecordMultipleTimesInBatch_WritesMostRecentUpdate(bool contactExistsPreSync)
+    {
+        // Arrange
+        var contactId = Guid.NewGuid();
+
+        if (contactExistsPreSync)
+        {
+            await InsertRow(Contact.EntityLogicalName, new Dictionary<string, object?>()
+            {
+                { "Id", contactId },
+                { "firstname", Faker.Name.First() },
+                { "lastname", Faker.Name.Last() },
+                { "__Inserted", _fixture.Clock.UtcNow.Subtract(TimeSpan.FromHours(1)) }
+            });
+        }
+
+        var contact1 = new Contact()
+        {
+            Id = contactId,
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            ModifiedOn = _fixture.Clock.UtcNow,
+        };
+
+        var contact2 = new Contact()
+        {
+            Id = contactId,
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            ModifiedOn = _fixture.Clock.UtcNow.AddMinutes(1),
+        };
+
+        var newItem1 = new NewOrUpdatedItem(ChangeType.NewOrUpdated, contact1);
+        var newItem2 = new NewOrUpdatedItem(ChangeType.NewOrUpdated, contact2);
+
+        // Act
+        await _fixture.PublishChangedItemsAndConsume(newItem1, newItem2);
+
+        // Assert
+        var row = await GetRowById(Contact.EntityLogicalName, contactId);
+        Assert.NotNull(row);
+        Assert.Equal(contactId, row["Id"]);
+        Assert.Equal(contact2.FirstName, row["firstname"]);
+        Assert.Equal(contact2.LastName, row["lastname"]);
+        Assert.Equal(_fixture.Clock.UtcNow, row["__Updated"]);
     }
 
     private async Task AssertInDeleteLog(string entityLogicalName, Guid entityId, DateTime expectedDeleted)

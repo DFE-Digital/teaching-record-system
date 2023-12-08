@@ -43,6 +43,7 @@ public sealed class TestableCrmEntityChangesService : ICrmEntityChangesService, 
         ColumnSet columns,
         DateTime? modifiedSince,
         int pageSize = 1000,
+        bool rollUpChanges = true,
         CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
@@ -56,6 +57,14 @@ public sealed class TestableCrmEntityChangesService : ICrmEntityChangesService, 
                 .ToArray()
             )
             .Where(batch => batch.Length > 0)
+            .Select(batch =>
+                batch.GroupBy(e =>
+                    !rollUpChanges ? Guid.NewGuid() :
+                    e is NewOrUpdatedItem newOrUpdatedItem ? newOrUpdatedItem.NewOrUpdatedEntity.Id :
+                    e is RemovedOrDeletedItem removedOrDeletedItem ? removedOrDeletedItem.RemovedItem.Id :
+                    throw new NotSupportedException($"Unexpected ChangeType: '{e.Type}'."))
+                .Select(g => g.Last())
+                .ToArray())
             .ToAsyncEnumerable();
     }
 

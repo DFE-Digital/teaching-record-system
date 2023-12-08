@@ -20,16 +20,16 @@ public class DqtReportingFixture
         migrator.MigrateDb();
     }
 
-    public IClock Clock => _crmClientFixture.Clock;
+    public TestableClock Clock => _crmClientFixture.Clock;
 
     public string ReportingDbConnectionString { get; }
 
-    public Task PublishChangedItemAndConsume(IChangedItem changedItem) =>
+    public Task PublishChangedItemsAndConsume(params IChangedItem[] changedItems) =>
         WithService(async (service, changesObserver) =>
         {
             await service.LoadEntityMetadata();
 
-            changesObserver.OnNext(new IChangedItem[] { changedItem });
+            changesObserver.OnNext(changedItems);
             var processTask = service.ProcessChangesForEntityType(Contact.EntityLogicalName, CancellationToken.None);
             changesObserver.OnCompleted();
             await processTask;
@@ -40,7 +40,7 @@ public class DqtReportingFixture
         var options = Options.Create(new DqtReportingOptions()
         {
             CrmConnectionString = "dummy",
-            Entities = new[] { Contact.EntityLogicalName },
+            Entities = [Contact.EntityLogicalName],
             PollIntervalSeconds = 60,
             ProcessAllEntityTypesConcurrently = false,
             ReportingDbConnectionString = ReportingDbConnectionString,

@@ -35,6 +35,7 @@ public class CrmEntityChangesService : ICrmEntityChangesService
         ColumnSet columns,
         DateTime? modifiedSince,
         int pageSize,
+        bool rollUpChanges,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         // CRM ignores page sizes above 5000
@@ -55,7 +56,8 @@ public class CrmEntityChangesService : ICrmEntityChangesService
 
         // If we're filtering out records that came before modifiedSince, ensure we have the modifiedon attribute
         var columnSet =
-            modifiedSince.HasValue && !columns.Columns.Contains("modifiedon") ? new ColumnSet(columns.Columns.Append("modifiedon").ToArray()) :
+            modifiedSince.HasValue && !columns.Columns.Contains("modifiedon") && !columns.AllColumns ?
+            new ColumnSet(columns.Columns.Append("modifiedon").ToArray()) :
             columns;
 
         using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
@@ -118,6 +120,8 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                     // Version stamp associated with the client has expired. Please perform a full sync.
                     // Resetting DataVersion will give us a full sync.
                     request.DataVersion = null;
+                    request.PageInfo.PageNumber = 1;
+                    request.PageInfo.PagingCookie = null;
                     continue;
                 }
                 catch (Exception ex) when ((ex is InsufficientMemoryException || ex is OutOfMemoryException) && request.PageInfo.Count > 1)
@@ -145,6 +149,18 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                     .Where(e => !modifiedSince.HasValue || e is not NewOrUpdatedItem ||
                         (e is NewOrUpdatedItem newOrUpdatedItem && newOrUpdatedItem.NewOrUpdatedEntity.GetAttributeValue<DateTime>("modifiedon") >= modifiedSince.Value))
                     .ToArray();
+
+                // Roll up changes to the same record so callers don't get the same record more than once in a batch.
+                if (rollUpChanges)
+                {
+                    changes = changes
+                        .GroupBy(e =>
+                            e is NewOrUpdatedItem newOrUpdatedItem ? newOrUpdatedItem.NewOrUpdatedEntity.Id :
+                            e is RemovedOrDeletedItem removedOrDeletedItem ? removedOrDeletedItem.RemovedItem.Id :
+                            throw new NotSupportedException($"Unexpected ChangeType: '{e.Type}'."))
+                        .Select(g => g.Last())
+                        .ToArray();
+                }
 
                 if (changes.Length > 0)
                 {
