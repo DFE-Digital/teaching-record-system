@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
 using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
+using TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Worker.Infrastructure.Logging;
@@ -33,7 +34,8 @@ builder.Services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.Confi
 builder
     .AddBlobStorage()
     .AddDistributedLocks()
-    .AddDqtReporting();
+    .AddDqtReporting()
+    .AddTrsSyncService();
 
 var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
 {
