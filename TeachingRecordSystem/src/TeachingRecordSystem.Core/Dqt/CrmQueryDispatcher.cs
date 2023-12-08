@@ -14,10 +14,12 @@ public class CrmQueryDispatcher : ICrmQueryDispatcher
 
     public async Task<TResult> ExecuteQuery<TResult>(ICrmQuery<TResult> query)
     {
-        var organizationService = _serviceProvider.GetRequiredService<IOrganizationServiceAsync>();
+        using var scope = _serviceProvider.CreateScope();
+
+        var organizationService = scope.ServiceProvider.GetRequiredService<IOrganizationServiceAsync>();
 
         var handlerType = typeof(ICrmQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
-        var handler = _serviceProvider.GetRequiredService(handlerType);
+        var handler = scope.ServiceProvider.GetRequiredService(handlerType);
 
         var wrapperHandlerType = typeof(QueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
         var wrappedHandler = (QueryHandler<TResult>)Activator.CreateInstance(wrapperHandlerType, handler)!;

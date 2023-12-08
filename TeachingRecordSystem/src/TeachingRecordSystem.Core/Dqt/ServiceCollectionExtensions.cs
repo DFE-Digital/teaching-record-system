@@ -12,7 +12,7 @@ public static partial class ServiceCollectionExtensions
                 .AsImplementedInterfaces()
                 .WithTransientLifetime());
 
-        services.AddTransient<ICrmQueryDispatcher, CrmQueryDispatcher>();
+        services.AddSingleton<ICrmQueryDispatcher, CrmQueryDispatcher>();
 
         return services;
     }
