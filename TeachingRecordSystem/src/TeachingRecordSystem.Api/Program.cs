@@ -25,7 +25,6 @@ using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
-using TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
@@ -238,12 +237,10 @@ public class Program
         services.AddAccessYourQualifications(configuration, env);
         services.AddCertificateGeneration();
         services.AddCrmEntityChanges();
-        services.AddTrsSyncService(builder.Configuration);
         services.AddBackgroundJobs(env, configuration);
         services.AddEmail(env, configuration);
         services.AddCrmQueries();
         services.AddSingleton<ReferenceDataCache>();
-        services.AddSingleton<TrsDataSyncHelper>();
 
         if (!env.IsUnitTests())
         {
