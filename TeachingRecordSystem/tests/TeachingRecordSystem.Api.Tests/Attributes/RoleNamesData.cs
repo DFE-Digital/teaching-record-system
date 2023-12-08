@@ -1,5 +1,4 @@
 using System.Reflection;
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using Xunit.Sdk;
 
 namespace TeachingRecordSystem.Api.Tests.Attributes;
@@ -14,7 +13,7 @@ public class RoleNamesData : DataAttribute
     }
     public override IEnumerable<object[]> GetData(MethodInfo testMethod)
     {
-        var allRoles = new object[] { RoleNames.UpdateNpq, RoleNames.UpdatePerson, RoleNames.GetPerson, RoleNames.UnlockPerson };
+        var allRoles = new object[] { ApiRoles.UpdateNpq, ApiRoles.UpdatePerson, ApiRoles.GetPerson, ApiRoles.UnlockPerson };
         var excluded = allRoles.Except(RolesToExclude);
         return new[] { new object[] { excluded } };
     }

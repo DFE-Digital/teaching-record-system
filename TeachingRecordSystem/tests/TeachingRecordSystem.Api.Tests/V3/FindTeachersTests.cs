@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
@@ -11,10 +10,10 @@ public class FindTeachersTests : ApiTestBase
         : base(apiFixture)
     {
         XrmFakedContext.DeleteAllEntities<Contact>();
-        SetCurrentApiClient(new[] { RoleNames.GetPerson });
+        SetCurrentApiClient(new[] { ApiRoles.GetPerson });
     }
 
-    [Theory, RoleNamesData(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson })]
+    [Theory, RoleNamesData(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson })]
     public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange

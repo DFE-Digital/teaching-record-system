@@ -1,5 +1,4 @@
 #nullable disable
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
@@ -13,10 +12,10 @@ public class GetOrCreateTrnRequestTests : ApiTestBase
 {
     public GetOrCreateTrnRequestTests(ApiFixture apiFixture) : base(apiFixture)
     {
-        SetCurrentApiClient(new[] { RoleNames.UpdatePerson });
+        SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }
 
-    [Theory, RoleNamesData(new[] { RoleNames.UpdatePerson })]
+    [Theory, RoleNamesData(new[] { ApiRoles.UpdatePerson })]
     public async Task GetOrCreateTrn_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange

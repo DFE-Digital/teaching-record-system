@@ -1,6 +1,5 @@
 #nullable disable
 using Microsoft.Xrm.Sdk;
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
@@ -12,10 +11,10 @@ public class GetTeacherTests : ApiTestBase
     public GetTeacherTests(ApiFixture apiFixture)
         : base(apiFixture)
     {
-        SetCurrentApiClient(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson });
+        SetCurrentApiClient(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson });
     }
 
-    [Theory, RoleNamesData(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson })]
+    [Theory, RoleNamesData(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson })]
     public async Task GetTeacher_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange

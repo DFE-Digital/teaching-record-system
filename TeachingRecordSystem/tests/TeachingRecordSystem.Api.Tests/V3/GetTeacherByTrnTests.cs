@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
@@ -8,7 +7,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     public GetTeacherByTrnTests(ApiFixture apiFixture)
         : base(apiFixture)
     {
-        SetCurrentApiClient(new[] { RoleNames.GetPerson });
+        SetCurrentApiClient(new[] { ApiRoles.GetPerson });
     }
 
     [Fact]
@@ -26,7 +25,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
     }
 
-    [Theory, RoleNamesData(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson })]
+    [Theory, RoleNamesData(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson })]
     public async Task GetTeacher_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange

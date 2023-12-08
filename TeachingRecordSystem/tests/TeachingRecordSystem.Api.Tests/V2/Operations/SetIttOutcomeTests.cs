@@ -1,6 +1,5 @@
 #nullable disable
 using System.Net;
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
@@ -12,10 +11,10 @@ public class SetIttOutcomeTests : ApiTestBase
 {
     public SetIttOutcomeTests(ApiFixture apiFixture) : base(apiFixture)
     {
-        SetCurrentApiClient(new[] { RoleNames.UpdatePerson });
+        SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }
 
-    [Theory, RoleNamesData(new[] { RoleNames.UpdatePerson })]
+    [Theory, RoleNamesData(new[] { ApiRoles.UpdatePerson })]
     public async Task IttOutcome_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange

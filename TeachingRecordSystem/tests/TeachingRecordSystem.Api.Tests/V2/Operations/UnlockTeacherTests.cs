@@ -1,6 +1,5 @@
 #nullable disable
 using System.Net;
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
@@ -9,10 +8,10 @@ public class UnlockTeacherTests : ApiTestBase
 {
     public UnlockTeacherTests(ApiFixture apiFixture) : base(apiFixture)
     {
-        SetCurrentApiClient(new[] { RoleNames.UnlockPerson });
+        SetCurrentApiClient(new[] { ApiRoles.UnlockPerson });
     }
 
-    [Theory, RoleNamesData(except: new[] { RoleNames.UnlockPerson })]
+    [Theory, RoleNamesData(except: new[] { ApiRoles.UnlockPerson })]
     public async Task UnlockTeacher_ClientDoesNotHaveSecurityRoles_ReturnsForbidden(string[] roles)
     {
         // Arrange
