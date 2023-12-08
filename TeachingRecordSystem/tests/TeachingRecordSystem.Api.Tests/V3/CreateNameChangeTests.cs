@@ -2,7 +2,6 @@ using System.Text;
 using JustEat.HttpClientInterception;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
@@ -13,7 +12,7 @@ public class CreateNameChangeTests : ApiTestBase
     public CreateNameChangeTests(ApiFixture apiFixture)
         : base(apiFixture)
     {
-        SetCurrentApiClient(new[] { RoleNames.UpdatePerson });
+        SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }
 
     [Theory]
@@ -53,7 +52,7 @@ public class CreateNameChangeTests : ApiTestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Theory, RoleNamesData(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson })]
+    [Theory, RoleNamesData(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson })]
     public async Task PostNameChanges_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange

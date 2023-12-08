@@ -1,7 +1,6 @@
 #nullable disable
 using System.Net;
 using Optional;
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
@@ -14,10 +13,10 @@ public class UpdateTeacherTests : ApiTestBase
 {
     public UpdateTeacherTests(ApiFixture apiFixture) : base(apiFixture)
     {
-        SetCurrentApiClient(new[] { RoleNames.UpdatePerson });
+        SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }
 
-    [Theory, RoleNamesData(except: new[] { RoleNames.UpdatePerson })]
+    [Theory, RoleNamesData(except: new[] { ApiRoles.UpdatePerson })]
     public async Task UpdateTeacher_ClientDoesNotHaveSecurityRoles_ReturnsForbidden(string[] roles)
     {
         // Arrange

@@ -1,6 +1,6 @@
-namespace TeachingRecordSystem.Api.Infrastructure.Security;
+namespace TeachingRecordSystem.Core;
 
-public class RoleNames
+public static class ApiRoles
 {
     public const string GetPerson = "GetPerson";
     public const string UpdatePerson = "UpdatePerson";

@@ -1,5 +1,4 @@
 #nullable disable
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.Responses;
 
@@ -9,10 +8,10 @@ public class FindTeachersTests : ApiTestBase
 {
     public FindTeachersTests(ApiFixture apiFixture) : base(apiFixture)
     {
-        SetCurrentApiClient(new[] { RoleNames.GetPerson });
+        SetCurrentApiClient(new[] { ApiRoles.GetPerson });
     }
 
-    [Theory, RoleNamesData(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson })]
+    [Theory, RoleNamesData(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson })]
     public async Task FindTeachers_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange

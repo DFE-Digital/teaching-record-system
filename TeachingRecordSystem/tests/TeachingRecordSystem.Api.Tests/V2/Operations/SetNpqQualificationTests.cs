@@ -1,5 +1,4 @@
 #nullable disable
-using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.Requests;
 
@@ -9,10 +8,10 @@ public class SetNpqQualificationTests : ApiTestBase
 {
     public SetNpqQualificationTests(ApiFixture apiFixture) : base(apiFixture)
     {
-        SetCurrentApiClient(new[] { RoleNames.UpdateNpq });
+        SetCurrentApiClient(new[] { ApiRoles.UpdateNpq });
     }
 
-    [Theory, RoleNamesData(except: new[] { RoleNames.UpdateNpq })]
+    [Theory, RoleNamesData(except: new[] { ApiRoles.UpdateNpq })]
     public async Task UnlockTeacher_ClientDoesNotHaveSecurityRoles_ReturnsForbidden(string[] roles)
     {
         // Arrange

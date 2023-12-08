@@ -136,25 +136,25 @@ public class Program
                 AuthorizationPolicies.GetPerson,
                 policy => policy
                     .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireRole(new[] { RoleNames.GetPerson, RoleNames.UpdatePerson }));
+                    .RequireRole([ApiRoles.GetPerson, ApiRoles.UpdatePerson]));
 
             options.AddPolicy(
                 AuthorizationPolicies.UpdatePerson,
                 policy => policy
                     .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireRole(new[] { RoleNames.UpdatePerson }));
+                    .RequireRole([ApiRoles.UpdatePerson]));
 
             options.AddPolicy(
                 AuthorizationPolicies.UpdateNpq,
                 policy => policy
                     .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireRole(new[] { RoleNames.UpdateNpq }));
+                    .RequireRole([ApiRoles.UpdateNpq]));
 
             options.AddPolicy(
                 AuthorizationPolicies.UnlockPerson,
                 policy => policy
                     .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireRole(new[] { RoleNames.UnlockPerson }));
+                    .RequireRole([ApiRoles.UnlockPerson]));
         });
 
         services
