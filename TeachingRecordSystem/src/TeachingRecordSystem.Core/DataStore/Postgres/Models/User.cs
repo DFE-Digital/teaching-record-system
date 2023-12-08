@@ -13,4 +13,5 @@ public class User
     public string? Email { get; set; }
     public string? AzureAdUserId { get; set; }
     public required string[] Roles { get; set; }
+    public Guid? DqtUserId { get; set; }
 }

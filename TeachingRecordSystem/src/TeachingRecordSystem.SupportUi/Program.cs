@@ -181,7 +181,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
             var httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext;
             if (httpContext?.User?.Identity?.IsAuthenticated == true)
             {
-                sc.CallerId = httpContext.User.GetCrmUserId();
+                sc.CallerId = httpContext.User.GetDqtUserId();
             }
 
             return sc;

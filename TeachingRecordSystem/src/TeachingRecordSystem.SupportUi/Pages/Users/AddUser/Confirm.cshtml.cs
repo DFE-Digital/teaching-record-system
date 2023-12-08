@@ -3,30 +3,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 
-public class ConfirmModel : PageModel
+public class ConfirmModel(
+    TrsDbContext dbContext,
+    IAadUserService userService,
+    ICrmQueryDispatcher crmQueryDispatcher,
+    IClock clock,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
-    private readonly TrsDbContext _dbContext;
-    private readonly IAadUserService _userService;
-    private readonly IClock _clock;
-    private readonly TrsLinkGenerator _linkGenerator;
+    private readonly TrsDbContext _dbContext = dbContext;
+    private readonly IAadUserService _userService = userService;
+    private readonly ICrmQueryDispatcher _crmQueryDispatcher = crmQueryDispatcher;
+    private readonly IClock _clock = clock;
+    private readonly TrsLinkGenerator _linkGenerator = linkGenerator;
     private Services.AzureActiveDirectory.User? _user;
-
-    public ConfirmModel(
-        TrsDbContext dbContext,
-        IAadUserService userService,
-        IClock clock,
-        TrsLinkGenerator linkGenerator)
-    {
-        _dbContext = dbContext;
-        _userService = userService;
-        _clock = clock;
-        _linkGenerator = linkGenerator;
-    }
 
     [BindProperty(SupportsGet = true)]
     public string? UserId { get; set; }
@@ -52,7 +47,7 @@ public class ConfirmModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        var roles = Roles ?? Array.Empty<string>();
+        var roles = Roles ?? [];
 
         // Ensure submitted roles are valid
         if (roles.Any(r => !UserRoles.All.Contains(r)))
@@ -70,15 +65,22 @@ public class ConfirmModel : PageModel
             return this.PageWithErrors();
         }
 
+        string azureAdUserId = _user!.UserId;
+
+        var dqtUser = await _crmQueryDispatcher.ExecuteQuery(
+            new GetSystemUserByAzureActiveDirectoryObjectIdQuery(
+                azureAdUserId, new ColumnSet()));
+
         var newUser = new Core.DataStore.Postgres.Models.User()
         {
             Active = true,
-            AzureAdUserId = _user!.UserId,
+            AzureAdUserId = azureAdUserId,
             Email = _user.Email,
             Name = Name!,
             Roles = roles,
             UserId = Guid.NewGuid(),
-            UserType = UserType.Person
+            UserType = UserType.Person,
+            DqtUserId = dqtUser?.Id
         };
 
         _dbContext.Users.Add(newUser);
