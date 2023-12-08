@@ -78,6 +78,54 @@ public class TrsLinkGenerator
     public string MqAddCheckAnswersCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/AddMq/CheckAnswers", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
+    public string MqEditProvider(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Provider/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditProviderCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Provider/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditProviderConfirm(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Provider/Confirm", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditProviderConfirmCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Provider/Confirm", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditSpecialism(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Specialism/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditSpecialismCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Specialism/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditSpecialismConfirm(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Specialism/Confirm", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditSpecialismConfirmCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Specialism/Confirm", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditStartDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/StartDate/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditStartDateCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/StartDate/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditStartDateConfirm(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/StartDate/Confirm", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditStartDateConfirmCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/StartDate/Confirm", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditResult(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Result/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditResultCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Result/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditResultConfirm(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Result/Confirm", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditResultConfirmCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Result/Confirm", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
     public string Persons(string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/Index", routeValues: new { search, sortBy, pageNumber });
 

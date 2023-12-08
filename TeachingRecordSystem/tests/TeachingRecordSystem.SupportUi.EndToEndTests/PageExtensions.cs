@@ -169,6 +169,46 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/mqs/add/check-answers");
     }
 
+    public static async Task AssertOnEditMqProviderPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider");
+    }
+
+    public static async Task AssertOnEditMqProviderConfirmPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/confirm");
+    }
+
+    public static async Task AssertOnEditMqSpecialismPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism");
+    }
+
+    public static async Task AssertOnEditMqSpecialismConfirmPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/confirm");
+    }
+
+    public static async Task AssertOnEditMqStartDatePage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date");
+    }
+
+    public static async Task AssertOnEditMqStartDateConfirmPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/confirm");
+    }
+
+    public static async Task AssertOnEditMqResultPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/result");
+    }
+
+    public static async Task AssertOnEditMqResultConfirmPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/result/confirm");
+    }
+
     public static async Task AssertFlashMessage(this IPage page, string expectedHeader)
     {
         Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader}')"));
@@ -202,12 +242,14 @@ public static class PageExtensions
         await page.ClickContinueButton();
     }
 
-
     public static Task ClickAcceptChangeButton(this IPage page)
         => ClickButton(page, "Accept change");
 
     public static Task ClickRejectChangeButton(this IPage page)
         => ClickButton(page, "Reject change");
+
+    public static Task ClickConfirmChangeButton(this IPage page)
+        => ClickButton(page, "Confirm change");
 
     public static Task ClickConfirmButton(this IPage page)
         => ClickButton(page, "Confirm");

@@ -93,7 +93,7 @@ public class StartDateTests : TestBase
     }
 
     [Fact]
-    public async Task Post_WhenStartDateIsEntered_ReturnsError()
+    public async Task Post_WhenNoStartDateIsEntered_ReturnsError()
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
