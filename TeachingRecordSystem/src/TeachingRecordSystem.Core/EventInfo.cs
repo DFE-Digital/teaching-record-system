@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.Core;
@@ -97,7 +96,7 @@ file class EventInfoJsonConverter : JsonConverter<EventInfo>
                     throw new JsonException();
                 }
 
-                var @event = JsonSerializer.Deserialize(ref reader, eventType, Event.JsonSerializerOptions);
+                var @event = JsonSerializer.Deserialize(ref reader, eventType, EventBase.JsonSerializerOptions);
 
                 reader.Read();
 
@@ -118,7 +117,7 @@ file class EventInfoJsonConverter : JsonConverter<EventInfo>
         writer.WritePropertyName("EventTypeName");
         writer.WriteStringValue(eventTypeName);
         writer.WritePropertyName("Event");
-        JsonSerializer.Serialize(writer, value.Event, eventType, Event.JsonSerializerOptions);
+        JsonSerializer.Serialize(writer, value.Event, eventType, EventBase.JsonSerializerOptions);
         writer.WriteEndObject();
     }
 }
