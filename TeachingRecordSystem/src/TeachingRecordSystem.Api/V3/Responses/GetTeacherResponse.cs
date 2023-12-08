@@ -30,16 +30,18 @@ public record GetTeacherResponse
 
 public record GetTeacherResponseQts
 {
-    public required DateOnly Awarded { get; init; }
+    public required DateOnly? Awarded { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string? CertificateUrl { get; init; }
+    public required string? StatusDescription { get; init; }
 }
 
 public record GetTeacherResponseEyts
 {
-    public required DateOnly Awarded { get; init; }
+    public required DateOnly? Awarded { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string? CertificateUrl { get; init; }
+    public required string? StatusDescription { get; init; }
 }
 
 public record GetTeacherResponseInduction

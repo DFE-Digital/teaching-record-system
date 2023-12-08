@@ -8553,7 +8553,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
-			public const string dfeta_EarlyYearsStatusId = "dfeta_earlyyearsstatusid";
+            public const string CreatedOn = "createdon";
+            public const string dfeta_EarlyYearsStatusId = "dfeta_earlyyearsstatusid";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_InductionId = "dfeta_inductionid";
 			public const string dfeta_name = "dfeta_name";
@@ -8637,11 +8638,32 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EarlyYearsStatusId");
 			}
 		}
-		
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eytsdate")]
+
+        /// <summary>
+        /// Date and time when the record was created.
+        /// </summary>
+        [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+        public System.Nullable<System.DateTime> CreatedOn
+        {
+            [System.Diagnostics.DebuggerNonUserCode()]
+            get
+            {
+                return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+            }
+            [System.Diagnostics.DebuggerNonUserCode()]
+            set
+            {
+                this.OnPropertyChanging("CreatedOn");
+                this.SetAttributeValue("createdon", value);
+                this.OnPropertyChanged("CreatedOn");
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eytsdate")]
 		public System.Nullable<System.DateTime> dfeta_EYTSDate
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]

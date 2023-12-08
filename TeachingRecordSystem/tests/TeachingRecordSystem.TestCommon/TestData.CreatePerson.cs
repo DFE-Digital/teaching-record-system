@@ -4,7 +4,7 @@ using Optional;
 using Optional.Unsafe;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Models;
+using static TeachingRecordSystem.Core.Dqt.RequestBuilder;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -32,6 +32,8 @@ public partial class TestData
         private string? _mobileNumber;
         private Contact_GenderCode? _gender;
         private bool? _hasNationalInsuranceNumber;
+        private readonly List<MandatoryQualification> _mandatoryQualifications = new();
+        private readonly List<QtsRegistration> _qtsRegistrations = new();
         private DateOnly? _qtsDate;
         private string? _teacherStatus;
         private DateOnly? _eytsDate;
@@ -168,27 +170,21 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithQts(DateOnly qtsDate, string teacherStatus = TeacherStatusQualifiedTeacherTrained)
+        public CreatePersonBuilder WithQts(DateOnly? qtsDate, string? teacherStatusValue, DateTime? createdDate)
         {
-            if ((_qtsDate is not null && _qtsDate != qtsDate) || (_teacherStatus is not null && _teacherStatus != teacherStatus))
-            {
-                throw new InvalidOperationException("WithQts cannot be changed after it's set.");
-            }
-
-            _qtsDate = qtsDate;
-            _teacherStatus = teacherStatus;
+            _qtsRegistrations.Add(new QtsRegistration(qtsDate, teacherStatusValue, createdDate, null, null));
             return this;
         }
 
-        public CreatePersonBuilder WithEyts(DateOnly eytsDate, string earlyYearsStatus = EaryYearsStatusProfessionalStatus)
+        public CreatePersonBuilder WithQtsRegistration(DateOnly? qtsDate, string? teacherStatusValue, DateTime? createdDate, DateOnly? eytsDate, string? eytsTeacherStatus)
         {
-            if ((_eytsDate is not null && _eytsDate != eytsDate) || (_earlyYearsStatus is not null && _earlyYearsStatus != earlyYearsStatus))
-            {
-                throw new InvalidOperationException("WithEyts cannot be changed after it's set.");
-            }
+            _qtsRegistrations.Add(new QtsRegistration(qtsDate, teacherStatusValue, createdDate, eytsDate, eytsTeacherStatus));
+            return this;
+        }
 
-            _eytsDate = eytsDate;
-            _earlyYearsStatus = earlyYearsStatus;
+        public CreatePersonBuilder WithEyts(DateOnly? eytsDate, string? eytsStatusValue, DateTime? createdDate)
+        {
+            _qtsRegistrations.Add(new QtsRegistration(null, null, createdDate, eytsDate, eytsStatusValue));
             return this;
         }
 
@@ -237,15 +233,18 @@ public partial class TestData
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = contact });
 
-            if (_qtsDate is not null && _teacherStatus is not null)
+            IInnerRequestHandle<RetrieveResponse>? getQtsRegistationTask = null;
+            var qts = _qtsRegistrations.Where(x => x.TeacherStatusValue != null);
+            foreach (var item in qts)
             {
-                var teacherStatus = await testData.ReferenceDataCache.GetTeacherStatusByValue(_teacherStatus);
+                var teacherStatus = await testData.ReferenceDataCache.GetTeacherStatusByValue(item.TeacherStatusValue!);
                 var qtsRegistrationId = Guid.NewGuid();
                 txnRequestBuilder.AddRequest(new CreateRequest()
                 {
                     Target = new dfeta_qtsregistration()
                     {
                         Id = qtsRegistrationId,
+                        CreatedOn = item.CreatedOn
                         dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName)
                     }
                 });
@@ -265,21 +264,30 @@ public partial class TestData
                     Target = new dfeta_qtsregistration()
                     {
                         Id = qtsRegistrationId,
-                        dfeta_QTSDate = _qtsDate.Value.ToDateTimeWithDqtBstFix(isLocalTime: true),
+                        dfeta_QTSDate = item.QtsDate!.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true),
                         dfeta_TeacherStatusId = teacherStatus.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
                     }
                 });
+
+                getQtsRegistationTask = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
+                {
+                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(new[] { dfeta_qtsregistration.Fields.dfeta_QTSDate, dfeta_qtsregistration.Fields.dfeta_EYTSDate }),
+                    Target = qtsRegistrationId.ToEntityReference(dfeta_qtsregistration.EntityLogicalName),
+                });
             }
 
-            if (_eytsDate is not null && _earlyYearsStatus is not null)
+            var eyts = _qtsRegistrations.Where(x => x.EytsStatusValue != null);
+            IInnerRequestHandle<RetrieveResponse>? getEytsRegistationTask = null;
+            foreach (var item in eyts)
             {
-                var earlyYearsStatus = await testData.ReferenceDataCache.GetEarlyYearsStatusByValue(_earlyYearsStatus);
                 var eytsRegistrationId = Guid.NewGuid();
+                var earlyYearsStatus = await testData.ReferenceDataCache.GetEarlyYearsStatusByValue(item.EytsStatusValue!);
                 txnRequestBuilder.AddRequest(new CreateRequest()
                 {
                     Target = new dfeta_qtsregistration()
                     {
                         Id = eytsRegistrationId,
+                        CreatedOn = item.CreatedOn
                         dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName)
                     }
                 });
@@ -290,9 +298,15 @@ public partial class TestData
                     Target = new dfeta_qtsregistration()
                     {
                         Id = eytsRegistrationId,
-                        dfeta_EYTSDate = _eytsDate.Value.ToDateTimeWithDqtBstFix(isLocalTime: true),
+                        dfeta_EYTSDate = item.EytsDate!.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true),
                         dfeta_EarlyYearsStatusId = earlyYearsStatus.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
                     }
+                });
+
+                getEytsRegistationTask = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
+                {
+                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(new[] { dfeta_qtsregistration.Fields.dfeta_QTSDate, dfeta_qtsregistration.Fields.dfeta_EYTSDate }),
+                    Target = eytsRegistrationId.ToEntityReference(dfeta_qtsregistration.EntityLogicalName)
                 });
             }
 
@@ -456,6 +470,11 @@ public partial class TestData
                 dfeta_MQStartDate = startDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
                 dfeta_MQ_Date = endDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
                 dfeta_MQ_Status = status?.GetDqtStatus()
+                QtsDate = getQtsRegistationTask != null ? getQtsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_QTSDate.ToDateOnlyWithDqtBstFix(true) : null,
+                EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
+                Sanctions = _sanctions.ToImmutableArray()
+
+                MandatoryQualifications = _mandatoryQualifications.ToImmutableArray()
             };
 
             requestBuilder.AddRequest(new CreateRequest()
@@ -506,4 +525,6 @@ public partial class TestData
         MandatoryQualificationStatus? Status,
         DateOnly? StartDate,
         DateOnly? EndDate);
+    public record QtsRegistration(DateOnly? QtsDate, string? TeacherStatusValue, DateTime? CreatedOn, DateOnly? EytsDate, string? EytsStatusValue);
+    public record MandatoryQualification(Guid QualificationId, string? ProviderValue, string? SpecialismValue, DateOnly? StartDate, DateOnly? EndDate, dfeta_qualification_dfeta_MQ_Status? Result);
 }

@@ -3,17 +3,20 @@ using System.Text.Json;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.Core.Dqt;
+using static TeachingRecordSystem.TestCommon.CrmTestData;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
 public abstract class GetTeacherTestBase : ApiTestBase
 {
-    private const string QualifiedTeacherTrainedTeacherStatusValue = "71";
-    private const string QtsAwardedInWalesTeacherStatusValue = "213";
+    internal const string QualifiedTeacherTrainedTeacherStatusValue = "71";
+    internal const string QtsAwardedInWalesTeacherStatusValue = "213";
     private readonly Guid _qtsAwardedInWalesTeacherStatusId = Guid.NewGuid();
 
     private readonly Guid _changeOfNameSubjectId = Guid.NewGuid();
     private readonly Guid _changeOfDateOfBirthSubjectId = Guid.NewGuid();
+    private readonly DateOnly defaultqtsDate = new DateOnly(1997, 4, 23);
+    private readonly DateOnly defaulteytsDate = new DateOnly(1995, 5, 14);
 
     protected GetTeacherTestBase(ApiFixture apiFixture) : base(apiFixture)
     {
@@ -24,10 +27,13 @@ public abstract class GetTeacherTestBase : ApiTestBase
         string baseUrl,
         Contact contact,
         bool expectQtsCertificateUrl,
-        bool expectEysCertificateUrl)
+        bool expectEysCertificateUrl,
+        QtsRegistration[]? qtsRegistrations,
+        (DateTime? QTSDate, string StatusDescription)? expectedQts,
+        (DateTime? EYTSDate, string StatusDescription)? expectedEyts)
     {
         // Arrange
-        await ConfigureMocks(contact);
+        await ConfigureMocks(contact, qtsRegistrations: qtsRegistrations);
 
         var request = new HttpRequestMessage(HttpMethod.Get, baseUrl);
 
@@ -45,25 +51,41 @@ public abstract class GetTeacherTestBase : ApiTestBase
             nationalInsuranceNumber = contact.dfeta_NINumber,
             qts = new
             {
-                awarded = contact.dfeta_QTSDate?.ToString("yyyy-MM-dd"),
-                certificateUrl = "/v3/certificates/qts"
+                awarded = expectedQts?.QTSDate?.ToString("yyyy-MM-dd"),
+                certificateUrl = "/v3/certificates/qts",
+                statusDescription = expectedQts?.StatusDescription
             },
             eyts = new
             {
-                awarded = contact.dfeta_EYTSDate?.ToString("yyyy-MM-dd"),
-                certificateUrl = "/v3/certificates/eyts"
+                awarded = expectedEyts?.EYTSDate?.ToString("yyyy-MM-dd"),
+                certificateUrl = "/v3/certificates/eyts",
+                statusDescription = expectedEyts?.StatusDescription
             },
             email = contact.EMailAddress1
         })!;
 
-        if (!expectQtsCertificateUrl)
+        if (expectedQts == null)
         {
-            expectedJson["qts"]?.AsObject().Remove("certificateUrl");
+            expectedJson["qts"] = null;
+        }
+        else
+        {
+            if (!expectQtsCertificateUrl)
+            {
+                expectedJson["qts"]?.AsObject().Remove("certificateUrl");
+            }
         }
 
-        if (!expectEysCertificateUrl)
+        if (expectedEyts == null)
         {
-            expectedJson["eyts"]?.AsObject().Remove("certificateUrl");
+            expectedJson["eyts"] = null;
+        }
+        else
+        {
+            if (!expectEysCertificateUrl)
+            {
+                expectedJson["eyts"]?.AsObject().Remove("certificateUrl");
+            }
         }
 
         await AssertEx.JsonResponseEquals(
@@ -76,10 +98,13 @@ public abstract class GetTeacherTestBase : ApiTestBase
         HttpClient httpClient,
         string baseUrl,
         Contact contact,
-        bool expectCertificateUrls)
+        bool expectCertificateUrls,
+        QtsRegistration[]? qtsRegistrations,
+        (DateTime? QTSDate, string StatusDescription)? expectedQts,
+        (DateTime? EYTSDate, string StatusDescription)? expectedEyts)
     {
         // Arrange
-        await ConfigureMocks(contact);
+        await ConfigureMocks(contact, qtsRegistrations: qtsRegistrations);
 
         var request = new HttpRequestMessage(HttpMethod.Get, baseUrl);
 
@@ -97,17 +122,27 @@ public abstract class GetTeacherTestBase : ApiTestBase
             nationalInsuranceNumber = contact.dfeta_NINumber,
             qts = new
             {
-                awarded = contact.dfeta_QTSDate?.ToString("yyyy-MM-dd"),
-                certificateUrl = "/v3/certificates/qts"
+                awarded = expectedQts?.QTSDate?.ToString("yyyy-MM-dd"),
+                certificateUrl = "/v3/certificates/qts",
+                statusDescription = expectedQts?.StatusDescription
             },
             eyts = new
             {
-                awarded = contact.dfeta_EYTSDate?.ToString("yyyy-MM-dd"),
-                certificateUrl = "/v3/certificates/eyts"
+                awarded = expectedEyts?.EYTSDate?.ToString("yyyy-MM-dd"),
+                certificateUrl = "/v3/certificates/eyts",
+                statusDescription = expectedEyts?.StatusDescription
             },
             email = contact.EMailAddress1
         })!;
 
+        if (expectedQts == null)
+        {
+            expectedJson["qts"] = null;
+        }
+        if (expectedEyts == null)
+        {
+            expectedJson["eyts"] = null;
+        }
         if (!expectCertificateUrls)
         {
             expectedJson["qts"]?.AsObject().Remove("certificateUrl");
@@ -124,7 +159,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
         HttpClient httpClient,
         string baseUrl,
         Contact contact,
-        bool expectCertificateUrls)
+        bool expectCertificateUrl = false)
     {
         // Arrange
         var induction = CreateInduction();
@@ -160,7 +195,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             }
         })!;
 
-        if (!expectCertificateUrls)
+        if (!expectCertificateUrl)
         {
             expectedJson.AsObject().Remove("certificateUrl");
         }
@@ -272,7 +307,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                     code = npqQualificationValid.dfeta_Type.ToString(),
                     name = npqQualificationValid.dfeta_Type?.GetName()
                 },
-                certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.Id}"
+                certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.Id}",
             }
         })!;
 
@@ -630,18 +665,22 @@ public abstract class GetTeacherTestBase : ApiTestBase
     }
 
     protected async Task<Contact> CreateContact(
-        bool hasMultiWordFirstName = false,
-        bool qualifiedInWales = false)
+        QtsRegistration[]? qtsQualifications = null,
+        bool hasMultiWordFirstName = false)
     {
-        var qtsDate = new DateOnly(1997, 4, 23);
-        var eytsDate = new DateOnly(1995, 5, 14);
         var firstName = hasMultiWordFirstName ? $"{Faker.Name.First()} {Faker.Name.First()}" : Faker.Name.First();
 
         var person = await TestData.CreatePerson(
-            b => b.WithFirstName(firstName)
-                .WithTrn()
-                .WithQts(qtsDate, qualifiedInWales ? QtsAwardedInWalesTeacherStatusValue : QualifiedTeacherTrainedTeacherStatusValue)
-                .WithEyts(eytsDate));
+            b =>
+            {
+                b.WithFirstName(firstName)
+                .WithTrn();
+
+                foreach (var item in qtsQualifications ?? Array.Empty<QtsRegistration>())
+                {
+                    b.WithQtsRegistration(item!.QtsDate, item!.TeacherStatusValue, item.CreatedOn, item!.EytsDate, item!.EytsStatusValue);
+                }
+            });
 
         return person.Contact;
     }
@@ -654,16 +693,9 @@ public abstract class GetTeacherTestBase : ApiTestBase
         dfeta_qualification[]? qualifications = null,
         Incident[]? incidents = null,
         (string FirstName, string? MiddleName, string LastName)[]? updatedNames = null,
-        (string SanctionCode, DateOnly? StartDate)[]? sanctions = null)
+        (string SanctionCode, DateOnly? StartDate)[]? sanctions = null,
+        QtsRegistration[]? qtsRegistrations = null)
     {
-        DataverseAdapterMock
-            .Setup(mock => mock.GetSubjectByTitle("Change of Name"))
-            .ReturnsAsync(new Subject()
-            {
-                Id = _changeOfNameSubjectId,
-                Title = "Change of Name"
-            });
-
         DataverseAdapterMock
             .Setup(mock => mock.GetSubjectByTitle("Change of Date of Birth"))
             .ReturnsAsync(new Subject()
@@ -715,7 +747,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             .Returns(async (string s, RequestBuilder b) => await TestData.ReferenceDataCache.GetTeacherStatusByValue(s));
 
         using var ctx = new DqtCrmServiceContext(TestData.OrganizationService);
-        var qtsRegistrations = ctx.dfeta_qtsregistrationSet
+        var qtsRegistrationss = ctx.dfeta_qtsregistrationSet
             .Where(c => c.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == contact.Id)
             .ToArray();
 
@@ -723,7 +755,34 @@ public abstract class GetTeacherTestBase : ApiTestBase
             .Setup(mock => mock.GetQtsRegistrationsByTeacher(
                 contact.Id,
                 It.IsAny<string[]>()))
-            .ReturnsAsync(qtsRegistrations ?? Array.Empty<dfeta_qtsregistration>());
+            .ReturnsAsync(qtsRegistrationss ?? Array.Empty<dfeta_qtsregistration>());
+
+        var allEytsStatuses = await TestData.ReferenceDataCache.GetEytsStatuses();
+        var distinctEyts = qtsRegistrations?.Where(x => !string.IsNullOrEmpty(x.EytsStatusValue)).Select(x => x.EytsStatusValue).Distinct().ToArray();
+        Array.ForEach(distinctEyts ?? Array.Empty<string>(), item =>
+        {
+            var eytsStatus = allEytsStatuses.Single(x => x.dfeta_Value == item);
+            DataverseAdapterMock
+                .Setup(mock => mock.GetEarlyYearsStatus(eytsStatus.Id))
+                .ReturnsAsync(eytsStatus);
+        });
+
+        foreach (var qtsRegistration in qtsRegistrations ?? Array.Empty<QtsRegistration>())
+        {
+            var teacherStatus = !string.IsNullOrEmpty(qtsRegistration.TeacherStatusValue) ? await TestData.ReferenceDataCache.GetTeacherStatusByValue(qtsRegistration.TeacherStatusValue) : null;
+            var eytsStatus = !string.IsNullOrEmpty(qtsRegistration.EytsStatusValue) ? await TestData.ReferenceDataCache.GetEarlyYearsStatusByValue(qtsRegistration.EytsStatusValue) : null;
+
+            await TestData.OrganizationService.CreateAsync(new dfeta_qtsregistration()
+            {
+                Id = Guid.NewGuid(),
+                dfeta_PersonId = contact.Id.ToEntityReference(Contact.EntityLogicalName),
+                dfeta_QTSDate = qtsRegistration.QtsDate?.ToDateTime(),
+                dfeta_EYTSDate = qtsRegistration.EytsDate?.ToDateTime(),
+                CreatedOn = qtsRegistration.CreatedOn,
+                dfeta_TeacherStatusId = teacherStatus?.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
+                dfeta_EarlyYearsStatusId = eytsStatus?.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
+            });
+        }
 
         foreach (var sanction in sanctions ?? Array.Empty<(string, DateOnly?)>())
         {
@@ -744,6 +803,14 @@ public abstract class GetTeacherTestBase : ApiTestBase
             await TestData.UpdatePerson(b => b.WithPersonId(contact.Id).WithUpdatedName(updatedName.FirstName, updatedName.MiddleName, updatedName.LastName));
             await Task.Delay(2000);
         }
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetSubjectByTitle("Change of Name"))
+            .ReturnsAsync(new Subject()
+            {
+                Id = _changeOfNameSubjectId,
+                Title = "Change of Name"
+            });
     }
 
     private static dfeta_initialteachertraining CreateItt(Contact teacher)

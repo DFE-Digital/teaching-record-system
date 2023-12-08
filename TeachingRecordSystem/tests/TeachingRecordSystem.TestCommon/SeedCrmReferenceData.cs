@@ -101,6 +101,97 @@ public class SeedCrmReferenceData : IStartupTask
             dfeta_name = "Qualified Teacher: QTS awarded in Wales",
             dfeta_QTSDateRequired = true
         });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "212",
+            dfeta_name = "Assessment only route candidate",
+            dfeta_QTSDateRequired = false
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "214",
+            dfeta_name = "Partial qualified teacher status",
+            dfeta_QTSDateRequired = false
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "211",
+            dfeta_name = "Trainee teacher",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "103",
+            dfeta_name = "Qualified Teacher: By virtue of overseas qualifications",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "104",
+            dfeta_name = "Qualified Teacher (by virtue of non-UK teaching qualifications)",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "206",
+            dfeta_name = "Qualified Teacher: Under temporary provision 2005/36/EC",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "223",
+            dfeta_name = "Qualified Teacher (by virtue of European teaching qualifications)",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "50",
+            dfeta_name = "Person not qualified for employment as a regular teacher whose employment as an Instructor is allowed under Regulation 18 of the Schools Regulations 1959",
+            dfeta_QTSDateRequired = false
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "67",
+            dfeta_name = "Qualified Teacher: Under the EC Directive",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "68",
+            dfeta_name = "Qualified Teacher: Teachers trained/registered in Scotland",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "69",
+            dfeta_name = "Qualified Teacher: Teachers trained/registered in Scotland",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "87",
+            dfeta_name = "Qualified teacher (under the EC Directive) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959",
+            dfeta_QTSDateRequired = true
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_teacherstatus()
+        {
+            dfeta_Value = "28",
+            dfeta_name = "Qualified Teacher: Teacher trained/registered in Scotland, further qualified to teach the deaf or partially hearing impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959.",
+            dfeta_QTSDateRequired = true
+        });
     }
 
     private void AddEarlyYearsStatuses()

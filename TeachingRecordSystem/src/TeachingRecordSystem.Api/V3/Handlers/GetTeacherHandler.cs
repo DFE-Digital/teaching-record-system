@@ -18,15 +18,18 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly TimeSpan _concurrentNameChangeWindow;
+    private readonly ReferenceDataCache _referenceDataCache;
 
     public GetTeacherHandler(
         IDataverseAdapter dataverseAdapter,
         ICrmQueryDispatcher crmQueryDispatcher,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ReferenceDataCache referenceDataCache)
     {
         _dataverseAdapter = dataverseAdapter;
         _crmQueryDispatcher = crmQueryDispatcher;
         _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue<int>("ConcurrentNameChangeWindowSeconds", 5));
+        _referenceDataCache = referenceDataCache;
     }
 
     public async Task<GetTeacherResponse?> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
@@ -234,10 +237,19 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             columnNames: new[]
             {
                 dfeta_qtsregistration.Fields.dfeta_QTSDate,
-                dfeta_qtsregistration.Fields.dfeta_TeacherStatusId
+                dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
+                dfeta_qtsregistration.Fields.dfeta_name,
+                dfeta_qtsregistration.Fields.dfeta_EYTSDate,
+                dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId
             });
 
-        var qtsAwardedInWales = qtsRegistrations.Any(qts => qts.dfeta_QTSDate is not null && qts.dfeta_TeacherStatusId.Id == qtsAwardedInWalesStatus.Id);
+
+        var qts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_QTSDate is not null);
+        var eyts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_EYTSDate is not null);
+        var qtsAwardedInWales = qts?.dfeta_TeacherStatusId.Id == qtsAwardedInWalesStatus.Id;
+        var eytsTeacherStatus = eyts != null ? await _dataverseAdapter.GetEarlyYearsStatus(eyts!.dfeta_EarlyYearsStatusId.Id) : null;
+        var allTeacherStatuses = await _referenceDataCache.GetTeacherStatuses();
+        var qtsStatus = qts != null ? allTeacherStatuses.Single(x => x.Id == qts.dfeta_TeacherStatusId.Id) : null;
 
         var allowIdSignInWithProhibitions = request.Include.HasFlag(GetTeacherRequestIncludes._AllowIdSignInWithProhibitions) ?
             Option.Some(teacher.dfeta_AllowIDSignInWithProhibitions == true) :
@@ -253,8 +265,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             PendingNameChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingNameChange) : default,
             PendingDateOfBirthChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingDateOfBirthChange) : default,
-            Qts = MapQts(teacher.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), qtsAwardedInWales, request.AccessMode),
-            Eyts = MapEyts(teacher.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), request.AccessMode),
+            Qts = MapQts(qts?.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), qtsAwardedInWales, request.AccessMode, qtsStatus != null ? GetQTSStatusDescription(qtsStatus!.dfeta_Value!) : null),
+            Eyts = MapEyts(eyts?.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), request.AccessMode, eytsTeacherStatus != null ? GetEytsStatusDescription(eytsTeacherStatus!.dfeta_Value!) : null),
             Email = teacher.EMailAddress1,
             Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ?
                 Option.Some(MapInduction(induction!, inductionPeriods!, request.AccessMode)) :
@@ -310,21 +322,54 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         };
     }
 
-    private static GetTeacherResponseQts? MapQts(DateOnly? qtsDate, bool qtsAwardedInWales, AccessMode accessMode) =>
-        qtsDate != null ?
+    private string? GetEytsStatusDescription(string? value) => value switch
+    {
+        "222" => "Early years professional status",
+        "221" => "Qualified",
+        "220" => "Early years trainee",
+        _ => throw new ArgumentException("Invalid EYTS Status")
+    };
+
+    private string? GetQTSStatusDescription(string value) => value switch
+    {
+        "28" => "Qualified",
+        "50" => "Qualified",
+        "67" => "Qualified",
+        "68" => "Qualified",
+        "69" => "Qualified",
+        "71" => "Qualified",
+        "87" => "Qualified",
+        "90" => "Qualified",
+        "100" => "Qualified",
+        "103" => "Qualified",
+        "104" => "Qualified",
+        "206" => "Qualified",
+        "211" => "Trainee teacher",
+        "212" => "Assessment only route candidate",
+        "213" => "Qualified",
+        "214" => "Partial qualified teacher status",
+        "223" => "Qualified",
+        _ => throw new ArgumentException("Invalid QTS Status")
+    };
+
+
+    private static GetTeacherResponseQts? MapQts(DateOnly? qtsDate, bool qtsAwardedInWales, AccessMode accessMode, string? statusDescription) =>
+        statusDescription is not null ?
             new GetTeacherResponseQts()
             {
-                Awarded = qtsDate.Value,
-                CertificateUrl = accessMode == AccessMode.IdentityAccessToken && !qtsAwardedInWales ? "/v3/certificates/qts" : null
+                Awarded = qtsDate,
+                CertificateUrl = accessMode == AccessMode.IdentityAccessToken && !qtsAwardedInWales && qtsDate.HasValue ? "/v3/certificates/qts" : null,
+                StatusDescription = statusDescription
             } :
             null;
 
-    private static GetTeacherResponseEyts? MapEyts(DateOnly? eytsDate, AccessMode accessMode) =>
-        eytsDate != null ?
+    private static GetTeacherResponseEyts? MapEyts(DateOnly? eytsDate, AccessMode accessMode, string? statusDescription) =>
+        statusDescription != null ?
             new GetTeacherResponseEyts()
             {
-                Awarded = eytsDate.Value,
-                CertificateUrl = accessMode == AccessMode.IdentityAccessToken ? "/v3/certificates/eyts" : null
+                Awarded = eytsDate,
+                CertificateUrl = accessMode == AccessMode.IdentityAccessToken ? "/v3/certificates/eyts" : null,
+                StatusDescription = statusDescription
             } :
             null;
 
