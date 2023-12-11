@@ -258,7 +258,7 @@ public partial class CrmTestData
                     Target = new dfeta_qtsregistration()
                     {
                         Id = qtsRegistrationId,
-                        dfeta_QTSDate = _qtsDate.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                        dfeta_QTSDate = _qtsDate.Value.ToDateTimeWithDqtBstFix(isLocalTime: true),
                         dfeta_TeacherStatusId = teacherStatus.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
                     }
                 });
@@ -283,7 +283,7 @@ public partial class CrmTestData
                     Target = new dfeta_qtsregistration()
                     {
                         Id = eytsRegistrationId,
-                        dfeta_EYTSDate = _eytsDate.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                        dfeta_EYTSDate = _eytsDate.Value.ToDateTimeWithDqtBstFix(isLocalTime: true),
                         dfeta_EarlyYearsStatusId = earlyYearsStatus.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
                     }
                 });
@@ -297,9 +297,9 @@ public partial class CrmTestData
                     Id = sanction.SanctionId,
                     dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_SanctionCodeId = sanctionCode.Id.ToEntityReference(dfeta_sanctioncode.EntityLogicalName),
-                    dfeta_StartDate = sanction.StartDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
-                    dfeta_EndDate = sanction.EndDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
-                    dfeta_NoReAppuntildate = sanction.ReviewDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                    dfeta_StartDate = sanction.StartDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
+                    dfeta_EndDate = sanction.EndDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
+                    dfeta_NoReAppuntildate = sanction.ReviewDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
                     dfeta_Spent = sanction.Spent,
                     dfeta_SanctionDetails = sanction.Details
                 };
@@ -338,8 +338,8 @@ public partial class CrmTestData
                     dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
                     dfeta_MQ_MQEstablishmentId = mqEstablishment is not null ? mqEstablishment.Id.ToEntityReference(dfeta_mqestablishment.EntityLogicalName) : null,
                     dfeta_MQ_SpecialismId = specialism is not null ? specialism.Id.ToEntityReference(dfeta_specialism.EntityLogicalName) : null,
-                    dfeta_MQStartDate = mandatoryQualification.StartDate.FromDateOnlyWithDqtBstFix(isLocalTime: true),
-                    dfeta_MQ_Date = mandatoryQualification.EndDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                    dfeta_MQStartDate = mandatoryQualification.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
+                    dfeta_MQ_Date = mandatoryQualification.EndDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
                     dfeta_MQ_Status = mandatoryQualification.Result
                 };
 
@@ -404,13 +404,13 @@ public partial class CrmTestData
             dfeta_StatedFirstName = StatedFirstName,
             dfeta_StatedMiddleName = StatedMiddleName,
             dfeta_StatedLastName = StatedLastName,
-            BirthDate = DateOfBirth.FromDateOnlyWithDqtBstFix(isLocalTime: false),
+            BirthDate = DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false),
             dfeta_TRN = Trn,
             EMailAddress1 = Email,
             MobilePhone = MobileNumber,
             dfeta_NINumber = NationalInsuranceNumber,
-            dfeta_QTSDate = QtsDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
-            dfeta_EYTSDate = EytsDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+            dfeta_QTSDate = QtsDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
+            dfeta_EYTSDate = EytsDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
             GenderCode = Enum.Parse<Contact_GenderCode>(Gender)
         };
     }

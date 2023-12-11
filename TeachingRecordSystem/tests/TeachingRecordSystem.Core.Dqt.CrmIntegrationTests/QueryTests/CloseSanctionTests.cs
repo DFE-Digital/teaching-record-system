@@ -34,7 +34,7 @@ public class CloseSanctionTests : IAsyncLifetime
         var closedSanction = ctx.dfeta_sanctionSet.SingleOrDefault(s => s.GetAttributeValue<Guid>(dfeta_sanction.PrimaryIdAttribute) == sanction.SanctionId);
         Assert.NotNull(closedSanction);
         Assert.Equal(dfeta_sanctionState.Active, closedSanction.StateCode);
-        Assert.Equal(endDate.FromDateOnlyWithDqtBstFix(isLocalTime: true), closedSanction.dfeta_EndDate);
+        Assert.Equal(endDate.ToDateTimeWithDqtBstFix(isLocalTime: true), closedSanction.dfeta_EndDate);
         Assert.True(closedSanction.dfeta_Spent);
     }
 }

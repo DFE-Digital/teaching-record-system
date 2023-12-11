@@ -43,6 +43,6 @@ public class UpdateMandatoryQualificationStatusTests : IAsyncLifetime
         var updatedQualification = ctx.dfeta_qualificationSet.SingleOrDefault(c => c.GetAttributeValue<Guid>(dfeta_qualification.PrimaryIdAttribute) == qualification.QualificationId);
         Assert.NotNull(updatedQualification);
         Assert.Equal(newMqStatus, updatedQualification.dfeta_MQ_Status);
-        Assert.Equal(newEndDate.FromDateOnlyWithDqtBstFix(isLocalTime: true), updatedQualification.dfeta_MQ_Date);
+        Assert.Equal(newEndDate.ToDateTimeWithDqtBstFix(isLocalTime: true), updatedQualification.dfeta_MQ_Date);
     }
 }

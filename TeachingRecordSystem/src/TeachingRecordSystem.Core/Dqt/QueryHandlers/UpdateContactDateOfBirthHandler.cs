@@ -13,7 +13,7 @@ public class UpdateContactDateOfBirthHandler : ICrmQueryHandler<UpdateContactDat
             Target = new Contact()
             {
                 Id = query.ContactId,
-                BirthDate = query.DateOfBirth.FromDateOnlyWithDqtBstFix(isLocalTime: false)
+                BirthDate = query.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false)
             }
         });
 
