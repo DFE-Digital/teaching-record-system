@@ -11,7 +11,6 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" />
-    <PackageReference Include="Azure.Extensions.AspNetCore.DataProtection.Blobs" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
@@ -29,5 +28,6 @@
     <ProjectReference Include="..\..\lib\formflow\src\FormFlow\FormFlow.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.Hosting\TeachingRecordSystem.Hosting.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.ServiceDefaults\TeachingRecordSystem.ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>

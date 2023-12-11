@@ -5,8 +5,6 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using idunno.Authentication.Basic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -26,13 +24,13 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
 using TeachingRecordSystem.Core.Infrastructure;
-using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.ServiceDefaults;
 
 namespace TeachingRecordSystem.Api;
 
@@ -44,14 +42,11 @@ public class Program
 
         builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
+        builder.AddServiceDefaults(dataProtectionBlobName: "Api");
+
         var services = builder.Services;
         var env = builder.Environment;
         var configuration = builder.Configuration;
-
-        if (builder.Environment.IsProduction())
-        {
-            builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
-        }
 
         builder.ConfigureLogging();
 
@@ -255,32 +250,11 @@ public class Program
         services.AddRedis(env, configuration, healthCheckBuilder);
         services.AddRateLimiting(env, configuration);
 
-        if (builder.Environment.IsProduction())
-        {
-            builder.Services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders = ForwardedHeaders.All;
-                options.KnownNetworks.Clear();
-                options.KnownProxies.Clear();
-            });
-
-            builder.Services.AddDataProtection()
-                .PersistKeysToAzureBlobStorage(
-                    configuration.GetRequiredValue("StorageConnectionString"),
-                    configuration.GetRequiredValue("DataProtectionKeysContainerName"),
-                    "Api");
-        }
-
         var app = builder.Build();
 
-        if (app.Environment.IsProduction())
-        {
-            app.UseForwardedHeaders();
-        }
+        app.MapDefaultEndpoints();
 
         app.UseRouting();
-
-        app.UseHealthChecks("/status");
 
         app.UseAuthentication();
         app.UseAuthorization();
@@ -299,11 +273,6 @@ public class Program
             ctx.Response.Headers.Append("X-XSS-Protection", "0");
 
             return next();
-        });
-
-        app.MapGet("/health", async context =>
-        {
-            await context.Response.WriteAsync("OK");
         });
 
         app.MapWebHookEndpoints();

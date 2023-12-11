@@ -3,8 +3,6 @@ using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
@@ -14,7 +12,7 @@ using Microsoft.Identity.Web;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
 using TeachingRecordSystem.SupportUi.Infrastructure.Conventions;
@@ -31,37 +29,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
-if (builder.Environment.IsProduction())
-{
-    builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
-}
+builder.AddServiceDefaults(dataProtectionBlobName: "SupportUi");
 
 builder.ConfigureLogging();
 
 var pgConnectionString = builder.Configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
-
-if (builder.Environment.IsProduction())
-{
-    builder.Services.Configure<ForwardedHeadersOptions>(options =>
-    {
-        options.ForwardedHeaders = ForwardedHeaders.All;
-        options.KnownNetworks.Clear();
-        options.KnownProxies.Clear();
-    });
-
-    builder.Services.AddHsts(options =>
-    {
-        options.Preload = true;
-        options.IncludeSubDomains = true;
-        options.MaxAge = TimeSpan.FromDays(365);
-    });
-
-    builder.Services.AddDataProtection()
-        .PersistKeysToAzureBlobStorage(
-            builder.Configuration.GetRequiredValue("StorageConnectionString"),
-            builder.Configuration.GetRequiredValue("DataProtectionKeysContainerName"),
-            "SupportUi");
-}
 
 if (builder.Environment.IsDevelopment())
 {
@@ -199,25 +171,25 @@ builder.Services
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.AddAlert,
             typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.AddAlertState),
-            requestDataKeys: new[] { "personId" },
+            requestDataKeys: ["personId"],
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.CloseAlert,
             typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert.CloseAlertState),
-            requestDataKeys: new[] { "alertId" },
+            requestDataKeys: ["alertId"],
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditName,
             typeof(TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditName.EditNameState),
-            requestDataKeys: new[] { "personId" },
+            requestDataKeys: ["personId"],
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditDateOfBirth,
             typeof(TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDateOfBirth.EditDateOfBirthState),
-            requestDataKeys: new[] { "personId" },
+            requestDataKeys: ["personId"],
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
@@ -268,11 +240,7 @@ builder.Services
 
 var app = builder.Build();
 
-if (app.Environment.IsProduction())
-{
-    app.UseForwardedHeaders();
-    app.UseHsts();
-}
+app.MapDefaultEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
@@ -306,19 +274,12 @@ app.UseCsp(csp =>
     }
 });
 
-app.UseHealthChecks("/status");
-
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapGet("/health", async context =>
-{
-    await context.Response.WriteAsync("OK");
-});
 
 app.MapGet("", context =>
 {
