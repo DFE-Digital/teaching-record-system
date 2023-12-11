@@ -26,7 +26,6 @@ using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
-using TeachingRecordSystem.Core.Services.CrmEntityChanges;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
@@ -231,17 +230,15 @@ public class Program
         services.AddIdentityApi(configuration, env);
         services.AddAccessYourQualifications(configuration, env);
         services.AddCertificateGeneration();
-        services.AddCrmEntityChanges();
         services.AddBackgroundJobs(env, configuration);
         services.AddEmail(env, configuration);
         services.AddCrmQueries();
-        services.AddSingleton<ReferenceDataCache>();
 
         if (!env.IsUnitTests())
         {
             var crmServiceClient = GetCrmServiceClient();
 
-            services.AddTransient<IOrganizationServiceAsync>(_ => crmServiceClient.Clone());
+            services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
             services.AddTransient<IDataverseAdapter, DataverseAdapter>();
 
             healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());

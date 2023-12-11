@@ -7,7 +7,6 @@ public interface ICrmEntityChangesService
 {
     IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
         string changesKey,
-        string crmClientName,
         string entityLogicalName,
         ColumnSet columns,
         DateTime? modifiedSince,

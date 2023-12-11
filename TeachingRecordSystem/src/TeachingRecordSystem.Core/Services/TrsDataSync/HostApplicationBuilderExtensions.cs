@@ -29,9 +29,12 @@ public static class HostApplicationBuilderExtensions
                 builder.Services.AddSingleton<IHostedService, TrsDataSyncService>();
             }
 
-            builder.Services.AddServiceClient(
+            builder.Services.AddNamedServiceClient(
                 TrsDataSyncService.CrmClientName,
+                ServiceLifetime.Singleton,
                 sp => new ServiceClient(sp.GetRequiredService<IOptions<TrsDataSyncServiceOptions>>().Value.CrmConnectionString));
+
+            builder.Services.AddCrmEntityChangesService(name: TrsDataSyncService.CrmClientName);
 
             builder.Services.AddSingleton<TrsDataSyncHelper>();
         }

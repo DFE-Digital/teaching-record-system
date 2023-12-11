@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -36,8 +37,8 @@ public partial class DqtReportingService : BackgroundService
 
     public DqtReportingService(
         IOptions<DqtReportingOptions> optionsAccessor,
-        ICrmEntityChangesService crmEntityChangesService,
-        ICrmQueryDispatcher crmQueryDispatcher,
+        [FromKeyedServices(CrmClientName)] ICrmEntityChangesService crmEntityChangesService,
+        [FromKeyedServices(CrmClientName)] ICrmQueryDispatcher crmQueryDispatcher,
         IClock clock,
         TelemetryClient telemetryClient,
         ILogger<DqtReportingService> logger)
@@ -173,7 +174,7 @@ public partial class DqtReportingService : BackgroundService
         try
         {
             // We don't populate modifiedSince here since it's so slow to query in the reporting DB
-            var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, CrmClientName, entityLogicalName, columns, modifiedSince: null, PageSize)
+            var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns, modifiedSince: null, PageSize)
                 .WithCancellation(cancellationToken);
 
             await foreach (var changes in changesEnumerable)

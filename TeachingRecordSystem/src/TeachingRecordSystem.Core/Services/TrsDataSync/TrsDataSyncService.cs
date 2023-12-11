@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,7 +22,7 @@ public class TrsDataSyncService : BackgroundService
     private readonly TrsDataSyncServiceOptions _options;
 
     public TrsDataSyncService(
-        ICrmEntityChangesService crmEntityChangesService,
+        [FromKeyedServices(CrmClientName)] ICrmEntityChangesService crmEntityChangesService,
         TrsDataSyncHelper trsDataSyncHelper,
         IOptions<TrsDataSyncServiceOptions> optionsAccessor,
         ILogger<TrsDataSyncService> logger)
@@ -89,7 +90,7 @@ public class TrsDataSyncService : BackgroundService
 
         var modifiedSince = await _trsDataSyncHelper.GetLastModifiedOnForEntity(entityLogicalName);
 
-        var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, CrmClientName, entityLogicalName, columns, modifiedSince, PageSize)
+        var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns, modifiedSince, PageSize)
             .WithCancellation(cancellationToken);
 
         await foreach (var changes in changesEnumerable)
