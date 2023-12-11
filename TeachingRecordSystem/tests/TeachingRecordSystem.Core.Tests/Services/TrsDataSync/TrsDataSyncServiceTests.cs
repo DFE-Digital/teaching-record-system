@@ -1,26 +1,24 @@
 using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
+using Microsoft.Xrm.Sdk;
+using TeachingRecordSystem.Core.Dqt.Models;
 
-namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.Services.TrsDataSync;
+namespace TeachingRecordSystem.Core.Tests.Services.TrsDataSync;
 
-public class TrsDataSyncHelperTests
+public class TrsDataSyncServiceTests : IClassFixture<TrsDataSyncServiceFixture>
 {
-    private readonly DbFixture _dbFixture;
+    private readonly TrsDataSyncServiceFixture _fixture;
     private readonly FakeTrnGenerator _trnGenerator;
 
-    public TrsDataSyncHelperTests(DbFixture dbFixture, FakeTrnGenerator trnGenerator)
+    public TrsDataSyncServiceTests(TrsDataSyncServiceFixture fixture, FakeTrnGenerator trnGenerator)
     {
-        _dbFixture = dbFixture;
+        _fixture = fixture;
         _trnGenerator = trnGenerator;
     }
 
     [Fact]
-    public async Task SyncContact_NewRecord_WritesNewRowToDb()
+    public async Task ProcessChangesForEntityType_WritesNewRecordToDatabase()
     {
         // Arrange
-        var clock = new TestableClock();
-        var helper = new TrsDataSyncHelper(_dbFixture.GetDbContextFactory(), clock);
-
         var contactId = Guid.NewGuid();
         var trn = _trnGenerator.GenerateTrn();
         var firstName = Faker.Name.First();
@@ -29,8 +27,8 @@ public class TrsDataSyncHelperTests
         var dateOfBirth = Faker.Identification.DateOfBirth();
         var email = Faker.Internet.Email();
         var nino = Faker.Identification.UkNationalInsuranceNumber();
-        var created = clock.UtcNow;
-        var modified = clock.Advance();
+        var created = _fixture.Clock.UtcNow;
+        var modified = _fixture.Clock.Advance();
 
         var contact = new Contact()
         {
@@ -50,11 +48,13 @@ public class TrsDataSyncHelperTests
             ModifiedOn = modified
         };
 
+        var newItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, contact);
+
         // Act
-        await helper.SyncContact(contact, ignoreInvalid: false);
+        await _fixture.PublishChangedItemAndConsume(newItem);
 
         // Assert
-        await _dbFixture.WithDbContext(async dbContext =>
+        await _fixture.DbFixture.WithDbContext(async dbContext =>
         {
             var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contact.Id);
             Assert.NotNull(person);
@@ -70,18 +70,15 @@ public class TrsDataSyncHelperTests
             Assert.Equal((int)ContactState.Active, person.DqtState);
             Assert.Equal(created, person.DqtCreatedOn);
             Assert.Equal(modified, person.DqtModifiedOn);
-            Assert.Equal(clock.UtcNow, person.DqtFirstSync);
-            Assert.Equal(clock.UtcNow, person.DqtLastSync);
+            Assert.Equal(_fixture.Clock.UtcNow, person.DqtFirstSync);
+            Assert.Equal(_fixture.Clock.UtcNow, person.DqtLastSync);
         });
     }
 
     [Fact]
-    public async Task SyncContact_ExistingRecord_UpdatesExistingRowInDb()
+    public async Task ProcessChangesForEntityType_WritesUpdatedRecordToDatabase()
     {
         // Arrange
-        var clock = new TestableClock();
-        var helper = new TrsDataSyncHelper(_dbFixture.GetDbContextFactory(), clock);
-
         var contactId = Guid.NewGuid();
         var trn = _trnGenerator.GenerateTrn();
 
@@ -91,11 +88,11 @@ public class TrsDataSyncHelperTests
         var initialDateOfBirth = Faker.Identification.DateOfBirth();
         var initialEmail = Faker.Internet.Email();
         var initialNino = Faker.Identification.UkNationalInsuranceNumber();
-        var initialSyncTime = clock.UtcNow;
-        var created = clock.UtcNow;
-        var initialModified = clock.UtcNow;
+        var initialSyncTime = _fixture.Clock.UtcNow;
+        var created = _fixture.Clock.UtcNow;
+        var initialModified = _fixture.Clock.UtcNow;
 
-        await _dbFixture.WithDbContext(async dbContext =>
+        await _fixture.DbFixture.WithDbContext(async dbContext =>
         {
             dbContext.Persons.Add(new()
             {
@@ -118,7 +115,7 @@ public class TrsDataSyncHelperTests
             await dbContext.SaveChangesAsync();
         });
 
-        clock.Advance();
+        _fixture.Clock.Advance();
 
         var newFirstName = Faker.Name.First();
         var newMiddleName = Faker.Name.Middle();
@@ -126,7 +123,7 @@ public class TrsDataSyncHelperTests
         var newDateOfBirth = Faker.Identification.DateOfBirth();
         var newEmail = Faker.Internet.Email();
         var newNino = Faker.Identification.UkNationalInsuranceNumber();
-        var newModified = clock.UtcNow;
+        var newModified = _fixture.Clock.UtcNow;
 
         var contact = new Contact()
         {
@@ -146,11 +143,13 @@ public class TrsDataSyncHelperTests
             dfeta_StatedLastName = null
         };
 
+        var updatedItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, contact);
+
         // Act
-        await helper.SyncContact(contact, ignoreInvalid: false);
+        await _fixture.PublishChangedItemAndConsume(updatedItem);
 
         // Assert
-        await _dbFixture.WithDbContext(async dbContext =>
+        await _fixture.DbFixture.WithDbContext(async dbContext =>
         {
             var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contact.Id);
             Assert.NotNull(person);
@@ -164,17 +163,14 @@ public class TrsDataSyncHelperTests
             Assert.Equal(created, person.DqtCreatedOn);
             Assert.Equal(newModified, person.DqtModifiedOn);
             Assert.Equal(initialSyncTime, person.DqtFirstSync);
-            Assert.Equal(clock.UtcNow, person.DqtLastSync);
+            Assert.Equal(_fixture.Clock.UtcNow, person.DqtLastSync);
         });
     }
 
     [Fact]
-    public async Task DeleteEntities_RemovesRowFromDb()
+    public async Task ProcessChangesForEntityType_DeletesRemovedRecordFromDatabase()
     {
         // Arrange
-        var clock = new TestableClock();
-        var helper = new TrsDataSyncHelper(_dbFixture.GetDbContextFactory(), clock);
-
         var contactId = Guid.NewGuid();
         var trn = _trnGenerator.GenerateTrn();
 
@@ -184,9 +180,9 @@ public class TrsDataSyncHelperTests
         var dateOfBirth = Faker.Identification.DateOfBirth();
         var email = Faker.Internet.Email();
         var nino = Faker.Identification.UkNationalInsuranceNumber();
-        var syncTime = clock.UtcNow;
+        var syncTime = _fixture.Clock.UtcNow;
 
-        await _dbFixture.WithDbContext(async dbContext =>
+        await _fixture.DbFixture.WithDbContext(async dbContext =>
         {
             dbContext.Persons.Add(new()
             {
@@ -207,11 +203,13 @@ public class TrsDataSyncHelperTests
             await dbContext.SaveChangesAsync();
         });
 
+        var removedItem = new RemovedOrDeletedItem(ChangeType.RemoveOrDeleted, new EntityReference(Contact.EntityLogicalName, contactId));
+
         // Act
-        await helper.DeleteEntities(Contact.EntityLogicalName, new[] { contactId });
+        await _fixture.PublishChangedItemAndConsume(removedItem);
 
         // Assert
-        await _dbFixture.WithDbContext(async dbContext =>
+        await _fixture.DbFixture.WithDbContext(async dbContext =>
         {
             var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contactId);
             Assert.Null(person);

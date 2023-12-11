@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
+namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
-public class DqtReportingOptions
+public class TrsDataSyncServiceOptions
 {
     [Required]
     public required int PollIntervalSeconds { get; set; }
@@ -14,10 +14,10 @@ public class DqtReportingOptions
     public required string CrmConnectionString { get; set; }
 
     [Required]
-    public required string ReportingDbConnectionString { get; set; }
+    public required bool ProcessAllEntityTypesConcurrently { get; set; }
 
     [Required]
-    public required bool ProcessAllEntityTypesConcurrently { get; set; }
+    public required bool IgnoreInvalidData { get; set; }
 
     [Required]
     public required bool RunService { get; set; }

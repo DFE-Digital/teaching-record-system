@@ -6,8 +6,9 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Dqt;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
+namespace TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
 public class CrmEntityChangesService : ICrmEntityChangesService
 {
@@ -147,7 +148,7 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                 // and we want to ensure we don't miss any of them.
                 var changes = response.EntityChanges.Changes
                     .Where(e => !modifiedSince.HasValue || e is not NewOrUpdatedItem ||
-                        (e is NewOrUpdatedItem newOrUpdatedItem && newOrUpdatedItem.NewOrUpdatedEntity.GetAttributeValue<DateTime>("modifiedon") >= modifiedSince.Value))
+                        e is NewOrUpdatedItem newOrUpdatedItem && newOrUpdatedItem.NewOrUpdatedEntity.GetAttributeValue<DateTime>("modifiedon") >= modifiedSince.Value)
                     .ToArray();
 
                 // Roll up changes to the same record so callers don't get the same record more than once in a batch.

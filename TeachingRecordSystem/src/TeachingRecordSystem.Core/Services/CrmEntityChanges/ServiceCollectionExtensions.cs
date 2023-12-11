@@ -1,7 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using TeachingRecordSystem.Core.Dqt;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
+namespace TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
 public static class ServiceCollectionExtensions
 {

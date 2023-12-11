@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
+using TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
+namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
 public class TrsDataSyncService : BackgroundService
 {

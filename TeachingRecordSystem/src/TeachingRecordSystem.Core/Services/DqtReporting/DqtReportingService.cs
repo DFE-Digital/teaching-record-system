@@ -9,10 +9,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
+using TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
+namespace TeachingRecordSystem.Core.Services.DqtReporting;
 
 public partial class DqtReportingService : BackgroundService
 {

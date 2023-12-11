@@ -5,7 +5,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
+namespace TeachingRecordSystem.Core.Services.DqtReporting;
 
 [DebuggerDisplay("{EntityLogicalName,nq}")]
 public class EntityTableMapping

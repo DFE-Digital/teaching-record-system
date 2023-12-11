@@ -5,8 +5,9 @@ using Npgsql;
 using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
+namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
 public class TrsDataSyncHelper
 {
@@ -188,7 +189,7 @@ public class TrsDataSyncHelper
 
         await txn.CommitAsync(cancellationToken);
 
-        void WriteNullableValueOrNull<T>(Nullable<T> value, NpgsqlDbType dbType)
+        void WriteNullableValueOrNull<T>(T? value, NpgsqlDbType dbType)
             where T : struct
         {
             if (value.HasValue)

@@ -1,7 +1,7 @@
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
+namespace TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
 public interface ICrmEntityChangesService
 {

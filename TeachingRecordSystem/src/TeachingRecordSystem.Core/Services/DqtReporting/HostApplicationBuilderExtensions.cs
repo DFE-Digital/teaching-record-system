@@ -3,8 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.Dqt;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
+namespace TeachingRecordSystem.Core.Services.DqtReporting;
 
 public static class HostApplicationBuilderExtensions
 {

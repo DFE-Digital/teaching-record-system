@@ -4,7 +4,7 @@ using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
+namespace TeachingRecordSystem.Core.Services.DqtReporting;
 
 public class IgnoreDependencyTelemetryProcessor : ITelemetryProcessor
 {

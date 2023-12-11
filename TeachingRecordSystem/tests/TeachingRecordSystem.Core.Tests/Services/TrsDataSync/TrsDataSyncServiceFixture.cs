@@ -1,26 +1,21 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
-using TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
+using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 
-namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.Services.TrsDataSync;
+namespace TeachingRecordSystem.Core.Tests.Services.TrsDataSync;
 
-public class TrsDataSyncServiceFixture
+public class TrsDataSyncServiceFixture(DbFixture dbFixture)
 {
-    public TrsDataSyncServiceFixture(DbFixture dbFixture)
-    {
-        DbFixture = dbFixture;
-        Clock = new TestableClock();
-    }
+    public DbFixture DbFixture { get; } = dbFixture;
 
-    public DbFixture DbFixture { get; }
-
-    public TestableClock Clock { get; }
+    public TestableClock Clock { get; } = new TestableClock();
 
     public Task PublishChangedItemAndConsume(IChangedItem changedItem) =>
         WithService(async (service, changesObserver) =>
         {
-            changesObserver.OnNext(new IChangedItem[] { changedItem });
+            changesObserver.OnNext([changedItem]);
             var processTask = service.ProcessChangesForEntityType(Contact.EntityLogicalName, CancellationToken.None);
             changesObserver.OnCompleted();
             await processTask;
@@ -31,7 +26,7 @@ public class TrsDataSyncServiceFixture
         var options = Options.Create(new TrsDataSyncServiceOptions()
         {
             CrmConnectionString = "dummy",
-            Entities = new[] { Contact.EntityLogicalName },
+            Entities = [Contact.EntityLogicalName],
             PollIntervalSeconds = 60,
             ProcessAllEntityTypesConcurrently = false,
             IgnoreInvalidData = false,

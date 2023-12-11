@@ -2,9 +2,9 @@ using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
+using TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
-namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.Services;
+namespace TeachingRecordSystem.TestCommon;
 
 public sealed class TestableCrmEntityChangesService : ICrmEntityChangesService, IDisposable
 {
@@ -53,7 +53,7 @@ public sealed class TestableCrmEntityChangesService : ICrmEntityChangesService, 
         return subject
             .Select(batch => batch
                 .Where(e => !modifiedSince.HasValue || e is not NewOrUpdatedItem ||
-                (e is NewOrUpdatedItem newOrUpdatedItem && newOrUpdatedItem.NewOrUpdatedEntity.GetAttributeValue<DateTime>("modifiedon") >= modifiedSince.Value))
+                e is NewOrUpdatedItem newOrUpdatedItem && newOrUpdatedItem.NewOrUpdatedEntity.GetAttributeValue<DateTime>("modifiedon") >= modifiedSince.Value)
                 .ToArray()
             )
             .Where(batch => batch.Length > 0)

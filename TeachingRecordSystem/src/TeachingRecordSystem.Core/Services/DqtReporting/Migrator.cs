@@ -8,7 +8,7 @@ using DbUp.ScriptProviders;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
-namespace TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
+namespace TeachingRecordSystem.Core.Services.DqtReporting;
 
 public class Migrator
 {
