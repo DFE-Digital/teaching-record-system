@@ -14,7 +14,7 @@ public class CreateSanctionHandler : ICrmQueryHandler<CreateSanctionQuery, Guid>
             dfeta_SanctionCodeId = query.SanctionCodeId.ToEntityReference(dfeta_sanctioncode.EntityLogicalName),
             dfeta_SanctionDetails = query.Details,
             dfeta_DetailsLink = query.Link,
-            dfeta_StartDate = query.StartDate.FromDateOnlyWithDqtBstFix(isLocalTime: true)
+            dfeta_StartDate = query.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: true)
         };
 
         var sanctionId = await organizationService.CreateAsync(sanction);

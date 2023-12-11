@@ -13,7 +13,7 @@ public class UpdateMandatoryQualificationStartDateHandler : ICrmQueryHandler<Upd
             Target = new dfeta_qualification()
             {
                 Id = query.QualificationId,
-                dfeta_MQStartDate = query.StartDate.FromDateOnlyWithDqtBstFix(isLocalTime: true)
+                dfeta_MQStartDate = query.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: true)
             }
         });
 

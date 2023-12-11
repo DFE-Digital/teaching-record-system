@@ -735,7 +735,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 dfeta_PersonId = contact.Id.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_SanctionCodeId = sanctionCode.Id.ToEntityReference(dfeta_sanctioncode.EntityLogicalName),
                 dfeta_Spent = false,
-                dfeta_StartDate = sanction.StartDate?.FromDateOnlyWithDqtBstFix(isLocalTime: true)
+                dfeta_StartDate = sanction.StartDate?.ToDateTimeWithDqtBstFix(isLocalTime: true)
             });
         }
 

@@ -46,8 +46,8 @@ public class CreateMandatoryQualificationTests : IAsyncLifetime
         Assert.Equal(person.ContactId, createdQualification.dfeta_PersonId.Id);
         Assert.Equal(mqEstablishment.Id, createdQualification.dfeta_MQ_MQEstablishmentId.Id);
         Assert.Equal(specialism.Id, createdQualification.dfeta_MQ_SpecialismId.Id);
-        Assert.Equal(startDate.FromDateOnlyWithDqtBstFix(isLocalTime: true), createdQualification.dfeta_MQStartDate);
+        Assert.Equal(startDate.ToDateTimeWithDqtBstFix(isLocalTime: true), createdQualification.dfeta_MQStartDate);
         Assert.Equal(dfeta_qualification_dfeta_MQ_Status.Passed, createdQualification.dfeta_MQ_Status);
-        Assert.Equal(endDate.FromDateOnlyWithDqtBstFix(isLocalTime: true), createdQualification.dfeta_MQ_Date);
+        Assert.Equal(endDate.ToDateTimeWithDqtBstFix(isLocalTime: true), createdQualification.dfeta_MQ_Date);
     }
 }

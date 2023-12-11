@@ -44,6 +44,6 @@ public class CreateSanctionTests : IAsyncLifetime
         Assert.Equal(sanctionCodeId, createdSanction.dfeta_SanctionCodeId.Id);
         Assert.Equal("These are some test details", createdSanction.dfeta_SanctionDetails);
         Assert.Equal("http://www.gov.uk", createdSanction.dfeta_DetailsLink);
-        Assert.Equal(startDate.FromDateOnlyWithDqtBstFix(isLocalTime: true), createdSanction.dfeta_StartDate);
+        Assert.Equal(startDate.ToDateTimeWithDqtBstFix(isLocalTime: true), createdSanction.dfeta_StartDate);
     }
 }
