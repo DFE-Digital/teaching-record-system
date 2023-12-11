@@ -126,6 +126,18 @@ public class TrsLinkGenerator
     public string MqEditResultConfirmCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/Result/Confirm", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 
+    public string MqDelete(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/DeleteMq/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqDeleteCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/DeleteMq/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqDeleteConfirm(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/DeleteMq/Confirm", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqDeleteConfirmCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/DeleteMq/Confirm", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
     public string Persons(string? search = null, ContactSearchSortByOption? sortBy = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/Index", routeValues: new { search, sortBy, pageNumber });
 

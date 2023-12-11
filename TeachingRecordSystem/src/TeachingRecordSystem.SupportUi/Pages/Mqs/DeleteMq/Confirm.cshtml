@@ -1,0 +1,54 @@
+@page "/mqs/{qualificationId}/delete/confirm/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq.ConfirmModel
+@{
+    ViewBag.Title = "Delete qualification";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.MqDelete(Model.QualificationId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+}
+
+<span class="govuk-caption-l">Delete qualification - @Model.PersonName</span>
+<h1 class="govuk-heading-l" data-testid="title">Confirm deletion of mandatory qualification</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.MqDeleteConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-summary-list data-testid="deletion-summary">
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason for deleting</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="deletion-reason">@Model.DeletionReason!.GetDisplayName()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>More detail about the reason for deleting</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="deletion-reason-detail">@(!string.IsNullOrEmpty(Model.DeletionReasonDetail) ? Model.DeletionReasonDetail : "None")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="provider">@(!string.IsNullOrEmpty(Model.TrainingProvider) ? Model.TrainingProvider : "None")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="specialism">@(!string.IsNullOrEmpty(Model.Specialism) ? Model.Specialism : "None")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>                
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="status">@(Model.Status.HasValue ? Model.Status : "None")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>                
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="start-date">@(Model.StartDate.HasValue ? Model.StartDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <div class="govuk-button-group">
+                <govuk-button class="govuk-button--warning" type="submit">Delete qualification</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqDeleteConfirmCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

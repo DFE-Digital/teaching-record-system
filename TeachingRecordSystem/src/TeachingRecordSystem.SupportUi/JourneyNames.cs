@@ -11,4 +11,5 @@ public static class JourneyNames
     public const string EditMqSpecialism = nameof(EditMqSpecialism);
     public const string EditMqStartDate = nameof(EditMqStartDate);
     public const string EditMqResult = nameof(EditMqResult);
+    public const string DeleteMq = nameof(DeleteMq);
 }

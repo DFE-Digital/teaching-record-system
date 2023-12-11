@@ -249,6 +249,12 @@ builder.Services
             typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result.EditMqResultState),
             requestDataKeys: new[] { "qualificationId" },
             appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.DeleteMq,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq.DeleteMqState),
+            requestDataKeys: new[] { "qualificationId" },
+            appendUniqueKey: true));
     });
 
 builder.Services
