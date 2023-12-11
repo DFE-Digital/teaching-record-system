@@ -4,9 +4,9 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
-using TeachingRecordSystem.Core.Services.CrmEntityChanges;
 using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Worker.Infrastructure.Logging;
@@ -44,11 +44,10 @@ var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue(
     MaxRetryCount = 2,
     RetryPauseTime = TimeSpan.FromSeconds(1)
 };
-builder.Services.AddTransient<IOrganizationServiceAsync>(_ => crmServiceClient.Clone());
+builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
 
 builder.Services
-    .AddTrsBaseServices()
-    .AddCrmEntityChanges();
+    .AddTrsBaseServices();
 
 // Filter telemetry emitted by DqtReportingService;
 // annoyingly we can't put this into the AddDqtReporting extension method since the method for adding Telemetry Processors
@@ -57,4 +56,5 @@ builder.Services.AddApplicationInsightsTelemetryWorkerService()
     .AddApplicationInsightsTelemetryProcessor<IgnoreDependencyTelemetryProcessor>();
 
 var host = builder.Build();
+
 await host.RunAsync();

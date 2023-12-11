@@ -30,7 +30,9 @@ public sealed class CrmClientFixture : IDisposable
         _lockManager.AcquireLock(_completedCts.Token);
         _memoryCache = memoryCache;
         _trnGenerationApiClient = GetTrnGenerationApiClient();
-        _referenceDataCache = new ReferenceDataCache(new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, referenceDataCache: null)));
+        _referenceDataCache = new ReferenceDataCache(
+            new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, referenceDataCache: null),
+            serviceClientName: null));
     }
 
     public TestableClock Clock { get; }
@@ -38,7 +40,7 @@ public sealed class CrmClientFixture : IDisposable
     public IConfiguration Configuration { get; }
 
     public CrmQueryDispatcher CreateQueryDispatcher() =>
-        new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, _referenceDataCache));
+        new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, _referenceDataCache), serviceClientName: null);
 
     /// <summary>
     /// Creates a scope that owns an implementation of <see cref="IOrganizationServiceAsync2"/> that tracks the entities created through it.
@@ -47,7 +49,7 @@ public sealed class CrmClientFixture : IDisposable
     public TestDataScope CreateTestDataScope() => new(
         _baseServiceClient,
         orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient),
-        orgService => new CrmQueryDispatcher(CreateQueryServiceProvider(orgService, _referenceDataCache)),
+        orgService => new CrmQueryDispatcher(CreateQueryServiceProvider(orgService, _referenceDataCache), serviceClientName: null),
         orgService => new CrmTestData(orgService, _referenceDataCache, () => _trnGenerationApiClient.GenerateTrn()),
         _memoryCache);
 

@@ -3,20 +3,13 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
-public class CrmQueryDispatcher : ICrmQueryDispatcher
+public class CrmQueryDispatcher(IServiceProvider serviceProvider, string? serviceClientName) : ICrmQueryDispatcher
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public CrmQueryDispatcher(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
     public async Task<TResult> ExecuteQuery<TResult>(ICrmQuery<TResult> query)
     {
-        using var scope = _serviceProvider.CreateScope();
+        using var scope = serviceProvider.CreateScope();
 
-        var organizationService = scope.ServiceProvider.GetRequiredService<IOrganizationServiceAsync>();
+        var organizationService = scope.ServiceProvider.GetRequiredKeyedService<IOrganizationServiceAsync>(serviceClientName);
 
         var handlerType = typeof(ICrmQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
         var handler = scope.ServiceProvider.GetRequiredService(handlerType);

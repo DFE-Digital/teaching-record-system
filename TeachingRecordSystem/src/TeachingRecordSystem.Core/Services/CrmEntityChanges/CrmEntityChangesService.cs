@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using Medallion.Threading;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
@@ -10,28 +11,14 @@ using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
-public class CrmEntityChangesService : ICrmEntityChangesService
+public class CrmEntityChangesService(
+    IDbContextFactory<TrsDbContext> dbContextFactory,
+    IOrganizationServiceAsync organizationService,
+    IDistributedLockProvider distributedLockProvider,
+    IClock clock) : ICrmEntityChangesService
 {
-    private readonly IDbContextFactory<TrsDbContext> _dbContextFactory;
-    private readonly ICrmServiceClientProvider _crmServiceClientProvider;
-    private readonly IDistributedLockProvider _distributedLockProvider;
-    private readonly IClock _clock;
-
-    public CrmEntityChangesService(
-        IDbContextFactory<TrsDbContext> dbContextFactory,
-        ICrmServiceClientProvider crmServiceClientProvider,
-        IDistributedLockProvider distributedLockProvider,
-        IClock clock)
-    {
-        _dbContextFactory = dbContextFactory;
-        _crmServiceClientProvider = crmServiceClientProvider;
-        _distributedLockProvider = distributedLockProvider;
-        _clock = clock;
-    }
-
     public async IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
         string changesKey,
-        string crmClientName,
         string entityLogicalName,
         ColumnSet columns,
         DateTime? modifiedSince,
@@ -46,7 +33,7 @@ public class CrmEntityChangesService : ICrmEntityChangesService
         }
 
         // Ensure only one node is processing changes for this key and entity type at a time
-        var @lock = await _distributedLockProvider.TryAcquireLockAsync(
+        var @lock = await distributedLockProvider.TryAcquireLockAsync(
             DistributedLockKeys.EntityChanges(changesKey, entityLogicalName),
             cancellationToken: cancellationToken);
 
@@ -61,12 +48,10 @@ public class CrmEntityChangesService : ICrmEntityChangesService
             new ColumnSet(columns.Columns.Append("modifiedon").ToArray()) :
             columns;
 
-        using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         await using (@lock)
         {
-            var organizationService = _crmServiceClientProvider.GetClient(crmClientName);
-
             var request = new RetrieveEntityChangesRequest()
             {
                 Columns = columnSet,
@@ -196,7 +181,7 @@ public class CrmEntityChangesService : ICrmEntityChangesService
                 $"""
                 INSERT INTO entity_changes_journals
                 (key, entity_logical_name, data_token, last_updated, last_updated_by, next_query_page_number, next_query_page_size, next_query_paging_cookie)
-                VALUES ({changesKey}, {entityLogicalName}, {dataToken}, {_clock.UtcNow}, {hostName}, {nextQueryPageNumber}, {nextQueryPageSize}, {nextQueryPagingCookie})
+                VALUES ({changesKey}, {entityLogicalName}, {dataToken}, {clock.UtcNow}, {hostName}, {nextQueryPageNumber}, {nextQueryPageSize}, {nextQueryPagingCookie})
                 ON CONFLICT (key, entity_logical_name) DO UPDATE SET
                 data_token = EXCLUDED.data_token,
                 last_updated = EXCLUDED.last_updated,

@@ -145,8 +145,9 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
         RetryPauseTime = TimeSpan.FromSeconds(1)
     };
 
-    builder.Services
-        .AddTransient<ServiceClient>(sp =>
+    builder.Services.AddDefaultServiceClient(
+        ServiceLifetime.Transient,
+        sp =>
         {
             var sc = serviceClient.Clone();
 
@@ -157,8 +158,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
             }
 
             return sc;
-        })
-        .AddTransient<IOrganizationServiceAsync>(sp => sp.GetRequiredService<ServiceClient>());
+        });
 
     healthCheckBuilder.AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
 }

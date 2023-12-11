@@ -8,9 +8,9 @@ using FakeXrmEasy.Middleware.Messages;
 using FakeXrmEasy.Middleware.Pipeline;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.TestCommon.Infrastructure.FakeXrmEasy.FakeMessageExecutors;
 using TeachingRecordSystem.TestCommon.Infrastructure.FakeXrmEasy.Plugins;
@@ -51,8 +51,8 @@ public static class ServiceCollectionExtensions
         QtsRegistrationUpdatedPlugin.Register(fakedXrmContext);
 
         services.AddSingleton<IXrmFakedContext>(fakedXrmContext);
-        var organizationService = fakedXrmContext.GetAsyncOrganizationService();
-        services.AddSingleton<IOrganizationServiceAsync>(organizationService);
+        var organizationService = fakedXrmContext.GetAsyncOrganizationService2();
+        services.AddDefaultServiceClient(ServiceLifetime.Singleton, _ => organizationService);
 
         var systemUser = new SystemUser()
         {

@@ -38,7 +38,6 @@ public sealed class TestableCrmEntityChangesService : ICrmEntityChangesService, 
 
     public IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
         string changesKey,
-        string serviceClientName,
         string entityLogicalName,
         ColumnSet columns,
         DateTime? modifiedSince,

@@ -20,9 +20,12 @@ public static class HostApplicationBuilderExtensions
 
             builder.Services.AddSingleton<IHostedService, DqtReportingService>();
 
-            builder.Services.AddServiceClient(
+            builder.Services.AddNamedServiceClient(
                 DqtReportingService.CrmClientName,
+                ServiceLifetime.Singleton,
                 sp => new ServiceClient(sp.GetRequiredService<IOptions<DqtReportingOptions>>().Value.CrmConnectionString));
+
+            builder.Services.AddCrmEntityChangesService(name: DqtReportingService.CrmClientName);
         }
 
         return builder;
