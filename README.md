@@ -1,7 +1,7 @@
 # teaching-record-system
 
 Provides an API over the Database of Qualified Teachers (DQT). Provides the core Teaching record and will eventually replace the Database of Qualified Teachers (DQT).
-[trs containers diagram](/docs/c4-diagrams-as-code/tr-containers.png)
+[trs containers diagram](docs/c4-diagrams-as-code/trs-containers.png)
 
 
 ## Calling the API
