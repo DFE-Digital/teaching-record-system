@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Suppor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Core", "src\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj", "{BB84ECB4-583D-4068-9A66-883233661594}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Core.Dqt.Tests", "tests\TeachingRecordSystem.Core.Dqt.Tests\TeachingRecordSystem.Core.Dqt.Tests.csproj", "{99B4311C-BD30-4370-BA4F-61BFA7B802FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Core.Dqt.CrmIntegrationTests", "tests\TeachingRecordSystem.Core.Dqt.CrmIntegrationTests\TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.csproj", "{99B4311C-BD30-4370-BA4F-61BFA7B802FA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Core.Tests", "tests\TeachingRecordSystem.Core.Tests\TeachingRecordSystem.Core.Tests.csproj", "{3380ADC3-A691-4B07-9FE3-CB5306974965}"
 EndProject
@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Worker
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Hosting", "src\TeachingRecordSystem.Hosting\TeachingRecordSystem.Hosting.csproj", "{BD13EB34-437A-45FE-AE0C-7DAD1E9681C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeachingRecordSystem.ServiceDefaults", "src\TeachingRecordSystem.ServiceDefaults\TeachingRecordSystem.ServiceDefaults.csproj", "{01E6CAE9-C591-4C04-A3C1-10BB3A7192FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.ServiceDefaults", "src\TeachingRecordSystem.ServiceDefaults\TeachingRecordSystem.ServiceDefaults.csproj", "{01E6CAE9-C591-4C04-A3C1-10BB3A7192FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -154,7 +154,7 @@ jobs:
       continue-on-error: true  # temporary- we're getting sporadic 503 errors here in action setup
 
   dqt_tests:
-    name: DQT tests
+    name: DQT integration tests
     runs-on: ubuntu-latest
     needs: [build]
     if: ${{ needs.build.outputs.run_crm_integration_tests == 'true' }}
@@ -215,12 +215,12 @@ jobs:
 
     - name: Build
       run: dotnet build --configuration Release
-      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Dqt.Tests
+      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Dqt.CrmIntegrationTests
 
     - name: Run tests
       uses: ./.github/workflows/actions/test
       with:
-        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Dqt.Tests
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Dqt.CrmIntegrationTests
         report_name: "DQT test results"
         dotnet_test_args: >-
           --no-build

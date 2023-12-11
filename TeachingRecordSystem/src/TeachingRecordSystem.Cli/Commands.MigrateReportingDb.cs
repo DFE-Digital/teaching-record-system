@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
+using TeachingRecordSystem.Core.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Cli;
 

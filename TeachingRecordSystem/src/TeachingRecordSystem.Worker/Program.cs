@@ -4,11 +4,11 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt.Services.CrmEntityChanges;
-using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
-using TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.Core.Services.CrmEntityChanges;
+using TeachingRecordSystem.Core.Services.DqtReporting;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Worker.Infrastructure.Logging;
 
 var builder = Host.CreateApplicationBuilder(args);

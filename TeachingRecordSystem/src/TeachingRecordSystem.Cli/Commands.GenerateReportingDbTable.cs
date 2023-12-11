@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xrm.Sdk.Metadata;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Dqt.Services.DqtReporting;
+using TeachingRecordSystem.Core.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Cli;
 

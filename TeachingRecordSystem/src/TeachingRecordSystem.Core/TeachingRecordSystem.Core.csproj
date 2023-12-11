@@ -5,41 +5,41 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0001_Initial.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0002_TrackingColumns.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0003_ContactSentQtsAwardedEmail.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0004_ContactAdditionalAttributes.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0005_ContactSlugId.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0006_Incident_msdyn_copilotengaged.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0007_ContactAllowpiiUpdatesFromRegister.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0008_EvergreenMissingColumns.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0009_EvergreenMissingColumns2.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0010_SanctionDetailsLink.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0011_AddHighProfileProgrammeType.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0012_FixProgrammeTypeCasing.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0013_PreviousNameTransactionId.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0014_Contact_dfeta_allowidsigninwithprohibitions.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0015_dfeta_qualification_dfeta_mq_status.sql" />
-    <None Remove="Dqt\Services\DqtReporting\Migrations\0016_dfeta_qualification_dfeta_trsdeletedevent.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0001_Initial.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0002_TrackingColumns.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0003_ContactSentQtsAwardedEmail.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0004_ContactAdditionalAttributes.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0005_ContactSlugId.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0006_Incident_msdyn_copilotengaged.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0007_ContactAllowpiiUpdatesFromRegister.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0008_EvergreenMissingColumns.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0009_EvergreenMissingColumns2.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0010_SanctionDetailsLink.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0011_AddHighProfileProgrammeType.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0012_FixProgrammeTypeCasing.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0013_PreviousNameTransactionId.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0014_Contact_dfeta_allowidsigninwithprohibitions.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0015_dfeta_qualification_dfeta_mq_status.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0016_dfeta_qualification_dfeta_trsdeletedevent.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0001_Initial.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0002_TrackingColumns.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0003_ContactSentQtsAwardedEmail.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0004_ContactAdditionalAttributes.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0005_ContactSlugId.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0006_Incident_msdyn_copilotengaged.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0007_ContactAllowpiiUpdatesFromRegister.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0008_EvergreenMissingColumns.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0009_EvergreenMissingColumns2.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0010_SanctionDetailsLink.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0011_AddHighProfileProgrammeType.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0012_FixProgrammeTypeCasing.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0013_PreviousNameTransactionId.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0014_Contact_dfeta_allowidsigninwithprohibitions.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0015_dfeta_qualification_dfeta_mq_status.sql" />
-    <EmbeddedResource Include="Dqt\Services\DqtReporting\Migrations\0016_dfeta_qualification_dfeta_trsdeletedevent.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0001_Initial.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0002_TrackingColumns.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0003_ContactSentQtsAwardedEmail.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0004_ContactAdditionalAttributes.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0005_ContactSlugId.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0006_Incident_msdyn_copilotengaged.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0007_ContactAllowpiiUpdatesFromRegister.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0008_EvergreenMissingColumns.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0009_EvergreenMissingColumns2.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0010_SanctionDetailsLink.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0011_AddHighProfileProgrammeType.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0012_FixProgrammeTypeCasing.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0013_PreviousNameTransactionId.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0014_Contact_dfeta_allowidsigninwithprohibitions.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0015_dfeta_qualification_dfeta_mq_status.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0016_dfeta_qualification_dfeta_trsdeletedevent.sql" />
   </ItemGroup>
 
   <ItemGroup>

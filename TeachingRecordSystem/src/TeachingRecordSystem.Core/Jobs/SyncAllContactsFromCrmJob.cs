@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Services.TrsDataSync;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
