@@ -160,6 +160,11 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
             return sc;
         });
 
+    builder.Services.AddNamedServiceClient(
+        "WithoutImpersonation",
+        ServiceLifetime.Transient,
+        _ => serviceClient.Clone());
+
     healthCheckBuilder.AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
 }
 

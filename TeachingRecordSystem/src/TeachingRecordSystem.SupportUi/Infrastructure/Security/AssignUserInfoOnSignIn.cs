@@ -73,13 +73,13 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
 
             async Task<Guid?> GetDqtUserId()
             {
-                using var serviceClient = ctx.HttpContext.RequestServices.GetRequiredKeyedService<ServiceClient>("WithoutImpersonation");
+                var organizationService = ctx.HttpContext.RequestServices.GetRequiredKeyedService<IOrganizationServiceAsync>("WithoutImpersonation");
 
                 var request = new QueryByAttribute(SystemUser.EntityLogicalName);
                 request.AddAttributeValue(SystemUser.Fields.AzureActiveDirectoryObjectId, new Guid(aadUserId));
                 request.AddAttributeValue(SystemUser.Fields.IsDisabled, false);
 
-                var response = await serviceClient.RetrieveMultipleAsync(request);
+                var response = await organizationService.RetrieveMultipleAsync(request);
 
                 if (response.Entities.Count == 0)
                 {
