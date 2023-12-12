@@ -67,7 +67,7 @@ public class IndexTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = journeyMqEstablishmentValue
             });
 
@@ -144,7 +144,7 @@ public class IndexTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = oldMqEstablishmentValue
             });
 
@@ -178,7 +178,7 @@ public class IndexTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = mqEstablishmentValue
             });
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")

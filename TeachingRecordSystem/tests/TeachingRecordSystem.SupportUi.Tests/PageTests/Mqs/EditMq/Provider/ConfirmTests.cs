@@ -23,7 +23,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false)
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -53,7 +53,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = newMqEstablishmentValue,
                 CurrentMqEstablishmentName = oldMqEstablishment.dfeta_name,
             });
@@ -85,7 +85,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false)
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -116,7 +116,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = newMqEstablishmentValue
             });
 
@@ -154,7 +154,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = newMqEstablishmentValue
             });
 

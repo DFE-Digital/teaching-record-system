@@ -23,7 +23,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false)
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -53,7 +53,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 SpecialismValue = newMqSpecialismValue,
                 CurrentSpecialismName = oldMqSpecialism.dfeta_name,
             });
@@ -85,7 +85,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false)
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -115,7 +115,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 SpecialismValue = newMqSpecialismValue
             });
 
@@ -151,7 +151,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 SpecialismValue = specialismValue
             });
 

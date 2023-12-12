@@ -643,7 +643,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 .WithQts(qtsDate, qualifiedInWales ? QtsAwardedInWalesTeacherStatusValue : QualifiedTeacherTrainedTeacherStatusValue)
                 .WithEyts(eytsDate));
 
-        return person.ToContact();
+        return person.Contact;
     }
 
     private async Task ConfigureMocks(

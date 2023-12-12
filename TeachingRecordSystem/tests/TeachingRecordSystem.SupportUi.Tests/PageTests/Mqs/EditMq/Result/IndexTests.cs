@@ -71,7 +71,7 @@ public class IndexTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 Result = journeyResult,
                 EndDate = journeyEndDate
             });
