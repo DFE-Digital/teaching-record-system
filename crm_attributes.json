@@ -19,6 +19,9 @@
     "subject",
     "statecode"
   ],
+  "businessunit": [
+    "businessunitid"
+  ],
   "contact": [
     "address1_city",
     "address1_country",
@@ -286,6 +289,7 @@
   ],
   "systemuser": [
     "azureactivedirectoryobjectid",
+    "businessunitid",
     "isdisabled",
     "firstname",
     "lastname",
