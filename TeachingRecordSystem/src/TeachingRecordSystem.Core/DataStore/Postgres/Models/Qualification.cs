@@ -3,11 +3,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 public abstract class Qualification
 {
     public required Guid QualificationId { get; init; }
-    public required Guid CreatedByUserId { get; init; }
     public required DateTime CreatedOn { get; init; }
-    public required Guid UpdatedByUserId { get; set; }
     public required DateTime UpdatedOn { get; set; }
-    public Guid? DeletedByUserId { get; set; }
     public DateTime? DeletedOn { get; set; }
     public QualificationType QualificationType { get; }
     public required Guid PersonId { get; init; }
