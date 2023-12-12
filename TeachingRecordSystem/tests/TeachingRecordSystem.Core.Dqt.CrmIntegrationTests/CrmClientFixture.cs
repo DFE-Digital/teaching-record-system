@@ -14,17 +14,19 @@ namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests;
 public sealed class CrmClientFixture : IDisposable
 {
     private readonly ServiceClient _baseServiceClient;
+    private readonly DbFixture _dbFixture;
     private readonly CancellationTokenSource _completedCts;
     private readonly EnvironmentLockManager _lockManager;
     private readonly IMemoryCache _memoryCache;
     private readonly ITrnGenerationApiClient _trnGenerationApiClient;
     private readonly ReferenceDataCache _referenceDataCache;
 
-    public CrmClientFixture(ServiceClient serviceClient, IConfiguration configuration, IMemoryCache memoryCache)
+    public CrmClientFixture(ServiceClient serviceClient, DbFixture dbFixture, IConfiguration configuration, IMemoryCache memoryCache)
     {
         Clock = new();
         Configuration = configuration;
         _baseServiceClient = serviceClient;
+        _dbFixture = dbFixture;
         _completedCts = new CancellationTokenSource();
         _lockManager = new EnvironmentLockManager(Configuration);
         _lockManager.AcquireLock(_completedCts.Token);
@@ -50,7 +52,7 @@ public sealed class CrmClientFixture : IDisposable
         _baseServiceClient,
         orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient),
         orgService => new CrmQueryDispatcher(CreateQueryServiceProvider(orgService, _referenceDataCache), serviceClientName: null),
-        orgService => new CrmTestData(orgService, _referenceDataCache, () => _trnGenerationApiClient.GenerateTrn()),
+        orgService => TestData.CreateWithCustomTrnGeneration(_dbFixture.GetDbContextFactory(), orgService, _referenceDataCache, () => _trnGenerationApiClient.GenerateTrn()),
         _memoryCache);
 
     public void Dispose()
@@ -93,7 +95,7 @@ public sealed class CrmClientFixture : IDisposable
             ServiceClient serviceClient,
             Func<IOrganizationServiceAsync2, DataverseAdapter> createDataverseAdapter,
             Func<IOrganizationServiceAsync2, CrmQueryDispatcher> createCrmQueryDispatcher,
-            Func<IOrganizationServiceAsync2, CrmTestData> createTestData,
+            Func<IOrganizationServiceAsync2, TestData> createTestData,
             IMemoryCache memoryCache)
         {
             _createDataverseAdapter = createDataverseAdapter;
@@ -106,7 +108,7 @@ public sealed class CrmClientFixture : IDisposable
 
         public ITrackedEntityOrganizationService OrganizationService { get; }
 
-        public CrmTestData TestData { get; }
+        public TestData TestData { get; }
 
         public CrmQueryDispatcher CreateQueryDispatcher() => _createCrmQueryDispatcher(OrganizationService);
 

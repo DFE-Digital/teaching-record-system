@@ -3,33 +3,37 @@ using System.Text;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public partial class CrmTestData
+public partial class TestData
 {
-    public Task<CreateDateOfBirthChangeIncidentResult> CreateDateOfBirthChangeIncident(Action<CreateDateOfBirthChangeIncidentBuilder>? configure = null)
+    public Task<CreateNameChangeIncidentResult> CreateNameChangeIncident(Action<CreateNameChangeIncidentBuilder> configure)
     {
-        var builder = new CreateDateOfBirthChangeIncidentBuilder();
+        var builder = new CreateNameChangeIncidentBuilder();
         configure?.Invoke(builder);
         return builder.Execute(this);
     }
 
-    public class CreateDateOfBirthChangeIncidentBuilder
+    public class CreateNameChangeIncidentBuilder
     {
         private const IncidentStatusType DefaultIncidentStatus = IncidentStatusType.Active;
 
-        private static readonly string _defaultEvidenceFileName = "evidence.jpeg";
-        private static readonly MemoryStream _defaultEvidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
+        private static readonly string _defaultEvidenceFileName = "evidence1.jpeg";
+        private static readonly MemoryStream _defaultEvidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test image"));
         private static readonly string _defaultEvidenceFileMimeType = "image/jpeg";
+
+        private static readonly string _additionalEvidenceFileName = "evidence2.pdf";
+        private static readonly MemoryStream _additionalEvidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test PDF"));
+        private static readonly string _additionalEvidenceFileMimeType = "application/pdf";
 
         private Guid? _customerId;
         private IncidentStatusType? _incidentStatusType;
+        private bool _hasMultipleEvidenceFiles = false;
 
-        public CreateDateOfBirthChangeIncidentBuilder WithCustomerId(Guid customerId)
+        public CreateNameChangeIncidentBuilder WithCustomerId(Guid customerId)
         {
             if (_customerId is not null && _customerId != customerId)
             {
@@ -40,7 +44,13 @@ public partial class CrmTestData
             return this;
         }
 
-        public CreateDateOfBirthChangeIncidentBuilder WithCanceledStatus()
+        public CreateNameChangeIncidentBuilder WithMultipleEvidenceFiles()
+        {
+            _hasMultipleEvidenceFiles = true;
+            return this;
+        }
+
+        public CreateNameChangeIncidentBuilder WithCanceledStatus()
         {
             if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Canceled)
             {
@@ -51,7 +61,7 @@ public partial class CrmTestData
             return this;
         }
 
-        public CreateDateOfBirthChangeIncidentBuilder WithRejectedStatus()
+        public CreateNameChangeIncidentBuilder WithRejectedStatus()
         {
             if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Rejected)
             {
@@ -62,7 +72,7 @@ public partial class CrmTestData
             return this;
         }
 
-        public CreateDateOfBirthChangeIncidentBuilder WithApprovedStatus()
+        public CreateNameChangeIncidentBuilder WithApprovedStatus()
         {
             if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Approved)
             {
@@ -73,57 +83,51 @@ public partial class CrmTestData
             return this;
         }
 
-        public async Task<CreateDateOfBirthChangeIncidentResult> Execute(CrmTestData testData)
+        public async Task<CreateNameChangeIncidentResult> Execute(TestData testData)
         {
             if (_customerId is null)
             {
                 throw new InvalidOperationException("Customer ID must be specified.");
             }
 
-            var dateOfBirth = testData.GenerateDateOfBirth();
+            var firstName = testData.GenerateFirstName();
+            var middleName = testData.GenerateMiddleName();
+            var lastName = testData.GenerateLastName();
 
             var incidentId = Guid.NewGuid();
-            var title = "Request to change date of birth";
-            var subjectTitle = "Change of Date of Birth";
-            var dateOfBirthChangeSubject = await testData.ReferenceDataCache.GetSubjectByTitle(subjectTitle);
+            var title = "Request to change name";
+            var subjectTitle = "Change of Name";
+            var nameChangeSubject = await testData.ReferenceDataCache.GetSubjectByTitle(subjectTitle);
 
             var incident = new Incident()
             {
                 Id = incidentId,
                 Title = title,
-                SubjectId = dateOfBirthChangeSubject!.Id.ToEntityReference(Subject.EntityLogicalName),
+                SubjectId = nameChangeSubject!.Id.ToEntityReference(Subject.EntityLogicalName),
                 CustomerId = _customerId.Value.ToEntityReference(Contact.EntityLogicalName),
-                dfeta_NewDateofBirth = dateOfBirth.ToDateTime()
+                dfeta_NewFirstName = firstName,
+                dfeta_NewMiddleName = middleName,
+                dfeta_NewLastName = lastName,
+                dfeta_StatedFirstName = firstName,
+                dfeta_StatedMiddleName = middleName,
+                dfeta_StatedLastName = lastName
             };
 
-            var document = new dfeta_document()
-            {
-                Id = Guid.NewGuid(),
-                dfeta_name = _defaultEvidenceFileName,
-                dfeta_Type = dfeta_DocumentType.ChangeofNameDOBEvidence,
-                dfeta_PersonId = _customerId.Value.ToEntityReference(Contact.EntityLogicalName),
-                dfeta_CaseId = incidentId.ToEntityReference(Incident.EntityLogicalName),
-                StatusCode = dfeta_document_StatusCode.Active
-            };
-
-            var annotationBody = await GetBase64EncodedFileContent(_defaultEvidenceFileContent);
-
-            var annotation = new Annotation()
-            {
-                ObjectId = document.Id.ToEntityReference(dfeta_document.EntityLogicalName),
-                ObjectTypeCode = dfeta_document.EntityLogicalName,
-                Subject = _defaultEvidenceFileName,
-                DocumentBody = annotationBody,
-                MimeType = _defaultEvidenceFileMimeType,
-                FileName = _defaultEvidenceFileName,
-                IsDocument = true,
-                NoteText = string.Empty
-            };
+            var evidences = new List<CreateNameChangeIncidentEvidence>();
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = incident });
+            var (document, annotation, evidence) = await CreateDocument(_customerId.Value, _defaultEvidenceFileName, _defaultEvidenceFileContent, _defaultEvidenceFileMimeType);
+            evidences.Add(evidence);
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = document });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = annotation });
+            if (_hasMultipleEvidenceFiles)
+            {
+                (document, annotation, evidence) = await CreateDocument(_customerId.Value, _additionalEvidenceFileName, _additionalEvidenceFileContent, _additionalEvidenceFileMimeType);
+                evidences.Add(evidence);
+                txnRequestBuilder.AddRequest(new CreateRequest() { Target = document });
+                txnRequestBuilder.AddRequest(new CreateRequest() { Target = annotation });
+            }
 
             _incidentStatusType ??= DefaultIncidentStatus;
 
@@ -183,24 +187,60 @@ public partial class CrmTestData
             var ticketNumber = createdIncident.TicketNumber;
             var createdOn = createdIncident.CreatedOn!.Value;
 
-            return new CreateDateOfBirthChangeIncidentResult()
+            return new CreateNameChangeIncidentResult()
             {
                 IncidentId = incidentId,
                 TicketNumber = ticketNumber,
                 CreatedOn = createdOn,
                 CustomerId = _customerId.Value,
                 Title = title,
-                SubjectId = dateOfBirthChangeSubject.Id,
+                SubjectId = nameChangeSubject.Id,
                 SubjectTitle = subjectTitle,
-                NewDateOfBirth = dateOfBirth,
-                Evidence = new CreateDateOfBirthChangeIncidentEvidence()
+                NewFirstName = firstName,
+                NewMiddleName = middleName,
+                NewLastName = lastName,
+                StatedFirstName = firstName,
+                StatedMiddleName = middleName,
+                StatedLastName = lastName,
+                Evidence = evidences.ToArray()
+            };
+
+            async Task<(dfeta_document, Annotation, CreateNameChangeIncidentEvidence)> CreateDocument(Guid customerId, string filename, Stream content, string mimeType)
+            {
+                var document = new dfeta_document()
+                {
+                    Id = Guid.NewGuid(),
+                    dfeta_name = filename,
+                    dfeta_Type = dfeta_DocumentType.ChangeofNameDOBEvidence,
+                    dfeta_PersonId = customerId.ToEntityReference(Contact.EntityLogicalName),
+                    dfeta_CaseId = incidentId.ToEntityReference(Incident.EntityLogicalName),
+                    StatusCode = dfeta_document_StatusCode.Active
+                };
+
+                var annotationBody = await GetBase64EncodedFileContent(content);
+
+                var annotation = new Annotation()
+                {
+                    ObjectId = document.Id.ToEntityReference(dfeta_document.EntityLogicalName),
+                    ObjectTypeCode = dfeta_document.EntityLogicalName,
+                    Subject = filename,
+                    DocumentBody = annotationBody,
+                    MimeType = mimeType,
+                    FileName = filename,
+                    IsDocument = true,
+                    NoteText = string.Empty
+                };
+
+                var evidence = new CreateNameChangeIncidentEvidence()
                 {
                     DocumentId = document.Id,
-                    FileName = _defaultEvidenceFileName,
+                    FileName = filename,
                     Base64EncodedFileContent = annotationBody,
-                    MimeType = _defaultEvidenceFileMimeType
-                }
-            };
+                    MimeType = mimeType
+                };
+
+                return (document, annotation, evidence);
+            }
         }
 
         private enum IncidentStatusType
@@ -212,7 +252,7 @@ public partial class CrmTestData
         }
     }
 
-    public record CreateDateOfBirthChangeIncidentResult
+    public record CreateNameChangeIncidentResult
     {
         public required Guid IncidentId { get; init; }
         public required string TicketNumber { get; init; }
@@ -221,11 +261,16 @@ public partial class CrmTestData
         public required string Title { get; init; }
         public required Guid SubjectId { get; init; }
         public required string SubjectTitle { get; init; }
-        public required DateOnly NewDateOfBirth { get; init; }
-        public required CreateDateOfBirthChangeIncidentEvidence Evidence { get; init; }
+        public required string NewFirstName { get; init; }
+        public required string? NewMiddleName { get; init; }
+        public required string NewLastName { get; init; }
+        public required string StatedFirstName { get; init; }
+        public required string? StatedMiddleName { get; init; }
+        public required string StatedLastName { get; init; }
+        public required CreateNameChangeIncidentEvidence[] Evidence { get; init; }
     }
 
-    public record CreateDateOfBirthChangeIncidentEvidence
+    public record CreateNameChangeIncidentEvidence
     {
         public required Guid DocumentId { get; init; }
         public required string FileName { get; init; }

@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public partial class CrmTestData
+public partial class TestData
 {
     public Task CreateCrmTask(Action<CreateCrmTaskBuilder>? configure)
     {
@@ -112,7 +112,7 @@ public partial class CrmTestData
             return this;
         }
 
-        public async Task Execute(CrmTestData crmTestData)
+        public async Task Execute(TestData crmTestData)
         {
             if (_personId is null)
             {

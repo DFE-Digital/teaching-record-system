@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public partial class CrmTestData
+public partial class TestData
 {
     public Task<CreatePersonResult> CreatePerson(Action<CreatePersonBuilder>? configure = null)
     {
@@ -183,7 +183,7 @@ public partial class CrmTestData
             return this;
         }
 
-        public async Task<CreatePersonResult> Execute(CrmTestData testData)
+        public async Task<CreatePersonResult> Execute(TestData testData)
         {
             var hasTrn = _hasTrn ?? true;
             var trn = hasTrn ? await testData.GenerateTrn() : null;

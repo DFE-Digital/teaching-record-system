@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public partial class CrmTestData
+public partial class TestData
 {
     public Task CreateNote(Action<CreateNoteBuilder>? configure)
     {
@@ -52,7 +52,7 @@ public partial class CrmTestData
             return this;
         }
 
-        public async Task Execute(CrmTestData testData)
+        public async Task Execute(TestData testData)
         {
             if (_personId is null)
             {
