@@ -23,7 +23,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false)
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/result/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -51,7 +51,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 Result = newResult,
                 EndDate = newEndDate,
                 CurrentResult = oldResult,
@@ -86,7 +86,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false)
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -117,7 +117,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 Result = newResult,
                 EndDate = newEndDate,
                 CurrentResult = oldResult,
@@ -157,7 +157,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 Result = newResult,
                 EndDate = newEndDate,
                 CurrentResult = oldResult,

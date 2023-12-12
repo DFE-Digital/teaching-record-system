@@ -23,7 +23,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false)
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/delete/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -69,7 +69,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishment = mqEstablishment is not null ? mqEstablishment.dfeta_name : null,
                 Specialism = specialism is not null ? specialism.dfeta_name : null,
                 Status = status,
@@ -111,7 +111,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false)
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -139,7 +139,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishment = "University of Leeds",
                 Specialism = "Hearing",
                 Status = dfeta_qualification_dfeta_MQ_Status.Passed,
@@ -180,7 +180,7 @@ public class ConfirmTests : TestBase
             {
                 Initialized = true,
                 PersonId = person.PersonId,
-                PersonName = person.ToContact().ResolveFullName(includeMiddleName: false),
+                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishment = "University of Leeds",
                 Specialism = "Hearing",
                 Status = dfeta_qualification_dfeta_MQ_Status.Passed,

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -36,7 +37,7 @@ public static class HostApplicationBuilderExtensions
 
             builder.Services.AddCrmEntityChangesService(name: TrsDataSyncService.CrmClientName);
 
-            builder.Services.AddSingleton<TrsDataSyncHelper>();
+            builder.Services.TryAddSingleton<TrsDataSyncHelper>();
         }
 
         return builder;

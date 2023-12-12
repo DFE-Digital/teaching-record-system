@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
 using TeachingRecordSystem.Core;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon;
 
@@ -71,9 +72,11 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddSingleton<CurrentUserProvider>();
                     services.AddTransient<TestUsers.CreateUsersStartupTask>();
                     services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
-                    services.AddSingleton<TestData>();
+                    services.AddSingleton<TestData>(
+                        sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
                     services.AddFakeXrm();
                     services.AddSingleton<FakeTrnGenerator>();
+                    services.AddSingleton<TrsDataSyncHelper>();
                 });
             });
 

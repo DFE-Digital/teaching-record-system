@@ -12,6 +12,7 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Api.Tests;
 
@@ -60,9 +61,11 @@ public class ApiFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClientMock.Object);
             services.AddTestScoped<IOptions<AccessYourQualificationsOptions>>(tss => tss.AccessYourQualificationsOptions);
             services.AddTestScoped<ICertificateGenerator>(tss => tss.CertificateGeneratorMock.Object);
-            services.AddSingleton<TestData>();
+            services.AddSingleton<TestData>(
+                sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
             services.AddFakeXrm();
             services.AddSingleton<FakeTrnGenerator>();
+            services.AddSingleton<TrsDataSyncHelper>();
 
             services.Configure<GetAnIdentityOptions>(options =>
             {

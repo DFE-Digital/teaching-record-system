@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -18,8 +20,14 @@ public partial class TestData
         IDbContextFactory<TrsDbContext> dbContextFactory,
         IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
-        : this(dbContextFactory, organizationService, referenceDataCache, generateTrn: () => Task.FromResult(trnGenerator.GenerateTrn()))
+        FakeTrnGenerator trnGenerator,
+        TestDataSyncConfiguration syncConfiguration)
+        : this(
+              dbContextFactory,
+              organizationService,
+              referenceDataCache,
+              generateTrn: () => Task.FromResult(trnGenerator.GenerateTrn()),
+              syncConfiguration)
     {
     }
 
@@ -27,12 +35,14 @@ public partial class TestData
         IDbContextFactory<TrsDbContext> dbContextFactory,
         IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
-        Func<Task<string>> generateTrn)
+        Func<Task<string>> generateTrn,
+        TestDataSyncConfiguration syncConfiguration)
     {
         DbContextFactory = dbContextFactory;
         OrganizationService = organizationService;
         ReferenceDataCache = referenceDataCache;
         _generateTrn = generateTrn;
+        SyncConfiguration = syncConfiguration;
     }
 
     public IDbContextFactory<TrsDbContext> DbContextFactory { get; }
@@ -41,13 +51,16 @@ public partial class TestData
 
     public ReferenceDataCache ReferenceDataCache { get; }
 
+    private TestDataSyncConfiguration SyncConfiguration { get; }
+
     public static TestData CreateWithCustomTrnGeneration(
         IDbContextFactory<TrsDbContext> dbContextFactory,
         IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
-        Func<Task<string>> generateTrn)
+        Func<Task<string>> generateTrn,
+        TestDataSyncConfiguration syncConfiguration)
     {
-        return new TestData(dbContextFactory, organizationService, referenceDataCache, generateTrn);
+        return new TestData(dbContextFactory, organizationService, referenceDataCache, generateTrn, syncConfiguration);
     }
 
     public static async Task<string> GetBase64EncodedFileContent(Stream file)
@@ -181,5 +194,36 @@ public partial class TestData
     {
         using var dbContext = await DbContextFactory.CreateDbContextAsync();
         await action(dbContext);
+    }
+}
+
+public sealed class TestDataSyncConfiguration
+{
+    private TestDataSyncConfiguration(bool syncEnabled, TrsDataSyncHelper? helper)
+    {
+        SyncEnabled = syncEnabled;
+        TrsDataSyncHelper = helper;
+    }
+
+    [MemberNotNullWhen(true, nameof(TrsDataSyncHelper))]
+    public bool SyncEnabled { get; }
+
+    public TrsDataSyncHelper? TrsDataSyncHelper { get; }
+
+    public static TestDataSyncConfiguration NoSync() => new(false, null);
+
+    public static TestDataSyncConfiguration Sync(TrsDataSyncHelper helper) => new(true, helper);
+
+    public async Task SyncIfEnabled(Func<TrsDataSyncHelper, Task> action, bool? overrideSync = null)
+    {
+        if (overrideSync == true && !SyncEnabled)
+        {
+            throw new InvalidOperationException("TestData instance has not been configured to support syncing.");
+        }
+
+        if (SyncEnabled && overrideSync != false)
+        {
+            await action(TrsDataSyncHelper);
+        }
     }
 }

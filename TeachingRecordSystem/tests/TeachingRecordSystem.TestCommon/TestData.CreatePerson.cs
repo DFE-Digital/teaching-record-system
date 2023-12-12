@@ -19,6 +19,7 @@ public partial class TestData
         private const string TeacherStatusQualifiedTeacherTrained = "71";
         private const string EaryYearsStatusProfessionalStatus = "222";
 
+        private bool? _syncEnabledOverride;
         private DateOnly? _dateOfBirth;
         private bool? _hasTrn;
         private string? _firstName;
@@ -34,6 +35,12 @@ public partial class TestData
         private string? _earlyYearsStatus;
         private readonly List<Sanction> _sanctions = new();
         private readonly List<MandatoryQualification> _mandatoryQualifications = new();
+
+        public CreatePersonBuilder WithSyncOverride(bool enabled)
+        {
+            _syncEnabledOverride = enabled;
+            return this;
+        }
 
         public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
         {
@@ -349,11 +356,24 @@ public partial class TestData
                 });
             }
 
+            var retrieveContactHandle = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
+            {
+                ColumnSet = new(allColumns: true),
+                Target = personId.ToEntityReference(Contact.EntityLogicalName)
+            });
+
             await txnRequestBuilder.Execute();
+
+            contact = retrieveContactHandle.GetResponse().Entity.ToEntity<Contact>();
+
+            await testData.SyncConfiguration.SyncIfEnabled(
+                helper => helper.SyncContact(contact, ignoreInvalid: false, CancellationToken.None),
+                _syncEnabledOverride);
 
             return new CreatePersonResult()
             {
                 PersonId = personId,
+                Contact = contact,
                 Trn = trn,
                 DateOfBirth = dateOfBirth,
                 FirstName = firstName,
@@ -378,6 +398,7 @@ public partial class TestData
     {
         public required Guid PersonId { get; init; }
         public Guid ContactId => PersonId;
+        public required Contact Contact { get; init; }
         public required string? Trn { get; init; }
         public required DateOnly DateOfBirth { get; init; }
         public required string FirstName { get; init; }
@@ -394,25 +415,6 @@ public partial class TestData
         public required DateOnly? EytsDate { get; init; }
         public required ImmutableArray<Sanction> Sanctions { get; init; }
         public required ImmutableArray<MandatoryQualification> MandatoryQualifications { get; init; }
-
-        public Contact ToContact() => new()
-        {
-            Id = PersonId,
-            FirstName = FirstName,
-            MiddleName = MiddleName,
-            LastName = LastName,
-            dfeta_StatedFirstName = StatedFirstName,
-            dfeta_StatedMiddleName = StatedMiddleName,
-            dfeta_StatedLastName = StatedLastName,
-            BirthDate = DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false),
-            dfeta_TRN = Trn,
-            EMailAddress1 = Email,
-            MobilePhone = MobileNumber,
-            dfeta_NINumber = NationalInsuranceNumber,
-            dfeta_QTSDate = QtsDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
-            dfeta_EYTSDate = EytsDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
-            GenderCode = Enum.Parse<Contact_GenderCode>(Gender)
-        };
     }
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);
