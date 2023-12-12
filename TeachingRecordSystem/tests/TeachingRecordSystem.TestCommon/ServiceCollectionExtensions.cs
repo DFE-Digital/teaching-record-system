@@ -54,19 +54,33 @@ public static class ServiceCollectionExtensions
         var organizationService = fakedXrmContext.GetAsyncOrganizationService2();
         services.AddDefaultServiceClient(ServiceLifetime.Singleton, _ => organizationService);
 
-        var systemUser = new SystemUser()
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "Test",
-            LastName = "User",
-        };
-
-        organizationService.Create(systemUser);
-        fakedXrmContext.CallerProperties.CallerId = systemUser.ToEntityReference();
+        fakedXrmContext.CallerProperties.CallerId = CreateTestUser();
 
         services.AddSingleton<SeedCrmReferenceData>();
         services.AddStartupTask<SeedCrmReferenceData>();
 
         return services;
+
+        EntityReference CreateTestUser()
+        {
+            // User must be assigned to a BusinessUnit, otherwise the WhoAmIRequest will not work
+
+            var businessUnit = new BusinessUnit()
+            {
+                Id = Guid.NewGuid()
+            };
+            organizationService.Create(businessUnit);
+
+            var systemUser = new SystemUser()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Test",
+                LastName = "User",
+                BusinessUnitId = businessUnit.Id.ToEntityReference(BusinessUnit.EntityLogicalName)
+            };
+            organizationService.Create(systemUser);
+
+            return systemUser.ToEntityReference();
+        }
     }
 }
