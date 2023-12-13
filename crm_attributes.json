@@ -215,7 +215,8 @@
     "dfeta_mq_status",
     "dfeta_mqstartdate",
     "dfeta_trsdeletedevent",
-    "CreatedOn"
+    "CreatedOn",
+    "ModifiedOn"
   ],
   "dfeta_specialism": [
     "dfeta_specialismid",

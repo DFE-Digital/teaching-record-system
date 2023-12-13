@@ -26,7 +26,7 @@ public class SyncAllContactsFromCrmJob
         const int pageSize = 1000;
 
         var serviceClient = _crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
-        var columns = new ColumnSet(_trsDataSyncHelper.GetSyncedAttributeNames(Contact.EntityLogicalName));
+        var columns = new ColumnSet(TrsDataSyncHelper.GetEntityInfoForModelType(Contact.EntityLogicalName).AttributeNames);
 
         // Ensure this is kept in sync with the predicate in TrsDataSyncHelper.SyncContacts
         var filter = new FilterExpression(LogicalOperator.And)
@@ -59,9 +59,8 @@ public class SyncAllContactsFromCrmJob
 
             var result = await serviceClient.RetrieveMultipleAsync(query);
 
-            await _trsDataSyncHelper.SyncEntities(
-                Contact.EntityLogicalName,
-                result.Entities,
+            await _trsDataSyncHelper.SyncPersons(
+                result.Entities.Select(e => e.ToEntity<Contact>()).ToArray(),
                 ignoreInvalid: _syncOptionsAccessor.Value.IgnoreInvalidData,
                 cancellationToken);
 

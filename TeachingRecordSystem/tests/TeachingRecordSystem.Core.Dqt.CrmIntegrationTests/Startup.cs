@@ -17,12 +17,16 @@ public class Startup
 
         DbHelper.ConfigureDbServices(services, configuration.GetRequiredConnectionString("DefaultConnection"));
 
-        services.AddSingleton(GetCrmServiceClient(configuration));
+        var serviceClient = GetCrmServiceClient(configuration);
+
+        services.AddSingleton(serviceClient);
         services.AddSingleton<IConfiguration>(configuration);
         services.AddSingleton<CrmClientFixture>();
         services.AddMemoryCache();
         services.AddSingleton<DbFixture>();
         services.AddSingleton<FakeTrnGenerator>();
+        services.AddSingleton<ReferenceDataCache>();
+        services.AddCrmQueries();
 
         // This is wrapped up in Task.Run because the ServiceClient constructor can deadlock in some environments (e.g. CI).
         // InitServiceAsync().Result within Microsoft.PowerPlatform.Dataverse.Client.ConnectionService.GetCachedService() looks to be the culprit

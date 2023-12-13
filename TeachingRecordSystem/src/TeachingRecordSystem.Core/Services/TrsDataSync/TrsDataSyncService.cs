@@ -8,34 +8,20 @@ using TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
-public class TrsDataSyncService : BackgroundService
+public class TrsDataSyncService(
+    [FromKeyedServices(TrsDataSyncService.CrmClientName)] ICrmEntityChangesService crmEntityChangesService,
+    TrsDataSyncHelper trsDataSyncHelper,
+    IOptions<TrsDataSyncServiceOptions> optionsAccessor,
+    ILogger<TrsDataSyncService> logger) : BackgroundService
 {
     public const string CrmClientName = "TrsDataSync";
-    public const string ChangesKey = "TrsDataSync";
+    private const string ChangesKeyPrefix = "TrsDataSync";
 
-    private const int MaxEntityTypesToProcessConcurrently = 10;
     private const int PageSize = 1000;
-
-    private readonly ICrmEntityChangesService _crmEntityChangesService;
-    private readonly TrsDataSyncHelper _trsDataSyncHelper;
-    private readonly ILogger<TrsDataSyncService> _logger;
-    private readonly TrsDataSyncServiceOptions _options;
-
-    public TrsDataSyncService(
-        [FromKeyedServices(CrmClientName)] ICrmEntityChangesService crmEntityChangesService,
-        TrsDataSyncHelper trsDataSyncHelper,
-        IOptions<TrsDataSyncServiceOptions> optionsAccessor,
-        ILogger<TrsDataSyncService> logger)
-    {
-        _crmEntityChangesService = crmEntityChangesService;
-        _trsDataSyncHelper = trsDataSyncHelper;
-        _logger = logger;
-        _options = optionsAccessor.Value;
-    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(_options.PollIntervalSeconds));
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(optionsAccessor.Value.PollIntervalSeconds));
 
         do
         {
@@ -48,12 +34,12 @@ public class TrsDataSyncService : BackgroundService
             }
             catch (ProcessChangesException ex)
             {
-                _logger.LogError(ex.InnerException, ex.Message);
+                logger.LogError(ex.InnerException, ex.Message);
                 return;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed processing entity changes.");
+                logger.LogError(ex, "Failed processing entity changes.");
                 return;
             }
         }
@@ -62,35 +48,46 @@ public class TrsDataSyncService : BackgroundService
 
     internal async Task ProcessChanges(CancellationToken cancellationToken)
     {
-        await Parallel.ForEachAsync(
-            _options.Entities,
-            new ParallelOptions()
-            {
-                MaxDegreeOfParallelism = _options.ProcessAllEntityTypesConcurrently ? MaxEntityTypesToProcessConcurrently : 1,
-                CancellationToken = cancellationToken
-            },
-            async (entityType, ct) =>
+        var modelTypesToSync = optionsAccessor.Value.ModelTypes;
+
+        // Order is important here; the dependees should come before dependents
+        await SyncIfEnabled(TrsDataSyncHelper.ModelTypes.Person);
+        await SyncIfEnabled(TrsDataSyncHelper.ModelTypes.MandatoryQualification);
+
+        async Task SyncIfEnabled(string modelType)
+        {
+            if (modelTypesToSync.Contains(modelType))
             {
                 try
                 {
-                    await ProcessChangesForEntityType(entityType, ct);
+                    await ProcessChangesForModelType(modelType, cancellationToken);
                 }
                 catch (Exception ex)
                 {
-                    throw new ProcessChangesException(entityType, ex);
+                    throw new ProcessChangesException(modelType, ex);
                 }
-            });
+            }
+        }
     }
 
-    internal async Task ProcessChangesForEntityType(string entityLogicalName, CancellationToken cancellationToken)
+    internal async Task ProcessChangesForModelType(string modelType, CancellationToken cancellationToken)
     {
-        var totalProcessed = 0;
+        // There are few CRM entity types that map to multiple model types (e.g. Qualification) -
+        // we want to sync them separately.
+        // We do this by having a separate `changesKey` for each model type.
 
-        var columns = new ColumnSet(_trsDataSyncHelper.GetSyncedAttributeNames(entityLogicalName));
+        var changesKey = modelType switch
+        {
+            TrsDataSyncHelper.ModelTypes.Person => ChangesKeyPrefix,  // Earlier version used "TrsDataSync" alone for syncing contacts - maintain that
+            _ => $"{ChangesKeyPrefix}:{modelType}"
+        };
 
-        var modifiedSince = await _trsDataSyncHelper.GetLastModifiedOnForEntity(entityLogicalName);
+        var (entityLogicalName, attributeNames) = TrsDataSyncHelper.GetEntityInfoForModelType(modelType);
+        var columns = new ColumnSet(attributeNames);
 
-        var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns, modifiedSince, PageSize)
+        var modifiedSince = await trsDataSyncHelper.GetLastModifiedOnForModelType(modelType);
+
+        var changesEnumerable = crmEntityChangesService.GetEntityChanges(changesKey, entityLogicalName, columns, modifiedSince, PageSize)
             .WithCancellation(cancellationToken);
 
         await foreach (var changes in changesEnumerable)
@@ -114,62 +111,30 @@ public class TrsDataSyncService : BackgroundService
                 }
             }
 
-            await HandleNewOrUpdatedItems(newOrUpdatedItems, cancellationToken);
-            totalProcessed += newOrUpdatedItems.Count;
+            await trsDataSyncHelper.SyncRecords(
+                modelType,
+                newOrUpdatedItems.Select(i => i.NewOrUpdatedEntity).ToArray(),
+                optionsAccessor.Value.IgnoreInvalidData,
+                cancellationToken);
 
-            // It's important deleted items are processed *after* upserts, otherwise we may resurrect a deleted record
-            await HandleRemovedOrDeletedItems(removedOrDeletedItems, cancellationToken);
-            totalProcessed += removedOrDeletedItems.Count;
+            await trsDataSyncHelper.DeleteRecords(
+                modelType,
+                removedOrDeletedItems.Select(i => i.RemovedItem.Id).ToArray(),
+                cancellationToken);
         }
-    }
-
-    private async Task HandleNewOrUpdatedItems(
-        IReadOnlyCollection<NewOrUpdatedItem> newOrUpdatedItems,
-        CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-
-        if (newOrUpdatedItems.Count == 0)
-        {
-            return;
-        }
-
-        var entityLogicalName = newOrUpdatedItems.First().NewOrUpdatedEntity.LogicalName;
-
-        await _trsDataSyncHelper.SyncEntities(
-            entityLogicalName,
-            newOrUpdatedItems.Select(i => i.NewOrUpdatedEntity).ToArray(),
-            _options.IgnoreInvalidData,
-            cancellationToken);
-    }
-
-    private async Task HandleRemovedOrDeletedItems(
-        IReadOnlyCollection<RemovedOrDeletedItem> removedOrDeletedItems,
-        CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-
-        if (removedOrDeletedItems.Count == 0)
-        {
-            return;
-        }
-
-        var entityLogicalName = removedOrDeletedItems.First().RemovedItem.LogicalName;
-
-        await _trsDataSyncHelper.DeleteEntities(entityLogicalName, removedOrDeletedItems.Select(i => i.RemovedItem.Id).ToArray(), cancellationToken);
     }
 }
 
 file class ProcessChangesException : Exception
 {
-    public ProcessChangesException(string entityType, Exception innerException)
-        : base(GetMessage(entityType), innerException)
+    public ProcessChangesException(string modelType, Exception innerException)
+        : base(GetMessage(modelType), innerException)
     {
-        EntityType = entityType;
+        ModelType = modelType;
     }
 
-    public string EntityType { get; }
+    public string ModelType { get; }
 
-    private static string GetMessage(string entityType) =>
-        $"Failed processing changes for '{entityType}' entity.";
+    private static string GetMessage(string modelType) =>
+        $"Failed processing changes for '{modelType}' data.";
 }

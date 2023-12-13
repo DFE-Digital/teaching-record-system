@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Npgsql;
 using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Core.Tests;
@@ -14,7 +15,13 @@ public class Startup
                 .AddEnvironmentVariables())
             .ConfigureServices((context, services) =>
             {
-                DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
+                var pgConnectionString = new NpgsqlConnectionStringBuilder(context.Configuration.GetRequiredConnectionString("DefaultConnection"))
+                {
+                    // We rely on error details to get the offending duplicate key values in the TrsDataSyncHelper
+                    IncludeErrorDetail = true
+                }.ConnectionString;
+
+                DbHelper.ConfigureDbServices(services, pgConnectionString);
 
                 services.AddSingleton<DbFixture>();
                 services.AddSingleton<FakeTrnGenerator>();

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Npgsql;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -22,7 +23,11 @@ if (builder.Environment.IsProduction())
 
 builder.ConfigureLogging();
 
-var pgConnectionString = builder.Configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
+string pgConnectionString = new NpgsqlConnectionStringBuilder(builder.Configuration.GetRequiredValue("ConnectionStrings:DefaultConnection"))
+{
+    // We rely on error details to get the offending duplicate key values in the TrsDataSyncHelper
+    IncludeErrorDetail = true
+}.ConnectionString;
 
 builder.Services.AddDbContext<TrsDbContext>(
     options => TrsDbContext.ConfigureOptions(options, pgConnectionString),
