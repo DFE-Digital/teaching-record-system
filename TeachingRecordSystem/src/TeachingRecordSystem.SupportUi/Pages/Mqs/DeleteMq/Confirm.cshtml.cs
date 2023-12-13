@@ -12,7 +12,7 @@ public class ConfirmModel(
     TrsLinkGenerator linkGenerator,
     IFileService fileService) : PageModel
 {
-    private readonly TimeSpan FileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
     public JourneyInstance<DeleteMqState>? JourneyInstance { get; set; }
 
@@ -84,7 +84,7 @@ public class ConfirmModel(
         DeletionReason = JourneyInstance!.State.DeletionReason;
         DeletionReasonDetail = JourneyInstance?.State.DeletionReasonDetail;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ? await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, FileUrlExpiresAfter) : null;
+        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ? await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) : null;
 
         await next();
     }

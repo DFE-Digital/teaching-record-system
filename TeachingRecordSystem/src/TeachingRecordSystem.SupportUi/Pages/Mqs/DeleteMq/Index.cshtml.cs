@@ -14,7 +14,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 public class IndexModel : PageModel
 {
     public const int MaxFileSizeMb = 50;
-    private readonly TimeSpan FileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly ReferenceDataCache _referenceDataCache;
     private readonly TrsLinkGenerator _linkGenerator;
@@ -81,7 +81,7 @@ public class IndexModel : PageModel
     {
         DeletionReason ??= JourneyInstance!.State.DeletionReason;
         DeletionReasonDetail ??= JourneyInstance?.State.DeletionReasonDetail;
-        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ? await _fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, FileUrlExpiresAfter) : null;
+        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ? await _fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) : null;
         UploadEvidence ??= JourneyInstance?.State.UploadEvidence;
     }
 
