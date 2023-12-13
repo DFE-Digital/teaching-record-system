@@ -2,14 +2,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 [Journey(JourneyNames.DeleteMq), RequireJourneyInstance]
 public class ConfirmModel(
     ICrmQueryDispatcher crmQueryDispatcher,
-    TrsLinkGenerator linkGenerator) : PageModel
+    TrsLinkGenerator linkGenerator,
+    IFileService fileService) : PageModel
 {
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+
     public JourneyInstance<DeleteMqState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -33,6 +37,10 @@ public class ConfirmModel(
 
     public string? DeletionReasonDetail { get; set; }
 
+    public string? EvidenceFileName { get; set; }
+
+    public string? UploadedEvidenceFileUrl { get; set; }
+
     public async Task<IActionResult> OnPost()
     {
         // Currently adding empty JSON until the deleted event is defined in a future Trello card
@@ -49,6 +57,11 @@ public class ConfirmModel(
 
     public async Task<IActionResult> OnPostCancel()
     {
+        if (JourneyInstance!.State.EvidenceFileId is not null)
+        {
+            await fileService.DeleteFile(JourneyInstance!.State.EvidenceFileId.Value);
+        }
+
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
@@ -70,6 +83,8 @@ public class ConfirmModel(
         EndDate = JourneyInstance!.State.EndDate;
         DeletionReason = JourneyInstance!.State.DeletionReason;
         DeletionReasonDetail = JourneyInstance?.State.DeletionReasonDetail;
+        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
+        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ? await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) : null;
 
         await next();
     }

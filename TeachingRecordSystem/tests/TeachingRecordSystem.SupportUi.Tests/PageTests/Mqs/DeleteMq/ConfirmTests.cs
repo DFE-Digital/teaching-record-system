@@ -37,9 +37,9 @@ public class ConfirmTests : TestBase
     }
 
     [Theory]
-    [InlineData("959", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Passed, "2021-11-05", MqDeletionReasonOption.ProviderRequest, "Some details about the deletion reason")]
-    [InlineData("959", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Deferred, null, MqDeletionReasonOption.ProviderRequest, null)]
-    [InlineData(null, null, null, null, null, MqDeletionReasonOption.AnotherReason, null)]
+    [InlineData("959", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Passed, "2021-11-05", MqDeletionReasonOption.ProviderRequest, "Some details about the deletion reason", true)]
+    [InlineData("959", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Deferred, null, MqDeletionReasonOption.ProviderRequest, null, false)]
+    [InlineData(null, null, null, null, null, MqDeletionReasonOption.AnotherReason, null, false)]
     public async Task Get_ValidRequest_DisplaysContentAsExpected(
         string? providerValue,
         MandatoryQualificationSpecialism? specialism,
@@ -47,7 +47,8 @@ public class ConfirmTests : TestBase
         MandatoryQualificationStatus? status,
         string? endDateString,
         MqDeletionReasonOption deletionReason,
-        string? deletionReasonDetail)
+        string? deletionReasonDetail,
+        bool uploadEvidence)
     {
         // Arrange
         var mqEstablishment = !string.IsNullOrEmpty(providerValue) ? await TestData.ReferenceDataCache.GetMqEstablishmentByValue(providerValue) : null;
@@ -75,7 +76,11 @@ public class ConfirmTests : TestBase
                 StartDate = startDate,
                 EndDate = endDate,
                 DeletionReason = deletionReason,
-                DeletionReasonDetail = deletionReasonDetail
+                DeletionReasonDetail = deletionReasonDetail,
+                UploadEvidence = uploadEvidence,
+                EvidenceFileId = uploadEvidence ? Guid.NewGuid() : null,
+                EvidenceFileName = uploadEvidence ? "test.pdf" : null,
+                EvidenceFileSizeDescription = uploadEvidence ? "1MB" : null
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualification.QualificationId}/delete/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -96,6 +101,15 @@ public class ConfirmTests : TestBase
         Assert.Equal(status is not null ? status.Value.ToString() : "None", deletionSummary.GetElementByTestId("status")!.TextContent);
         Assert.Equal(startDate is not null ? startDate.Value.ToString("d MMMM yyyy") : "None", deletionSummary.GetElementByTestId("start-date")!.TextContent);
         Assert.Equal(endDate is not null ? endDate.Value.ToString("d MMMM yyyy") : "None", deletionSummary.GetElementByTestId("end-date")!.TextContent);
+        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
+        if (uploadEvidence)
+        {
+            Assert.NotNull(uploadedEvidenceLink);
+        }
+        else
+        {
+            Assert.Null(uploadedEvidenceLink);
+        }
     }
 
     [Fact]
@@ -146,6 +160,10 @@ public class ConfirmTests : TestBase
                 EndDate = new DateOnly(2023, 11, 05),
                 DeletionReason = MqDeletionReasonOption.ProviderRequest,
                 DeletionReasonDetail = "Some details about the deletion reason",
+                UploadEvidence = true,
+                EvidenceFileId = Guid.NewGuid(),
+                EvidenceFileName = "test.pdf",
+                EvidenceFileSizeDescription = "1MB"
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -187,6 +205,7 @@ public class ConfirmTests : TestBase
                 EndDate = new DateOnly(2023, 11, 05),
                 DeletionReason = MqDeletionReasonOption.ProviderRequest,
                 DeletionReasonDetail = "Some details about the deletion reason",
+                UploadEvidence = false
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -203,7 +222,6 @@ public class ConfirmTests : TestBase
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
     }
-
 
     private async Task<JourneyInstance<DeleteMqState>> CreateJourneyInstance(Guid qualificationId, DeleteMqState? state = null) =>
         await CreateJourneyInstance(
