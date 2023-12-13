@@ -12,17 +12,17 @@ public class EditMqResultState
 
     public string? PersonName { get; set; }
 
-    public dfeta_qualification_dfeta_MQ_Status? CurrentResult { get; set; }
+    public MandatoryQualificationStatus? CurrentStatus { get; set; }
 
-    public dfeta_qualification_dfeta_MQ_Status? Result { get; set; }
+    public MandatoryQualificationStatus? Status { get; set; }
 
     public DateOnly? CurrentEndDate { get; set; }
 
     public DateOnly? EndDate { get; set; }
 
     [JsonIgnore]
-    public bool IsComplete => Result.HasValue &&
-        (Result!.Value != dfeta_qualification_dfeta_MQ_Status.Passed || (Result.Value == dfeta_qualification_dfeta_MQ_Status.Passed && EndDate.HasValue));
+    public bool IsComplete => Status.HasValue &&
+        (Status != MandatoryQualificationStatus.Passed || (Status == MandatoryQualificationStatus.Passed && EndDate.HasValue));
 
     public async Task EnsureInitialized(
         ICrmQueryDispatcher crmQueryDispatcher,
@@ -48,8 +48,8 @@ public class EditMqResultState
 
         EndDate = qualification.dfeta_MQ_Date.ToDateOnlyWithDqtBstFix(isLocalTime: true);
         CurrentEndDate = EndDate;
-        Result = qualification.dfeta_MQ_Status ?? (EndDate is not null ? dfeta_qualification_dfeta_MQ_Status.Passed : null);
-        CurrentResult = qualification.dfeta_MQ_Status;
+        Status = qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus() ?? (EndDate is not null ? MandatoryQualificationStatus.Passed : null);
+        CurrentStatus = qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus();
         PersonId = personDetail!.Contact.Id;
         PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
         Initialized = true;

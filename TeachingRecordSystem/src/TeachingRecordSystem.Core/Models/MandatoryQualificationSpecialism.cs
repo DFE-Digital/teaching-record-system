@@ -1,41 +1,70 @@
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace TeachingRecordSystem.Core.Models;
 
 public enum MandatoryQualificationSpecialism
 {
-    [MandatoryQualificationInfo(isValidForNewRecord: false), Display(Name = "Auditory")]
+    [MandatoryQualificationSpecialismInfo(name: "auditory", dqtValue: "Auditory", isValidForNewRecord: false)]
     Auditory = 0,
 
-    [MandatoryQualificationInfo, Display(Name = "Deaf education")]
+    [MandatoryQualificationSpecialismInfo(name: "deaf education", dqtValue: "Deaf education")]
     DeafEducation = 1,
 
-    [MandatoryQualificationInfo, Display(Name = "Hearing")]
+    [MandatoryQualificationSpecialismInfo(name: "hearing", dqtValue: "Hearing")]
     Hearing = 2,
 
-    [MandatoryQualificationInfo, Display(Name = "Multi-Sensory")]
+    [MandatoryQualificationSpecialismInfo(name: "multi-sensory", dqtValue: "Multi-Sensory")]
     MultiSensory = 3,
 
-    [MandatoryQualificationInfo, Display(Name = "N/A")]
+    [MandatoryQualificationSpecialismInfo(name: "N/A", dqtValue: "N/A")]
     NotApplicable = 4,
 
-    [MandatoryQualificationInfo, Display(Name = "Visual")]
+    [MandatoryQualificationSpecialismInfo(name: "visual", dqtValue: "Visual")]
     Visual = 5,
 }
 
-public static class MandatoryQualificationSpecialismExtensions
+public static class MandatoryQualificationSpecialismRegistry
 {
-    public static bool IsValidForNewRecord(this MandatoryQualificationSpecialism specialism) =>
-        specialism.GetType()
+    private static readonly IReadOnlyDictionary<MandatoryQualificationSpecialism, MandatoryQualificationSpecialismInfo> _info =
+        Enum.GetValues<MandatoryQualificationSpecialism>().ToDictionary(s => s, s => GetInfo(s));
+
+    public static IReadOnlyCollection<MandatoryQualificationSpecialismInfo> All => _info.Values.ToArray();
+
+    public static string GetName(this MandatoryQualificationSpecialism specialism) => _info[specialism].Name;
+
+    public static string GetTitle(this MandatoryQualificationSpecialism specialism) => _info[specialism].Title;
+
+    public static string GetDqtValue(this MandatoryQualificationSpecialism specialism) => _info[specialism].DqtValue;
+
+    public static bool IsValidForNewRecord(this MandatoryQualificationSpecialism specialism) => _info[specialism].IsValidForNewRecord;
+
+    public static MandatoryQualificationSpecialism ToMandatoryQualificationSpecialism(this dfeta_specialism specialism) =>
+        _info.Values.Single(s => s.DqtValue == specialism.dfeta_Value).Value;
+
+    private static MandatoryQualificationSpecialismInfo GetInfo(MandatoryQualificationSpecialism specialism)
+    {
+        var attr = specialism.GetType()
             .GetMember(specialism.ToString())
             .Single()
-            .GetCustomAttribute<MandatoryQualificationInfoAttribute>()?
-            .IsValidForNewRecord == true;
+            .GetCustomAttribute<MandatoryQualificationSpecialismInfoAttribute>() ??
+            throw new Exception($"{nameof(MandatoryQualificationSpecialism)}.{specialism} is missing the {nameof(MandatoryQualificationSpecialismInfoAttribute)} attribute.");
+
+        return new MandatoryQualificationSpecialismInfo(specialism, attr.Name, attr.DqtValue, attr.IsValidForNewRecord);
+    }
+}
+
+public sealed record MandatoryQualificationSpecialismInfo(MandatoryQualificationSpecialism Value, string Name, string DqtValue, bool IsValidForNewRecord)
+{
+    public string Title => Name[0..1].ToUpper() + Name[1..];
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-file sealed class MandatoryQualificationInfoAttribute(bool isValidForNewRecord = true) : Attribute
+file sealed class MandatoryQualificationSpecialismInfoAttribute(
+    string name,
+    string dqtValue,
+    bool isValidForNewRecord = true) : Attribute
 {
+    public string Name => name;
+    public string DqtValue => dqtValue;
     public bool IsValidForNewRecord => isValidForNewRecord;
 }

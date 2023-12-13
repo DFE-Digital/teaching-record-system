@@ -16,7 +16,7 @@ public class CreateMandatoryQualificationHandler : ICrmQueryHandler<CreateMandat
             dfeta_MQ_MQEstablishmentId = query.MqEstablishmentId.ToEntityReference(dfeta_mqestablishment.EntityLogicalName),
             dfeta_MQ_SpecialismId = query.SpecialismId.ToEntityReference(dfeta_specialism.EntityLogicalName),
             dfeta_MQStartDate = query.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
-            dfeta_MQ_Status = query.Result,
+            dfeta_MQ_Status = query.Status,
             dfeta_MQ_Date = query.EndDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
         };
 

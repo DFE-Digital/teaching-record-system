@@ -19,12 +19,12 @@ public class UpdateMandatoryQualificationSpecialismTests : IAsyncLifetime
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var originalSpecialismValue = "Visual";
-        var newSpecialism = await _dataScope.TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
+        var originalSpecialism = MandatoryQualificationSpecialism.Visual;
+        var newSpecialism = await _dataScope.TestData.ReferenceDataCache.GetMqSpecialismByValue(MandatoryQualificationSpecialism.Hearing.GetDqtValue());
 
         var person = await _dataScope.TestData.CreatePerson(
             x => x.WithQts(qtsDate: new DateOnly(2021, 10, 5))
-                    .WithMandatoryQualification(specialismValue: originalSpecialismValue));
+                   .WithMandatoryQualification(specialism: originalSpecialism));
 
         var qualification = person.MandatoryQualifications.First();
 

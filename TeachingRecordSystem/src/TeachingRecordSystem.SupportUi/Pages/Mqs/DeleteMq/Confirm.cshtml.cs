@@ -1,25 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 [Journey(JourneyNames.DeleteMq), RequireJourneyInstance]
-public class ConfirmModel : PageModel
+public class ConfirmModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly TrsLinkGenerator _linkGenerator;
-
-    public ConfirmModel(
-        ICrmQueryDispatcher crmQueryDispatcher,
-        TrsLinkGenerator linkGenerator)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _linkGenerator = linkGenerator;
-    }
-
     public JourneyInstance<DeleteMqState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -31,9 +21,9 @@ public class ConfirmModel : PageModel
 
     public string? TrainingProvider { get; set; }
 
-    public string? Specialism { get; set; }
+    public MandatoryQualificationSpecialism? Specialism { get; set; }
 
-    public dfeta_qualification_dfeta_MQ_Status? Status { get; set; }
+    public MandatoryQualificationStatus? Status { get; set; }
 
     public DateOnly? StartDate { get; set; }
 
@@ -46,7 +36,7 @@ public class ConfirmModel : PageModel
     public async Task<IActionResult> OnPost()
     {
         // Currently adding empty JSON until the deleted event is defined in a future Trello card
-        await _crmQueryDispatcher.ExecuteQuery(
+        await crmQueryDispatcher.ExecuteQuery(
             new DeleteQualificationQuery(
                 QualificationId,
                 "{}"));
@@ -54,20 +44,20 @@ public class ConfirmModel : PageModel
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification deleted");
 
-        return Redirect(_linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(_linkGenerator.MqDelete(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.MqDelete(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 

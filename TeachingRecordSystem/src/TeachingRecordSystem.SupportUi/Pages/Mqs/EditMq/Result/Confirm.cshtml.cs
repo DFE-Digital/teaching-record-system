@@ -1,25 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result;
 
 [Journey(JourneyNames.EditMqResult), RequireJourneyInstance]
-public class ConfirmModel : PageModel
+public class ConfirmModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly TrsLinkGenerator _linkGenerator;
-
-    public ConfirmModel(
-        ICrmQueryDispatcher crmQueryDispatcher,
-        TrsLinkGenerator linkGenerator)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _linkGenerator = linkGenerator;
-    }
-
     public JourneyInstance<EditMqResultState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -29,9 +19,9 @@ public class ConfirmModel : PageModel
 
     public string? PersonName { get; set; }
 
-    public dfeta_qualification_dfeta_MQ_Status? CurrentResult { get; set; }
+    public MandatoryQualificationStatus? CurrentStatus { get; set; }
 
-    public dfeta_qualification_dfeta_MQ_Status? NewResult { get; set; }
+    public MandatoryQualificationStatus? NewStatus { get; set; }
 
     public DateOnly? CurrentEndDate { get; set; }
 
@@ -39,36 +29,36 @@ public class ConfirmModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        await _crmQueryDispatcher.ExecuteQuery(
+        await crmQueryDispatcher.ExecuteQuery(
             new UpdateMandatoryQualificationStatusQuery(
                 QualificationId,
-                NewResult!.Value,
+                NewStatus!.Value.GetDqtStatus(),
                 NewEndDate));
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification changed");
 
-        return Redirect(_linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(_linkGenerator.MqEditResult(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.MqEditResult(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 
         PersonId = JourneyInstance!.State.PersonId;
         PersonName = JourneyInstance!.State.PersonName;
-        CurrentResult = JourneyInstance!.State.CurrentResult;
-        NewResult ??= JourneyInstance!.State.Result;
+        CurrentStatus = JourneyInstance!.State.CurrentStatus;
+        NewStatus ??= JourneyInstance!.State.Status;
         CurrentEndDate = JourneyInstance!.State.CurrentEndDate;
         NewEndDate ??= JourneyInstance!.State.EndDate;
 

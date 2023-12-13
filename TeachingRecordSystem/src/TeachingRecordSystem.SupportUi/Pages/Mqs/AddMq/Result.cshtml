@@ -15,7 +15,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqAddResult(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
-            <govuk-radios asp-for="Result" data-testid="result-options">
+            <govuk-radios asp-for="Status" data-testid="result-options">
                 <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Deferred" data-testid="result-deferred">
                     Deferred
                 </govuk-radios-item>

@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -124,12 +125,12 @@ public partial class TestData
 
         public CreatePersonBuilder WithMandatoryQualification(
             string? providerValue = null,
-            string? specialismValue = null,
+            MandatoryQualificationSpecialism? specialism = null,
+            MandatoryQualificationStatus? status = null,
             DateOnly? startDate = null,
-            DateOnly? endDate = null,
-            dfeta_qualification_dfeta_MQ_Status? result = null)
+            DateOnly? endDate = null)
         {
-            _mandatoryQualifications.Add(new(Guid.NewGuid(), providerValue, specialismValue, startDate, endDate, result));
+            _mandatoryQualifications.Add(new(Guid.NewGuid(), providerValue, specialism, status, startDate, endDate));
             return this;
         }
 
@@ -334,20 +335,20 @@ public partial class TestData
                 }
             }
 
-            foreach (var mandatoryQualification in _mandatoryQualifications)
+            foreach (var mq in _mandatoryQualifications)
             {
-                var mqEstablishment = !string.IsNullOrEmpty(mandatoryQualification.ProviderValue) ? await testData.ReferenceDataCache.GetMqEstablishmentByValue(mandatoryQualification.ProviderValue) : null;
-                var specialism = !string.IsNullOrEmpty(mandatoryQualification.SpecialismValue) ? await testData.ReferenceDataCache.GetMqSpecialismByValue(mandatoryQualification.SpecialismValue) : null;
+                var mqEstablishment = mq.ProviderValue is not null ? await testData.ReferenceDataCache.GetMqEstablishmentByValue(mq.ProviderValue) : null;
+                var specialism = mq.Specialism is not null ? await testData.ReferenceDataCache.GetMqSpecialismByValue(mq.Specialism.Value.GetDqtValue()) : null;
                 var qualification = new dfeta_qualification()
                 {
-                    Id = mandatoryQualification.QualificationId,
+                    Id = mq.QualificationId,
                     dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
-                    dfeta_MQ_MQEstablishmentId = mqEstablishment is not null ? mqEstablishment.Id.ToEntityReference(dfeta_mqestablishment.EntityLogicalName) : null,
-                    dfeta_MQ_SpecialismId = specialism is not null ? specialism.Id.ToEntityReference(dfeta_specialism.EntityLogicalName) : null,
-                    dfeta_MQStartDate = mandatoryQualification.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                    dfeta_MQ_Date = mandatoryQualification.EndDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                    dfeta_MQ_Status = mandatoryQualification.Result
+                    dfeta_MQ_MQEstablishmentId = mqEstablishment?.Id.ToEntityReference(dfeta_mqestablishment.EntityLogicalName),
+                    dfeta_MQ_SpecialismId = specialism?.Id.ToEntityReference(dfeta_specialism.EntityLogicalName),
+                    dfeta_MQStartDate = mq.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
+                    dfeta_MQ_Date = mq.EndDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
+                    dfeta_MQ_Status = mq.Status?.GetDqtStatus()
                 };
 
                 txnRequestBuilder.AddRequest(new CreateRequest()
@@ -419,5 +420,11 @@ public partial class TestData
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);
 
-    public record MandatoryQualification(Guid QualificationId, string? ProviderValue, string? SpecialismValue, DateOnly? StartDate, DateOnly? EndDate, dfeta_qualification_dfeta_MQ_Status? Result);
+    public record MandatoryQualification(
+        Guid QualificationId,
+        string? ProviderValue,
+        MandatoryQualificationSpecialism? Specialism,
+        MandatoryQualificationStatus? Status,
+        DateOnly? StartDate,
+        DateOnly? EndDate);
 }

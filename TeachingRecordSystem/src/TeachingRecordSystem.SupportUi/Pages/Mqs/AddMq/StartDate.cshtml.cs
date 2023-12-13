@@ -7,16 +7,8 @@ using TeachingRecordSystem.Core.Dqt.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class StartDateModel : PageModel
+public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
 {
-    private readonly TrsLinkGenerator _linkGenerator;
-
-    public StartDateModel(
-        TrsLinkGenerator linkGenerator)
-    {
-        _linkGenerator = linkGenerator;
-    }
-
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -42,13 +34,13 @@ public class StartDateModel : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state => state.StartDate = StartDate);
 
-        return Redirect(_linkGenerator.MqAddResult(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqAddResult(PersonId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

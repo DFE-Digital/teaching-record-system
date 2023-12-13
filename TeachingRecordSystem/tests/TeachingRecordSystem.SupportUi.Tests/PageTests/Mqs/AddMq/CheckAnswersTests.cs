@@ -1,5 +1,4 @@
 using FormFlow;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
@@ -33,18 +32,18 @@ public class CheckAnswersTests : TestBase
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        var specialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
+        var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
-        var result = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var status = MandatoryQualificationStatus.Passed;
         DateOnly? endDate = new DateOnly(2021, 11, 5);
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
             new AddMqState()
             {
                 MqEstablishmentValue = mqEstablishment.dfeta_Value,
-                SpecialismValue = specialism.dfeta_Value,
+                Specialism = specialism,
                 StartDate = startDate,
-                Result = result,
+                Status = status,
                 EndDate = endDate
             });
 
@@ -58,25 +57,25 @@ public class CheckAnswersTests : TestBase
     }
 
     [Theory]
-    [InlineData(dfeta_qualification_dfeta_MQ_Status.InProgress)]
-    [InlineData(dfeta_qualification_dfeta_MQ_Status.Failed)]
-    [InlineData(dfeta_qualification_dfeta_MQ_Status.Passed)]
-    public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState(dfeta_qualification_dfeta_MQ_Status result)
+    [InlineData(MandatoryQualificationStatus.InProgress)]
+    [InlineData(MandatoryQualificationStatus.Failed)]
+    [InlineData(MandatoryQualificationStatus.Passed)]
+    public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState(MandatoryQualificationStatus status)
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        var specialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
+        var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
-        DateOnly? endDate = result == dfeta_qualification_dfeta_MQ_Status.Passed ? new DateOnly(2021, 11, 5) : null;
+        DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
             new AddMqState()
             {
                 MqEstablishmentValue = mqEstablishment.dfeta_Value,
-                SpecialismValue = specialism.dfeta_Value,
+                Specialism = specialism,
                 StartDate = startDate,
-                Result = result,
+                Status = status,
                 EndDate = endDate
             });
 
@@ -88,10 +87,10 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await response.GetDocument();
         Assert.Equal(mqEstablishment.dfeta_name, doc.GetElementByTestId("provider")!.TextContent);
-        Assert.Equal(specialism.dfeta_name, doc.GetElementByTestId("specialism")!.TextContent);
+        Assert.Equal(specialism.GetTitle(), doc.GetElementByTestId("specialism")!.TextContent);
         Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("start-date")!.TextContent);
-        Assert.Equal(result.ToString(), doc.GetElementByTestId("result")!.TextContent);
-        if (result == dfeta_qualification_dfeta_MQ_Status.Passed)
+        Assert.Equal(status.ToString(), doc.GetElementByTestId("result")!.TextContent);
+        if (status == MandatoryQualificationStatus.Passed)
         {
             Assert.Equal(endDate!.Value.ToString("d MMMM yyyy"), doc.GetElementByTestId("end-date")!.TextContent);
         }
@@ -121,25 +120,25 @@ public class CheckAnswersTests : TestBase
     }
 
     [Theory]
-    [InlineData(dfeta_qualification_dfeta_MQ_Status.InProgress)]
-    [InlineData(dfeta_qualification_dfeta_MQ_Status.Failed)]
-    [InlineData(dfeta_qualification_dfeta_MQ_Status.Passed)]
-    public async Task Post_Confirm_CompletesJourneyAndRedirectsWithFlashMessage(dfeta_qualification_dfeta_MQ_Status result)
+    [InlineData(MandatoryQualificationStatus.InProgress)]
+    [InlineData(MandatoryQualificationStatus.Failed)]
+    [InlineData(MandatoryQualificationStatus.Passed)]
+    public async Task Post_Confirm_CompletesJourneyAndRedirectsWithFlashMessage(MandatoryQualificationStatus status)
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        var specialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
+        var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
-        DateOnly? endDate = result == dfeta_qualification_dfeta_MQ_Status.Passed ? new DateOnly(2021, 11, 5) : null;
+        DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
             new AddMqState()
             {
                 MqEstablishmentValue = mqEstablishment.dfeta_Value,
-                SpecialismValue = specialism.dfeta_Value,
+                Specialism = specialism,
                 StartDate = startDate,
-                Result = result,
+                Status = status,
                 EndDate = endDate
             });
 
@@ -168,18 +167,18 @@ public class CheckAnswersTests : TestBase
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        var specialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
+        var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
-        var result = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var status = MandatoryQualificationStatus.Passed;
         DateOnly? endDate = new DateOnly(2021, 11, 5);
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
             new AddMqState()
             {
                 MqEstablishmentValue = mqEstablishment.dfeta_Value,
-                SpecialismValue = specialism.dfeta_Value,
+                Specialism = specialism,
                 StartDate = startDate,
-                Result = result,
+                Status = status,
                 EndDate = endDate
             });
 

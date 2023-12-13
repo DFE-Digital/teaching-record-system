@@ -40,12 +40,9 @@ public class ConfirmTests : TestBase
     public async Task Get_ValidRequest_DisplaysContentAsExpected()
     {
         // Arrange
-        var oldMqSpecialismValue = "Hearing";
-        var oldMqSpecialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue(oldMqSpecialismValue);
-        var newMqSpecialismValue = "Visual";
-        var newMqSpecialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue(newMqSpecialismValue);
-        var person = await TestData.CreatePerson(
-                       b => b.WithMandatoryQualification(specialismValue: oldMqSpecialismValue));
+        var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
+        var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: oldMqSpecialism));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -54,8 +51,8 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                SpecialismValue = newMqSpecialismValue,
-                CurrentSpecialismName = oldMqSpecialism.dfeta_name,
+                Specialism = newMqSpecialism,
+                CurrentSpecialism = oldMqSpecialism,
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -69,8 +66,8 @@ public class ConfirmTests : TestBase
         var doc = await response.GetDocument();
         var changeDetails = doc.GetElementByTestId("change-details");
         Assert.NotNull(changeDetails);
-        Assert.Equal(oldMqSpecialism.dfeta_name, changeDetails.GetElementByTestId("current-value")!.TextContent);
-        Assert.Equal(newMqSpecialism.dfeta_name, changeDetails.GetElementByTestId("new-value")!.TextContent);
+        Assert.Equal(oldMqSpecialism.GetTitle(), changeDetails.GetElementByTestId("current-value")!.TextContent);
+        Assert.Equal(newMqSpecialism.GetTitle(), changeDetails.GetElementByTestId("new-value")!.TextContent);
     }
 
     [Fact]
@@ -105,9 +102,9 @@ public class ConfirmTests : TestBase
     public async Task Post_Confirm_CompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
-        var oldMqSpecialismValue = "Hearing";
-        var newMqSpecialismValue = "Visual";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialismValue: oldMqSpecialismValue));
+        var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
+        var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: oldMqSpecialism));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -116,7 +113,7 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                SpecialismValue = newMqSpecialismValue
+                Specialism = newMqSpecialism
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -142,8 +139,8 @@ public class ConfirmTests : TestBase
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var specialismValue = "Hearing";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialismValue: specialismValue));
+        var specialism = MandatoryQualificationSpecialism.Hearing;
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: specialism));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -152,7 +149,7 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                SpecialismValue = specialismValue
+                Specialism = specialism
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")

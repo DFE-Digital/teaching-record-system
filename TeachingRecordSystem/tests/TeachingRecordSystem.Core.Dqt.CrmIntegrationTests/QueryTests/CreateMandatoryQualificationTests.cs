@@ -31,7 +31,7 @@ public class CreateMandatoryQualificationTests : IAsyncLifetime
             MqEstablishmentId = mqEstablishment.Id,
             SpecialismId = specialism.Id,
             StartDate = new DateOnly(2023, 01, 5),
-            Result = dfeta_qualification_dfeta_MQ_Status.Passed,
+            Status = dfeta_qualification_dfeta_MQ_Status.Passed,
             EndDate = new DateOnly(2023, 07, 10),
         };
 

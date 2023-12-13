@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
@@ -104,8 +105,8 @@ public class MqTests : TestBase
     [Fact]
     public async Task EditMqSpecialism()
     {
-        var oldSpecialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
-        var newSpecialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue("Visual");
+        var oldSpecialism = MandatoryQualificationSpecialism.Hearing;
+        var newSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
@@ -121,9 +122,9 @@ public class MqTests : TestBase
 
         await page.AssertOnEditMqSpecialismPage(qualificationId);
 
-        await page.IsCheckedAsync($"label:text-is('{oldSpecialism.dfeta_name}')");
+        await page.IsCheckedAsync($"label:text-is('{oldSpecialism.GetTitle()}')");
 
-        await page.CheckAsync($"label:text-is('{newSpecialism.dfeta_name}')");
+        await page.CheckAsync($"label:text-is('{newSpecialism.GetTitle()}')");
 
         await page.ClickContinueButton();
 
@@ -172,10 +173,10 @@ public class MqTests : TestBase
     [Fact]
     public async Task EditMqResult()
     {
-        var oldResult = dfeta_qualification_dfeta_MQ_Status.Failed;
-        var newResult = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 11, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(result: oldResult));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: oldStatus));
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
@@ -190,9 +191,9 @@ public class MqTests : TestBase
 
         await page.AssertOnEditMqResultPage(qualificationId);
 
-        await page.IsCheckedAsync($"label:text-is('{oldResult}')");
+        await page.IsCheckedAsync($"label:text-is('{oldStatus}')");
 
-        await page.CheckAsync($"label:text-is('{newResult}')");
+        await page.CheckAsync($"label:text-is('{newStatus}')");
 
         await page.FillDateInput(newEndDate);
 

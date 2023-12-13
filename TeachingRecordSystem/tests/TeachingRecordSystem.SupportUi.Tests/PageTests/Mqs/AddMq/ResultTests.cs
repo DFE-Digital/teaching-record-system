@@ -31,13 +31,13 @@ public class ResultTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
-        var result = Core.Dqt.Models.dfeta_qualification_dfeta_MQ_Status.Passed;
+        var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
             new AddMqState()
             {
-                Result = result,
+                Status = status,
                 EndDate = endDate,
             });
 
@@ -52,7 +52,7 @@ public class ResultTests : TestBase
         var radioButtons = resultOptions!.GetElementsByTagName("input");
         var selectedResult = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedResult);
-        Assert.Equal(result.ToString(), selectedResult.GetAttribute("value"));
+        Assert.Equal(status.ToString(), selectedResult.GetAttribute("value"));
         Assert.Equal($"{endDate:%d}", doc.GetElementById("EndDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{endDate:%M}", doc.GetElementById("EndDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{endDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
@@ -79,7 +79,7 @@ public class ResultTests : TestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var result = Core.Dqt.Models.dfeta_qualification_dfeta_MQ_Status.Passed;
+        var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
         var journeyInstance = await CreateJourneyInstance(personId);
 
@@ -87,7 +87,7 @@ public class ResultTests : TestBase
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "Result", result.ToString() },
+                { "Status", status.ToString() },
                 { "EndDate.Day", $"{endDate:%d}" },
                 { "EndDate.Month", $"{endDate:%M}" },
                 { "EndDate.Year", $"{endDate:yyyy}" },
@@ -117,7 +117,7 @@ public class ResultTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Result", "Select a result");
+        await AssertEx.HtmlResponseHasError(response, "Status", "Select a result");
     }
 
     [Fact]
@@ -125,14 +125,14 @@ public class ResultTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
-        var result = Core.Dqt.Models.dfeta_qualification_dfeta_MQ_Status.Passed;
+        var status = MandatoryQualificationStatus.Passed;
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/result?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "Result", result.ToString() },
+                { "Status", status.ToString() },
             }
         };
 
@@ -148,7 +148,7 @@ public class ResultTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
-        var result = Core.Dqt.Models.dfeta_qualification_dfeta_MQ_Status.Passed;
+        var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
@@ -156,7 +156,7 @@ public class ResultTests : TestBase
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "Result", result.ToString() },
+                { "Status", status.ToString() },
                 { "EndDate.Day", $"{endDate:%d}" },
                 { "EndDate.Month", $"{endDate:%M}" },
                 { "EndDate.Year", $"{endDate:yyyy}" },

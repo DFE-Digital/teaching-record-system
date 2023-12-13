@@ -40,10 +40,10 @@ public class ConfirmTests : TestBase
     public async Task Get_ValidRequest_DisplaysContentAsExpected()
     {
         // Arrange
-        var oldResult = dfeta_qualification_dfeta_MQ_Status.Failed;
-        var newResult = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(result: oldResult));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: oldStatus));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -52,9 +52,9 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                Result = newResult,
+                Status = newStatus,
                 EndDate = newEndDate,
-                CurrentResult = oldResult,
+                CurrentStatus = oldStatus,
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/result/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -68,8 +68,8 @@ public class ConfirmTests : TestBase
         var doc = await response.GetDocument();
         var changeDetails = doc.GetElementByTestId("change-details");
         Assert.NotNull(changeDetails);
-        Assert.Equal(oldResult.ToString(), changeDetails.GetElementByTestId("current-result")!.TextContent);
-        Assert.Equal(newResult.ToString(), changeDetails.GetElementByTestId("new-result")!.TextContent);
+        Assert.Equal(oldStatus.GetTitle(), changeDetails.GetElementByTestId("current-result")!.TextContent);
+        Assert.Equal(newStatus.GetTitle(), changeDetails.GetElementByTestId("new-result")!.TextContent);
         Assert.Equal("None", changeDetails.GetElementByTestId("current-end-date")!.TextContent);
         Assert.Equal(newEndDate.ToString("d MMMM yyyy"), changeDetails.GetElementByTestId("new-end-date")!.TextContent);
     }
@@ -106,10 +106,10 @@ public class ConfirmTests : TestBase
     public async Task Post_Confirm_CompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
-        var oldResult = dfeta_qualification_dfeta_MQ_Status.Failed;
-        var newResult = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(result: oldResult));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: oldStatus));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -118,9 +118,9 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                Result = newResult,
+                Status = newStatus,
                 EndDate = newEndDate,
-                CurrentResult = oldResult,
+                CurrentStatus = oldStatus,
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -146,10 +146,10 @@ public class ConfirmTests : TestBase
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var oldResult = dfeta_qualification_dfeta_MQ_Status.Failed;
-        var newResult = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(result: oldResult));
+        TestData.CreatePersonResult person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: oldStatus));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -158,9 +158,9 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                Result = newResult,
+                Status = newStatus,
                 EndDate = newEndDate,
-                CurrentResult = oldResult,
+                CurrentStatus = oldStatus,
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")

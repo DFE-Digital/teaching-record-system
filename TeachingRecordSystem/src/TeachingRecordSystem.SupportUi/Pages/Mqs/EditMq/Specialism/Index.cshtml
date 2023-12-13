@@ -14,13 +14,13 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqEditSpecialism(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
-            <govuk-radios asp-for="SpecialismValue" data-testid="specialism-list">
+            <govuk-radios asp-for="Specialism" data-testid="specialism-list">
                 @if (Model.Specialisms is not null)
                 {
                     @foreach (var specialism in Model.Specialisms)
                     {
-                        <govuk-radios-item value="@specialism.dfeta_Value">
-                            @specialism.dfeta_name
+                        <govuk-radios-item value="@specialism.Value">
+                            @specialism.Title
                         </govuk-radios-item>
                     }
                 }

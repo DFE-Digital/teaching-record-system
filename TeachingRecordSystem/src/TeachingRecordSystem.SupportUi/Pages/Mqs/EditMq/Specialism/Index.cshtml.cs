@@ -8,22 +8,11 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 [Journey(JourneyNames.EditMqSpecialism), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel : PageModel
+public class IndexModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    ReferenceDataCache referenceDataCache,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly ReferenceDataCache _referenceDataCache;
-    private readonly TrsLinkGenerator _linkGenerator;
-
-    public IndexModel(
-        ICrmQueryDispatcher crmQueryDispatcher,
-        ReferenceDataCache referenceDataCache,
-        TrsLinkGenerator linkGenerator)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _referenceDataCache = referenceDataCache;
-        _linkGenerator = linkGenerator;
-    }
-
     public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -35,20 +24,20 @@ public class IndexModel : PageModel
 
     [BindProperty]
     [Display(Name = "Specialism")]
-    public string? SpecialismValue { get; set; }
+    public MandatoryQualificationSpecialism? Specialism { get; set; }
 
-    public dfeta_specialism[]? Specialisms { get; set; }
+    public MandatoryQualificationSpecialismInfo[]? Specialisms { get; set; }
 
     public void OnGet()
     {
-        SpecialismValue ??= JourneyInstance!.State.SpecialismValue;
+        Specialism ??= JourneyInstance!.State.Specialism;
     }
 
     public async Task<IActionResult> OnPost()
     {
-        if (string.IsNullOrWhiteSpace(SpecialismValue))
+        if (Specialism is null)
         {
-            ModelState.AddModelError(nameof(SpecialismValue), "Select a specialism");
+            ModelState.AddModelError(nameof(Specialism), "Select a specialism");
         }
 
         if (!ModelState.IsValid)
@@ -56,32 +45,31 @@ public class IndexModel : PageModel
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.SpecialismValue = SpecialismValue);
+        await JourneyInstance!.UpdateStateAsync(state => state.Specialism = Specialism);
 
-        return Redirect(_linkGenerator.MqEditSpecialismConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditSpecialismConfirm(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var qualification = await _crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId));
+        var qualification = await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId));
         if (qualification is null || qualification.dfeta_Type != dfeta_qualification_dfeta_Type.MandatoryQualification)
         {
             context.Result = NotFound();
             return;
         }
 
-        var specialisms = await _referenceDataCache.GetMqSpecialisms();
-        Specialisms = specialisms
-            .OrderBy(e => e.dfeta_name)
+        Specialisms = MandatoryQualificationSpecialismRegistry.All
+            .OrderBy(t => t.Title)
             .ToArray();
 
-        await JourneyInstance!.State.EnsureInitialized(_crmQueryDispatcher, _referenceDataCache, qualification);
+        await JourneyInstance!.State.EnsureInitialized(crmQueryDispatcher, referenceDataCache, qualification);
 
         PersonId = JourneyInstance!.State.PersonId;
         PersonName = JourneyInstance!.State.PersonName;
