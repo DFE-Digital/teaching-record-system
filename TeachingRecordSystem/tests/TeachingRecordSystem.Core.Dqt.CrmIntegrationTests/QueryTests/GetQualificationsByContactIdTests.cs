@@ -35,7 +35,7 @@ public class GetQualificationsByContactIdTests : IAsyncLifetime
         var person = await _dataScope.TestData.CreatePerson(
             x => x.WithQts(qtsDate: new DateOnly(2021, 10, 5))
                     .WithMandatoryQualification()
-                    .WithMandatoryQualification(providerValue: "959", specialismValue: "Visual"));
+                    .WithMandatoryQualification(providerValue: "959", specialism: MandatoryQualificationSpecialism.Visual));
 
         // Act
         var qualifications = await _crmQueryDispatcher.ExecuteQuery(new GetQualificationsByContactIdQuery(person.ContactId));

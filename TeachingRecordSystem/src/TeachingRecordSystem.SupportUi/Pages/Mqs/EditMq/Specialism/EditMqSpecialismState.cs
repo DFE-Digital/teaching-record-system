@@ -13,13 +13,13 @@ public class EditMqSpecialismState
 
     public string? PersonName { get; set; }
 
-    public string? CurrentSpecialismName { get; set; }
+    public MandatoryQualificationSpecialism? CurrentSpecialism { get; set; }
 
-    public string? SpecialismValue { get; set; }
+    public MandatoryQualificationSpecialism? Specialism { get; set; }
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(SpecialismValue))]
-    public bool IsComplete => !string.IsNullOrWhiteSpace(SpecialismValue);
+    [MemberNotNullWhen(true, nameof(Specialism))]
+    public bool IsComplete => Specialism is not null;
 
     public async Task EnsureInitialized(
         ICrmQueryDispatcher crmQueryDispatcher,
@@ -45,8 +45,8 @@ public class EditMqSpecialismState
                     Contact.Fields.dfeta_QTSDate)));
 
         var mqSpecialism = qualification.dfeta_MQ_SpecialismId is not null ? await referenceDataCache.GetMqSpecialismById(qualification.dfeta_MQ_SpecialismId.Id) : null;
-        SpecialismValue = mqSpecialism is not null ? mqSpecialism.dfeta_Value : null;
-        CurrentSpecialismName = mqSpecialism is not null ? mqSpecialism.dfeta_name : null;
+        Specialism = mqSpecialism?.ToMandatoryQualificationSpecialism();
+        CurrentSpecialism = mqSpecialism?.ToMandatoryQualificationSpecialism();
         PersonId = personDetail!.Contact.Id;
         PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
         Initialized = true;

@@ -31,12 +31,12 @@ public class SpecialismTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
-        var specialismValue = "Hearing";
+        var specialism = MandatoryQualificationSpecialism.Hearing;
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
             new AddMqState()
             {
-                SpecialismValue = specialismValue
+                Specialism = specialism
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -50,7 +50,7 @@ public class SpecialismTests : TestBase
         var radioButtons = providerList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedSpecialism);
-        Assert.Equal(specialismValue, selectedSpecialism.GetAttribute("value"));
+        Assert.Equal(specialism.ToString(), selectedSpecialism.GetAttribute("value"));
     }
 
     [Fact]
@@ -58,14 +58,14 @@ public class SpecialismTests : TestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var specialismValue = "Hearing";
+        var specialism = MandatoryQualificationSpecialism.Hearing;
         var journeyInstance = await CreateJourneyInstance(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "SpecialismValue", specialismValue }
+                { "Specialism", specialism }
             }
         };
 
@@ -92,7 +92,7 @@ public class SpecialismTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "SpecialismValue", "Select a specialism");
+        await AssertEx.HtmlResponseHasError(response, "Specialism", "Select a specialism");
     }
 
     [Fact]
@@ -100,14 +100,14 @@ public class SpecialismTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
-        var specialismValue = "Hearing";
+        var specialism = MandatoryQualificationSpecialism.Hearing;
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "SpecialismValue", specialismValue }
+                { "Specialism", specialism }
             }
         };
 

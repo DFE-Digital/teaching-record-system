@@ -7,16 +7,8 @@ using TeachingRecordSystem.Core.Dqt.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class ResultModel : PageModel
+public class ResultModel(TrsLinkGenerator linkGenerator) : PageModel
 {
-    private readonly TrsLinkGenerator _linkGenerator;
-
-    public ResultModel(
-        TrsLinkGenerator linkGenerator)
-    {
-        _linkGenerator = linkGenerator;
-    }
-
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -25,7 +17,7 @@ public class ResultModel : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
-    public dfeta_qualification_dfeta_MQ_Status? Result { get; set; }
+    public MandatoryQualificationStatus? Status { get; set; }
 
     [BindProperty]
     [Display(Name = "End date")]
@@ -33,12 +25,12 @@ public class ResultModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        if (Result is null)
+        if (Status is null)
         {
-            ModelState.AddModelError(nameof(Result), "Select a result");
+            ModelState.AddModelError(nameof(Status), "Select a result");
         }
 
-        if (Result == dfeta_qualification_dfeta_MQ_Status.Passed && EndDate is null)
+        if (Status == MandatoryQualificationStatus.Passed && EndDate is null)
         {
             ModelState.AddModelError(nameof(EndDate), "Enter an end date");
         }
@@ -51,17 +43,17 @@ public class ResultModel : PageModel
         await JourneyInstance!.UpdateStateAsync(
             state =>
             {
-                state.Result = Result;
-                state.EndDate = Result == dfeta_qualification_dfeta_MQ_Status.Passed ? EndDate : null;
+                state.Status = Status;
+                state.EndDate = Status == MandatoryQualificationStatus.Passed ? EndDate : null;
             });
 
-        return Redirect(_linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -69,7 +61,7 @@ public class ResultModel : PageModel
         var personDetail = (ContactDetail?)context.HttpContext.Items["CurrentPersonDetail"];
 
         PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
-        Result ??= JourneyInstance!.State.Result;
+        Status ??= JourneyInstance!.State.Status;
         EndDate ??= JourneyInstance!.State.EndDate;
 
         await next();

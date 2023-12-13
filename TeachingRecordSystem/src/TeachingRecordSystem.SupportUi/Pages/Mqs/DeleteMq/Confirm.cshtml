@@ -29,7 +29,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="specialism">@(!string.IsNullOrEmpty(Model.Specialism) ? Model.Specialism : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="specialism">@(Model.Specialism?.GetTitle() ?? "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>                
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>

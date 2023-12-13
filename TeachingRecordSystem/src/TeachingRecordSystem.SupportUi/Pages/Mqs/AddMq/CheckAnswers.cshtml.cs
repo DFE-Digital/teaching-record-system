@@ -32,25 +32,27 @@ public class CheckAnswersModel : PageModel
 
     public dfeta_mqestablishment? MqEstablishment { get; set; }
 
-    public dfeta_specialism? Specialism { get; set; }
+    public MandatoryQualificationSpecialism? Specialism { get; set; }
 
     public DateOnly? StartDate { get; set; }
 
-    public dfeta_qualification_dfeta_MQ_Status? Result { get; set; }
+    public MandatoryQualificationStatus? Status { get; set; }
 
     public DateOnly? EndDate { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
+        var mqSpecialism = await _referenceDataCache.GetMqSpecialismByValue(Specialism!.Value.GetDqtValue());
+
         await _crmQueryDispatcher.ExecuteQuery(
             new CreateMandatoryQualificationQuery()
             {
                 ContactId = PersonId,
                 MqEstablishmentId = MqEstablishment!.Id,
-                SpecialismId = Specialism!.Id,
+                SpecialismId = mqSpecialism.Id,
                 StartDate = StartDate!.Value,
-                Result = Result!.Value,
-                EndDate = Result == dfeta_qualification_dfeta_MQ_Status.Passed
+                Status = Status!.Value.GetDqtStatus(),
+                EndDate = Status == MandatoryQualificationStatus.Passed
                     ? EndDate!.Value
                     : null
             });
@@ -78,10 +80,10 @@ public class CheckAnswersModel : PageModel
 
         PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
         MqEstablishment = await _referenceDataCache.GetMqEstablishmentByValue(JourneyInstance!.State.MqEstablishmentValue!);
-        Specialism = await _referenceDataCache.GetMqSpecialismByValue(JourneyInstance!.State.SpecialismValue!);
-        StartDate = JourneyInstance!.State.StartDate;
-        Result = JourneyInstance!.State.Result;
-        EndDate = JourneyInstance!.State.EndDate;
+        Specialism = JourneyInstance.State.Specialism;
+        StartDate = JourneyInstance.State.StartDate;
+        Status = JourneyInstance.State.Status;
+        EndDate = JourneyInstance.State.EndDate;
 
         await next();
     }

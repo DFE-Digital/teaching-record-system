@@ -6,19 +6,8 @@ using TeachingRecordSystem.Core.Dqt.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class SpecialismModel : PageModel
+public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
 {
-    private readonly ReferenceDataCache _referenceDataCache;
-    private readonly TrsLinkGenerator _linkGenerator;
-
-    public SpecialismModel(
-        ReferenceDataCache referenceDataCache,
-        TrsLinkGenerator linkGenerator)
-    {
-        _referenceDataCache = referenceDataCache;
-        _linkGenerator = linkGenerator;
-    }
-
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -27,15 +16,15 @@ public class SpecialismModel : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
-    public string? SpecialismValue { get; set; }
+    public MandatoryQualificationSpecialism? Specialism { get; set; }
 
-    public dfeta_specialism[]? Specialisms { get; set; }
+    public MandatoryQualificationSpecialismInfo[]? Specialisms { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
-        if (SpecialismValue is null)
+        if (Specialism is null)
         {
-            ModelState.AddModelError(nameof(SpecialismValue), "Select a specialism");
+            ModelState.AddModelError(nameof(Specialism), "Select a specialism");
         }
 
         if (!ModelState.IsValid)
@@ -43,28 +32,27 @@ public class SpecialismModel : PageModel
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.SpecialismValue = SpecialismValue);
+        await JourneyInstance!.UpdateStateAsync(state => state.Specialism = Specialism);
 
-        return Redirect(_linkGenerator.MqAddStartDate(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqAddStartDate(PersonId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var personDetail = (ContactDetail?)context.HttpContext.Items["CurrentPersonDetail"];
 
-        var specialisms = await _referenceDataCache.GetMqSpecialisms();
-        Specialisms = specialisms
-            .OrderBy(e => e.dfeta_name)
+        Specialisms = MandatoryQualificationSpecialismRegistry.All
+            .OrderBy(t => t.Title)
             .ToArray();
 
         PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
-        SpecialismValue ??= JourneyInstance!.State.SpecialismValue;
+        Specialism ??= JourneyInstance!.State.Specialism;
 
         await next();
     }

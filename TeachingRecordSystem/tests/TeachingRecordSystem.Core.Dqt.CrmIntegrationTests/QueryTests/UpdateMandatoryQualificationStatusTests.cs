@@ -16,9 +16,13 @@ public class UpdateMandatoryQualificationStatusTests : IAsyncLifetime
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
     [Theory]
-    [InlineData(dfeta_qualification_dfeta_MQ_Status.Failed, null, dfeta_qualification_dfeta_MQ_Status.Passed, "2021-10-05")]
-    [InlineData(dfeta_qualification_dfeta_MQ_Status.Passed, "2021-10-05", dfeta_qualification_dfeta_MQ_Status.Failed, null)]
-    public async Task QueryExecutesSuccessfully(dfeta_qualification_dfeta_MQ_Status? originalMqStatus, string? originalEndDateString, dfeta_qualification_dfeta_MQ_Status newMqStatus, string? newEndDateString)
+    [InlineData(MandatoryQualificationStatus.Failed, null, MandatoryQualificationStatus.Passed, "2021-10-05")]
+    [InlineData(MandatoryQualificationStatus.Passed, "2021-10-05", MandatoryQualificationStatus.Failed, null)]
+    public async Task QueryExecutesSuccessfully(
+        MandatoryQualificationStatus? originalMqStatus,
+        string? originalEndDateString,
+        MandatoryQualificationStatus newMqStatus,
+        string? newEndDateString)
     {
         // Arrange
         DateOnly? originalEndDate = !string.IsNullOrEmpty(originalEndDateString) ? DateOnly.Parse(originalEndDateString) : null;
@@ -26,7 +30,7 @@ public class UpdateMandatoryQualificationStatusTests : IAsyncLifetime
 
         var person = await _dataScope.TestData.CreatePerson(
             x => x.WithQts(qtsDate: new DateOnly(2021, 10, 5))
-                .WithMandatoryQualification(result: originalMqStatus, endDate: originalEndDate));
+                .WithMandatoryQualification(status: originalMqStatus, endDate: originalEndDate));
 
         var qualification = person.MandatoryQualifications.First();
 
@@ -34,7 +38,7 @@ public class UpdateMandatoryQualificationStatusTests : IAsyncLifetime
         await _crmQueryDispatcher.ExecuteQuery(
             new UpdateMandatoryQualificationStatusQuery(
                 qualification.QualificationId,
-                newMqStatus,
+                newMqStatus.GetDqtStatus(),
                 newEndDate));
 
         // Assert
@@ -42,7 +46,7 @@ public class UpdateMandatoryQualificationStatusTests : IAsyncLifetime
 
         var updatedQualification = ctx.dfeta_qualificationSet.SingleOrDefault(c => c.GetAttributeValue<Guid>(dfeta_qualification.PrimaryIdAttribute) == qualification.QualificationId);
         Assert.NotNull(updatedQualification);
-        Assert.Equal(newMqStatus, updatedQualification.dfeta_MQ_Status);
+        Assert.Equal(newMqStatus, updatedQualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus());
         Assert.Equal(newEndDate.ToDateTimeWithDqtBstFix(isLocalTime: true), updatedQualification.dfeta_MQ_Date);
     }
 }

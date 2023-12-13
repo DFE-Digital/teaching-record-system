@@ -31,9 +31,9 @@ public class IndexTests : TestBase
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
-        var databaseResult = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var databaseStatus = MandatoryQualificationStatus.Passed;
         var databaseEndDate = new DateOnly(2021, 11, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(result: databaseResult, endDate: databaseEndDate));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: databaseStatus, endDate: databaseEndDate));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
@@ -50,7 +50,7 @@ public class IndexTests : TestBase
         var radioButtons = resultOptions!.GetElementsByTagName("input");
         var selectedResult = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedResult);
-        Assert.Equal(databaseResult.ToString(), selectedResult.GetAttribute("value"));
+        Assert.Equal(databaseStatus.ToString(), selectedResult.GetAttribute("value"));
         Assert.Equal($"{databaseEndDate:%d}", doc.GetElementById("EndDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{databaseEndDate:%M}", doc.GetElementById("EndDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{databaseEndDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
@@ -60,10 +60,10 @@ public class IndexTests : TestBase
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var databaseResult = dfeta_qualification_dfeta_MQ_Status.Failed;
-        var journeyResult = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var databaseStatus = MandatoryQualificationStatus.Failed;
+        var journeyStatus = MandatoryQualificationStatus.Passed;
         var journeyEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(result: databaseResult));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: databaseStatus));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -72,7 +72,7 @@ public class IndexTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                Result = journeyResult,
+                Status = journeyStatus,
                 EndDate = journeyEndDate
             });
 
@@ -89,7 +89,7 @@ public class IndexTests : TestBase
         var radioButtons = resultOptions!.GetElementsByTagName("input");
         var selectedResult = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedResult);
-        Assert.Equal(journeyResult.ToString(), selectedResult.GetAttribute("value"));
+        Assert.Equal(journeyStatus.ToString(), selectedResult.GetAttribute("value"));
         Assert.Equal($"{journeyEndDate:%d}", doc.GetElementById("EndDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{journeyEndDate:%M}", doc.GetElementById("EndDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{journeyEndDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
@@ -131,7 +131,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Result", "Select a result");
+        await AssertEx.HtmlResponseHasError(response, "Status", "Select a result");
     }
 
     [Fact]
@@ -141,13 +141,13 @@ public class IndexTests : TestBase
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
-        var result = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var status = MandatoryQualificationStatus.Passed;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "Result", result.ToString() }
+                { "Status", status.ToString() }
             }
         };
 
@@ -161,10 +161,10 @@ public class IndexTests : TestBase
     [Fact]
     public async Task Post_ValidRequest_RedirectsToConfirmPage()
     {
-        var oldResult = dfeta_qualification_dfeta_MQ_Status.Failed;
-        var newResult = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var oldStatus = MandatoryQualificationStatus.Failed;
+        var newStatus = dfeta_qualification_dfeta_MQ_Status.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(result: oldResult));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: oldStatus));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
@@ -172,7 +172,7 @@ public class IndexTests : TestBase
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "Result", newResult.ToString() },
+                { "Status", newStatus.ToString() },
                 { "EndDate.Day", $"{newEndDate:%d}" },
                 { "EndDate.Month", $"{newEndDate:%M}" },
                 { "EndDate.Year", $"{newEndDate:yyyy}" },

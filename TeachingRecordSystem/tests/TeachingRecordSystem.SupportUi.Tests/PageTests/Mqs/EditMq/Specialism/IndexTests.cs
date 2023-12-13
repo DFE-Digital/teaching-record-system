@@ -31,8 +31,8 @@ public class IndexTests : TestBase
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
-        var databaseSpecialismValue = "Hearing";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialismValue: databaseSpecialismValue));
+        var databaseSpecialism = MandatoryQualificationSpecialism.Hearing;
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: databaseSpecialism));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
@@ -49,16 +49,16 @@ public class IndexTests : TestBase
         var radioButtons = specialismList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedSpecialism);
-        Assert.Equal(databaseSpecialismValue, selectedSpecialism.GetAttribute("value"));
+        Assert.Equal(databaseSpecialism.ToString(), selectedSpecialism.GetAttribute("value"));
     }
 
     [Fact]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var databaseSpecialismValue = "Hearing";
-        var journeySpecialismValue = "Visual";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialismValue: databaseSpecialismValue));
+        var databaseSpecialism = MandatoryQualificationSpecialism.Hearing;
+        var journeySpecialism = MandatoryQualificationSpecialism.Visual;
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: databaseSpecialism));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -67,7 +67,7 @@ public class IndexTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                SpecialismValue = journeySpecialismValue
+                Specialism = journeySpecialism
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -83,7 +83,7 @@ public class IndexTests : TestBase
         var radioButtons = specialismList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedSpecialism);
-        Assert.Equal(journeySpecialismValue, selectedSpecialism.GetAttribute("value"));
+        Assert.Equal(journeySpecialism.ToString(), selectedSpecialism.GetAttribute("value"));
     }
 
     [Fact]
@@ -126,16 +126,16 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "SpecialismValue", "Select a specialism");
+        await AssertEx.HtmlResponseHasError(response, "Specialism", "Select a specialism");
     }
 
     [Fact]
     public async Task Post_WhenSpecialismIsSelected_RedirectsToConfirmPage()
     {
         // Arrange
-        var oldSpecialismValue = "Hearing";
-        var newSpecialismValue = "Visual";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialismValue: oldSpecialismValue));
+        var oldSpecialism = MandatoryQualificationSpecialism.Hearing;
+        var newSpecialism = MandatoryQualificationSpecialism.Visual;
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: oldSpecialism));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -144,14 +144,14 @@ public class IndexTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                SpecialismValue = oldSpecialismValue
+                Specialism = oldSpecialism
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "SpecialismValue", newSpecialismValue }
+                { "Specialism", newSpecialism }
             }
         };
 
@@ -167,8 +167,8 @@ public class IndexTests : TestBase
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var specialismValue = "Hearing";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialismValue: specialismValue));
+        var specialism = MandatoryQualificationSpecialism.Hearing;
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: specialism));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -177,7 +177,7 @@ public class IndexTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                SpecialismValue = specialismValue
+                Specialism = specialism
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")

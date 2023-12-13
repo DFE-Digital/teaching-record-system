@@ -25,8 +25,8 @@
                 <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
                         <th class="govuk-table__header" scope="row">Result</th>
-                        <td class="govuk-table__cell" data-testid="current-result">@(Model.CurrentResult.HasValue ? Model.CurrentResult.Value : "None")</td>
-                        <td class="govuk-table__cell" data-testid="new-result">@(Model.NewResult.HasValue ? Model.NewResult.Value : "None")</td>
+                        <td class="govuk-table__cell" data-testid="current-result">@(Model.CurrentStatus.HasValue ? Model.CurrentStatus.Value : "None")</td>
+                        <td class="govuk-table__cell" data-testid="new-result">@(Model.NewStatus.HasValue ? Model.NewStatus.Value : "None")</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th class="govuk-table__header" scope="row">End date</th>

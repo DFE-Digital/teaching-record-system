@@ -37,31 +37,30 @@ public class ConfirmTests : TestBase
     }
 
     [Theory]
-    [InlineData("959", "Hearing", "2021-10-05", dfeta_qualification_dfeta_MQ_Status.Passed, "2021-11-05", MqDeletionReasonOption.ProviderRequest, "Some details about the deletion reason")]
-    [InlineData("959", "Hearing", "2021-10-05", dfeta_qualification_dfeta_MQ_Status.Deferred, null, MqDeletionReasonOption.ProviderRequest, null)]
+    [InlineData("959", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Passed, "2021-11-05", MqDeletionReasonOption.ProviderRequest, "Some details about the deletion reason")]
+    [InlineData("959", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Deferred, null, MqDeletionReasonOption.ProviderRequest, null)]
     [InlineData(null, null, null, null, null, MqDeletionReasonOption.AnotherReason, null)]
     public async Task Get_ValidRequest_DisplaysContentAsExpected(
         string? providerValue,
-        string? specialismValue,
+        MandatoryQualificationSpecialism? specialism,
         string? startDateString,
-        dfeta_qualification_dfeta_MQ_Status? status,
+        MandatoryQualificationStatus? status,
         string? endDateString,
         MqDeletionReasonOption deletionReason,
         string? deletionReasonDetail)
     {
         // Arrange
         var mqEstablishment = !string.IsNullOrEmpty(providerValue) ? await TestData.ReferenceDataCache.GetMqEstablishmentByValue(providerValue) : null;
-        var specialism = !string.IsNullOrEmpty(specialismValue) ? await TestData.ReferenceDataCache.GetMqSpecialismByValue(specialismValue) : null;
         DateOnly? startDate = !string.IsNullOrEmpty(startDateString) ? DateOnly.Parse(startDateString) : null;
         DateOnly? endDate = !string.IsNullOrEmpty(endDateString) ? DateOnly.Parse(endDateString) : null;
 
         var person = await TestData.CreatePerson(
             b => b.WithMandatoryQualification(
                 providerValue: providerValue,
-                specialismValue: specialismValue,
+                specialism: specialism,
                 startDate: startDate,
                 endDate: endDate,
-                result: status));
+                status: status));
         var qualification = person.MandatoryQualifications.Single();
         var journeyInstance = await CreateJourneyInstance(
             qualification.QualificationId,
@@ -70,8 +69,8 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                MqEstablishment = mqEstablishment is not null ? mqEstablishment.dfeta_name : null,
-                Specialism = specialism is not null ? specialism.dfeta_name : null,
+                MqEstablishment = mqEstablishment?.dfeta_name,
+                Specialism = specialism,
                 Status = status,
                 StartDate = startDate,
                 EndDate = endDate,
@@ -93,7 +92,7 @@ public class ConfirmTests : TestBase
         Assert.Equal(deletionReason.GetDisplayName(), deletionSummary.GetElementByTestId("deletion-reason")!.TextContent);
         Assert.Equal(!string.IsNullOrEmpty(deletionReasonDetail) ? deletionReasonDetail : "None", deletionSummary.GetElementByTestId("deletion-reason-detail")!.TextContent);
         Assert.Equal(mqEstablishment is not null ? mqEstablishment.dfeta_name : "None", deletionSummary.GetElementByTestId("provider")!.TextContent);
-        Assert.Equal(specialism is not null ? specialism.dfeta_name : "None", deletionSummary.GetElementByTestId("specialism")!.TextContent);
+        Assert.Equal(specialism?.GetTitle() ?? "None", deletionSummary.GetElementByTestId("specialism")!.TextContent);
         Assert.Equal(status is not null ? status.Value.ToString() : "None", deletionSummary.GetElementByTestId("status")!.TextContent);
         Assert.Equal(startDate is not null ? startDate.Value.ToString("d MMMM yyyy") : "None", deletionSummary.GetElementByTestId("start-date")!.TextContent);
         Assert.Equal(endDate is not null ? endDate.Value.ToString("d MMMM yyyy") : "None", deletionSummary.GetElementByTestId("end-date")!.TextContent);
@@ -141,8 +140,8 @@ public class ConfirmTests : TestBase
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishment = "University of Leeds",
-                Specialism = "Hearing",
-                Status = dfeta_qualification_dfeta_MQ_Status.Passed,
+                Specialism = MandatoryQualificationSpecialism.Hearing,
+                Status = MandatoryQualificationStatus.Passed,
                 StartDate = new DateOnly(2023, 09, 01),
                 EndDate = new DateOnly(2023, 11, 05),
                 DeletionReason = MqDeletionReasonOption.ProviderRequest,
@@ -182,8 +181,8 @@ public class ConfirmTests : TestBase
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishment = "University of Leeds",
-                Specialism = "Hearing",
-                Status = dfeta_qualification_dfeta_MQ_Status.Passed,
+                Specialism = MandatoryQualificationSpecialism.Hearing,
+                Status = MandatoryQualificationStatus.Passed,
                 StartDate = new DateOnly(2023, 09, 01),
                 EndDate = new DateOnly(2023, 11, 05),
                 DeletionReason = MqDeletionReasonOption.ProviderRequest,

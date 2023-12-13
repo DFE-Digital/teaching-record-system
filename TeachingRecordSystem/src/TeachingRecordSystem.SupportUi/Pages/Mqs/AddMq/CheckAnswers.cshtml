@@ -25,7 +25,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="specialism">@Model.Specialism!.dfeta_name</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="specialism">@Model.Specialism!.Value.GetTitle()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqAddSpecialism(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
@@ -39,7 +39,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Result</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="result">@Model.Result</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="result">@Model.Status</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqAddResult(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>

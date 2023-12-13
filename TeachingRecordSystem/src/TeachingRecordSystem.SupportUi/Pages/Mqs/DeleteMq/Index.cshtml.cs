@@ -35,9 +35,9 @@ public class IndexModel : PageModel
 
     public string? TrainingProvider { get; set; }
 
-    public string? Specialism { get; set; }
+    public MandatoryQualificationSpecialism? Specialism { get; set; }
 
-    public dfeta_qualification_dfeta_MQ_Status? Status { get; set; }
+    public MandatoryQualificationStatus? Status { get; set; }
 
     public DateOnly? StartDate { get; set; }
 

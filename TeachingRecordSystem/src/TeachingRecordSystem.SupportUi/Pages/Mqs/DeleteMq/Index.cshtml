@@ -9,7 +9,7 @@
 }
 
 <span class="govuk-caption-l">Delete qualification - @Model.PersonName</span>
-<h1 class="govuk-heading-l" data-testid="title">Mandatory qualification@(!string.IsNullOrEmpty(Model.Specialism) ? $" for {Model.Specialism!.ToLowerInvariant()}" : "")</h1>
+<h1 class="govuk-heading-l" data-testid="title">Mandatory qualification@(Model.Specialism is MandatoryQualificationSpecialism specialism ? $" for {specialism.GetName()}" : "")</h1>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">

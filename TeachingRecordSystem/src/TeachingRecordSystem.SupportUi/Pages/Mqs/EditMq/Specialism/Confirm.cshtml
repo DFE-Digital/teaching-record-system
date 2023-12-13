@@ -25,8 +25,8 @@
                 <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
                         <th class="govuk-table__header" scope="row">Specialism</th>
-                        <td class="govuk-table__cell" data-testid="current-value">@Model.CurrentSpecialismName</td>
-                        <td class="govuk-table__cell" data-testid="new-value">@Model.NewSpecialism!.dfeta_name</td>
+                        <td class="govuk-table__cell" data-testid="current-value">@Model.CurrentSpecialism</td>
+                        <td class="govuk-table__cell" data-testid="new-value">@Model.NewSpecialism!.Value.GetTitle()</td>
                     </tr>
                 </tbody>
             </table>
