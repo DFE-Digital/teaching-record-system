@@ -54,6 +54,7 @@ public class SendInductionCompletedEmailJob
 
         _dbContext.AddEvent(new InductionCompletedEmailSentEvent
         {
+            EventId = Guid.NewGuid(),
             InductionCompletedEmailsJobId = inductionCompletedEmailsJobId,
             PersonId = personId,
             EmailAddress = item.EmailAddress,

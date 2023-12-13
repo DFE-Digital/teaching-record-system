@@ -11,6 +11,7 @@ public class EventInfoTests
         // Arrange
         var @e = new UserActivatedEvent()
         {
+            EventId = Guid.NewGuid(),
             CreatedUtc = DateTime.UtcNow,
             SourceUserId = DataStore.Postgres.Models.User.SystemUserId,
             User = new()
