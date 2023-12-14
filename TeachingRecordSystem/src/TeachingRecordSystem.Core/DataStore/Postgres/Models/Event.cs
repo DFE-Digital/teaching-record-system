@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Event
 {
-    public long EventId { get; }
+    public long Id { get; }
     public required string EventName { get; init; }
     public required DateTime Created { get; init; }
     public required string Payload { get; init; }
