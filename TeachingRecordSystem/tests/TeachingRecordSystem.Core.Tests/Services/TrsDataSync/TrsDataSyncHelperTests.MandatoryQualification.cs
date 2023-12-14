@@ -2,6 +2,8 @@ using FakeXrmEasy.Extensions;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Events;
+using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -65,6 +67,56 @@ public partial class TrsDataSyncHelperTests
         {
             var mq = await dbContext.MandatoryQualifications.SingleOrDefaultAsync(p => p.DqtQualificationId == qualificationId);
             Assert.Null(mq);
+        });
+    }
+
+    [Fact]
+    public async Task SyncMandatoryQualification_WithDeletedEvent_SetsDeletedOnPropertyAndSavesEvent()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson(b => b.WithSyncOverride(false));
+        var qualificationId = Guid.NewGuid();
+        var entity = await CreateMandatoryQualificationEntity(qualificationId, person.ContactId);
+
+        var specialism = (await TestData.ReferenceDataCache.GetMqSpecialisms())
+            .Single(s => s.Id == entity.dfeta_MQ_SpecialismId?.Id)
+            .ToMandatoryQualificationSpecialism();
+
+        var dqtUserId = await TestData.GetCurrentCrmUserId();
+
+        var deletedEvent = new MandatoryQualificationDeletedEvent()
+        {
+            CreatedUtc = Clock.UtcNow,
+            DeletionReason = "Added in error",
+            DeletionReasonDetail = "Some extra information",
+            EventId = Guid.NewGuid(),
+            EvidenceFile = null,
+            MandatoryQualification = new()
+            {
+                QualificationId = qualificationId,
+                Specialism = specialism,
+                Status = entity.dfeta_MQ_Status?.ToMandatoryQualificationStatus(),
+                EndDate = entity.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                StartDate = entity.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            },
+            PersonId = person.PersonId,
+            RaisedBy = RaisedByUserInfo.FromDqtUser(dqtUserId, "Test User")
+        };
+        entity.dfeta_TrsDeletedEvent = EventInfo.Create(deletedEvent).Serialize();
+        entity.StateCode = dfeta_qualificationState.Inactive;
+
+        // Act
+        await Helper.SyncMandatoryQualification(entity, ignoreInvalid: false);
+
+        // Assert
+        await DbFixture.WithDbContext(async dbContext =>
+        {
+            var mq = await dbContext.MandatoryQualifications.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.DqtQualificationId == qualificationId);
+            Assert.NotNull(mq);
+            mq.DeletedOn = deletedEvent.CreatedUtc;
+
+            var @event = await dbContext.Events.SingleOrDefaultAsync(e => e.EventId == deletedEvent.EventId);
+            Assert.Equivalent(deletedEvent, @event?.ToEventBase());
         });
     }
 

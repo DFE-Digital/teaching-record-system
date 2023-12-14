@@ -70,7 +70,7 @@ file class EventInfoJsonConverter : JsonConverter<EventInfo>
 
             var propertyName = reader.GetString();
 
-            if (propertyName == "EventTypeName")
+            if (propertyName == "EventName")
             {
                 reader.Read();
 
@@ -111,11 +111,11 @@ file class EventInfoJsonConverter : JsonConverter<EventInfo>
     public override void Write(Utf8JsonWriter writer, EventInfo value, JsonSerializerOptions options)
     {
         var eventType = value.Event.GetType();
-        var eventTypeName = eventType.Name;
+        var eventName = value.Event.GetEventName();
 
         writer.WriteStartObject();
-        writer.WritePropertyName("EventTypeName");
-        writer.WriteStringValue(eventTypeName);
+        writer.WritePropertyName("EventName");
+        writer.WriteStringValue(eventName);
         writer.WritePropertyName("Event");
         JsonSerializer.Serialize(writer, value.Event, eventType, EventBase.JsonSerializerOptions);
         writer.WriteEndObject();

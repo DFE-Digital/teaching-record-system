@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -9,6 +10,7 @@ using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -66,10 +68,10 @@ public class TrsDataSyncHelper(
         var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
         await connection.OpenAsync();
 
-        using (var createTempTableCommand = connection.CreateCommand())
+        using (var cmd = connection.CreateCommand())
         {
-            createTempTableCommand.CommandText = modelTypeSyncInfo.GetLastModifiedOnStatement;
-            await using var reader = await createTempTableCommand.ExecuteReaderAsync();
+            cmd.CommandText = modelTypeSyncInfo.GetLastModifiedOnStatement;
+            await using var reader = await cmd.ExecuteReaderAsync();
             var read = reader.Read();
             Debug.Assert(read);
             return reader.IsDBNull(0) ? null : reader.GetDateTime(0);
@@ -193,10 +195,11 @@ public class TrsDataSyncHelper(
         // Not all dfeta_qualification records are MQs..
         var toSync = entities.Where(q => q.dfeta_Type == dfeta_qualification_dfeta_Type.MandatoryQualification);
 
-        var mqs = await MapMandatoryQualifications(toSync);
+        var (mqs, events) = await MapMandatoryQualifications(toSync);
 
         if (mqs.Count == 0)
         {
+            Debug.Assert(events.Count == 0);
             return 0;
         }
 
@@ -278,6 +281,8 @@ public class TrsDataSyncHelper(
             break;
         }
         while (true);
+
+        await SyncEvents(events, cancellationToken);
 
         return mqs.Count;
     }
@@ -515,46 +520,128 @@ public class TrsDataSyncHelper(
         })
         .ToList();
 
-    private async Task<List<MandatoryQualification>> MapMandatoryQualifications(
+    private async Task<(List<MandatoryQualification> MandatoryQualifications, List<EventBase> Events)> MapMandatoryQualifications(
         IEnumerable<dfeta_qualification> qualifications)
     {
         var mqSpecialisms = await referenceDataCache.GetMqSpecialisms();
 
-        return qualifications
-            .Select(q =>
+        var mqs = new List<MandatoryQualification>();
+        var events = new List<EventBase>();
+
+        foreach (var q in qualifications)
+        {
+            var deletedEvent = q.dfeta_TrsDeletedEvent is not null and not "{}" ?
+                EventInfo.Deserialize<MandatoryQualificationDeletedEvent>(q.dfeta_TrsDeletedEvent).Event :
+                null;
+
+            if (deletedEvent is not null)
             {
-                // Waiting on deleted event being fully defined
-                //var deletedEvent = q.dfeta_TrsDeletedEvent is not null and not "{}" ?
-                //    EventInfo.Deserialize<MandatoryQualificationDeletedEvent>(q.dfeta_TrsDeletedEvent).Event :
-                //    null;
+                events.Add(deletedEvent);
+            }
 
-                MandatoryQualificationSpecialism? specialism = q.dfeta_MQ_SpecialismId is not null ?
-                    mqSpecialisms.Single(s => s.Id == q.dfeta_MQ_SpecialismId.Id).ToMandatoryQualificationSpecialism() :
-                    null;
+            MandatoryQualificationSpecialism? specialism = q.dfeta_MQ_SpecialismId is not null ?
+                mqSpecialisms.Single(s => s.Id == q.dfeta_MQ_SpecialismId.Id).ToMandatoryQualificationSpecialism() :
+                null;
 
-                MandatoryQualificationStatus? status = q.dfeta_MQ_Status?.ToMandatoryQualificationStatus() ??
-                    (q.dfeta_MQ_Date.HasValue ? MandatoryQualificationStatus.Passed : null);
+            MandatoryQualificationStatus? status = q.dfeta_MQ_Status?.ToMandatoryQualificationStatus() ??
+                (q.dfeta_MQ_Date.HasValue ? MandatoryQualificationStatus.Passed : null);
 
-                return new MandatoryQualification()
-                {
-                    QualificationId = q.Id,
-                    CreatedOn = q.CreatedOn!.Value,
-                    UpdatedOn = q.ModifiedOn!.Value,
-                    //DeletedOn = deletedEvent?.CreatedUtc,
-                    PersonId = q.dfeta_PersonId.Id,
-                    DqtQualificationId = q.Id,
-                    DqtState = (int)q.StateCode!,
-                    DqtCreatedOn = q.CreatedOn!.Value,
-                    DqtModifiedOn = q.ModifiedOn!.Value,
-                    Specialism = specialism,
-                    Status = status,
-                    StartDate = q.dfeta_MQStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    EndDate = q.dfeta_MQ_Date.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    DqtMqEstablishmentId = q.dfeta_MQ_MQEstablishmentId?.Id,
-                    DqtSpecialismId = q.dfeta_MQ_SpecialismId?.Id
-                };
-            })
-            .ToList();
+            mqs.Add(new MandatoryQualification()
+            {
+                QualificationId = q.Id,
+                CreatedOn = q.CreatedOn!.Value,
+                UpdatedOn = q.ModifiedOn!.Value,
+                DeletedOn = deletedEvent?.CreatedUtc,
+                PersonId = q.dfeta_PersonId.Id,
+                DqtQualificationId = q.Id,
+                DqtState = (int)q.StateCode!,
+                DqtCreatedOn = q.CreatedOn!.Value,
+                DqtModifiedOn = q.ModifiedOn!.Value,
+                Specialism = specialism,
+                Status = status,
+                StartDate = q.dfeta_MQStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                EndDate = q.dfeta_MQ_Date.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                DqtMqEstablishmentId = q.dfeta_MQ_MQEstablishmentId?.Id,
+                DqtSpecialismId = q.dfeta_MQ_SpecialismId?.Id
+            });
+        }
+
+        return (mqs, events);
+    }
+
+    private async Task<int> SyncEvents(IReadOnlyCollection<EventBase> events, CancellationToken cancellationToken)
+    {
+        var tempTableName = "temp_events_import";
+        var tableName = "events";
+
+        var columnNames = new[]
+        {
+            "event_id",
+            "event_name",
+            "created",
+            "payload"
+        };
+
+        var columnList = string.Join(", ", columnNames);
+
+        var createTempTableStatement = $"""
+            CREATE TEMP TABLE {tempTableName} (
+                event_id UUID NOT NULL,
+                event_name VARCHAR(200) NOT NULL,
+                created TIMESTAMP WITH TIME ZONE NOT NULL,
+                payload JSONB NOT NULL
+            )
+            """;
+
+        var copyStatement = $"COPY {tempTableName} ({columnList}) FROM STDIN (FORMAT BINARY)";
+
+        var insertStatement =
+            $"""
+            INSERT INTO {tableName} ({columnList}, published)
+            SELECT {columnList}, false FROM {tempTableName}
+            ON CONFLICT (event_id) DO NOTHING
+            """;
+
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
+        await connection.OpenAsync(cancellationToken);
+        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+
+        using (var createTempTableCommand = connection.CreateCommand())
+        {
+            createTempTableCommand.CommandText = createTempTableStatement;
+            createTempTableCommand.Transaction = txn;
+            await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        using var writer = await connection.BeginBinaryImportAsync(copyStatement, cancellationToken);
+
+        foreach (var e in events)
+        {
+            var payload = JsonSerializer.Serialize(e, e.GetType(), EventBase.JsonSerializerOptions);
+
+            writer.StartRow();
+            writer.WriteValueOrNull(e.EventId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(e.GetEventName(), NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull(e.CreatedUtc, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(payload, NpgsqlDbType.Jsonb);
+        }
+
+        await writer.CompleteAsync(cancellationToken);
+        await writer.CloseAsync(cancellationToken);
+
+        using (var mergeCommand = connection.CreateCommand())
+        {
+            mergeCommand.CommandText = insertStatement;
+            mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
+            mergeCommand.Transaction = txn;
+            await mergeCommand.ExecuteNonQueryAsync();
+        }
+
+        await txn.CommitAsync(cancellationToken);
+
+        return events.Count;
     }
 
     private record ModelTypeSyncInfo
