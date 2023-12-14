@@ -10,4 +10,6 @@ public abstract record EventBase
     public required Guid EventId { get; init; }
     public required DateTime CreatedUtc { get; init; }
     public required RaisedByUserInfo RaisedBy { get; init; }
+
+    public string GetEventName() => GetType().Name;
 }

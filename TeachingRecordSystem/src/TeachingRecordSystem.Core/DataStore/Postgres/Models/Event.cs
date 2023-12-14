@@ -13,7 +13,7 @@ public class Event
 
     public static Event FromEventBase(EventBase @event)
     {
-        var eventName = @event.GetType().Name;
+        var eventName = @event.GetEventName();
         var payload = JsonSerializer.Serialize(@event, inputType: @event.GetType(), EventBase.JsonSerializerOptions);
 
         return new Event()
