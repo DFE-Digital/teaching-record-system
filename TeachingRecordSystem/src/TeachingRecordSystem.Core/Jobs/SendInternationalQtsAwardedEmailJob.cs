@@ -54,6 +54,7 @@ public class SendInternationalQtsAwardedEmailJob
 
         _dbContext.AddEvent(new InternationalQtsAwardedEmailSentEvent
         {
+            EventId = Guid.NewGuid(),
             InternationalQtsAwardedEmailsJobId = internationalQtsAwardedEmailsJobId,
             PersonId = personId,
             EmailAddress = item.EmailAddress,
