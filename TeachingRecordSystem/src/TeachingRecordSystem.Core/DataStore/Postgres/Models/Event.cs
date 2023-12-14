@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Event
 {
-    public long Id { get; }
+    public required Guid EventId { get; init; }
     public required string EventName { get; init; }
     public required DateTime Created { get; init; }
     public required string Payload { get; init; }
@@ -18,6 +18,7 @@ public class Event
 
         return new Event()
         {
+            EventId = @event.EventId,
             Created = @event.CreatedUtc,
             EventName = eventName,
             Payload = payload

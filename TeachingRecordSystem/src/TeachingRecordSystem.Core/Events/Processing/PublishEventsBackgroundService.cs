@@ -40,10 +40,13 @@ public class PublishEventsBackgroundService : BackgroundService
     {
         using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        // The ID of the last processed event for this tick of the timer.
+        // The ID and timestamp of the last processed event for this tick of the timer.
         // This is fed into the query to ensure we won't process the same event multiple times in the same timer tick
-        // (in cases where publishing the event failed).
-        long lastProcessedEventId = 0;
+        // (which might happen otherwise if publishing the event failed first time around).
+        // We cannot use timestamp alone since it's possible there are multiple events with exactly the same timestamp
+        // and we don't want to miss one of them.
+        DateTime lastProcessedEventTimestamp = DateTime.MinValue;
+        Guid lastProcessedEventId = Guid.Empty;
 
         // How many events were processed in this batch.
         // If processedCount < BatchSize there are no more events to process.
@@ -54,7 +57,13 @@ public class PublishEventsBackgroundService : BackgroundService
             using var txn = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
             var unpublishedEvents = await dbContext.Events
-                .FromSql($"select * from events where published is false and id > {lastProcessedEventId} for update skip locked limit {BatchSize}")
+                .FromSql($"""
+                    select * from events
+                    where published is false
+                    and created > {lastProcessedEventTimestamp}
+                    and event_id != {lastProcessedEventId}
+                    for update skip locked limit {BatchSize}
+                    """)
                 .ToListAsync(cancellationToken: cancellationToken);
 
             if (unpublishedEvents.Count == 0)
@@ -71,15 +80,16 @@ public class PublishEventsBackgroundService : BackgroundService
 
                     e.Published = true;
 
-                    _logger.LogDebug("Successfully published {EventType} event {EventId}.", e.EventName, e.Id);
+                    _logger.LogDebug("Successfully published {EventType} event {EventId}.", e.EventName, e.EventId);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to publish event {EventId}.", e.Id);
+                    _logger.LogError(ex, "Failed to publish event {EventId}.", e.EventId);
                 }
                 finally
                 {
-                    lastProcessedEventId = e.Id;
+                    lastProcessedEventTimestamp = e.Created;
+                    lastProcessedEventId = e.EventId;
                 }
             }
 
