@@ -1,11 +1,11 @@
-@page "/mqs/{qualificationId}/result/confirm/{handler?}"
-@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result.ConfirmModel
+@page "/mqs/{qualificationId}/status/confirm/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status.ConfirmModel
 @{
     ViewBag.Title = "Check details and confirm change";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.MqEditResult(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.MqEditStatus(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
 <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
@@ -13,7 +13,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.MqEditResultConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.MqEditStatusConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <table class="govuk-table" data-testid="change-details">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -24,9 +24,9 @@
                 </thead>
                 <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
-                        <th class="govuk-table__header" scope="row">Result</th>
-                        <td class="govuk-table__cell" data-testid="current-result">@(Model.CurrentStatus.HasValue ? Model.CurrentStatus.Value : "None")</td>
-                        <td class="govuk-table__cell" data-testid="new-result">@(Model.NewStatus.HasValue ? Model.NewStatus.Value : "None")</td>
+                        <th class="govuk-table__header" scope="row">Status</th>
+                        <td class="govuk-table__cell" data-testid="current-status">@(Model.CurrentStatus.HasValue ? Model.CurrentStatus.Value : "None")</td>
+                        <td class="govuk-table__cell" data-testid="new-status">@(Model.NewStatus.HasValue ? Model.NewStatus.Value : "None")</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th class="govuk-table__header" scope="row">End date</th>
@@ -38,7 +38,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm change</govuk-button>
-                <govuk-button formaction="@LinkGenerator.MqEditResultConfirmCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqEditStatusConfirmCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

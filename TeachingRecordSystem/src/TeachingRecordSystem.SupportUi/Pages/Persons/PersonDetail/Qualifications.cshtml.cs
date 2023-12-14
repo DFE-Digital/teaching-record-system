@@ -57,10 +57,10 @@ public class QualificationsModel : PageModel
                 {
                     QualificationId = q.Id,
                     Provider = mqEstablishment is not null ? mqEstablishment.dfeta_name : null,
-                    Specialism = specialism is not null ? specialism.dfeta_name : null,
+                    Specialism = specialism?.ToMandatoryQualificationSpecialism(),
                     StartDate = q.dfeta_MQStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     EndDate = q.dfeta_MQ_Date.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    Result = q.dfeta_MQ_Status
+                    Status = q.dfeta_MQ_Status?.ToMandatoryQualificationStatus()
                 };
             });
 
@@ -80,9 +80,9 @@ public class QualificationsModel : PageModel
     {
         public required Guid QualificationId { get; init; }
         public required string? Provider { get; init; }
-        public required string? Specialism { get; init; }
+        public required MandatoryQualificationSpecialism? Specialism { get; init; }
         public required DateOnly? StartDate { get; init; }
         public required DateOnly? EndDate { get; init; }
-        public required dfeta_qualification_dfeta_MQ_Status? Result { get; init; }
+        public required MandatoryQualificationStatus? Status { get; init; }
     }
 }

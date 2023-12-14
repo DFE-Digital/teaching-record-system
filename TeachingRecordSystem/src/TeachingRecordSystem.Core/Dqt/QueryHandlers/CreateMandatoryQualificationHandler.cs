@@ -9,7 +9,6 @@ public class CreateMandatoryQualificationHandler : ICrmQueryHandler<CreateMandat
     {
         var qualification = new dfeta_qualification()
         {
-            Id = Guid.NewGuid(),
             dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
             dfeta_name = "Mandatory Qualification",
             dfeta_PersonId = query.ContactId.ToEntityReference(Contact.EntityLogicalName),

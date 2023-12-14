@@ -17,16 +17,12 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [Required(ErrorMessage = "Enter a start date")]
     [Display(Name = "Start date")]
     public DateOnly? StartDate { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
-        if (StartDate is null)
-        {
-            ModelState.AddModelError(nameof(StartDate), "Enter a start date");
-        }
-
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -34,7 +30,7 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state => state.StartDate = StartDate);
 
-        return Redirect(linkGenerator.MqAddResult(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqAddStatus(PersonId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()

@@ -34,6 +34,7 @@ public class IndexModel : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [Required(ErrorMessage = "Select a training provider")]
     [Display(Name = "Training Provider")]
     public string? MqEstablishmentValue { get; set; }
 
@@ -46,11 +47,6 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        if (string.IsNullOrWhiteSpace(MqEstablishmentValue))
-        {
-            ModelState.AddModelError(nameof(MqEstablishmentValue), "Select a training provider");
-        }
-
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
