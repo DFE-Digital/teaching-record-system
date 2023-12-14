@@ -22,7 +22,7 @@ public class EditMqResultState
 
     [JsonIgnore]
     public bool IsComplete => Status.HasValue &&
-        (Status != MandatoryQualificationStatus.Passed || Status == MandatoryQualificationStatus.Passed && EndDate.HasValue);
+        (Status != MandatoryQualificationStatus.Passed || (Status == MandatoryQualificationStatus.Passed && EndDate.HasValue));
 
     public async Task EnsureInitialized(
         ICrmQueryDispatcher crmQueryDispatcher,
