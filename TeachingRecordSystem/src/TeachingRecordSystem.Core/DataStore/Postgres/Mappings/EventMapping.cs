@@ -9,12 +9,11 @@ public class EventMapping : IEntityTypeConfiguration<Event>
     public void Configure(EntityTypeBuilder<Event> builder)
     {
         builder.ToTable("events");
-        builder.Property(e => e.Id).IsRequired().ValueGeneratedOnAdd();
         builder.Property(e => e.EventName).IsRequired().HasMaxLength(200);
         builder.Property(e => e.Created).IsRequired();
         builder.Property(e => e.Payload).IsRequired().HasColumnType("jsonb");
         builder.Property(e => e.Published);
-        builder.HasKey(e => e.Id);
+        builder.HasKey(e => e.EventId);
         builder.HasIndex(e => e.Payload).HasMethod("gin");
     }
 }
