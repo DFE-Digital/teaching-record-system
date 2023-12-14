@@ -54,13 +54,12 @@ public class PublishEventsBackgroundService : BackgroundService
             using var txn = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
             var unpublishedEvents = await dbContext.Events
-                .FromSql($"select * from events where published is false and event_id > {lastProcessedEventId} for update skip locked limit {BatchSize}")
+                .FromSql($"select * from events where published is false and id > {lastProcessedEventId} for update skip locked limit {BatchSize}")
                 .ToListAsync(cancellationToken: cancellationToken);
 
             if (unpublishedEvents.Count == 0)
             {
-                processedCount = 0;
-                continue;
+                break;
             }
 
             foreach (var e in unpublishedEvents)
@@ -72,15 +71,15 @@ public class PublishEventsBackgroundService : BackgroundService
 
                     e.Published = true;
 
-                    _logger.LogDebug("Successfully published {EventType} event {EventId}.", e.EventName, e.EventId);
+                    _logger.LogDebug("Successfully published {EventType} event {EventId}.", e.EventName, e.Id);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to publish event {EventId}.", e.EventId);
+                    _logger.LogError(ex, "Failed to publish event {EventId}.", e.Id);
                 }
                 finally
                 {
-                    lastProcessedEventId = e.EventId;
+                    lastProcessedEventId = e.Id;
                 }
             }
 
