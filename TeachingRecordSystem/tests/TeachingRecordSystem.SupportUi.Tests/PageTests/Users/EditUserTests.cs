@@ -194,7 +194,7 @@ public class EditUserTests : TestBase
             {
                 var userCreatedEvent = Assert.IsType<UserUpdatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
-                Assert.Equal(userCreatedEvent.SourceUserId, GetCurrentUserId());
+                Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
                 Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
                 Assert.Equal(newName, userCreatedEvent.User.Name);
                 Assert.Equal(updatedUser.Email, userCreatedEvent.User.Email);
@@ -247,7 +247,7 @@ public class EditUserTests : TestBase
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.SourceUserId, GetCurrentUserId());
+            Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
             Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
         });
 
@@ -294,7 +294,7 @@ public class EditUserTests : TestBase
         {
             var userCreatedEvent = Assert.IsType<UserActivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.SourceUserId, GetCurrentUserId());
+            Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
             Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
         });
 

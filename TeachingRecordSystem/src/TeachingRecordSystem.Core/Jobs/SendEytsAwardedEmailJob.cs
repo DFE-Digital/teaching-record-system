@@ -59,7 +59,7 @@ public class SendEytsAwardedEmailJob
             PersonId = personId,
             EmailAddress = item.EmailAddress,
             CreatedUtc = _clock.UtcNow,
-            SourceUserId = DataStore.Postgres.Models.User.SystemUserId
+            RaisedBy = DataStore.Postgres.Models.User.SystemUserId
         });
 
         await _dbContext.SaveChangesAsync();
