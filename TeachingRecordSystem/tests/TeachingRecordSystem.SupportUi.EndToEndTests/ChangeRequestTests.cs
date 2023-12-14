@@ -2,9 +2,9 @@ using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
-public class CaseTests : TestBase
+public class ChangeRequestTests : TestBase
 {
-    public CaseTests(HostFixture hostFixture)
+    public ChangeRequestTests(HostFixture hostFixture)
         : base(hostFixture)
     {
     }
@@ -12,7 +12,7 @@ public class CaseTests : TestBase
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task SelectCaseAndApprove(bool isNameChange)
+    public async Task SelectChangeRequestAndApprove(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePerson();
         string caseReference;
@@ -32,21 +32,21 @@ public class CaseTests : TestBase
 
         await page.GoToHomePage();
 
-        await page.ClickOpenCasesLinkInNavigationBar();
+        await page.ClickChangeRequestsLinkInNavigationBar();
 
-        await page.AssertOnOpenCasesPage();
+        await page.AssertOnChangeRequestsPage();
 
-        await page.ClickCaseReferenceLinkOpenCasesPage(caseReference);
+        await page.ClickCaseReferenceLinkChangeRequestsPage(caseReference);
 
-        await page.AssertOnCaseDetailPage(caseReference);
+        await page.AssertOnChangeRequestDetailPage(caseReference);
 
         await page.ClickAcceptChangeButton();
 
-        await page.AssertOnAcceptCasePage(caseReference);
+        await page.AssertOnAcceptChangeRequestPage(caseReference);
 
         await page.ClickConfirmButton();
 
-        await page.AssertOnOpenCasesPage();
+        await page.AssertOnChangeRequestsPage();
 
         await page.AssertFlashMessage("The request has been accepted");
     }
@@ -54,7 +54,7 @@ public class CaseTests : TestBase
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task SelectCaseAndReject(bool isNameChange)
+    public async Task SelectChangeRequestAndReject(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePerson();
         string caseReference;
@@ -74,23 +74,23 @@ public class CaseTests : TestBase
 
         await page.GoToHomePage();
 
-        await page.ClickOpenCasesLinkInNavigationBar();
+        await page.ClickChangeRequestsLinkInNavigationBar();
 
-        await page.AssertOnOpenCasesPage();
+        await page.AssertOnChangeRequestsPage();
 
-        await page.ClickCaseReferenceLinkOpenCasesPage(caseReference);
+        await page.ClickCaseReferenceLinkChangeRequestsPage(caseReference);
 
-        await page.AssertOnCaseDetailPage(caseReference);
+        await page.AssertOnChangeRequestDetailPage(caseReference);
 
         await page.ClickRejectChangeButton();
 
-        await page.AssertOnRejectCasePage(caseReference);
+        await page.AssertOnRejectChangeRequestPage(caseReference);
 
         await page.CheckAsync("label:text-is('Request and proof don’t match')");
 
-        await page.ClickConfirmButton();
+        await page.ClickRejectButton();
 
-        await page.AssertOnOpenCasesPage();
+        await page.AssertOnChangeRequestsPage();
 
         await page.AssertFlashMessage("The request has been rejected");
     }
@@ -98,7 +98,7 @@ public class CaseTests : TestBase
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task SelectCaseAndCancel(bool isNameChange)
+    public async Task SelectChangeRequestAndCancel(bool isNameChange)
     {
         var createPersonResult = await TestData.CreatePerson();
         string caseReference;
@@ -118,23 +118,23 @@ public class CaseTests : TestBase
 
         await page.GoToHomePage();
 
-        await page.ClickOpenCasesLinkInNavigationBar();
+        await page.ClickChangeRequestsLinkInNavigationBar();
 
-        await page.AssertOnOpenCasesPage();
+        await page.AssertOnChangeRequestsPage();
 
-        await page.ClickCaseReferenceLinkOpenCasesPage(caseReference);
+        await page.ClickCaseReferenceLinkChangeRequestsPage(caseReference);
 
-        await page.AssertOnCaseDetailPage(caseReference);
+        await page.AssertOnChangeRequestDetailPage(caseReference);
 
         await page.ClickRejectChangeButton();
 
-        await page.AssertOnRejectCasePage(caseReference);
+        await page.AssertOnRejectChangeRequestPage(caseReference);
 
         await page.CheckAsync("label:text-is('Change no longer required')");
 
-        await page.ClickConfirmButton();
+        await page.ClickRejectButton();
 
-        await page.AssertOnOpenCasesPage();
+        await page.AssertOnChangeRequestsPage();
 
         await page.AssertFlashMessage("The request has been cancelled");
     }

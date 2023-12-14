@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Cases.EditCase;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ChangeRequests.EditChangeRequest;
 
 public class RejectTests : TestBase
 {
@@ -15,7 +15,7 @@ public class RejectTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/cases/{createIncidentResult.TicketNumber}/reject");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}/reject");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -32,7 +32,7 @@ public class RejectTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/cases/{createIncidentResult.TicketNumber}/reject");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}/reject");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -48,7 +48,7 @@ public class RejectTests : TestBase
         SetCurrentUser(TestUsers.Helpdesk);
         var nonExistentTicketNumber = Guid.NewGuid().ToString();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/cases/{nonExistentTicketNumber}/reject");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{nonExistentTicketNumber}/reject");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -65,7 +65,7 @@ public class RejectTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/cases/{createIncidentResult.TicketNumber}/reject");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}/reject");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -82,7 +82,7 @@ public class RejectTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/cases/{createIncidentResult.TicketNumber}/reject")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{createIncidentResult.TicketNumber}/reject")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -102,7 +102,7 @@ public class RejectTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/cases/{createIncidentResult.TicketNumber}/reject")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{createIncidentResult.TicketNumber}/reject")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -125,7 +125,7 @@ public class RejectTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/cases/{createIncidentResult.TicketNumber}/reject")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{createIncidentResult.TicketNumber}/reject")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -152,7 +152,7 @@ public class RejectTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/cases/{createIncidentResult.TicketNumber}/reject")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{createIncidentResult.TicketNumber}/reject")
         {
             Content = new FormUrlEncodedContentBuilder()
             {

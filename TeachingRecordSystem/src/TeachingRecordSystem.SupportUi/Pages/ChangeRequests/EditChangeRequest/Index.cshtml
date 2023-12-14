@@ -1,0 +1,133 @@
+@page "/change-requests/{ticketNumber}/{handler?}/{id?}"
+@model TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.IndexModel
+@{
+    ViewBag.Title = "Request";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.ChangeRequests()" />
+}
+
+<span class="govuk-caption-l" data-testid="heading-caption">@Model.ChangeType - @Model.PersonName</span>
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <table class="govuk-table">         
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
+                        <th scope="col" class="govuk-table__header">Current</th>
+                        <th scope="col" class="govuk-table__header">New</th>
+                    </tr>
+                </thead>
+            @if (Model.ChangeType == DqtConstants.NameChangeSubjectTitle)
+            {
+                <tbody class="govuk-table__body">
+                    @if (Model.NameChangeRequest!.CurrentFirstName != Model.NameChangeRequest!.NewFirstName)
+                    {
+                        <tr class="govuk-table__row" data-testid="first-name">
+                            <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="first-name-title">First name</td>
+                            <td class="govuk-table__cell" data-testid="first-name-current">@Model.NameChangeRequest!.CurrentFirstName</td>
+                            <td class="govuk-table__cell" data-testid="first-name-new">@Model.NameChangeRequest!.NewFirstName</td>
+                        </tr>
+                    }
+                    @if (Model.NameChangeRequest!.CurrentMiddleName != Model.NameChangeRequest!.NewMiddleName)
+                    {
+                        <tr class="govuk-table__row" data-testid="middle-name">
+                            <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="middle-name-title">Middle name</td>
+                            <td class="govuk-table__cell" data-testid="middle-name-current">@Model.NameChangeRequest!.CurrentMiddleName</td>
+                            <td class="govuk-table__cell" data-testid="middle-name-new">@Model.NameChangeRequest!.NewMiddleName</td>
+                        </tr>
+                    }
+                    @if (Model.NameChangeRequest!.CurrentLastName != Model.NameChangeRequest!.NewLastName)
+                    {
+                        <tr class="govuk-table__row" data-testid="last-name">
+                            <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="last-name-title">Last name</td>
+                            <td class="govuk-table__cell" data-testid="last-name-current">@Model.NameChangeRequest!.CurrentLastName</td>
+                            <td class="govuk-table__cell" data-testid="last-name-new">@Model.NameChangeRequest!.NewLastName</td>
+                        </tr>
+                    }
+                </tbody>
+            }
+            @if (Model.ChangeType == DqtConstants.DateOfBirthChangeSubjectTitle)
+            {             
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row" data-testid="date-of-birth">
+                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="date-of-birth-title">Date of birth</td>
+                        <td class="govuk-table__cell" data-testid="date-of-birth-current">@Model.DateOfBirthChangeRequest!.CurrentDateOfBirth.ToString("d MMMM yyyy")</td>
+                        <td class="govuk-table__cell" data-testid="date-of-birth-new">@Model.DateOfBirthChangeRequest!.NewDateOfBirth.ToString("d MMMM yyyy")</td>
+                    </tr>
+                </tbody>
+            }
+        </table>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <h2 class="govuk-heading-l">Proof</h2>
+        <govuk-details>
+            <govuk-details-summary>Documents we accept</govuk-details-summary>
+            <govuk-details-text>
+                <ul class="govuk-list govuk-list--spaced">
+                    @if (Model.ChangeType == DqtConstants.NameChangeSubjectTitle)
+                    {
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Marriage</h4>
+                            <span>Marriage certificate</span>
+                        </li>
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Civil Partnership</h4>
+                            <span>Civil agreement certificate</span>
+                        </li>
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Divorce</h4>
+                            <span>Decree absolute and birth certificate</span>
+                        </li>
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Statutory declaration</h4>
+                            <span>Statutory declaration</span>
+                        </li>
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Deed poll</h4>
+                            <span>Deed poll</span>
+                        </li>
+                        <li>
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Fix a typo</h4>
+                            <span>Passport</span>
+                        </li>
+                    }
+                    @if (Model.ChangeType == DqtConstants.DateOfBirthChangeSubjectTitle)
+                    {
+                        <li>Birth certificate</li>
+                        <li>Passport</li>
+                        <li>Driving license</li>
+                    }
+                </ul>
+            </govuk-details-text>
+        </govuk-details>
+        @foreach (var evidence in Model.Evidence!)
+        {
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full govuk-!-margin-bottom-4">
+                    @if (evidence.MimeType == "application/pdf")
+                    {
+                        <object data="@LinkGenerator.ChangeRequestDocument(Model.TicketNumber, evidence.DocumentId)" type="application/pdf" width="100%" height="500px" class="govuk-!-margin-bottom-2" data-testid="pdf-@evidence.DocumentId">
+                        </object>
+                    }
+                    else
+                    {
+                        <img src="@LinkGenerator.ChangeRequestDocument(Model.TicketNumber, evidence.DocumentId)" alt="evidence.FileName" width="100%" height="auto" class="govuk-!-margin-bottom-2" data-testid="image-@evidence.DocumentId" />
+                    }
+                    <a href="@LinkGenerator.ChangeRequestDocument(Model.TicketNumber, evidence.DocumentId)" class="govuk-link" rel="noreferrer noopener" target="_blank" date-testid="view-larger-@evidence.DocumentId">View larger (opens in new tab)</a>
+                </div>
+            </div>
+        }
+    </div>        
+</div>
+
+<div class="govuk-button-group">
+    <govuk-button-link href="@LinkGenerator.AcceptChangeRequest(Model.TicketNumber)" class="govuk-button">Accept change</govuk-button-link>
+    <govuk-button-link href="@LinkGenerator.RejectChangeRequest(Model.TicketNumber)" class="govuk-button govuk-button--warning">Reject change</govuk-button-link>
+</div>

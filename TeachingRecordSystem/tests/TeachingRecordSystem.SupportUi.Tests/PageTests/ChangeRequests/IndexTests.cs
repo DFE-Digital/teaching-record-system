@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Dqt.Models;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Cases;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ChangeRequests;
 
 [Collection(nameof(DisableParallelization))]
 public class IndexTests : TestBase
@@ -17,7 +17,7 @@ public class IndexTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.NoRoles);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, "/cases");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/change-requests");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -35,7 +35,7 @@ public class IndexTests : TestBase
         var createPerson2Result = await TestData.CreatePerson();
         var createIncident2Result = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPerson2Result.ContactId));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, "/cases");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/change-requests");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -44,25 +44,25 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await response.GetDocument();
-        var tableRow1 = doc.GetElementByTestId($"case-{createIncident1Result.TicketNumber}");
+        var tableRow1 = doc.GetElementByTestId($"change-request-{createIncident1Result.TicketNumber}");
         Assert.NotNull(tableRow1);
-        Assert.Equal(createIncident1Result.TicketNumber, tableRow1.GetElementByTestId($"case-reference-{createIncident1Result.TicketNumber}")!.TextContent);
+        Assert.Equal(createIncident1Result.TicketNumber, tableRow1.GetElementByTestId($"request-reference-{createIncident1Result.TicketNumber}")!.TextContent);
         Assert.Equal($"{createPerson1Result.FirstName} {createPerson1Result.LastName}", tableRow1.GetElementByTestId($"name-{createIncident1Result.TicketNumber}")!.TextContent);
-        Assert.Equal(createIncident1Result.SubjectTitle, tableRow1.GetElementByTestId($"case-type-{createIncident1Result.TicketNumber}")!.TextContent);
+        Assert.Equal(createIncident1Result.SubjectTitle, tableRow1.GetElementByTestId($"change-type-{createIncident1Result.TicketNumber}")!.TextContent);
         Assert.Equal(createIncident1Result.CreatedOn.ToString("dd/MM/yyyy"), tableRow1.GetElementByTestId($"created-on-{createIncident1Result.TicketNumber}")!.TextContent);
-        var tableRow2 = doc.GetElementByTestId($"case-{createIncident2Result.TicketNumber}");
+        var tableRow2 = doc.GetElementByTestId($"change-request-{createIncident2Result.TicketNumber}");
         Assert.NotNull(tableRow2);
-        Assert.Equal(createIncident2Result.TicketNumber, tableRow2.GetElementByTestId($"case-reference-{createIncident2Result.TicketNumber}")!.TextContent);
+        Assert.Equal(createIncident2Result.TicketNumber, tableRow2.GetElementByTestId($"request-reference-{createIncident2Result.TicketNumber}")!.TextContent);
         Assert.Equal($"{createPerson2Result.FirstName} {createPerson2Result.LastName}", tableRow2.GetElementByTestId($"name-{createIncident2Result.TicketNumber}")!.TextContent);
-        Assert.Equal(createIncident2Result.SubjectTitle, tableRow2.GetElementByTestId($"case-type-{createIncident2Result.TicketNumber}")!.TextContent);
+        Assert.Equal(createIncident2Result.SubjectTitle, tableRow2.GetElementByTestId($"change-type-{createIncident2Result.TicketNumber}")!.TextContent);
         Assert.Equal(createIncident2Result.CreatedOn.ToString("dd/MM/yyyy"), tableRow2.GetElementByTestId($"created-on-{createIncident2Result.TicketNumber}")!.TextContent);
     }
 
     [Fact]
-    public async Task Get_ValidRequestNoActiveCases_RendersExpectedContent()
+    public async Task Get_ValidRequestNoActiveChangeRequests_RendersExpectedContent()
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Get, "/cases");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/change-requests");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -70,6 +70,6 @@ public class IndexTests : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         var doc = await response.GetDocument();
-        Assert.NotNull(doc.GetElementByTestId("no-cases"));
+        Assert.NotNull(doc.GetElementByTestId("no-change-requests"));
     }
 }

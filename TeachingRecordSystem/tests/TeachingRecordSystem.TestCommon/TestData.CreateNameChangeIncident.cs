@@ -30,6 +30,9 @@ public partial class TestData
         private static readonly string _additionalEvidenceFileMimeType = "application/pdf";
 
         private Guid? _customerId;
+        private string? _newFirstName;
+        private string? _newMiddleName;
+        private string? _newLastName;
         private IncidentStatusType? _incidentStatusType;
         private bool _hasMultipleEvidenceFiles = false;
 
@@ -41,6 +44,39 @@ public partial class TestData
             }
 
             _customerId = customerId;
+            return this;
+        }
+
+        public CreateNameChangeIncidentBuilder WithNewFirstName(string firstName)
+        {
+            if (_newFirstName is not null && _newFirstName != firstName)
+            {
+                throw new InvalidOperationException("New first name cannot be changed after it's set.");
+            }
+
+            _newFirstName = firstName;
+            return this;
+        }
+
+        public CreateNameChangeIncidentBuilder WithNewMiddleName(string middleName)
+        {
+            if (_newMiddleName is not null && _newMiddleName != middleName)
+            {
+                throw new InvalidOperationException("New middle name cannot be changed after it's set.");
+            }
+
+            _newMiddleName = middleName;
+            return this;
+        }
+
+        public CreateNameChangeIncidentBuilder WithNewLastName(string lastName)
+        {
+            if (_newLastName is not null && _newLastName != lastName)
+            {
+                throw new InvalidOperationException("New last name cannot be changed after it's set.");
+            }
+
+            _newLastName = lastName;
             return this;
         }
 
@@ -90,9 +126,9 @@ public partial class TestData
                 throw new InvalidOperationException("Customer ID must be specified.");
             }
 
-            var firstName = testData.GenerateFirstName();
-            var middleName = testData.GenerateMiddleName();
-            var lastName = testData.GenerateLastName();
+            var firstName = _newFirstName ?? testData.GenerateFirstName();
+            var middleName = _newMiddleName ?? testData.GenerateMiddleName();
+            var lastName = _newLastName ?? testData.GenerateLastName();
 
             var incidentId = Guid.NewGuid();
             var title = "Request to change name";

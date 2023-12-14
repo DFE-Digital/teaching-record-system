@@ -5,9 +5,9 @@ using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Cases;
+namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests;
 
-[Authorize(Policy = AuthorizationPolicies.CaseManagement)]
+[Authorize(Policy = AuthorizationPolicies.ChangeRequestManagement)]
 public class IndexModel : PageModel
 {
     private const int PageSize = 15;
@@ -23,7 +23,7 @@ public class IndexModel : PageModel
         _crmQueryDispatcher = crmQueryDispatcher;
     }
 
-    public CaseInfo[]? Cases { get; set; }
+    public ChangeRequestInfo[]? ChangeRequests { get; set; }
 
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
@@ -53,7 +53,7 @@ public class IndexModel : PageModel
         if (PageNumber > TotalKnownPages)
         {
             // Redirect to first page
-            return Redirect(_linkGenerator.Cases());
+            return Redirect(_linkGenerator.ChangeRequests());
         }
 
         if (incidentsResult.TotalRecordCount < MaxCrmResultCount)
@@ -72,7 +72,7 @@ public class IndexModel : PageModel
         PreviousPage = PageNumber > 1 ? PageNumber - 1 : null;
         NextPage = PageNumber < TotalKnownPages ? PageNumber + 1 : null;
 
-        Cases = incidentsResult.Incidents
+        ChangeRequests = incidentsResult.Incidents
             .Select(MapIncident)
             .OrderBy(c => c.CreatedOn)
             .ToArray();
@@ -80,25 +80,25 @@ public class IndexModel : PageModel
         return Page();
     }
 
-    private CaseInfo MapIncident(Incident incident)
+    private ChangeRequestInfo MapIncident(Incident incident)
     {
         var customer = incident.Extract<Contact>("contact", Contact.PrimaryIdAttribute);
         var subject = incident.Extract<Subject>("subject", Subject.PrimaryIdAttribute);
 
-        return new CaseInfo()
+        return new ChangeRequestInfo()
         {
-            CaseReference = incident.TicketNumber,
+            RequestReference = incident.TicketNumber,
             Customer = customer.dfeta_StatedFirstName is not null ? $"{customer.dfeta_StatedFirstName} {customer.dfeta_StatedLastName}" : $"{customer.FirstName} {customer.LastName}",
-            CaseType = subject.Title,
+            ChangeType = subject.Title,
             CreatedOn = incident.CreatedOn!.Value
         };
     }
 
-    public record CaseInfo
+    public record ChangeRequestInfo
     {
-        public required string CaseReference { get; init; }
+        public required string RequestReference { get; init; }
         public required string Customer { get; init; }
-        public required string CaseType { get; init; }
+        public required string ChangeType { get; init; }
         public required DateTime CreatedOn { get; init; }
     }
 }

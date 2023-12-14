@@ -1,0 +1,69 @@
+@page "/change-requests/{ticketNumber}/accept"
+@model TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.AcceptModel
+@{
+    ViewBag.Title = "Confirm the change";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.EditChangeRequest(Model.TicketNumber)" />
+}
+
+<span class="govuk-caption-l">@Model.CaseType - @Model.PersonName</span>
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">        
+        <form action="@LinkGenerator.AcceptChangeRequest(Model.TicketNumber)" method="post">
+            <table class="govuk-table">                
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"></th>
+                        <th scope="col" class="govuk-table__header">Current</th>
+                        <th scope="col" class="govuk-table__header">New</th>
+                    </tr>
+                </thead>
+                @if (Model.CaseType == DqtConstants.NameChangeSubjectTitle)
+                {
+                    <tbody class="govuk-table__body">
+                        @if (Model.NameChangeRequest!.CurrentFirstName != Model.NameChangeRequest!.NewFirstName)
+                        {
+                            <tr class="govuk-table__row" data-testid="first-name">
+                                <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="first-name-title">First name</td>
+                                <td class="govuk-table__cell" data-testid="first-name-current">@Model.NameChangeRequest!.CurrentFirstName</td>
+                                <td class="govuk-table__cell" data-testid="first-name-new">@Model.NameChangeRequest!.NewFirstName</td>
+                            </tr>
+                        }
+                        @if (Model.NameChangeRequest!.CurrentMiddleName != Model.NameChangeRequest!.NewMiddleName)
+                        {
+                            <tr class="govuk-table__row" data-testid="middle-name">
+                                <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="middle-name-title">Middle name</td>
+                                <td class="govuk-table__cell" data-testid="middle-name-current">@Model.NameChangeRequest!.CurrentMiddleName</td>
+                                <td class="govuk-table__cell" data-testid="middle-name-new">@Model.NameChangeRequest!.NewMiddleName</td>
+                            </tr>
+                        }
+                        @if (Model.NameChangeRequest!.CurrentLastName != Model.NameChangeRequest!.NewLastName)
+                        {
+                            <tr class="govuk-table__row" data-testid="last-name">
+                                <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="last-name-title">Last name</td>
+                                <td class="govuk-table__cell" data-testid="last-name-current">@Model.NameChangeRequest!.CurrentLastName</td>
+                                <td class="govuk-table__cell" data-testid="last-name-new">@Model.NameChangeRequest!.NewLastName</td>
+                            </tr>
+                        }
+                    </tbody>
+                }
+                @if (Model.CaseType == DqtConstants.DateOfBirthChangeSubjectTitle)
+                {
+                    <tbody class="govuk-table__body">
+                        <tr class="govuk-table__row" data-testid="date-of-birth">
+                            <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="date-of-birth-title">Date of birth</td>
+                            <td class="govuk-table__cell" data-testid="date-of-birth-current">@Model.DateOfBirthChangeRequest!.CurrentDateOfBirth.ToString("d MMMM yyyy")</td>
+                            <td class="govuk-table__cell" data-testid="date-of-birth-new">@Model.DateOfBirthChangeRequest!.NewDateOfBirth.ToString("d MMMM yyyy")</td>
+                        </tr>
+                    </tbody>
+                }
+            </table>
+
+            <govuk-button type="submit">Confirm</govuk-button>
+        </form>
+    </div>
+</div>

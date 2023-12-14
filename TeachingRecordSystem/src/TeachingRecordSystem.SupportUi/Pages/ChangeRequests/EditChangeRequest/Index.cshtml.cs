@@ -5,10 +5,10 @@ using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Cases.EditCase;
+namespace TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest;
 
-[Authorize(Policy = AuthorizationPolicies.CaseManagement)]
-public class IndexModel : PageModel
+[Authorize(Policy = AuthorizationPolicies.ChangeRequestManagement)]
+public partial class IndexModel : PageModel
 {
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
 
@@ -17,7 +17,9 @@ public class IndexModel : PageModel
         _crmQueryDispatcher = crmQueryDispatcher;
     }
 
-    public CaseInfo? CaseHeader { get; set; }
+    public string? ChangeType { get; set; }
+
+    public string? PersonName { get; set; }
 
     public NameChangeRequestInfo? NameChangeRequest { get; set; }
 
@@ -71,13 +73,8 @@ public class IndexModel : PageModel
         var subject = incidentDetail.Subject;
         var incidentDocuments = incidentDetail.IncidentDocuments;
 
-        CaseHeader = new CaseInfo()
-        {
-            CaseReference = incidentDetail.Incident.TicketNumber,
-            Customer = customer.dfeta_StatedFirstName is not null ? $"{customer.dfeta_StatedFirstName} {customer.dfeta_StatedLastName}" : $"{customer.FirstName} {customer.LastName}",
-            CaseType = subject.Title,
-            CreatedOn = incident.CreatedOn!.Value
-        };
+        ChangeType = subject.Title;
+        PersonName = customer.ResolveFullName(includeMiddleName: false);
 
         if (subject.Title == DqtConstants.NameChangeSubjectTitle)
         {
@@ -116,30 +113,6 @@ public class IndexModel : PageModel
 
             Evidence = evidence.ToArray();
         }
-    }
-
-    public record CaseInfo
-    {
-        public required string CaseReference { get; init; }
-        public required string Customer { get; init; }
-        public required string CaseType { get; init; }
-        public required DateTime CreatedOn { get; init; }
-    }
-
-    public record NameChangeRequestInfo
-    {
-        public required string CurrentFirstName { get; init; }
-        public required string? CurrentMiddleName { get; init; }
-        public required string CurrentLastName { get; init; }
-        public required string NewFirstName { get; init; }
-        public required string? NewMiddleName { get; init; }
-        public required string NewLastName { get; init; }
-    }
-
-    public record DateOfBirthChangeRequestInfo
-    {
-        public required DateOnly CurrentDateOfBirth { get; init; }
-        public required DateOnly NewDateOfBirth { get; init; }
     }
 
     public record EvidenceInfo

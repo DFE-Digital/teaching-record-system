@@ -70,7 +70,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(
-        AuthorizationPolicies.CaseManagement,
+        AuthorizationPolicies.ChangeRequestManagement,
         policy => policy
             .RequireAuthenticatedUser()
             .RequireRole(UserRoles.Helpdesk, UserRoles.Administrator))

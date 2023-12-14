@@ -43,10 +43,10 @@
                         {
                             if (User.IsActiveTrsUser())
                             {
-                                if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.CaseManagement)).Succeeded)
+                                if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.ChangeRequestManagement)).Succeeded)
                                 {
-                                    <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/cases") ? "govuk-header__navigation-item--active" : "")">
-                                        <a class="govuk-header__link" href="@LinkGenerator.Cases()">Open cases</a>
+                                    <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/change-requests") ? "govuk-header__navigation-item--active" : "")">
+                                        <a class="govuk-header__link" href="@LinkGenerator.ChangeRequests()">Change requests</a>
                                     </li>
                                 }
 
