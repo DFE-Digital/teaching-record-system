@@ -24,6 +24,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Logging;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Redis;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 
@@ -225,7 +226,7 @@ builder.Services
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditMqResult,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result.EditMqResultState),
+            typeof(EditMqResultState),
             requestDataKeys: new[] { "qualificationId" },
             appendUniqueKey: true));
 

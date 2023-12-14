@@ -52,6 +52,7 @@ public class IndexModel : PageModel
     public DateOnly? EndDate { get; set; }
 
     [BindProperty]
+    [Required(ErrorMessage = "Select a reason for deleting")]
     [Display(Name = "Reason for deleting")]
     public MqDeletionReasonOption? DeletionReason { get; set; }
 
@@ -87,11 +88,6 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        if (DeletionReason is null)
-        {
-            ModelState.AddModelError(nameof(DeletionReason), "Select a reason for deleting");
-        }
-
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
         {
             ModelState.AddModelError(nameof(EvidenceFile), "Select a file");

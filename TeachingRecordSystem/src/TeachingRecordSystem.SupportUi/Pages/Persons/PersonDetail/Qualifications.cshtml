@@ -20,7 +20,7 @@ else
     @foreach (var mq in Model.MandatoryQualifications)
     {
         <govuk-summary-card data-testid="mq-@mq.QualificationId">
-            <govuk-summary-card-title>Mandatory qualification@(!string.IsNullOrEmpty(mq.Specialism) ? $" for {mq.Specialism!.ToLowerInvariant()}" : "")</govuk-summary-card-title>
+            <govuk-summary-card-title>Mandatory qualification@(mq.Specialism is not null ? $" for {mq.Specialism?.GetName()}" : "")</govuk-summary-card-title>
             <govuk-summary-card-actions>
                 <govuk-summary-card-action href="@LinkGenerator.MqDelete(mq.QualificationId, null)" visually-hidden-text="delete qualification" data-testid="delete-link-@mq.QualificationId">Delete qualification</govuk-summary-card-action>
             </govuk-summary-card-actions>
@@ -34,7 +34,7 @@ else
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="mq-specialism-@mq.QualificationId">@(!string.IsNullOrEmpty(mq.Specialism) ? mq.Specialism : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="mq-specialism-@mq.QualificationId">@(mq.Specialism is not null ? mq.Specialism?.GetTitle() : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqEditSpecialism(mq.QualificationId, null)" class="govuk-link" visually-hidden-text="change specialism" data-testid="specialism-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
@@ -47,17 +47,17 @@ else
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Result</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="mq-result-@mq.QualificationId">@(mq.Result.HasValue ? mq.Result!.ToString() : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="mq-status-@mq.QualificationId">@(mq.Status.HasValue ? mq.Status?.GetTitle() : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.MqEditResult(mq.QualificationId, null)" visually-hidden-text="change result" data-testid="result-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.MqEditStatus(mq.QualificationId, null)" visually-hidden-text="change status" data-testid="status-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="mq-end-date-@mq.QualificationId">@(mq.EndDate.HasValue ? mq.EndDate!.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.MqEditResult(mq.QualificationId, null)" visually-hidden-text="change end date" data-testid="end-date-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.MqEditStatus(mq.QualificationId, null)" visually-hidden-text="change end date" data-testid="end-date-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             </govuk-summary-list>

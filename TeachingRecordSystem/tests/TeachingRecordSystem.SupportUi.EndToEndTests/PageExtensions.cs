@@ -159,9 +159,9 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/mqs/add/start-date");
     }
 
-    public static async Task AssertOnAddMqResultPage(this IPage page)
+    public static async Task AssertOnAddMqStatusPage(this IPage page)
     {
-        await page.WaitForUrlPathAsync($"/mqs/add/result");
+        await page.WaitForUrlPathAsync($"/mqs/add/status");
     }
 
     public static async Task AssertOnAddMqCheckAnswersPage(this IPage page)
@@ -199,14 +199,14 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/confirm");
     }
 
-    public static async Task AssertOnEditMqResultPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqStatusPage(this IPage page, Guid qualificationId)
     {
-        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/result");
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status");
     }
 
-    public static async Task AssertOnEditMqResultConfirmPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqStatusConfirmPage(this IPage page, Guid qualificationId)
     {
-        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/result/confirm");
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/confirm");
     }
 
     public static async Task AssertOnDeleteMqPage(this IPage page, Guid qualificationId)

@@ -28,6 +28,7 @@ public class ProviderModel : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [Required(ErrorMessage = "Select a training provider")]
     [Display(Name = "Training provider")]
     public string? MqEstablishmentValue { get; set; }
 
@@ -35,11 +36,6 @@ public class ProviderModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        if (string.IsNullOrWhiteSpace(MqEstablishmentValue))
-        {
-            ModelState.AddModelError(nameof(MqEstablishmentValue), "Select a training provider");
-        }
-
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();

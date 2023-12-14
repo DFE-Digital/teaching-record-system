@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result;
+namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 [Journey(JourneyNames.EditMqResult), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(
@@ -22,6 +22,7 @@ public class IndexModel(
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [Required(ErrorMessage = "Select a status")]
     public MandatoryQualificationStatus? Status { get; set; }
 
     [BindProperty]
@@ -36,11 +37,6 @@ public class IndexModel(
 
     public async Task<IActionResult> OnPost()
     {
-        if (Status is null)
-        {
-            ModelState.AddModelError(nameof(Status), "Select a result");
-        }
-
         if (Status == MandatoryQualificationStatus.Passed && EndDate is null)
         {
             ModelState.AddModelError(nameof(EndDate), "Enter an end date");
@@ -58,7 +54,7 @@ public class IndexModel(
                 state.EndDate = Status == MandatoryQualificationStatus.Passed ? EndDate : null;
             });
 
-        return Redirect(linkGenerator.MqEditResultConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditStatusConfirm(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
