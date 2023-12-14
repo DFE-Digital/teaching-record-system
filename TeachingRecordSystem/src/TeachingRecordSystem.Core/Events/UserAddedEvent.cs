@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events.Models;
+
 namespace TeachingRecordSystem.Core.Events;
 
 public record UserAddedEvent : EventBase

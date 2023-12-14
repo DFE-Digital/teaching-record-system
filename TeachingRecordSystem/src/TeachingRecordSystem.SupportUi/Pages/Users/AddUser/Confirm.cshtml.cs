@@ -88,8 +88,8 @@ public class ConfirmModel(
         _dbContext.AddEvent(new UserAddedEvent()
         {
             EventId = Guid.NewGuid(),
-            User = Core.Events.User.FromModel(newUser),
-            SourceUserId = User.GetUserId(),
+            User = Core.Events.Models.User.FromModel(newUser),
+            RaisedBy = User.GetUserId(),
             CreatedUtc = _clock.UtcNow
         });
 

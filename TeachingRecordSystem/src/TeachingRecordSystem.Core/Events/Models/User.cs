@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Core.Events;
+namespace TeachingRecordSystem.Core.Events.Models;
 
 public record User
 {
