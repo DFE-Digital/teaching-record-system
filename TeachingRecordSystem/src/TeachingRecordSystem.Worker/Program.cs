@@ -1,15 +1,15 @@
+using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using Npgsql;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
+using TeachingRecordSystem.Hosting;
 using TeachingRecordSystem.Worker.Infrastructure.Logging;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -23,24 +23,13 @@ if (builder.Environment.IsProduction())
 
 builder.ConfigureLogging();
 
-string pgConnectionString = new NpgsqlConnectionStringBuilder(builder.Configuration.GetRequiredValue("ConnectionStrings:DefaultConnection"))
-{
-    // We rely on error details to get the offending duplicate key values in the TrsDataSyncHelper
-    IncludeErrorDetail = true
-}.ConnectionString;
-
-builder.Services.AddDbContext<TrsDbContext>(
-    options => TrsDbContext.ConfigureOptions(options, pgConnectionString),
-    contextLifetime: ServiceLifetime.Transient,
-    optionsLifetime: ServiceLifetime.Singleton);
-
-builder.Services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options, pgConnectionString));
-
 builder
+    .AddDatabase()
     .AddBlobStorage()
     .AddDistributedLocks()
     .AddDqtReporting()
-    .AddTrsSyncService();
+    .AddTrsSyncService()
+    .AddHangfire();
 
 var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
 {
@@ -50,6 +39,8 @@ var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue(
     RetryPauseTime = TimeSpan.FromSeconds(1)
 };
 builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
+
+builder.Services.AddHangfireServer();
 
 builder.Services
     .AddTrsBaseServices();

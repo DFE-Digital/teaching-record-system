@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hangfire.NetCore" />
+    <PackageReference Include="Hangfire.PostgreSql" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Sentry.Serilog" />
     <PackageReference Include="Serilog.Formatting.Compact" />

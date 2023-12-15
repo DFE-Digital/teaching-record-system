@@ -8,11 +8,14 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
 
-    <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.Hosting\TeachingRecordSystem.Hosting.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
     <PackageReference Include="Azure.Extensions.AspNetCore.DataProtection.Blobs" />
+    <PackageReference Include="Hangfire.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
   </ItemGroup>
   
 </Project>
