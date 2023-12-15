@@ -120,7 +120,32 @@ public partial class TrsDataSyncHelperTests
         });
     }
 
-    private async Task AssertDatabaseMandatoryQualificationMatchesEntity(dfeta_qualification entity, DateTime? expectedFirstSync = null)
+    [Fact]
+    public async Task SyncMandatoryQualification_AlreadyHaveNewerVersion_DoesNotUpdateDatabase()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var qualificationId = Guid.NewGuid();
+        var initialEntity = await CreateMandatoryQualificationEntity(qualificationId, person.ContactId);
+
+        Clock.Advance();
+        var updatedEntity = await CreateMandatoryQualificationEntity(qualificationId, person.ContactId, initialEntity);
+
+        await Helper.SyncMandatoryQualification(updatedEntity, ignoreInvalid: false);
+        var expectedFirstSync = Clock.UtcNow;
+        var expectedLastSync = Clock.UtcNow;
+
+        // Act
+        await Helper.SyncMandatoryQualification(initialEntity, ignoreInvalid: false);
+
+        // Assert
+        await AssertDatabaseMandatoryQualificationMatchesEntity(updatedEntity, expectedFirstSync, expectedLastSync);
+    }
+
+    private async Task AssertDatabaseMandatoryQualificationMatchesEntity(
+        dfeta_qualification entity,
+        DateTime? expectedFirstSync = null,
+        DateTime? expectedLastSync = null)
     {
         await DbFixture.WithDbContext(async dbContext =>
         {
@@ -137,7 +162,7 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal(QualificationType.MandatoryQualification, mq.QualificationType);
             Assert.Equal(entity.dfeta_PersonId?.Id, mq.PersonId);
             Assert.Equal(expectedFirstSync ?? Clock.UtcNow, mq.DqtFirstSync);
-            Assert.Equal(Clock.UtcNow, mq.DqtLastSync);
+            Assert.Equal(expectedLastSync ?? Clock.UtcNow, mq.DqtLastSync);
             Assert.Equal((int)entity.StateCode!, mq.DqtState);
             Assert.Equal(entity.CreatedOn, mq.DqtCreatedOn);
             Assert.Equal(entity.ModifiedOn, mq.DqtModifiedOn);
@@ -158,7 +183,8 @@ public partial class TrsDataSyncHelperTests
         var specialisms = await TestData.ReferenceDataCache.GetMqSpecialisms();
         var establishments = await TestData.ReferenceDataCache.GetMqEstablishments();
 
-        var modified = Clock.UtcNow;
+        var createdOn = Clock.UtcNow;
+        var modifiedOn = Clock.UtcNow;
         var state = dfeta_qualificationState.Active;
         var specialism = specialisms.RandomOne();
         var establishment = establishments.RandomOne();
@@ -172,10 +198,10 @@ public partial class TrsDataSyncHelperTests
             dfeta_qualificationId = qualificationId,
             dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
             dfeta_PersonId = personContactId.ToEntityReference(Contact.EntityLogicalName),
-            CreatedOn = Clock.UtcNow
+            CreatedOn = createdOn
         };
 
-        newQualification.ModifiedOn = modified;
+        newQualification.ModifiedOn = modifiedOn;
         newQualification.StateCode = state;
         newQualification.dfeta_MQ_SpecialismId = specialism.dfeta_specialismId!.Value.ToEntityReference(dfeta_specialism.EntityLogicalName);
         newQualification.dfeta_MQ_MQEstablishmentId = establishment.Id.ToEntityReference(dfeta_mqestablishment.EntityLogicalName);
