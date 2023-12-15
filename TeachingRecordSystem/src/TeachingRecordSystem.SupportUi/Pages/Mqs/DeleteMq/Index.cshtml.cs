@@ -11,26 +11,15 @@ using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 [Journey(JourneyNames.DeleteMq), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel : PageModel
+public class IndexModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    ReferenceDataCache referenceDataCache,
+    TrsLinkGenerator linkGenerator,
+    IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly ReferenceDataCache _referenceDataCache;
-    private readonly TrsLinkGenerator _linkGenerator;
-    private readonly IFileService _fileService;
 
-    public IndexModel(
-        ICrmQueryDispatcher crmQueryDispatcher,
-        ReferenceDataCache referenceDataCache,
-        TrsLinkGenerator linkGenerator,
-        IFileService fileService)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _referenceDataCache = referenceDataCache;
-        _linkGenerator = linkGenerator;
-        _fileService = fileService;
-    }
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
     public JourneyInstance<DeleteMqState>? JourneyInstance { get; set; }
 
@@ -82,7 +71,9 @@ public class IndexModel : PageModel
     {
         DeletionReason ??= JourneyInstance!.State.DeletionReason;
         DeletionReasonDetail ??= JourneyInstance?.State.DeletionReasonDetail;
-        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ? await _fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) : null;
+        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            null;
         UploadEvidence ??= JourneyInstance?.State.UploadEvidence;
     }
 
@@ -104,11 +95,11 @@ public class IndexModel : PageModel
             {
                 if (EvidenceFileId is not null)
                 {
-                    await _fileService.DeleteFile(EvidenceFileId.Value);
+                    await fileService.DeleteFile(EvidenceFileId.Value);
                 }
 
                 using var stream = EvidenceFile.OpenReadStream();
-                var evidenceFileId = await _fileService.UploadFile(stream, EvidenceFile.ContentType);
+                var evidenceFileId = await fileService.UploadFile(stream, EvidenceFile.ContentType);
                 await JourneyInstance!.UpdateStateAsync(state =>
                 {
                     state.EvidenceFileId = evidenceFileId;
@@ -119,7 +110,7 @@ public class IndexModel : PageModel
         }
         else if (EvidenceFileId is not null)
         {
-            await _fileService.DeleteFile(EvidenceFileId.Value);
+            await fileService.DeleteFile(EvidenceFileId.Value);
             await JourneyInstance!.UpdateStateAsync(state =>
             {
                 state.EvidenceFileId = null;
@@ -135,30 +126,30 @@ public class IndexModel : PageModel
             state.UploadEvidence = UploadEvidence;
         });
 
-        return Redirect(_linkGenerator.MqDeleteConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqDeleteConfirm(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         if (JourneyInstance!.State.EvidenceFileId is not null)
         {
-            await _fileService.DeleteFile(JourneyInstance!.State.EvidenceFileId.Value);
+            await fileService.DeleteFile(JourneyInstance!.State.EvidenceFileId.Value);
         }
 
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var qualification = await _crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId));
+        var qualification = await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId));
         if (qualification is null || qualification.dfeta_Type != dfeta_qualification_dfeta_Type.MandatoryQualification)
         {
             context.Result = NotFound();
             return;
         }
 
-        await JourneyInstance!.State.EnsureInitialized(_crmQueryDispatcher, _referenceDataCache, qualification);
+        await JourneyInstance!.State.EnsureInitialized(crmQueryDispatcher, referenceDataCache, qualification);
 
         PersonId = JourneyInstance!.State.PersonId;
         PersonName = JourneyInstance!.State.PersonName;

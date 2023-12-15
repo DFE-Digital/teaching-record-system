@@ -1,5 +1,7 @@
 using FormFlow;
+using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;
@@ -141,11 +143,22 @@ public class ConfirmTests : TestBase
     }
 
     [Fact]
-    public async Task Post_Confirm_CompletesJourneyAndRedirectsWithFlashMessage()
+    public async Task Post_Confirm_DeletesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
-        // Arrange        
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        // Arrange
+        var mqEstablishment = "University of Leeds";
+        var specialism = MandatoryQualificationSpecialism.Hearing;
+        var status = MandatoryQualificationStatus.Passed;
+        var startDate = new DateOnly(2023, 09, 01);
+        var endDate = new DateOnly(2023, 11, 05);
+        var deletionReason = MqDeletionReasonOption.ProviderRequest;
+        var deletionReasonDetail = "Some details about the deletion reason";
+        var evidenceFileId = Guid.NewGuid();
+        var evidenceFileName = "test.pdf";
+
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: specialism, status: status, startDate: startDate, endDate: endDate));
+        var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
+
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new DeleteMqState()
@@ -153,16 +166,16 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                MqEstablishment = "University of Leeds",
-                Specialism = MandatoryQualificationSpecialism.Hearing,
-                Status = MandatoryQualificationStatus.Passed,
-                StartDate = new DateOnly(2023, 09, 01),
-                EndDate = new DateOnly(2023, 11, 05),
-                DeletionReason = MqDeletionReasonOption.ProviderRequest,
-                DeletionReasonDetail = "Some details about the deletion reason",
+                MqEstablishment = mqEstablishment,
+                Specialism = specialism,
+                Status = status,
+                StartDate = startDate,
+                EndDate = endDate,
+                DeletionReason = deletionReason,
+                DeletionReasonDetail = deletionReasonDetail,
                 UploadEvidence = true,
-                EvidenceFileId = Guid.NewGuid(),
-                EvidenceFileName = "test.pdf",
+                EvidenceFileId = evidenceFileId,
+                EvidenceFileName = evidenceFileName,
                 EvidenceFileSizeDescription = "1MB"
             });
 
@@ -180,6 +193,42 @@ public class ConfirmTests : TestBase
         var redirectResponse = await response.FollowRedirect(HttpClient);
         var redirectDoc = await redirectResponse.GetDocument();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification deleted");
+
+        await WithDbContext(async dbContext =>
+        {
+            var mq = await dbContext.MandatoryQualifications.IgnoreQueryFilters().SingleOrDefaultAsync(mq => mq.QualificationId == qualificationId);
+            Assert.NotNull(mq);
+            Assert.Equal(Clock.UtcNow, mq.DeletedOn);
+        });
+
+        EventObserver.AssertEventsSaved(e =>
+        {
+            var expectedMqDeletedEvent = new MandatoryQualificationDeletedEvent()
+            {
+                EventId = Guid.Empty,
+                CreatedUtc = Clock.UtcNow,
+                RaisedBy = GetCurrentUserId(),
+                PersonId = person.PersonId,
+                MandatoryQualification = new()
+                {
+                    QualificationId = qualificationId,
+                    Specialism = specialism,
+                    Status = status,
+                    StartDate = startDate,
+                    EndDate = endDate
+                },
+                DeletionReason = deletionReason.GetDisplayName(),
+                DeletionReasonDetail = deletionReasonDetail,
+                EvidenceFile = new Core.Events.Models.File()
+                {
+                    FileId = evidenceFileId,
+                    Name = evidenceFileName
+                }
+            };
+
+            var actualMqDeletedEvent = Assert.IsType<MandatoryQualificationDeletedEvent>(e);
+            Assert.Equivalent(expectedMqDeletedEvent with { EventId = actualMqDeletedEvent.EventId }, actualMqDeletedEvent);
+        });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
