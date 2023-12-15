@@ -7,48 +7,45 @@ using TeachingRecordSystem.Core.Jobs.Scheduling;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public static class ServiceCollectionExtensions
+public static class HostApplicationBuilderExtensions
 {
-    public static IServiceCollection AddBackgroundJobs(
-        this IServiceCollection services,
-        IHostEnvironment environment,
-        IConfiguration configuration)
+    public static IHostApplicationBuilder AddBackgroundJobs(this IHostApplicationBuilder builder)
     {
-        if ((!environment.IsUnitTests() && !environment.IsEndToEndTests()))
+        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
         {
-            if (configuration.GetValue<bool>("RecurringJobs:Enabled"))
+            if (builder.Configuration.GetValue<bool>("RecurringJobs:Enabled"))
             {
-                services.AddOptions<RecurringJobsOptions>()
-                    .Bind(configuration.GetSection("RecurringJobs"))
+                builder.Services.AddOptions<RecurringJobsOptions>()
+                    .Bind(builder.Configuration.GetSection("RecurringJobs"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
-                services.AddOptions<BatchSendQtsAwardedEmailsJobOptions>()
-                    .Bind(configuration.GetSection("RecurringJobs:BatchSendQtsAwardedEmails"))
+                builder.Services.AddOptions<BatchSendQtsAwardedEmailsJobOptions>()
+                    .Bind(builder.Configuration.GetSection("RecurringJobs:BatchSendQtsAwardedEmails"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
-                services.AddOptions<BatchSendInternationalQtsAwardedEmailsJobOptions>()
-                    .Bind(configuration.GetSection("RecurringJobs:BatchSendInternationalQtsAwardedEmails"))
+                builder.Services.AddOptions<BatchSendInternationalQtsAwardedEmailsJobOptions>()
+                    .Bind(builder.Configuration.GetSection("RecurringJobs:BatchSendInternationalQtsAwardedEmails"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
-                services.AddOptions<BatchSendEytsAwardedEmailsJobOptions>()
-                    .Bind(configuration.GetSection("RecurringJobs:BatchSendEytsAwardedEmails"))
+                builder.Services.AddOptions<BatchSendEytsAwardedEmailsJobOptions>()
+                    .Bind(builder.Configuration.GetSection("RecurringJobs:BatchSendEytsAwardedEmails"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
-                services.AddOptions<BatchSendInductionCompletedEmailsJobOptions>()
-                    .Bind(configuration.GetSection("RecurringJobs:BatchSendInductionCompletedEmails"))
+                builder.Services.AddOptions<BatchSendInductionCompletedEmailsJobOptions>()
+                    .Bind(builder.Configuration.GetSection("RecurringJobs:BatchSendInductionCompletedEmails"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
-                services.AddTransient<SendQtsAwardedEmailJob>();
-                services.AddTransient<QtsAwardedEmailJobDispatcher>();
-                services.AddTransient<SendInternationalQtsAwardedEmailJob>();
-                services.AddTransient<InternationalQtsAwardedEmailJobDispatcher>();
-                services.AddTransient<SendEytsAwardedEmailJob>();
-                services.AddTransient<EytsAwardedEmailJobDispatcher>();
-                services.AddTransient<SendInductionCompletedEmailJob>();
-                services.AddTransient<InductionCompletedEmailJobDispatcher>();
+                builder.Services.AddTransient<SendQtsAwardedEmailJob>();
+                builder.Services.AddTransient<QtsAwardedEmailJobDispatcher>();
+                builder.Services.AddTransient<SendInternationalQtsAwardedEmailJob>();
+                builder.Services.AddTransient<InternationalQtsAwardedEmailJobDispatcher>();
+                builder.Services.AddTransient<SendEytsAwardedEmailJob>();
+                builder.Services.AddTransient<EytsAwardedEmailJobDispatcher>();
+                builder.Services.AddTransient<SendInductionCompletedEmailJob>();
+                builder.Services.AddTransient<InductionCompletedEmailJobDispatcher>();
 
-                services.AddStartupTask(sp =>
+                builder.Services.AddStartupTask(sp =>
                 {
                     var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
                     var options = sp.GetRequiredService<IOptions<RecurringJobsOptions>>().Value;
@@ -77,7 +74,7 @@ public static class ServiceCollectionExtensions
                 });
             }
 
-            services.AddStartupTask(sp =>
+            builder.Services.AddStartupTask(sp =>
             {
                 var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
 
@@ -92,15 +89,6 @@ public static class ServiceCollectionExtensions
             });
         }
 
-        if (environment.IsProduction())
-        {
-            services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
-        }
-        else
-        {
-            services.AddSingleton<IBackgroundJobScheduler, ExecuteImmediatelyJobScheduler>();
-        }
-
-        return services;
+        return builder;
     }
 }

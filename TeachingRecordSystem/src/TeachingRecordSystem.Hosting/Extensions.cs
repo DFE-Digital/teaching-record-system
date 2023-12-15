@@ -28,7 +28,7 @@ public static class Extensions
         return builder;
     }
 
-    public static void AddHangfire(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddHangfire(this IHostApplicationBuilder builder)
     {
         if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
         {
@@ -40,6 +40,8 @@ public static class Extensions
                 .UseRecommendedSerializerSettings()
                 .UsePostgreSqlStorage(o => o.UseNpgsqlConnection(pgConnectionString)));
         }
+
+        return builder;
     }
 
     public static void ConfigureSerilog(
