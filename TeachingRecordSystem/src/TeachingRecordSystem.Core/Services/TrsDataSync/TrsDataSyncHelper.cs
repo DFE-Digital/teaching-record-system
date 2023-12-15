@@ -242,6 +242,8 @@ public class TrsDataSyncHelper(
                     await mergeCommand.ExecuteNonQueryAsync();
                 }
 
+                await SyncEvents(events, txn, cancellationToken);
+
                 await txn.CommitAsync(cancellationToken);
             }
             catch (PostgresException ex) when (ex.SqlState == "23503" && ex.ConstraintName == Qualification.PersonForeignKeyName)
@@ -281,8 +283,6 @@ public class TrsDataSyncHelper(
             break;
         }
         while (true);
-
-        await SyncEvents(events, cancellationToken);
 
         return mqs.Count;
     }
@@ -569,7 +569,7 @@ public class TrsDataSyncHelper(
         return (mqs, events);
     }
 
-    private async Task<int> SyncEvents(IReadOnlyCollection<EventBase> events, CancellationToken cancellationToken)
+    private async Task<int> SyncEvents(IReadOnlyCollection<EventBase> events, NpgsqlTransaction transaction, CancellationToken cancellationToken)
     {
         var tempTableName = "temp_events_import";
         var tableName = "events";
@@ -602,20 +602,14 @@ public class TrsDataSyncHelper(
             ON CONFLICT (event_id) DO NOTHING
             """;
 
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-
-        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
-        await connection.OpenAsync(cancellationToken);
-        using var txn = await connection.BeginTransactionAsync(cancellationToken);
-
-        using (var createTempTableCommand = connection.CreateCommand())
+        using (var createTempTableCommand = transaction.Connection!.CreateCommand())
         {
             createTempTableCommand.CommandText = createTempTableStatement;
-            createTempTableCommand.Transaction = txn;
+            createTempTableCommand.Transaction = transaction;
             await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
         }
 
-        using var writer = await connection.BeginBinaryImportAsync(copyStatement, cancellationToken);
+        using var writer = await transaction.Connection!.BeginBinaryImportAsync(copyStatement, cancellationToken);
 
         foreach (var e in events)
         {
@@ -631,15 +625,13 @@ public class TrsDataSyncHelper(
         await writer.CompleteAsync(cancellationToken);
         await writer.CloseAsync(cancellationToken);
 
-        using (var mergeCommand = connection.CreateCommand())
+        using (var mergeCommand = transaction.Connection!.CreateCommand())
         {
             mergeCommand.CommandText = insertStatement;
             mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
-            mergeCommand.Transaction = txn;
+            mergeCommand.Transaction = transaction;
             await mergeCommand.ExecuteNonQueryAsync();
         }
-
-        await txn.CommitAsync(cancellationToken);
 
         return events.Count;
     }
