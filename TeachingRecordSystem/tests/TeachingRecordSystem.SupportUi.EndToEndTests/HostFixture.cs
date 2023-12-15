@@ -72,7 +72,6 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                         .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
 
                     services.AddSingleton<CurrentUserProvider>();
-                    services.AddTransient<TestUsers.CreateUsersStartupTask>();
                     services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
                     services.AddSingleton<TestData>(
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));

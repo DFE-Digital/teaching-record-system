@@ -62,7 +62,6 @@ public class HostFixture : WebApplicationFactory<Program>
             });
 
             services.AddSingleton<CurrentUserProvider>();
-            services.AddTransient<TestUsers.CreateUsersStartupTask>();
             services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
 
             services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
