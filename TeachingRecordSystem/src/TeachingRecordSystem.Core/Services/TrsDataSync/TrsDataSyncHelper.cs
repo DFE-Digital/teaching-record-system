@@ -191,6 +191,18 @@ public class TrsDataSyncHelper(
         return people.Count;
     }
 
+    public async Task<bool> SyncMandatoryQualification(Guid qualificationId, CancellationToken cancellationToken)
+    {
+        var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.MandatoryQualification);
+        var qualifications = await GetEntities<dfeta_qualification>(
+            dfeta_qualification.EntityLogicalName,
+            dfeta_qualification.PrimaryIdAttribute,
+            [qualificationId],
+            modelTypeSyncInfo.AttributeNames,
+            cancellationToken);
+        return await SyncMandatoryQualifications(qualifications, ignoreInvalid: false, cancellationToken) == 1;
+    }
+
     public async Task<bool> SyncMandatoryQualification(dfeta_qualification entity, bool ignoreInvalid, CancellationToken cancellationToken = default) =>
         await SyncMandatoryQualifications(new[] { entity }, ignoreInvalid, cancellationToken) == 1;
 

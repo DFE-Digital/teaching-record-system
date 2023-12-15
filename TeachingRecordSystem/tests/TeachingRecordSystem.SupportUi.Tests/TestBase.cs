@@ -33,12 +33,12 @@ public abstract class TestBase : IDisposable
         });
 
         _trsSyncSubscription = hostFixture.Services.GetRequiredService<TrsDataSyncHelper>().GetSyncedEntitiesObservable()
-            .Subscribe(onNext: (object[] synced) =>
+            .Subscribe(onNext: static (object[] synced) =>
             {
                 var events = synced.OfType<EventBase>();
                 foreach (var e in events)
                 {
-                    _testServices.EventObserver.OnEventSaved(e);
+                    TestScopedServices.GetCurrent().EventObserver.OnEventSaved(e);
                 }
             });
     }
