@@ -7,12 +7,12 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Processing;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
-using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -28,8 +28,6 @@ public class HostFixture : WebApplicationFactory<Program>
         _configuration = configuration;
         _ = base.Services;  // Start the host
     }
-
-    public CaptureEventObserver EventObserver { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -67,7 +65,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddTransient<TestUsers.CreateUsersStartupTask>();
             services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
 
-            services.AddSingleton<IEventObserver>(EventObserver);
+            services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IAadUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
@@ -119,6 +117,13 @@ public class HostFixture : WebApplicationFactory<Program>
                 pageApplicationModel.Filters.Remove(autoValidateAttribute);
             }
         }
+    }
+
+    // IEventObserver needs to be a singleton but we want it to resolve to a test-scoped CaptureEventObserver.
+    // This provides a wrapper that can be registered as a singleon that delegates to the test-scoped IEventObserver instance.
+    private class ForwardToTestScopedEventObserver : IEventObserver
+    {
+        public Task OnEventSaved(EventBase @event) => TestScopedServices.GetCurrent().EventObserver.OnEventSaved(@event);
     }
 }
 
