@@ -50,6 +50,10 @@ public static class ServiceCollectionExtensions
         CalculateActiveSanctionsPlugin.Register(fakedXrmContext);
         QtsRegistrationUpdatedPlugin.Register(fakedXrmContext);
 
+        // SeedCrmReferenceData must be registered before AddDefaultServiceClient is called
+        // to ensure this task runs before the cache pre-warming task
+        services.AddStartupTask<SeedCrmReferenceData>();
+
         services.AddSingleton<IXrmFakedContext>(fakedXrmContext);
         var organizationService = fakedXrmContext.GetAsyncOrganizationService2();
         services.AddDefaultServiceClient(ServiceLifetime.Singleton, _ => organizationService);
@@ -57,7 +61,6 @@ public static class ServiceCollectionExtensions
         fakedXrmContext.CallerProperties.CallerId = CreateTestUser();
 
         services.AddSingleton<SeedCrmReferenceData>();
-        services.AddStartupTask<SeedCrmReferenceData>();
 
         return services;
 

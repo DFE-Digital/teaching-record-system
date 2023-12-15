@@ -25,7 +25,8 @@ public static partial class ServiceCollectionExtensions
     {
         services.AddServiceClient(name: null, lifetime, createServiceClient);
 
-        services.TryAddSingleton<ReferenceDataCache>();
+        services.AddSingleton<ReferenceDataCache>();
+        services.AddStartupTask<ReferenceDataCache>();
 
         return services;
     }

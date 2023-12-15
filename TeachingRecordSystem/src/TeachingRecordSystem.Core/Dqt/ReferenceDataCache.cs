@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
-public class ReferenceDataCache
+public class ReferenceDataCache : IStartupTask
 {
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private Task<dfeta_mqestablishment[]>? _mqEstablishmentsTask;
@@ -121,4 +121,14 @@ public class ReferenceDataCache
         LazyInitializer.EnsureInitialized(
             ref _mqEstablishmentsTask,
             () => _crmQueryDispatcher.ExecuteQuery(new GetAllMqEstablishmentsQuery()));
+
+    async Task IStartupTask.Execute()
+    {
+        await EnsureSanctionCodes();
+        await EnsureSubjects();
+        await EnsureTeacherStatuses();
+        await EnsureEarlyYearsStatuses();
+        await EnsureSpecialisms();
+        await EnsureMqEstablishments();
+    }
 }

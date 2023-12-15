@@ -14,7 +14,7 @@ public static partial class ServiceCollectionExtensions
         AddStartupTask(services, _ => task);
 
     public static IServiceCollection AddStartupTask<T>(this IServiceCollection services) where T : class, IStartupTask =>
-        AddStartupTask(services, sp => sp.GetRequiredService<T>());
+        AddStartupTask(services, sp => sp.GetService<T>() ?? ActivatorUtilities.CreateInstance<T>(sp));
 
     public static IServiceCollection AddStartupTask(this IServiceCollection services, Func<IServiceProvider, IStartupTask> createTask)
     {
