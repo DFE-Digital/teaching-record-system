@@ -365,9 +365,11 @@ public class TrsDataSyncHelper(
 
         var insertStatement =
             $"""
-            INSERT INTO {tableName} ({columnList}, dqt_first_sync, dqt_last_sync)
+            INSERT INTO {tableName} AS t ({columnList}, dqt_first_sync, dqt_last_sync)
             SELECT {columnList}, {NowParameterName}, {NowParameterName} FROM {tempTableName}
-            ON CONFLICT (person_id) DO UPDATE SET dqt_last_sync = {NowParameterName}, {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
+            ON CONFLICT (person_id) DO UPDATE
+            SET dqt_last_sync = {NowParameterName}, {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
+            WHERE t.dqt_modified_on < EXCLUDED.dqt_modified_on
             """;
 
         var deleteStatement = $"DELETE FROM {tableName} WHERE dqt_contact_id = ANY({IdsParameterName})";
@@ -460,9 +462,11 @@ public class TrsDataSyncHelper(
 
         var insertStatement =
             $"""
-            INSERT INTO {tableName} ({columnList}, dqt_first_sync, dqt_last_sync)
+            INSERT INTO {tableName} AS t ({columnList}, dqt_first_sync, dqt_last_sync)
             SELECT {columnList}, {NowParameterName}, {NowParameterName} FROM {tempTableName}
-            ON CONFLICT (qualification_id) DO UPDATE SET dqt_last_sync = {NowParameterName}, {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
+            ON CONFLICT (qualification_id) DO UPDATE
+            SET dqt_last_sync = {NowParameterName}, {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
+            WHERE t.dqt_modified_on < EXCLUDED.dqt_modified_on
             """;
 
         var deleteStatement = $"DELETE FROM {tableName} WHERE dqt_qualification_id = ANY({IdsParameterName})";

@@ -62,7 +62,31 @@ public partial class TrsDataSyncHelperTests
         });
     }
 
-    private async Task AssertDatabasePersonMatchesEntity(Contact entity, DateTime? expectedFirstSync = null)
+    [Fact]
+    public async Task SyncPerson_AlreadyHaveNewerVersion_DoesNotUpdateDatabase()
+    {
+        // Arrange
+        var contactId = Guid.NewGuid();
+        var initialEntity = await CreatePersonEntity(contactId);
+
+        Clock.Advance();
+        var updatedEntity = await CreatePersonEntity(contactId, initialEntity);
+
+        await Helper.SyncPerson(updatedEntity, ignoreInvalid: false);
+        var expectedFirstSync = Clock.UtcNow;
+        var expectedLastSync = Clock.UtcNow;
+
+        // Act
+        await Helper.SyncPerson(initialEntity, ignoreInvalid: false);
+
+        // Assert
+        await AssertDatabasePersonMatchesEntity(updatedEntity, expectedFirstSync, expectedLastSync);
+    }
+
+    private async Task AssertDatabasePersonMatchesEntity(
+        Contact entity,
+        DateTime? expectedFirstSync = null,
+        DateTime? expectedLastSync = null)
     {
         await DbFixture.WithDbContext(async dbContext =>
         {
@@ -81,7 +105,7 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal(entity.CreatedOn, person.DqtCreatedOn);
             Assert.Equal(entity.ModifiedOn, person.DqtModifiedOn);
             Assert.Equal(expectedFirstSync ?? Clock.UtcNow, person.DqtFirstSync);
-            Assert.Equal(Clock.UtcNow, person.DqtLastSync);
+            Assert.Equal(expectedLastSync ?? Clock.UtcNow, person.DqtLastSync);
         });
     }
 
@@ -89,7 +113,8 @@ public partial class TrsDataSyncHelperTests
         Guid contactId,
         Contact? existingContact = null)
     {
-        var modified = Clock.UtcNow;
+        var createdOn = Clock.UtcNow;
+        var modifiedOn = Clock.UtcNow;
         var state = ContactState.Active;
         var trn = await TestData.GenerateTrn();
         var firstName = Faker.Name.First();
@@ -103,10 +128,10 @@ public partial class TrsDataSyncHelperTests
         {
             Id = contactId,
             ContactId = contactId,
-            CreatedOn = Clock.UtcNow
+            CreatedOn = createdOn
         };
 
-        newContact.ModifiedOn = modified;
+        newContact.ModifiedOn = modifiedOn;
         newContact.StateCode = state;
         newContact.dfeta_TRN = trn;
         newContact.FirstName = firstName;
