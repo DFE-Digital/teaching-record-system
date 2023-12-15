@@ -74,6 +74,7 @@
     <PackageReference Include="PdfSharpCore" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="System.Net.Http.Json" />
+    <PackageReference Include="System.Reactive" />
   </ItemGroup>
 
 </Project>

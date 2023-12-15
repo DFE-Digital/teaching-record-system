@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +32,10 @@ public class TrsDataSyncHelper(
         { ModelTypes.Person, GetModelTypeSyncInfoForPerson() },
         { ModelTypes.MandatoryQualification, GetModelTypeSyncInfoForMandatoryQualification() },
     };
+
+    private readonly ISubject<object[]> _syncedEntitiesSubject = new Subject<object[]>();
+
+    public IObservable<object[]> GetSyncedEntitiesObservable() => _syncedEntitiesSubject;
 
     public static (string EntityLogicalName, string[] AttributeNames) GetEntityInfoForModelType(string modelType)
     {
@@ -181,6 +187,7 @@ public class TrsDataSyncHelper(
 
         await txn.CommitAsync(cancellationToken);
 
+        _syncedEntitiesSubject.OnNext(people.ToArray());
         return people.Count;
     }
 
@@ -284,6 +291,7 @@ public class TrsDataSyncHelper(
         }
         while (true);
 
+        _syncedEntitiesSubject.OnNext([.. mqs, .. events]);
         return mqs.Count;
     }
 

@@ -16,7 +16,6 @@
     <PackageReference Include="Moq" />
     <PackageReference Include="Respawn" />
     <PackageReference Include="System.Linq.Async" />
-    <PackageReference Include="System.Reactive" />
     <PackageReference Include="xunit.assert" />
   </ItemGroup>
 

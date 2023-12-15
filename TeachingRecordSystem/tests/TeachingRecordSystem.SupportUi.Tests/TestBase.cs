@@ -1,3 +1,4 @@
+using System.Reactive.Linq;
 using FakeXrmEasy.Abstractions;
 using FormFlow;
 using FormFlow.State;
@@ -7,20 +8,22 @@ using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Events;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
-public abstract class TestBase
+public abstract class TestBase : IDisposable
 {
     private readonly TestScopedServices _testServices;
+    private readonly IDisposable _trsSyncSubscription;
 
     protected TestBase(HostFixture hostFixture)
     {
         HostFixture = hostFixture;
 
-        HostFixture.EventObserver.Init();
         _testServices = TestScopedServices.Reset();
         SetCurrentUser(TestUsers.Administrator);
 
@@ -28,11 +31,21 @@ public abstract class TestBase
         {
             AllowAutoRedirect = false
         });
+
+        _trsSyncSubscription = hostFixture.Services.GetRequiredService<TrsDataSyncHelper>().GetSyncedEntitiesObservable()
+            .Subscribe(onNext: (object[] synced) =>
+            {
+                var events = synced.OfType<EventBase>();
+                foreach (var e in events)
+                {
+                    _testServices.EventObserver.OnEventSaved(e);
+                }
+            });
     }
 
     public HostFixture HostFixture { get; }
 
-    public CaptureEventObserver EventObserver => HostFixture.EventObserver;
+    public CaptureEventObserver EventObserver => _testServices.EventObserver;
 
     public Mock<IDataverseAdapter> DataverseAdapterMock => _testServices.DataverseAdapterMock;
 
@@ -80,6 +93,11 @@ public abstract class TestBase
         var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
         var reloadedInstance = await stateProvider.GetInstanceAsync(journeyInstance.InstanceId, typeof(TState));
         return (JourneyInstance<TState>)reloadedInstance!;
+    }
+
+    public virtual void Dispose()
+    {
+        _trsSyncSubscription.Dispose();
     }
 
     protected Guid GetCurrentUserId()
