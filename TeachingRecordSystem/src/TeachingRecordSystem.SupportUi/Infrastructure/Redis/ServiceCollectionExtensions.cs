@@ -5,8 +5,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddRedis(
         this IServiceCollection services,
         IWebHostEnvironment environment,
-        IConfiguration configuration,
-        IHealthChecksBuilder healthChecksBuilder)
+        IConfiguration configuration)
     {
         if (environment.IsProduction())
         {
@@ -14,7 +13,7 @@ public static class ServiceCollectionExtensions
 
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionString);
 
-            healthChecksBuilder.AddRedis(connectionString);
+            services.AddHealthChecks().AddRedis(connectionString);
         }
 
         return services;
