@@ -18,7 +18,7 @@ public static partial class ServiceCollectionExtensions
 
     public static IServiceCollection AddStartupTask(this IServiceCollection services, Func<IServiceProvider, IStartupTask> createTask)
     {
-        if (!services.Any(d => d.ImplementationType == typeof(RunStartupTasksHostedService)))
+        if (!services.Any(d => !d.IsKeyedService && d.ImplementationType == typeof(RunStartupTasksHostedService)))
         {
             services.Insert(0, ServiceDescriptor.Transient<IHostedService, RunStartupTasksHostedService>());
         }
