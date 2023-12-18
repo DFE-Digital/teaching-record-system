@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
@@ -28,7 +27,7 @@ public class SendInternationalQtsAwardedEmailJobTests : InternationalQtsAwardedE
         var notificationSender = new Mock<INotificationSender>();
         var getAnIdentityApiClient = new Mock<IGetAnIdentityApiClient>();
         var accessYourQualificationOptions = Options.Create(
-            new AccessYourQualificationsOptions
+            new AccessYourTeachingQualificationsOptions
             {
                 BaseAddress = "https://aytq.com"
             });

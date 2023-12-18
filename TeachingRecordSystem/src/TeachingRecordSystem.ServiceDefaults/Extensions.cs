@@ -54,7 +54,6 @@ public static class Extensions
         if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
         {
             builder.Services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
-
         }
         else
         {

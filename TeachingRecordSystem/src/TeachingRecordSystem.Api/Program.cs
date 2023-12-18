@@ -19,7 +19,6 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
-using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
@@ -187,7 +186,7 @@ public class Program
 
         services.AddTrnGenerationApi(configuration);
         services.AddIdentityApi(configuration, env);
-        services.AddAccessYourQualifications(configuration, env);
+        services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();
         services.AddEmail(env, configuration);
         services.AddCrmQueries();
