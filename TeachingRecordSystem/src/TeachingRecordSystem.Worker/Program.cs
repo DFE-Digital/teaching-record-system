@@ -9,6 +9,7 @@ using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.DqtReporting;
+using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Hosting;
 using TeachingRecordSystem.Worker.Infrastructure.Logging;
@@ -41,11 +42,13 @@ var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue(
     RetryPauseTime = TimeSpan.FromSeconds(1)
 };
 builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
+AddLegacyDataverseAdapterServices();
 
 builder.Services.AddHangfireServer();
 
 builder.Services
-    .AddTrsBaseServices();
+    .AddTrsBaseServices()
+    .AddMemoryCache();
 
 // Filter telemetry emitted by DqtReportingService;
 // annoyingly we can't put this into the AddDqtReporting extension method since the method for adding Telemetry Processors
@@ -56,3 +59,14 @@ builder.Services.AddApplicationInsightsTelemetryWorkerService()
 var host = builder.Build();
 
 await host.RunAsync();
+
+void AddLegacyDataverseAdapterServices()
+{
+    builder.Services.AddTransient<IDataverseAdapter, DataverseAdapter>();
+    builder.Services.AddSingleton<ITrnGenerationApiClient, DummyTrnGenerationApiClient>();
+}
+
+sealed class DummyTrnGenerationApiClient : ITrnGenerationApiClient
+{
+    public Task<string> GenerateTrn() => throw new NotImplementedException();
+}
