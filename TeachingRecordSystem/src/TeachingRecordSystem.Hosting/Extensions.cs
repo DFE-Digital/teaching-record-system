@@ -9,11 +9,26 @@ using Serilog;
 using Serilog.Formatting.Compact;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 
 namespace TeachingRecordSystem.Hosting;
 
 public static class Extensions
 {
+    public static IHostApplicationBuilder AddBackgroundWorkScheduler(this IHostApplicationBuilder builder)
+    {
+        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+        {
+            builder.Services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
+        }
+        else
+        {
+            builder.Services.AddSingleton<IBackgroundJobScheduler, ExecuteImmediatelyJobScheduler>();
+        }
+
+        return builder;
+    }
+
     public static IHostApplicationBuilder AddDatabase(this IHostApplicationBuilder builder)
     {
         var pgConnectionString = GetPostgresConnectionString(builder.Configuration);

@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Hosting;
 
 namespace TeachingRecordSystem.ServiceDefaults;
@@ -22,6 +20,7 @@ public static class Extensions
 
         builder.AddDatabase();
         builder.AddHangfire();
+        builder.AddBackgroundWorkScheduler();
 
         builder.Services.AddHealthChecks().AddNpgSql(builder.Configuration.GetPostgresConnectionString());
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -49,15 +48,6 @@ public static class Extensions
                     builder.Configuration.GetRequiredValue("StorageConnectionString"),
                     builder.Configuration.GetRequiredValue("DataProtectionKeysContainerName"),
                     dataProtectionBlobName);
-        }
-
-        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
-        {
-            builder.Services.AddSingleton<IBackgroundJobScheduler, HangfireBackgroundJobScheduler>();
-        }
-        else
-        {
-            builder.Services.AddSingleton<IBackgroundJobScheduler, ExecuteImmediatelyJobScheduler>();
         }
 
         return builder;
