@@ -32,7 +32,8 @@ builder
     .AddDqtReporting()
     .AddTrsSyncService()
     .AddHangfire()
-    .AddBackgroundJobs();
+    .AddBackgroundJobs()
+    .AddBackgroundWorkScheduler();
 
 var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
 {
