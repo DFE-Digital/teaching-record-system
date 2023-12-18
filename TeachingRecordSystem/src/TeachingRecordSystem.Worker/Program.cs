@@ -22,7 +22,9 @@ builder.Services.Configure<HostOptions>(o => o.BackgroundServiceExceptionBehavio
 
 if (builder.Environment.IsProduction())
 {
-    builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
+    builder.Configuration
+        .AddJsonEnvironmentVariable("AppConfig")
+        .AddJsonEnvironmentVariable("SharedConfig");
 }
 
 builder.ConfigureLogging();
