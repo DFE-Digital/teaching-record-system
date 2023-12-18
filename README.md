@@ -1,9 +1,10 @@
 # teaching-record-system
 
 Provides an API over the Database of Qualified Teachers (DQT). Provides the core Teaching record and will eventually replace the Database of Qualified Teachers (DQT).
-[trs containers diagram](docs/c4-diagrams-as-code/trs-containers.png)
+[trs containers diagram](docs/c4-diagrams-as-code/trs-containers.png). The "To Be" Teacher Pensions and EWC (Teaching Council) integration is shown [here](docs/c4-diagrams-as-code/trs-data-integration.png).
 
-
+## Authorising Access using GOV.UK One Login
+All DfE services will adopt the standard GOV.UK One-Login service to provide standard access to citizen facing services. However, for Teacher Services digital services, it is sometime necessary to implement further authorisation to access a teaching record (e.g. for a teacher to view certificates). TRS will provide this authorisation seamlessly (from a user POV) by handling the redirection between calling service --> GOV.UK OneLogin sign in screen -->TRS (to check access) and back to the calling service. More detail can be found [here](docs/trs-gov.one-login-flow.md).
 ## Calling the API
 
 The API is versioned and each endpoint is prefixed with the version number e.g. `/v2/`. You can view the API specifications for each version by visiting `/swagger` (see [Environments](#environments) below for the base addresses).
