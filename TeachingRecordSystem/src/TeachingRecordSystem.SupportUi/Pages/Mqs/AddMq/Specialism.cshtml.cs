@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,17 +17,13 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [Required(ErrorMessage = "Select a specialism")]
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
     public MandatoryQualificationSpecialismInfo[]? Specialisms { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
-        if (Specialism is null)
-        {
-            ModelState.AddModelError(nameof(Specialism), "Select a specialism");
-        }
-
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();

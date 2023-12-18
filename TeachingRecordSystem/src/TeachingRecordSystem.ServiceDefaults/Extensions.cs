@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.Hosting;
 
 namespace TeachingRecordSystem.ServiceDefaults;
 
@@ -15,6 +17,13 @@ public static class Extensions
         string dataProtectionBlobName)
     {
         builder.Services.AddHealthChecks();
+
+        builder.AddDatabase();
+        builder.AddHangfire();
+        builder.AddBackgroundWorkScheduler();
+
+        builder.Services.AddHealthChecks().AddNpgSql(builder.Configuration.GetPostgresConnectionString());
+        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
         if (builder.Environment.IsProduction())
         {

@@ -2,14 +2,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Events;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 [Journey(JourneyNames.DeleteMq), RequireJourneyInstance]
 public class ConfirmModel(
     ICrmQueryDispatcher crmQueryDispatcher,
-    TrsLinkGenerator linkGenerator) : PageModel
+    TrsLinkGenerator linkGenerator,
+    IFileService fileService,
+    ReferenceDataCache referenceDataCache,
+    IClock clock,
+    IBackgroundJobScheduler backgroundJobScheduler) : PageModel
 {
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+
     public JourneyInstance<DeleteMqState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -33,13 +43,46 @@ public class ConfirmModel(
 
     public string? DeletionReasonDetail { get; set; }
 
+    public string? EvidenceFileName { get; set; }
+
+    public string? UploadedEvidenceFileUrl { get; set; }
+
     public async Task<IActionResult> OnPost()
     {
-        // Currently adding empty JSON until the deleted event is defined in a future Trello card
+        var qualification = (await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId)))!;
+        var mqSpecialisms = await referenceDataCache.GetMqSpecialisms();
+
+        var deletedEvent = new MandatoryQualificationDeletedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = clock.UtcNow,
+            RaisedBy = User.GetUserId(),
+            PersonId = PersonId!.Value,
+            MandatoryQualification = new()
+            {
+                QualificationId = QualificationId,
+                Specialism = mqSpecialisms.SingleOrDefault(s => s.Id == qualification.dfeta_MQ_SpecialismId?.Id)?.ToMandatoryQualificationSpecialism(),
+                Status = qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus(),
+                StartDate = qualification.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                EndDate = qualification.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            },
+            DeletionReason = DeletionReason!.GetDisplayName(),
+            DeletionReasonDetail = DeletionReasonDetail,
+            EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
+                new Core.Events.Models.File()
+                {
+                    FileId = fileId,
+                    Name = JourneyInstance.State.EvidenceFileName!
+                } :
+                null
+        };
+
         await crmQueryDispatcher.ExecuteQuery(
             new DeleteQualificationQuery(
                 QualificationId,
-                "{}"));
+                EventInfo.Create(deletedEvent).Serialize()));
+
+        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncMandatoryQualification(QualificationId, CancellationToken.None));
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification deleted");
@@ -49,6 +92,11 @@ public class ConfirmModel(
 
     public async Task<IActionResult> OnPostCancel()
     {
+        if (JourneyInstance!.State.EvidenceFileId is not null)
+        {
+            await fileService.DeleteFile(JourneyInstance!.State.EvidenceFileId.Value);
+        }
+
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
@@ -70,6 +118,8 @@ public class ConfirmModel(
         EndDate = JourneyInstance!.State.EndDate;
         DeletionReason = JourneyInstance!.State.DeletionReason;
         DeletionReasonDetail = JourneyInstance?.State.DeletionReasonDetail;
+        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
+        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ? await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) : null;
 
         await next();
     }

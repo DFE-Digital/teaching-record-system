@@ -246,7 +246,7 @@ public class ConfirmTests : TestBase
         {
             var userCreatedEvent = Assert.IsType<UserAddedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
-            Assert.Equal(userCreatedEvent.SourceUserId, GetCurrentUserId());
+            Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
             Assert.Equal(UserType.Person, userCreatedEvent.User.UserType);
             Assert.Equal(newName, userCreatedEvent.User.Name);
             Assert.Equal(email, userCreatedEvent.User.Email);

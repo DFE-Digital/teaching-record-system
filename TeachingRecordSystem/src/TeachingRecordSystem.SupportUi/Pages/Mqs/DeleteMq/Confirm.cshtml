@@ -21,7 +21,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>More detail about the reason for deleting</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="deletion-reason-detail">@(!string.IsNullOrEmpty(Model.DeletionReasonDetail) ? Model.DeletionReasonDetail : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="deletion-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(Model.DeletionReasonDetail) ? Model.DeletionReasonDetail : "None")"/></govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
@@ -44,6 +44,13 @@
                     <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             </govuk-summary-list>
+
+            @if (Model.UploadedEvidenceFileUrl is not null)
+            {
+                <p class="govuk-body">
+                    <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                </p>
+            }            
 
             <div class="govuk-button-group">
                 <govuk-button class="govuk-button--warning" type="submit">Delete qualification</govuk-button>

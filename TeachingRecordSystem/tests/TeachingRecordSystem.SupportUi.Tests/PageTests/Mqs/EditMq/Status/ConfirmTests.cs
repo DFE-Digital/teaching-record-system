@@ -1,8 +1,8 @@
 using FormFlow;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Result;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
 
 public class ConfirmTests : TestBase
 {
@@ -26,14 +26,14 @@ public class ConfirmTests : TestBase
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/result/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/result?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class ConfirmTests : TestBase
                 CurrentStatus = oldStatus,
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/result/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -68,8 +68,8 @@ public class ConfirmTests : TestBase
         var doc = await response.GetDocument();
         var changeDetails = doc.GetElementByTestId("change-details");
         Assert.NotNull(changeDetails);
-        Assert.Equal(oldStatus.GetTitle(), changeDetails.GetElementByTestId("current-result")!.TextContent);
-        Assert.Equal(newStatus.GetTitle(), changeDetails.GetElementByTestId("new-result")!.TextContent);
+        Assert.Equal(oldStatus.GetTitle(), changeDetails.GetElementByTestId("current-status")!.TextContent);
+        Assert.Equal(newStatus.GetTitle(), changeDetails.GetElementByTestId("new-status")!.TextContent);
         Assert.Equal("None", changeDetails.GetElementByTestId("current-end-date")!.TextContent);
         Assert.Equal(newEndDate.ToString("d MMMM yyyy"), changeDetails.GetElementByTestId("new-end-date")!.TextContent);
     }
@@ -89,7 +89,7 @@ public class ConfirmTests : TestBase
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -99,7 +99,7 @@ public class ConfirmTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/result?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public class ConfirmTests : TestBase
                 CurrentStatus = oldStatus,
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -163,7 +163,7 @@ public class ConfirmTests : TestBase
                 CurrentStatus = oldStatus,
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };

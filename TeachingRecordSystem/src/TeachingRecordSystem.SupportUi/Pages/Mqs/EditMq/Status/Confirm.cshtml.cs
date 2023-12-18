@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result;
+namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 [Journey(JourneyNames.EditMqResult), RequireJourneyInstance]
 public class ConfirmModel(
@@ -51,7 +51,7 @@ public class ConfirmModel(
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(linkGenerator.MqEditResult(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.MqEditStatus(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 

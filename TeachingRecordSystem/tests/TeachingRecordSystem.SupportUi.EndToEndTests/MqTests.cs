@@ -1,3 +1,4 @@
+using Microsoft.Playwright;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Models;
@@ -51,7 +52,7 @@ public class MqTests : TestBase
 
         await page.ClickContinueButton();
 
-        await page.AssertOnAddMqResultPage();
+        await page.AssertOnAddMqStatusPage();
 
         await page.CheckAsync($"label:text-is('{result}')");
 
@@ -187,9 +188,9 @@ public class MqTests : TestBase
 
         await page.AssertOnPersonQualificationsPage(person.PersonId);
 
-        await page.ClickLinkForElementWithTestId($"result-change-link-{qualificationId}");
+        await page.ClickLinkForElementWithTestId($"status-change-link-{qualificationId}");
 
-        await page.AssertOnEditMqResultPage(qualificationId);
+        await page.AssertOnEditMqStatusPage(qualificationId);
 
         await page.IsCheckedAsync($"label:text-is('{oldStatus}')");
 
@@ -199,7 +200,7 @@ public class MqTests : TestBase
 
         await page.ClickContinueButton();
 
-        await page.AssertOnEditMqResultConfirmPage(qualificationId);
+        await page.AssertOnEditMqStatusConfirmPage(qualificationId);
 
         await page.ClickConfirmChangeButton();
 
@@ -231,6 +232,17 @@ public class MqTests : TestBase
         await page.CheckAsync($"label:text-is('{deletionReason.GetDisplayName()}')");
 
         await page.FillAsync("label:text-is('More detail about the reason for deleting')", deletionReasonDetail);
+
+        await page.CheckAsync($"label:text-is('Yes')");
+
+        await page.SetInputFilesAsync(
+            "label:text-is('Upload a file')",
+            new FilePayload()
+            {
+                Name = "evidence.jpg",
+                MimeType = "image/jpeg",
+                Buffer = TestCommon.TestData.JpegImage
+            });
 
         await page.ClickContinueButton();
 

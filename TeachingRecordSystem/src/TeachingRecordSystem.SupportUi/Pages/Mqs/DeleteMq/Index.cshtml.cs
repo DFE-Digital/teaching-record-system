@@ -1,28 +1,25 @@
 using System.ComponentModel.DataAnnotations;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 [Journey(JourneyNames.DeleteMq), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel : PageModel
+public class IndexModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    ReferenceDataCache referenceDataCache,
+    TrsLinkGenerator linkGenerator,
+    IFileService fileService) : PageModel
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly ReferenceDataCache _referenceDataCache;
-    private readonly TrsLinkGenerator _linkGenerator;
+    public const int MaxFileSizeMb = 50;
 
-    public IndexModel(
-        ICrmQueryDispatcher crmQueryDispatcher,
-        ReferenceDataCache referenceDataCache,
-        TrsLinkGenerator linkGenerator)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _referenceDataCache = referenceDataCache;
-        _linkGenerator = linkGenerator;
-    }
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
     public JourneyInstance<DeleteMqState>? JourneyInstance { get; set; }
 
@@ -44,6 +41,7 @@ public class IndexModel : PageModel
     public DateOnly? EndDate { get; set; }
 
     [BindProperty]
+    [Required(ErrorMessage = "Select a reason for deleting")]
     [Display(Name = "Reason for deleting")]
     public MqDeletionReasonOption? DeletionReason { get; set; }
 
@@ -51,17 +49,39 @@ public class IndexModel : PageModel
     [Display(Name = "More detail about the reason for deleting")]
     public string? DeletionReasonDetail { get; set; }
 
-    public void OnGet()
+    [BindProperty]
+    [Display(Name = "Upload evidence")]
+    [Required(ErrorMessage = "Select yes if you want to upload evidence")]
+    public bool? UploadEvidence { get; set; }
+
+    [BindProperty]
+    [EvidenceFile]
+    [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    public IFormFile? EvidenceFile { get; set; }
+
+    public Guid? EvidenceFileId { get; set; }
+
+    public string? EvidenceFileName { get; set; }
+
+    public string? EvidenceFileSizeDescription { get; set; }
+
+    public string? UploadedEvidenceFileUrl { get; set; }
+
+    public async Task OnGet()
     {
         DeletionReason ??= JourneyInstance!.State.DeletionReason;
         DeletionReasonDetail ??= JourneyInstance?.State.DeletionReasonDetail;
+        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            null;
+        UploadEvidence ??= JourneyInstance?.State.UploadEvidence;
     }
 
     public async Task<IActionResult> OnPost()
     {
-        if (DeletionReason is null)
+        if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
         {
-            ModelState.AddModelError(nameof(DeletionReason), "Select a reason for deleting");
+            ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
         }
 
         if (!ModelState.IsValid)
@@ -69,31 +89,67 @@ public class IndexModel : PageModel
             return this.PageWithErrors();
         }
 
+        if (UploadEvidence == true)
+        {
+            if (EvidenceFile is not null)
+            {
+                if (EvidenceFileId is not null)
+                {
+                    await fileService.DeleteFile(EvidenceFileId.Value);
+                }
+
+                using var stream = EvidenceFile.OpenReadStream();
+                var evidenceFileId = await fileService.UploadFile(stream, EvidenceFile.ContentType);
+                await JourneyInstance!.UpdateStateAsync(state =>
+                {
+                    state.EvidenceFileId = evidenceFileId;
+                    state.EvidenceFileName = EvidenceFile.FileName;
+                    state.EvidenceFileSizeDescription = EvidenceFile.Length.Bytes().Humanize();
+                });
+            }
+        }
+        else if (EvidenceFileId is not null)
+        {
+            await fileService.DeleteFile(EvidenceFileId.Value);
+            await JourneyInstance!.UpdateStateAsync(state =>
+            {
+                state.EvidenceFileId = null;
+                state.EvidenceFileName = null;
+                state.EvidenceFileSizeDescription = null;
+            });
+        }
+
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.DeletionReason = DeletionReason;
             state.DeletionReasonDetail = DeletionReasonDetail;
+            state.UploadEvidence = UploadEvidence;
         });
 
-        return Redirect(_linkGenerator.MqDeleteConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqDeleteConfirm(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
+        if (JourneyInstance!.State.EvidenceFileId is not null)
+        {
+            await fileService.DeleteFile(JourneyInstance!.State.EvidenceFileId.Value);
+        }
+
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var qualification = await _crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId));
+        var qualification = await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId));
         if (qualification is null || qualification.dfeta_Type != dfeta_qualification_dfeta_Type.MandatoryQualification)
         {
             context.Result = NotFound();
             return;
         }
 
-        await JourneyInstance!.State.EnsureInitialized(_crmQueryDispatcher, _referenceDataCache, qualification);
+        await JourneyInstance!.State.EnsureInitialized(crmQueryDispatcher, referenceDataCache, qualification);
 
         PersonId = JourneyInstance!.State.PersonId;
         PersonName = JourneyInstance!.State.PersonName;
@@ -102,6 +158,9 @@ public class IndexModel : PageModel
         Status = JourneyInstance!.State.Status;
         StartDate = JourneyInstance!.State.StartDate;
         EndDate = JourneyInstance!.State.EndDate;
+        EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
+        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
+        EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
 
         await next();
     }

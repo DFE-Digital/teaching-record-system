@@ -102,8 +102,9 @@ public class EditUser : PageModel
 
         _dbContext.AddEvent(new UserUpdatedEvent
         {
-            User = Core.Events.User.FromModel(user),
-            SourceUserId = User.GetUserId(),
+            EventId = Guid.NewGuid(),
+            User = Core.Events.Models.User.FromModel(user),
+            RaisedBy = User.GetUserId(),
             CreatedUtc = _clock.UtcNow,
             Changes = changes
         });
@@ -128,8 +129,9 @@ public class EditUser : PageModel
 
         _dbContext.AddEvent(new UserDeactivatedEvent
         {
-            User = Core.Events.User.FromModel(user),
-            SourceUserId = User.GetUserId(),
+            EventId = Guid.NewGuid(),
+            User = Core.Events.Models.User.FromModel(user),
+            RaisedBy = User.GetUserId(),
             CreatedUtc = _clock.UtcNow
         });
 
@@ -152,8 +154,9 @@ public class EditUser : PageModel
 
         _dbContext.AddEvent(new UserActivatedEvent
         {
-            User = Core.Events.User.FromModel(user),
-            SourceUserId = User.GetUserId(),
+            EventId = Guid.NewGuid(),
+            User = Core.Events.Models.User.FromModel(user),
+            RaisedBy = User.GetUserId(),
             CreatedUtc = _clock.UtcNow
         });
 

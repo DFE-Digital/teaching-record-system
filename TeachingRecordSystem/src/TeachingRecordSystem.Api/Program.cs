@@ -1,14 +1,11 @@
 using System.Security.Claims;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Hangfire;
-using Hangfire.PostgreSql;
 using idunno.Authentication.Basic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using Npgsql;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
@@ -20,11 +17,8 @@ using TeachingRecordSystem.Api.Infrastructure.RateLimiting;
 using TeachingRecordSystem.Api.Infrastructure.Redis;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Validation;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
-using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
@@ -48,12 +42,6 @@ public class Program
         var configuration = builder.Configuration;
 
         builder.ConfigureLogging();
-
-        string pgConnectionString = new NpgsqlConnectionStringBuilder(configuration.GetRequiredValue("ConnectionStrings:DefaultConnection"))
-        {
-            // We rely on error details to get the offending duplicate key values in the TrsDataSyncHelper
-            IncludeErrorDetail = true
-        }.ConnectionString;
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
@@ -108,22 +96,15 @@ public class Program
                     .RequireClaim(ClaimTypes.Name));
 
             options.AddPolicy(
-                    AuthorizationPolicies.IdentityUserWithTrn,
-                    policy => policy
-                        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                        .RequireAssertion(ctx =>
-                        {
-                            var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                            return scopes.Contains("dqt:read");
-                        })
-                        .RequireClaim("trn"));
-
-            options.AddPolicy(
-                AuthorizationPolicies.Hangfire,
+                AuthorizationPolicies.IdentityUserWithTrn,
                 policy => policy
-                    .AddAuthenticationSchemes(BasicAuthenticationDefaults.AuthenticationScheme)
-                    .RequireAuthenticatedUser()
-                );
+                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAssertion(ctx =>
+                    {
+                        var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        return scopes.Contains("dqt:read");
+                    })
+                    .RequireClaim("trn"));
 
             options.AddPolicy(
                 AuthorizationPolicies.GetPerson,
@@ -187,9 +168,6 @@ public class Program
 
         services.AddOpenApi(configuration);
 
-        var healthCheckBuilder = services.AddHealthChecks()
-            .AddNpgSql(pgConnectionString);
-
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
         services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
         services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
@@ -202,35 +180,14 @@ public class Program
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
-        services.AddDbContext<TrsDbContext>(
-            options => TrsDbContext.ConfigureOptions(options, pgConnectionString),
-            contextLifetime: ServiceLifetime.Transient,
-            optionsLifetime: ServiceLifetime.Singleton);
-
-        services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options, pgConnectionString));
-
-        services.AddDatabaseDeveloperPageExceptionFilter();
-
         builder.AddBlobStorage();
 
         builder.AddDistributedLocks();
 
-        if (!env.IsUnitTests() && !env.IsEndToEndTests())
-        {
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(o => o.UseNpgsqlConnection(pgConnectionString)));
-
-            services.AddHangfireServer();
-        }
-
         services.AddTrnGenerationApi(configuration);
         services.AddIdentityApi(configuration, env);
-        services.AddAccessYourQualifications(configuration, env);
+        services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();
-        services.AddBackgroundJobs(env, configuration);
         services.AddEmail(env, configuration);
         services.AddCrmQueries();
 
@@ -241,10 +198,11 @@ public class Program
             services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
             services.AddTransient<IDataverseAdapter, DataverseAdapter>();
 
-            healthCheckBuilder.AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
+            services.AddHealthChecks()
+                .AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
         }
 
-        services.AddRedis(env, configuration, healthCheckBuilder);
+        services.AddRedis(env, configuration);
         services.AddRateLimiting(env, configuration);
 
         var app = builder.Build();
@@ -275,11 +233,6 @@ public class Program
         app.MapWebHookEndpoints();
 
         app.MapControllers();
-
-        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
-        {
-            app.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.Hangfire, "/_hangfire");
-        }
 
         if (env.IsDevelopment())
         {

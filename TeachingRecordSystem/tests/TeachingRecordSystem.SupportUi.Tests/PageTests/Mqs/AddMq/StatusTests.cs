@@ -3,9 +3,9 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
-public class ResultTests : TestBase
+public class StatusTests : TestBase
 {
-    public ResultTests(HostFixture hostFixture)
+    public StatusTests(HostFixture hostFixture)
         : base(hostFixture)
     {
     }
@@ -17,7 +17,7 @@ public class ResultTests : TestBase
         var personId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstance(personId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/result?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/status?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -41,14 +41,14 @@ public class ResultTests : TestBase
                 EndDate = endDate,
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/result?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await response.GetDocument();
-        var resultOptions = doc.GetElementByTestId("result-options");
+        var resultOptions = doc.GetElementByTestId("status-options");
         var radioButtons = resultOptions!.GetElementsByTagName("input");
         var selectedResult = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedResult);
@@ -65,7 +65,7 @@ public class ResultTests : TestBase
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/result?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -83,7 +83,7 @@ public class ResultTests : TestBase
         var endDate = new DateOnly(2021, 11, 5);
         var journeyInstance = await CreateJourneyInstance(personId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/result?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -108,7 +108,7 @@ public class ResultTests : TestBase
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/result?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>())
         };
@@ -117,7 +117,7 @@ public class ResultTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Status", "Select a result");
+        await AssertEx.HtmlResponseHasError(response, "Status", "Select a status");
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class ResultTests : TestBase
         var status = MandatoryQualificationStatus.Passed;
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/result?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -152,7 +152,7 @@ public class ResultTests : TestBase
         var endDate = new DateOnly(2021, 11, 5);
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/result?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {

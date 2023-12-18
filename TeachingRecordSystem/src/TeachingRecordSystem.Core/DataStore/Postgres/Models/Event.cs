@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Event
 {
-    public long EventId { get; }
+    public required Guid EventId { get; init; }
     public required string EventName { get; init; }
     public required DateTime Created { get; init; }
     public required string Payload { get; init; }
@@ -13,11 +13,12 @@ public class Event
 
     public static Event FromEventBase(EventBase @event)
     {
-        var eventName = @event.GetType().Name;
+        var eventName = @event.GetEventName();
         var payload = JsonSerializer.Serialize(@event, inputType: @event.GetType(), EventBase.JsonSerializerOptions);
 
         return new Event()
         {
+            EventId = @event.EventId,
             Created = @event.CreatedUtc,
             EventName = eventName,
             Payload = payload

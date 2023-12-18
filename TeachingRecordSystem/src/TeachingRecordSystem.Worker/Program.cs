@@ -1,14 +1,17 @@
+using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.DqtReporting;
+using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
+using TeachingRecordSystem.Hosting;
 using TeachingRecordSystem.Worker.Infrastructure.Logging;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -22,20 +25,15 @@ if (builder.Environment.IsProduction())
 
 builder.ConfigureLogging();
 
-var pgConnectionString = builder.Configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
-
-builder.Services.AddDbContext<TrsDbContext>(
-    options => TrsDbContext.ConfigureOptions(options, pgConnectionString),
-    contextLifetime: ServiceLifetime.Transient,
-    optionsLifetime: ServiceLifetime.Singleton);
-
-builder.Services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options, pgConnectionString));
-
 builder
+    .AddDatabase()
     .AddBlobStorage()
     .AddDistributedLocks()
     .AddDqtReporting()
-    .AddTrsSyncService();
+    .AddTrsSyncService()
+    .AddHangfire()
+    .AddBackgroundJobs()
+    .AddBackgroundWorkScheduler();
 
 var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
 {
@@ -45,9 +43,13 @@ var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue(
     RetryPauseTime = TimeSpan.FromSeconds(1)
 };
 builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
+AddLegacyDataverseAdapterServices();
+
+builder.Services.AddHangfireServer();
 
 builder.Services
-    .AddTrsBaseServices();
+    .AddTrsBaseServices()
+    .AddMemoryCache();
 
 // Filter telemetry emitted by DqtReportingService;
 // annoyingly we can't put this into the AddDqtReporting extension method since the method for adding Telemetry Processors
@@ -58,3 +60,14 @@ builder.Services.AddApplicationInsightsTelemetryWorkerService()
 var host = builder.Build();
 
 await host.RunAsync();
+
+void AddLegacyDataverseAdapterServices()
+{
+    builder.Services.AddTransient<IDataverseAdapter, DataverseAdapter>();
+    builder.Services.AddSingleton<ITrnGenerationApiClient, DummyTrnGenerationApiClient>();
+}
+
+sealed class DummyTrnGenerationApiClient : ITrnGenerationApiClient
+{
+    public Task<string> GenerateTrn() => throw new NotImplementedException();
+}

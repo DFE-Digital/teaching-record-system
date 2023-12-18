@@ -9109,6 +9109,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Id = "dfeta_qualificationid";
 			public const string dfeta_TrsDeletedEvent = "dfeta_trsdeletedevent";
 			public const string dfeta_Type = "dfeta_type";
+			public const string ModifiedOn = "modifiedon";
 			public const string StateCode = "statecode";
 			public const string business_unit_dfeta_qualification = "business_unit_dfeta_qualification";
 			public const string dfeta_account_dfeta_qualification_he = "dfeta_account_dfeta_qualification_he";
@@ -9970,6 +9971,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_Type");
 				this.SetAttributeValue("dfeta_type", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
 				this.OnPropertyChanged("dfeta_Type");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the record was modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 		

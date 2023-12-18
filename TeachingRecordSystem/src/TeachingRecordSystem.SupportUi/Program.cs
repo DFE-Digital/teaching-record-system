@@ -1,4 +1,5 @@
 using GovUk.Frontend.AspNetCore;
+using Hangfire;
 using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -11,7 +12,8 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Identity.Web;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Infrastructure;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
@@ -22,6 +24,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Logging;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Redis;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 
@@ -32,8 +35,6 @@ builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 builder.AddServiceDefaults(dataProtectionBlobName: "SupportUi");
 
 builder.ConfigureLogging();
-
-var pgConnectionString = builder.Configuration.GetRequiredValue("ConnectionStrings:DefaultConnection");
 
 if (builder.Environment.IsDevelopment())
 {
@@ -67,14 +68,17 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     });
 }
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy(
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(
         AuthorizationPolicies.CaseManagement,
         policy => policy
             .RequireAuthenticatedUser()
-            .RequireRole(UserRoles.Helpdesk, UserRoles.Administrator));
-});
+            .RequireRole(UserRoles.Helpdesk, UserRoles.Administrator))
+    .AddPolicy(
+        AuthorizationPolicies.Hangfire,
+        policy => policy
+            .RequireAuthenticatedUser()
+            .RequireRole(UserRoles.Administrator));
 
 builder.Services
     .AddRazorPages(options =>
@@ -110,22 +114,7 @@ builder.Services
         options.Cookie.Name = "trs-tempdata";
     });
 
-var healthCheckBuilder = builder.Services.AddHealthChecks()
-    .AddNpgSql(pgConnectionString);
-
-builder.Services.AddDbContext<TrsDbContext>(
-    options => TrsDbContext.ConfigureOptions(options, pgConnectionString),
-    contextLifetime: ServiceLifetime.Transient,
-    optionsLifetime: ServiceLifetime.Singleton);
-
-builder.Services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options, pgConnectionString));
-
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-}
-
-builder.Services.AddRedis(builder.Environment, builder.Configuration, healthCheckBuilder);
+builder.Services.AddRedis(builder.Environment, builder.Configuration);
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
 {
@@ -165,7 +154,8 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
         ServiceLifetime.Transient,
         _ => serviceClient.Clone());
 
-    healthCheckBuilder.AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
+    builder.Services.AddHealthChecks()
+        .AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
 }
 
 builder.Services
@@ -200,39 +190,41 @@ builder.Services
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.AddMq,
             typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.AddMqState),
-            requestDataKeys: new[] { "personId" },
+            requestDataKeys: ["personId"],
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditMqProvider,
             typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider.EditMqProviderState),
-            requestDataKeys: new[] { "qualificationId" },
+            requestDataKeys: ["qualificationId"],
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditMqSpecialism,
             typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism.EditMqSpecialismState),
-            requestDataKeys: new[] { "qualificationId" },
+            requestDataKeys: ["qualificationId"],
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditMqStartDate,
             typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate.EditMqStartDateState),
-            requestDataKeys: new[] { "qualificationId" },
+            requestDataKeys: ["qualificationId"],
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditMqResult,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result.EditMqResultState),
-            requestDataKeys: new[] { "qualificationId" },
+            typeof(EditMqResultState),
+            requestDataKeys: ["qualificationId"],
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.DeleteMq,
             typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq.DeleteMqState),
-            requestDataKeys: new[] { "qualificationId" },
+            requestDataKeys: ["qualificationId"],
             appendUniqueKey: true));
     });
+
+builder.AddBlobStorage();
 
 builder.Services
     .AddTransient<TrsLinkGenerator>()
@@ -241,7 +233,8 @@ builder.Services
     .AddSupportUiServices(builder.Configuration, builder.Environment)
     .AddSingleton<ReferenceDataCache>()
     .AddSingleton<SanctionTextLookup>()
-    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
+    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
+    .AddFileService();
 
 var app = builder.Build();
 
@@ -294,6 +287,11 @@ app.MapGet("", context =>
 
 app.MapRazorPages();
 app.MapControllers();
+
+if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+{
+    app.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.Hangfire, "/_hangfire");
+}
 
 app.Run();
 

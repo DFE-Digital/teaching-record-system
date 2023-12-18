@@ -64,12 +64,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Event", b =>
                 {
-                    b.Property<long>("EventId")
+                    b.Property<Guid>("EventId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
+                        .HasColumnType("uuid")
                         .HasColumnName("event_id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("EventId"));
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone")

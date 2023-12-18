@@ -1,8 +1,8 @@
-@page "/mqs/{qualificationId}/result/{handler?}"
+@page "/mqs/{qualificationId}/status/{handler?}"
 @using TeachingRecordSystem.Core.Dqt.Models;
-@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result.IndexModel
+@model TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status.IndexModel
 @{
-    ViewBag.Title = "Result";
+    ViewBag.Title = "Status";
 }
 
 @section BeforeContent {
@@ -14,21 +14,21 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.MqEditResult(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.MqEditStatus(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-radios asp-for="Status" data-testid="result-options">
-                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.InProgress" data-testid="result-in-progress">
+                <govuk-radios-item value="@MandatoryQualificationStatus.InProgress" data-testid="result-in-progress">
                     In Progress
                 </govuk-radios-item>
-                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Deferred" data-testid="result-deferred">
+                <govuk-radios-item value="@MandatoryQualificationStatus.Deferred" data-testid="result-deferred">
                     Deferred
                 </govuk-radios-item>
-                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Extended" data-testid="result-extended">
+                <govuk-radios-item value="@MandatoryQualificationStatus.Extended" data-testid="result-extended">
                     Extended
                 </govuk-radios-item>
-                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Failed" data-testid="result-failed">
+                <govuk-radios-item value="@MandatoryQualificationStatus.Failed" data-testid="result-failed">
                     Failed
                 </govuk-radios-item>
-                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Passed" data-testid="result-passed">
+                <govuk-radios-item value="@MandatoryQualificationStatus.Passed" data-testid="result-passed">
                     Passed
                     <govuk-radios-item-conditional>
                         <govuk-date-input asp-for="EndDate">
@@ -38,14 +38,14 @@
                         </govuk-date-input>
                     </govuk-radios-item-conditional>
                 </govuk-radios-item>
-                <govuk-radios-item value="@dfeta_qualification_dfeta_MQ_Status.Withdrawn" date-testid="result-withdrawn">
+                <govuk-radios-item value="@MandatoryQualificationStatus.Withdrawn" date-testid="result-withdrawn">
                     Withdrawn
                 </govuk-radios-item>
             </govuk-radios>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator.MqEditResultCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.MqEditStatusCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

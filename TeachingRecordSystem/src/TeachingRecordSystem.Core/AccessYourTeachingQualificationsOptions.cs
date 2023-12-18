@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.Core.Services.AccessYourQualifications;
+namespace TeachingRecordSystem.Core;
 
-public class AccessYourQualificationsOptions
+public class AccessYourTeachingQualificationsOptions
 {
     [Required]
     public required string BaseAddress { get; init; }

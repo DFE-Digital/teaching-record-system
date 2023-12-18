@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result;
+namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 public class EditMqResultState
 {

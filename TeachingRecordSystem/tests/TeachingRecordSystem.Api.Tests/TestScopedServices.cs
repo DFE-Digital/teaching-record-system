@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
@@ -17,7 +16,7 @@ public class TestScopedServices
         DataverseAdapterMock = new();
         GetAnIdentityApiClientMock = new();
 
-        AccessYourQualificationsOptions = Options.Create(new AccessYourQualificationsOptions()
+        AccessYourTeachingQualificationsOptions = Options.Create(new AccessYourTeachingQualificationsOptions()
         {
             BaseAddress = "https://aytq.com",
         });
@@ -44,6 +43,6 @@ public class TestScopedServices
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
-    public IOptions<AccessYourQualificationsOptions> AccessYourQualificationsOptions { get; }
+    public IOptions<AccessYourTeachingQualificationsOptions> AccessYourTeachingQualificationsOptions { get; }
 
 }

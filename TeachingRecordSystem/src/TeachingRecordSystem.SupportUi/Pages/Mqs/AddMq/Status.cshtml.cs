@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.Dqt.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class ResultModel(TrsLinkGenerator linkGenerator) : PageModel
+public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -17,6 +17,7 @@ public class ResultModel(TrsLinkGenerator linkGenerator) : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [Required(ErrorMessage = "Select a status")]
     public MandatoryQualificationStatus? Status { get; set; }
 
     [BindProperty]
@@ -25,11 +26,6 @@ public class ResultModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        if (Status is null)
-        {
-            ModelState.AddModelError(nameof(Status), "Select a result");
-        }
-
         if (Status == MandatoryQualificationStatus.Passed && EndDate is null)
         {
             ModelState.AddModelError(nameof(EndDate), "Enter an end date");

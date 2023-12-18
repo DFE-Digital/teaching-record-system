@@ -2,6 +2,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public abstract class Qualification
 {
+    public const string PersonForeignKeyName = "fk_qualifications_person";
+
     public required Guid QualificationId { get; init; }
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }

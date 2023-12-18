@@ -98,9 +98,10 @@ public class PublishEventsBackgroundServiceTests : IAsyncLifetime
 
     private EventBase CreateDummyEvent() => new DummyEvent()
     {
+        EventId = Guid.NewGuid(),
         DummyProperty = Faker.Name.FullName(),
         CreatedUtc = TestableClock.Initial.ToUniversalTime(),
-        SourceUserId = DataStore.Postgres.Models.User.SystemUserId
+        RaisedBy = User.SystemUserId
     };
 
     private class TestableEventObserver : IEventObserver

@@ -15,7 +15,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
@@ -30,7 +29,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
     private readonly ICurrentClientProvider _currentClientProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
     private readonly IGetAnIdentityApiClient _identityApiClient;
-    private readonly AccessYourQualificationsOptions _accessYourQualificationsOptions;
+    private readonly AccessYourTeachingQualificationsOptions _accessYourTeachingQualificationsOptions;
 
     public GetOrCreateTrnRequestHandler(
         TrsDbContext TrsDbContext,
@@ -38,14 +37,14 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
         ICurrentClientProvider currentClientProvider,
         IDistributedLockProvider distributedLockProvider,
         IGetAnIdentityApiClient identityApiClient,
-        IOptions<AccessYourQualificationsOptions> accessYourQualificationsOptions)
+        IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions)
     {
         _trsDbContext = TrsDbContext;
         _dataverseAdapter = dataverseAdapter;
         _currentClientProvider = currentClientProvider;
         _distributedLockProvider = distributedLockProvider;
         _identityApiClient = identityApiClient;
-        _accessYourQualificationsOptions = accessYourQualificationsOptions.Value;
+        _accessYourTeachingQualificationsOptions = accessYourTeachingQualificationsOptions.Value;
     }
 
     public async Task<TrnRequestInfo> Handle(GetOrCreateTrnRequest request, CancellationToken cancellationToken)
@@ -187,7 +186,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             QtsDate = qtsDate,
             PotentialDuplicate = status == TrnRequestStatus.Pending,
             SlugId = request.SlugId,
-            AccessYourTeachingQualificationsLink = trnToken is not null ? Option.Some($"{_accessYourQualificationsOptions.BaseAddress}{_accessYourQualificationsOptions.StartUrlPath}?trn_token={trnToken}") : default
+            AccessYourTeachingQualificationsLink = trnToken is not null ? Option.Some($"{_accessYourTeachingQualificationsOptions.BaseAddress}{_accessYourTeachingQualificationsOptions.StartUrlPath}?trn_token={trnToken}") : default
         };
     }
 

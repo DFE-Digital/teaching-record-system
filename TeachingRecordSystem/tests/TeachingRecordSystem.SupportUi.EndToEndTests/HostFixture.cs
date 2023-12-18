@@ -3,7 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
+using Moq;
 using TeachingRecordSystem.Core;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon;
@@ -70,13 +72,25 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                         .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
 
                     services.AddSingleton<CurrentUserProvider>();
-                    services.AddTransient<TestUsers.CreateUsersStartupTask>();
                     services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
                     services.AddSingleton<TestData>(
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
                     services.AddFakeXrm();
                     services.AddSingleton<FakeTrnGenerator>();
                     services.AddSingleton<TrsDataSyncHelper>();
+                    services.AddSingleton(GetMockFileService());
+
+                    IFileService GetMockFileService()
+                    {
+                        var fileService = new Mock<IFileService>();
+                        fileService
+                            .Setup(s => s.UploadFile(It.IsAny<Stream>(), It.IsAny<string?>()))
+                            .ReturnsAsync(Guid.NewGuid());
+                        fileService
+                            .Setup(s => s.GetFileUrl(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                            .ReturnsAsync("https://fake.blob.core.windows.net/fake");
+                        return fileService.Object;
+                    }
                 });
             });
 

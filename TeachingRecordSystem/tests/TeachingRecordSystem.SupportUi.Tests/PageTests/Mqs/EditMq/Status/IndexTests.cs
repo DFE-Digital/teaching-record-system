@@ -1,8 +1,8 @@
 using FormFlow;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Result;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Result;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
 
 public class IndexTests : TestBase
 {
@@ -18,7 +18,7 @@ public class IndexTests : TestBase
         var qualificationId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/result?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -37,7 +37,7 @@ public class IndexTests : TestBase
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/result?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -76,7 +76,7 @@ public class IndexTests : TestBase
                 EndDate = journeyEndDate
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/result?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -102,7 +102,7 @@ public class IndexTests : TestBase
         var qualificationId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -122,7 +122,7 @@ public class IndexTests : TestBase
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
@@ -131,7 +131,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Status", "Select a result");
+        await AssertEx.HtmlResponseHasError(response, "Status", "Select a status");
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstance(qualificationId);
         var status = MandatoryQualificationStatus.Passed;
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -168,7 +168,7 @@ public class IndexTests : TestBase
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -184,7 +184,7 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/result/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/mqs/{qualificationId}/status/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -195,7 +195,7 @@ public class IndexTests : TestBase
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/result/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
         };
