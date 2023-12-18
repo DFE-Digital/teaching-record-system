@@ -9,6 +9,7 @@ using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.DqtReporting;
+using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Hosting;
@@ -33,7 +34,8 @@ builder
     .AddTrsSyncService()
     .AddHangfire()
     .AddBackgroundJobs()
-    .AddBackgroundWorkScheduler();
+    .AddBackgroundWorkScheduler()
+    .AddEmail();
 
 var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
 {
