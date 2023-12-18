@@ -27,7 +27,9 @@ public static class Extensions
 
         if (builder.Environment.IsProduction())
         {
-            builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
+            builder.Configuration
+                .AddJsonEnvironmentVariable("AppConfig")
+                .AddJsonEnvironmentVariable("SharedConfig");
 
             builder.Services.Configure<ForwardedHeadersOptions>(options =>
             {

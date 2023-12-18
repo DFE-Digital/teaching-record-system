@@ -179,12 +179,12 @@ public class Program
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 
-        builder.AddBlobStorage();
-
-        builder.AddDistributedLocks();
+        builder
+            .AddBlobStorage()
+            .AddDistributedLocks()
+            .AddIdentityApi();
 
         services.AddTrnGenerationApi(configuration);
-        services.AddIdentityApi(configuration, env);
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();
         services.AddCrmQueries();

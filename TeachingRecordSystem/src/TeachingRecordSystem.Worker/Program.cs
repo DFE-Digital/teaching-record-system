@@ -9,6 +9,7 @@ using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.DqtReporting;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -21,7 +22,9 @@ builder.Services.Configure<HostOptions>(o => o.BackgroundServiceExceptionBehavio
 
 if (builder.Environment.IsProduction())
 {
-    builder.Configuration.AddJsonEnvironmentVariable("AppConfig");
+    builder.Configuration
+        .AddJsonEnvironmentVariable("AppConfig")
+        .AddJsonEnvironmentVariable("SharedConfig");
 }
 
 builder.ConfigureLogging();
@@ -35,7 +38,8 @@ builder
     .AddHangfire()
     .AddBackgroundJobs()
     .AddBackgroundWorkScheduler()
-    .AddEmail();
+    .AddEmail()
+    .AddIdentityApi();
 
 var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
 {
