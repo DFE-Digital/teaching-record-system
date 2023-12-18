@@ -21,7 +21,6 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.ServiceDefaults;
 
@@ -188,7 +187,6 @@ public class Program
         services.AddIdentityApi(configuration, env);
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();
-        services.AddEmail(env, configuration);
         services.AddCrmQueries();
 
         if (!env.IsUnitTests())
