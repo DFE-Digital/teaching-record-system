@@ -6,25 +6,22 @@ using TeachingRecordSystem.Core.Services.GetAnIdentity.Api;
 
 namespace TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
-public static class ServiceCollectionExtensions
+public static class HostApplicationBuilderExtensions
 {
-    public static IServiceCollection AddIdentityApi(
-        this IServiceCollection services,
-        IConfiguration configuration,
-        IHostEnvironment environment)
+    public static IHostApplicationBuilder AddIdentityApi(this IHostApplicationBuilder builder)
     {
-        if (!environment.IsUnitTests() && !environment.IsEndToEndTests())
+        if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
         {
-            services.AddOptions<GetAnIdentityOptions>()
-                .Bind(configuration.GetSection("GetAnIdentity"))
+            builder.Services.AddOptions<GetAnIdentityOptions>()
+                .Bind(builder.Configuration.GetSection("GetAnIdentity"))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            services
+            builder.Services
                 .AddTransient<ClientCredentialsBearerTokenDelegatingHandler>()
                 .AddHttpClient<ClientCredentialsBearerTokenDelegatingHandler>();
 
-            services
+            builder.Services
                 .AddHttpClient<IGetAnIdentityApiClient, GetAnIdentityApiClient>((sp, httpClient) =>
                 {
                     var options = sp.GetRequiredService<IOptions<GetAnIdentityOptions>>();
@@ -33,6 +30,6 @@ public static class ServiceCollectionExtensions
                 .AddHttpMessageHandler<ClientCredentialsBearerTokenDelegatingHandler>();
         }
 
-        return services;
+        return builder;
     }
 }
