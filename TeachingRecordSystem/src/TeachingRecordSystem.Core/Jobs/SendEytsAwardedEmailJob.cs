@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events;
-using TeachingRecordSystem.Core.Services.AccessYourQualifications;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
@@ -17,20 +16,20 @@ public class SendEytsAwardedEmailJob
     private readonly TrsDbContext _dbContext;
     private readonly IGetAnIdentityApiClient _identityApiClient;
     private readonly IClock _clock;
-    private readonly AccessYourQualificationsOptions _accessYourQualificationsOptions;
+    private readonly AccessYourTeachingQualificationsOptions _accessYourTeachingQualificationsOptions;
 
     public SendEytsAwardedEmailJob(
         INotificationSender notificationSender,
         TrsDbContext dbContext,
         IGetAnIdentityApiClient identityApiClient,
-        IOptions<AccessYourQualificationsOptions> accessYourQualificationsOptions,
+        IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions,
         IClock clock)
     {
         _notificationSender = notificationSender;
         _dbContext = dbContext;
         _identityApiClient = identityApiClient;
         _clock = clock;
-        _accessYourQualificationsOptions = accessYourQualificationsOptions.Value;
+        _accessYourTeachingQualificationsOptions = accessYourTeachingQualificationsOptions.Value;
     }
 
     public async Task Execute(Guid eytsAwardedEmailsJobId, Guid personId)
@@ -46,7 +45,7 @@ public class SendEytsAwardedEmailJob
             };
 
             var tokenResponse = await _identityApiClient.CreateTrnToken(request);
-            item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourQualificationsOptions.BaseAddress}{_accessYourQualificationsOptions.StartUrlPath}?trn_token={tokenResponse.TrnToken}";
+            item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourTeachingQualificationsOptions.BaseAddress}{_accessYourTeachingQualificationsOptions.StartUrlPath}?trn_token={tokenResponse.TrnToken}";
         }
 
         await _notificationSender.SendEmail(EytsAwardedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
