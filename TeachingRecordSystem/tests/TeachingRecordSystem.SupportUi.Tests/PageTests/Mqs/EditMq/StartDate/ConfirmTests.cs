@@ -1,4 +1,5 @@
 using FormFlow;
+using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
@@ -99,7 +100,7 @@ public class ConfirmTests : TestBase
     }
 
     [Fact]
-    public async Task Post_Confirm_CompletesJourneyAndRedirectsWithFlashMessage()
+    public async Task Post_Confirm_CompletesJourneyRedirectsWithFlashMessageAndUpdatesMq()
     {
         // Arrange
         var oldStartDate = new DateOnly(2021, 10, 5);
@@ -134,13 +135,20 @@ public class ConfirmTests : TestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
+
+        await WithDbContext(async dbContext =>
+        {
+            var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
+            Assert.Equal(newStartDate, qualification.StartDate);
+        });
     }
 
     [Fact]
-    public async Task Post_Cancel_DeletesJourneyAndRedirects()
+    public async Task Post_Cancel_DeletesJourneyRedirectsAndDoesNotUpdateMq()
     {
         // Arrange
         var oldStartDate = new DateOnly(2021, 10, 5);
+        var newStartDate = new DateOnly(2021, 10, 6);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
@@ -150,7 +158,7 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                StartDate = oldStartDate
+                StartDate = newStartDate
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -166,6 +174,12 @@ public class ConfirmTests : TestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
+
+        await WithDbContext(async dbContext =>
+        {
+            var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
+            Assert.Equal(oldStartDate, qualification.StartDate);
+        });
     }
 
     private async Task<JourneyInstance<EditMqStartDateState>> CreateJourneyInstance(Guid qualificationId, EditMqStartDateState? state = null) =>

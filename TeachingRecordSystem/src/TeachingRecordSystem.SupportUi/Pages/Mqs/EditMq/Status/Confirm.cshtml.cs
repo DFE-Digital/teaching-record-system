@@ -2,13 +2,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 [Journey(JourneyNames.EditMqResult), RequireJourneyInstance]
 public class ConfirmModel(
     ICrmQueryDispatcher crmQueryDispatcher,
-    TrsLinkGenerator linkGenerator) : PageModel
+    TrsLinkGenerator linkGenerator,
+    IBackgroundJobScheduler backgroundJobScheduler) : PageModel
 {
     public JourneyInstance<EditMqResultState>? JourneyInstance { get; set; }
 
@@ -37,6 +40,8 @@ public class ConfirmModel(
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification changed");
+
+        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncMandatoryQualification(QualificationId, CancellationToken.None));
 
         return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }

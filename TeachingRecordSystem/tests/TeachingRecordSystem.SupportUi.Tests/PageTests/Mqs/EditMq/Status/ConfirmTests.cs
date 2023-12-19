@@ -1,4 +1,5 @@
 using FormFlow;
+using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
@@ -103,7 +104,7 @@ public class ConfirmTests : TestBase
     }
 
     [Fact]
-    public async Task Post_Confirm_CompletesJourneyAndRedirectsWithFlashMessage()
+    public async Task Post_Confirm_CompletesJourneyRedirectsWithFlashMessageAndUpdatesMq()
     {
         // Arrange
         var oldStatus = MandatoryQualificationStatus.Failed;
@@ -140,13 +141,21 @@ public class ConfirmTests : TestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
+
+        await WithDbContext(async dbContext =>
+        {
+            var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
+            Assert.Equal(newStatus, qualification.Status);
+            Assert.Equal(newEndDate, qualification.EndDate);
+        });
     }
 
     [Fact]
-    public async Task Post_Cancel_DeletesJourneyAndRedirects()
+    public async Task Post_Cancel_DeletesJourneyRedirectsAndDoesNotUpdateMq()
     {
         // Arrange
         var oldStatus = MandatoryQualificationStatus.Failed;
+        var oldEndDate = (DateOnly?)null;
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
@@ -161,6 +170,7 @@ public class ConfirmTests : TestBase
                 Status = newStatus,
                 EndDate = newEndDate,
                 CurrentStatus = oldStatus,
+                CurrentEndDate = oldEndDate
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -176,11 +186,18 @@ public class ConfirmTests : TestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
+
+        await WithDbContext(async dbContext =>
+        {
+            var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
+            Assert.Equal(oldStatus, qualification.Status);
+            Assert.Equal(oldEndDate, qualification.EndDate);
+        });
     }
 
     private async Task<JourneyInstance<EditMqResultState>> CreateJourneyInstance(Guid qualificationId, EditMqResultState? state = null) =>
-    await CreateJourneyInstance(
-        JourneyNames.EditMqResult,
-        state ?? new EditMqResultState(),
-        new KeyValuePair<string, object>("qualificationId", qualificationId));
+        await CreateJourneyInstance(
+            JourneyNames.EditMqResult,
+            state ?? new EditMqResultState(),
+            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }

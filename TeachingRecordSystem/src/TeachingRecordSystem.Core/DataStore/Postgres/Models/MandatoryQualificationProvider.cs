@@ -17,7 +17,14 @@ public class MandatoryQualificationProvider
             return false;
         }
 
-        switch (mqestablishment.dfeta_Value)
+        return TryMapFromDqtMqEstablishmentValue(mqestablishment.dfeta_Value, out provider);
+    }
+
+    public static bool TryMapFromDqtMqEstablishmentValue(
+        string mqestablishmentValue,
+        [NotNullWhen(true)] out MandatoryQualificationProvider? provider)
+    {
+        switch (mqestablishmentValue)
         {
             case "963":  // University of Oxford/Oxford Polytechnic
                 provider = All.Single(p => p.Name == "University of Oxford/Oxford Polytechnic");

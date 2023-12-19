@@ -1,4 +1,6 @@
 using FormFlow;
+using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
@@ -101,7 +103,7 @@ public class ConfirmTests : TestBase
     }
 
     [Fact]
-    public async Task Post_Confirm_CompletesJourneyAndRedirectsWithFlashMessage()
+    public async Task Post_Confirm_CompletesJourneyRedirectsWithFlashMessageAndUpdatesMq()
     {
         // Arrange
         var oldMqEstablishmentValue = "955"; // University of Birmingham
@@ -135,10 +137,17 @@ public class ConfirmTests : TestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
+
+        await WithDbContext(async dbContext =>
+        {
+            var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
+            MandatoryQualificationProvider.TryMapFromDqtMqEstablishmentValue(newMqEstablishmentValue, out var expectedProvider);
+            Assert.Equal(expectedProvider?.MandatoryQualificationProviderId, qualification.ProviderId);
+        });
     }
 
     [Fact]
-    public async Task Post_Cancel_DeletesJourneyAndRedirects()
+    public async Task Post_Cancel_DeletesJourneyAndRedirectsAndDoesNotUpdateMq()
     {
         // Arrange
         var oldMqEstablishmentValue = "955"; // University of Birmingham
@@ -168,6 +177,13 @@ public class ConfirmTests : TestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
+
+        await WithDbContext(async dbContext =>
+        {
+            var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
+            MandatoryQualificationProvider.TryMapFromDqtMqEstablishmentValue(oldMqEstablishmentValue, out var expectedProvider);
+            Assert.Equal(expectedProvider?.MandatoryQualificationProviderId, qualification.ProviderId);
+        });
     }
 
     private async Task<JourneyInstance<EditMqProviderState>> CreateJourneyInstance(Guid qualificationId, EditMqProviderState? state = null) =>

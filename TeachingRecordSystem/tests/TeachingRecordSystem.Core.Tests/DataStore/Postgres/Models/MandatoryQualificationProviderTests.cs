@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.Core.Tests.DataStore.Postgres.Models;
 
@@ -49,13 +48,9 @@ public class MandatoryQualificationProviderTests
     public void TryMapFromDqtMqEstablishment_ReturnsExpectedResult(string mqestablishmentValue, bool expectedResult)
     {
         // Arrange
-        var mqestablishment = new dfeta_mqestablishment()
-        {
-            dfeta_Value = mqestablishmentValue
-        };
 
         // Act
-        var result = MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqestablishment, out var provider);
+        var result = MandatoryQualificationProvider.TryMapFromDqtMqEstablishmentValue(mqestablishmentValue, out var provider);
 
         // Assert
         Assert.Equal(expectedResult, result);

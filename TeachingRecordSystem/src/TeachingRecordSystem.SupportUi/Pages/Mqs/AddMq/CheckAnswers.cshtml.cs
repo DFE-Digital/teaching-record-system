@@ -3,26 +3,18 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class CheckAnswersModel : PageModel
+public class CheckAnswersModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    ReferenceDataCache referenceDataCache,
+    TrsLinkGenerator linkGenerator,
+    IBackgroundJobScheduler backgroundJobScheduler) : PageModel
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly ReferenceDataCache _referenceDataCache;
-    private readonly TrsLinkGenerator _linkGenerator;
-
-    public CheckAnswersModel(
-        ICrmQueryDispatcher crmQueryDispatcher,
-        ReferenceDataCache referenceDataCache,
-        TrsLinkGenerator linkGenerator)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _referenceDataCache = referenceDataCache;
-        _linkGenerator = linkGenerator;
-    }
-
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -42,9 +34,9 @@ public class CheckAnswersModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        var mqSpecialism = await _referenceDataCache.GetMqSpecialismByValue(Specialism!.Value.GetDqtValue());
+        var mqSpecialism = await referenceDataCache.GetMqSpecialismByValue(Specialism!.Value.GetDqtValue());
 
-        await _crmQueryDispatcher.ExecuteQuery(
+        var qualificationId = await crmQueryDispatcher.ExecuteQuery(
             new CreateMandatoryQualificationQuery()
             {
                 ContactId = PersonId,
@@ -57,16 +49,18 @@ public class CheckAnswersModel : PageModel
                     : null
             });
 
+        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncMandatoryQualification(qualificationId, CancellationToken.None));
+
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification added");
 
-        return Redirect(_linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonDetail(PersonId));
+        return Redirect(linkGenerator.PersonDetail(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -75,11 +69,11 @@ public class CheckAnswersModel : PageModel
 
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(_linkGenerator.MqAddProvider(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.MqAddProvider(PersonId, JourneyInstance.InstanceId));
         }
 
         PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
-        MqEstablishment = await _referenceDataCache.GetMqEstablishmentByValue(JourneyInstance!.State.MqEstablishmentValue!);
+        MqEstablishment = await referenceDataCache.GetMqEstablishmentByValue(JourneyInstance!.State.MqEstablishmentValue!);
         Specialism = JourneyInstance.State.Specialism;
         StartDate = JourneyInstance.State.StartDate;
         Status = JourneyInstance.State.Status;
