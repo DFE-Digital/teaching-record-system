@@ -9,18 +9,13 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class DbHelper
+public class DbHelper(string connectionString)
 {
     private Respawner? _respawner;
     private readonly SemaphoreSlim _schemaLock = new(1, 1);
     private bool _haveResetSchema = false;
 
-    public DbHelper(string connectionString)
-    {
-        ConnectionString = connectionString;
-    }
-
-    public string ConnectionString { get; }
+    public string ConnectionString { get; } = connectionString;
 
     public static void ConfigureDbServices(IServiceCollection services, string connectionString)
     {
@@ -107,6 +102,7 @@ public class DbHelper
             connection,
             new RespawnerOptions()
             {
-                DbAdapter = DbAdapter.Postgres
+                DbAdapter = DbAdapter.Postgres,
+                TablesToIgnore = ["mandatory_qualification_providers"]
             });
 }

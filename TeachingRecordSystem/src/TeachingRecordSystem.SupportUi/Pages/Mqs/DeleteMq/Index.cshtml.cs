@@ -153,7 +153,7 @@ public class IndexModel(
 
         PersonId = JourneyInstance!.State.PersonId;
         PersonName = JourneyInstance!.State.PersonName;
-        TrainingProvider = JourneyInstance!.State.MqEstablishment;
+        TrainingProvider = JourneyInstance!.State.ProviderName;
         Specialism = JourneyInstance!.State.Specialism;
         Status = JourneyInstance!.State.Status;
         StartDate = JourneyInstance!.State.StartDate;

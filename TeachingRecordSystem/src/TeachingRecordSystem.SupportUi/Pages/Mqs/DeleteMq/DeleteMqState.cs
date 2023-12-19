@@ -13,7 +13,7 @@ public class DeleteMqState
 
     public string? PersonName { get; set; }
 
-    public string? MqEstablishment { get; set; }
+    public string? ProviderName { get; set; }
 
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
@@ -67,7 +67,7 @@ public class DeleteMqState
         PersonId = personDetail!.Contact.Id;
         PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
         var mqEstablishment = qualification.dfeta_MQ_MQEstablishmentId is not null ? await referenceDataCache.GetMqEstablishmentById(qualification.dfeta_MQ_MQEstablishmentId.Id) : null;
-        MqEstablishment = mqEstablishment?.dfeta_name;
+        ProviderName = mqEstablishment?.dfeta_name;
         var mqSpecialism = qualification.dfeta_MQ_SpecialismId is not null ? await referenceDataCache.GetMqSpecialismById(qualification.dfeta_MQ_SpecialismId.Id) : null;
         Specialism = mqSpecialism?.ToMandatoryQualificationSpecialism();
         StartDate = qualification.dfeta_MQStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true);

@@ -444,6 +444,7 @@ public class TrsDataSyncHelper(
             "dqt_state",
             "dqt_created_on",
             "dqt_modified_on",
+            "mq_provider_id",
             "mq_specialism",
             "mq_status",
             "start_date",
@@ -501,6 +502,7 @@ public class TrsDataSyncHelper(
             writer.WriteNullableValueOrNull(mq.DqtState, NpgsqlDbType.Integer);
             writer.WriteNullableValueOrNull(mq.DqtCreatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteNullableValueOrNull(mq.DqtModifiedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteNullableValueOrNull(mq.ProviderId, NpgsqlDbType.Uuid);
             writer.WriteNullableValueOrNull((int?)mq.Specialism, NpgsqlDbType.Integer);
             writer.WriteNullableValueOrNull((int?)mq.Status, NpgsqlDbType.Integer);
             writer.WriteNullableValueOrNull(mq.StartDate, NpgsqlDbType.Date);
@@ -547,6 +549,7 @@ public class TrsDataSyncHelper(
     private async Task<(List<MandatoryQualification> MandatoryQualifications, List<EventBase> Events)> MapMandatoryQualifications(
         IEnumerable<dfeta_qualification> qualifications)
     {
+        var mqEstablishments = await referenceDataCache.GetMqEstablishments();
         var mqSpecialisms = await referenceDataCache.GetMqSpecialisms();
 
         var mqs = new List<MandatoryQualification>();
@@ -562,6 +565,9 @@ public class TrsDataSyncHelper(
             {
                 events.Add(deletedEvent);
             }
+
+            MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(
+                mqEstablishments.SingleOrDefault(e => e.Id == q.dfeta_MQ_MQEstablishmentId!?.Id), out var provider);
 
             MandatoryQualificationSpecialism? specialism = q.dfeta_MQ_SpecialismId is not null ?
                 mqSpecialisms.Single(s => s.Id == q.dfeta_MQ_SpecialismId.Id).ToMandatoryQualificationSpecialism() :
@@ -581,6 +587,7 @@ public class TrsDataSyncHelper(
                 DqtState = (int)q.StateCode!,
                 DqtCreatedOn = q.CreatedOn!.Value,
                 DqtModifiedOn = q.ModifiedOn!.Value,
+                ProviderId = provider?.MandatoryQualificationProviderId,
                 Specialism = specialism,
                 Status = status,
                 StartDate = q.dfeta_MQStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
