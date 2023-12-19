@@ -65,14 +65,15 @@ public class CheckAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var personDetail = (ContactDetail?)context.HttpContext.Items["CurrentPersonDetail"];
-
         if (!JourneyInstance!.State.IsComplete)
         {
             context.Result = Redirect(linkGenerator.MqAddProvider(PersonId, JourneyInstance.InstanceId));
+            return;
         }
 
-        PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+
+        PersonName = personInfo.Name;
         MqEstablishment = await referenceDataCache.GetMqEstablishmentByValue(JourneyInstance!.State.MqEstablishmentValue!);
         Specialism = JourneyInstance.State.Specialism;
         StartDate = JourneyInstance.State.StartDate;

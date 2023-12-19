@@ -3,19 +3,13 @@ using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 [Journey(JourneyNames.DeleteMq), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(
-    ICrmQueryDispatcher crmQueryDispatcher,
-    ReferenceDataCache referenceDataCache,
-    TrsLinkGenerator linkGenerator,
-    IFileService fileService) : PageModel
+public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
 
@@ -140,28 +134,20 @@ public class IndexModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var qualification = await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId));
-        if (qualification is null || qualification.dfeta_Type != dfeta_qualification_dfeta_Type.MandatoryQualification)
-        {
-            context.Result = NotFound();
-            return;
-        }
+        var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        await JourneyInstance!.State.EnsureInitialized(crmQueryDispatcher, referenceDataCache, qualification);
-
-        PersonId = JourneyInstance!.State.PersonId;
-        PersonName = JourneyInstance!.State.PersonName;
-        TrainingProvider = JourneyInstance!.State.ProviderName;
-        Specialism = JourneyInstance!.State.Specialism;
-        Status = JourneyInstance!.State.Status;
-        StartDate = JourneyInstance!.State.StartDate;
-        EndDate = JourneyInstance!.State.EndDate;
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
+        TrainingProvider = qualificationInfo.DqtEstablishmentName;
+        Specialism = qualificationInfo.MandatoryQualification.Specialism;
+        Status = qualificationInfo.MandatoryQualification.Status;
+        StartDate = qualificationInfo.MandatoryQualification.StartDate;
+        EndDate = qualificationInfo.MandatoryQualification.EndDate;
         EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
-
-        await next();
     }
 }

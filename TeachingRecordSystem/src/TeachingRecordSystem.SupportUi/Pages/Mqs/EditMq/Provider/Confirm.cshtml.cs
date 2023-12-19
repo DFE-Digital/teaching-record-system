@@ -57,8 +57,10 @@ public class ConfirmModel(
             return;
         }
 
-        PersonId = JourneyInstance!.State.PersonId;
-        PersonName = JourneyInstance!.State.PersonName;
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
         CurrentMqEstablishmentName = JourneyInstance!.State.CurrentMqEstablishmentName;
         NewMqEstablishment = await referenceDataCache.GetMqEstablishmentByValue(JourneyInstance!.State.MqEstablishmentValue!);
 

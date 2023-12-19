@@ -2,15 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 [Journey(JourneyNames.EditMqResult), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(
-    ICrmQueryDispatcher crmQueryDispatcher,
-    TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditMqResultState>? JourneyInstance { get; set; }
 
@@ -63,20 +59,14 @@ public class IndexModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var qualification = await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId));
-        if (qualification is null || qualification.dfeta_Type != dfeta_qualification_dfeta_Type.MandatoryQualification)
-        {
-            context.Result = NotFound();
-            return;
-        }
+        var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        await JourneyInstance!.State.EnsureInitialized(crmQueryDispatcher, qualification);
+        JourneyInstance!.State.EnsureInitialized(qualificationInfo);
 
-        PersonId = JourneyInstance!.State.PersonId;
-        PersonName = JourneyInstance!.State.PersonName;
-
-        await next();
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
     }
 }

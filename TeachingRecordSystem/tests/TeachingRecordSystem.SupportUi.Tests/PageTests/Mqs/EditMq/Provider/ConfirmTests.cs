@@ -1,18 +1,12 @@
 using FormFlow;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Provider;
 
-public class ConfirmTests : TestBase
+public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ConfirmTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
@@ -23,9 +17,7 @@ public class ConfirmTests : TestBase
             qualificationId,
             new EditMqProviderState()
             {
-                Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
+                Initialized = true
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -53,8 +45,6 @@ public class ConfirmTests : TestBase
             new EditMqProviderState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = newMqEstablishmentValue,
                 CurrentMqEstablishmentName = oldMqEstablishment.dfeta_name,
             });
@@ -84,9 +74,7 @@ public class ConfirmTests : TestBase
             qualificationId,
             new EditMqProviderState()
             {
-                Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
+                Initialized = true
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -115,8 +103,6 @@ public class ConfirmTests : TestBase
             new EditMqProviderState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = newMqEstablishmentValue
             });
 
@@ -159,8 +145,6 @@ public class ConfirmTests : TestBase
             new EditMqProviderState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = newMqEstablishmentValue
             });
 

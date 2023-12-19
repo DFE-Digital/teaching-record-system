@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
@@ -39,13 +38,11 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var personDetail = (ContactDetail?)context.HttpContext.Items["CurrentPersonDetail"];
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
+        PersonName = personInfo.Name;
         StartDate ??= JourneyInstance!.State.StartDate;
-
-        await next();
     }
 }

@@ -50,7 +50,7 @@ public class ConfirmModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         if (!JourneyInstance!.State.IsComplete)
         {
@@ -58,11 +58,11 @@ public class ConfirmModel(
             return;
         }
 
-        PersonId = JourneyInstance!.State.PersonId;
-        PersonName = JourneyInstance!.State.PersonName;
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
         CurrentSpecialism = JourneyInstance!.State.CurrentSpecialism;
         NewSpecialism = JourneyInstance!.State.Specialism;
-
-        await next();
     }
 }

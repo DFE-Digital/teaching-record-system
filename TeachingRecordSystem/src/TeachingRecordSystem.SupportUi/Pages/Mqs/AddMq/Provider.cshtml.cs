@@ -7,19 +7,10 @@ using TeachingRecordSystem.Core.Dqt.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class ProviderModel : PageModel
+public class ProviderModel(
+    ReferenceDataCache referenceDataCache,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
-    private readonly ReferenceDataCache _referenceDataCache;
-    private readonly TrsLinkGenerator _linkGenerator;
-
-    public ProviderModel(
-        ReferenceDataCache referenceDataCache,
-        TrsLinkGenerator linkGenerator)
-    {
-        _referenceDataCache = referenceDataCache;
-        _linkGenerator = linkGenerator;
-    }
-
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -43,25 +34,25 @@ public class ProviderModel : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state => state.MqEstablishmentValue = MqEstablishmentValue);
 
-        return Redirect(_linkGenerator.MqAddSpecialism(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqAddSpecialism(PersonId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var personDetail = (ContactDetail?)context.HttpContext.Items["CurrentPersonDetail"];
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        var establishments = await _referenceDataCache.GetMqEstablishments();
+        var establishments = await referenceDataCache.GetMqEstablishments();
         MqEstablishments = establishments
             .OrderBy(e => e.dfeta_name)
             .ToArray();
 
-        PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
+        PersonName = personInfo.Name;
         MqEstablishmentValue ??= JourneyInstance!.State.MqEstablishmentValue;
 
         await next();

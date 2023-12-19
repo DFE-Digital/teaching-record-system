@@ -128,13 +128,16 @@ public class ConfirmModel(
             return;
         }
 
-        PersonId = JourneyInstance!.State.PersonId;
-        PersonName = JourneyInstance!.State.PersonName;
-        TrainingProvider = JourneyInstance!.State.ProviderName;
-        Specialism = JourneyInstance!.State.Specialism;
-        Status = JourneyInstance!.State.Status;
-        StartDate = JourneyInstance!.State.StartDate;
-        EndDate = JourneyInstance!.State.EndDate;
+        var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
+        TrainingProvider = qualificationInfo.DqtEstablishmentName;
+        Specialism = qualificationInfo.MandatoryQualification.Specialism;
+        Status = qualificationInfo.MandatoryQualification.Status;
+        StartDate = qualificationInfo.MandatoryQualification.StartDate;
+        EndDate = qualificationInfo.MandatoryQualification.EndDate;
         DeletionReason = JourneyInstance!.State.DeletionReason;
         DeletionReasonDetail = JourneyInstance?.State.DeletionReasonDetail;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
