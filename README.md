@@ -1,10 +1,21 @@
 # teaching-record-system
 
 Provides an API over the Database of Qualified Teachers (DQT). Provides the core Teaching record and will eventually replace the Database of Qualified Teachers (DQT).
-[trs containers diagram](docs/c4-diagrams-as-code/trs-containers.png). The "To Be" Teacher Pensions and EWC (Teaching Council) integration is shown [here](docs/c4-diagrams-as-code/trs-data-integration.png).
+
+* [Teaching Record System High Level Architecture (just showing core components)](docs/c4-diagrams-as-code/trs-core-containers.jpg)
+* [Teaching Record System (to be) External Data Integration Architecture](docs/c4-diagrams-as-code/trs-to-be-external-integrations.jpg)
+* [Teaching Record System (to be) Teaching Pensions Data Integration Architecture](docs/c4-diagrams-as-code/trs-to-be-tps-data-integrations.jpg)
+* [Teaching Record System (to be) EWC Data Integration Architecture](docs/c4-diagrams-as-code/trs-to-be-ewc-integrations.jpg)
+
+## What does it do?
+
+It is the primary source of teaching records for DfE. It holds data to meet UK Government statutory obligations as well as allow individuals working in the UK education system (including, but not limited to) teachers in schools withing England, Wales, Scotland and Northern Ireland to access digital services provided by the DfE.
 
 ## Authorising Access using GOV.UK One Login
-All DfE services will adopt the standard GOV.UK One-Login service to provide standard access to citizen facing services. However, for Teacher Services digital services, it is sometime necessary to implement further authorisation to access a teaching record (e.g. for a teacher to view certificates). TRS will provide this authorisation seamlessly (from a user POV) by handling the redirection between calling service --> GOV.UK OneLogin sign in screen -->TRS (to check access) and back to the calling service. More detail can be found [here](docs/trs-gov.one-login-flow.md).
+All DfE services will adopt the standard GOV.UK One-Login service to provide standard access to citizen facing services. However, for Teacher Services digital services, it is sometime necessary to implement further authorisation to access a teaching record (e.g. for a teacher to view certificates). TRS will provide this authorisation seamlessly (from a user POV) by handling the redirection between calling service --> GOV.UK OneLogin sign in screen -->TRS (to check access) and back to the calling service.
+
+* [Authorisation flow for services using GOVUK.One Login](docs/trs-gov.one-login-flow.md)
+
 ## Calling the API
 
 The API is versioned and each endpoint is prefixed with the version number e.g. `/v2/`. You can view the API specifications for each version by visiting `/swagger` (see [Environments](#environments) below for the base addresses).
