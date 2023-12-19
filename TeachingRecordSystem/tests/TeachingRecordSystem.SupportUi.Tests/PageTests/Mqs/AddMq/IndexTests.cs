@@ -1,12 +1,7 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
-public class IndexTests : TestBase
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public IndexTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Get_RedirectsToMqAddProvider()
     {
@@ -16,10 +11,11 @@ public class IndexTests : TestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add?personId={person.PersonId}");
 
         // Act
-        var response = await HttpClient.SendAsync(request);
+        var response = await HttpClient.SendAsync(request);  // Initializes journey
+        response = await response.FollowRedirect(HttpClient);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/add/provider?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/mqs/add/provider?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 }

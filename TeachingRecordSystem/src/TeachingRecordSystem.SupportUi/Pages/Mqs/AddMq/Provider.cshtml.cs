@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
-[Journey(JourneyNames.AddMq), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.AddMq), RequireJourneyInstance]
 public class ProviderModel : PageModel
 {
     private readonly ReferenceDataCache _referenceDataCache;
