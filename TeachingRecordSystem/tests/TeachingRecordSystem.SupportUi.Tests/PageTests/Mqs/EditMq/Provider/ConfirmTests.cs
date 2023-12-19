@@ -44,8 +44,7 @@ public class ConfirmTests : TestBase
         var oldMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(oldMqEstablishmentValue);
         var newMqEstablishmentValue = "959"; // University of Leeds
         var newMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(newMqEstablishmentValue);
-        var person = await TestData.CreatePerson(
-            b => b.WithMandatoryQualification(providerValue: oldMqEstablishmentValue));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -107,8 +106,7 @@ public class ConfirmTests : TestBase
         // Arrange
         var oldMqEstablishmentValue = "955"; // University of Birmingham
         var newMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(
-                       b => b.WithMandatoryQualification(providerValue: oldMqEstablishmentValue));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -145,8 +143,7 @@ public class ConfirmTests : TestBase
         // Arrange
         var oldMqEstablishmentValue = "955"; // University of Birmingham
         var newMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(
-                       b => b.WithMandatoryQualification(providerValue: oldMqEstablishmentValue));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,

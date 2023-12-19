@@ -58,7 +58,12 @@ public class QualificationsTests : TestBase
         DateOnly? endDate = !string.IsNullOrEmpty(endDateString) ? DateOnly.Parse(endDateString) : null;
         var person = await TestData.CreatePerson(x => x
             .WithQts(qtsDate: new DateOnly(2021, 10, 5))
-            .WithMandatoryQualification(providerValue, specialism, status, startDate, endDate));
+            .WithMandatoryQualification(q => q
+                .WithDqtMqEstablishmentValue(providerValue)
+                .WithSpecialism(specialism)
+                .WithStatus(status)
+                .WithStartDate(startDate)
+                .WithEndDate(endDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");

@@ -42,7 +42,7 @@ public class ConfirmTests : TestBase
         // Arrange
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: oldMqSpecialism));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -104,7 +104,7 @@ public class ConfirmTests : TestBase
         // Arrange
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: oldMqSpecialism));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -140,7 +140,7 @@ public class ConfirmTests : TestBase
     {
         // Arrange
         var specialism = MandatoryQualificationSpecialism.Hearing;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: specialism));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,

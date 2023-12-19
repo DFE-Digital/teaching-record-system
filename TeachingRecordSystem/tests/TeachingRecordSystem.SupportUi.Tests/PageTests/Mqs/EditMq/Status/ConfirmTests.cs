@@ -43,7 +43,7 @@ public class ConfirmTests : TestBase
         var oldStatus = MandatoryQualificationStatus.Failed;
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: oldStatus));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -109,7 +109,7 @@ public class ConfirmTests : TestBase
         var oldStatus = MandatoryQualificationStatus.Failed;
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: oldStatus));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -149,7 +149,7 @@ public class ConfirmTests : TestBase
         var oldStatus = MandatoryQualificationStatus.Failed;
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
-        TestData.CreatePersonResult person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: oldStatus));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,

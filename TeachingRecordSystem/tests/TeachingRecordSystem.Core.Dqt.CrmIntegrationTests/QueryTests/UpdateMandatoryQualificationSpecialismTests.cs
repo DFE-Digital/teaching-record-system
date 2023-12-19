@@ -22,9 +22,9 @@ public class UpdateMandatoryQualificationSpecialismTests : IAsyncLifetime
         var originalSpecialism = MandatoryQualificationSpecialism.Visual;
         var newSpecialism = await _dataScope.TestData.ReferenceDataCache.GetMqSpecialismByValue(MandatoryQualificationSpecialism.Hearing.GetDqtValue());
 
-        var person = await _dataScope.TestData.CreatePerson(
-            x => x.WithQts(qtsDate: new DateOnly(2021, 10, 5))
-                   .WithMandatoryQualification(specialism: originalSpecialism));
+        var person = await _dataScope.TestData.CreatePerson(x => x
+            .WithQts(qtsDate: new DateOnly(2021, 10, 5))
+            .WithMandatoryQualification(q => q.WithSpecialism(originalSpecialism)));
 
         var qualification = person.MandatoryQualifications.First();
 

@@ -33,8 +33,7 @@ public class IndexTests : TestBase
     {
         // Arrange        
         var databaseMqEstablishmentValue = "955"; // University of Birmingham
-        var person = await TestData.CreatePerson(
-            b => b.WithMandatoryQualification(providerValue: databaseMqEstablishmentValue));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(databaseMqEstablishmentValue)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
@@ -58,8 +57,7 @@ public class IndexTests : TestBase
         // Arrange        
         var databaseMqEstablishmentValue = "955"; // University of Birmingham
         var journeyMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(
-            b => b.WithMandatoryQualification(providerValue: databaseMqEstablishmentValue));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(databaseMqEstablishmentValue)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -135,8 +133,7 @@ public class IndexTests : TestBase
         // Arrange
         var oldMqEstablishmentValue = "955"; // University of Birmingham
         var newMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(
-            b => b.WithMandatoryQualification(providerValue: oldMqEstablishmentValue));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,

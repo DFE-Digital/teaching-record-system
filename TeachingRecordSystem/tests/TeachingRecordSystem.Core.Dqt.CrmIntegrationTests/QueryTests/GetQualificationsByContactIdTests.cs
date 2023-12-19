@@ -32,10 +32,10 @@ public class GetQualificationsByContactIdTests : IAsyncLifetime
     public async Task WhenCalled_ForContactWithQualifications_ReturnsQualificationsAsExpected()
     {
         // Arrange
-        var person = await _dataScope.TestData.CreatePerson(
-            x => x.WithQts(qtsDate: new DateOnly(2021, 10, 5))
-                    .WithMandatoryQualification()
-                    .WithMandatoryQualification(providerValue: "959", specialism: MandatoryQualificationSpecialism.Visual));
+        var person = await _dataScope.TestData.CreatePerson(x => x
+            .WithQts(qtsDate: new DateOnly(2021, 10, 5))
+            .WithMandatoryQualification()
+            .WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue("959").WithSpecialism(MandatoryQualificationSpecialism.Visual)));
 
         // Act
         var qualifications = await _crmQueryDispatcher.ExecuteQuery(new GetQualificationsByContactIdQuery(person.ContactId));

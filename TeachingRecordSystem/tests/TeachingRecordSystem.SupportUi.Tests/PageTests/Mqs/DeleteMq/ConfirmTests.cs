@@ -58,13 +58,12 @@ public class ConfirmTests : TestBase
         DateOnly? startDate = !string.IsNullOrEmpty(startDateString) ? DateOnly.Parse(startDateString) : null;
         DateOnly? endDate = !string.IsNullOrEmpty(endDateString) ? DateOnly.Parse(endDateString) : null;
 
-        var person = await TestData.CreatePerson(
-            b => b.WithMandatoryQualification(
-                providerValue: providerValue,
-                specialism: specialism,
-                startDate: startDate,
-                endDate: endDate,
-                status: status));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q
+            .WithDqtMqEstablishmentValue(providerValue)
+            .WithSpecialism(specialism)
+            .WithStartDate(startDate)
+            .WithEndDate(endDate)
+            .WithStatus(status)));
         var qualification = person.MandatoryQualifications.Single();
         var journeyInstance = await CreateJourneyInstance(
             qualification.QualificationId,
@@ -157,12 +156,12 @@ public class ConfirmTests : TestBase
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "test.pdf";
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(
-            providerValue: mqEstablishmentDqtValue,
-            specialism: specialism,
-            status: status,
-            startDate: startDate,
-            endDate: endDate));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q
+            .WithDqtMqEstablishmentValue(mqEstablishmentDqtValue)
+            .WithSpecialism(specialism)
+            .WithStatus(status)
+            .WithStartDate(startDate)
+            .WithEndDate(endDate)));
 
         var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(mqEstablishmentDqtValue);

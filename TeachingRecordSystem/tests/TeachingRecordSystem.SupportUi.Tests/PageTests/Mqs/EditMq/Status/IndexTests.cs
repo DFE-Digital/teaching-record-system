@@ -33,7 +33,7 @@ public class IndexTests : TestBase
         // Arrange
         var databaseStatus = MandatoryQualificationStatus.Passed;
         var databaseEndDate = new DateOnly(2021, 11, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: databaseStatus, endDate: databaseEndDate));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus).WithEndDate(databaseEndDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
@@ -63,7 +63,7 @@ public class IndexTests : TestBase
         var databaseStatus = MandatoryQualificationStatus.Failed;
         var journeyStatus = MandatoryQualificationStatus.Passed;
         var journeyEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: databaseStatus));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -164,7 +164,7 @@ public class IndexTests : TestBase
         var oldStatus = MandatoryQualificationStatus.Failed;
         var newStatus = dfeta_qualification_dfeta_MQ_Status.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: oldStatus));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 

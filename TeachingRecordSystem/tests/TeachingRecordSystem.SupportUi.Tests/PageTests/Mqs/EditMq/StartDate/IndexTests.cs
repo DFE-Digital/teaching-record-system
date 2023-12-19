@@ -32,7 +32,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(startDate: databaseStartDate));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(databaseStartDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
@@ -56,7 +56,7 @@ public class IndexTests : TestBase
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var journeyStartDate = new DateOnly(2021, 10, 6);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(startDate: databaseStartDate));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(databaseStartDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -110,7 +110,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(startDate: databaseStartDate));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(databaseStartDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
@@ -132,7 +132,7 @@ public class IndexTests : TestBase
         // Arrange
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(startDate: oldStartDate));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
@@ -159,7 +159,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var oldStartDate = new DateOnly(2021, 10, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(startDate: oldStartDate));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
