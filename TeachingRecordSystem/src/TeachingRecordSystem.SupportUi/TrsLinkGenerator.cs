@@ -4,16 +4,9 @@ using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 
 namespace TeachingRecordSystem.SupportUi;
 
-public class TrsLinkGenerator
+public class TrsLinkGenerator(LinkGenerator linkGenerator)
 {
     protected const string DateOnlyFormat = DateOnlyModelBinder.Format;
-
-    private readonly LinkGenerator _linkGenerator;
-
-    public TrsLinkGenerator(LinkGenerator linkGenerator)
-    {
-        _linkGenerator = linkGenerator;
-    }
 
     public string Index() => GetRequiredPathByPage("/Index");
 
@@ -171,7 +164,7 @@ public class TrsLinkGenerator
 
     private string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {
-        var url = _linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
+        var url = linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
 
         if (journeyInstanceId?.UniqueKey is string journeyInstanceUniqueKey)
         {

@@ -279,12 +279,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("", context =>
-{
-    context.Response.Redirect("/persons");
-    return Task.CompletedTask;
-});
-
 app.MapRazorPages();
 app.MapControllers();
 
