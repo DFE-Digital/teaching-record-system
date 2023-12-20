@@ -95,3 +95,7 @@ make *ARGS:
 # Generates CRM model types
 generate-crm-models *ARGS:
   @scripts/Generate-CrmModels.ps1 {{ARGS}}
+
+# Removes the cached DB schema version file for tests
+remove-tests-schema-cache:
+  @scripts/Remove-TestsSchemaCache.ps1
