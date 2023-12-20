@@ -63,7 +63,7 @@
     <PackageVersion Include="NSwag.Examples" Version="1.0.11" />
     <PackageVersion Include="Optional" Version="4.0.0" />
     <PackageVersion Include="PdfSharpCore" Version="1.3.62" />
-    <PackageVersion Include="RedisRateLimiting.AspNetCore" Version="1.0.9" />
+    <PackageVersion Include="RedisRateLimiting.AspNetCore" Version="1.1.0" />
     <PackageVersion Include="Respawn" Version="6.1.0" />
     <PackageVersion Include="Scrutor" Version="4.2.2" />
     <PackageVersion Include="Sentry.AspNetCore" Version="3.40.1" />
