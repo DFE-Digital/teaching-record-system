@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Cli;
@@ -8,6 +10,7 @@ public static partial class Commands
     public static Command CreateMigrateDbCommand(IConfiguration configuration)
     {
         var connectionStringOption = new Option<string>("--connection-string") { IsRequired = true };
+        var targetMigrationOption = new Option<string>("--target-migration") { IsRequired = false };
 
         var configuredConnectionString = configuration.GetConnectionString("DefaultConnection");
         if (configuredConnectionString is not null)
@@ -17,16 +20,18 @@ public static partial class Commands
 
         var migrateDbCommand = new Command("migrate-db", "Migrate the database to the latest version.")
         {
-            connectionStringOption
+            connectionStringOption,
+            targetMigrationOption
         };
 
         migrateDbCommand.SetHandler(
-            async (string connectionString) =>
+            async (string connectionString, string? targetMigration) =>
             {
                 using var dbContext = TrsDbContext.Create(connectionString);
-                await dbContext.Database.MigrateAsync();
+                await dbContext.GetService<IMigrator>().MigrateAsync(targetMigration);
             },
-            connectionStringOption);
+            connectionStringOption,
+            targetMigrationOption);
 
         return migrateDbCommand;
     }
