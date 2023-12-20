@@ -54,7 +54,7 @@ format-changed:
 
 # Run the EF Core Command-line Tools for the Core project
 ef *ARGS:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Core"}} && dotnet ef {{ARGS}}
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Core"}} && dotnet dotnet-ef {{ARGS}}
 
 # Run the API project in Development mode
 run-api:
