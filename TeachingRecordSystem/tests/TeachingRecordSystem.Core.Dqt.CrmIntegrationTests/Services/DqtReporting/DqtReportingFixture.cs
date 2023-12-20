@@ -20,7 +20,7 @@ public class DqtReportingFixture
         migrator.MigrateDb();
     }
 
-    public TestableClock Clock => _crmClientFixture.Clock;
+    public IClock Clock => _crmClientFixture.Clock;
 
     public string ReportingDbConnectionString { get; }
 

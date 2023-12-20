@@ -7,7 +7,7 @@ public class GetTeachersByInitialTeacherTrainingSlugIdTests : IAsyncLifetime
     private readonly CrmClientFixture.TestDataScope _dataScope;
     private readonly DataverseAdapter _dataverseAdapter;
     private readonly ITrackedEntityOrganizationService _organizationService;
-    private readonly TestableClock _clock;
+    private readonly IClock _clock;
 
     public GetTeachersByInitialTeacherTrainingSlugIdTests(CrmClientFixture crmClientFixture)
     {

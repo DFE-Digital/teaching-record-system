@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -20,12 +21,14 @@ public partial class TestData
         IDbContextFactory<TrsDbContext> dbContextFactory,
         IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
+        IClock clock,
         FakeTrnGenerator trnGenerator,
         TestDataSyncConfiguration syncConfiguration)
         : this(
               dbContextFactory,
               organizationService,
               referenceDataCache,
+              clock,
               generateTrn: () => Task.FromResult(trnGenerator.GenerateTrn()),
               syncConfiguration)
     {
@@ -35,12 +38,14 @@ public partial class TestData
         IDbContextFactory<TrsDbContext> dbContextFactory,
         IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
+        IClock clock,
         Func<Task<string>> generateTrn,
         TestDataSyncConfiguration syncConfiguration)
     {
         DbContextFactory = dbContextFactory;
         OrganizationService = organizationService;
         ReferenceDataCache = referenceDataCache;
+        Clock = clock;
         _generateTrn = generateTrn;
         SyncConfiguration = syncConfiguration;
     }
@@ -57,6 +62,8 @@ public partial class TestData
         0x00, 0x00, 0x00, 0x00, 0xFF, 0xDA, 0x00, 0x08, 0x01, 0x01, 0x00, 0x01, 0x3F, 0x10
     };
 
+    public IClock Clock { get; }
+
     public IDbContextFactory<TrsDbContext> DbContextFactory { get; }
 
     public IOrganizationServiceAsync OrganizationService { get; }
@@ -69,10 +76,11 @@ public partial class TestData
         IDbContextFactory<TrsDbContext> dbContextFactory,
         IOrganizationServiceAsync organizationService,
         ReferenceDataCache referenceDataCache,
+        IClock clock,
         Func<Task<string>> generateTrn,
         TestDataSyncConfiguration syncConfiguration)
     {
-        return new TestData(dbContextFactory, organizationService, referenceDataCache, generateTrn, syncConfiguration);
+        return new TestData(dbContextFactory, organizationService, referenceDataCache, clock, generateTrn, syncConfiguration);
     }
 
     public static async Task<string> GetBase64EncodedFileContent(Stream file)

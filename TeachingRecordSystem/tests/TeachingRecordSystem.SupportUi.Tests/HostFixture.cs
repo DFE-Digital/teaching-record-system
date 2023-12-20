@@ -69,7 +69,10 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IAadUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
             services.AddSingleton<TestData>(
-                sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
+                sp => ActivatorUtilities.CreateInstance<TestData>(
+                    sp,
+                    (IClock)new ForwardToTestScopedClock(),
+                    TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
             services.AddFakeXrm();
             services.AddTransient<ICurrentUserIdProvider, TestUserCurrentUserIdProvider>();
             services.AddSingleton<FakeTrnGenerator>();
@@ -123,6 +126,11 @@ public class HostFixture : WebApplicationFactory<Program>
     private class ForwardToTestScopedEventObserver : IEventObserver
     {
         public Task OnEventSaved(EventBase @event) => TestScopedServices.GetCurrent().EventObserver.OnEventSaved(@event);
+    }
+
+    private class ForwardToTestScopedClock : IClock
+    {
+        public DateTime UtcNow => TestScopedServices.GetCurrent().Clock.UtcNow;
     }
 }
 

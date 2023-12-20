@@ -28,6 +28,7 @@ public partial class TrsDataSyncHelperTests
             dbContextFactory,
             organizationService,
             referenceDataCache,
+            Clock,
             trnGenerator,
             TestDataSyncConfiguration.Sync(Helper));
     }

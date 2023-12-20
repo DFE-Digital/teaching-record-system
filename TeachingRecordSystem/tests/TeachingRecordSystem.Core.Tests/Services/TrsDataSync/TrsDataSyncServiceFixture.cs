@@ -30,6 +30,7 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
             dbContextFactory,
             organizationService,
             referenceDataCache,
+            Clock,
             trnGenerator,
             TestDataSyncConfiguration.Sync(Helper));
     }
