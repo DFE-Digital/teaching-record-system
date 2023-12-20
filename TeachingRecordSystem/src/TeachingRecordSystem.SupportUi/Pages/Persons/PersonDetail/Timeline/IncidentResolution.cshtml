@@ -1,0 +1,25 @@
+@using TeachingRecordSystem.Core.Dqt.Models
+@model TimelineItem<(IncidentResolution IncidentResolution, Incident Incident)>
+@{
+    var (resolution, incident) = Model.ItemModel;
+    var createdByUser = resolution.Extract<SystemUser>($"{SystemUser.EntityLogicalName}_createdby", SystemUser.PrimaryIdAttribute);
+    var modifiedByUser = resolution.Extract<SystemUser>($"{SystemUser.EntityLogicalName}_modifiedby", SystemUser.PrimaryIdAttribute);
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title" data-testid="timeline-item-title">@incident.Title case @(resolution.StateCode == IncidentResolutionState.Canceled ? "re-activated" : "resolved")</h2>
+        <p class="moj-timeline__byline" data-testid="timeline-item-user">by @modifiedByUser.FirstName @modifiedByUser.LastName</p>
+    </div>
+    <p class="moj-timeline__date">
+        <time datetime="@Model.Timestamp.ToUniversalTime().ToString("O")" data-testid="timeline-item-time">
+            @Model.Timestamp.ToString("dd MMMMM yyyy 'at' h:mm tt")
+        </time>
+    </p>
+    <div class="moj-timeline__description">
+        <p class="govuk-body" data-testid="timeline-item-summary">@resolution.Subject</p>
+        <p class="govuk-body" data-testid="timeline-item-description">
+            @(resolution.StateCode == IncidentResolutionState.Canceled ? $"Originally resolved by {createdByUser.FirstName} {createdByUser.LastName}" : "")
+        </p>
+    </div>
+</div>
