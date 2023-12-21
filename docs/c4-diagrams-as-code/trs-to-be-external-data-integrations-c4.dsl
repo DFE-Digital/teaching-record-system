@@ -35,7 +35,6 @@ workspace {
       tps-bancs-api -> trsApi "Get a TRN for a teaching pension member (to-be)"
       tps-bancs-api -> trsApi "Send deceased indicator (to-be)"
       tps-bancs-api -> trsApi "Send workforce data (to-be)"
-      tps-bancs-api -> trsApi "Send teaching claims payment checks data (to-be)"
 
       trsApi -> tps-bancs-api "Return a TRN for a teaching pension member (to-be)"
       trsApi -> tps-bancs-api "Return prohibition outcomes (to-be)"
