@@ -7,7 +7,7 @@ using NSwag.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Requests;
 
-namespace TeachingRecordSystem.Api.V3.Controllers;
+namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
 [ApiController]
 [Route("certificates")]

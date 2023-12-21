@@ -141,6 +141,7 @@ public class Program
 
                 options.Conventions.Add(new ApiVersionConvention());
                 options.Conventions.Add(new AuthorizationPolicyConvention());
+                options.Conventions.Add(new BackFillVersionedEndpointsConvention());
             })
             .ConfigureApiBehaviorOptions(options =>
             {

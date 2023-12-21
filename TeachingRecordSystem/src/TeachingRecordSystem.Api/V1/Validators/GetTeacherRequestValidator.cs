@@ -1,7 +1,6 @@
 #nullable disable
 using FluentValidation;
 using TeachingRecordSystem.Api.V1.Requests;
-using TeachingRecordSystem.Api.Validation;
 
 namespace TeachingRecordSystem.Api.V1.Validators;
 
@@ -14,7 +13,7 @@ public class GetTeacherRequestValidator : AbstractValidator<GetTeacherRequest>
             .WithMessage(Properties.StringResources.ErrorMessages_TRNMustBe7Digits);
 
         RuleFor(x => x.BirthDate)
-            .GreaterThanOrEqualTo(Constants.MinCrmDateTime)
+            .GreaterThanOrEqualTo(Validation.Constants.MinCrmDateTime)
             .WithMessage(Properties.StringResources.ErrorMessages_BirthDateIsOutOfRange);
     }
 }
