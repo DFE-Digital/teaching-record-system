@@ -8,14 +8,9 @@ using TeachingRecordSystem.Core.Events.Processing;
 namespace TeachingRecordSystem.Core.Tests.Events.Processing;
 
 [Collection(nameof(DisableParallelization))]
-public class PublishEventsBackgroundServiceTests : IAsyncLifetime
+public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLifetime
 {
-    private readonly DbFixture _dbFixture;
-
-    public PublishEventsBackgroundServiceTests(DbFixture dbFixture)
-    {
-        _dbFixture = dbFixture;
-    }
+    private readonly DbFixture _dbFixture = dbFixture;
 
     public Task InitializeAsync() =>
         _dbFixture.WithDbContext(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from events"));

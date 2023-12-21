@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -11,9 +12,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231221141110_EventInserted")]
+    partial class EventInserted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,7 +82,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("event_name");
 
-                    b.Property<DateTime>("Inserted")
+                    b.Property<DateTime?>("Inserted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("inserted");
@@ -337,97 +340,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasName("pk_journey_states");
 
                     b.ToTable("journey_states", (string)null);
-                });
-
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.MandatoryQualificationProvider", b =>
-                {
-                    b.Property<Guid>("MandatoryQualificationProviderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("mandatory_qualification_provider_id");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("name");
-
-                    b.HasKey("MandatoryQualificationProviderId")
-                        .HasName("pk_mandatory_qualification_providers");
-
-                    b.ToTable("mandatory_qualification_providers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("e28ea41d-408d-4c89-90cc-8b9b04ac68f5"),
-                            Name = "University of Birmingham"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("89f9a1aa-3d68-4985-a4ce-403b6044c18c"),
-                            Name = "University of Leeds"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("aa5c300e-3b7c-456c-8183-3520b3d55dca"),
-                            Name = "University of Manchester"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("f417e73e-e2ad-40eb-85e3-55865be7f6be"),
-                            Name = "Mary Hare School / University of Hertfordshire"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("fbf22e04-b274-4c80-aba8-79fb6a7a32ce"),
-                            Name = "University of Edinburgh"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("26204149-349c-4ad6-9466-bb9b83723eae"),
-                            Name = "Liverpool John Moores University"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("0c30f666-647c-4ea8-8883-0fc6010b56be"),
-                            Name = "University of Oxford/Oxford Polytechnic"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("d0e6d54c-5e90-438a-945d-f97388c2b352"),
-                            Name = "University of Cambridge"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("aec32252-ef25-452e-a358-34a04e03369c"),
-                            Name = "University of Newcastle-upon-Tyne"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("d9ee7054-7fde-4cfd-9a5e-4b99511d1b3d"),
-                            Name = "University of Plymouth"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("707d58ca-1953-413b-9a46-41e9b0be885e"),
-                            Name = "University of Hertfordshire"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("3fc648a7-18e4-49e7-8a4b-1612616b72d5"),
-                            Name = "University of London"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("374dceb8-8224-45b8-b7dc-a6b0282b1065"),
-                            Name = "Bristol Polytechnic"
-                        },
-                        new
-                        {
-                            MandatoryQualificationProviderId = new Guid("d4fc958b-21de-47ec-9f03-36ae237a1b11"),
-                            Name = "University College, Swansea"
-                        });
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", b =>
@@ -800,10 +712,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("date")
                         .HasColumnName("end_date");
 
-                    b.Property<Guid?>("ProviderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("mq_provider_id");
-
                     b.Property<int?>("Specialism")
                         .HasColumnType("integer")
                         .HasColumnName("mq_specialism");
@@ -875,14 +783,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_qualifications_person");
-                });
-
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.MandatoryQualification", b =>
-                {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.MandatoryQualificationProvider", null)
-                        .WithMany()
-                        .HasForeignKey("ProviderId")
-                        .HasConstraintName("fk_qualifications_mandatory_qualification_provider");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.EytsAwardedEmailsJob", b =>

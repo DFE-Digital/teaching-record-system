@@ -582,6 +582,7 @@ public class TrsDataSyncHelper(
             "event_id",
             "event_name",
             "created",
+            "inserted",
             "payload"
         };
 
@@ -592,6 +593,7 @@ public class TrsDataSyncHelper(
                 event_id UUID NOT NULL,
                 event_name VARCHAR(200) NOT NULL,
                 created TIMESTAMP WITH TIME ZONE NOT NULL,
+                inserted TIMESTAMP WITH TIME ZONE NOT NULL,
                 payload JSONB NOT NULL
             )
             """;
@@ -622,6 +624,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(e.EventId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(e.GetEventName(), NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(e.CreatedUtc, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(clock.UtcNow, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(payload, NpgsqlDbType.Jsonb);
         }
 

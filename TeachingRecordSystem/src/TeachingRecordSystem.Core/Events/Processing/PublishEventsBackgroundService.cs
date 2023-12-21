@@ -60,9 +60,11 @@ public class PublishEventsBackgroundService : BackgroundService
                 .FromSql($"""
                     select * from events
                     where published is false
-                    and created > {lastProcessedEventTimestamp}
+                    and inserted > {lastProcessedEventTimestamp}
                     and event_id != {lastProcessedEventId}
-                    for update skip locked limit {BatchSize}
+                    order by inserted, created
+                    for update skip locked
+                    limit {BatchSize}
                     """)
                 .ToListAsync(cancellationToken: cancellationToken);
 
@@ -88,7 +90,7 @@ public class PublishEventsBackgroundService : BackgroundService
                 }
                 finally
                 {
-                    lastProcessedEventTimestamp = e.Created;
+                    lastProcessedEventTimestamp = e.Inserted;
                     lastProcessedEventId = e.EventId;
                 }
             }
