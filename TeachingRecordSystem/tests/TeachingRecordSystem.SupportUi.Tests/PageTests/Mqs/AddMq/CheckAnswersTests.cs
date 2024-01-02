@@ -1,4 +1,6 @@
 using FormFlow;
+using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
@@ -123,11 +125,12 @@ public class CheckAnswersTests : TestBase
     [InlineData(MandatoryQualificationStatus.InProgress)]
     [InlineData(MandatoryQualificationStatus.Failed)]
     [InlineData(MandatoryQualificationStatus.Passed)]
-    public async Task Post_Confirm_CompletesJourneyAndRedirectsWithFlashMessage(MandatoryQualificationStatus status)
+    public async Task Post_Confirm_CompletesJourneyRedirectsWithFlashMessageAndCreatesMq(MandatoryQualificationStatus status)
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
+        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
@@ -159,10 +162,21 @@ public class CheckAnswersTests : TestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
+
+        await WithDbContext(async dbContext =>
+        {
+            var qualification = await dbContext.MandatoryQualifications.SingleOrDefaultAsync(q => q.PersonId == person.PersonId);
+            Assert.NotNull(qualification);
+            Assert.Equal(provider!.MandatoryQualificationProviderId, qualification.ProviderId);
+            Assert.Equal(specialism, qualification.Specialism);
+            Assert.Equal(status, qualification.Status);
+            Assert.Equal(startDate, qualification.StartDate);
+            Assert.Equal(endDate, qualification.EndDate);
+        });
     }
 
     [Fact]
-    public async Task Post_Cancel_DeletesJourneyAndRedirects()
+    public async Task Post_Cancel_DeletesJourneyRedirectsAndDoesNotCreateMq()
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
@@ -195,6 +209,12 @@ public class CheckAnswersTests : TestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
+
+        await WithDbContext(async dbContext =>
+        {
+            var qualifications = await dbContext.MandatoryQualifications.Where(q => q.PersonId == person.PersonId).ToArrayAsync();
+            Assert.Empty(qualifications);
+        });
     }
 
     private async Task<JourneyInstance<AddMqState>> CreateJourneyInstance(Guid personId, AddMqState? state = null) =>

@@ -3,26 +3,18 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 [Journey(JourneyNames.EditMqProvider), RequireJourneyInstance]
-public class ConfirmModel : PageModel
+public class ConfirmModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    ReferenceDataCache referenceDataCache,
+    TrsLinkGenerator linkGenerator,
+    IBackgroundJobScheduler backgroundJobScheduler) : PageModel
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly ReferenceDataCache _referenceDataCache;
-    private readonly TrsLinkGenerator _linkGenerator;
-
-    public ConfirmModel(
-        ICrmQueryDispatcher crmQueryDispatcher,
-        ReferenceDataCache referenceDataCache,
-        TrsLinkGenerator linkGenerator)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _referenceDataCache = referenceDataCache;
-        _linkGenerator = linkGenerator;
-    }
-
     public JourneyInstance<EditMqProviderState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -38,7 +30,7 @@ public class ConfirmModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        await _crmQueryDispatcher.ExecuteQuery(
+        await crmQueryDispatcher.ExecuteQuery(
             new UpdateMandatoryQualificationEstablishmentQuery(
                 QualificationId,
                 NewMqEstablishment!.Id));
@@ -46,27 +38,29 @@ public class ConfirmModel : PageModel
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification changed");
 
-        return Redirect(_linkGenerator.PersonQualifications(PersonId!.Value));
+        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncMandatoryQualification(QualificationId, CancellationToken.None));
+
+        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(_linkGenerator.MqEditProvider(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.MqEditProvider(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 
         PersonId = JourneyInstance!.State.PersonId;
         PersonName = JourneyInstance!.State.PersonName;
         CurrentMqEstablishmentName = JourneyInstance!.State.CurrentMqEstablishmentName;
-        NewMqEstablishment = await _referenceDataCache.GetMqEstablishmentByValue(JourneyInstance!.State.MqEstablishmentValue!);
+        NewMqEstablishment = await referenceDataCache.GetMqEstablishmentByValue(JourneyInstance!.State.MqEstablishmentValue!);
 
         await next();
     }

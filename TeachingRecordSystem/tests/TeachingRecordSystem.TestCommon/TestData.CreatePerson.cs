@@ -355,6 +355,13 @@ public partial class TestData
                 helper => helper.SyncPerson(contact, ignoreInvalid: false, CancellationToken.None),
                 _syncEnabledOverride);
 
+            foreach (var mq in _mqBuilders)
+            {
+                await testData.SyncConfiguration.SyncIfEnabled(
+                    helper => helper.SyncMandatoryQualification(mq.QualificationId, CancellationToken.None),
+                    _syncEnabledOverride);
+            }
+
             return new CreatePersonResult()
             {
                 PersonId = PersonId,
@@ -386,6 +393,8 @@ public partial class TestData
         private Option<MandatoryQualificationStatus?> _status;
         private Option<DateOnly?> _startDate;
         private Option<DateOnly?> _endDate;
+
+        public Guid QualificationId { get; } = Guid.NewGuid();
 
         public CreatePersonMandatoryQualificationBuilder WithDqtMqEstablishmentValue(string? value)
         {
@@ -421,7 +430,6 @@ public partial class TestData
         {
             var mqEstablishments = await testData.ReferenceDataCache.GetMqEstablishments();
 
-            var qualificationId = Guid.NewGuid();
             var personId = createPersonBuilder.PersonId;
 
             var dqtMqEstablishmentValue = _dqtMqEstablishmentValue.ValueOr(mqEstablishments.RandomOne().dfeta_Value);
@@ -440,7 +448,7 @@ public partial class TestData
 
             var qualification = new dfeta_qualification()
             {
-                Id = qualificationId,
+                Id = QualificationId,
                 dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
                 dfeta_MQ_MQEstablishmentId = mqEstablishment?.Id.ToEntityReference(dfeta_mqestablishment.EntityLogicalName),
@@ -456,7 +464,7 @@ public partial class TestData
             });
 
             return new MandatoryQualificationInfo(
-                qualificationId,
+                QualificationId,
                 dqtMqEstablishmentValue,
                 specialism,
                 status,
