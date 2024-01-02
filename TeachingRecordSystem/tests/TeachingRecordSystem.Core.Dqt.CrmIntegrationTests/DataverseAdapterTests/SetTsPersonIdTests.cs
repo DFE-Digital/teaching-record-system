@@ -10,7 +10,7 @@ public class SetTsPersonIdTests : IAsyncLifetime
     private readonly DataverseAdapter _dataverseAdapter;
     private readonly IOrganizationServiceAsync _organizationService;
     private readonly TestDataHelper _testDataHelper;
-    private readonly TestableClock _clock;
+    private readonly IClock _clock;
 
     public SetTsPersonIdTests(CrmClientFixture crmClientFixture)
     {

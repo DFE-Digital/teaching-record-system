@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.DataverseAdapterTest
 public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLifetime
 {
     private readonly CreateTeacherFixture _createTeacherFixture;
-    private readonly TestableClock _clock;
+    private readonly IClock _clock;
     private readonly CrmClientFixture.TestDataScope _dataScope;
     private readonly DataverseAdapter _dataverseAdapter;
     private readonly IOrganizationServiceAsync _organizationService;

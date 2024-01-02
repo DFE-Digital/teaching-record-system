@@ -61,7 +61,10 @@ public class ApiFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IOptions<AccessYourTeachingQualificationsOptions>>(tss => tss.AccessYourTeachingQualificationsOptions);
             services.AddTestScoped<ICertificateGenerator>(tss => tss.CertificateGeneratorMock.Object);
             services.AddSingleton<TestData>(
-                sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
+                sp => ActivatorUtilities.CreateInstance<TestData>(
+                    sp,
+                    (IClock)new ForwardToTestScopedClock(),
+                    TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
             services.AddFakeXrm();
             services.AddSingleton<FakeTrnGenerator>();
             services.AddSingleton<TrsDataSyncHelper>();
@@ -101,6 +104,11 @@ public class ApiFixture : WebApplicationFactory<Program>
         {
             return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
         }
+    }
+
+    private class ForwardToTestScopedClock : IClock
+    {
+        public DateTime UtcNow => TestScopedServices.GetCurrent().Clock.UtcNow;
     }
 }
 

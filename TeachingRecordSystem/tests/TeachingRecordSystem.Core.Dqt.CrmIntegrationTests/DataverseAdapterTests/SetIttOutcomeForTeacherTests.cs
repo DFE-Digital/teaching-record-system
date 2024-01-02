@@ -11,7 +11,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
     private readonly DataverseAdapter _dataverseAdapter;
     private readonly IOrganizationServiceAsync _organizationService;
     private readonly TestDataHelper _testDataHelper;
-    private readonly TestableClock _clock;
+    private readonly IClock _clock;
 
     public SetIttOutcomeForTeacherTests(CrmClientFixture crmClientFixture)
     {

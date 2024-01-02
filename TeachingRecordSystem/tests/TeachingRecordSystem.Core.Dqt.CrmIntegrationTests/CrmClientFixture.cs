@@ -23,7 +23,7 @@ public sealed class CrmClientFixture : IDisposable
 
     public CrmClientFixture(ServiceClient serviceClient, DbFixture dbFixture, IConfiguration configuration, IMemoryCache memoryCache)
     {
-        Clock = new();
+        Clock = new Clock();
         Configuration = configuration;
         _baseServiceClient = serviceClient;
         _dbFixture = dbFixture;
@@ -37,7 +37,7 @@ public sealed class CrmClientFixture : IDisposable
             serviceClientName: null));
     }
 
-    public TestableClock Clock { get; }
+    public IClock Clock { get; }
 
     public IConfiguration Configuration { get; }
 
@@ -56,6 +56,7 @@ public sealed class CrmClientFixture : IDisposable
             _dbFixture.GetDbContextFactory(),
             orgService,
             _referenceDataCache,
+            Clock,
             () => _trnGenerationApiClient.GenerateTrn(),
             TestDataSyncConfiguration.NoSync()),
         _memoryCache);
