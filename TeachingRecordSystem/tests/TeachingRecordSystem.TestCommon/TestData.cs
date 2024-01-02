@@ -202,6 +202,19 @@ public partial class TestData
 
     public Contact_GenderCode GenerateGender() => Faker.Enum.Random<Contact_GenderCode>();
 
+    public DateOnly GenerateDate(DateOnly min, DateOnly? max = null)
+    {
+        if (max is not null && max <= min)
+        {
+            throw new ArgumentOutOfRangeException("max", "max must be after min.");
+        }
+
+        max ??= min.AddYears(1);
+
+        var daysDiff = Math.Min(1, (int)(max.Value.ToDateTime(TimeOnly.MinValue) - min.ToDateTime(TimeOnly.MinValue)).TotalDays);
+        return min.AddDays(Random.Shared.Next(minValue: 1, maxValue: daysDiff));
+    }
+
     public string GenerateNationalInsuranceNumber() => Faker.Identification.UkNationalInsuranceNumber();
 
     protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)

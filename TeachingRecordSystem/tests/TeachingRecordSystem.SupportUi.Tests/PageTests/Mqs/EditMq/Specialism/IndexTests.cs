@@ -32,7 +32,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var databaseSpecialism = MandatoryQualificationSpecialism.Hearing;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: databaseSpecialism));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(databaseSpecialism)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
@@ -58,7 +58,7 @@ public class IndexTests : TestBase
         // Arrange
         var databaseSpecialism = MandatoryQualificationSpecialism.Hearing;
         var journeySpecialism = MandatoryQualificationSpecialism.Visual;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: databaseSpecialism));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(databaseSpecialism)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -135,7 +135,7 @@ public class IndexTests : TestBase
         // Arrange
         var oldSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newSpecialism = MandatoryQualificationSpecialism.Visual;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: oldSpecialism));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldSpecialism)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -168,7 +168,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var specialism = MandatoryQualificationSpecialism.Hearing;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: specialism));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,

@@ -28,9 +28,9 @@ public class UpdateMandatoryQualificationStatusTests : IAsyncLifetime
         DateOnly? originalEndDate = !string.IsNullOrEmpty(originalEndDateString) ? DateOnly.Parse(originalEndDateString) : null;
         DateOnly? newEndDate = !string.IsNullOrEmpty(newEndDateString) ? DateOnly.Parse(newEndDateString) : null;
 
-        var person = await _dataScope.TestData.CreatePerson(
-            x => x.WithQts(qtsDate: new DateOnly(2021, 10, 5))
-                .WithMandatoryQualification(status: originalMqStatus, endDate: originalEndDate));
+        var person = await _dataScope.TestData.CreatePerson(x => x
+            .WithQts(qtsDate: new DateOnly(2021, 10, 5))
+            .WithMandatoryQualification(q => q.WithStatus(originalMqStatus).WithEndDate(originalEndDate)));
 
         var qualification = person.MandatoryQualifications.First();
 

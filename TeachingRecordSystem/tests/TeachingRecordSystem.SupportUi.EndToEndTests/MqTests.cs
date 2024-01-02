@@ -143,7 +143,7 @@ public class MqTests : TestBase
     {
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(startDate: oldStartDate));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
@@ -177,7 +177,7 @@ public class MqTests : TestBase
         var oldStatus = MandatoryQualificationStatus.Failed;
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 11, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(status: oldStatus));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 

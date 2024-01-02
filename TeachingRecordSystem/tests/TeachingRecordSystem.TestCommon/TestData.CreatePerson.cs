@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.Xrm.Sdk.Messages;
+using Optional;
+using Optional.Unsafe;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Models;
@@ -34,8 +36,10 @@ public partial class TestData
         private string? _teacherStatus;
         private DateOnly? _eytsDate;
         private string? _earlyYearsStatus;
-        private readonly List<Sanction> _sanctions = new();
-        private readonly List<MandatoryQualification> _mandatoryQualifications = new();
+        private readonly List<Sanction> _sanctions = [];
+        private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
+
+        public Guid PersonId { get; } = Guid.NewGuid();
 
         public CreatePersonBuilder WithSyncOverride(bool enabled)
         {
@@ -123,14 +127,11 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithMandatoryQualification(
-            string? providerValue = null,
-            MandatoryQualificationSpecialism? specialism = null,
-            MandatoryQualificationStatus? status = null,
-            DateOnly? startDate = null,
-            DateOnly? endDate = null)
+        public CreatePersonBuilder WithMandatoryQualification(Action<CreatePersonMandatoryQualificationBuilder>? configure = null)
         {
-            _mandatoryQualifications.Add(new(Guid.NewGuid(), providerValue, specialism, status, startDate, endDate));
+            var mqBuilder = new CreatePersonMandatoryQualificationBuilder();
+            configure?.Invoke(mqBuilder);
+            _mqBuilders.Add(mqBuilder);
             return this;
         }
 
@@ -191,7 +192,7 @@ public partial class TestData
             return this;
         }
 
-        public async Task<CreatePersonResult> Execute(TestData testData)
+        internal async Task<CreatePersonResult> Execute(TestData testData)
         {
             var hasTrn = _hasTrn ?? true;
             var trn = hasTrn ? await testData.GenerateTrn() : null;
@@ -204,11 +205,9 @@ public partial class TestData
             var dateOfBirth = _dateOfBirth ?? testData.GenerateDateOfBirth();
             var gender = _gender ?? testData.GenerateGender();
 
-            var personId = Guid.NewGuid();
-
             var contact = new Contact()
             {
-                Id = personId,
+                Id = PersonId,
                 FirstName = firstName,
                 MiddleName = middleName,
                 LastName = lastName,
@@ -247,7 +246,7 @@ public partial class TestData
                     Target = new dfeta_qtsregistration()
                     {
                         Id = qtsRegistrationId,
-                        dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName)
+                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName)
                     }
                 });
 
@@ -255,7 +254,7 @@ public partial class TestData
                 {
                     Target = new dfeta_initialteachertraining()
                     {
-                        dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
+                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
                         dfeta_Result = dfeta_ITTResult.Pass,
                     }
                 });
@@ -281,7 +280,7 @@ public partial class TestData
                     Target = new dfeta_qtsregistration()
                     {
                         Id = eytsRegistrationId,
-                        dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName)
+                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName)
                     }
                 });
 
@@ -303,7 +302,7 @@ public partial class TestData
                 var crmSanction = new dfeta_sanction()
                 {
                     Id = sanction.SanctionId,
-                    dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
+                    dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
                     dfeta_SanctionCodeId = sanctionCode.Id.ToEntityReference(dfeta_sanctioncode.EntityLogicalName),
                     dfeta_StartDate = sanction.StartDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
                     dfeta_EndDate = sanction.EndDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
@@ -335,36 +334,21 @@ public partial class TestData
                 }
             }
 
-            foreach (var mq in _mandatoryQualifications)
+            var mqs = new List<MandatoryQualificationInfo>();
+            foreach (var mqBuilder in _mqBuilders)
             {
-                var mqEstablishment = mq.ProviderValue is not null ? await testData.ReferenceDataCache.GetMqEstablishmentByValue(mq.ProviderValue) : null;
-                var specialism = mq.Specialism is not null ? await testData.ReferenceDataCache.GetMqSpecialismByValue(mq.Specialism.Value.GetDqtValue()) : null;
-                var qualification = new dfeta_qualification()
-                {
-                    Id = mq.QualificationId,
-                    dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
-                    dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
-                    dfeta_MQ_MQEstablishmentId = mqEstablishment?.Id.ToEntityReference(dfeta_mqestablishment.EntityLogicalName),
-                    dfeta_MQ_SpecialismId = specialism?.Id.ToEntityReference(dfeta_specialism.EntityLogicalName),
-                    dfeta_MQStartDate = mq.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                    dfeta_MQ_Date = mq.EndDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                    dfeta_MQ_Status = mq.Status?.GetDqtStatus()
-                };
-
-                txnRequestBuilder.AddRequest(new CreateRequest()
-                {
-                    Target = qualification
-                });
+                mqs.Add(await mqBuilder.AppendRequests(this, testData, txnRequestBuilder));
             }
 
             var retrieveContactHandle = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
             {
                 ColumnSet = new(allColumns: true),
-                Target = personId.ToEntityReference(Contact.EntityLogicalName)
+                Target = PersonId.ToEntityReference(Contact.EntityLogicalName)
             });
 
             await txnRequestBuilder.Execute();
 
+            // Read the contact record back (plugins may have added/amended data so our original record will be stale)
             contact = retrieveContactHandle.GetResponse().Entity.ToEntity<Contact>();
 
             await testData.SyncConfiguration.SyncIfEnabled(
@@ -373,7 +357,7 @@ public partial class TestData
 
             return new CreatePersonResult()
             {
-                PersonId = personId,
+                PersonId = PersonId,
                 Contact = contact,
                 Trn = trn,
                 DateOfBirth = dateOfBirth,
@@ -389,9 +373,96 @@ public partial class TestData
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 QtsDate = _qtsDate,
                 EytsDate = _eytsDate,
-                Sanctions = _sanctions.ToImmutableArray(),
-                MandatoryQualifications = _mandatoryQualifications.ToImmutableArray()
+                Sanctions = [.. _sanctions],
+                MandatoryQualifications = [.. mqs]
             };
+        }
+    }
+
+    public class CreatePersonMandatoryQualificationBuilder
+    {
+        private Option<string?> _dqtMqEstablishmentValue;
+        private Option<MandatoryQualificationSpecialism?> _specialism;
+        private Option<MandatoryQualificationStatus?> _status;
+        private Option<DateOnly?> _startDate;
+        private Option<DateOnly?> _endDate;
+
+        public CreatePersonMandatoryQualificationBuilder WithDqtMqEstablishmentValue(string? value)
+        {
+            _dqtMqEstablishmentValue = Option.Some(value);
+            return this;
+        }
+
+        public CreatePersonMandatoryQualificationBuilder WithSpecialism(MandatoryQualificationSpecialism? specialism)
+        {
+            _specialism = Option.Some(specialism);
+            return this;
+        }
+
+        public CreatePersonMandatoryQualificationBuilder WithStatus(MandatoryQualificationStatus? status)
+        {
+            _status = Option.Some(status);
+            return this;
+        }
+
+        public CreatePersonMandatoryQualificationBuilder WithStartDate(DateOnly? startDate)
+        {
+            _startDate = Option.Some(startDate);
+            return this;
+        }
+
+        public CreatePersonMandatoryQualificationBuilder WithEndDate(DateOnly? endDate)
+        {
+            _endDate = Option.Some(endDate);
+            return this;
+        }
+
+        internal async Task<MandatoryQualificationInfo> AppendRequests(CreatePersonBuilder createPersonBuilder, TestData testData, RequestBuilder requestBuilder)
+        {
+            var mqEstablishments = await testData.ReferenceDataCache.GetMqEstablishments();
+
+            var qualificationId = Guid.NewGuid();
+            var personId = createPersonBuilder.PersonId;
+
+            var dqtMqEstablishmentValue = _dqtMqEstablishmentValue.ValueOr(mqEstablishments.RandomOne().dfeta_Value);
+            var specialism = _specialism.ValueOr(MandatoryQualificationSpecialismRegistry.All.Where(s => s.Title != "Deaf education").RandomOne().Value);  // Build env is missing Deaf education
+            var status = _status.ValueOr(_endDate.ValueOrDefault() is DateOnly ? MandatoryQualificationStatus.Passed : MandatoryQualificationStatusRegistry.All.RandomOne().Value);
+            var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
+            var endDate = _endDate.ValueOr(status == MandatoryQualificationStatus.Passed ? testData.GenerateDate(min: (startDate ?? new DateOnly(2000, 1, 1)).AddYears(1)) : null);
+
+            var mqEstablishment = dqtMqEstablishmentValue is not null ?
+                await testData.ReferenceDataCache.GetMqEstablishmentByValue(dqtMqEstablishmentValue) :
+                null;
+
+            var dqtSpecialism = specialism is not null ?
+                await testData.ReferenceDataCache.GetMqSpecialismByValue(specialism.Value.GetDqtValue()) :
+                null;
+
+            var qualification = new dfeta_qualification()
+            {
+                Id = qualificationId,
+                dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
+                dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
+                dfeta_MQ_MQEstablishmentId = mqEstablishment?.Id.ToEntityReference(dfeta_mqestablishment.EntityLogicalName),
+                dfeta_MQ_SpecialismId = dqtSpecialism?.Id.ToEntityReference(dfeta_specialism.EntityLogicalName),
+                dfeta_MQStartDate = startDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
+                dfeta_MQ_Date = endDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
+                dfeta_MQ_Status = status?.GetDqtStatus()
+            };
+
+            requestBuilder.AddRequest(new CreateRequest()
+            {
+                Target = qualification
+            });
+
+            return new MandatoryQualificationInfo(
+                qualificationId,
+                dqtMqEstablishmentValue,
+                specialism,
+                status,
+                startDate,
+                endDate
+            );
         }
     }
 
@@ -415,14 +486,14 @@ public partial class TestData
         public required DateOnly? QtsDate { get; init; }
         public required DateOnly? EytsDate { get; init; }
         public required ImmutableArray<Sanction> Sanctions { get; init; }
-        public required ImmutableArray<MandatoryQualification> MandatoryQualifications { get; init; }
+        public required ImmutableArray<MandatoryQualificationInfo> MandatoryQualifications { get; init; }
     }
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);
 
-    public record MandatoryQualification(
+    public record MandatoryQualificationInfo(
         Guid QualificationId,
-        string? ProviderValue,
+        string? DqtMqEstablishmentValue,
         MandatoryQualificationSpecialism? Specialism,
         MandatoryQualificationStatus? Status,
         DateOnly? StartDate,

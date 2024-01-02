@@ -1,6 +1,7 @@
 using FakeXrmEasy.Abstractions;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -152,22 +153,14 @@ public class SeedCrmReferenceData : IStartupTask
 
     private void AddSpecialisms()
     {
-        _xrmFakedContext.CreateEntity(new dfeta_specialism()
+        foreach (var specialism in MandatoryQualificationSpecialismRegistry.All)
         {
-            dfeta_Value = "Hearing",
-            dfeta_name = "Hearing"
-        });
-
-        _xrmFakedContext.CreateEntity(new dfeta_specialism()
-        {
-            dfeta_Value = "Multi-Sensory",
-            dfeta_name = "Multi_Sensory Impairment"
-        });
-
-        _xrmFakedContext.CreateEntity(new dfeta_specialism()
-        {
-            dfeta_Value = "Visual",
-            dfeta_name = "Visual Impairment"
-        });
+            _xrmFakedContext.CreateEntity(new dfeta_specialism()
+            {
+                dfeta_Value = specialism.DqtValue,
+                dfeta_name = specialism.Title,
+                StateCode = specialism.IsValidForNewRecord ? dfeta_specialismState.Active : dfeta_specialismState.Inactive
+            });
+        }
     }
 }

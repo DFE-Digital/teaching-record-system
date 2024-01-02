@@ -10,8 +10,6 @@ public class GetAllSpecialismsHandler : ICrmQueryHandler<GetAllSpecialismsQuery,
     public async Task<dfeta_specialism[]> Execute(GetAllSpecialismsQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
-        filter.AddCondition(dfeta_specialism.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_specialismState.Active);
-        filter.AddCondition(dfeta_specialism.Fields.dfeta_Value, ConditionOperator.In, "Hearing", "Multi-Sensory", "Visual");
 
         var queryExpression = new QueryExpression
         {
