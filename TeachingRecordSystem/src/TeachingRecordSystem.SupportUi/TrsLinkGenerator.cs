@@ -41,7 +41,7 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string MqAdd(Guid personId) =>
         GetRequiredPathByPage("/Mqs/AddMq/Index", routeValues: new { personId });
 
-    public string MqAddProvider(Guid personId, JourneyInstanceId? journeyInstanceId) =>
+    public string MqAddProvider(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/AddMq/Provider", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
     public string MqAddProviderCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
