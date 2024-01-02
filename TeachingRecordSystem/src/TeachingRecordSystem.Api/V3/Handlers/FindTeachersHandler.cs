@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using MediatR;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
 using TeachingRecordSystem.Core.Dqt;
@@ -9,18 +10,14 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.V3.Handlers;
 
-public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeachersResponse>
+public class FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfiguration configuration) :
+    IRequestHandler<FindTeachersRequest, FindTeachersResponse>
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-
-    public FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-    }
+    private readonly TimeSpan _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue<int>("ConcurrentNameChangeWindowSeconds", 5));
 
     public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
     {
-        var contacts = await _crmQueryDispatcher.ExecuteQuery(
+        var contacts = await crmQueryDispatcher.ExecuteQuery(
             new GetContactsByLastNameAndDateOfBirthQuery(
                 request.LastName!,
                 request.DateOfBirth!.Value,
@@ -34,11 +31,18 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
                     Contact.Fields.dfeta_StatedMiddleName,
                     Contact.Fields.dfeta_StatedLastName)));
 
-        var sanctions = await _crmQueryDispatcher.ExecuteQuery(
+        var contactsById = contacts.ToDictionary(r => r.Id, r => r);
+
+        var sanctions = await crmQueryDispatcher.ExecuteQuery(
             new GetSanctionsByContactIdsQuery(
-                contacts.Select(r => r.Id),
+                contactsById.Keys,
                 ActiveOnly: true,
                 new()));
+
+        var previousNames = (await crmQueryDispatcher.ExecuteQuery(new GetPreviousNamesByContactIdsQuery(contactsById.Keys)))
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => PreviousNameHelper.GetFullPreviousNames(kvp.Value, contactsById[kvp.Key], _concurrentNameChangeWindow));
 
         return new FindTeachersResponse()
         {
@@ -57,6 +61,14 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
                     {
                         Code = s.SanctionCode,
                         StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                    })
+                    .ToImmutableArray(),
+                PreviousNames = previousNames[r.Id]
+                    .Select(name => new NameInfo()
+                    {
+                        FirstName = name.FirstName,
+                        MiddleName = name.MiddleName,
+                        LastName = name.LastName
                     })
                     .ToImmutableArray()
             })

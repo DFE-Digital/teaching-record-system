@@ -210,58 +210,18 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             sanctions = (await _crmQueryDispatcher.ExecuteQuery(getSanctionsQuery))[teacher.Id];
         }
 
-        List<NameInfo>? previousNames = null;
+        IEnumerable<NameInfo>? previousNames = null;
 
         if (request.Include.HasFlag(GetTeacherRequestIncludes.PreviousNames))
         {
-            previousNames = new List<NameInfo>();
-            var currentFirstName = contactDetail.Contact.FirstName;
-            var currentMiddleName = contactDetail.Contact.MiddleName;
-            var currentLastName = contactDetail.Contact.LastName;
-            DateTime? createdOnBaseline = null;
-
-            foreach (var previousName in contactDetail.PreviousNames.OrderByDescending(p => p.CreatedOn))
-            {
-                if (createdOnBaseline is null)
+            previousNames = PreviousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact, _concurrentNameChangeWindow)
+                .Select(name => new NameInfo()
                 {
-                    createdOnBaseline = previousName.CreatedOn;
-                }
-                else if (createdOnBaseline - previousName.CreatedOn > _concurrentNameChangeWindow)
-                {
-                    previousNames.Add(new NameInfo()
-                    {
-                        FirstName = currentFirstName,
-                        MiddleName = currentMiddleName ?? string.Empty,
-                        LastName = currentLastName
-                    });
-                    createdOnBaseline = previousName.CreatedOn;
-                }
-
-                switch (previousName.dfeta_Type)
-                {
-                    case dfeta_NameType.FirstName:
-                        currentFirstName = previousName.dfeta_name;
-                        break;
-                    case dfeta_NameType.MiddleName:
-                        currentMiddleName = previousName.dfeta_name;
-                        break;
-                    case dfeta_NameType.LastName:
-                        currentLastName = previousName.dfeta_name;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (createdOnBaseline is not null)
-            {
-                previousNames.Add(new NameInfo()
-                {
-                    FirstName = currentFirstName,
-                    MiddleName = currentMiddleName ?? string.Empty,
-                    LastName = currentLastName
-                });
-            }
+                    FirstName = name.FirstName,
+                    MiddleName = name.MiddleName,
+                    LastName = name.LastName
+                })
+                .ToArray();
         }
 
         var firstName = teacher.ResolveFirstName();

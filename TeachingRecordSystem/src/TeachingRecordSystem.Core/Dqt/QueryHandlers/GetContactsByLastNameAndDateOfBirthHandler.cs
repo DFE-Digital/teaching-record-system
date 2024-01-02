@@ -8,7 +8,6 @@ public class GetContactsByLastNameAndDateOfBirthHandler : ICrmQueryHandler<GetCo
 {
     public async Task<Contact[]> Execute(GetContactsByLastNameAndDateOfBirthQuery query, IOrganizationServiceAsync organizationService)
     {
-        //Find all the permutations of names to match on
         var lastNameFilter = new FilterExpression(LogicalOperator.Or);
         lastNameFilter.AddCondition(Contact.Fields.LastName, ConditionOperator.Equal, query.LastName);
         lastNameFilter.AddCondition(Contact.Fields.dfeta_PreviousLastName, ConditionOperator.Equal, query.LastName);
