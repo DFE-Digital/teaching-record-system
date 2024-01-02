@@ -78,8 +78,11 @@ public partial class TrsDataSyncHelperTests
         var qualificationId = Guid.NewGuid();
         var entity = await CreateMandatoryQualificationEntity(qualificationId, person.ContactId);
 
-        var specialism = (await TestData.ReferenceDataCache.GetMqSpecialisms())
-            .Single(s => s.Id == entity.dfeta_MQ_SpecialismId?.Id)
+        var establishment = await TestData.ReferenceDataCache.GetMqEstablishmentById(entity.dfeta_MQ_MQEstablishmentId.Id);
+        Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var provider);
+        Assert.NotNull(provider);
+
+        var specialism = (await TestData.ReferenceDataCache.GetMqSpecialismById(entity.dfeta_MQ_SpecialismId.Id))
             .ToMandatoryQualificationSpecialism();
 
         var dqtUserId = await TestData.GetCurrentCrmUserId();
@@ -94,6 +97,13 @@ public partial class TrsDataSyncHelperTests
             MandatoryQualification = new()
             {
                 QualificationId = qualificationId,
+                Provider = new()
+                {
+                    MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                    Name = provider.Name,
+                    DqtMqEstablishmentId = establishment.Id,
+                    DqtMqEstablishmentName = establishment.dfeta_name
+                },
                 Specialism = specialism,
                 Status = entity.dfeta_MQ_Status?.ToMandatoryQualificationStatus(),
                 EndDate = entity.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
@@ -149,6 +159,12 @@ public partial class TrsDataSyncHelperTests
     {
         await DbFixture.WithDbContext(async dbContext =>
         {
+            var establishment = entity.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
+                await TestData.ReferenceDataCache.GetMqEstablishmentById(establishmentId) :
+                null;
+
+            Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var expectedProvider);
+
             var expectedSpecialism = (await TestData.ReferenceDataCache.GetMqSpecialisms())
                 .Single(s => s.Id == entity.dfeta_MQ_SpecialismId?.Id)
                 .ToMandatoryQualificationSpecialism();
@@ -166,6 +182,7 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal((int)entity.StateCode!, mq.DqtState);
             Assert.Equal(entity.CreatedOn, mq.DqtCreatedOn);
             Assert.Equal(entity.ModifiedOn, mq.DqtModifiedOn);
+            Assert.Equal(expectedProvider?.MandatoryQualificationProviderId, mq.ProviderId);
             Assert.Equal(expectedSpecialism, mq.Specialism);
             Assert.Equal(entity.dfeta_MQ_Status?.ToMandatoryQualificationStatus(), mq.Status);
             Assert.Equal(entity.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), mq.StartDate);

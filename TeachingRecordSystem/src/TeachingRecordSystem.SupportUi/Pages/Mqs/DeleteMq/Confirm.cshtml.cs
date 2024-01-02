@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
@@ -50,7 +51,16 @@ public class ConfirmModel(
     public async Task<IActionResult> OnPost()
     {
         var qualification = (await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId)))!;
-        var mqSpecialisms = await referenceDataCache.GetMqSpecialisms();
+
+        var establishment = qualification.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
+            await referenceDataCache.GetMqEstablishmentById(establishmentId) :
+            null;
+
+        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var provider);
+
+        var specialism = qualification.dfeta_MQ_SpecialismId?.Id is Guid specialismId ?
+            await referenceDataCache.GetMqSpecialismById(specialismId) :
+            null;
 
         var deletedEvent = new MandatoryQualificationDeletedEvent()
         {
@@ -61,7 +71,16 @@ public class ConfirmModel(
             MandatoryQualification = new()
             {
                 QualificationId = QualificationId,
-                Specialism = mqSpecialisms.SingleOrDefault(s => s.Id == qualification.dfeta_MQ_SpecialismId?.Id)?.ToMandatoryQualificationSpecialism(),
+                Provider = provider is not null || establishment is not null ?
+                    new()
+                    {
+                        MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
+                        Name = provider?.Name,
+                        DqtMqEstablishmentId = establishment?.Id,
+                        DqtMqEstablishmentName = establishment?.dfeta_name
+                    } :
+                    null,
+                Specialism = specialism?.ToMandatoryQualificationSpecialism(),
                 Status = qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus(),
                 StartDate = qualification.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 EndDate = qualification.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
@@ -111,7 +130,7 @@ public class ConfirmModel(
 
         PersonId = JourneyInstance!.State.PersonId;
         PersonName = JourneyInstance!.State.PersonName;
-        TrainingProvider = JourneyInstance!.State.MqEstablishment;
+        TrainingProvider = JourneyInstance!.State.ProviderName;
         Specialism = JourneyInstance!.State.Specialism;
         Status = JourneyInstance!.State.Status;
         StartDate = JourneyInstance!.State.StartDate;

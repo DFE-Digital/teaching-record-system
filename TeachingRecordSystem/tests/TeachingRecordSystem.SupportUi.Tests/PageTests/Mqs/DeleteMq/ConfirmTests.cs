@@ -1,5 +1,6 @@
 using FormFlow;
 using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
@@ -72,7 +73,7 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                MqEstablishment = mqEstablishment?.dfeta_name,
+                ProviderName = mqEstablishment?.dfeta_name,
                 Specialism = specialism,
                 Status = status,
                 StartDate = startDate,
@@ -146,7 +147,7 @@ public class ConfirmTests : TestBase
     public async Task Post_Confirm_DeletesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
-        var mqEstablishment = "University of Leeds";
+        var mqEstablishmentDqtValue = "959";  // "University of Leeds"
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var status = MandatoryQualificationStatus.Passed;
         var startDate = new DateOnly(2023, 09, 01);
@@ -156,8 +157,17 @@ public class ConfirmTests : TestBase
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "test.pdf";
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(specialism: specialism, status: status, startDate: startDate, endDate: endDate));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(
+            providerValue: mqEstablishmentDqtValue,
+            specialism: specialism,
+            status: status,
+            startDate: startDate,
+            endDate: endDate));
+
         var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
+        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(mqEstablishmentDqtValue);
+        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
+        Assert.NotNull(provider);
 
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -166,7 +176,7 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                MqEstablishment = mqEstablishment,
+                ProviderName = mqEstablishment.dfeta_name,
                 Specialism = specialism,
                 Status = status,
                 StartDate = startDate,
@@ -212,6 +222,13 @@ public class ConfirmTests : TestBase
                 MandatoryQualification = new()
                 {
                     QualificationId = qualificationId,
+                    Provider = new()
+                    {
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name,
+                        DqtMqEstablishmentId = mqEstablishment.Id,
+                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                    },
                     Specialism = specialism,
                     Status = status,
                     StartDate = startDate,
@@ -247,7 +264,7 @@ public class ConfirmTests : TestBase
                 Initialized = true,
                 PersonId = person.PersonId,
                 PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                MqEstablishment = "University of Leeds",
+                ProviderName = "University of Leeds",
                 Specialism = MandatoryQualificationSpecialism.Hearing,
                 Status = MandatoryQualificationStatus.Passed,
                 StartDate = new DateOnly(2023, 09, 01),

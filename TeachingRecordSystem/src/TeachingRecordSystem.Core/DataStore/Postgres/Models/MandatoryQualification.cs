@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class MandatoryQualification : Qualification
 {
-    // TODO Add Provider here when we've figured out how to model MQ Providers
+    public Guid? ProviderId { get; set; }
     public MandatoryQualificationSpecialism? Specialism { get; set; }
     public MandatoryQualificationStatus? Status { get; set; }
     public DateOnly? StartDate { get; set; }

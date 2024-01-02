@@ -14,7 +14,7 @@ public class EventInfoTests
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = DateTime.UtcNow,
-            RaisedBy = DataStore.Postgres.Models.User.SystemUserId,
+            RaisedBy = Core.DataStore.Postgres.Models.User.SystemUserId,
             User = new()
             {
                 AzureAdUserId = "ad-user-id",

@@ -8,6 +8,8 @@ public class MandatoryQualificationMapping : IEntityTypeConfiguration<MandatoryQ
 {
     public void Configure(EntityTypeBuilder<MandatoryQualification> builder)
     {
+        builder.HasOne<MandatoryQualificationProvider>().WithMany().HasForeignKey(p => p.ProviderId).HasConstraintName("fk_qualifications_mandatory_qualification_provider");
+        builder.Property(q => q.ProviderId).HasColumnName("mq_provider_id");
         builder.Property(q => q.Specialism).HasColumnName("mq_specialism");
         builder.Property(q => q.Status).HasColumnName("mq_status");
         builder.Property(q => q.StartDate).HasColumnName("start_date");
