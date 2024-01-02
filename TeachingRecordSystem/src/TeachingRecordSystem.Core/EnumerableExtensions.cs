@@ -2,6 +2,12 @@ namespace TeachingRecordSystem.Core;
 
 public static class EnumerableExtensions
 {
+    public static T First<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) =>
+        source.FirstOrDefault(predicate) ?? throw new InvalidOperationException(failedErrorMessage);
+
+    public static T Single<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) =>
+        source.SingleOrDefault(predicate) ?? throw new InvalidOperationException(failedErrorMessage);
+
     public static IEnumerable<T[]> GetCombinations<T>(this IEnumerable<T> source)
     {
         if (source is null)

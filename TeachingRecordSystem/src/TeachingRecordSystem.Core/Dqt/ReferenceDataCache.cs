@@ -21,13 +21,13 @@ public class ReferenceDataCache : IStartupTask
     {
         var sanctionCodes = await EnsureSanctionCodes();
         // build environment has some duplicate sanction codes, which prevent us using Single() here
-        return sanctionCodes.First(s => s.dfeta_Value == value);
+        return sanctionCodes.First(s => s.dfeta_Value == value, $"Could not find sanction code with value: '{value}'.");
     }
 
     public async Task<dfeta_sanctioncode> GetSanctionCodeById(Guid sanctionCodeId)
     {
         var sanctionCodes = await EnsureSanctionCodes();
-        return sanctionCodes.Single(s => s.dfeta_sanctioncodeId == sanctionCodeId);
+        return sanctionCodes.Single(s => s.dfeta_sanctioncodeId == sanctionCodeId, $"Could not find sanction code with ID: '{sanctionCodeId}'.");
     }
 
     public async Task<dfeta_sanctioncode[]> GetSanctionCodes()
@@ -39,19 +39,19 @@ public class ReferenceDataCache : IStartupTask
     public async Task<Subject> GetSubjectByTitle(string title)
     {
         var subjects = await EnsureSubjects();
-        return subjects.Single(s => s.Title == title);
+        return subjects.Single(s => s.Title == title, $"Could not find subject with title: '{title}'.");
     }
 
     public async Task<dfeta_teacherstatus> GetTeacherStatusByValue(string value)
     {
         var teacherStatuses = await EnsureTeacherStatuses();
-        return teacherStatuses.Single(ts => ts.dfeta_Value == value);
+        return teacherStatuses.Single(ts => ts.dfeta_Value == value, $"Could not find teacher status with value: '{value}'.");
     }
 
     public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusByValue(string value)
     {
         var earlyYearsStatuses = await EnsureEarlyYearsStatuses();
-        return earlyYearsStatuses.Single(ey => ey.dfeta_Value == value);
+        return earlyYearsStatuses.Single(ey => ey.dfeta_Value == value, $"Could not find early years teacher status with value: '{value}'.");
     }
 
     public async Task<dfeta_specialism[]> GetMqSpecialisms()
@@ -64,13 +64,13 @@ public class ReferenceDataCache : IStartupTask
     {
         var specialisms = await EnsureSpecialisms();
         // build environment has some duplicate Specialisms, which prevent us using Single() here
-        return specialisms.First(s => s.dfeta_Value == value);
+        return specialisms.First(s => s.dfeta_Value == value, $"Could not find MQ specialism with value: '{value}'.");
     }
 
     public async Task<dfeta_specialism> GetMqSpecialismById(Guid specialismId)
     {
         var specialisms = await EnsureSpecialisms();
-        return specialisms.Single(s => s.dfeta_specialismId == specialismId);
+        return specialisms.Single(s => s.dfeta_specialismId == specialismId, $"Could not find MQ specialism with ID: '{specialismId}'.");
     }
 
     public async Task<dfeta_mqestablishment[]> GetMqEstablishments()
@@ -83,13 +83,13 @@ public class ReferenceDataCache : IStartupTask
     {
         var mqEstablishments = await EnsureMqEstablishments();
         // build environment has some duplicate MQ Establishments, which prevent us using Single() here
-        return mqEstablishments.First(s => s.dfeta_Value == value);
+        return mqEstablishments.First(s => s.dfeta_Value == value, $"Could not find MQ establishment with value: '{value}'.");
     }
 
     public async Task<dfeta_mqestablishment> GetMqEstablishmentById(Guid mqEstablishmentId)
     {
         var mqEstablishments = await EnsureMqEstablishments();
-        return mqEstablishments.Single(s => s.dfeta_mqestablishmentId == mqEstablishmentId);
+        return mqEstablishments.Single(s => s.dfeta_mqestablishmentId == mqEstablishmentId, $"Could not find MQ establishment with ID: '{mqEstablishmentId}'.");
     }
 
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
