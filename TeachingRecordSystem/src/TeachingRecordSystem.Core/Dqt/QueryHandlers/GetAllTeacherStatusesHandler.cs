@@ -17,7 +17,6 @@ public class GetAllTeacherStatusesHandler : ICrmQueryHandler<GetAllTeacherStatus
                 dfeta_teacherstatus.Fields.dfeta_QTSDateRequired,
                 dfeta_teacherstatus.Fields.dfeta_Value)
         };
-        queryExpression.Criteria.AddCondition(dfeta_teacherstatus.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_teacherStatusState.Active);
 
         var request = new RetrieveMultipleRequest()
         {
