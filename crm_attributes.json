@@ -166,6 +166,7 @@
     "statecode"
   ],
   "dfeta_qtsregistration": [
+    "createdon",
     "dfeta_earlyyearsstatusid",
     "dfeta_eytsdate",
     "dfeta_inductionid",

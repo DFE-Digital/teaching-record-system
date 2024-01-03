@@ -30,7 +30,7 @@ public class SpecialismTests : TestBase
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
+        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
@@ -80,7 +80,7 @@ public class SpecialismTests : TestBase
     public async Task Post_WhenNoSpecialismIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
+        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -99,7 +99,7 @@ public class SpecialismTests : TestBase
     public async Task Post_WhenSpecialismIsSelected_RedirectsToStartDatePage()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
+        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 

@@ -57,7 +57,7 @@ public class QualificationsTests : TestBase
         DateOnly? startDate = !string.IsNullOrEmpty(startDateString) ? DateOnly.Parse(startDateString) : null;
         DateOnly? endDate = !string.IsNullOrEmpty(endDateString) ? DateOnly.Parse(endDateString) : null;
         var person = await TestData.CreatePerson(x => x
-            .WithQts(qtsDate: new DateOnly(2021, 10, 5))
+            .WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5))
             .WithMandatoryQualification(q => q
                 .WithDqtMqEstablishmentValue(providerValue)
                 .WithSpecialism(specialism)

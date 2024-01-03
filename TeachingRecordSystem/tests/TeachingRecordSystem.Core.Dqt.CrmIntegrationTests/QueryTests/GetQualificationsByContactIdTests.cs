@@ -33,7 +33,7 @@ public class GetQualificationsByContactIdTests : IAsyncLifetime
     {
         // Arrange
         var person = await _dataScope.TestData.CreatePerson(x => x
-            .WithQts(qtsDate: new DateOnly(2021, 10, 5))
+            .WithQts(qtsDate: new DateOnly(2021, 10, 5), "213", new DateTime(2021, 10, 5))
             .WithMandatoryQualification()
             .WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue("959").WithSpecialism(MandatoryQualificationSpecialism.Visual)));
 

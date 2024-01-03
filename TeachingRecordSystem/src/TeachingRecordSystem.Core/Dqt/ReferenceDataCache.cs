@@ -48,6 +48,18 @@ public class ReferenceDataCache : IStartupTask
         return teacherStatuses.Single(ts => ts.dfeta_Value == value, $"Could not find teacher status with value: '{value}'.");
     }
 
+    public async Task<dfeta_teacherstatus[]> GetTeacherStatuses()
+    {
+        var teacherStatuses = await EnsureTeacherStatuses();
+        return teacherStatuses;
+    }
+
+    public async Task<dfeta_earlyyearsstatus[]> GetEytsStatuses()
+    {
+        var earlyyearStatuses = await EnsureEarlyYearsStatuses();
+        return earlyyearStatuses;
+    }
+
     public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusByValue(string value)
     {
         var earlyYearsStatuses = await EnsureEarlyYearsStatuses();

@@ -16,7 +16,7 @@ public class MqTests : TestBase
     [Fact]
     public async Task AddMq()
     {
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5)));
+        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
         var specialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
         var startDate = new DateOnly(2021, 3, 1);

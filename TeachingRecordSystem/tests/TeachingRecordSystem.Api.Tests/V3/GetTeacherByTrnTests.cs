@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Api.Tests.Attributes;
+using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
@@ -59,19 +60,25 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     [Fact]
     public async Task Get_ValidRequest_ReturnsExpectedResponse()
     {
-        var contact = await CreateContact(qualifiedInWales: false);
+        var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false);
+        await ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
     }
 
     [Fact]
     public async Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse()
     {
-        var contact = await CreateContact(qualifiedInWales: true);
+        var qtsDate = new DateOnly(2021, 01, 01);
+        var qtsCreatedDate = new DateTime(2021, 01, 01);
+        var qts = new QtsRegistration[]
+        {
+            new QtsRegistration(qtsDate, QtsAwardedInWalesTeacherStatusValue, qtsCreatedDate, null, null)
+        };
+        var contact = await CreateContact(qts);
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false);
+        await ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), "Qualified"), expectedEyts: null);
     }
 
     [Fact]
@@ -80,7 +87,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectCertificateUrls: false);
+        await ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectCertificateUrls: false, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
     }
 
     [Fact]
@@ -89,7 +96,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithInduction_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, contact, expectCertificateUrls: false);
+        await ValidRequestWithInduction_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, contact);
     }
 
     [Fact]

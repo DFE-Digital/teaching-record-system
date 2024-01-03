@@ -23,7 +23,7 @@ public class UpdateMandatoryQualificationStartDateTests : IAsyncLifetime
         var newStartDate = new DateOnly(2020, 11, 7);
 
         var person = await _dataScope.TestData.CreatePerson(x => x
-            .WithQts(qtsDate: new DateOnly(2021, 10, 5))
+            .WithQts(qtsDate: new DateOnly(2021, 10, 5), "213", new DateTime(2021, 10, 5))
             .WithMandatoryQualification(q => q.WithStartDate(originalStartDate)));
 
         var qualification = person.MandatoryQualifications.First();
