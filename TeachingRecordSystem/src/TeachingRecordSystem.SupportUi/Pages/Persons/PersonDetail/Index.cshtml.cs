@@ -33,7 +33,7 @@ public class IndexModel : PageModel
 
     public PersonInfo? Person { get; set; }
 
-    public async Task<IActionResult> OnGet()
+    public async Task OnGet()
     {
         var contactDetail = await _crmQueryDispatcher.ExecuteQuery(
             new GetContactDetailByIdQuery(
@@ -54,55 +54,10 @@ public class IndexModel : PageModel
                     Contact.Fields.GenderCode,
                     Contact.Fields.dfeta_ActiveSanctions)));
 
-        Person = MapContactDetail(contactDetail!);
+        var contact = contactDetail!.Contact;
+        var previousNames = PreviousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact, _concurrentNameChangeWindow);
 
-        return Page();
-    }
-
-    private PersonInfo MapContactDetail(ContactDetail contactDetail)
-    {
-        var currentFirstName = contactDetail.Contact.FirstName;
-        var currentMiddleName = contactDetail.Contact.MiddleName;
-        var currentLastName = contactDetail.Contact.LastName;
-        var previousNames = new List<string>();
-        DateTime? createdOnBaseline = null;
-
-        foreach (var previousName in contactDetail.PreviousNames.OrderByDescending(p => p.CreatedOn))
-        {
-            if (createdOnBaseline is null)
-            {
-                createdOnBaseline = previousName.CreatedOn;
-            }
-            else if (createdOnBaseline - previousName.CreatedOn > _concurrentNameChangeWindow)
-            {
-                previousNames.Add(GetFullName(currentFirstName, currentMiddleName, currentLastName));
-                createdOnBaseline = previousName.CreatedOn;
-            }
-
-            switch (previousName.dfeta_Type)
-            {
-                case dfeta_NameType.FirstName:
-                    currentFirstName = previousName.dfeta_name;
-                    break;
-                case dfeta_NameType.MiddleName:
-                    currentMiddleName = previousName.dfeta_name;
-                    break;
-                case dfeta_NameType.LastName:
-                    currentLastName = previousName.dfeta_name;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        if (createdOnBaseline is not null)
-        {
-            previousNames.Add(GetFullName(currentFirstName, currentMiddleName, currentLastName));
-        }
-
-        var contact = contactDetail.Contact;
-
-        return new PersonInfo()
+        Person = new PersonInfo()
         {
             Name = contact.ResolveFullName(includeMiddleName: false),
             FullName = contact.ResolveFullName(includeMiddleName: true),
@@ -113,7 +68,9 @@ public class IndexModel : PageModel
             MobileNumber = contact.MobilePhone,
             Gender = contact.GenderCode.ToString(),
             HasAlerts = contact.dfeta_ActiveSanctions == true,
-            PreviousNames = previousNames.ToArray()
+            PreviousNames = previousNames
+                .Select(name => GetFullName(name.FirstName, name.MiddleName, name.LastName))
+                .ToArray()
         };
     }
 

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.Api.V3.Requests;
 
 namespace TeachingRecordSystem.Api.V3.Responses;
@@ -18,4 +19,5 @@ public record FindTeachersResponseResult
     public required string MiddleName { get; init; }
     public required string LastName { get; init; }
     public required ImmutableArray<SanctionInfo> Sanctions { get; init; }
+    public required ImmutableArray<NameInfo> PreviousNames { get; init; }
 }

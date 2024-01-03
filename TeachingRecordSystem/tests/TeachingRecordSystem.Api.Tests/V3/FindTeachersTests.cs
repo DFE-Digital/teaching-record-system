@@ -13,7 +13,7 @@ public class FindTeachersTests : ApiTestBase
         SetCurrentApiClient(new[] { ApiRoles.GetPerson });
     }
 
-    [Theory, RoleNamesData(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson })]
+    [Theory, RoleNamesData([ApiRoles.GetPerson, ApiRoles.UpdatePerson])]
     public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
@@ -124,7 +124,8 @@ public class FindTeachersTests : ApiTestBase
                                 code = person1.Sanctions[0].SanctionCode,
                                 startDate = person1.Sanctions[0].StartDate
                             }
-                        }
+                        },
+                        previousNames = Array.Empty<object>()
                     },
                     new
                     {
@@ -140,7 +141,8 @@ public class FindTeachersTests : ApiTestBase
                                 code = person2.Sanctions[0].SanctionCode,
                                 startDate = person2.Sanctions[0].StartDate
                             }
-                        }
+                        },
+                        previousNames = Array.Empty<object>()
                     }
                 }
             });
@@ -195,7 +197,8 @@ public class FindTeachersTests : ApiTestBase
                                 code = person1.Sanctions[0].SanctionCode,
                                 startDate = person1.Sanctions[0].StartDate
                             }
-                        }
+                        },
+                        previousNames = Array.Empty<object>()
                     },
                     new
                     {
@@ -210,6 +213,15 @@ public class FindTeachersTests : ApiTestBase
                             {
                                 code = person2.Sanctions[0].SanctionCode,
                                 startDate = person2.Sanctions[0].StartDate
+                            }
+                        },
+                        previousNames = new object[]
+                        {
+                            new
+                            {
+                                firstName = person2.FirstName,
+                                middleName = person2.MiddleName,
+                                lastName = person2.LastName
                             }
                         }
                     }
@@ -257,7 +269,8 @@ public class FindTeachersTests : ApiTestBase
                         firstName = person.FirstName,
                         middleName = person.MiddleName ?? "",
                         lastName = person.LastName,
-                        sanctions = new object[0]
+                        sanctions = Array.Empty<object>(),
+                        previousNames = Array.Empty<object>()
                     }
                 }
             });
