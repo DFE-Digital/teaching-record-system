@@ -1,4 +1,5 @@
 @page "/persons/{personId}/changelog"
+@using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.SupportUi.Pages.Common;
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ChangeLogModel
 @{
@@ -20,29 +21,13 @@ else
     <div class="moj-timeline">
         @foreach (var timelineItem in Model.TimelineItems)
         {
-            <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item">
-                <div class="moj-timeline__header">
-                    <h2 class="moj-timeline__title" data-testid="timeline-item-title">@timelineItem.Title</h2>
-                    <p class="moj-timeline__byline" data-testid="timeline-item-user">by @timelineItem.User</p>
-                    @if (timelineItem.Status is not null)
-                    {
-                        var tagClass = timelineItem.Status switch
-                        {
-                            ChangeLogModel.TimelineItemStatus.Overdue => "govuk-tag--red",
-                            ChangeLogModel.TimelineItemStatus.Closed => "govuk-tag--grey",
-                            _ => null
-                        };
-                        <govuk-tag class="@tagClass" data-testid="timeline-item-status">@timelineItem.Status</govuk-tag>
-                    }
-                </div>
-                <p class="moj-timeline__date">
-                    <time datetime="@timelineItem.Time.ToUniversalTime().ToString("O")" data-testid="timeline-item-time">@timelineItem.Time.ToString("dd MMMMM yyyy 'at' h:mm tt")</time>
-                </p>
-                <div class="moj-timeline__description">
-                    <p class="govuk-body" data-testid="timeline-item-summary">@timelineItem.Summary</p>
-                    <p class="govuk-body" data-testid="timeline-item-description">@timelineItem.Description</p>
-                </div>
-            </div>
+            var viewName = timelineItem.ItemType switch
+            {
+                TimelineItemType.Event => $"./Timeline/Events/{((EventBase)timelineItem.ItemModel).GetEventName()}.cshtml",
+                _ => $"./Timeline/{timelineItem.ItemType}.cshtml"
+            };
+
+            <partial name="@viewName" for="@timelineItem" />
         }
     </div>
 }

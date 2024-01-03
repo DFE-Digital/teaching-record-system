@@ -28,7 +28,7 @@ public class GetNotesByContactIdTests : IAsyncLifetime
         Assert.NotNull(result);
         Assert.Empty(result.Annotations);
         Assert.Empty(result.Tasks);
-        Assert.Null(result.IncidentResolutions);
+        Assert.Empty(result.IncidentResolutions);
     }
 
     [Theory]
@@ -91,7 +91,7 @@ public class GetNotesByContactIdTests : IAsyncLifetime
         }
         else
         {
-            Assert.Null(result.IncidentResolutions);
+            Assert.Empty(result.IncidentResolutions);
         }
     }
 }

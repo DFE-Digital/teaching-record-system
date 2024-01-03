@@ -130,7 +130,7 @@ public class GetNotesByContactIdHandler : ICrmQueryHandler<GetNotesByContactIdQu
 
         var annotations = (await annotationResponse.GetResponseAsync()).EntityCollection.Entities.Select(e => e.ToEntity<Annotation>()).ToArray();
         var incidents = (await incidentResponse.GetResponseAsync()).EntityCollection.Entities.Select(e => e.ToEntity<Incident>()).ToArray();
-        (IncidentResolution, Incident)[]? incidentResolutions = incidents is not null && incidents.Length > 0 ? incidents.Select(i => (i.Extract<IncidentResolution>(IncidentResolution.EntityLogicalName, IncidentResolution.PrimaryIdAttribute), i)).ToArray() : null;
+        var incidentResolutions = incidents.Select(i => (i.Extract<IncidentResolution>(IncidentResolution.EntityLogicalName, IncidentResolution.PrimaryIdAttribute), i)).ToArray();
         var tasks = (await taskResponse.GetResponseAsync()).EntityCollection.Entities.Select(e => e.ToEntity<CrmTask>()).ToArray();
 
         return new TeacherNotesResult(annotations, incidentResolutions, tasks);

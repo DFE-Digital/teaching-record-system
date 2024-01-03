@@ -1,0 +1,21 @@
+@using TeachingRecordSystem.Core.Dqt.Models
+@model TimelineItem<Annotation>
+@{
+    var user = Model.ItemModel.Extract<SystemUser>(SystemUser.EntityLogicalName, SystemUser.PrimaryIdAttribute);
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title" data-testid="timeline-item-title">Note modified</h2>
+        <p class="moj-timeline__byline" data-testid="timeline-item-user">by @user.FirstName @user.LastName</p>
+    </div>
+    <p class="moj-timeline__date">
+        <time datetime="@Model.Timestamp.ToUniversalTime().ToString("O")" data-testid="timeline-item-time">
+            @Model.Timestamp.ToString("dd MMMMM yyyy 'at' h:mm tt")
+        </time>
+    </p>
+    <div class="moj-timeline__description">
+        <p class="govuk-body" data-testid="timeline-item-summary">@Model.ItemModel.Subject</p>
+        <p class="govuk-body" data-testid="timeline-item-description">@Model.ItemModel.NoteText</p>
+    </div>
+</div>
