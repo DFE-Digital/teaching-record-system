@@ -265,7 +265,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             PendingNameChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingNameChange) : default,
             PendingDateOfBirthChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingDateOfBirthChange) : default,
-            Qts = MapQts(qts?.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), qtsAwardedInWales, request.AccessMode, qtsStatus != null ? GetQTSStatusDescription(qtsStatus!.dfeta_Value!) : null),
+            Qts = MapQts(qts?.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), qtsAwardedInWales, request.AccessMode, qtsStatus != null ? GetQTSStatusDescription(qtsStatus!.dfeta_Value!, qtsStatus.dfeta_name) : null),
             Eyts = MapEyts(eyts?.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), request.AccessMode, eytsTeacherStatus != null ? GetEytsStatusDescription(eytsTeacherStatus!.dfeta_Value!) : null),
             Email = teacher.EMailAddress1,
             Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ?
@@ -330,7 +330,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         _ => throw new ArgumentException("Invalid EYTS Status")
     };
 
-    private string? GetQTSStatusDescription(string value) => value switch
+    private string? GetQTSStatusDescription(string value, string statusDescription) => value switch
     {
         "28" => "Qualified",
         "50" => "Qualified",
@@ -349,6 +349,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         "213" => "Qualified",
         "214" => "Partial qualified teacher status",
         "223" => "Qualified",
+        _ when statusDescription.StartsWith("Qualified teacher:", StringComparison.InvariantCultureIgnoreCase) => "Qualified",
         _ => throw new ArgumentException("Invalid QTS Status")
     };
 
