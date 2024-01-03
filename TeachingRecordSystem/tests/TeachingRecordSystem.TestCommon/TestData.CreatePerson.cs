@@ -4,6 +4,7 @@ using Optional;
 using Optional.Unsafe;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Models;
 using static TeachingRecordSystem.Core.Dqt.RequestBuilder;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -34,9 +35,7 @@ public partial class TestData
         private bool? _hasNationalInsuranceNumber;
         private readonly List<MandatoryQualification> _mandatoryQualifications = new();
         private readonly List<QtsRegistration> _qtsRegistrations = new();
-        private DateOnly? _qtsDate;
         private string? _teacherStatus;
-        private DateOnly? _eytsDate;
         private string? _earlyYearsStatus;
         private readonly List<Sanction> _sanctions = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
@@ -244,8 +243,8 @@ public partial class TestData
                     Target = new dfeta_qtsregistration()
                     {
                         Id = qtsRegistrationId,
+                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
                         CreatedOn = item.CreatedOn
-                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName)
                     }
                 });
 
@@ -258,13 +257,19 @@ public partial class TestData
                     }
                 });
 
+                getQtsRegistationTask = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
+                {
+                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(new[] { dfeta_qtsregistration.Fields.dfeta_QTSDate, dfeta_qtsregistration.Fields.dfeta_EYTSDate }),
+                    Target = qtsRegistrationId.ToEntityReference(dfeta_qtsregistration.EntityLogicalName),
+                });
+
                 // Plugin which updates Contact with QTS Date only fires on Update or Delete
                 txnRequestBuilder.AddRequest(new UpdateRequest()
                 {
                     Target = new dfeta_qtsregistration()
                     {
                         Id = qtsRegistrationId,
-                        dfeta_QTSDate = item.QtsDate!.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                        dfeta_QTSDate = item.QtsDate!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true),
                         dfeta_TeacherStatusId = teacherStatus.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
                         CreatedOn = item.CreatedOn
                     }
@@ -288,9 +293,15 @@ public partial class TestData
                     Target = new dfeta_qtsregistration()
                     {
                         Id = eytsRegistrationId,
+                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
                         CreatedOn = item.CreatedOn
-                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName)
                     }
+                });
+
+                getEytsRegistationTask = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
+                {
+                    ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(new[] { dfeta_qtsregistration.Fields.dfeta_QTSDate, dfeta_qtsregistration.Fields.dfeta_EYTSDate }),
+                    Target = eytsRegistrationId.ToEntityReference(dfeta_qtsregistration.EntityLogicalName)
                 });
 
                 // Plugin which updates Contact with EYTS Date only fires on Update or Delete
@@ -299,7 +310,7 @@ public partial class TestData
                     Target = new dfeta_qtsregistration()
                     {
                         Id = eytsRegistrationId,
-                        dfeta_EYTSDate = item.EytsDate!.Value.FromDateOnlyWithDqtBstFix(isLocalTime: true),
+                        dfeta_EYTSDate = item.EytsDate!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true),
                         dfeta_EarlyYearsStatusId = earlyYearsStatus.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
                         CreatedOn = item.CreatedOn
                     }
@@ -394,8 +405,8 @@ public partial class TestData
                 MobileNumber = _mobileNumber,
                 Gender = gender.ToString(),
                 NationalInsuranceNumber = contact.dfeta_NINumber,
-                QtsDate = _qtsDate,
-                EytsDate = _eytsDate,
+                QtsDate = getQtsRegistationTask != null ? getQtsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_QTSDate.ToDateOnlyWithDqtBstFix(true) : null,
+                EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 Sanctions = [.. _sanctions],
                 MandatoryQualifications = [.. mqs]
             };
@@ -472,10 +483,6 @@ public partial class TestData
                 dfeta_MQStartDate = startDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
                 dfeta_MQ_Date = endDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
                 dfeta_MQ_Status = status?.GetDqtStatus()
-                QtsDate = getQtsRegistationTask != null ? getQtsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_QTSDate.ToDateOnlyWithDqtBstFix(true) : null,
-                EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
-                Sanctions = _sanctions.ToImmutableArray(),
-                MandatoryQualifications = _mandatoryQualifications.ToImmutableArray()
             };
 
             requestBuilder.AddRequest(new CreateRequest()

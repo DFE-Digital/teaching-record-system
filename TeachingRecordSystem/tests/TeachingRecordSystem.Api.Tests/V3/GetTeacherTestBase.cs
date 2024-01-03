@@ -3,7 +3,7 @@ using System.Text.Json;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.Core.Dqt;
-using static TeachingRecordSystem.TestCommon.CrmTestData;
+using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 

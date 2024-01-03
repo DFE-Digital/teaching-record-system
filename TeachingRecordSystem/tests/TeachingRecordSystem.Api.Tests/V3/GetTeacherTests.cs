@@ -1,4 +1,4 @@
-using static TeachingRecordSystem.TestCommon.CrmTestData;
+using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
