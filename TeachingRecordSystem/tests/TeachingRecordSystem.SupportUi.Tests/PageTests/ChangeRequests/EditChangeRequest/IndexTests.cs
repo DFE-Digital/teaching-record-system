@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Cases.EditCase;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ChangeRequests.EditChangeRequest;
 
 public class IndexTests : TestBase
 {
@@ -15,7 +15,7 @@ public class IndexTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/cases/{createIncidentResult.TicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -32,7 +32,7 @@ public class IndexTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/cases/{createIncidentResult.TicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -48,7 +48,7 @@ public class IndexTests : TestBase
         SetCurrentUser(TestUsers.Helpdesk);
         var nonExistentTicketNumber = Guid.NewGuid().ToString();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/cases/{nonExistentTicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{nonExistentTicketNumber}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -65,7 +65,7 @@ public class IndexTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/cases/{createIncidentResult.TicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -74,18 +74,30 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Get_WithTicketNumberForActiveNameChangeIncident_RendersExpectedContent()
+    [Theory]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
+    [InlineData(false, false, true)]
+    [InlineData(true, true, false)]
+    [InlineData(true, false, true)]
+    [InlineData(false, true, true)]
+    [InlineData(true, true, true)]
+    public async Task Get_WithTicketNumberForActiveNameChangeIncident_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName)
     {
         // Arrange
         SetCurrentUser(TestUsers.Helpdesk);
         var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithMultipleEvidenceFiles());
+        var createIncidentResult = await TestData.CreateNameChangeIncident(
+            b => b.WithCustomerId(createPersonResult.ContactId)
+                .WithNewFirstName(hasNewFirstName ? TestData.GenerateChangedFirstName(createPersonResult.FirstName) : createPersonResult.FirstName)
+                .WithNewMiddleName(hasNewMiddleName ? TestData.GenerateChangedMiddleName(createPersonResult.MiddleName) : createPersonResult.MiddleName)
+                .WithNewLastName(hasNewLastName ? TestData.GenerateChangedLastName(createPersonResult.LastName) : createPersonResult.LastName)
+                .WithMultipleEvidenceFiles());
 
         var imageEvidence = createIncidentResult.Evidence.Single(e => e.MimeType == "image/jpeg");
         var pdfEvidence = createIncidentResult.Evidence.Single(e => e.MimeType == "application/pdf");
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/cases/{createIncidentResult.TicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -94,25 +106,43 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await response.GetDocument();
-        Assert.Equal(createIncidentResult.SubjectTitle, doc.GetElementByTestId("page-title")!.TextContent);
-        var headerRow = doc.GetElementByTestId("case-header");
-        Assert.NotNull(headerRow);
-        Assert.Equal(createIncidentResult.TicketNumber, headerRow.GetElementByTestId("case-header-case-reference")!.TextContent);
-        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.LastName}", headerRow.GetElementByTestId("case-header-name")!.TextContent);
-        Assert.Equal(createIncidentResult.CreatedOn.ToString("dd/MM/yyyy"), headerRow.GetElementByTestId("case-header-created-on")!.TextContent);
+        Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TextContent);
 
         var firstNameRow = doc.GetElementByTestId("first-name");
-        Assert.NotNull(firstNameRow);
-        Assert.Equal(createPersonResult.FirstName, firstNameRow.GetElementByTestId("first-name-current")!.TextContent);
-        Assert.Equal(createIncidentResult.NewFirstName, firstNameRow.GetElementByTestId("first-name-new")!.TextContent);
+        if (hasNewFirstName)
+        {
+            Assert.NotNull(firstNameRow);
+            Assert.Equal(createPersonResult.FirstName, firstNameRow.GetElementByTestId("first-name-current")!.TextContent);
+            Assert.Equal(createIncidentResult.NewFirstName, firstNameRow.GetElementByTestId("first-name-new")!.TextContent);
+        }
+        else
+        {
+            Assert.Null(firstNameRow);
+        }
+
         var middleNameRow = doc.GetElementByTestId("middle-name");
-        Assert.NotNull(middleNameRow);
-        Assert.Equal(createPersonResult.MiddleName, middleNameRow.GetElementByTestId("middle-name-current")!.TextContent);
-        Assert.Equal(createIncidentResult.NewMiddleName, middleNameRow.GetElementByTestId("middle-name-new")!.TextContent);
+        if (hasNewMiddleName)
+        {
+            Assert.NotNull(middleNameRow);
+            Assert.Equal(createPersonResult.MiddleName, middleNameRow.GetElementByTestId("middle-name-current")!.TextContent);
+            Assert.Equal(createIncidentResult.NewMiddleName, middleNameRow.GetElementByTestId("middle-name-new")!.TextContent);
+        }
+        else
+        {
+            Assert.Null(middleNameRow);
+        }
+
         var lastNameRow = doc.GetElementByTestId("last-name");
-        Assert.NotNull(lastNameRow);
-        Assert.Equal(createPersonResult.LastName, lastNameRow.GetElementByTestId("last-name-current")!.TextContent);
-        Assert.Equal(createIncidentResult.NewLastName, lastNameRow.GetElementByTestId("last-name-new")!.TextContent);
+        if (hasNewLastName)
+        {
+            Assert.NotNull(lastNameRow);
+            Assert.Equal(createPersonResult.LastName, lastNameRow.GetElementByTestId("last-name-current")!.TextContent);
+            Assert.Equal(createIncidentResult.NewLastName, lastNameRow.GetElementByTestId("last-name-new")!.TextContent);
+        }
+        else
+        {
+            Assert.Null(lastNameRow);
+        }
 
         var imageDocument = doc.GetElementByTestId($"image-{imageEvidence.DocumentId}");
         Assert.NotNull(imageDocument);
@@ -128,7 +158,7 @@ public class IndexTests : TestBase
         var createPersonResult = await TestData.CreatePerson();
         var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/cases/{createIncidentResult.TicketNumber}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -137,17 +167,12 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await response.GetDocument();
-        Assert.Equal(createIncidentResult.SubjectTitle, doc.GetElementByTestId("page-title")!.TextContent);
-        var headerRow = doc.GetElementByTestId("case-header");
-        Assert.NotNull(headerRow);
-        Assert.Equal(createIncidentResult.TicketNumber, headerRow.GetElementByTestId("case-header-case-reference")!.TextContent);
-        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.LastName}", headerRow.GetElementByTestId("case-header-name")!.TextContent);
-        Assert.Equal(createIncidentResult.CreatedOn.ToString("dd/MM/yyyy"), headerRow.GetElementByTestId("case-header-created-on")!.TextContent);
+        Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TextContent);
 
         var dateOfBirthRow = doc.GetElementByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthRow);
-        Assert.Equal(createPersonResult.DateOfBirth.ToString("dd/MM/yyyy"), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TextContent);
-        Assert.Equal(createIncidentResult.NewDateOfBirth.ToString("dd/MM/yyyy"), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TextContent);
+        Assert.Equal(createPersonResult.DateOfBirth.ToString("d MMMM yyyy"), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TextContent);
+        Assert.Equal(createIncidentResult.NewDateOfBirth.ToString("d MMMM yyyy"), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TextContent);
 
         var imageDocument = doc.GetElementByTestId($"image-{createIncidentResult.Evidence.DocumentId}");
         Assert.NotNull(imageDocument);

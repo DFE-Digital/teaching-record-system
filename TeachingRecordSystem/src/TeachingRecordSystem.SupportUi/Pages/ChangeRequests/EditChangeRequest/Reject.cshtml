@@ -1,18 +1,20 @@
-@page "/cases/{ticketNumber}/reject"
-@using static TeachingRecordSystem.SupportUi.Pages.Cases.EditCase.RejectModel;
-@model TeachingRecordSystem.SupportUi.Pages.Cases.EditCase.RejectModel
+@page "/change-requests/{ticketNumber}/reject"
+@using static TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.RejectModel;
+@model TeachingRecordSystem.SupportUi.Pages.ChangeRequests.EditChangeRequest.RejectModel
 @{
-    ViewBag.Title = "Are you sure you want to reject this change?";
+    ViewBag.Title = "Reject the change";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.EditCase(Model.TicketNumber)" />
+    <govuk-back-link href="@LinkGenerator.EditChangeRequest(Model.TicketNumber)" />
 }
 
+<span class="govuk-caption-l">@Model.ChangeType - @Model.PersonName</span>
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
-        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-        <form action="@LinkGenerator.RejectCase(Model.TicketNumber)" method="post">
+    <div class="govuk-grid-column-two-thirds-from-desktop">        
+        <form action="@LinkGenerator.RejectChangeRequest(Model.TicketNumber)" method="post">
             <govuk-radios asp-for="RejectionReasonChoice">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend>
@@ -33,7 +35,7 @@
                 </govuk-radios-fieldset>
             </govuk-radios>
 
-            <govuk-button type="submit">Confirm</govuk-button>
+            <govuk-button type="submit">Reject</govuk-button>
         </form>
     </div>
 </div>

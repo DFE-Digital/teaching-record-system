@@ -54,34 +54,34 @@ public static class PageExtensions
         await page.GetByTestId($"view-alert-link-{alertId}").ClickAsync();
     }
 
-    public static async Task ClickOpenCasesLinkInNavigationBar(this IPage page)
+    public static async Task ClickChangeRequestsLinkInNavigationBar(this IPage page)
     {
-        await page.ClickAsync("a:text-is('Open cases')");
+        await page.ClickAsync("a:text-is('Change requests')");
     }
 
-    public static async Task AssertOnOpenCasesPage(this IPage page)
+    public static async Task AssertOnChangeRequestsPage(this IPage page)
     {
-        await page.WaitForUrlPathAsync("/cases");
+        await page.WaitForUrlPathAsync("/change-requests");
     }
 
-    public static async Task ClickCaseReferenceLinkOpenCasesPage(this IPage page, string caseReference)
+    public static async Task ClickCaseReferenceLinkChangeRequestsPage(this IPage page, string caseReference)
     {
         await page.ClickAsync($"a:text-is('{caseReference}')");
     }
 
-    public static async Task AssertOnCaseDetailPage(this IPage page, string caseReference)
+    public static async Task AssertOnChangeRequestDetailPage(this IPage page, string caseReference)
     {
-        await page.WaitForUrlPathAsync($"/cases/{caseReference}");
+        await page.WaitForUrlPathAsync($"/change-requests/{caseReference}");
     }
 
-    public static async Task AssertOnAcceptCasePage(this IPage page, string caseReference)
+    public static async Task AssertOnAcceptChangeRequestPage(this IPage page, string caseReference)
     {
-        await page.WaitForUrlPathAsync($"/cases/{caseReference}/accept");
+        await page.WaitForUrlPathAsync($"/change-requests/{caseReference}/accept");
     }
 
-    public static async Task AssertOnRejectCasePage(this IPage page, string caseReference)
+    public static async Task AssertOnRejectChangeRequestPage(this IPage page, string caseReference)
     {
-        await page.WaitForUrlPathAsync($"/cases/{caseReference}/reject");
+        await page.WaitForUrlPathAsync($"/change-requests/{caseReference}/reject");
     }
 
     public static async Task AssertOnPersonDetailPage(this IPage page, Guid personId)
@@ -263,6 +263,9 @@ public static class PageExtensions
 
     public static Task ClickConfirmButton(this IPage page)
         => ClickButton(page, "Confirm");
+
+    public static Task ClickRejectButton(this IPage page)
+        => ClickButton(page, "Reject");
 
     public static Task ClickContinueButton(this IPage page)
         => ClickButton(page, "Continue");
