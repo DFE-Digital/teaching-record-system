@@ -62,6 +62,10 @@ public class TrsDataSyncService(
                 {
                     await ProcessChangesForModelType(modelType, cancellationToken);
                 }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     throw new ProcessChangesException(modelType, ex);
