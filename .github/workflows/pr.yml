@@ -213,19 +213,29 @@ jobs:
     - name: Create test reporting database
       run: docker exec $(docker ps --latest --quiet) /opt/mssql-tools/bin/sqlcmd -U "sa" -P "$MSSQL_PASSWORD" -Q "create database $MSSQL_DB; alter database $MSSQL_DB set ALLOW_SNAPSHOT_ISOLATION on;"
 
-    - name: Build
-      run: dotnet build --configuration Release
-      working-directory: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Dqt.CrmIntegrationTests
+    - name: Get test filter
+      id: test_filter
+      run: |
+        # If no DataverseAdapter files (or their tests) have been changed in this PR then filter out related tests
+        DOTNET_TEST_FILTER=""
+        git fetch origin main --quiet --depth=1
+        CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA)
+        if [[ $(echo "$CHANGED_FILES" | grep -EL "DataverseAdapter") ]]; then
+          echo "::notice::Skipping DataverseAdapter tests"
+          DOTNET_TEST_FILTER='--filter "FullyQualifiedName!~TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.DataverseAdapterTests"'
+        fi
+
+        echo filter_arg=$DOTNET_TEST_FILTER >> $GITHUB_OUTPUT
 
     - name: Run tests
       uses: ./.github/workflows/actions/test
       with:
         test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Core.Dqt.CrmIntegrationTests
-        report_name: "DQT test results"
+        report_name: "DQT integration test results"
         dotnet_test_args: >-
-          --no-build
           -e DqtReporting__ReportingDbConnectionString="Data Source=(local); Initial Catalog=${{ env.MSSQL_DB }}; User=sa; Password=${{ env.MSSQL_PASSWORD }}; TrustServerCertificate=True"
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
+          ${{ steps.test_filter.outputs.filter_arg }}
         config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
 
   package:
