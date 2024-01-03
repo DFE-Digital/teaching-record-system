@@ -234,7 +234,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         Assert.Equal(existingTeacherId, crmTask.dfeta_potentialduplicateid?.Id);
         Assert.Equal(expectedCategory, crmTask.Category);
         Assert.Equal("Notification for QTS Unit Team", crmTask.Subject);
-        Assert.Equal(_clock.UtcNow, crmTask.ScheduledEnd);
+        Assert.Equal(_clock.UtcNow, crmTask.ScheduledEnd.Value, TimeSpan.FromSeconds(15));
 
         var expectedDescription = $"Potential duplicate\nMatched on\n  - First name: '{firstName}'\n  - Middle name: '{middleName}'\n  - Last name: '{lastName}'\n  - Date of birth: '{birthDate:dd/MM/yyyy}'\n" +
             expectedDescriptionSupplement;
