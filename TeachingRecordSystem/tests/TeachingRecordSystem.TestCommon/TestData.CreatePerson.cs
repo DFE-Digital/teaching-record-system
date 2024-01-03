@@ -35,7 +35,6 @@ public partial class TestData
         private bool? _hasNationalInsuranceNumber;
         private readonly List<MandatoryQualification> _mandatoryQualifications = new();
         private readonly List<QtsRegistration> _qtsRegistrations = new();
-        private string? _teacherStatus;
         private string? _earlyYearsStatus;
         private readonly List<Sanction> _sanctions = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
