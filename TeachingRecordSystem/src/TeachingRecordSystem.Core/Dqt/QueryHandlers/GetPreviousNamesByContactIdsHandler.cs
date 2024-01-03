@@ -12,6 +12,11 @@ public class GetPreviousNamesByContactIdsHandler : ICrmQueryHandler<GetPreviousN
     {
         var contactIdsArray = query.ContactIds.ToArray();
 
+        if (contactIdsArray.Length == 0)
+        {
+            return new Dictionary<Guid, dfeta_previousname[]>();
+        }
+
         var queryExpression = new QueryExpression(dfeta_previousname.EntityLogicalName)
         {
             ColumnSet = new ColumnSet(
