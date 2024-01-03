@@ -25,6 +25,8 @@ public class GetQualificationByIdHandler : ICrmQueryHandler<GetQualificationById
                 dfeta_qualification.Fields.dfeta_MQ_SpecialismId,
                 dfeta_qualification.Fields.dfeta_MQ_Date,
                 dfeta_qualification.Fields.dfeta_MQ_Status,
+                dfeta_qualification.Fields.CreatedOn,
+                dfeta_qualification.Fields.ModifiedOn,
                 dfeta_qualification.Fields.StateCode),
             Criteria = filter
         };

@@ -1,17 +1,11 @@
 using AngleSharp.Html.Dom;
 using FormFlow;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Provider;
 
-public class IndexTests : TestBase
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public IndexTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
@@ -64,8 +58,6 @@ public class IndexTests : TestBase
             new EditMqProviderState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = journeyMqEstablishmentValue
             });
 
@@ -140,8 +132,6 @@ public class IndexTests : TestBase
             new EditMqProviderState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = oldMqEstablishmentValue
             });
 
@@ -174,8 +164,6 @@ public class IndexTests : TestBase
             new EditMqProviderState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 MqEstablishmentValue = mqEstablishmentValue
             });
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")

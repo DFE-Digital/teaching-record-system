@@ -566,35 +566,7 @@ public class TrsDataSyncHelper(
                 events.Add(deletedEvent);
             }
 
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(
-                mqEstablishments.SingleOrDefault(e => e.Id == q.dfeta_MQ_MQEstablishmentId!?.Id), out var provider);
-
-            MandatoryQualificationSpecialism? specialism = q.dfeta_MQ_SpecialismId is not null ?
-                mqSpecialisms.Single(s => s.Id == q.dfeta_MQ_SpecialismId.Id).ToMandatoryQualificationSpecialism() :
-                null;
-
-            MandatoryQualificationStatus? status = q.dfeta_MQ_Status?.ToMandatoryQualificationStatus() ??
-                (q.dfeta_MQ_Date.HasValue ? MandatoryQualificationStatus.Passed : null);
-
-            mqs.Add(new MandatoryQualification()
-            {
-                QualificationId = q.Id,
-                CreatedOn = q.CreatedOn!.Value,
-                UpdatedOn = q.ModifiedOn!.Value,
-                DeletedOn = deletedEvent?.CreatedUtc,
-                PersonId = q.dfeta_PersonId.Id,
-                DqtQualificationId = q.Id,
-                DqtState = (int)q.StateCode!,
-                DqtCreatedOn = q.CreatedOn!.Value,
-                DqtModifiedOn = q.ModifiedOn!.Value,
-                ProviderId = provider?.MandatoryQualificationProviderId,
-                Specialism = specialism,
-                Status = status,
-                StartDate = q.dfeta_MQStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                EndDate = q.dfeta_MQ_Date.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                DqtMqEstablishmentId = q.dfeta_MQ_MQEstablishmentId?.Id,
-                DqtSpecialismId = q.dfeta_MQ_SpecialismId?.Id
-            });
+            mqs.Add(MandatoryQualification.MapFromDqtQualification(q, mqEstablishments, mqSpecialisms));
         }
 
         return (mqs, events);

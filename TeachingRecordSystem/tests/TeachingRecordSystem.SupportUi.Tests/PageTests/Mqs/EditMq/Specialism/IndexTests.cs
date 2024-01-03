@@ -1,16 +1,10 @@
 using FormFlow;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Specialism;
 
-public class IndexTests : TestBase
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public IndexTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
@@ -65,8 +59,6 @@ public class IndexTests : TestBase
             new EditMqSpecialismState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 Specialism = journeySpecialism
             });
 
@@ -142,8 +134,6 @@ public class IndexTests : TestBase
             new EditMqSpecialismState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 Specialism = oldSpecialism
             });
 
@@ -175,8 +165,6 @@ public class IndexTests : TestBase
             new EditMqSpecialismState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 Specialism = specialism
             });
 

@@ -1,16 +1,10 @@
 using FormFlow;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.StartDate;
 
-public class IndexTests : TestBase
+public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public IndexTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Get_WithQualificationIdForNonExistentQualification_ReturnsNotFound()
     {
@@ -63,8 +57,6 @@ public class IndexTests : TestBase
             new EditMqStartDateState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
                 StartDate = journeyStartDate
             });
 

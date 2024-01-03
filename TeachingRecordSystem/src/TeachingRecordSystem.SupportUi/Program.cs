@@ -4,6 +4,7 @@ using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
@@ -89,13 +90,28 @@ builder.Services
             "/Persons/PersonDetail",
             model =>
             {
-                model.Filters.Add(new CheckPersonExistsFilter());
+                model.Filters.Add(new CheckPersonExistsFilterFactory());
             });
+
         options.Conventions.AddFolderApplicationModelConvention(
             "/Mqs/AddMq",
             model =>
             {
-                model.Filters.Add(new CheckPersonExistsFilter());
+                model.Filters.Add(new CheckPersonExistsFilterFactory());
+            });
+
+        options.Conventions.AddFolderApplicationModelConvention(
+            "/Mqs/DeleteMq",
+            model =>
+            {
+                model.Filters.Add(new ServiceFilterAttribute<CheckMandatoryQualificationExistsFilter>());
+            });
+
+        options.Conventions.AddFolderApplicationModelConvention(
+            "/Mqs/EditMq",
+            model =>
+            {
+                model.Filters.Add(new ServiceFilterAttribute<CheckMandatoryQualificationExistsFilter>() { Order = -200 });
             });
     })
     .AddMvcOptions(options =>
@@ -161,6 +177,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 builder.Services
     .AddTransient<FormFlow.State.IUserInstanceStateProvider, DbUserInstanceStateProvider>()
     .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
+    .AddTransient<CheckMandatoryQualificationExistsFilter>()
     .AddFormFlow(options =>
     {
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(

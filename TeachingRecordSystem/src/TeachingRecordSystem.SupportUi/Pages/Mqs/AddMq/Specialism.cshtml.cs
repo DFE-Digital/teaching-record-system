@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
@@ -40,17 +39,15 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var personDetail = (ContactDetail?)context.HttpContext.Items["CurrentPersonDetail"];
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         Specialisms = MandatoryQualificationSpecialismRegistry.All
             .OrderBy(t => t.Title)
             .ToArray();
 
-        PersonName = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
+        PersonName = personInfo.Name;
         Specialism ??= JourneyInstance!.State.Specialism;
-
-        await next();
     }
 }

@@ -1,19 +1,13 @@
 using FormFlow;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;
 
-public class ConfirmTests : TestBase
+public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ConfirmTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
@@ -24,9 +18,7 @@ public class ConfirmTests : TestBase
             qualificationId,
             new DeleteMqState()
             {
-                Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
+                Initialized = true
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/delete/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -70,13 +62,6 @@ public class ConfirmTests : TestBase
             new DeleteMqState
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                ProviderName = mqEstablishment?.dfeta_name,
-                Specialism = specialism,
-                Status = status,
-                StartDate = startDate,
-                EndDate = endDate,
                 DeletionReason = deletionReason,
                 DeletionReasonDetail = deletionReasonDetail,
                 UploadEvidence = uploadEvidence,
@@ -124,9 +109,7 @@ public class ConfirmTests : TestBase
             qualificationId,
             new DeleteMqState()
             {
-                Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false)
+                Initialized = true
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -173,13 +156,6 @@ public class ConfirmTests : TestBase
             new DeleteMqState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                ProviderName = mqEstablishment.dfeta_name,
-                Specialism = specialism,
-                Status = status,
-                StartDate = startDate,
-                EndDate = endDate,
                 DeletionReason = deletionReason,
                 DeletionReasonDetail = deletionReasonDetail,
                 UploadEvidence = true,
@@ -261,13 +237,6 @@ public class ConfirmTests : TestBase
             new DeleteMqState()
             {
                 Initialized = true,
-                PersonId = person.PersonId,
-                PersonName = person.Contact.ResolveFullName(includeMiddleName: false),
-                ProviderName = "University of Leeds",
-                Specialism = MandatoryQualificationSpecialism.Hearing,
-                Status = MandatoryQualificationStatus.Passed,
-                StartDate = new DateOnly(2023, 09, 01),
-                EndDate = new DateOnly(2023, 11, 05),
                 DeletionReason = MqDeletionReasonOption.ProviderRequest,
                 DeletionReasonDetail = "Some details about the deletion reason",
                 UploadEvidence = false

@@ -67,13 +67,11 @@ public class QualificationsModel : PageModel
         return Task.WhenAll(mqs);
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var personDetail = (ContactDetail?)context.HttpContext.Items["CurrentPersonDetail"];
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        Name = personDetail!.Contact.ResolveFullName(includeMiddleName: false);
-
-        await next();
+        Name = personInfo.Name;
     }
 
     public record MandatoryQualificationInfo
