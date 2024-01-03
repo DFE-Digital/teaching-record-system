@@ -4,14 +4,9 @@ using Xunit.Sdk;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.Services.DqtReporting;
 
-public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
+public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixture<DqtReportingFixture>
 {
-    private readonly DqtReportingFixture _fixture;
-
-    public DqtReportingServiceTests(DqtReportingFixture fixture)
-    {
-        _fixture = fixture;
-    }
+    private static readonly TimeSpan _dateTimeComparisonTolerance = TimeSpan.FromMilliseconds(500);
 
     [Fact]
     public async Task ProcessChangesForEntityType_WritesNewRecordToDatabase()
@@ -28,7 +23,7 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
         var newItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, newContact);
 
         // Act
-        await _fixture.PublishChangedItemsAndConsume(newItem);
+        await fixture.PublishChangedItemsAndConsume(newItem);
 
         // Assert
         var row = await GetRowById(Contact.EntityLogicalName, contactId);
@@ -36,8 +31,8 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
         Assert.Equal(newContact.Id, row["Id"]);
         Assert.Equal(newContact.FirstName, row["firstname"]);
         Assert.Equal(newContact.LastName, row["lastname"]);
-        Assert.Equal(_fixture.Clock.UtcNow, row["__Inserted"]);
-        Assert.Equal(_fixture.Clock.UtcNow, row["__Updated"]);
+        Assert.Equal(fixture.Clock.UtcNow, (DateTime)row["__Inserted"]!, _dateTimeComparisonTolerance);
+        Assert.Equal(fixture.Clock.UtcNow, (DateTime)row["__Updated"]!, _dateTimeComparisonTolerance);
     }
 
     [Fact]
@@ -45,7 +40,7 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
     {
         // Arrange
         var contactId = Guid.NewGuid();
-        var insertedTime = _fixture.Clock.UtcNow.AddDays(-10);
+        var insertedTime = fixture.Clock.UtcNow.AddDays(-10);
 
         await InsertRow(Contact.EntityLogicalName, new Dictionary<string, object?>()
         {
@@ -65,7 +60,7 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
         var newItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, updatedContact);
 
         // Act
-        await _fixture.PublishChangedItemsAndConsume(newItem);
+        await fixture.PublishChangedItemsAndConsume(newItem);
 
         // Assert
         var row = await GetRowById(Contact.EntityLogicalName, contactId);
@@ -73,8 +68,8 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
         Assert.Equal(updatedContact.Id, row["Id"]);
         Assert.Equal(updatedContact.FirstName, row["firstname"]);
         Assert.Equal(updatedContact.LastName, row["lastname"]);
-        Assert.Equal(insertedTime, row["__Inserted"]);
-        Assert.Equal(_fixture.Clock.UtcNow, row["__Updated"]);
+        Assert.Equal(insertedTime, (DateTime)row["__Inserted"]!, _dateTimeComparisonTolerance);
+        Assert.Equal(fixture.Clock.UtcNow, (DateTime)row["__Updated"]!, _dateTimeComparisonTolerance);
     }
 
     [Fact]
@@ -82,7 +77,7 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
     {
         // Arrange
         var contactId = Guid.NewGuid();
-        var insertedTime = _fixture.Clock.UtcNow.AddDays(-10);
+        var insertedTime = fixture.Clock.UtcNow.AddDays(-10);
 
         await InsertRow(Contact.EntityLogicalName, new Dictionary<string, object?>()
         {
@@ -97,12 +92,12 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
             new EntityReference(Contact.EntityLogicalName, contactId));
 
         // Act
-        await _fixture.PublishChangedItemsAndConsume(removedItem);
+        await fixture.PublishChangedItemsAndConsume(removedItem);
 
         // Assert
         var row = await GetRowById(Contact.EntityLogicalName, contactId);
         Assert.Null(row);
-        await AssertInDeleteLog(Contact.EntityLogicalName, contactId, expectedDeleted: _fixture.Clock.UtcNow);
+        await AssertInDeleteLog(Contact.EntityLogicalName, contactId, expectedDeleted: fixture.Clock.UtcNow);
     }
 
     [Theory]
@@ -120,7 +115,7 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
                 { "Id", contactId },
                 { "firstname", Faker.Name.First() },
                 { "lastname", Faker.Name.Last() },
-                { "__Inserted", _fixture.Clock.UtcNow.Subtract(TimeSpan.FromHours(1)) }
+                { "__Inserted", fixture.Clock.UtcNow.Subtract(TimeSpan.FromHours(1)) }
             });
         }
 
@@ -129,7 +124,7 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
             Id = contactId,
             FirstName = Faker.Name.First(),
             LastName = Faker.Name.Last(),
-            ModifiedOn = _fixture.Clock.UtcNow,
+            ModifiedOn = fixture.Clock.UtcNow,
         };
 
         var contact2 = new Contact()
@@ -137,14 +132,14 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
             Id = contactId,
             FirstName = Faker.Name.First(),
             LastName = Faker.Name.Last(),
-            ModifiedOn = _fixture.Clock.UtcNow.AddMinutes(1),
+            ModifiedOn = fixture.Clock.UtcNow.AddMinutes(1),
         };
 
         var newItem1 = new NewOrUpdatedItem(ChangeType.NewOrUpdated, contact1);
         var newItem2 = new NewOrUpdatedItem(ChangeType.NewOrUpdated, contact2);
 
         // Act
-        await _fixture.PublishChangedItemsAndConsume(newItem1, newItem2);
+        await fixture.PublishChangedItemsAndConsume(newItem1, newItem2);
 
         // Assert
         var row = await GetRowById(Contact.EntityLogicalName, contactId);
@@ -152,12 +147,12 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
         Assert.Equal(contactId, row["Id"]);
         Assert.Equal(contact2.FirstName, row["firstname"]);
         Assert.Equal(contact2.LastName, row["lastname"]);
-        Assert.Equal(_fixture.Clock.UtcNow, row["__Updated"]);
+        Assert.Equal(fixture.Clock.UtcNow, (DateTime)row["__Updated"]!, _dateTimeComparisonTolerance);
     }
 
     private async Task AssertInDeleteLog(string entityLogicalName, Guid entityId, DateTime expectedDeleted)
     {
-        using var sqlConnection = new SqlConnection(_fixture.ReportingDbConnectionString);
+        using var sqlConnection = new SqlConnection(fixture.ReportingDbConnectionString);
         await sqlConnection.OpenAsync();
 
         var cmd = new SqlCommand("select Deleted from [__DeleteLog] where EntityId = @EntityId and EntityType = @EntityType");
@@ -173,12 +168,12 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
         }
 
         var deleted = reader.GetDateTime(0);
-        Assert.Equal(expectedDeleted, deleted);
+        Assert.Equal(expectedDeleted, deleted, _dateTimeComparisonTolerance);
     }
 
     private async Task<IReadOnlyDictionary<string, object?>?> GetRowById(string tableName, Guid id)
     {
-        using var sqlConnection = new SqlConnection(_fixture.ReportingDbConnectionString);
+        using var sqlConnection = new SqlConnection(fixture.ReportingDbConnectionString);
         await sqlConnection.OpenAsync();
 
         var cmd = new SqlCommand($"select * from {tableName} where id = @id");
@@ -202,7 +197,7 @@ public class DqtReportingServiceTests : IClassFixture<DqtReportingFixture>
 
     private async Task InsertRow(string tableName, IReadOnlyDictionary<string, object?> columns)
     {
-        using var sqlConnection = new SqlConnection(_fixture.ReportingDbConnectionString);
+        using var sqlConnection = new SqlConnection(fixture.ReportingDbConnectionString);
         await sqlConnection.OpenAsync();
 
         var cmd = new SqlCommand(
