@@ -349,7 +349,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         "213" => "Qualified",
         "214" => "Partial qualified teacher status",
         "223" => "Qualified",
-        _ when statusDescription.StartsWith("Qualified teacher:", StringComparison.InvariantCultureIgnoreCase) => "Qualified",
+        _ when statusDescription.StartsWith("Qualified teacher", StringComparison.InvariantCultureIgnoreCase) => "Qualified",
         _ => throw new ArgumentException("Invalid QTS Status")
     };
 
