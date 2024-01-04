@@ -8,10 +8,11 @@ public class Event
     public required Guid EventId { get; init; }
     public required string EventName { get; init; }
     public required DateTime Created { get; init; }
+    public required DateTime Inserted { get; init; }
     public required string Payload { get; init; }
     public bool Published { get; set; }
 
-    public static Event FromEventBase(EventBase @event)
+    public static Event FromEventBase(EventBase @event, DateTime? inserted)
     {
         var eventName = @event.GetEventName();
         var payload = JsonSerializer.Serialize(@event, inputType: @event.GetType(), EventBase.JsonSerializerOptions);
@@ -19,8 +20,9 @@ public class Event
         return new Event()
         {
             EventId = @event.EventId,
-            Created = @event.CreatedUtc,
             EventName = eventName,
+            Created = @event.CreatedUtc,
+            Inserted = inserted ?? @event.CreatedUtc,
             Payload = payload
         };
     }

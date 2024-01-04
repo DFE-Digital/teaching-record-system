@@ -63,9 +63,9 @@ public class TrsDbContext : DbContext
             .UseSnakeCaseNamingConvention();
     }
 
-    public void AddEvent(EventBase @event)
+    public void AddEvent(EventBase @event, DateTime? inserted = null)
     {
-        Events.Add(Event.FromEventBase(@event));
+        Events.Add(Event.FromEventBase(@event, inserted));
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

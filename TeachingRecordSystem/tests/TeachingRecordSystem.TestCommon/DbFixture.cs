@@ -4,17 +4,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class DbFixture
+public class DbFixture(DbHelper dbHelper, IServiceProvider serviceProvider)
 {
-    public DbFixture(DbHelper dbHelper, IServiceProvider serviceProvider)
-    {
-        DbHelper = dbHelper;
-        Services = serviceProvider;
-    }
+    public DbHelper DbHelper { get; } = dbHelper;
 
-    public DbHelper DbHelper { get; }
-
-    public IServiceProvider Services { get; }
+    public IServiceProvider Services { get; } = serviceProvider;
 
     public TrsDbContext GetDbContext() => Services.GetRequiredService<TrsDbContext>();
 
