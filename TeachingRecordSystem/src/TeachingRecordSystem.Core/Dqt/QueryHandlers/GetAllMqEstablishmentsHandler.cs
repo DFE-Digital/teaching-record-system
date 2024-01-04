@@ -10,7 +10,6 @@ public class GetAllMqEstablishmentsHandler : ICrmQueryHandler<GetAllMqEstablishm
     public async Task<dfeta_mqestablishment[]> Execute(GetAllMqEstablishmentsQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
-        filter.AddCondition(dfeta_mqestablishment.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_mqestablishmentState.Active);
 
         var queryExpression = new QueryExpression
         {
