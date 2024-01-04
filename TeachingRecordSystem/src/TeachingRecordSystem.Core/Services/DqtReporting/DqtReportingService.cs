@@ -146,6 +146,10 @@ public partial class DqtReportingService : BackgroundService
                 {
                     await ProcessChangesForEntityType(entityType, ct);
                 }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     throw new ProcessChangesException(entityType, ex);
