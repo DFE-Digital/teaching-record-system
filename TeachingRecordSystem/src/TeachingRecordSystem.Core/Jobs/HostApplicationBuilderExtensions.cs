@@ -80,8 +80,13 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.RemoveIfExists("MopUpQtsAwardeesJob");
 
-                recurringJobManager.AddOrUpdate<SyncAllContactsFromCrmJob>(
-                    nameof(SyncAllContactsFromCrmJob),
+                recurringJobManager.AddOrUpdate<SyncAllPersonsFromCrmJob>(
+                    nameof(SyncAllPersonsFromCrmJob),
+                    job => job.Execute(CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<SyncAllMqsFromCrmJob>(
+                    nameof(SyncAllMqsFromCrmJob),
                     job => job.Execute(CancellationToken.None),
                     Cron.Never);
 
