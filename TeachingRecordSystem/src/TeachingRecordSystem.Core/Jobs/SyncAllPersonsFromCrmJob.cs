@@ -5,13 +5,13 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class SyncAllContactsFromCrmJob
+public class SyncAllPersonsFromCrmJob
 {
     private readonly ICrmServiceClientProvider _crmServiceClientProvider;
     private readonly TrsDataSyncHelper _trsDataSyncHelper;
     private readonly IOptions<TrsDataSyncServiceOptions> _syncOptionsAccessor;
 
-    public SyncAllContactsFromCrmJob(
+    public SyncAllPersonsFromCrmJob(
         ICrmServiceClientProvider crmServiceClientProvider,
         TrsDataSyncHelper trsDataSyncHelper,
         IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor)
@@ -26,7 +26,7 @@ public class SyncAllContactsFromCrmJob
         const int pageSize = 1000;
 
         var serviceClient = _crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
-        var columns = new ColumnSet(TrsDataSyncHelper.GetEntityInfoForModelType(Contact.EntityLogicalName).AttributeNames);
+        var columns = new ColumnSet(TrsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person).AttributeNames);
 
         // Ensure this is kept in sync with the predicate in TrsDataSyncHelper.SyncContacts
         var filter = new FilterExpression(LogicalOperator.And)
