@@ -7,13 +7,13 @@ public class EditMqProviderState
 {
     public bool Initialized { get; set; }
 
-    public string? CurrentMqEstablishmentName { get; set; }
+    public Guid? CurrentProviderId { get; set; }
 
-    public string? MqEstablishmentValue { get; set; }
+    public Guid? ProviderId { get; set; }
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(MqEstablishmentValue))]
-    public bool IsComplete => !string.IsNullOrWhiteSpace(MqEstablishmentValue);
+    [MemberNotNullWhen(true, nameof(ProviderId))]
+    public bool IsComplete => ProviderId.HasValue;
 
     public void EnsureInitialized(CurrentMandatoryQualificationFeature qualificationInfo)
     {
@@ -22,8 +22,7 @@ public class EditMqProviderState
             return;
         }
 
-        CurrentMqEstablishmentName = qualificationInfo.DqtEstablishmentName;
-        MqEstablishmentValue = qualificationInfo.DqtEstablishmentValue;
+        ProviderId = CurrentProviderId = qualificationInfo.MandatoryQualification.ProviderId;
         Initialized = true;
     }
 }

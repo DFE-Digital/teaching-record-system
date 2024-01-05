@@ -34,19 +34,17 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequest_DisplaysContentAsExpected()
     {
         // Arrange
-        var oldMqEstablishmentValue = "955"; // University of Birmingham
-        var oldMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(oldMqEstablishmentValue);
-        var newMqEstablishmentValue = "959"; // University of Leeds
-        var newMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(newMqEstablishmentValue);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
+        var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = newMqEstablishmentValue,
-                CurrentMqEstablishmentName = oldMqEstablishment.dfeta_name,
+                ProviderId = newProvider.MandatoryQualificationProviderId,
+                CurrentProviderId = oldProvider.MandatoryQualificationProviderId
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -60,8 +58,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocument();
         var changeDetails = doc.GetElementByTestId("change-details");
         Assert.NotNull(changeDetails);
-        Assert.Equal(oldMqEstablishment.dfeta_name, changeDetails.GetElementByTestId("current-value")!.TextContent);
-        Assert.Equal(newMqEstablishment.dfeta_name, changeDetails.GetElementByTestId("new-value")!.TextContent);
+        Assert.Equal(oldProvider.Name, changeDetails.GetElementByTestId("current-value")!.TextContent);
+        Assert.Equal(newProvider.Name, changeDetails.GetElementByTestId("new-value")!.TextContent);
     }
 
     [Fact]
@@ -94,16 +92,17 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Confirm_CompletesJourneyRedirectsWithFlashMessageAndUpdatesMq()
     {
         // Arrange
-        var oldMqEstablishmentValue = "955"; // University of Birmingham
-        var newMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
+        var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = newMqEstablishmentValue
+                ProviderId = newProvider.MandatoryQualificationProviderId,
+                CurrentProviderId = oldProvider.MandatoryQualificationProviderId
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -127,8 +126,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContext(async dbContext =>
         {
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishmentValue(newMqEstablishmentValue, out var expectedProvider);
-            Assert.Equal(expectedProvider?.MandatoryQualificationProviderId, qualification.ProviderId);
+            Assert.Equal(newProvider.MandatoryQualificationProviderId, qualification.ProviderId);
         });
     }
 
@@ -136,16 +134,17 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Cancel_DeletesJourneyAndRedirectsAndDoesNotUpdateMq()
     {
         // Arrange
-        var oldMqEstablishmentValue = "955"; // University of Birmingham
-        var newMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
+        var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = newMqEstablishmentValue
+                ProviderId = newProvider.MandatoryQualificationProviderId,
+                CurrentProviderId = oldProvider.MandatoryQualificationProviderId
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -165,8 +164,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContext(async dbContext =>
         {
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishmentValue(oldMqEstablishmentValue, out var expectedProvider);
-            Assert.Equal(expectedProvider?.MandatoryQualificationProviderId, qualification.ProviderId);
+            Assert.Equal(oldProvider.MandatoryQualificationProviderId, qualification.ProviderId);
         });
     }
 

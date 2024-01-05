@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
+using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
 [Journey(JourneyNames.EditMqStartDate), RequireJourneyInstance]
 public class ConfirmModel(
-    ICrmQueryDispatcher crmQueryDispatcher,
-    TrsLinkGenerator linkGenerator,
-    IBackgroundJobScheduler backgroundJobScheduler) : PageModel
+    TrsDbContext dbContext,
+    IClock clock,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditMqStartDateState>? JourneyInstance { get; set; }
 
@@ -28,15 +27,16 @@ public class ConfirmModel(
 
     public async Task<IActionResult> OnPost()
     {
-        await crmQueryDispatcher.ExecuteQuery(
-            new UpdateMandatoryQualificationStartDateQuery(
-                QualificationId,
-                NewStartDate!.Value));
+        var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.QualificationId == QualificationId);
+        qualification.StartDate = NewStartDate;
+        qualification.UpdatedOn = clock.UtcNow;
+
+        // TODO Audit event
+
+        await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification changed");
-
-        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncMandatoryQualification(QualificationId, CancellationToken.None));
 
         return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
@@ -60,6 +60,6 @@ public class ConfirmModel(
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         CurrentStartDate = JourneyInstance!.State.CurrentStartDate;
-        NewStartDate ??= JourneyInstance!.State.StartDate;
+        NewStartDate ??= JourneyInstance!.State.StartDate.Value;
     }
 }

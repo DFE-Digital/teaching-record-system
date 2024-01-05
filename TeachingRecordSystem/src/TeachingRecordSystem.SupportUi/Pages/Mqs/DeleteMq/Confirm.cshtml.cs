@@ -1,23 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 [Journey(JourneyNames.DeleteMq), RequireJourneyInstance]
 public class ConfirmModel(
-    ICrmQueryDispatcher crmQueryDispatcher,
+    TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
-    ReferenceDataCache referenceDataCache,
-    IClock clock,
-    IBackgroundJobScheduler backgroundJobScheduler) : PageModel
+    IClock clock) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -30,7 +27,7 @@ public class ConfirmModel(
 
     public string? PersonName { get; set; }
 
-    public string? TrainingProvider { get; set; }
+    public string? ProviderName { get; set; }
 
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
@@ -50,40 +47,41 @@ public class ConfirmModel(
 
     public async Task<IActionResult> OnPost()
     {
-        var qualification = (await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId)))!;
+        var now = clock.UtcNow;
 
-        var establishment = qualification.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
-            await referenceDataCache.GetMqEstablishmentById(establishmentId) :
-            null;
+        var qualificationAndProvider = await dbContext.MandatoryQualifications
+            .Join(
+                dbContext.MandatoryQualificationProviders.DefaultIfEmpty(),
+                q => q.ProviderId,
+                p => p!.MandatoryQualificationProviderId,
+                (mq, provider) => new { MandatoryQualification = mq, Provider = provider })
+            .SingleAsync(q => q.MandatoryQualification.QualificationId == QualificationId);
 
-        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var provider);
+        var qualification = qualificationAndProvider.MandatoryQualification;
+        var provider = qualificationAndProvider.Provider;
 
-        var specialism = qualification.dfeta_MQ_SpecialismId?.Id is Guid specialismId ?
-            await referenceDataCache.GetMqSpecialismById(specialismId) :
-            null;
+        qualification.DeletedOn = now;
 
         var deletedEvent = new MandatoryQualificationDeletedEvent()
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
+            CreatedUtc = now,
             RaisedBy = User.GetUserId(),
             PersonId = PersonId!.Value,
             MandatoryQualification = new()
             {
                 QualificationId = QualificationId,
-                Provider = provider is not null || establishment is not null ?
+                Provider = provider is not null ?
                     new()
                     {
-                        MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
-                        Name = provider?.Name,
-                        DqtMqEstablishmentId = establishment?.Id,
-                        DqtMqEstablishmentName = establishment?.dfeta_name
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name
                     } :
                     null,
-                Specialism = specialism?.ToMandatoryQualificationSpecialism(),
-                Status = qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus(),
-                StartDate = qualification.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                EndDate = qualification.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                Specialism = qualification.Specialism,
+                Status = qualification.Status,
+                StartDate = qualification.StartDate,
+                EndDate = qualification.EndDate,
             },
             DeletionReason = DeletionReason!.GetDisplayName(),
             DeletionReasonDetail = DeletionReasonDetail,
@@ -96,12 +94,9 @@ public class ConfirmModel(
                 null
         };
 
-        await crmQueryDispatcher.ExecuteQuery(
-            new DeleteQualificationQuery(
-                QualificationId,
-                EventInfo.Create(deletedEvent).Serialize()));
+        dbContext.AddEvent(deletedEvent);
 
-        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncMandatoryQualification(QualificationId, CancellationToken.None));
+        await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification deleted");
@@ -133,7 +128,7 @@ public class ConfirmModel(
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        TrainingProvider = qualificationInfo.DqtEstablishmentName;
+        ProviderName = qualificationInfo.MandatoryQualification.Provider?.Name;
         Specialism = qualificationInfo.MandatoryQualification.Specialism;
         Status = qualificationInfo.MandatoryQualification.Status;
         StartDate = qualificationInfo.MandatoryQualification.StartDate;
@@ -145,4 +140,6 @@ public class ConfirmModel(
 
         await next();
     }
+
+    private record QualificationInfo(MandatoryQualification Qualification, MandatoryQualificationProvider? Provider);
 }

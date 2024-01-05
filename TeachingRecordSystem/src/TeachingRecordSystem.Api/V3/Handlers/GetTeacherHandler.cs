@@ -1,40 +1,33 @@
 using System.Text;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Xrm.Sdk.Query;
 using Optional;
 using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.Api.V3.Handlers;
 
-public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherResponse?>
+public class GetTeacherHandler(
+    TrsDbContext dbContext,
+    IDataverseAdapter dataverseAdapter,
+    ICrmQueryDispatcher crmQueryDispatcher,
+    IConfiguration configuration,
+    ReferenceDataCache referenceDataCache) : IRequestHandler<GetTeacherRequest, GetTeacherResponse?>
 {
     private const string QtsAwardedInWalesTeacherStatusValue = "213";
-
-    private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly TimeSpan _concurrentNameChangeWindow;
-    private readonly ReferenceDataCache _referenceDataCache;
-
-    public GetTeacherHandler(
-        IDataverseAdapter dataverseAdapter,
-        ICrmQueryDispatcher crmQueryDispatcher,
-        IConfiguration configuration,
-        ReferenceDataCache referenceDataCache)
-    {
-        _dataverseAdapter = dataverseAdapter;
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue<int>("ConcurrentNameChangeWindowSeconds", 5));
-        _referenceDataCache = referenceDataCache;
-    }
+    private readonly TimeSpan _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue<int>("ConcurrentNameChangeWindowSeconds", 5));
 
     public async Task<GetTeacherResponse?> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
-        var contactDetail = await _crmQueryDispatcher.ExecuteQuery(
+        var contactDetail = await crmQueryDispatcher.ExecuteQuery(
             new GetContactDetailByTrnQuery(
                 request.Trn,
                 new ColumnSet(
@@ -63,35 +56,35 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         if (request.Include.HasFlag(GetTeacherRequestIncludes.Induction))
         {
-            (induction, inductionPeriods) = await _dataverseAdapter.GetInductionByTeacher(
+            (induction, inductionPeriods) = await dataverseAdapter.GetInductionByTeacher(
                 teacher.Id,
-                columnNames: new[]
-                {
+                columnNames:
+                [
                     dfeta_induction.PrimaryIdAttribute,
                     dfeta_induction.Fields.dfeta_StartDate,
                     dfeta_induction.Fields.dfeta_CompletionDate,
                     dfeta_induction.Fields.dfeta_InductionStatus
-                },
-                inductionPeriodColumnNames: new[]
-                {
+                ],
+                inductionPeriodColumnNames:
+                [
                     dfeta_inductionperiod.Fields.dfeta_InductionId,
                     dfeta_inductionperiod.Fields.dfeta_StartDate,
                     dfeta_inductionperiod.Fields.dfeta_EndDate,
                     dfeta_inductionperiod.Fields.dfeta_Numberofterms,
                     dfeta_inductionperiod.Fields.dfeta_AppropriateBodyId
-                },
-                appropriateBodyColumnNames: new[]
-                {
+                ],
+                appropriateBodyColumnNames:
+                [
                     Account.PrimaryIdAttribute,
                     Account.Fields.Name
-                });
+                ]);
         }
 
         dfeta_initialteachertraining[]? itt = default;
 
         if (request.Include.HasFlag(GetTeacherRequestIncludes.InitialTeacherTraining))
         {
-            itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+            itt = await dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 teacher.Id,
                 columnNames: new[]
                 {
@@ -127,69 +120,59 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         dfeta_qualification[]? qualifications = default;
 
-        if ((request.Include & (GetTeacherRequestIncludes.MandatoryQualifications | GetTeacherRequestIncludes.NpqQualifications | GetTeacherRequestIncludes.HigherEducationQualifications)) != 0)
+        if ((request.Include & (GetTeacherRequestIncludes.NpqQualifications | GetTeacherRequestIncludes.HigherEducationQualifications)) != 0)
         {
-            string[]? columnNames = new[]
-            {
+            string[]? columnNames =
+            [
                 dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
                 dfeta_qualification.Fields.dfeta_Type,
                 dfeta_qualification.Fields.StateCode
-            };
+            ];
 
-            string[]? specialismColumnNames = null;
             string[]? heQualificationColumnNames = null;
             string[]? heSubjectColumnNames = null;
 
-            if (request.Include.HasFlag(GetTeacherRequestIncludes.MandatoryQualifications))
-            {
-                columnNames = new[]
-                {
-                    dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
-                    dfeta_qualification.Fields.dfeta_Type,
-                    dfeta_qualification.Fields.StateCode,
-                    dfeta_qualification.Fields.dfeta_MQ_Date,
-                    dfeta_qualification.Fields.dfeta_MQ_SpecialismId
-                };
-
-                specialismColumnNames = new[]
-                {
-                    dfeta_specialism.PrimaryIdAttribute,
-                    dfeta_specialism.Fields.dfeta_name
-                };
-            }
-
             if (request.Include.HasFlag(GetTeacherRequestIncludes.HigherEducationQualifications))
             {
-                heQualificationColumnNames = new[]
-                {
+                heQualificationColumnNames =
+                [
                     dfeta_hequalification.PrimaryIdAttribute,
                     dfeta_hequalification.Fields.dfeta_name
-                };
+                ];
 
-                heSubjectColumnNames = new[]
-                {
+                heSubjectColumnNames =
+                [
                     dfeta_hesubject.PrimaryIdAttribute,
                     dfeta_hesubject.Fields.dfeta_name,
                     dfeta_hesubject.Fields.dfeta_Value
-                };
+                ];
             }
 
-            qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+            qualifications = await dataverseAdapter.GetQualificationsForTeacher(
                 teacher.Id,
                 columnNames,
                 heQualificationColumnNames,
-                heSubjectColumnNames,
-                specialismColumnNames);
+                heSubjectColumnNames);
+        }
+
+        MandatoryQualification[]? mqs = default;
+
+        if ((request.Include & GetTeacherRequestIncludes.MandatoryQualifications) != 0)
+        {
+            mqs = await dbContext.MandatoryQualifications
+                .Include(mq => mq.Provider)
+                .Where(mq => mq.PersonId == teacher.Id)
+                .ToArrayAsync();
         }
 
         bool pendingNameChange = default, pendingDateOfBirthChange = default;
 
         if (request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges))
         {
-            var nameChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Name");
-            var dateOfBirthChangeSubject = await _dataverseAdapter.GetSubjectByTitle("Change of Date of Birth");
+            var nameChangeSubject = await dataverseAdapter.GetSubjectByTitle("Change of Name");
+            var dateOfBirthChangeSubject = await dataverseAdapter.GetSubjectByTitle("Change of Date of Birth");
 
-            var incidents = await _dataverseAdapter.GetIncidentsByContactId(
+            var incidents = await dataverseAdapter.GetIncidentsByContactId(
                 teacher.Id,
                 IncidentState.Active,
                 columnNames: new[] { Incident.Fields.SubjectId, Incident.Fields.StateCode });
@@ -210,7 +193,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     dfeta_sanction.Fields.dfeta_EndDate,
                     dfeta_sanction.Fields.dfeta_Spent));
 
-            sanctions = (await _crmQueryDispatcher.ExecuteQuery(getSanctionsQuery))[teacher.Id];
+            sanctions = (await crmQueryDispatcher.ExecuteQuery(getSanctionsQuery))[teacher.Id];
         }
 
         IEnumerable<NameInfo>? previousNames = null;
@@ -231,8 +214,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         var middleName = teacher.ResolveMiddleName();
         var lastName = teacher.ResolveLastName();
 
-        var qtsAwardedInWalesStatus = await _dataverseAdapter.GetTeacherStatus(QtsAwardedInWalesTeacherStatusValue, null);
-        var qtsRegistrations = await _dataverseAdapter.GetQtsRegistrationsByTeacher(
+        var qtsAwardedInWalesStatus = await referenceDataCache.GetTeacherStatusByValue(QtsAwardedInWalesTeacherStatusValue);
+        var qtsRegistrations = await dataverseAdapter.GetQtsRegistrationsByTeacher(
             teacher.Id,
             columnNames: new[]
             {
@@ -247,8 +230,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         var qts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_QTSDate is not null);
         var eyts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_EYTSDate is not null);
         var qtsAwardedInWales = qts?.dfeta_TeacherStatusId.Id == qtsAwardedInWalesStatus.Id;
-        var eytsTeacherStatus = eyts != null ? await _dataverseAdapter.GetEarlyYearsStatus(eyts!.dfeta_EarlyYearsStatusId.Id) : null;
-        var allTeacherStatuses = await _referenceDataCache.GetTeacherStatuses();
+        var eytsTeacherStatus = eyts != null ? await referenceDataCache.GetEarlyYearsStatusById(eyts!.dfeta_EarlyYearsStatusId.Id) : null;
+        var allTeacherStatuses = await referenceDataCache.GetTeacherStatuses();
         var qtsStatus = qts != null ? allTeacherStatuses.Single(x => x.Id == qts.dfeta_TeacherStatusId.Id) : null;
 
         var allowIdSignInWithProhibitions = request.Include.HasFlag(GetTeacherRequestIncludes._AllowIdSignInWithProhibitions) ?
@@ -265,7 +248,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             NationalInsuranceNumber = teacher.dfeta_NINumber,
             PendingNameChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingNameChange) : default,
             PendingDateOfBirthChange = request.Include.HasFlag(GetTeacherRequestIncludes.PendingDetailChanges) ? Option.Some(pendingDateOfBirthChange) : default,
-            Qts = MapQts(qts?.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), qtsAwardedInWales, request.AccessMode, qtsStatus != null ? GetQTSStatusDescription(qtsStatus!.dfeta_Value!, qtsStatus.dfeta_name) : null),
+            Qts = MapQts(qts?.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), qtsAwardedInWales, request.AccessMode, qtsStatus != null ? GetQtsStatusDescription(qtsStatus!.dfeta_Value!, qtsStatus.dfeta_name) : null),
             Eyts = MapEyts(eyts?.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), request.AccessMode, eytsTeacherStatus != null ? GetEytsStatusDescription(eytsTeacherStatus!.dfeta_Value!) : null),
             Email = teacher.EMailAddress1,
             Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ?
@@ -289,7 +272,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Option.Some(MapNpqQualifications(qualifications!, request.AccessMode)) :
                 default,
             MandatoryQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.MandatoryQualifications) ?
-                Option.Some(MapMandatoryQualifications(qualifications!)) :
+                Option.Some(MapMandatoryQualifications(mqs!)) :
                 default,
             HigherEducationQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.HigherEducationQualifications) ?
                 Option.Some(MapHigherEducationQualifications(qualifications!)) :
@@ -322,7 +305,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         };
     }
 
-    private string? GetEytsStatusDescription(string? value) => value switch
+    private static string? GetEytsStatusDescription(string? value) => value switch
     {
         "222" => "Early years professional status",
         "221" => "Qualified",
@@ -330,7 +313,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         _ => throw new ArgumentException("Invalid EYTS Status")
     };
 
-    private string? GetQTSStatusDescription(string value, string statusDescription) => value switch
+    private static string? GetQtsStatusDescription(string value, string description) => value switch
     {
         "28" => "Qualified",
         "50" => "Qualified",
@@ -349,10 +332,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         "213" => "Qualified",
         "214" => "Partial qualified teacher status",
         "223" => "Qualified",
-        _ when statusDescription.StartsWith("Qualified teacher", StringComparison.InvariantCultureIgnoreCase) => "Qualified",
+        _ when description.StartsWith("Qualified teacher", StringComparison.OrdinalIgnoreCase) => "Qualified",
         _ => throw new ArgumentException("Invalid QTS Status")
     };
-
 
     private static GetTeacherResponseQts? MapQts(DateOnly? qtsDate, bool qtsAwardedInWales, AccessMode accessMode, string? statusDescription) =>
         statusDescription is not null ?
@@ -517,24 +499,15 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             _ => throw new NotImplementedException($"Qualification Type {qualificationType} is not currently supported.")
         };
 
-    private static IEnumerable<GetTeacherResponseMandatoryQualification> MapMandatoryQualifications(dfeta_qualification[] qualifications) =>
-        qualifications
-            ?.Where(q => q.dfeta_Type.HasValue
-                && q.dfeta_Type.Value == dfeta_qualification_dfeta_Type.MandatoryQualification
-                && q.StateCode == dfeta_qualificationState.Active
-                && q.dfeta_MQ_Date.HasValue)
-            .Select(mq => new
-            {
-                Awarded = mq.dfeta_MQ_Date!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                Specialism = mq.Extract<dfeta_specialism>(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute)
-            })
-            .Where(mq => mq.Specialism != null)
+    private static IEnumerable<GetTeacherResponseMandatoryQualification> MapMandatoryQualifications(IEnumerable<MandatoryQualification> mqs) =>
+        mqs
+            .Where(mq => mq.EndDate.HasValue && mq.Specialism.HasValue)
             .Select(mq => new GetTeacherResponseMandatoryQualification()
             {
-                Awarded = mq.Awarded,
-                Specialism = mq.Specialism.dfeta_name
+                Awarded = mq.EndDate!.Value,
+                Specialism = mq.Specialism!.Value.GetTitle()
             })
-            .ToArray() ?? Array.Empty<GetTeacherResponseMandatoryQualification>();
+            .ToArray();
 
     private static IEnumerable<GetTeacherResponseHigherEducationQualification> MapHigherEducationQualifications(dfeta_qualification[] qualifications) =>
         qualifications

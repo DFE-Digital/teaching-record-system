@@ -24,8 +24,7 @@ public interface IDataverseAdapter
         Guid teacherId,
         string[] columnNames,
         string[] heQualificationColumnNames = null,
-        string[] heSubjectColumnNames = null,
-        string[] specialismColumnNames = null);
+        string[] heSubjectColumnNames = null);
 
     Task<dfeta_qualification> GetQualificationById(
         Guid qualificationId,

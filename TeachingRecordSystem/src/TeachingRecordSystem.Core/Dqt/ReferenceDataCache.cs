@@ -2,20 +2,14 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
-public class ReferenceDataCache : IStartupTask
+public class ReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher) : IStartupTask
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private Task<dfeta_mqestablishment[]>? _mqEstablishmentsTask;
     private Task<dfeta_sanctioncode[]>? _getSanctionCodesTask;
     private Task<Subject[]>? _getSubjectsTask;
     private Task<dfeta_teacherstatus[]>? _getTeacherStatusesTask;
     private Task<dfeta_earlyyearsstatus[]>? _getEarlyYearsStatusesTask;
     private Task<dfeta_specialism[]>? _getSpecialismsTask;
-
-    public ReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-    }
 
     public async Task<dfeta_sanctioncode> GetSanctionCodeByValue(string value)
     {
@@ -58,6 +52,12 @@ public class ReferenceDataCache : IStartupTask
     {
         var earlyyearStatuses = await EnsureEarlyYearsStatuses();
         return earlyyearStatuses;
+    }
+
+    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusById(Guid eytsStatusId)
+    {
+        var earlyYearsStatuses = await EnsureEarlyYearsStatuses();
+        return earlyYearsStatuses.Single(ey => ey.Id == eytsStatusId, $"Could not find early years teacher status with ID: '{eytsStatusId}'.");
     }
 
     public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusByValue(string value)
@@ -107,32 +107,32 @@ public class ReferenceDataCache : IStartupTask
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllSanctionCodesQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllSanctionCodesQuery()));
 
     private Task<Subject[]> EnsureSubjects() =>
         LazyInitializer.EnsureInitialized(
             ref _getSubjectsTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllSubjectsQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllSubjectsQuery()));
 
     private Task<dfeta_teacherstatus[]> EnsureTeacherStatuses() =>
         LazyInitializer.EnsureInitialized(
             ref _getTeacherStatusesTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllTeacherStatusesQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllTeacherStatusesQuery()));
 
     private Task<dfeta_earlyyearsstatus[]> EnsureEarlyYearsStatuses() =>
         LazyInitializer.EnsureInitialized(
             ref _getEarlyYearsStatusesTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllEarlyYearsStatusesQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllEarlyYearsStatusesQuery()));
 
     private Task<dfeta_specialism[]> EnsureSpecialisms() =>
         LazyInitializer.EnsureInitialized(
             ref _getSpecialismsTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllSpecialismsQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllSpecialismsQuery()));
 
     private Task<dfeta_mqestablishment[]> EnsureMqEstablishments() =>
         LazyInitializer.EnsureInitialized(
             ref _mqEstablishmentsTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllMqEstablishmentsQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllMqEstablishmentsQuery()));
 
     async Task IStartupTask.Execute()
     {

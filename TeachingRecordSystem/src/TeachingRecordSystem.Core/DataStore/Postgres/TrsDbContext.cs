@@ -48,6 +48,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<MandatoryQualification> MandatoryQualifications => Set<MandatoryQualification>();
 
+    public DbSet<MandatoryQualificationProvider> MandatoryQualificationProviders => Set<MandatoryQualificationProvider>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
     {
         if (connectionString != null)

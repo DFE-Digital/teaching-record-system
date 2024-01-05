@@ -1,16 +1,12 @@
 using AngleSharp.Html.Dom;
 using FormFlow;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
-public class ProviderTests : TestBase
+public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ProviderTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
@@ -48,12 +44,12 @@ public class ProviderTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
-        var mqEstablishmentValue = "959"; // University of Leeds
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
             new AddMqState()
             {
-                MqEstablishmentValue = mqEstablishmentValue
+                ProviderId = provider.MandatoryQualificationProviderId
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -63,9 +59,9 @@ public class ProviderTests : TestBase
 
         // Assert
         var doc = await response.GetDocument();
-        var selectedProvider = doc.GetElementById("MqEstablishmentValue") as IHtmlSelectElement;
+        var selectedProvider = doc.GetElementById("ProviderId") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
-        Assert.Equal(mqEstablishmentValue, selectedProvider.Value);
+        Assert.Equal(provider.MandatoryQualificationProviderId.ToString(), selectedProvider.Value);
     }
 
     [Fact]
@@ -73,14 +69,14 @@ public class ProviderTests : TestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var mqEstablishmentValue = "959"; // University of Leeds
+        var providerId = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds").MandatoryQualificationProviderId;
         var journeyInstance = await CreateJourneyInstance(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/provider?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "MqEstablishmentValue", mqEstablishmentValue }
+                { "ProviderId", providerId }
             }
         };
 
@@ -107,7 +103,7 @@ public class ProviderTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "MqEstablishmentValue", "Select a training provider");
+        await AssertEx.HtmlResponseHasError(response, "ProviderId", "Select a training provider");
     }
 
     [Fact]
@@ -115,14 +111,14 @@ public class ProviderTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
-        var mqEstablishmentValue = "959"; // University of Leeds
+        var providerId = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds").MandatoryQualificationProviderId;
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "MqEstablishmentValue", mqEstablishmentValue }
+                { "ProviderId", providerId }
             }
         };
 

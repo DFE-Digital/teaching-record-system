@@ -24,7 +24,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
     public string? PersonName { get; set; }
 
-    public string? TrainingProvider { get; set; }
+    public string? ProviderName { get; set; }
 
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
@@ -141,7 +141,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        TrainingProvider = qualificationInfo.DqtEstablishmentName;
+        ProviderName = qualificationInfo.MandatoryQualification.Provider?.Name;
         Specialism = qualificationInfo.MandatoryQualification.Specialism;
         Status = qualificationInfo.MandatoryQualification.Status;
         StartDate = qualificationInfo.MandatoryQualification.StartDate;

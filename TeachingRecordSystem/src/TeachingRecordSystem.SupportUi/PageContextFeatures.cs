@@ -32,8 +32,4 @@ public record CurrentPersonFeature(Guid PersonId, string FirstName, string LastN
     public string Name => FirstName + " " + LastName;
 }
 
-public record CurrentMandatoryQualificationFeature(
-    MandatoryQualification MandatoryQualification,
-    MandatoryQualificationProvider? Provider,
-    string? DqtEstablishmentName,
-    string? DqtEstablishmentValue);
+public record CurrentMandatoryQualificationFeature(MandatoryQualification MandatoryQualification);

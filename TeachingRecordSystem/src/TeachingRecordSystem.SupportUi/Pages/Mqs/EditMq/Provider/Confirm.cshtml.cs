@@ -1,19 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
+using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 [Journey(JourneyNames.EditMqProvider), RequireJourneyInstance]
 public class ConfirmModel(
-    ICrmQueryDispatcher crmQueryDispatcher,
-    ReferenceDataCache referenceDataCache,
-    TrsLinkGenerator linkGenerator,
-    IBackgroundJobScheduler backgroundJobScheduler) : PageModel
+    TrsDbContext dbContext,
+    IClock clock,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditMqProviderState>? JourneyInstance { get; set; }
 
@@ -24,21 +21,24 @@ public class ConfirmModel(
 
     public string? PersonName { get; set; }
 
-    public string? CurrentMqEstablishmentName { get; set; }
+    public string? CurrentProviderName { get; set; }
 
-    public dfeta_mqestablishment? NewMqEstablishment { get; set; }
+    public Guid NewProviderId { get; set; }
+
+    public string? NewProviderName { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
-        await crmQueryDispatcher.ExecuteQuery(
-            new UpdateMandatoryQualificationEstablishmentQuery(
-                QualificationId,
-                NewMqEstablishment!.Id));
+        var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.QualificationId == QualificationId);
+        qualification.ProviderId = NewProviderId;
+        qualification.UpdatedOn = clock.UtcNow;
+
+        // TODO Audit event
+
+        await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification changed");
-
-        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncMandatoryQualification(QualificationId, CancellationToken.None));
 
         return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
@@ -59,10 +59,17 @@ public class ConfirmModel(
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
+        var newAndOldProviders = await dbContext.MandatoryQualificationProviders
+            .Where(p =>
+                p.MandatoryQualificationProviderId == JourneyInstance!.State.CurrentProviderId ||
+                p.MandatoryQualificationProviderId == JourneyInstance!.State.ProviderId)
+            .ToDictionaryAsync(p => p.MandatoryQualificationProviderId, p => p);
+
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        CurrentMqEstablishmentName = JourneyInstance!.State.CurrentMqEstablishmentName;
-        NewMqEstablishment = await referenceDataCache.GetMqEstablishmentByValue(JourneyInstance!.State.MqEstablishmentValue!);
+        CurrentProviderName = JourneyInstance!.State.CurrentProviderId is Guid currentProviderId ? newAndOldProviders[currentProviderId].Name : null;
+        NewProviderId = JourneyInstance!.State.ProviderId.Value;
+        NewProviderName = newAndOldProviders[NewProviderId].Name;
 
         await next();
     }

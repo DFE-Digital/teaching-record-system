@@ -18,21 +18,21 @@
             <govuk-summary-list>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="provider">@Model.MqEstablishment!.dfeta_name</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="provider">@Model.ProviderName</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqAddProvider(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="specialism">@Model.Specialism!.Value.GetTitle()</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="specialism">@Model.Specialism.GetTitle()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqAddSpecialism(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate!.Value.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>

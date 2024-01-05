@@ -1,24 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-public class QualificationsModel : PageModel
+public class QualificationsModel(TrsDbContext dbContext) : PageModel
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly ReferenceDataCache _referenceDataCache;
-
-    public QualificationsModel(
-        ICrmQueryDispatcher crmQueryDispatcher,
-        ReferenceDataCache referenceDataCache)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _referenceDataCache = referenceDataCache;
-    }
-
     [FromRoute]
     public Guid PersonId { get; set; }
 
@@ -35,36 +25,20 @@ public class QualificationsModel : PageModel
 
     public MandatoryQualificationInfo[]? MandatoryQualifications { get; set; }
 
-    public async Task<IActionResult> OnGet()
+    public async Task OnGet()
     {
-        var qualifications = await _crmQueryDispatcher.ExecuteQuery(new GetQualificationsByContactIdQuery(PersonId));
-        MandatoryQualifications = await MapMandatoryQualifications(qualifications!);
-
-        return Page();
-    }
-
-    private Task<MandatoryQualificationInfo[]> MapMandatoryQualifications(dfeta_qualification[] qualifications)
-    {
-        var mqs = qualifications
-            .Where(q => q.dfeta_Type == dfeta_qualification_dfeta_Type.MandatoryQualification)
-            .OrderByDescending(q => q.dfeta_CompletionorAwardDate)
-            .Select(async q =>
+        MandatoryQualifications = await dbContext.MandatoryQualifications
+            .Include(mq => mq.Provider)
+            .Where(mq => mq.PersonId == PersonId)
+            .Select(mq => new MandatoryQualificationInfo()
             {
-                var mqEstablishment = q.dfeta_MQ_MQEstablishmentId is not null ? await _referenceDataCache.GetMqEstablishmentById(q.dfeta_MQ_MQEstablishmentId.Id) : null;
-                var specialism = q.dfeta_MQ_SpecialismId is not null ? await _referenceDataCache.GetMqSpecialismById(q.dfeta_MQ_SpecialismId.Id) : null;
-
-                return new MandatoryQualificationInfo
-                {
-                    QualificationId = q.Id,
-                    Provider = mqEstablishment is not null ? mqEstablishment.dfeta_name : null,
-                    Specialism = specialism?.ToMandatoryQualificationSpecialism(),
-                    StartDate = q.dfeta_MQStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    EndDate = q.dfeta_MQ_Date.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    Status = q.dfeta_MQ_Status?.ToMandatoryQualificationStatus()
-                };
-            });
-
-        return Task.WhenAll(mqs);
+                QualificationId = mq.QualificationId,
+                ProviderName = mq.Provider != null ? mq.Provider.Name : null,
+                Status = mq.Status,
+                Specialism = mq.Specialism,
+                StartDate = mq.StartDate,
+                EndDate = mq.EndDate
+            }).ToArrayAsync();
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -77,10 +51,10 @@ public class QualificationsModel : PageModel
     public record MandatoryQualificationInfo
     {
         public required Guid QualificationId { get; init; }
-        public required string? Provider { get; init; }
+        public required string? ProviderName { get; init; }
+        public required MandatoryQualificationStatus? Status { get; init; }
         public required MandatoryQualificationSpecialism? Specialism { get; init; }
         public required DateOnly? StartDate { get; init; }
         public required DateOnly? EndDate { get; init; }
-        public required MandatoryQualificationStatus? Status { get; init; }
     }
 }

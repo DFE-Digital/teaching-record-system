@@ -1,24 +1,20 @@
 using Microsoft.Playwright;
 using TeachingRecordSystem.Core;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
-public class MqTests : TestBase
+public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public MqTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task AddMq()
     {
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
-        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        var specialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         var result = dfeta_qualification_dfeta_MQ_Status.Passed;
         var endDate = new DateOnly(2021, 11, 5);
@@ -35,14 +31,14 @@ public class MqTests : TestBase
 
         await page.AssertOnAddMqProviderPage();
 
-        await page.FillAsync($"label:text-is('Training provider')", mqEstablishment.dfeta_name);
+        await page.FillAsync($"label:text-is('Training provider')", provider.Name);
 
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButton();
 
         await page.AssertOnAddMqSpecialismPage();
 
-        await page.CheckAsync($"label:text-is('{specialism.dfeta_name}')");
+        await page.CheckAsync($"label:text-is('{specialism.GetTitle()}')");
 
         await page.ClickContinueButton();
 
@@ -72,9 +68,9 @@ public class MqTests : TestBase
     [Fact]
     public async Task EditMqProvider()
     {
-        var oldMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        var newMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("961"); // University of Manchester        
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Manchester");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
@@ -89,7 +85,7 @@ public class MqTests : TestBase
 
         await page.AssertOnEditMqProviderPage(qualificationId);
 
-        await page.FillAsync($"label:text-is('Training provider')", newMqEstablishment.dfeta_name);
+        await page.FillAsync($"label:text-is('Training provider')", newProvider.Name);
 
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButton();
@@ -108,7 +104,7 @@ public class MqTests : TestBase
     {
         var oldSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newSpecialism = MandatoryQualificationSpecialism.Visual;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldSpecialism)));
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 

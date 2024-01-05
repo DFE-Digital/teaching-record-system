@@ -325,7 +325,8 @@ public abstract class GetTeacherTestBase : ApiTestBase
     protected async Task ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(
         HttpClient httpClient,
         string baseUrl,
-        Contact contact)
+        Contact contact,
+        IEnumerable<MandatoryQualificationInfo> mqs)
     {
         // Arrange
         var mandatoryQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, null, dfeta_qualificationState.Active, "Visual Impairment");
@@ -341,7 +342,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
             mandatoryQualificationInactive
         };
 
-        await ConfigureMocks(contact, qualifications: qualifications);
+        await ConfigureMocks(contact);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=MandatoryQualifications");
 
@@ -666,20 +667,22 @@ public abstract class GetTeacherTestBase : ApiTestBase
 
     protected async Task<Contact> CreateContact(
         QtsRegistration[]? qtsQualifications = null,
-        bool hasMultiWordFirstName = false)
+        bool hasMultiWordFirstName = false,
+        Action<CreatePersonBuilder>? configurePerson = null)
     {
         var firstName = hasMultiWordFirstName ? $"{Faker.Name.First()} {Faker.Name.First()}" : Faker.Name.First();
 
         var person = await TestData.CreatePerson(
             b =>
             {
-                b.WithFirstName(firstName)
-                .WithTrn();
+                b.WithFirstName(firstName).WithTrn();
 
-                foreach (var item in qtsQualifications ?? Array.Empty<QtsRegistration>())
+                foreach (var item in qtsQualifications ?? [])
                 {
                     b.WithQtsRegistration(item!.QtsDate, item!.TeacherStatusValue, item.CreatedOn, item!.EytsDate, item!.EytsStatusValue);
                 }
+
+                configurePerson?.Invoke(b);
             });
 
         return person.Contact;
@@ -716,7 +719,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
                 /*activeOnly: */true))
-            .ReturnsAsync(itt != null ? new[] { itt } : Array.Empty<dfeta_initialteachertraining>());
+            .ReturnsAsync(itt != null ? [itt] : Array.Empty<dfeta_initialteachertraining>());
 
         DataverseAdapterMock
             .Setup(mock => mock.GetInductionByTeacher(
@@ -732,13 +735,12 @@ public abstract class GetTeacherTestBase : ApiTestBase
                  contact.Id,
                  It.IsAny<string[]>(),
                  It.IsAny<string[]>(),
-                 It.IsAny<string[]>(),
                  It.IsAny<string[]>()))
-             .ReturnsAsync(qualifications ?? Array.Empty<dfeta_qualification>());
+             .ReturnsAsync(qualifications ?? []);
 
         DataverseAdapterMock
             .Setup(mock => mock.GetIncidentsByContactId(contact.Id, IncidentState.Active, It.IsAny<string[]>()))
-            .ReturnsAsync(incidents ?? Array.Empty<Incident>());
+            .ReturnsAsync(incidents ?? []);
 
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacherStatus(
@@ -759,7 +761,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
 
         var allEytsStatuses = await TestData.ReferenceDataCache.GetEytsStatuses();
         var distinctEyts = qtsRegistrations?.Where(x => !string.IsNullOrEmpty(x.EytsStatusValue)).Select(x => x.EytsStatusValue).Distinct().ToArray();
-        Array.ForEach(distinctEyts ?? Array.Empty<string>(), item =>
+        Array.ForEach(distinctEyts ?? [], item =>
         {
             var eytsStatus = allEytsStatuses.Single(x => x.dfeta_Value == item);
             DataverseAdapterMock
@@ -767,7 +769,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
                 .ReturnsAsync(eytsStatus);
         });
 
-        foreach (var qtsRegistration in qtsRegistrations ?? Array.Empty<QtsRegistration>())
+        foreach (var qtsRegistration in qtsRegistrations ?? [])
         {
             var teacherStatus = !string.IsNullOrEmpty(qtsRegistration.TeacherStatusValue) ? await TestData.ReferenceDataCache.GetTeacherStatusByValue(qtsRegistration.TeacherStatusValue) : null;
             var eytsStatus = !string.IsNullOrEmpty(qtsRegistration.EytsStatusValue) ? await TestData.ReferenceDataCache.GetEarlyYearsStatusByValue(qtsRegistration.EytsStatusValue) : null;

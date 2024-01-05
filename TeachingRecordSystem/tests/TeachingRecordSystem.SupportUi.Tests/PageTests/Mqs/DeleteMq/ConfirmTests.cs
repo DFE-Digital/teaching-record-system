@@ -32,11 +32,11 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData("959", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Passed, "2021-11-05", MqDeletionReasonOption.ProviderRequest, "Some details about the deletion reason", true)]
-    [InlineData("959", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Deferred, null, MqDeletionReasonOption.ProviderRequest, null, false)]
+    [InlineData("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Passed, "2021-11-05", MqDeletionReasonOption.ProviderRequest, "Some details about the deletion reason", true)]
+    [InlineData("University of Leeds", MandatoryQualificationSpecialism.Hearing, "2021-10-05", MandatoryQualificationStatus.Deferred, null, MqDeletionReasonOption.ProviderRequest, null, false)]
     [InlineData(null, null, null, null, null, MqDeletionReasonOption.AnotherReason, null, false)]
     public async Task Get_ValidRequest_DisplaysContentAsExpected(
-        string? providerValue,
+        string? providerName,
         MandatoryQualificationSpecialism? specialism,
         string? startDateString,
         MandatoryQualificationStatus? status,
@@ -46,12 +46,12 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         bool uploadEvidence)
     {
         // Arrange
-        var mqEstablishment = !string.IsNullOrEmpty(providerValue) ? await TestData.ReferenceDataCache.GetMqEstablishmentByValue(providerValue) : null;
+        var provider = providerName is not null ? MandatoryQualificationProvider.All.Single(p => p.Name == providerName) : null;
         DateOnly? startDate = !string.IsNullOrEmpty(startDateString) ? DateOnly.Parse(startDateString) : null;
         DateOnly? endDate = !string.IsNullOrEmpty(endDateString) ? DateOnly.Parse(endDateString) : null;
 
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q
-            .WithDqtMqEstablishmentValue(providerValue)
+            .WithProvider(provider?.MandatoryQualificationProviderId)
             .WithSpecialism(specialism)
             .WithStartDate(startDate)
             .WithEndDate(endDate)
@@ -83,7 +83,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(deletionSummary);
         Assert.Equal(deletionReason.GetDisplayName(), deletionSummary.GetElementByTestId("deletion-reason")!.TextContent);
         Assert.Equal(!string.IsNullOrEmpty(deletionReasonDetail) ? deletionReasonDetail : "None", deletionSummary.GetElementByTestId("deletion-reason-detail")!.TextContent);
-        Assert.Equal(mqEstablishment is not null ? mqEstablishment.dfeta_name : "None", deletionSummary.GetElementByTestId("provider")!.TextContent);
+        Assert.Equal(provider?.Name ?? "None", deletionSummary.GetElementByTestId("provider")!.TextContent);
         Assert.Equal(specialism?.GetTitle() ?? "None", deletionSummary.GetElementByTestId("specialism")!.TextContent);
         Assert.Equal(status is not null ? status.Value.ToString() : "None", deletionSummary.GetElementByTestId("status")!.TextContent);
         Assert.Equal(startDate is not null ? startDate.Value.ToString("d MMMM yyyy") : "None", deletionSummary.GetElementByTestId("start-date")!.TextContent);
@@ -129,7 +129,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Confirm_DeletesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
-        var mqEstablishmentDqtValue = "959";  // "University of Leeds"
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var status = MandatoryQualificationStatus.Passed;
         var startDate = new DateOnly(2023, 09, 01);
@@ -140,16 +140,13 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var evidenceFileName = "test.pdf";
 
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q
-            .WithDqtMqEstablishmentValue(mqEstablishmentDqtValue)
+            .WithProvider(provider.MandatoryQualificationProviderId)
             .WithSpecialism(specialism)
             .WithStatus(status)
             .WithStartDate(startDate)
             .WithEndDate(endDate)));
 
         var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
-        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(mqEstablishmentDqtValue);
-        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
-        Assert.NotNull(provider);
 
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -200,9 +197,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Provider = new()
                     {
                         MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
-                        DqtMqEstablishmentId = mqEstablishment.Id,
-                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                        Name = provider.Name
                     },
                     Specialism = specialism,
                     Status = status,
