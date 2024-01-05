@@ -49,13 +49,13 @@ public class IndexTests : TestBase
         Assert.Equal(createIncident1Result.TicketNumber, tableRow1.GetElementByTestId($"request-reference-{createIncident1Result.TicketNumber}")!.TextContent);
         Assert.Equal($"{createPerson1Result.FirstName} {createPerson1Result.LastName}", tableRow1.GetElementByTestId($"name-{createIncident1Result.TicketNumber}")!.TextContent);
         Assert.Equal(createIncident1Result.SubjectTitle, tableRow1.GetElementByTestId($"change-type-{createIncident1Result.TicketNumber}")!.TextContent);
-        Assert.Equal(createIncident1Result.CreatedOn.ToString("dd/MM/yyyy"), tableRow1.GetElementByTestId($"created-on-{createIncident1Result.TicketNumber}")!.TextContent);
+        Assert.Equal(createIncident1Result.CreatedOn.ToString("d MMMM yyyy"), tableRow1.GetElementByTestId($"created-on-{createIncident1Result.TicketNumber}")!.TextContent);
         var tableRow2 = doc.GetElementByTestId($"change-request-{createIncident2Result.TicketNumber}");
         Assert.NotNull(tableRow2);
         Assert.Equal(createIncident2Result.TicketNumber, tableRow2.GetElementByTestId($"request-reference-{createIncident2Result.TicketNumber}")!.TextContent);
         Assert.Equal($"{createPerson2Result.FirstName} {createPerson2Result.LastName}", tableRow2.GetElementByTestId($"name-{createIncident2Result.TicketNumber}")!.TextContent);
         Assert.Equal(createIncident2Result.SubjectTitle, tableRow2.GetElementByTestId($"change-type-{createIncident2Result.TicketNumber}")!.TextContent);
-        Assert.Equal(createIncident2Result.CreatedOn.ToString("dd/MM/yyyy"), tableRow2.GetElementByTestId($"created-on-{createIncident2Result.TicketNumber}")!.TextContent);
+        Assert.Equal(createIncident2Result.CreatedOn.ToString("d MMMM yyyy"), tableRow2.GetElementByTestId($"created-on-{createIncident2Result.TicketNumber}")!.TextContent);
     }
 
     [Fact]

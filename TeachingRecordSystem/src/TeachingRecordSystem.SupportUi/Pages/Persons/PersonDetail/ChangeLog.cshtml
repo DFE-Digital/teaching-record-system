@@ -1,6 +1,7 @@
 @page "/persons/{personId}/changelog"
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.SupportUi.Pages.Common;
+@using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ChangeLogModel
 @{
     Layout = "Layout";
@@ -23,7 +24,7 @@ else
         {
             var viewName = timelineItem.ItemType switch
             {
-                TimelineItemType.Event => $"./Timeline/Events/{((EventBase)timelineItem.ItemModel).GetEventName()}.cshtml",
+                TimelineItemType.Event => $"./Timeline/Events/{((TimelineEvent)timelineItem.ItemModel).Event.GetEventName()}.cshtml",
                 _ => $"./Timeline/{timelineItem.ItemType}.cshtml"
             };
 

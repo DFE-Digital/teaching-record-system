@@ -1,0 +1,62 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService
+@model TimelineItem<TimelineEvent<MandatoryQualificationDeletedEvent>>
+@{
+    var deletedEvent = Model.ItemModel.Event;
+    var mandatoryQualification = deletedEvent.MandatoryQualification;
+    var evidenceFileUrl = deletedEvent.EvidenceFile is not null ? await FileService.GetFileUrl(deletedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
+    var raisedByUser = Model.ItemModel.RaisedByUser;
+    var raisedBy = deletedEvent.RaisedBy.IsDqtUser ? (raisedByUser.DqtUser?.Name ?? "Unknown") : (raisedByUser.User?.Name) ?? "Unknown";
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Mandatory qualification deleted</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @raisedBy on</span>
+        <time datetime="@deletedEvent.CreatedUtc.ToString("O")" data-testid="timeline-item-time">
+            @deletedEvent.CreatedUtc.ToString("dd MMMMM yyyy 'at' h:mm tt")
+        </time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Reason for deleting</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="deletion-reason">@(!string.IsNullOrEmpty(deletedEvent.DeletionReason) ? deletedEvent.DeletionReason : "None")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>More detail about the reason for deleting</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="deletion-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(deletedEvent.DeletionReasonDetail) ? deletedEvent.DeletionReasonDetail : "None")" /></govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="provider">@(mandatoryQualification.Provider is not null ? mandatoryQualification.Provider.Name : "None" )</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="specialism">@(mandatoryQualification.Specialism.HasValue ? mandatoryQualification.Specialism.Value.GetTitle() : "None")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="start-date">@(mandatoryQualification.StartDate.HasValue ? mandatoryQualification.StartDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="status">@(mandatoryQualification.Status.HasValue ? mandatoryQualification.Status.Value.GetTitle() : "None")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="end-date">@(mandatoryQualification.EndDate.HasValue ? mandatoryQualification.EndDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        </govuk-summary-list>
+
+        @if (evidenceFileUrl is not null)
+        {
+            <p class="govuk-body">
+                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{deletedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
+            </p>
+        }
+    </div>
+</div>
