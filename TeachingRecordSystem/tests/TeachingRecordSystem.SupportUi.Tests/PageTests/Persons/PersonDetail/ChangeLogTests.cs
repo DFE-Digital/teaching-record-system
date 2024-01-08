@@ -243,4 +243,91 @@ public class ChangeLogTests : TestBase
         Assert.Equal(deletedEvents[0].MandatoryQualification.Status!.Value.GetTitle(), changes[1].GetElementByTestId("status")!.TextContent.Trim());
         Assert.Equal(deletedEvents[0].MandatoryQualification.EndDate.HasValue ? deletedEvents[0].MandatoryQualification.EndDate!.Value.ToString("d MMMM yyyy") : "None", changes[1].GetElementByTestId("end-date")!.TextContent.Trim());
     }
+
+    [Fact]
+    public async Task Get_WithPersonIdForPersonWithDqtDeactivatedMandatoryQualification_DisplaysChangesAsExpected()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification().WithMandatoryQualification());
+        var mqs = new (bool RaisedByDqtUser, TestData.MandatoryQualificationInfo Mq, DateTime CreatedUtc)[]
+        {
+            (true, person.MandatoryQualifications[0], Clock.UtcNow.AddSeconds(-2)),
+            (false, person.MandatoryQualifications[1], Clock.UtcNow)
+        };
+
+        var dqtUserId = await TestData.GetCurrentCrmUserId();
+        var user = await TestData.CreateUser();
+
+        var deactivatedEvents = new List<MandatoryQualificationDqtDeactivatedEvent>();
+
+        await WithDbContext(async dbContext =>
+        {
+            foreach (var mqInfo in mqs)
+            {
+                var mq = mqInfo.Mq;
+                var establishment = mq.DqtMqEstablishmentValue is string establishmentValue ?
+                    await TestData.ReferenceDataCache.GetMqEstablishmentByValue(mq.DqtMqEstablishmentValue) :
+                    null;
+                Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var provider);
+
+                var deactivatedEvent = new MandatoryQualificationDqtDeactivatedEvent()
+                {
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = mqInfo.CreatedUtc,
+                    RaisedBy = mqInfo.RaisedByDqtUser ? RaisedByUserInfo.FromDqtUser(dqtUserId, "Test User") : RaisedByUserInfo.FromUserId(user.UserId),
+                    PersonId = person.ContactId,
+                    MandatoryQualification = new()
+                    {
+                        QualificationId = mq.QualificationId,
+                        Provider = new()
+                        {
+                            MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
+                            Name = provider?.Name,
+                            DqtMqEstablishmentId = establishment?.Id,
+                            DqtMqEstablishmentName = establishment?.dfeta_name
+                        },
+                        Specialism = mq.Specialism,
+                        Status = mq.Status,
+                        StartDate = mq.StartDate,
+                        EndDate = mq.EndDate,
+                    }
+                };
+
+                deactivatedEvents.Add(deactivatedEvent);
+                dbContext.AddEvent(deactivatedEvent);
+            }
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        var doc = await response.GetDocument();
+        var changes = doc.GetAllElementsByTestId("timeline-item");
+        Assert.NotEmpty(changes);
+        Assert.Equal(2, changes.Count);
+        Assert.Null(changes[0].GetElementByTestId("timeline-item-status"));
+        Assert.Equal($"By {user.Name} on", changes[0].GetElementByTestId("raised-by")!.TextContent.Trim());
+        Assert.NotNull(changes[0].GetElementByTestId("timeline-item-time"));
+        Assert.Equal(deactivatedEvents[1].MandatoryQualification.Provider!.Name, changes[0].GetElementByTestId("provider")!.TextContent.Trim());
+        Assert.Equal(deactivatedEvents[1].MandatoryQualification.Specialism!.Value.GetTitle(), changes[0].GetElementByTestId("specialism")!.TextContent.Trim());
+        Assert.Equal(deactivatedEvents[1].MandatoryQualification.StartDate!.Value.ToString("d MMMM yyyy"), changes[0].GetElementByTestId("start-date")!.TextContent.Trim());
+        Assert.Equal(deactivatedEvents[1].MandatoryQualification.Status!.Value.GetTitle(), changes[0].GetElementByTestId("status")!.TextContent.Trim());
+        Assert.Equal(deactivatedEvents[1].MandatoryQualification.EndDate.HasValue ? deactivatedEvents[1].MandatoryQualification.EndDate!.Value.ToString("d MMMM yyyy") : "None", changes[0].GetElementByTestId("end-date")!.TextContent.Trim());
+
+        Assert.Null(changes[1].GetElementByTestId("timeline-item-status"));
+        Assert.Equal($"By Test User on", changes[1].GetElementByTestId("raised-by")!.TextContent.Trim());
+        Assert.NotNull(changes[0].GetElementByTestId("timeline-item-time"));
+        Assert.Equal(deactivatedEvents[0].MandatoryQualification.Provider!.Name, changes[1].GetElementByTestId("provider")!.TextContent.Trim());
+        Assert.Equal(deactivatedEvents[0].MandatoryQualification.Specialism!.Value.GetTitle(), changes[1].GetElementByTestId("specialism")!.TextContent.Trim());
+        Assert.Equal(deactivatedEvents[0].MandatoryQualification.StartDate!.Value.ToString("d MMMM yyyy"), changes[1].GetElementByTestId("start-date")!.TextContent.Trim());
+        Assert.Equal(deactivatedEvents[0].MandatoryQualification.Status!.Value.GetTitle(), changes[1].GetElementByTestId("status")!.TextContent.Trim());
+        Assert.Equal(deactivatedEvents[0].MandatoryQualification.EndDate.HasValue ? deactivatedEvents[0].MandatoryQualification.EndDate!.Value.ToString("d MMMM yyyy") : "None", changes[1].GetElementByTestId("end-date")!.TextContent.Trim());
+    }
 }
