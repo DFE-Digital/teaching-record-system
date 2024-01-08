@@ -14,7 +14,7 @@ public class DeleteQualificationHandler : ICrmQueryHandler<DeleteQualificationQu
             {
                 Id = query.QualificationId,
                 StateCode = dfeta_qualificationState.Inactive,
-                dfeta_TrsDeletedEvent = query.SerializedEvent
+                dfeta_TrsDeletedEvent = EventInfo.Create(query.Event).Serialize()
             }
         });
 

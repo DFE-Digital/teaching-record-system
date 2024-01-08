@@ -13,7 +13,8 @@ public class UpdateMandatoryQualificationSpecialismHandler : ICrmQueryHandler<Up
             Target = new dfeta_qualification()
             {
                 Id = query.QualificationId,
-                dfeta_MQ_SpecialismId = query.SpecialismId.ToEntityReference(dfeta_specialism.EntityLogicalName)
+                dfeta_MQ_SpecialismId = query.SpecialismId.ToEntityReference(dfeta_specialism.EntityLogicalName),
+                dfeta_TRSEvent = EventInfo.Create(query.Event).Serialize()
             }
         });
 

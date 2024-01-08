@@ -25,19 +25,14 @@ public class CrmQueryDispatcher(IServiceProvider serviceProvider, string? servic
         public abstract Task<T> Execute(ICrmQuery<T> query, IOrganizationServiceAsync organizationService);
     }
 
-    private class QueryHandler<TQuery, TResult> : QueryHandler<TResult>
+    private class QueryHandler<TQuery, TResult>(ICrmQueryHandler<TQuery, TResult> innerHandler) : QueryHandler<TResult>
         where TQuery : ICrmQuery<TResult>
     {
-        private readonly ICrmQueryHandler<TQuery, TResult> _innerHandler;
-
-        public QueryHandler(ICrmQueryHandler<TQuery, TResult> innerHandler)
+        public override Task<TResult> Execute(
+            ICrmQuery<TResult> query,
+            IOrganizationServiceAsync organizationService)
         {
-            _innerHandler = innerHandler;
-        }
-
-        public override Task<TResult> Execute(ICrmQuery<TResult> query, IOrganizationServiceAsync organizationService)
-        {
-            return _innerHandler.Execute((TQuery)query, organizationService);
+            return innerHandler.Execute((TQuery)query, organizationService);
         }
     }
 }

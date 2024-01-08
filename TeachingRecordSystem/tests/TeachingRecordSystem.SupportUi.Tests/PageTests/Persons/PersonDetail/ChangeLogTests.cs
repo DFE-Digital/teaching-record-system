@@ -205,8 +205,8 @@ public class ChangeLogTests : TestBase
 
             await TestData.DeleteMandatoryQualification(
                 mq.QualificationId,
-                EventInfo.Create(deletedEvent).Serialize(),
-                true);
+                deletedEvent,
+                syncEnabled: true);
         }
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");

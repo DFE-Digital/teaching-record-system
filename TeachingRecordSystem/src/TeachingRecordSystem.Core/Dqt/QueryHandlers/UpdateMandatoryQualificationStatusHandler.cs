@@ -14,7 +14,8 @@ public class UpdateMandatoryQualificationStatusHandler : ICrmQueryHandler<Update
             {
                 Id = query.QualificationId,
                 dfeta_MQ_Status = query.MqStatus,
-                dfeta_MQ_Date = query.EndDate.ToDateTimeWithDqtBstFix(isLocalTime: true)
+                dfeta_MQ_Date = query.EndDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
+                dfeta_TRSEvent = EventInfo.Create(query.Event).Serialize()
             }
         });
 

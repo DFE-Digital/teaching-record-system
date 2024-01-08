@@ -94,7 +94,6 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
     private EventBase CreateDummyEvent() => new DummyEvent()
     {
         EventId = Guid.NewGuid(),
-        DummyProperty = Faker.Name.FullName(),
         CreatedUtc = TestableClock.Initial.ToUniversalTime(),
         RaisedBy = User.SystemUserId
     };

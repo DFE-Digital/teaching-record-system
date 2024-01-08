@@ -1303,6 +1303,299 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	}
 	
 	/// <summary>
+	/// Track changes to records for analysis, record keeping, and compliance.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("audit")]
+	public partial class Audit : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the audit entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string Action = "action";
+			public const string AuditId = "auditid";
+			public const string Id = "auditid";
+			public const string CallingUserId = "callinguserid";
+			public const string CreatedOn = "createdon";
+			public const string ObjectId = "objectid";
+			public const string ObjectTypeCode = "objecttypecode";
+			public const string Operation = "operation";
+			public const string UserId = "userid";
+			public const string lk_audit_callinguserid = "lk_audit_callinguserid";
+			public const string lk_audit_userid = "lk_audit_userid";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public Audit() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "Audit";
+		
+		public const string PrimaryIdAttribute = "auditid";
+		
+		public const string EntityLogicalName = "audit";
+		
+		public const string EntityLogicalCollectionName = "audits";
+		
+		public const string EntitySetName = "audits";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Actions the user can perform that cause a change
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("action")]
+		public virtual Audit_Action? Action
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((Audit_Action?)(EntityOptionSetEnum.GetEnum(this, "action")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Action");
+				this.SetAttributeValue("action", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("Action");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the auditing instance
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("auditid")]
+		public System.Nullable<System.Guid> AuditId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("auditid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("AuditId");
+				this.SetAttributeValue("auditid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("AuditId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("auditid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.AuditId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the calling user in case of an impersonated call
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("callinguserid")]
+		public Microsoft.Xrm.Sdk.EntityReference CallingUserId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("callinguserid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CallingUserId");
+				this.SetAttributeValue("callinguserid", value);
+				this.OnPropertyChanged("CallingUserId");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the audit record was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the record that is being audited
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objectid")]
+		public Microsoft.Xrm.Sdk.EntityReference ObjectId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("objectid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ObjectId");
+				this.SetAttributeValue("objectid", value);
+				this.OnPropertyChanged("ObjectId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the entity that is being audited
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("objecttypecode")]
+		public string ObjectTypeCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("objecttypecode");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ObjectTypeCode");
+				this.SetAttributeValue("objecttypecode", value);
+				this.OnPropertyChanged("ObjectTypeCode");
+			}
+		}
+		
+		/// <summary>
+		/// The action that causes the audit--it will be create, delete, update, upsert or archive
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("operation")]
+		public virtual Audit_Operation? Operation
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((Audit_Operation?)(EntityOptionSetEnum.GetEnum(this, "operation")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Operation");
+				this.SetAttributeValue("operation", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("Operation");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who caused a change
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("userid")]
+		public Microsoft.Xrm.Sdk.EntityReference UserId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("userid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("UserId");
+				this.SetAttributeValue("userid", value);
+				this.OnPropertyChanged("UserId");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_audit_callinguserid
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("callinguserid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_audit_callinguserid")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_audit_callinguserid
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_audit_callinguserid", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_audit_callinguserid");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_audit_callinguserid", null, value);
+				this.OnPropertyChanged("lk_audit_callinguserid");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_audit_userid
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("userid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_audit_userid")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_audit_userid
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_audit_userid", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_audit_userid");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_audit_userid", null, value);
+				this.OnPropertyChanged("lk_audit_userid");
+			}
+		}
+	}
+	
+	/// <summary>
 	/// Business, division, or department in the Microsoft Dynamics 365 database.
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -8553,8 +8846,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
-            public const string CreatedOn = "createdon";
-            public const string dfeta_EarlyYearsStatusId = "dfeta_earlyyearsstatusid";
+			public const string CreatedOn = "createdon";
+			public const string dfeta_EarlyYearsStatusId = "dfeta_earlyyearsstatusid";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_InductionId = "dfeta_inductionid";
 			public const string dfeta_name = "dfeta_name";
@@ -8620,6 +8913,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// Date and time when the record was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+		
+		/// <summary>
 		/// Unique identifier for Early Years Status associated with QTS Registration.
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_earlyyearsstatusid")]
@@ -8638,32 +8951,11 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanged("dfeta_EarlyYearsStatusId");
 			}
 		}
-
-        /// <summary>
-        /// Date and time when the record was created.
-        /// </summary>
-        [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
-        public System.Nullable<System.DateTime> CreatedOn
-        {
-            [System.Diagnostics.DebuggerNonUserCode()]
-            get
-            {
-                return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
-            }
-            [System.Diagnostics.DebuggerNonUserCode()]
-            set
-            {
-                this.OnPropertyChanging("CreatedOn");
-                this.SetAttributeValue("createdon", value);
-                this.OnPropertyChanged("CreatedOn");
-            }
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eytsdate")]
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_eytsdate")]
 		public System.Nullable<System.DateTime> dfeta_EYTSDate
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
@@ -9091,6 +9383,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string CreatedBy = "createdby";
 			public const string CreatedOn = "createdon";
 			public const string dfeta_CompletionorAwardDate = "dfeta_completionorawarddate";
 			public const string dfeta_createdbyapi = "dfeta_createdbyapi";
@@ -9130,6 +9423,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_qualificationId = "dfeta_qualificationid";
 			public const string Id = "dfeta_qualificationid";
 			public const string dfeta_TrsDeletedEvent = "dfeta_trsdeletedevent";
+			public const string dfeta_TRSEvent = "dfeta_trsevent";
 			public const string dfeta_Type = "dfeta_type";
 			public const string ModifiedOn = "modifiedon";
 			public const string StateCode = "statecode";
@@ -9190,6 +9484,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who created the record.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
 			}
 		}
 		
@@ -9973,6 +10287,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_TrsDeletedEvent");
 				this.SetAttributeValue("dfeta_trsdeletedevent", value);
 				this.OnPropertyChanged("dfeta_TrsDeletedEvent");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trsevent")]
+		public string dfeta_TRSEvent
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_trsevent");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_TRSEvent");
+				this.SetAttributeValue("dfeta_trsevent", value);
+				this.OnPropertyChanged("dfeta_TRSEvent");
 			}
 		}
 		
@@ -18364,6 +18698,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string AzureActiveDirectoryObjectId = "azureactivedirectoryobjectid";
 			public const string BusinessUnitId = "businessunitid";
 			public const string FirstName = "firstname";
+			public const string FullName = "fullname";
 			public const string IsDisabled = "isdisabled";
 			public const string LastName = "lastname";
 			public const string SystemUserId = "systemuserid";
@@ -18385,6 +18720,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_annotationbase_createdonbehalfby = "lk_annotationbase_createdonbehalfby";
 			public const string lk_annotationbase_modifiedby = "lk_annotationbase_modifiedby";
 			public const string lk_annotationbase_modifiedonbehalfby = "lk_annotationbase_modifiedonbehalfby";
+			public const string lk_audit_callinguserid = "lk_audit_callinguserid";
+			public const string lk_audit_userid = "lk_audit_userid";
 			public const string lk_businessunit_createdonbehalfby = "lk_businessunit_createdonbehalfby";
 			public const string lk_businessunit_modifiedonbehalfby = "lk_businessunit_modifiedonbehalfby";
 			public const string lk_businessunitbase_createdby = "lk_businessunitbase_createdby";
@@ -18633,6 +18970,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("FirstName");
 				this.SetAttributeValue("firstname", value);
 				this.OnPropertyChanged("FirstName");
+			}
+		}
+		
+		/// <summary>
+		/// Full name of the user.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("fullname")]
+		public string FullName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("fullname");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("FullName");
+				this.SetAttributeValue("fullname", value);
+				this.OnPropertyChanged("FullName");
 			}
 		}
 		
@@ -19056,6 +19413,46 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("lk_annotationbase_modifiedonbehalfby");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Annotation>("lk_annotationbase_modifiedonbehalfby", null, value);
 				this.OnPropertyChanged("lk_annotationbase_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_audit_callinguserid
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_audit_callinguserid")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Audit> lk_audit_callinguserid
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Audit>("lk_audit_callinguserid", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_audit_callinguserid");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Audit>("lk_audit_callinguserid", null, value);
+				this.OnPropertyChanged("lk_audit_callinguserid");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_audit_userid
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_audit_userid")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Audit> lk_audit_userid
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Audit>("lk_audit_userid", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_audit_userid");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Audit>("lk_audit_userid", null, value);
+				this.OnPropertyChanged("lk_audit_userid");
 			}
 		}
 		
@@ -22567,6 +22964,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			get
 			{
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Annotation>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.Audit"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.Audit> AuditSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Audit>();
 			}
 		}
 		

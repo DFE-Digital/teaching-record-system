@@ -1,5 +1,7 @@
 using FormFlow;
 using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
@@ -92,14 +94,23 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_Confirm_CompletesJourneyRedirectsWithFlashMessageAndUpdatesMq()
+    public async Task Post_Confirm_UpdatesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
         var oldStatus = MandatoryQualificationStatus.Failed;
         var newStatus = MandatoryQualificationStatus.Passed;
+        var oldEndDate = (DateOnly?)null;
         var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus).WithEndDate(oldEndDate)));
+        var qualification = person.MandatoryQualifications.First();
+        var qualificationId = qualification.QualificationId;
+        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(qualification.DqtMqEstablishmentValue!);
+        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
+        Assert.NotNull(provider);
+
+        EventObserver.Clear();
+
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqResultState()
@@ -133,6 +144,51 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
             Assert.Equal(newStatus, qualification.Status);
             Assert.Equal(newEndDate, qualification.EndDate);
+        });
+
+        EventObserver.AssertEventsSaved(e =>
+        {
+            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent()
+            {
+                EventId = Guid.Empty,
+                CreatedUtc = Clock.UtcNow,
+                RaisedBy = GetCurrentUserId(),
+                PersonId = person.PersonId,
+                MandatoryQualification = new()
+                {
+                    QualificationId = qualificationId,
+                    Provider = new()
+                    {
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name,
+                        DqtMqEstablishmentId = mqEstablishment.Id,
+                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                    },
+                    Specialism = qualification.Specialism,
+                    Status = newStatus,
+                    StartDate = qualification.StartDate,
+                    EndDate = newEndDate
+                },
+                OldMandatoryQualification = new()
+                {
+                    QualificationId = qualificationId,
+                    Provider = new()
+                    {
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name,
+                        DqtMqEstablishmentId = mqEstablishment.Id,
+                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                    },
+                    Specialism = qualification.Specialism,
+                    Status = oldStatus,
+                    StartDate = qualification.StartDate,
+                    EndDate = oldEndDate
+                },
+                Changes = MandatoryQualificationUpdatedEventChanges.Status | MandatoryQualificationUpdatedEventChanges.EndDate
+            };
+
+            var actualMqUpdatedEvent = Assert.IsType<MandatoryQualificationUpdatedEvent>(e);
+            Assert.Equivalent(expectedMqUpdatedEvent with { EventId = actualMqUpdatedEvent.EventId }, actualMqUpdatedEvent);
         });
     }
 
