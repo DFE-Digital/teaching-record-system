@@ -29,7 +29,7 @@
                     <td class="govuk-table__cell" data-testid="request-reference-@changeRequestInfo.RequestReference"><a href="@LinkGenerator.EditChangeRequest(changeRequestInfo.RequestReference)" class="govuk-link">@changeRequestInfo.RequestReference</a></td>
                     <td class="govuk-table__cell" data-testid="name-@changeRequestInfo.RequestReference">@changeRequestInfo.Customer</td>
                     <td class="govuk-table__cell" data-testid="change-type-@changeRequestInfo.RequestReference">@changeRequestInfo.ChangeType</td>
-                    <td class="govuk-table__cell" data-testid="created-on-@changeRequestInfo.RequestReference">@changeRequestInfo.CreatedOn.ToString("dd/MM/yyyy")</td>
+                    <td class="govuk-table__cell" data-testid="created-on-@changeRequestInfo.RequestReference">@changeRequestInfo.CreatedOn.ToString("d MMMM yyyy")</td>
                 </tr>
             }
         }        
