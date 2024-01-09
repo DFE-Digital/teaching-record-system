@@ -86,15 +86,15 @@ public class ChangeLogModel(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFa
         TimelineItems = notesResult
             .Annotations.Select(n => (TimelineItem)new TimelineItem<Annotation>(
                 TimelineItemType.Annotation,
-                n.ModifiedOn.WithDqtBstFix(isLocalTime: true)!.Value,
+                n.ModifiedOn!.Value.ToLocal(),
                 n))
             .Concat(notesResult.IncidentResolutions.Select(r => new TimelineItem<(IncidentResolution, Incident)>(
                 TimelineItemType.IncidentResolution,
-                r.Resolution.ModifiedOn.WithDqtBstFix(isLocalTime: true)!.Value,
+                r.Resolution.ModifiedOn!.Value.ToLocal(),
                 r)))
             .Concat(notesResult.Tasks.Select(t => new TimelineItem<CrmTask>(
                 TimelineItemType.Task,
-                t.ModifiedOn.WithDqtBstFix(isLocalTime: true)!.Value,
+                t.ModifiedOn!.Value.ToLocal(),
                 t)))
             .Concat(eventsWithUser.Select(MapTimelineEvent))
             .OrderByDescending(i => i.Timestamp)
@@ -141,7 +141,7 @@ public class ChangeLogModel(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFa
         var timelineEventType = typeof(TimelineEvent<>).MakeGenericType(@event.GetType()!);
         var timelineEvent = (TimelineEvent)Activator.CreateInstance(timelineEventType, @event, raiseByUser)!;
         var timelineItemType = typeof(TimelineItem<>).MakeGenericType(timelineEventType);
-        return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.Event, timelineEvent.Event.CreatedUtc, timelineEvent)!;
+        return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.Event, timelineEvent.Event.CreatedUtc.ToLocal(), timelineEvent)!;
     }
 
     /// <summary>

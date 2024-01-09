@@ -249,10 +249,12 @@ public class ChangeLogTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification().WithMandatoryQualification());
+        var dateTimeOutsideBst = new DateTime(2021, 1, 1, 10, 30, 0, DateTimeKind.Utc);
+        var dateTimeInsideBst = new DateTime(2021, 6, 1, 10, 30, 0, DateTimeKind.Utc);
         var mqs = new (bool RaisedByDqtUser, TestData.MandatoryQualificationInfo Mq, DateTime CreatedUtc)[]
         {
-            (true, person.MandatoryQualifications[0], Clock.UtcNow.AddSeconds(-2)),
-            (false, person.MandatoryQualifications[1], Clock.UtcNow)
+            (true, person.MandatoryQualifications[0], dateTimeOutsideBst),
+            (false, person.MandatoryQualifications[1], dateTimeInsideBst)
         };
 
         var dqtUserId = await TestData.GetCurrentCrmUserId();
@@ -314,7 +316,7 @@ public class ChangeLogTests : TestBase
         Assert.Equal(2, changes.Count);
         Assert.Null(changes[0].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By {user.Name} on", changes[0].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.NotNull(changes[0].GetElementByTestId("timeline-item-time"));
+        Assert.Equal("01 June 2021 at 11:30 AM", changes[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[1].MandatoryQualification.Provider!.Name, changes[0].GetElementByTestId("provider")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[1].MandatoryQualification.Specialism!.Value.GetTitle(), changes[0].GetElementByTestId("specialism")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[1].MandatoryQualification.StartDate!.Value.ToString("d MMMM yyyy"), changes[0].GetElementByTestId("start-date")!.TextContent.Trim());
@@ -323,7 +325,7 @@ public class ChangeLogTests : TestBase
 
         Assert.Null(changes[1].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By Test User on", changes[1].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.NotNull(changes[0].GetElementByTestId("timeline-item-time"));
+        Assert.Equal("01 January 2021 at 10:30 AM", changes[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[0].MandatoryQualification.Provider!.Name, changes[1].GetElementByTestId("provider")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[0].MandatoryQualification.Specialism!.Value.GetTitle(), changes[1].GetElementByTestId("specialism")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[0].MandatoryQualification.StartDate!.Value.ToString("d MMMM yyyy"), changes[1].GetElementByTestId("start-date")!.TextContent.Trim());

@@ -19,6 +19,6 @@ public static class DateTimeExtensions
     public static DateOnly? ToDateOnlyWithDqtBstFix(this DateTime? dateTime, bool isLocalTime) =>
         dateTime.HasValue ? ToDateOnlyWithDqtBstFix(dateTime.Value, isLocalTime) : null;
 
-    public static DateTime? WithDqtBstFix(this DateTime? dateTime, bool isLocalTime) =>
-        dateTime.HasValue ? (isLocalTime ? TimeZoneInfo.ConvertTimeFromUtc(dateTime.Value, _gmt) : dateTime.Value) : null;
+    public static DateTime ToLocal(this DateTime dateTime) =>
+        TimeZoneInfo.ConvertTimeFromUtc(dateTime, _gmt);
 }
