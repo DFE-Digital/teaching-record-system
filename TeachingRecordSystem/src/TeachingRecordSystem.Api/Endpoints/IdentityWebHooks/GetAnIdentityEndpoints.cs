@@ -105,6 +105,11 @@ public static class GetAnIdentityEndpoints
                         Contact.Fields.dfeta_LastIdentityUpdate
                     });
 
+                if (teacher is null)
+                {
+                    throw new InvalidOperationException($"Received a webhook for a teacher that doesn't exist: {user.Trn}.");
+                }
+
                 if (notification.TimeUtc > (teacher.dfeta_LastIdentityUpdate ?? DateTime.MinValue))
                 {
                     await dataverseAdapter.UpdateTeacherIdentityInfo(new UpdateTeacherIdentityInfoCommand()
