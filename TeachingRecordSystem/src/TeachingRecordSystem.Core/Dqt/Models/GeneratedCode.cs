@@ -1625,6 +1625,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string business_unit_incident_resolution_activities = "business_unit_incident_resolution_activities";
 			public const string business_unit_incidents = "business_unit_incidents";
 			public const string Referencedbusiness_unit_parent_business_unit = "Referencedbusiness_unit_parent_business_unit";
+			public const string business_unit_roles = "business_unit_roles";
 			public const string business_unit_system_users = "business_unit_system_users";
 			public const string business_unit_task_activities = "business_unit_task_activities";
 			public const string Referencingbusiness_unit_parent_business_unit = "business_unit_parent_business_unit";
@@ -2017,6 +2018,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Referencedbusiness_unit_parent_business_unit");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.BusinessUnit>("business_unit_parent_business_unit", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
 				this.OnPropertyChanged("Referencedbusiness_unit_parent_business_unit");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N business_unit_roles
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("business_unit_roles")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Role> business_unit_roles
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("business_unit_roles", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("business_unit_roles");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("business_unit_roles", null, value);
+				this.OnPropertyChanged("business_unit_roles");
 			}
 		}
 		
@@ -14346,6 +14367,351 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	}
 	
 	/// <summary>
+	/// Grouping of security privileges. Users are assigned roles that authorize their access to the Microsoft CRM system.
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("role")]
+	public partial class Role : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the role entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string Name = "name";
+			public const string RoleId = "roleid";
+			public const string Id = "roleid";
+			public const string Referencedrole_parent_role = "Referencedrole_parent_role";
+			public const string Referencedrole_parent_root_role = "Referencedrole_parent_root_role";
+			public const string systemuserroles_association = "systemuserroles_association";
+			public const string business_unit_roles = "business_unit_roles";
+			public const string lk_role_createdonbehalfby = "lk_role_createdonbehalfby";
+			public const string lk_role_modifiedonbehalfby = "lk_role_modifiedonbehalfby";
+			public const string lk_rolebase_createdby = "lk_rolebase_createdby";
+			public const string lk_rolebase_modifiedby = "lk_rolebase_modifiedby";
+			public const string Referencingrole_parent_role = "role_parent_role";
+			public const string Referencingrole_parent_root_role = "role_parent_root_role";
+		}
+		
+		public const string AlternateKeys = "overwritetime,businessunitid,componentstate,parentrootroleid|overwritetime,rolete" +
+			"mplateid,componentstate,businessunitid";
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public Role() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "Role";
+		
+		public const string PrimaryIdAttribute = "roleid";
+		
+		public const string PrimaryNameAttribute = "name";
+		
+		public const string EntityLogicalName = "role";
+		
+		public const string EntityLogicalCollectionName = "roles";
+		
+		public const string EntitySetName = "roles";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Name of the role.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("name")]
+		public string Name
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("name");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Name");
+				this.SetAttributeValue("name", value);
+				this.OnPropertyChanged("Name");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the role.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("roleid")]
+		public System.Nullable<System.Guid> RoleId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("roleid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("RoleId");
+				this.SetAttributeValue("roleid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("RoleId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("roleid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.RoleId = value;
+			}
+		}
+		
+		/// <summary>
+		/// 1:N role_parent_role
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("role_parent_role", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Role> Referencedrole_parent_role
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("role_parent_role", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedrole_parent_role");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("role_parent_role", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedrole_parent_role");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N role_parent_root_role
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("role_parent_root_role", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Role> Referencedrole_parent_root_role
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("role_parent_root_role", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencedrole_parent_root_role");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("role_parent_root_role", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referencedrole_parent_root_role");
+			}
+		}
+		
+		/// <summary>
+		/// N:N systemuserroles_association
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("systemuserroles_association")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SystemUser> systemuserroles_association
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("systemuserroles_association", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("systemuserroles_association");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("systemuserroles_association", null, value);
+				this.OnPropertyChanged("systemuserroles_association");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 business_unit_roles
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("businessunitid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("business_unit_roles")]
+		public TeachingRecordSystem.Core.Dqt.Models.BusinessUnit business_unit_roles
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.BusinessUnit>("business_unit_roles", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("business_unit_roles");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.BusinessUnit>("business_unit_roles", null, value);
+				this.OnPropertyChanged("business_unit_roles");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_role_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_role_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_role_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_role_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_role_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_role_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_role_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_role_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_role_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_role_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_role_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_role_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_role_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_role_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_rolebase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_rolebase_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_rolebase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_rolebase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_rolebase_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_rolebase_createdby", null, value);
+				this.OnPropertyChanged("lk_rolebase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_rolebase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_rolebase_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_rolebase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_rolebase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_rolebase_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_rolebase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_rolebase_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 role_parent_role
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentroleid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("role_parent_role", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public TeachingRecordSystem.Core.Dqt.Models.Role Referencingrole_parent_role
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Role>("role_parent_role", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingrole_parent_role");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Role>("role_parent_role", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingrole_parent_role");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 role_parent_root_role
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("parentrootroleid")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("role_parent_root_role", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public TeachingRecordSystem.Core.Dqt.Models.Role Referencingrole_parent_root_role
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Role>("role_parent_root_role", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingrole_parent_root_role");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Role>("role_parent_root_role", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingrole_parent_root_role");
+			}
+		}
+	}
+	
+	/// <summary>
 	/// Message that is supported by the SDK.
 	/// </summary>
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -18816,6 +19182,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_incidentresolution_modifiedonbehalfby = "lk_incidentresolution_modifiedonbehalfby";
 			public const string lk_plugintype_createdonbehalfby = "lk_plugintype_createdonbehalfby";
 			public const string lk_plugintype_modifiedonbehalfby = "lk_plugintype_modifiedonbehalfby";
+			public const string lk_role_createdonbehalfby = "lk_role_createdonbehalfby";
+			public const string lk_role_modifiedonbehalfby = "lk_role_modifiedonbehalfby";
+			public const string lk_rolebase_createdby = "lk_rolebase_createdby";
+			public const string lk_rolebase_modifiedby = "lk_rolebase_modifiedby";
 			public const string lk_sdkmessage_createdonbehalfby = "lk_sdkmessage_createdonbehalfby";
 			public const string lk_sdkmessage_modifiedonbehalfby = "lk_sdkmessage_modifiedonbehalfby";
 			public const string lk_sdkmessagefilter_createdonbehalfby = "lk_sdkmessagefilter_createdonbehalfby";
@@ -18860,6 +19230,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string user_incidentresolution = "user_incidentresolution";
 			public const string Referenceduser_parent_user = "Referenceduser_parent_user";
 			public const string user_task = "user_task";
+			public const string systemuserroles_association = "systemuserroles_association";
 			public const string business_unit_system_users = "business_unit_system_users";
 			public const string Referencinglk_systemuser_createdonbehalfby = "lk_systemuser_createdonbehalfby";
 			public const string Referencinglk_systemuser_modifiedonbehalfby = "lk_systemuser_modifiedonbehalfby";
@@ -21337,6 +21708,86 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N lk_role_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_role_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Role> lk_role_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("lk_role_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_role_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("lk_role_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_role_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_role_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_role_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Role> lk_role_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("lk_role_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_role_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("lk_role_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_role_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_rolebase_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_rolebase_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Role> lk_rolebase_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("lk_rolebase_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_rolebase_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("lk_rolebase_createdby", null, value);
+				this.OnPropertyChanged("lk_rolebase_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_rolebase_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_rolebase_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Role> lk_rolebase_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("lk_rolebase_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_rolebase_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("lk_rolebase_modifiedby", null, value);
+				this.OnPropertyChanged("lk_rolebase_modifiedby");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N lk_sdkmessage_createdonbehalfby
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_sdkmessage_createdonbehalfby")]
@@ -22217,6 +22668,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// N:N systemuserroles_association
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("systemuserroles_association")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Role> systemuserroles_association
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("systemuserroles_association", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("systemuserroles_association");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Role>("systemuserroles_association", null, value);
+				this.OnPropertyChanged("systemuserroles_association");
+			}
+		}
+		
+		/// <summary>
 		/// N:1 business_unit_system_users
 		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("businessunitid")]
@@ -22339,6 +22810,192 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Referencinguser_parent_user");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_parent_user", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
 				this.OnPropertyChanged("Referencinguser_parent_user");
+			}
+		}
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("systemuserroles")]
+	public partial class SystemUserRoles : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the systemuserroles entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string RoleId = "roleid";
+			public const string SystemUserId = "systemuserid";
+			public const string SystemUserRoleId = "systemuserroleid";
+			public const string Id = "systemuserroleid";
+			public const string VersionNumber = "versionnumber";
+			public const string systemuserroles_association = "systemuserroles_association";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public SystemUserRoles() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "SystemUserRoles";
+		
+		public const string PrimaryIdAttribute = "systemuserroleid";
+		
+		public const string EntityLogicalName = "systemuserroles";
+		
+		public const string EntityLogicalCollectionName = null;
+		
+		public const string EntitySetName = "systemuserrolescollection";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("roleid")]
+		public System.Nullable<System.Guid> RoleId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("roleid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("RoleId");
+				this.SetAttributeValue("roleid", value);
+				this.OnPropertyChanged("RoleId");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("systemuserid")]
+		public System.Nullable<System.Guid> SystemUserId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("systemuserid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SystemUserId");
+				this.SetAttributeValue("systemuserid", value);
+				this.OnPropertyChanged("SystemUserId");
+			}
+		}
+		
+		/// <summary>
+		/// For internal use only.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("systemuserroleid")]
+		public System.Nullable<System.Guid> SystemUserRoleId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("systemuserroleid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("SystemUserRoleId");
+				this.SetAttributeValue("systemuserroleid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("SystemUserRoleId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("systemuserroleid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.SystemUserRoleId = value;
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("versionnumber")]
+		public System.Nullable<long> VersionNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<long>>("versionnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("VersionNumber");
+				this.SetAttributeValue("versionnumber", value);
+				this.OnPropertyChanged("VersionNumber");
+			}
+		}
+		
+		/// <summary>
+		/// N:N systemuserroles_association
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("systemuserroles_association")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.SystemUser> systemuserroles_association
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("systemuserroles_association", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("systemuserroles_association");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("systemuserroles_association", null, value);
+				this.OnPropertyChanged("systemuserroles_association");
 			}
 		}
 	}
@@ -23268,6 +23925,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.Role"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.Role> RoleSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.Role>();
+			}
+		}
+		
+		/// <summary>
 		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SdkMessage"/> entities.
 		/// </summary>
 		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.SdkMessage> SdkMessageSet
@@ -23348,6 +24017,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			get
 			{
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SystemUser>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.SystemUserRoles"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.SystemUserRoles> SystemUserRolesSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.SystemUserRoles>();
 			}
 		}
 		

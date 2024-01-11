@@ -16,16 +16,12 @@ public class ConfirmModel(
     IClock clock,
     TrsLinkGenerator linkGenerator) : PageModel
 {
-    private readonly TrsDbContext _dbContext = dbContext;
-    private readonly IAadUserService _userService = userService;
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher = crmQueryDispatcher;
-    private readonly IClock _clock = clock;
-    private readonly TrsLinkGenerator _linkGenerator = linkGenerator;
     private Services.AzureActiveDirectory.User? _user;
 
     [BindProperty(SupportsGet = true)]
     public string? UserId { get; set; }
 
+    [Display(Name = "Email address")]
     public string? Email { get; set; }
 
     [BindProperty]
@@ -37,6 +33,16 @@ public class ConfirmModel(
     [BindProperty]
     [Display(Name = "Roles")]
     public string[]? Roles { get; set; }
+
+    public Guid? DqtUserId { get; set; }
+
+    public string? AzureAdUserId { get; set; }
+
+    public string[]? DqtRoles { get; set; }
+
+    public bool HasCrmAccount { get; set; }
+
+    public bool CrmAccountIsDisabled { get; set; }
 
     public IActionResult OnGet()
     {
@@ -65,42 +71,36 @@ public class ConfirmModel(
             return this.PageWithErrors();
         }
 
-        string azureAdUserId = _user!.UserId;
-
-        var dqtUser = await _crmQueryDispatcher.ExecuteQuery(
-            new GetSystemUserByAzureActiveDirectoryObjectIdQuery(
-                azureAdUserId, new ColumnSet()));
-
         var newUser = new Core.DataStore.Postgres.Models.User()
         {
             Active = true,
-            AzureAdUserId = azureAdUserId,
-            Email = _user.Email,
+            AzureAdUserId = AzureAdUserId,
+            Email = _user!.Email,
             Name = Name!,
             Roles = roles,
             UserId = Guid.NewGuid(),
-            DqtUserId = dqtUser?.Id
+            DqtUserId = DqtUserId
         };
 
-        _dbContext.Users.Add(newUser);
+        dbContext.Users.Add(newUser);
 
-        _dbContext.AddEvent(new UserAddedEvent()
+        dbContext.AddEvent(new UserAddedEvent()
         {
             EventId = Guid.NewGuid(),
             User = Core.Events.Models.User.FromModel(newUser),
             RaisedBy = User.GetUserId(),
-            CreatedUtc = _clock.UtcNow
+            CreatedUtc = clock.UtcNow
         });
 
-        await _dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess("User added");
-        return Redirect(_linkGenerator.Users());
+        return Redirect(linkGenerator.Users());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        _user = await _userService.GetUserById(UserId!);
+        _user = await userService.GetUserById(UserId!);
 
         if (_user is null)
         {
@@ -109,6 +109,21 @@ public class ConfirmModel(
         }
 
         Email = _user.Email;
+        AzureAdUserId = _user.UserId;
+
+        if (AzureAdUserId is not null)
+        {
+            var crmUserInfo = await crmQueryDispatcher.ExecuteQuery(
+                new GetSystemUserByAzureActiveDirectoryObjectIdQuery(AzureAdUserId));
+
+            if (crmUserInfo is not null)
+            {
+                DqtUserId = crmUserInfo.SystemUser.Id;
+                HasCrmAccount = true;
+                CrmAccountIsDisabled = crmUserInfo.SystemUser.IsDisabled == true;
+                DqtRoles = crmUserInfo.Roles.Select(r => r.Name).OrderBy(n => n).ToArray();
+            }
+        }
 
         await next();
     }

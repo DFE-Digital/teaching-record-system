@@ -8,6 +8,7 @@ using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
@@ -79,6 +80,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddSingleton<FakeTrnGenerator>();
                     services.AddSingleton<TrsDataSyncHelper>();
                     services.AddSingleton(GetMockFileService());
+                    services.AddSingleton(GetMockAdUserService());
 
                     IFileService GetMockFileService()
                     {
@@ -90,6 +92,18 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                             .Setup(s => s.GetFileUrl(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
                             .ReturnsAsync("https://fake.blob.core.windows.net/fake");
                         return fileService.Object;
+                    }
+
+                    IAadUserService GetMockAdUserService()
+                    {
+                        var userService = new Mock<IAadUserService>();
+                        userService
+                            .Setup(s => s.GetUserByEmail(It.IsAny<string>()))
+                            .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
+                        userService
+                            .Setup(s => s.GetUserById(It.IsAny<string>()))
+                            .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
+                        return userService.Object;
                     }
                 });
             });

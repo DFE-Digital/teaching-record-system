@@ -290,6 +290,10 @@
     "subject"
   ],
   "plugintype": [],
+  "role": [
+    "name",
+    "roleid"
+  ],
   "sdkmessage": [],
   "sdkmessagefilter": [],
   "sdkmessageprocessingstep": [],
@@ -310,6 +314,7 @@
     "fullname",
     "systemuserid"
   ],
+  "systemuserroles": [],
   "task": [
     "activityid",
     "category",

@@ -2,22 +2,18 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 
 [Authorize(Roles = UserRoles.Administrator)]
-public class IndexModel : PageModel
+public class IndexModel(
+    TrsDbContext dbContext,
+    IAadUserService userService,
+    TrsLinkGenerator trsLinkGenerator) : PageModel
 {
-    private readonly IAadUserService _userService;
-    private readonly TrsLinkGenerator _trsLinkGenerator;
-
-    public IndexModel(IAadUserService userService, TrsLinkGenerator trsLinkGenerator)
-    {
-        _userService = userService;
-        _trsLinkGenerator = trsLinkGenerator;
-    }
-
     [Display(Name = "Email address")]
     [Required(ErrorMessage = "Enter an email address")]
     [BindProperty]
@@ -40,7 +36,7 @@ public class IndexModel : PageModel
             email += "@education.gov.uk";
         }
 
-        var user = await _userService.GetUserByEmail(email);
+        var user = await userService.GetUserByEmail(email);
 
         if (user is null)
         {
@@ -48,6 +44,12 @@ public class IndexModel : PageModel
             return this.PageWithErrors();
         }
 
-        return Redirect(_trsLinkGenerator.AddUser(user.UserId));
+        var existingUser = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == user.UserId);
+        if (existingUser is not null)
+        {
+            return Redirect(trsLinkGenerator.EditUser(existingUser.UserId));
+        }
+
+        return Redirect(trsLinkGenerator.AddUserConfirm(user.UserId));
     }
 }

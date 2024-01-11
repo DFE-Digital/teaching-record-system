@@ -16,7 +16,7 @@
         {
             <tr class="govuk-table__row" data-testid="user-@user.UserId">
                 <td class="govuk-table__cell">
-                    <a href="@LinkGenerator.EditUser(user.UserId)" class="govuk-link">@user.Name</a>
+                    <a href="@LinkGenerator.EditUser(user.UserId)" class="govuk-link" data-testid="edit-user-@user.UserId">@user.Name</a>
                 </td>
                 <td class="govuk-table__cell empty-hyphens">@Html.ShyEmail(user.Email!)</td>
             </tr>
@@ -24,4 +24,4 @@
     </tbody>
 </table>
 
-<govuk-button-link href="@LinkGenerator.AddUser()" class="govuk-button--secondary">Add user</govuk-button-link>
+<govuk-button-link href="@LinkGenerator.AddUser()" class="govuk-button--secondary" data-testid="add-user">Add user</govuk-button-link>

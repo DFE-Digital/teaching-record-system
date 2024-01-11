@@ -16,19 +16,26 @@
 
             @if (!Model.HasCrmAccount)
             {
-                <govuk-warning-text icon-fallback-text="Warning" data-testid="NoCrmAccountWarning">User does not have an account in CRM.</govuk-warning-text>
+                <govuk-warning-text icon-fallback-text="Warning" data-testid="no-crm-account-warning">User does not have an account in CRM.<br />The user will not be able to access the TRS Console.</govuk-warning-text>
             }
             else if (Model.CrmAccountIsDisabled)
             {
-                <govuk-warning-text icon-fallback-text="Warning" data-testid="CrmAccountDisabledWarning">User's CRM account is disabled.</govuk-warning-text>
+                <govuk-warning-text icon-fallback-text="Warning" data-testid="disabled-crm-account-warning">User CRM account is disabled.<br />The user will not be able to access the TRS Console.</govuk-warning-text>
+            }
+            else if (Model.DqtRoles is null || Model.DqtRoles.Length == 0)
+            {
+                <govuk-warning-text icon-fallback-text="Warning" data-testid="no-dqt-roles-warning">User does not have any roles in CRM.<br />The user will not be able to access the TRS Console.</govuk-warning-text>
             }
 
-            <govuk-input asp-for="Email" type="email" disabled />
+            <govuk-input asp-for="Email" label-class="govuk-label--m" type="email" disabled />
 
-            <govuk-input asp-for="Name" disabled="@(!Model.IsActiveUser)" />
+            <govuk-input asp-for="Name" label-class="govuk-label--m" disabled="@(!Model.IsActiveUser)" />
 
             <govuk-checkboxes asp-for="Roles">
                 <govuk-checkboxes-fieldset>
+                    <govuk-checkboxes-fieldset-legend>
+                        <h2 class="govuk-heading-m">Roles</h2>
+                    </govuk-checkboxes-fieldset-legend>
                     @foreach (var role in UserRoles.All)
                     {
                         <govuk-checkboxes-item value="@role" disabled="@(!Model.IsActiveUser)">@UserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
@@ -36,10 +43,21 @@
                 </govuk-checkboxes-fieldset>
             </govuk-checkboxes>
 
+            @if (Model.DqtRoles?.Length > 0)
+            {
+                <h2 class="govuk-heading-m">DQT roles</h2>
+                <ul class="govuk-list" data-testid="dqt-roles-list">
+                    @foreach (var dqtRole in Model.DqtRoles!)
+                    {
+                        <li>@dqtRole</li>
+                    }
+                </ul>
+            }
+
             @if (Model.IsActiveUser)
             {
                 <div class="govuk-button-group">
-                    <govuk-button type="submit">Save and continue</govuk-button>
+                    <govuk-button type="submit">Save changes</govuk-button>
                     <govuk-button class="govuk-button--secondary" type="submit" asp-page-handler="deactivate">Deactivate</govuk-button>
                 </div>
             }

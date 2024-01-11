@@ -158,7 +158,7 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string AddUser() => GetRequiredPathByPage("/Users/AddUser/Index");
 
-    public string AddUser(string userId) => GetRequiredPathByPage("/Users/AddUser/Confirm", routeValues: new { userId });
+    public string AddUserConfirm(string userId) => GetRequiredPathByPage("/Users/AddUser/Confirm", routeValues: new { userId });
 
     public string EditUser(Guid userId) => GetRequiredPathByPage("/Users/EditUser", routeValues: new { userId });
 
