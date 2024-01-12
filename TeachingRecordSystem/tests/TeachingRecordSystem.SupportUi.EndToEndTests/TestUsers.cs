@@ -1,7 +1,6 @@
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
@@ -11,25 +10,18 @@ public static class TestUsers
     {
         Active = true,
         Name = "Test administrator",
-        Roles = new[] { UserRoles.Administrator },
+        Roles = [UserRoles.Administrator],
         UserId = Guid.NewGuid(),
-        UserType = UserType.Person
+        Email = "test.admin@localhost"
     };
 
-    public class CreateUsersStartupTask : IStartupTask
+    public class CreateUsersStartupTask(TrsDbContext trsDbContext) : IStartupTask
     {
-        private readonly TrsDbContext _dbContext;
-
-        public CreateUsersStartupTask(TrsDbContext trsDbContext)
-        {
-            _dbContext = trsDbContext;
-        }
-
         public Task Execute()
         {
-            _dbContext.Users.Add(Administrator);
+            trsDbContext.Users.Add(Administrator);
 
-            return _dbContext.SaveChangesAsync();
+            return trsDbContext.SaveChangesAsync();
         }
     }
 }

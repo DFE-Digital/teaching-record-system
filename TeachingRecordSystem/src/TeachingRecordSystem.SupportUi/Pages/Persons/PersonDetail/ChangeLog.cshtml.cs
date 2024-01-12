@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
@@ -52,20 +51,7 @@ public class ChangeLogModel(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFa
                 SELECT
                     e.event_name,
                     e.payload as event_payload,
-                    u.user_id as trs_user_user_id,
-                    u.active as trs_user_active,
-                    u.user_type as trs_user_user_type,
                     u.name as trs_user_name,
-                    u.email as trs_user_email,
-                    u.azure_ad_user_id as trs_user_azure_ad_user_id,
-                    u.roles as trs_user_roles,
-                    u.dqt_user_id as trs_user_dqt_user_id,
-                    CASE
-                        WHEN e.payload #>> Array['RaisedBy','DqtUserId'] is not null THEN
-                            (e.payload #>> Array['RaisedBy','DqtUserId'])::uuid
-                        ELSE
-                            null
-                    END as dqt_user_id,
                     e.payload #>> Array['RaisedBy','DqtUserName'] as dqt_user_name
                 FROM
                         events as e
@@ -106,36 +92,10 @@ public class ChangeLogModel(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFa
     private TimelineItem MapTimelineEvent(EventWithUser eventWithUser)
     {
         var @event = EventBase.Deserialize(eventWithUser.EventPayload, eventWithUser.EventName);
-        User? user = null;
-        if (eventWithUser.TrsUserUserId is not null)
-        {
-            user = new User
-            {
-                UserId = eventWithUser.TrsUserUserId.Value,
-                Active = eventWithUser.TrsUserActive!.Value,
-                UserType = eventWithUser.TrsUserUserType!.Value,
-                Name = eventWithUser.TrsUserName!,
-                Email = eventWithUser.TrsUserEmail,
-                AzureAdUserId = eventWithUser.TrsUserAzureAdUserId,
-                Roles = eventWithUser.TrsUserRoles!,
-                DqtUserId = eventWithUser.TrsUserDqtUserId
-            };
-        }
 
-        DqtUser? dqtUser = null;
-        if (eventWithUser.DqtUserId is not null)
+        RaisedByUserInfo raiseByUser = new()
         {
-            dqtUser = new DqtUser
-            {
-                UserId = eventWithUser.DqtUserId.Value,
-                Name = eventWithUser.DqtUserName!
-            };
-        }
-
-        RaisedByUser raiseByUser = new()
-        {
-            User = user,
-            DqtUser = dqtUser
+            Name = eventWithUser.TrsUserName ?? eventWithUser.DqtUserName!
         };
 
         var timelineEventType = typeof(TimelineEvent<>).MakeGenericType(@event.GetType()!);
@@ -151,15 +111,7 @@ public class ChangeLogModel(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFa
     {
         public required string EventName { get; init; }
         public required string EventPayload { get; init; }
-        public required Guid? TrsUserUserId { get; init; }
-        public required bool? TrsUserActive { get; set; }
-        public required UserType? TrsUserUserType { get; init; }
         public required string? TrsUserName { get; set; }
-        public required string? TrsUserEmail { get; set; }
-        public required string? TrsUserAzureAdUserId { get; set; }
-        public required string[]? TrsUserRoles { get; set; }
-        public required Guid? TrsUserDqtUserId { get; set; }
-        public required Guid? DqtUserId { get; set; }
         public required string? DqtUserName { get; set; }
     }
 }

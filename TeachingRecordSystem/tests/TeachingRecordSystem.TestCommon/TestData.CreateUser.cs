@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -17,7 +16,7 @@ public partial class TestData
             active ??= true;
             name ??= GenerateName();
             email ??= GenerateUniqueEmail();
-            roles ??= new[] { UserRoles.Helpdesk };
+            roles ??= [UserRoles.Helpdesk];
 
             var user = new User()
             {
@@ -26,7 +25,6 @@ public partial class TestData
                 Email = email,
                 Roles = roles,
                 UserId = Guid.NewGuid(),
-                UserType = UserType.Person,
                 AzureAdUserId = null
             };
 
