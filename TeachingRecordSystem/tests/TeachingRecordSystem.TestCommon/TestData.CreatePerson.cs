@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Microsoft.Xrm.Sdk.Messages;
 using Optional;
 using Optional.Unsafe;
@@ -551,8 +550,8 @@ public partial class TestData
         public required string? NationalInsuranceNumber { get; init; }
         public required DateOnly? QtsDate { get; init; }
         public required DateOnly? EytsDate { get; init; }
-        public required ImmutableArray<Sanction> Sanctions { get; init; }
-        public required ImmutableArray<MandatoryQualificationInfo> MandatoryQualifications { get; init; }
+        public required IReadOnlyCollection<Sanction> Sanctions { get; init; }
+        public required IReadOnlyCollection<MandatoryQualificationInfo> MandatoryQualifications { get; init; }
     }
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);

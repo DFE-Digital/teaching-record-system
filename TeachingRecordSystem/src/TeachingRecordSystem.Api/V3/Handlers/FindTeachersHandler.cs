@@ -62,7 +62,7 @@ public class FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfig
                         Code = s.SanctionCode,
                         StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
                     })
-                    .ToImmutableArray(),
+                    .AsReadOnly(),
                 PreviousNames = previousNames[r.Id]
                     .Select(name => new NameInfo()
                     {
@@ -70,10 +70,10 @@ public class FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfig
                         MiddleName = name.MiddleName,
                         LastName = name.LastName
                     })
-                    .ToImmutableArray()
+                    .AsReadOnly()
             })
             .OrderBy(c => c.Trn)
-            .ToImmutableArray()
+            .AsReadOnly()
         };
     }
 }

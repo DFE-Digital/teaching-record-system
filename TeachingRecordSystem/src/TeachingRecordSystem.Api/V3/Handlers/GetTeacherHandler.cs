@@ -272,18 +272,20 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Option.Some(MapInduction(induction!, inductionPeriods!, request.AccessMode)) :
                 default,
             InitialTeacherTraining = request.Include.HasFlag(GetTeacherRequestIncludes.InitialTeacherTraining) ?
-                Option.Some(itt!.Select(i => new GetTeacherResponseInitialTeacherTraining()
-                {
-                    Qualification = MapIttQualification(i),
-                    ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>(),
-                    ProgrammeTypeDescription = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
-                    StartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    EndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
-                    AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
-                    Provider = MapIttProvider(i),
-                    Subjects = MapSubjects(i)
-                })) :
+                Option.Some(itt!
+                    .Select(i => new GetTeacherResponseInitialTeacherTraining()
+                    {
+                        Qualification = MapIttQualification(i),
+                        ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>(),
+                        ProgrammeTypeDescription = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
+                        StartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        EndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
+                        AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
+                        Provider = MapIttProvider(i),
+                        Subjects = MapSubjects(i)
+                    })
+                    .AsReadOnly()) :
                 default,
             NpqQualifications = request.Include.HasFlag(GetTeacherRequestIncludes.NpqQualifications) ?
                 Option.Some(MapNpqQualifications(qualifications!, request.AccessMode)) :
@@ -302,7 +304,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     {
                         Code = s.SanctionCode,
                         StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
-                    })) :
+                    })
+                    .AsReadOnly()) :
                 default,
             Alerts = request.Include.HasFlag(GetTeacherRequestIncludes.Alerts) ?
                 Option.Some(sanctions!
@@ -313,10 +316,11 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                         DqtSanctionCode = s.SanctionCode,
                         StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                         EndDate = s.Sanction.dfeta_EndDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
-                    })) :
+                    })
+                    .AsReadOnly()) :
                 default,
             PreviousNames = request.Include.HasFlag(GetTeacherRequestIncludes.PreviousNames) ?
-                Option.Some(previousNames!.Select(n => n)) :
+                Option.Some(previousNames!.Select(n => n).AsReadOnly()) :
                 default,
             AllowIdSignInWithProhibitions = allowIdSignInWithProhibitions
         };
@@ -464,7 +468,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             null;
     }
 
-    private static IEnumerable<GetTeacherResponseInitialTeacherTrainingSubject> MapSubjects(dfeta_initialteachertraining initialTeacherTraining)
+    private static IReadOnlyCollection<GetTeacherResponseInitialTeacherTrainingSubject> MapSubjects(dfeta_initialteachertraining initialTeacherTraining)
     {
         var subjects = new List<GetTeacherResponseInitialTeacherTrainingSubject>();
 
@@ -484,7 +488,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         return subjects;
     }
 
-    private static IEnumerable<GetTeacherResponseNpqQualification> MapNpqQualifications(dfeta_qualification[] qualifications, AccessMode accessMode) =>
+    private static IReadOnlyCollection<GetTeacherResponseNpqQualification> MapNpqQualifications(dfeta_qualification[] qualifications, AccessMode accessMode) =>
         qualifications
             ?.Where(q => q.dfeta_Type.HasValue
                 && q.dfeta_Type.Value.IsNpq()
@@ -500,7 +504,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 },
                 CertificateUrl = accessMode == AccessMode.IdentityAccessToken ? $"/v3/certificates/npq/{q.Id}" : null
             })
-            .ToArray() ?? Array.Empty<GetTeacherResponseNpqQualification>();
+            .ToArray() ?? [];
 
     private static NpqQualificationType MapNpqQualificationType(dfeta_qualification_dfeta_Type qualificationType) =>
         qualificationType switch
@@ -517,7 +521,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             _ => throw new NotImplementedException($"Qualification Type {qualificationType} is not currently supported.")
         };
 
-    private static IEnumerable<GetTeacherResponseMandatoryQualification> MapMandatoryQualifications(dfeta_qualification[] qualifications) =>
+    private static IReadOnlyCollection<GetTeacherResponseMandatoryQualification> MapMandatoryQualifications(dfeta_qualification[] qualifications) =>
         qualifications
             ?.Where(q => q.dfeta_Type.HasValue
                 && q.dfeta_Type.Value == dfeta_qualification_dfeta_Type.MandatoryQualification
@@ -534,9 +538,9 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Awarded = mq.Awarded,
                 Specialism = mq.Specialism.dfeta_name
             })
-            .ToArray() ?? Array.Empty<GetTeacherResponseMandatoryQualification>();
+            .ToArray() ?? [];
 
-    private static IEnumerable<GetTeacherResponseHigherEducationQualification> MapHigherEducationQualifications(dfeta_qualification[] qualifications) =>
+    private static IReadOnlyCollection<GetTeacherResponseHigherEducationQualification> MapHigherEducationQualifications(dfeta_qualification[] qualifications) =>
         qualifications
             ?.Where(q =>
                 q.dfeta_Type.HasValue &&
@@ -587,5 +591,5 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     Subjects = heSubjects.ToArray()
                 };
             })
-            .ToArray() ?? Array.Empty<GetTeacherResponseHigherEducationQualification>();
+            .ToArray() ?? [];
 }

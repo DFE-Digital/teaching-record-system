@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.Api.V3.Requests;
 
@@ -8,7 +7,7 @@ public record FindTeachersResponse
 {
     public required int Total { get; init; }
     public required FindTeachersRequest Query { get; init; }
-    public required ImmutableArray<FindTeachersResponseResult> Results { get; init; }
+    public required IReadOnlyCollection<FindTeachersResponseResult> Results { get; init; }
 }
 
 public record FindTeachersResponseResult
@@ -18,6 +17,6 @@ public record FindTeachersResponseResult
     public required string FirstName { get; init; }
     public required string MiddleName { get; init; }
     public required string LastName { get; init; }
-    public required ImmutableArray<SanctionInfo> Sanctions { get; init; }
-    public required ImmutableArray<NameInfo> PreviousNames { get; init; }
+    public required IReadOnlyCollection<SanctionInfo> Sanctions { get; init; }
+    public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
 }

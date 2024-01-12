@@ -18,13 +18,13 @@ public record GetTeacherResponse
     public required GetTeacherResponseQts? Qts { get; init; }
     public required GetTeacherResponseEyts? Eyts { get; init; }
     public required Option<GetTeacherResponseInduction?> Induction { get; init; }
-    public required Option<IEnumerable<GetTeacherResponseInitialTeacherTraining>> InitialTeacherTraining { get; init; }
-    public required Option<IEnumerable<GetTeacherResponseNpqQualification>> NpqQualifications { get; init; }
-    public required Option<IEnumerable<GetTeacherResponseMandatoryQualification>> MandatoryQualifications { get; init; }
-    public required Option<IEnumerable<GetTeacherResponseHigherEducationQualification>> HigherEducationQualifications { get; init; }
-    public required Option<IEnumerable<SanctionInfo>> Sanctions { get; init; }
-    public required Option<IEnumerable<AlertInfo>> Alerts { get; init; }
-    public required Option<IEnumerable<NameInfo>> PreviousNames { get; init; }
+    public required Option<IReadOnlyCollection<GetTeacherResponseInitialTeacherTraining>> InitialTeacherTraining { get; init; }
+    public required Option<IReadOnlyCollection<GetTeacherResponseNpqQualification>> NpqQualifications { get; init; }
+    public required Option<IReadOnlyCollection<GetTeacherResponseMandatoryQualification>> MandatoryQualifications { get; init; }
+    public required Option<IReadOnlyCollection<GetTeacherResponseHigherEducationQualification>> HigherEducationQualifications { get; init; }
+    public required Option<IReadOnlyCollection<SanctionInfo>> Sanctions { get; init; }
+    public required Option<IReadOnlyCollection<AlertInfo>> Alerts { get; init; }
+    public required Option<IReadOnlyCollection<NameInfo>> PreviousNames { get; init; }
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
 }
 
@@ -52,7 +52,7 @@ public record GetTeacherResponseInduction
     public required string? StatusDescription { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string? CertificateUrl { get; init; }
-    public required IEnumerable<GetTeacherResponseInductionPeriod> Periods { get; init; }
+    public required IReadOnlyCollection<GetTeacherResponseInductionPeriod> Periods { get; init; }
 }
 
 public record GetTeacherResponseInductionPeriod
@@ -78,7 +78,7 @@ public record GetTeacherResponseInitialTeacherTraining
     public required IttOutcome? Result { get; init; }
     public required GetTeacherResponseInitialTeacherTrainingAgeRange? AgeRange { get; init; }
     public required GetTeacherResponseInitialTeacherTrainingProvider? Provider { get; init; }
-    public required IEnumerable<GetTeacherResponseInitialTeacherTrainingSubject> Subjects { get; init; }
+    public required IReadOnlyCollection<GetTeacherResponseInitialTeacherTrainingSubject> Subjects { get; init; }
 }
 
 public record GetTeacherResponseInitialTeacherTrainingQualification
@@ -127,7 +127,7 @@ public record GetTeacherResponseHigherEducationQualification
 {
     public required string Name { get; init; }
     public required DateOnly? Awarded { get; init; }
-    public required IEnumerable<GetTeacherResponseHigherEducationQualificationSubject> Subjects { get; init; }
+    public required IReadOnlyCollection<GetTeacherResponseHigherEducationQualificationSubject> Subjects { get; init; }
 }
 
 public record GetTeacherResponseHigherEducationQualificationSubject
