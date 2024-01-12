@@ -5,8 +5,8 @@ namespace TeachingRecordSystem.Api.Tests.V3;
 
 public class GetTeacherByTrnTests : GetTeacherTestBase
 {
-    public GetTeacherByTrnTests(ApiFixture apiFixture)
-        : base(apiFixture)
+    public GetTeacherByTrnTests(HostFixture hostFixture)
+        : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.GetPerson });
     }
@@ -20,7 +20,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
 
         // Act
-        var response = await ApiFixture.CreateClient().SendAsync(request);
+        var response = await HostFixture.CreateClient().SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);

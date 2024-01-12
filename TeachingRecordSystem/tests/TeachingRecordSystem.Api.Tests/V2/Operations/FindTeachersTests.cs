@@ -4,9 +4,9 @@ using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-public class FindTeachersTests : ApiTestBase
+public class FindTeachersTests : TestBase
 {
-    public FindTeachersTests(ApiFixture apiFixture) : base(apiFixture)
+    public FindTeachersTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.GetPerson });
     }

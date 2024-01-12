@@ -6,9 +6,9 @@ using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-public class GetTrnRequestTests : ApiTestBase
+public class GetTrnRequestTests : TestBase
 {
-    public GetTrnRequestTests(ApiFixture apiFixture) : base(apiFixture)
+    public GetTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }

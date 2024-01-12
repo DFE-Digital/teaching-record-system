@@ -6,10 +6,10 @@ using TeachingRecordSystem.Api.V2.ApiModels;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-public class GetTeacherTests : ApiTestBase
+public class GetTeacherTests : TestBase
 {
-    public GetTeacherTests(ApiFixture apiFixture)
-        : base(apiFixture)
+    public GetTeacherTests(HostFixture hostFixture)
+        : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson });
     }

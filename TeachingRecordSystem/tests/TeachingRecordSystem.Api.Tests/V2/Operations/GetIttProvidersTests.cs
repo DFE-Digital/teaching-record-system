@@ -2,9 +2,9 @@
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-public class GetIttProvidersTests : ApiTestBase
+public class GetIttProvidersTests : TestBase
 {
-    public GetIttProvidersTests(ApiFixture apiFixture) : base(apiFixture)
+    public GetIttProvidersTests(HostFixture hostFixture) : base(hostFixture)
     {
     }
 

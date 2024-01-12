@@ -2,10 +2,10 @@ using Microsoft.Xrm.Sdk;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
-public class GetNpqCertificateTests : ApiTestBase
+public class GetNpqCertificateTests : TestBase
 {
-    public GetNpqCertificateTests(ApiFixture apiFixture)
-        : base(apiFixture)
+    public GetNpqCertificateTests(HostFixture hostFixture)
+        : base(hostFixture)
     {
     }
 

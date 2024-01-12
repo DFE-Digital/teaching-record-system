@@ -4,9 +4,9 @@ using Microsoft.Xrm.Sdk;
 
 namespace TeachingRecordSystem.Api.Tests.Filters;
 
-public class CrmServiceProtectionFaultExceptionFilterTests : ApiTestBase
+public class CrmServiceProtectionFaultExceptionFilterTests : TestBase
 {
-    public CrmServiceProtectionFaultExceptionFilterTests(ApiFixture apiFixture) : base(apiFixture)
+    public CrmServiceProtectionFaultExceptionFilterTests(HostFixture hostFixture) : base(hostFixture)
     {
     }
 

@@ -4,9 +4,9 @@ using TeachingRecordSystem.Api.V2.Requests;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-public class SetNpqQualificationTests : ApiTestBase
+public class SetNpqQualificationTests : TestBase
 {
-    public SetNpqQualificationTests(ApiFixture apiFixture) : base(apiFixture)
+    public SetNpqQualificationTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.UpdateNpq });
     }

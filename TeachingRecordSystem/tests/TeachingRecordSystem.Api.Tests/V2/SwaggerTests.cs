@@ -1,8 +1,8 @@
 namespace TeachingRecordSystem.Api.Tests.V2;
 
-public class SwaggerTests : ApiTestBase
+public class SwaggerTests : TestBase
 {
-    public SwaggerTests(ApiFixture apiFixture) : base(apiFixture)
+    public SwaggerTests(HostFixture hostFixture) : base(hostFixture)
     {
     }
 
@@ -11,7 +11,7 @@ public class SwaggerTests : ApiTestBase
     {
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, "swagger/v2.json");
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
 
         // Act
         var response = await httpClient.SendAsync(request);

@@ -1,9 +1,9 @@
 namespace TeachingRecordSystem.Api.Tests.V3;
 
-public class GetEytsCertificateTests : ApiTestBase
+public class GetEytsCertificateTests : TestBase
 {
-    public GetEytsCertificateTests(ApiFixture apiFixture)
-        : base(apiFixture)
+    public GetEytsCertificateTests(HostFixture hostFixture)
+        : base(hostFixture)
     {
     }
 

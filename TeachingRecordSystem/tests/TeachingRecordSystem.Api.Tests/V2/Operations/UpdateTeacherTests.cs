@@ -9,9 +9,9 @@ using TeachingRecordSystem.Api.Validation;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-public class UpdateTeacherTests : ApiTestBase
+public class UpdateTeacherTests : TestBase
 {
-    public UpdateTeacherTests(ApiFixture apiFixture) : base(apiFixture)
+    public UpdateTeacherTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }

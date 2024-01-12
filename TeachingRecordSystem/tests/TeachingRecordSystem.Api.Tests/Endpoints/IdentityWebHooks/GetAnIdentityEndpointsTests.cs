@@ -8,20 +8,20 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Tests.Endpoints.IdentityWebHooks;
 
-public class GetAnIdentityEndpointsTests : ApiTestBase
+public class GetAnIdentityEndpointsTests : TestBase
 {
-    public GetAnIdentityEndpointsTests(ApiFixture apiFixture)
-       : base(apiFixture)
+    public GetAnIdentityEndpointsTests(HostFixture hostFixture)
+       : base(hostFixture)
     {
     }
 
-    private IOptions<GetAnIdentityOptions> GetAnIdentityOptions => ApiFixture.Services.GetRequiredService<IOptions<GetAnIdentityOptions>>();
+    private IOptions<GetAnIdentityOptions> GetAnIdentityOptions => HostFixture.Services.GetRequiredService<IOptions<GetAnIdentityOptions>>();
 
     [Fact]
     public async Task Post_WithNoSignatureInHeader_ReturnsUnauthorised()
     {
         // Arrange
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity");
 
@@ -37,7 +37,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
     {
         // Arrange
         var signature = "InvalidSignature";
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity");
@@ -60,7 +60,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
 
         var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(GetAnIdentityOptions.Value.WebHookClientSecret, jsonContent);
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
@@ -89,7 +89,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
 
         var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(GetAnIdentityOptions.Value.WebHookClientSecret, jsonContent);
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
@@ -115,7 +115,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
 
         var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(GetAnIdentityOptions.Value.WebHookClientSecret, jsonContent);
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
@@ -144,7 +144,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
 
         var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(GetAnIdentityOptions.Value.WebHookClientSecret, jsonContent);
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
@@ -189,7 +189,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
 
         var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(GetAnIdentityOptions.Value.WebHookClientSecret, jsonContent);
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
@@ -236,7 +236,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
 
         var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(GetAnIdentityOptions.Value.WebHookClientSecret, jsonContent);
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
@@ -283,7 +283,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
 
         var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(GetAnIdentityOptions.Value.WebHookClientSecret, jsonContent);
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
@@ -336,7 +336,7 @@ public class GetAnIdentityEndpointsTests : ApiTestBase
 
         var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
         var signature = GenerateSignature(GetAnIdentityOptions.Value.WebHookClientSecret, jsonContent);
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")

@@ -2,13 +2,13 @@ using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
-public class GetQtsCertificateTests : ApiTestBase
+public class GetQtsCertificateTests : TestBase
 {
     private const string QtsAwardedInWalesTeacherStatusValue = "213";
     private readonly Guid _qtsAwardedInWalesTeacherStatusId = Guid.NewGuid();
 
-    public GetQtsCertificateTests(ApiFixture apiFixture)
-        : base(apiFixture)
+    public GetQtsCertificateTests(HostFixture hostFixture)
+        : base(hostFixture)
     {
     }
 

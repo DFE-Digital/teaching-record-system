@@ -3,10 +3,10 @@ using TeachingRecordSystem.Api.Properties;
 
 namespace TeachingRecordSystem.Api.Tests.V1.Operations;
 
-public class GetTeacherTests : ApiTestBase
+public class GetTeacherTests : TestBase
 {
-    public GetTeacherTests(ApiFixture apiFixture)
-        : base(apiFixture)
+    public GetTeacherTests(HostFixture hostFixture)
+        : base(hostFixture)
     {
     }
 

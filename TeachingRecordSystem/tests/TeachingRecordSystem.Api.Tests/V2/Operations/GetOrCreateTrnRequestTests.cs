@@ -8,9 +8,9 @@ using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-public class GetOrCreateTrnRequestTests : ApiTestBase
+public class GetOrCreateTrnRequestTests : TestBase
 {
-    public GetOrCreateTrnRequestTests(ApiFixture apiFixture) : base(apiFixture)
+    public GetOrCreateTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }

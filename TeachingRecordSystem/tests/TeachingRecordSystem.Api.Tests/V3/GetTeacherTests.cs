@@ -4,8 +4,8 @@ namespace TeachingRecordSystem.Api.Tests.V3;
 
 public class GetTeacherTests : GetTeacherTestBase
 {
-    public GetTeacherTests(ApiFixture apiFixture)
-        : base(apiFixture)
+    public GetTeacherTests(HostFixture hostFixture)
+        : base(hostFixture)
     {
     }
 
