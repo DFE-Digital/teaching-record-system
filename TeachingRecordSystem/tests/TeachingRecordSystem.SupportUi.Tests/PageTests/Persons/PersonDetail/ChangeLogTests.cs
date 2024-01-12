@@ -158,8 +158,8 @@ public class ChangeLogTests : TestBase
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification().WithMandatoryQualification());
         var mqs = new (bool RaisedByDqtUser, TestData.MandatoryQualificationInfo Mq, DateTime CreatedUtc)[]
         {
-            (true, person.MandatoryQualifications[0], Clock.UtcNow.AddSeconds(-2)),
-            (false, person.MandatoryQualifications[1], Clock.UtcNow)
+            (true, person.MandatoryQualifications.First(), Clock.UtcNow.AddSeconds(-2)),
+            (false, person.MandatoryQualifications.Last(), Clock.UtcNow)
         };
 
         var dqtUserId = await TestData.GetCurrentCrmUserId();
@@ -253,8 +253,8 @@ public class ChangeLogTests : TestBase
         var dateTimeInsideBst = new DateTime(2021, 6, 1, 10, 30, 0, DateTimeKind.Utc);
         var mqs = new (bool RaisedByDqtUser, TestData.MandatoryQualificationInfo Mq, DateTime CreatedUtc)[]
         {
-            (true, person.MandatoryQualifications[0], dateTimeOutsideBst),
-            (false, person.MandatoryQualifications[1], dateTimeInsideBst)
+            (true, person.MandatoryQualifications.First(), dateTimeOutsideBst),
+            (false, person.MandatoryQualifications.Last(), dateTimeInsideBst)
         };
 
         var dqtUserId = await TestData.GetCurrentCrmUserId();

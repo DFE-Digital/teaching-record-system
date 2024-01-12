@@ -121,8 +121,8 @@ public class FindTeachersTests : ApiTestBase
                         {
                             new
                             {
-                                code = person1.Sanctions[0].SanctionCode,
-                                startDate = person1.Sanctions[0].StartDate
+                                code = person1.Sanctions.First().SanctionCode,
+                                startDate = person1.Sanctions.First().StartDate
                             }
                         },
                         previousNames = Array.Empty<object>()
@@ -138,8 +138,8 @@ public class FindTeachersTests : ApiTestBase
                         {
                             new
                             {
-                                code = person2.Sanctions[0].SanctionCode,
-                                startDate = person2.Sanctions[0].StartDate
+                                code = person2.Sanctions.First().SanctionCode,
+                                startDate = person2.Sanctions.First().StartDate
                             }
                         },
                         previousNames = Array.Empty<object>()
@@ -194,8 +194,8 @@ public class FindTeachersTests : ApiTestBase
                         {
                             new
                             {
-                                code = person1.Sanctions[0].SanctionCode,
-                                startDate = person1.Sanctions[0].StartDate
+                                code = person1.Sanctions.First().SanctionCode,
+                                startDate = person1.Sanctions.First().StartDate
                             }
                         },
                         previousNames = Array.Empty<object>()
@@ -211,8 +211,8 @@ public class FindTeachersTests : ApiTestBase
                         {
                             new
                             {
-                                code = person2.Sanctions[0].SanctionCode,
-                                startDate = person2.Sanctions[0].StartDate
+                                code = person2.Sanctions.First().SanctionCode,
+                                startDate = person2.Sanctions.First().StartDate
                             }
                         },
                         previousNames = new object[]

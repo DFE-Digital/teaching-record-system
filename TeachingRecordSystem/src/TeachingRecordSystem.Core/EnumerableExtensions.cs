@@ -2,6 +2,9 @@ namespace TeachingRecordSystem.Core;
 
 public static class EnumerableExtensions
 {
+    public static IReadOnlyCollection<T> AsReadOnly<T>(this IEnumerable<T> enumerable) =>
+        enumerable is IReadOnlyCollection<T> roc ? roc : enumerable.ToArray();
+
     public static T First<T>(this IEnumerable<T> source, Func<T, bool> predicate, string failedErrorMessage) =>
         source.FirstOrDefault(predicate) ?? throw new InvalidOperationException(failedErrorMessage);
 

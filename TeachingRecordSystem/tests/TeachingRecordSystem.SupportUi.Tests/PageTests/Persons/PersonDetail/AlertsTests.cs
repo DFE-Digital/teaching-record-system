@@ -66,12 +66,12 @@ public class AlertsTests : TestBase
         var previousAlerts = doc.GetElementByTestId("previous-alerts");
         Assert.NotNull(previousAlerts);
 
-        var previousAlert = previousAlerts.GetElementByTestId($"previous-alert-{person.Sanctions[0].SanctionId}");
+        var previousAlert = previousAlerts.GetElementByTestId($"previous-alert-{person.Sanctions.First().SanctionId}");
         Assert.NotNull(previousAlert);
-        Assert.Equal(sanctionCodeName, previousAlert.GetElementByTestId($"previous-alert-description-{person.Sanctions[0].SanctionId}")!.TextContent);
-        Assert.Equal(sanctionStartDate.ToString("dd/MM/yyyy"), previousAlert.GetElementByTestId($"previous-alert-start-date-{person.Sanctions[0].SanctionId}")!.TextContent);
-        Assert.Equal(sanctionEndDate.ToString("dd/MM/yyyy"), previousAlert.GetElementByTestId($"previous-alert-end-date-{person.Sanctions[0].SanctionId}")!.TextContent);
-        Assert.Equal("Closed", previousAlert.GetElementByTestId($"previous-alert-status-{person.Sanctions[0].SanctionId}")!.TextContent);
+        Assert.Equal(sanctionCodeName, previousAlert.GetElementByTestId($"previous-alert-description-{person.Sanctions.First().SanctionId}")!.TextContent);
+        Assert.Equal(sanctionStartDate.ToString("dd/MM/yyyy"), previousAlert.GetElementByTestId($"previous-alert-start-date-{person.Sanctions.First().SanctionId}")!.TextContent);
+        Assert.Equal(sanctionEndDate.ToString("dd/MM/yyyy"), previousAlert.GetElementByTestId($"previous-alert-end-date-{person.Sanctions.First().SanctionId}")!.TextContent);
+        Assert.Equal("Closed", previousAlert.GetElementByTestId($"previous-alert-status-{person.Sanctions.First().SanctionId}")!.TextContent);
     }
 
     [Fact]
@@ -92,10 +92,10 @@ public class AlertsTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await response.GetDocument();
-        var currentAlert = doc.GetElementByTestId($"current-alert-{person.Sanctions[0].SanctionId}");
+        var currentAlert = doc.GetElementByTestId($"current-alert-{person.Sanctions.First().SanctionId}");
         Assert.NotNull(currentAlert);
-        Assert.Equal(sanctionStartDate.ToString("dd/MM/yyyy"), currentAlert.GetElementByTestId($"current-alert-start-date-{person.Sanctions[0].SanctionId}")!.TextContent);
-        var details = currentAlert.GetElementByTestId($"current-alert-details-{person.Sanctions[0].SanctionId}");
+        Assert.Equal(sanctionStartDate.ToString("dd/MM/yyyy"), currentAlert.GetElementByTestId($"current-alert-start-date-{person.Sanctions.First().SanctionId}")!.TextContent);
+        var details = currentAlert.GetElementByTestId($"current-alert-details-{person.Sanctions.First().SanctionId}");
         Assert.NotNull(details);
 
         var previousAlerts = doc.GetElementByTestId("previous-alerts");
@@ -126,20 +126,20 @@ public class AlertsTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await response.GetDocument();
-        var currentAlert = doc.GetElementByTestId($"current-alert-{person.Sanctions[0].SanctionId}");
+        var currentAlert = doc.GetElementByTestId($"current-alert-{person.Sanctions.First().SanctionId}");
         Assert.NotNull(currentAlert);
-        Assert.Equal(sanction1StartDate.ToString("dd/MM/yyyy"), currentAlert.GetElementByTestId($"current-alert-start-date-{person.Sanctions[0].SanctionId}")!.TextContent);
-        var details = currentAlert.GetElementByTestId($"current-alert-details-{person.Sanctions[0].SanctionId}");
+        Assert.Equal(sanction1StartDate.ToString("dd/MM/yyyy"), currentAlert.GetElementByTestId($"current-alert-start-date-{person.Sanctions.First().SanctionId}")!.TextContent);
+        var details = currentAlert.GetElementByTestId($"current-alert-details-{person.Sanctions.First().SanctionId}");
         Assert.NotNull(details);
 
         var previousAlerts = doc.GetElementByTestId("previous-alerts");
         Assert.NotNull(previousAlerts);
 
-        var previousAlert = previousAlerts.GetElementByTestId($"previous-alert-{person.Sanctions[1].SanctionId}");
+        var previousAlert = previousAlerts.GetElementByTestId($"previous-alert-{person.Sanctions.Last().SanctionId}");
         Assert.NotNull(previousAlert);
-        Assert.Equal(sanction2CodeName, previousAlert.GetElementByTestId($"previous-alert-description-{person.Sanctions[1].SanctionId}")!.TextContent);
-        Assert.Equal(sanction2StartDate.ToString("dd/MM/yyyy"), previousAlert.GetElementByTestId($"previous-alert-start-date-{person.Sanctions[1].SanctionId}")!.TextContent);
-        Assert.Equal(sanction2EndDate.ToString("dd/MM/yyyy"), previousAlert.GetElementByTestId($"previous-alert-end-date-{person.Sanctions[1].SanctionId}")!.TextContent);
-        Assert.Equal("Closed", previousAlert.GetElementByTestId($"previous-alert-status-{person.Sanctions[1].SanctionId}")!.TextContent);
+        Assert.Equal(sanction2CodeName, previousAlert.GetElementByTestId($"previous-alert-description-{person.Sanctions.Last().SanctionId}")!.TextContent);
+        Assert.Equal(sanction2StartDate.ToString("dd/MM/yyyy"), previousAlert.GetElementByTestId($"previous-alert-start-date-{person.Sanctions.Last().SanctionId}")!.TextContent);
+        Assert.Equal(sanction2EndDate.ToString("dd/MM/yyyy"), previousAlert.GetElementByTestId($"previous-alert-end-date-{person.Sanctions.Last().SanctionId}")!.TextContent);
+        Assert.Equal("Closed", previousAlert.GetElementByTestId($"previous-alert-status-{person.Sanctions.Last().SanctionId}")!.TextContent);
     }
 }
