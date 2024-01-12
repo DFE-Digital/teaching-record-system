@@ -1,5 +1,7 @@
 using FormFlow;
 using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.StartDate;
@@ -88,13 +90,21 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_Confirm_CompletesJourneyRedirectsWithFlashMessageAndUpdatesMq()
+    public async Task Post_Confirm_UpdatesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
+
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualification = person.MandatoryQualifications.First();
+        var qualificationId = qualification.QualificationId;
+        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(qualification.DqtMqEstablishmentValue!);
+        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
+        Assert.NotNull(provider);
+
+        EventObserver.Clear();
+
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStartDateState()
@@ -126,6 +136,51 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
             Assert.Equal(newStartDate, qualification.StartDate);
+        });
+
+        EventObserver.AssertEventsSaved(e =>
+        {
+            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent()
+            {
+                EventId = Guid.Empty,
+                CreatedUtc = Clock.UtcNow,
+                RaisedBy = GetCurrentUserId(),
+                PersonId = person.PersonId,
+                MandatoryQualification = new()
+                {
+                    QualificationId = qualificationId,
+                    Provider = new()
+                    {
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name,
+                        DqtMqEstablishmentId = mqEstablishment.Id,
+                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                    },
+                    Specialism = qualification.Specialism,
+                    Status = qualification.Status,
+                    StartDate = newStartDate,
+                    EndDate = qualification.EndDate
+                },
+                OldMandatoryQualification = new()
+                {
+                    QualificationId = qualificationId,
+                    Provider = new()
+                    {
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name,
+                        DqtMqEstablishmentId = mqEstablishment.Id,
+                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                    },
+                    Specialism = qualification.Specialism,
+                    Status = qualification.Status,
+                    StartDate = oldStartDate,
+                    EndDate = qualification.EndDate
+                },
+                Changes = MandatoryQualificationUpdatedEventChanges.StartDate
+            };
+
+            var actualMqUpdatedEvent = Assert.IsType<MandatoryQualificationUpdatedEvent>(e);
+            Assert.Equivalent(expectedMqUpdatedEvent with { EventId = actualMqUpdatedEvent.EventId }, actualMqUpdatedEvent);
         });
     }
 

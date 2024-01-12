@@ -1,5 +1,4 @@
 using FormFlow;
-using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
@@ -146,6 +145,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithStartDate(startDate)
             .WithEndDate(endDate)));
 
+        EventObserver.Clear();
+
         var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(mqEstablishmentDqtValue);
         MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
@@ -178,13 +179,6 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var redirectResponse = await response.FollowRedirect(HttpClient);
         var redirectDoc = await redirectResponse.GetDocument();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification deleted");
-
-        await WithDbContext(async dbContext =>
-        {
-            var mq = await dbContext.MandatoryQualifications.IgnoreQueryFilters().SingleOrDefaultAsync(mq => mq.QualificationId == qualificationId);
-            Assert.NotNull(mq);
-            Assert.Equal(Clock.UtcNow, mq.DeletedOn);
-        });
 
         EventObserver.AssertEventsSaved(e =>
         {

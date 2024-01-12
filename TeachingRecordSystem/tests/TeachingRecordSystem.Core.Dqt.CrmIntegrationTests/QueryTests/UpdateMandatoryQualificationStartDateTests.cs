@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events;
+
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
 public class UpdateMandatoryQualificationStartDateTests : IAsyncLifetime
@@ -32,7 +34,8 @@ public class UpdateMandatoryQualificationStartDateTests : IAsyncLifetime
         await _crmQueryDispatcher.ExecuteQuery(
             new UpdateMandatoryQualificationStartDateQuery(
                 qualification.QualificationId,
-                newStartDate));
+                newStartDate,
+                DummyEvent.Create()));
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

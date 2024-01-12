@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -13,7 +15,8 @@ public class CheckAnswersModel(
     ICrmQueryDispatcher crmQueryDispatcher,
     ReferenceDataCache referenceDataCache,
     TrsLinkGenerator linkGenerator,
-    IBackgroundJobScheduler backgroundJobScheduler) : PageModel
+    IBackgroundJobScheduler backgroundJobScheduler,
+    IClock clock) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -34,11 +37,41 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPost()
     {
+        var qualificationId = Guid.NewGuid();
+
         var mqSpecialism = await referenceDataCache.GetMqSpecialismByValue(Specialism!.Value.GetDqtValue());
 
-        var qualificationId = await crmQueryDispatcher.ExecuteQuery(
+        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(MqEstablishment, out var provider);
+
+        var createdEvent = new MandatoryQualificationCreatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = clock.UtcNow,
+            RaisedBy = User.GetUserId(),
+            PersonId = PersonId,
+            MandatoryQualification = new()
+            {
+                QualificationId = qualificationId,
+                Provider = provider is not null || MqEstablishment is not null ?
+                    new()
+                    {
+                        MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
+                        Name = provider?.Name,
+                        DqtMqEstablishmentId = MqEstablishment?.Id,
+                        DqtMqEstablishmentName = MqEstablishment?.dfeta_name
+                    } :
+                    null,
+                Specialism = Specialism,
+                Status = Status,
+                StartDate = StartDate,
+                EndDate = EndDate
+            }
+        };
+
+        await crmQueryDispatcher.ExecuteQuery(
             new CreateMandatoryQualificationQuery()
             {
+                QualificationId = qualificationId,
                 ContactId = PersonId,
                 MqEstablishmentId = MqEstablishment!.Id,
                 SpecialismId = mqSpecialism.Id,
@@ -46,10 +79,12 @@ public class CheckAnswersModel(
                 Status = Status!.Value.GetDqtStatus(),
                 EndDate = Status == MandatoryQualificationStatus.Passed
                     ? EndDate!.Value
-                    : null
+                    : null,
+                Event = createdEvent
             });
 
-        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncMandatoryQualification(qualificationId, CancellationToken.None));
+        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(
+            helper => helper.SyncMandatoryQualification(qualificationId, new[] { createdEvent }, CancellationToken.None));
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification added");

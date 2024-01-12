@@ -13,7 +13,8 @@ public class UpdateMandatoryQualificationEstablishmentHandler : ICrmQueryHandler
             Target = new dfeta_qualification()
             {
                 Id = query.QualificationId,
-                dfeta_MQ_MQEstablishmentId = query.MqEstablishmentId.ToEntityReference(dfeta_mqestablishment.EntityLogicalName)
+                dfeta_MQ_MQEstablishmentId = query.MqEstablishmentId.ToEntityReference(dfeta_mqestablishment.EntityLogicalName),
+                dfeta_TRSEvent = EventInfo.Create(query.Event).Serialize()
             }
         });
 

@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events;
+
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
 public class UpdateMandatoryQualificationStatusTests : IAsyncLifetime
@@ -39,7 +41,8 @@ public class UpdateMandatoryQualificationStatusTests : IAsyncLifetime
             new UpdateMandatoryQualificationStatusQuery(
                 qualification.QualificationId,
                 newMqStatus.GetDqtStatus(),
-                newEndDate));
+                newEndDate,
+                DummyEvent.Create()));
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

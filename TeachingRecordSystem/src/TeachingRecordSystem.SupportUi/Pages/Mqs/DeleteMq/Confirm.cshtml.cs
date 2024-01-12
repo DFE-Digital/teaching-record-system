@@ -16,8 +16,8 @@ public class ConfirmModel(
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
     ReferenceDataCache referenceDataCache,
-    IClock clock,
-    IBackgroundJobScheduler backgroundJobScheduler) : PageModel
+    IBackgroundJobScheduler backgroundJobScheduler,
+    IClock clock) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -99,9 +99,10 @@ public class ConfirmModel(
         await crmQueryDispatcher.ExecuteQuery(
             new DeleteQualificationQuery(
                 QualificationId,
-                EventInfo.Create(deletedEvent).Serialize()));
+                deletedEvent));
 
-        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncMandatoryQualification(QualificationId, CancellationToken.None));
+        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(
+            helper => helper.SyncMandatoryQualification(QualificationId, new[] { deletedEvent }, CancellationToken.None));
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification deleted");

@@ -1,11 +1,14 @@
 using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.ServiceModel;
 using System.Text.Json;
+using Microsoft.Crm.Sdk.Messages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using Npgsql;
 using NpgsqlTypes;
@@ -26,6 +29,7 @@ public class TrsDataSyncHelper(
 
     private const string NowParameterName = "@now";
     private const string IdsParameterName = "@ids";
+    private const int MaxAuditRequestsPerBatch = 10;
 
     private static readonly IReadOnlyDictionary<string, ModelTypeSyncInfo> _modelTypeSyncInfo = new Dictionary<string, ModelTypeSyncInfo>()
     {
@@ -37,10 +41,52 @@ public class TrsDataSyncHelper(
 
     public IObservable<object[]> GetSyncedEntitiesObservable() => _syncedEntitiesSubject;
 
+    private bool IsFakeXrm { get; } = organizationService.GetType().FullName == "Castle.Proxies.ObjectProxy_2";
+
     public static (string EntityLogicalName, string[] AttributeNames) GetEntityInfoForModelType(string modelType)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
         return (modelTypeSyncInfo.EntityLogicalName, modelTypeSyncInfo.AttributeNames);
+    }
+
+    public static MandatoryQualification MapMandatoryQualificationFromDqtQualification(
+        dfeta_qualification qualification,
+        IEnumerable<dfeta_mqestablishment> mqEstablishments,
+        IEnumerable<dfeta_specialism> mqSpecialisms)
+    {
+        if (qualification.dfeta_Type != dfeta_qualification_dfeta_Type.MandatoryQualification)
+        {
+            throw new ArgumentException("Qualification is not a mandatory qualification.", nameof(qualification));
+        }
+
+        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(
+            mqEstablishments.SingleOrDefault(e => e.Id == qualification.dfeta_MQ_MQEstablishmentId!?.Id), out var provider);
+
+        MandatoryQualificationSpecialism? specialism = qualification.dfeta_MQ_SpecialismId is not null ?
+            mqSpecialisms.Single(s => s.Id == qualification.dfeta_MQ_SpecialismId.Id).ToMandatoryQualificationSpecialism() :
+            null;
+
+        MandatoryQualificationStatus? status = qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus() ??
+            (qualification.dfeta_MQ_Date.HasValue ? MandatoryQualificationStatus.Passed : null);
+
+        return new MandatoryQualification()
+        {
+            QualificationId = qualification.Id,
+            CreatedOn = qualification.CreatedOn!.Value,
+            UpdatedOn = qualification.ModifiedOn!.Value,
+            PersonId = qualification.dfeta_PersonId.Id,
+            DqtQualificationId = qualification.Id,
+            DqtState = (int)qualification.StateCode!,
+            DqtCreatedOn = qualification.CreatedOn!.Value,
+            DqtModifiedOn = qualification.ModifiedOn!.Value,
+            ProviderId = provider?.MandatoryQualificationProviderId,
+            Specialism = specialism,
+            Status = status,
+            StartDate = qualification.dfeta_MQStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            EndDate = qualification.dfeta_MQ_Date.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            DqtMqEstablishmentId = qualification.dfeta_MQ_MQEstablishmentId?.Id,
+            DqtSpecialismId = qualification.dfeta_MQ_SpecialismId?.Id
+        };
     }
 
     public async Task DeleteRecords(string modelType, IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)
@@ -93,7 +139,14 @@ public class TrsDataSyncHelper(
     public async Task<bool> SyncPerson(Guid contactId, CancellationToken cancellationToken)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.Person);
-        var contacts = await GetEntities<Contact>(Contact.EntityLogicalName, Contact.PrimaryIdAttribute, [contactId], modelTypeSyncInfo.AttributeNames, cancellationToken);
+
+        var contacts = await GetEntities<Contact>(
+            Contact.EntityLogicalName,
+            Contact.PrimaryIdAttribute,
+            [contactId],
+            modelTypeSyncInfo.AttributeNames,
+            cancellationToken);
+
         return await SyncPersons(contacts, ignoreInvalid: false, cancellationToken) == 1;
     }
 
@@ -191,31 +244,76 @@ public class TrsDataSyncHelper(
         return people.Count;
     }
 
-    public async Task<bool> SyncMandatoryQualification(Guid qualificationId, CancellationToken cancellationToken)
+    public async Task<bool> SyncMandatoryQualification(Guid qualificationId, IReadOnlyCollection<EventBase> events, CancellationToken cancellationToken)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.MandatoryQualification);
+
         var qualifications = await GetEntities<dfeta_qualification>(
             dfeta_qualification.EntityLogicalName,
             dfeta_qualification.PrimaryIdAttribute,
             [qualificationId],
             modelTypeSyncInfo.AttributeNames,
             cancellationToken);
-        return await SyncMandatoryQualifications(qualifications, ignoreInvalid: false, cancellationToken) == 1;
+
+        if (IsFakeXrm)
+        {
+            var mqEstablishments = await referenceDataCache.GetMqEstablishments();
+            var mqSpecialisms = await referenceDataCache.GetMqSpecialisms();
+
+            var mqs = qualifications.Select(q => MapMandatoryQualificationFromDqtQualification(q, mqEstablishments, mqSpecialisms)).ToArray();
+
+            return await SyncMandatoryQualifications(mqs, events, ignoreInvalid: false, cancellationToken) == 1;
+        }
+        else
+        {
+            return await SyncMandatoryQualifications(qualifications, ignoreInvalid: false, cancellationToken) == 1;
+        }
     }
 
-    public async Task<bool> SyncMandatoryQualification(dfeta_qualification entity, bool ignoreInvalid, CancellationToken cancellationToken = default) =>
-        await SyncMandatoryQualifications(new[] { entity }, ignoreInvalid, cancellationToken) == 1;
+    public async Task<bool> SyncMandatoryQualification(
+        dfeta_qualification entity,
+        AuditDetailCollection auditDetails,
+        bool ignoreInvalid,
+        CancellationToken cancellationToken = default)
+    {
+        var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
+        {
+            { entity.Id, auditDetails }
+        };
+
+        return await SyncMandatoryQualifications(new[] { entity }, auditDetailsDict, ignoreInvalid, cancellationToken) == 1;
+    }
 
     public async Task<int> SyncMandatoryQualifications(
         IReadOnlyCollection<dfeta_qualification> entities,
+        bool ignoreInvalid,
+        CancellationToken cancellationToken)
+    {
+        var auditDetails = await GetAuditRecords(dfeta_qualification.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
+
+        return await SyncMandatoryQualifications(entities, auditDetails, ignoreInvalid, cancellationToken);
+    }
+
+    public async Task<int> SyncMandatoryQualifications(
+        IReadOnlyCollection<dfeta_qualification> entities,
+        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
         bool ignoreInvalid,
         CancellationToken cancellationToken = default)
     {
         // Not all dfeta_qualification records are MQs..
         var toSync = entities.Where(q => q.dfeta_Type == dfeta_qualification_dfeta_Type.MandatoryQualification);
 
-        var (mqs, events) = await MapMandatoryQualifications(toSync);
+        var (mqs, events) = await MapMandatoryQualificationsAndAudits(toSync, auditDetails);
 
+        return await SyncMandatoryQualifications(mqs, events, ignoreInvalid, cancellationToken);
+    }
+
+    private async Task<int> SyncMandatoryQualifications(
+        IReadOnlyCollection<MandatoryQualification> mqs,
+        IReadOnlyCollection<EventBase> events,
+        bool ignoreInvalid,
+        CancellationToken cancellationToken)
+    {
         if (mqs.Count == 0)
         {
             Debug.Assert(events.Count == 0);
@@ -228,6 +326,8 @@ public class TrsDataSyncHelper(
 
         var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
         await connection.OpenAsync(cancellationToken);
+
+        var toSync = mqs.ToList();
 
         do
         {
@@ -244,7 +344,7 @@ public class TrsDataSyncHelper(
 
                 using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement, cancellationToken);
 
-                foreach (var mq in mqs)
+                foreach (var mq in toSync)
                 {
                     writer.StartRow();
                     modelTypeSyncInfo.WriteRecord(writer, mq);
@@ -283,8 +383,8 @@ public class TrsDataSyncHelper(
 
                     if (ignoreInvalid)
                     {
-                        mqs.RemoveAll(mq => mq.PersonId == personId);
-                        if (mqs.Count == 0)
+                        toSync.RemoveAll(mq => mq.PersonId == personId);
+                        if (toSync.Count == 0)
                         {
                             return 0;
                         }
@@ -303,8 +403,137 @@ public class TrsDataSyncHelper(
         }
         while (true);
 
-        _syncedEntitiesSubject.OnNext([.. mqs, .. events]);
-        return mqs.Count;
+        _syncedEntitiesSubject.OnNext([.. toSync, .. events]);
+        return toSync.Count;
+    }
+
+    private EntityVersionInfo<TEntity>[] GetEntityVersions<TEntity>(TEntity latest, IEnumerable<AuditDetail> auditDetails)
+        where TEntity : Entity
+    {
+        var created = latest.GetAttributeValue<DateTime?>("createdon")!.Value;
+        var createdBy = latest.GetAttributeValue<EntityReference>("createdby");
+
+        var ordered = auditDetails
+            .OfType<AttributeAuditDetail>()
+            .Select(a => (AuditDetail: a, AuditRecord: a.AuditRecord.ToEntity<Audit>()))
+            .OrderBy(a => a.AuditRecord.CreatedOn)
+            .ToArray();
+
+        if (ordered.Length == 0)
+        {
+            return [new EntityVersionInfo<TEntity>(latest.Id, latest, ChangedAttributes: Array.Empty<string>(), created, createdBy.Id, createdBy.Name)];
+        }
+
+        var versions = new List<EntityVersionInfo<TEntity>>();
+
+        var initialVersion = GetInitialVersion();
+        versions.Add(new EntityVersionInfo<TEntity>(initialVersion.Id, initialVersion, ChangedAttributes: Array.Empty<string>(), created, createdBy.Id, createdBy.Name));
+
+        latest = initialVersion.ShallowClone();
+        foreach (var audit in ordered)
+        {
+            if (audit.AuditRecord.Action == Audit_Action.Create)
+            {
+                if (audit != ordered[0])
+                {
+                    throw new InvalidOperationException($"Expected the {Audit_Action.Create} audit to be first.");
+                }
+
+                continue;
+            }
+
+            var thisVersion = latest.ShallowClone();
+            var changedAttributes = new List<string>();
+
+            foreach (var attr in audit.AuditDetail.DeletedAttributes)
+            {
+                thisVersion.Attributes.Remove(attr.Value);
+                changedAttributes.Add(attr.Value);
+            }
+
+            foreach (var attr in audit.AuditDetail.NewValue.Attributes)
+            {
+                thisVersion.Attributes[attr.Key] = attr.Value;
+                changedAttributes.Add(attr.Key);
+            }
+
+            versions.Add(new EntityVersionInfo<TEntity>(
+                audit.AuditRecord.Id,
+                thisVersion,
+                changedAttributes.ToArray(),
+                audit.AuditRecord.CreatedOn!.Value,
+                audit.AuditRecord.UserId.Id,
+                audit.AuditRecord.UserId.Name));
+
+            latest = thisVersion;
+        }
+
+        return versions.ToArray();
+
+        TEntity GetInitialVersion()
+        {
+            if (ordered[0] is { AuditRecord: { Action: Audit_Action.Create } } createAction)
+            {
+                var entity = createAction.AuditDetail.NewValue.ToEntity<TEntity>();
+                entity.Id = latest.Id;
+                entity["createdon"] = created;
+                entity["createdby"] = createdBy;
+                entity["modifiedon"] = created;
+                return entity;
+            }
+
+            // Starting with `latest`, go through each event in reverse and undo the changes it applied.
+            // When we're done we end up with the initial version of the record.
+            var initial = latest.ShallowClone();
+
+            foreach (var a in ordered.Reverse())
+            {
+                // Check that new attributes align with what we have in `initial`;
+                // if they don't, then we've got an incomplete history
+                foreach (var attr in a.AuditDetail.NewValue.Attributes)
+                {
+                    if (!AttributeValuesEqual(attr.Value, initial.Attributes[attr.Key]))
+                    {
+                        throw new Exception($"Non-contiguous audit records for {initial.LogicalName} '{initial.Id}':\n" +
+                            $"Expected '{attr.Key}' to be '{attr.Value}' but was '{initial.Attributes[attr.Key]}'.");
+                    }
+
+                    if (!a.AuditDetail.OldValue.Attributes.Contains(attr.Key))
+                    {
+                        initial.Attributes.Remove(attr.Key);
+                    }
+                }
+
+                foreach (var attr in a.AuditDetail.OldValue.Attributes)
+                {
+                    initial.Attributes[attr.Key] = attr.Value;
+                }
+            }
+
+            return initial;
+        }
+
+        static bool AttributeValuesEqual(object? first, object? second)
+        {
+            if (first is null && second is null)
+            {
+                return true;
+            }
+
+            if (first is null || second is null)
+            {
+                return false;
+            }
+
+            if (first.GetType() != second.GetType())
+            {
+                return false;
+            }
+
+            return first is EntityReference firstRef && second is EntityReference secondRef ?
+                firstRef.Name == secondRef.Name && firstRef.Id == secondRef.Id :
+                first.Equals(second);
+        }
     }
 
     private static ModelTypeSyncInfo<TModel> GetModelTypeSyncInfo<TModel>(string modelType) =>
@@ -315,10 +544,47 @@ public class TrsDataSyncHelper(
             modelTypeSyncInfo :
             throw new ArgumentException($"Unknown data type: '{modelType}.", nameof(modelType));
 
+    private async Task<IReadOnlyDictionary<Guid, AuditDetailCollection>> GetAuditRecords(
+        string entityLogicalName,
+        IEnumerable<Guid> ids,
+        CancellationToken cancellationToken)
+    {
+        return (await Task.WhenAll(ids
+            .Chunk(MaxAuditRequestsPerBatch)
+            .Select(async chunk =>
+            {
+                var request = new ExecuteMultipleRequest()
+                {
+                    Requests = new(),
+                    Settings = new()
+                    {
+                        ContinueOnError = false,
+                        ReturnResponses = true
+                    }
+                };
+
+                request.Requests.AddRange(chunk.Select(e => new RetrieveRecordChangeHistoryRequest() { Target = e.ToEntityReference(entityLogicalName) }));
+
+                var response = (ExecuteMultipleResponse)await organizationService.ExecuteAsync(request, cancellationToken);
+
+                if (response.IsFaulted)
+                {
+                    var firstFault = response.Responses.First(r => r.Fault is not null).Fault;
+                    throw new FaultException<OrganizationServiceFault>(firstFault, new FaultReason(firstFault.Message));
+                }
+
+                return response.Responses.Zip(
+                    chunk,
+                    (r, e) => (Id: e, ((RetrieveRecordChangeHistoryResponse)r.Response).AuditDetailCollection));
+            })))
+            .SelectMany(b => b)
+            .ToDictionary(t => t.Id, t => t.AuditDetailCollection);
+    }
+
     private async Task<TEntity[]> GetEntities<TEntity>(
         string entityLogicalName,
         string idAttributeName,
-        Guid[] ids,
+        IEnumerable<Guid> ids,
         string[] attributeNames,
         CancellationToken cancellationToken)
         where TEntity : Entity
@@ -478,6 +744,7 @@ public class TrsDataSyncHelper(
         {
             dfeta_qualification.Fields.dfeta_qualificationId,
             dfeta_qualification.Fields.CreatedOn,
+            dfeta_qualification.Fields.CreatedBy,
             dfeta_qualification.Fields.ModifiedOn,
             dfeta_qualification.Fields.dfeta_TrsDeletedEvent,
             dfeta_qualification.Fields.dfeta_Type,
@@ -520,7 +787,8 @@ public class TrsDataSyncHelper(
             GetLastModifiedOnStatement = getLastModifiedOnStatement,
             EntityLogicalName = dfeta_qualification.EntityLogicalName,
             AttributeNames = attributeNames,
-            GetSyncHandler = helper => (entities, ignoreInvalid, ct) => helper.SyncMandatoryQualifications(entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(), ignoreInvalid, ct),
+            GetSyncHandler = helper => (entities, ignoreInvalid, ct) =>
+                helper.SyncMandatoryQualifications(entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(), ignoreInvalid, ct),
             WriteRecord = writeRecord
         };
     }
@@ -546,8 +814,9 @@ public class TrsDataSyncHelper(
         })
         .ToList();
 
-    private async Task<(List<MandatoryQualification> MandatoryQualifications, List<EventBase> Events)> MapMandatoryQualifications(
-        IEnumerable<dfeta_qualification> qualifications)
+    private async Task<(List<MandatoryQualification> MandatoryQualifications, List<EventBase> Events)> MapMandatoryQualificationsAndAudits(
+        IEnumerable<dfeta_qualification> qualifications,
+        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails)
     {
         var mqEstablishments = await referenceDataCache.GetMqEstablishments();
         var mqSpecialisms = await referenceDataCache.GetMqSpecialisms();
@@ -557,23 +826,212 @@ public class TrsDataSyncHelper(
 
         foreach (var q in qualifications)
         {
-            var deletedEvent = q.dfeta_TrsDeletedEvent is not null and not "{}" ?
-                EventInfo.Deserialize<MandatoryQualificationDeletedEvent>(q.dfeta_TrsDeletedEvent).Event :
-                null;
+            var mapped = MapMandatoryQualificationFromDqtQualification(q, mqEstablishments, mqSpecialisms);
 
-            if (deletedEvent is not null)
+            var audits = auditDetails[q.Id].AuditDetails;
+            var versions = GetEntityVersions(q, audits);
+
+            events.Add(audits.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create) ?
+                MapCreatedEvent(versions.First()) :
+                MapMigratedEvent(versions.First()));
+
+            foreach (var (thisVersion, previousVersion) in versions.Skip(1).Zip(versions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
             {
-                events.Add(deletedEvent);
+                var mappedEvent = MapUpdatedEvent(thisVersion, previousVersion);
+
+                if (mappedEvent is not null)
+                {
+                    events.Add(mappedEvent);
+                }
             }
 
-            mqs.Add(MandatoryQualification.MapFromDqtQualification(q, mqEstablishments, mqSpecialisms));
+            // If the record is deactivated, the final event should be a MandatoryQualificationDeletedEvent or MandatoryQualificationDqtDeactivatedEvent
+            if (q.StateCode == dfeta_qualificationState.Inactive)
+            {
+                var lastEvent = events.Last();
+
+                if (lastEvent is MandatoryQualificationDqtDeactivatedEvent or MandatoryQualificationDeletedEvent)
+                {
+                    mapped.DeletedOn = lastEvent.CreatedUtc;
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"Expected last event to be a {nameof(MandatoryQualificationDqtDeactivatedEvent)}" +
+                        $" or {nameof(MandatoryQualificationDeletedEvent)} but was {lastEvent.GetEventName()}.");
+                }
+            }
+
+            mqs.Add(mapped);
         }
 
         return (mqs, events);
+
+        EventBase MapCreatedEvent(EntityVersionInfo<dfeta_qualification> snapshot)
+        {
+            if (snapshot.Entity.Attributes.ContainsKey(dfeta_qualification.Fields.dfeta_TRSEvent))
+            {
+                var eventFromAttr = EventInfo.Deserialize(snapshot.Entity.dfeta_TRSEvent).Event;
+
+                if (!(eventFromAttr is DummyEvent))
+                {
+                    if (!(eventFromAttr is MandatoryQualificationCreatedEvent))
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected event to be {nameof(MandatoryQualificationCreatedEvent)} but got {eventFromAttr.GetEventName()}.");
+                    }
+
+                    return eventFromAttr;
+                }
+            }
+
+            return new MandatoryQualificationCreatedEvent()
+            {
+                EventId = snapshot.Id,
+                CreatedUtc = snapshot.Timestamp,
+                RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity)
+            };
+        }
+
+        EventBase MapMigratedEvent(EntityVersionInfo<dfeta_qualification> snapshot)
+        {
+            return new MandatoryQualificationDqtMigratedEvent()
+            {
+                EventId = snapshot.Id,
+                CreatedUtc = snapshot.Timestamp,
+                RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity)
+            };
+        }
+
+        EventBase? MapUpdatedEvent(EntityVersionInfo<dfeta_qualification> snapshot, EntityVersionInfo<dfeta_qualification> previous)
+        {
+            if (snapshot.Entity.Attributes.ContainsKey(dfeta_qualification.Fields.dfeta_TRSEvent))
+            {
+                var eventFromAttr = EventInfo.Deserialize(snapshot.Entity.dfeta_TRSEvent).Event;
+
+                if (!(eventFromAttr is DummyEvent))
+                {
+                    // dfeta_TRSEvent may contain a stale value from a previous version
+                    // (if the record was updated from the CRM UI then dfeta_TRSEvent won't have been updated).
+                    // Check the previous events we've created; if we've seen it before we know we should ignore it this time.
+                    if (!events.Any(e => e.EventId == eventFromAttr.EventId))
+                    {
+                        return eventFromAttr;
+                    }
+                }
+            }
+
+            if (snapshot.Entity.Attributes.ContainsKey(dfeta_qualification.Fields.dfeta_TrsDeletedEvent))
+            {
+                var eventFromAttr = EventInfo.Deserialize(snapshot.Entity.dfeta_TrsDeletedEvent).Event;
+
+                if (!(eventFromAttr is DummyEvent))
+                {
+                    return eventFromAttr;
+                }
+            }
+
+            if (snapshot.ChangedAttributes.Contains(dfeta_qualification.Fields.StateCode))
+            {
+                var nonStateAttributes = snapshot.ChangedAttributes
+                    .Where(a => !(a is "statecode" or "statuscode"))
+                    .ToArray();
+
+                if (nonStateAttributes.Length > 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
+                }
+
+                if (snapshot.Entity.StateCode == dfeta_qualificationState.Inactive)
+                {
+                    return new MandatoryQualificationDqtDeactivatedEvent()
+                    {
+                        EventId = snapshot.Id,
+                        CreatedUtc = snapshot.Timestamp,
+                        RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                        PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                        MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity)
+                    };
+                }
+                else
+                {
+                    return new MandatoryQualificationDqtReactivatedEvent()
+                    {
+                        EventId = snapshot.Id,
+                        CreatedUtc = snapshot.Timestamp,
+                        RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                        PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                        MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity)
+                    };
+                }
+            }
+
+            var changes = MandatoryQualificationUpdatedEventChanges.None |
+                (snapshot.ChangedAttributes.Contains(dfeta_qualification.Fields.dfeta_MQ_MQEstablishmentId) ? MandatoryQualificationUpdatedEventChanges.Provider : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_qualification.Fields.dfeta_MQ_SpecialismId) ? MandatoryQualificationUpdatedEventChanges.Specialism : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_qualification.Fields.dfeta_MQ_Status) ? MandatoryQualificationUpdatedEventChanges.Status : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_qualification.Fields.dfeta_MQStartDate) ? MandatoryQualificationUpdatedEventChanges.StartDate : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_qualification.Fields.dfeta_MQ_Date) ? MandatoryQualificationUpdatedEventChanges.EndDate : 0);
+
+            if (changes == MandatoryQualificationUpdatedEventChanges.None)
+            {
+                return null;
+            }
+
+            return new MandatoryQualificationUpdatedEvent()
+            {
+                EventId = snapshot.Id,
+                CreatedUtc = snapshot.Timestamp,
+                RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity),
+                OldMandatoryQualification = GetEventMandatoryQualification(previous.Entity),
+                Changes = changes
+            };
+        }
+
+        Events.Models.MandatoryQualification GetEventMandatoryQualification(dfeta_qualification snapshot)
+        {
+            var mapped = MapMandatoryQualificationFromDqtQualification(snapshot, mqEstablishments, mqSpecialisms);
+
+            var establishment = snapshot.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
+                mqEstablishments.Single(e => e.Id == establishmentId) :
+                null;
+
+            MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var provider);
+
+            return new()
+            {
+                QualificationId = mapped.QualificationId,
+                Provider = provider is not null || establishment is not null ?
+                    new()
+                    {
+                        MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
+                        Name = provider?.Name,
+                        DqtMqEstablishmentId = establishment?.Id,
+                        DqtMqEstablishmentName = establishment?.dfeta_name
+                    } :
+                    null,
+                Specialism = mapped.Specialism,
+                Status = mapped.Status,
+                StartDate = mapped.StartDate,
+                EndDate = mapped.EndDate,
+            };
+        }
     }
 
     private async Task<int> SyncEvents(IReadOnlyCollection<EventBase> events, NpgsqlTransaction transaction, CancellationToken cancellationToken)
     {
+        if (events.Count == 0)
+        {
+            return 0;
+        }
+
         var tempTableName = "temp_events_import";
         var tableName = "events";
 
@@ -659,6 +1117,15 @@ public class TrsDataSyncHelper(
         public required Action<NpgsqlBinaryImporter, TModel> WriteRecord { get; init; }
     }
 
+    private record EntityVersionInfo<TEntity>(
+        Guid Id,
+        TEntity Entity,
+        string[] ChangedAttributes,
+        DateTime Timestamp,
+        Guid UserId,
+        string UserName)
+        where TEntity : Entity;
+
     public static class ModelTypes
     {
         public const string Person = "Person";
@@ -668,6 +1135,20 @@ public class TrsDataSyncHelper(
 
 file static class Extensions
 {
+    public static TEntity ShallowClone<TEntity>(this TEntity entity) where TEntity : Entity
+    {
+        // N.B. This only clones Attributes
+
+        var cloned = new Entity(entity.LogicalName, entity.Id);
+
+        foreach (var attr in entity.Attributes)
+        {
+            cloned.Attributes.Add(attr.Key, attr.Value);
+        }
+
+        return cloned.ToEntity<TEntity>();
+    }
+
     /// <summary>
     /// Returns <c>null</c> if <paramref name="value"/> is empty or whitespace.
     /// </summary>

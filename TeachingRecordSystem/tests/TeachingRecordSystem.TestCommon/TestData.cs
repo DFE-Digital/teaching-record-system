@@ -215,6 +215,19 @@ public partial class TestData
         return min.AddDays(Random.Shared.Next(minValue: 1, maxValue: daysDiff));
     }
 
+    public DateOnly GenerateChangedDate(DateOnly currentDate, DateOnly min, DateOnly? max = null)
+    {
+        DateOnly newDate;
+
+        do
+        {
+            newDate = GenerateDate(min, max);
+        }
+        while (newDate == currentDate);
+
+        return newDate;
+    }
+
     public string GenerateNationalInsuranceNumber() => Faker.Identification.UkNationalInsuranceNumber();
 
     protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)

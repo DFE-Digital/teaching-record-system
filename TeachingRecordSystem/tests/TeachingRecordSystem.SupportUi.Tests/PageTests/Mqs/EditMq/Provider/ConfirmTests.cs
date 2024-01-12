@@ -1,6 +1,7 @@
 using FormFlow;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Provider;
@@ -91,13 +92,24 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_Confirm_CompletesJourneyRedirectsWithFlashMessageAndUpdatesMq()
+    public async Task Post_Confirm_UpdatesMqCreatesEventAndCompletesJourneyRedirectsWithFlashMessage()
     {
         // Arrange
         var oldMqEstablishmentValue = "955"; // University of Birmingham
         var newMqEstablishmentValue = "959"; // University of Leeds
+        var oldEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(oldMqEstablishmentValue);
+        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(oldEstablishment, out var oldProvider);
+        Assert.NotNull(oldProvider);
+        var newEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(newMqEstablishmentValue);
+        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(newEstablishment, out var newProvider);
+        Assert.NotNull(newProvider);
+
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualification = person.MandatoryQualifications.First();
+        var qualificationId = qualification.QualificationId;
+
+        EventObserver.Clear();
+
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
@@ -127,8 +139,52 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContext(async dbContext =>
         {
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishmentValue(newMqEstablishmentValue, out var expectedProvider);
-            Assert.Equal(expectedProvider?.MandatoryQualificationProviderId, qualification.ProviderId);
+            Assert.Equal(newProvider?.MandatoryQualificationProviderId, qualification.ProviderId);
+        });
+
+        EventObserver.AssertEventsSaved(e =>
+        {
+            var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent()
+            {
+                EventId = Guid.Empty,
+                CreatedUtc = Clock.UtcNow,
+                RaisedBy = GetCurrentUserId(),
+                PersonId = person.PersonId,
+                MandatoryQualification = new()
+                {
+                    QualificationId = qualificationId,
+                    Provider = new()
+                    {
+                        MandatoryQualificationProviderId = newProvider.MandatoryQualificationProviderId,
+                        Name = newProvider.Name,
+                        DqtMqEstablishmentId = newEstablishment.Id,
+                        DqtMqEstablishmentName = newEstablishment.dfeta_name
+                    },
+                    Specialism = qualification.Specialism,
+                    Status = qualification.Status,
+                    StartDate = qualification.StartDate,
+                    EndDate = qualification.EndDate
+                },
+                OldMandatoryQualification = new()
+                {
+                    QualificationId = qualificationId,
+                    Provider = new()
+                    {
+                        MandatoryQualificationProviderId = oldProvider.MandatoryQualificationProviderId,
+                        Name = oldProvider.Name,
+                        DqtMqEstablishmentId = oldEstablishment.Id,
+                        DqtMqEstablishmentName = oldEstablishment.dfeta_name
+                    },
+                    Specialism = qualification.Specialism,
+                    Status = qualification.Status,
+                    StartDate = qualification.StartDate,
+                    EndDate = qualification.EndDate
+                },
+                Changes = MandatoryQualificationUpdatedEventChanges.Provider
+            };
+
+            var actualMqUpdatedEvent = Assert.IsType<MandatoryQualificationUpdatedEvent>(e);
+            Assert.Equivalent(expectedMqUpdatedEvent with { EventId = actualMqUpdatedEvent.EventId }, actualMqUpdatedEvent);
         });
     }
 

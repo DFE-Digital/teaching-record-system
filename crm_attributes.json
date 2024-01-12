@@ -19,6 +19,16 @@
     "subject",
     "statecode"
   ],
+  "audit": [
+    "action",
+    "auditid",
+    "callinguserid",
+    "createdon",
+    "objectid",
+    "objecttypecode",
+    "operation",
+    "userid"
+  ],
   "businessunit": [
     "businessunitid"
   ],
@@ -216,7 +226,9 @@
     "dfeta_mq_status",
     "dfeta_mqstartdate",
     "dfeta_trsdeletedevent",
+    "dfeta_trsevent",
     "CreatedOn",
+    "CreatedBy",
     "ModifiedOn"
   ],
   "dfeta_specialism": [
@@ -295,6 +307,7 @@
     "isdisabled",
     "firstname",
     "lastname",
+    "fullname",
     "systemuserid"
   ],
   "task": [

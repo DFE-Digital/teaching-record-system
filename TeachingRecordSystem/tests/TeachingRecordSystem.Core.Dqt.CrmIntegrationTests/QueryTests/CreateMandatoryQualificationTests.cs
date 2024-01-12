@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Events;
+
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
 public class CreateMandatoryQualificationTests : IAsyncLifetime
@@ -19,6 +21,7 @@ public class CreateMandatoryQualificationTests : IAsyncLifetime
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
+        var qualificationId = Guid.NewGuid();
         var person = await _dataScope.TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), teacherStatusValue: "213", createdDate: new DateTime(2021, 10, 5)));
         var mqEstablishment = await _dataScope.TestData.ReferenceDataCache.GetMqEstablishmentByValue("955"); // University of Birmingham
         var specialism = await _dataScope.TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
@@ -27,16 +30,18 @@ public class CreateMandatoryQualificationTests : IAsyncLifetime
 
         var query = new CreateMandatoryQualificationQuery()
         {
+            QualificationId = qualificationId,
             ContactId = person.ContactId,
             MqEstablishmentId = mqEstablishment.Id,
             SpecialismId = specialism.Id,
             StartDate = new DateOnly(2023, 01, 5),
             Status = dfeta_qualification_dfeta_MQ_Status.Passed,
             EndDate = new DateOnly(2023, 07, 10),
+            Event = DummyEvent.Create()
         };
 
         // Act
-        var qualificationId = await _crmQueryDispatcher.ExecuteQuery(query);
+        await _crmQueryDispatcher.ExecuteQuery(query);
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
