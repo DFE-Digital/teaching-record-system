@@ -7,9 +7,9 @@ using TeachingRecordSystem.Api.V2.Requests;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-public class SetIttOutcomeTests : ApiTestBase
+public class SetIttOutcomeTests : TestBase
 {
-    public SetIttOutcomeTests(ApiFixture apiFixture) : base(apiFixture)
+    public SetIttOutcomeTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }

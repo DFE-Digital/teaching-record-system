@@ -5,10 +5,10 @@ public class Startup
     public void ConfigureHost(IHostBuilder hostBuilder) =>
         hostBuilder
             .ConfigureHostConfiguration(builder => builder
-                .AddUserSecrets<ApiFixture>(optional: true)
+                .AddUserSecrets<HostFixture>(optional: true)
                 .AddEnvironmentVariables())
             .ConfigureServices(services =>
             {
-                services.AddSingleton<ApiFixture>();
+                services.AddSingleton<HostFixture>();
             });
 }

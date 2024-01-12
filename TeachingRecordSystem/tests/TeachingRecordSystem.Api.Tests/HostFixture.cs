@@ -15,11 +15,11 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Api.Tests;
 
-public class ApiFixture : WebApplicationFactory<Program>
+public class HostFixture : WebApplicationFactory<Program>
 {
     private readonly IConfiguration _configuration;
 
-    public ApiFixture(IConfiguration configuration)
+    public HostFixture(IConfiguration configuration)
     {
         _configuration = configuration;
         JwtSigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()), SecurityAlgorithms.RsaSha256);
@@ -52,7 +52,7 @@ public class ApiFixture : WebApplicationFactory<Program>
             });
 
             // Add controllers defined in this test assembly
-            services.AddMvc().AddApplicationPart(typeof(ApiFixture).Assembly);
+            services.AddMvc().AddApplicationPart(typeof(HostFixture).Assembly);
 
             services.AddSingleton<CurrentApiClientProvider>();
             services.AddTestScoped<IClock>(tss => tss.Clock);

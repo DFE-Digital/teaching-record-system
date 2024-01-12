@@ -7,10 +7,10 @@ using TeachingRecordSystem.Api.Tests.Attributes;
 namespace TeachingRecordSystem.Api.Tests.V3;
 
 [Collection(nameof(DisableParallelization))]  // Configures EvidenceFilesHttpClient
-public class CreateDateOfBirthChangeTests : ApiTestBase
+public class CreateDateOfBirthChangeTests : TestBase
 {
-    public CreateDateOfBirthChangeTests(ApiFixture apiFixture)
-        : base(apiFixture)
+    public CreateDateOfBirthChangeTests(HostFixture hostFixture)
+        : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }
@@ -26,7 +26,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
 
-        ApiFixture.ConfigureEvidenceFilesHttpClient(options =>
+        HostFixture.ConfigureEvidenceFilesHttpClient(options =>
         {
             var builder = new HttpRequestInterceptionBuilder();
 
@@ -107,7 +107,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
 
-        ApiFixture.ConfigureEvidenceFilesHttpClient(options =>
+        HostFixture.ConfigureEvidenceFilesHttpClient(options =>
         {
             var builder = new HttpRequestInterceptionBuilder();
 
@@ -181,7 +181,7 @@ public class CreateDateOfBirthChangeTests : ApiTestBase
         var evidenceFileUrl = Faker.Internet.SecureUrl();
         var evidenceFileContent = Encoding.UTF8.GetBytes("Test file");
 
-        ApiFixture.ConfigureEvidenceFilesHttpClient(options =>
+        HostFixture.ConfigureEvidenceFilesHttpClient(options =>
         {
             var builder = new HttpRequestInterceptionBuilder();
 

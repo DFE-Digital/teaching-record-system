@@ -7,7 +7,7 @@ using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
-public abstract class GetTeacherTestBase : ApiTestBase
+public abstract class GetTeacherTestBase : TestBase
 {
     internal const string QualifiedTeacherTrainedTeacherStatusValue = "71";
     internal const string QtsAwardedInWalesTeacherStatusValue = "213";
@@ -18,7 +18,7 @@ public abstract class GetTeacherTestBase : ApiTestBase
     private readonly DateOnly defaultqtsDate = new DateOnly(1997, 4, 23);
     private readonly DateOnly defaulteytsDate = new DateOnly(1995, 5, 14);
 
-    protected GetTeacherTestBase(ApiFixture apiFixture) : base(apiFixture)
+    protected GetTeacherTestBase(HostFixture hostFixture) : base(hostFixture)
     {
     }
 

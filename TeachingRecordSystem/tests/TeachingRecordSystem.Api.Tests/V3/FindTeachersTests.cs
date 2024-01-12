@@ -4,10 +4,10 @@ using TeachingRecordSystem.Api.Tests.Attributes;
 namespace TeachingRecordSystem.Api.Tests.V3;
 
 [Collection(nameof(DisableParallelization))]
-public class FindTeachersTests : ApiTestBase
+public class FindTeachersTests : TestBase
 {
-    public FindTeachersTests(ApiFixture apiFixture)
-        : base(apiFixture)
+    public FindTeachersTests(HostFixture hostFixture)
+        : base(hostFixture)
     {
         XrmFakedContext.DeleteAllEntities<Contact>();
         SetCurrentApiClient(new[] { ApiRoles.GetPerson });

@@ -4,9 +4,9 @@ using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
-public class UnlockTeacherTests : ApiTestBase
+public class UnlockTeacherTests : TestBase
 {
-    public UnlockTeacherTests(ApiFixture apiFixture) : base(apiFixture)
+    public UnlockTeacherTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.UnlockPerson });
     }

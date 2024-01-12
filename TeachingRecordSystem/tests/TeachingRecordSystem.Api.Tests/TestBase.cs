@@ -12,23 +12,23 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Tests;
 
-public abstract class ApiTestBase
+public abstract class TestBase
 {
     private readonly TestScopedServices _testServices;
 
-    protected ApiTestBase(ApiFixture apiFixture)
+    protected TestBase(HostFixture hostFixture)
     {
-        ApiFixture = apiFixture;
+        HostFixture = hostFixture;
         _testServices = TestScopedServices.Reset();
         SetCurrentApiClient(Array.Empty<string>());
 
         {
-            HttpClientWithApiKey = apiFixture.CreateClient();
+            HttpClientWithApiKey = hostFixture.CreateClient();
             HttpClientWithApiKey.DefaultRequestHeaders.Add("X-Use-CurrentClientIdProvider", "true");  // Signal for TestAuthenticationHandler to run
         }
     }
 
-    public ApiFixture ApiFixture { get; }
+    public HostFixture HostFixture { get; }
 
     public Mock<ICertificateGenerator> CertificateGeneratorMock => _testServices.CertificateGeneratorMock;
 
@@ -42,9 +42,9 @@ public abstract class ApiTestBase
 
     public HttpClient HttpClientWithApiKey { get; }
 
-    public TestData TestData => ApiFixture.Services.GetRequiredService<TestData>();
+    public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
-    public IXrmFakedContext XrmFakedContext => ApiFixture.Services.GetRequiredService<IXrmFakedContext>();
+    public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     public JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().Configure());
@@ -60,7 +60,7 @@ public abstract class ApiTestBase
 
         var jwtHandler = new JwtSecurityTokenHandler();
 
-        var signingCredentials = ApiFixture.JwtSigningCredentials;
+        var signingCredentials = HostFixture.JwtSigningCredentials;
 
         var tokenDescriptor = new SecurityTokenDescriptor()
         {
@@ -71,7 +71,7 @@ public abstract class ApiTestBase
 
         var accessToken = jwtHandler.CreateEncodedJwt(tokenDescriptor);
 
-        var httpClient = ApiFixture.CreateClient();
+        var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
 
         return httpClient;
@@ -79,14 +79,14 @@ public abstract class ApiTestBase
 
     protected void SetCurrentApiClient(IEnumerable<string> roles, string clientId = "tests")
     {
-        var currentUserProvider = ApiFixture.Services.GetRequiredService<CurrentApiClientProvider>();
+        var currentUserProvider = HostFixture.Services.GetRequiredService<CurrentApiClientProvider>();
         currentUserProvider.CurrentApiClientId = clientId;
         currentUserProvider.Roles = roles.ToArray();
     }
 
     public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {
-        var dbContextFactory = ApiFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+        var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
         return await action(dbContext);
     }
