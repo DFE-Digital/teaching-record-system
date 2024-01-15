@@ -42,6 +42,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
+
     public DbSet<Person> Persons => Set<Person>();
 
     public DbSet<Qualification> Qualifications => Set<Qualification>();

@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
-public class User
+public abstract class UserBase
 {
     public const int NameMaxLength = 200;
 
@@ -8,10 +8,23 @@ public class User
 
     public required Guid UserId { get; init; }
     public required bool Active { get; set; }
-    public required UserType UserType { get; init; }
+    public UserType UserType { get; }
     public required string Name { get; set; }
-    public string? Email { get; set; }
+}
+
+public class User : UserBase
+{
+    public required string? Email { get; set; }
     public string? AzureAdUserId { get; set; }
     public required string[] Roles { get; set; }
     public Guid? DqtUserId { get; set; }
+}
+
+public class ApplicationUser : UserBase
+{
+    public required string[] ApiRoles { get; set; }
+}
+
+public class SystemUser : UserBase
+{
 }

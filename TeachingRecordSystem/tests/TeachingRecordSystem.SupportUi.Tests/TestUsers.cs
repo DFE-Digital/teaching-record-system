@@ -9,55 +9,48 @@ public static class TestUsers
     {
         Active = true,
         Name = "Test administrator",
-        Roles = new[] { UserRoles.Administrator },
+        Roles = [UserRoles.Administrator],
         UserId = Guid.NewGuid(),
-        UserType = UserType.Person
+        Email = "test.administrator@localhost"
     };
 
     public static User Helpdesk { get; } = new()
     {
         Active = true,
         Name = "Test helpdesk user",
-        Roles = new[] { UserRoles.Helpdesk },
+        Roles = [UserRoles.Helpdesk],
         UserId = Guid.NewGuid(),
-        UserType = UserType.Person
+        Email = "test.helpdesk@localhost"
     };
 
     public static User UnusedRole { get; } = new()
     {
         Active = true,
         Name = "Test other user",
-        Roles = new[] { "UnusedRole" },
+        Roles = ["UnusedRole"],
         UserId = Guid.NewGuid(),
-        UserType = UserType.Person
+        Email = "test.other@localhost"
     };
 
     public static User NoRoles { get; } = new()
     {
         Active = true,
         Name = "No roles",
-        Roles = Array.Empty<string>(),
+        Roles = [],
         UserId = Guid.NewGuid(),
-        UserType = UserType.Person
+        Email = "test.empty@localhost"
     };
 
-    public class CreateUsersStartupTask : IStartupTask
+    public class CreateUsersStartupTask(TrsDbContext trsDbContext) : IStartupTask
     {
-        private readonly TrsDbContext _dbContext;
-
-        public CreateUsersStartupTask(TrsDbContext trsDbContext)
-        {
-            _dbContext = trsDbContext;
-        }
-
         public Task Execute()
         {
-            _dbContext.Users.Add(Administrator);
-            _dbContext.Users.Add(Helpdesk);
-            _dbContext.Users.Add(UnusedRole);
-            _dbContext.Users.Add(NoRoles);
+            trsDbContext.Users.Add(Administrator);
+            trsDbContext.Users.Add(Helpdesk);
+            trsDbContext.Users.Add(UnusedRole);
+            trsDbContext.Users.Add(NoRoles);
 
-            return _dbContext.SaveChangesAsync();
+            return trsDbContext.SaveChangesAsync();
         }
     }
 }

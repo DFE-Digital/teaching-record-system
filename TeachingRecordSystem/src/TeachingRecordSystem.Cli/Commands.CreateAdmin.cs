@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.Cli;
 
@@ -45,9 +44,8 @@ public static partial class Commands
                     Active = true,
                     Email = email,
                     Name = name,
-                    Roles = new[] { UserRoles.Administrator },
-                    UserId = Guid.NewGuid(),
-                    UserType = UserType.Person
+                    Roles = [UserRoles.Administrator],
+                    UserId = Guid.NewGuid()
                 });
 
                 await dbContext.SaveChangesAsync();

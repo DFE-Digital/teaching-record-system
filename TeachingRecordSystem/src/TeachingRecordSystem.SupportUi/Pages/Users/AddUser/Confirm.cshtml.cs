@@ -79,7 +79,6 @@ public class ConfirmModel(
             Name = Name!,
             Roles = roles,
             UserId = Guid.NewGuid(),
-            UserType = UserType.Person,
             DqtUserId = dqtUser?.Id
         };
 
