@@ -1,17 +1,21 @@
+using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<User> CreateUser(
+    public async Task<User> CreateUser(
         bool? active = null,
         string? name = null,
         string? email = null,
-        string[]? roles = null)
+        string[]? roles = null,
+        Guid? azureAdUserId = null)
     {
-        return WithDbContext(async dbContext =>
+        var user = await WithDbContext(async dbContext =>
         {
             active ??= true;
             name ??= GenerateName();
@@ -25,7 +29,7 @@ public partial class TestData
                 Email = email,
                 Roles = roles,
                 UserId = Guid.NewGuid(),
-                AzureAdUserId = null
+                AzureAdUserId = azureAdUserId?.ToString(),
             };
 
             dbContext.Users.Add(user);
@@ -34,5 +38,53 @@ public partial class TestData
 
             return user;
         });
+
+        return user;
+    }
+
+    public async Task CreateCrmUser(
+        Guid azureAdUserId,
+        bool hasDisabledCrmAccount = false,
+        string[]? dqtRoles = null)
+    {
+        var txnRequestBuilder = RequestBuilder.CreateTransaction(this.OrganizationService);
+
+        var systemUserId = Guid.NewGuid();
+        txnRequestBuilder.AddRequest(new CreateRequest()
+        {
+            Target = new Core.Dqt.Models.SystemUser()
+            {
+                Id = systemUserId,
+                AzureActiveDirectoryObjectId = azureAdUserId,
+                IsDisabled = hasDisabledCrmAccount
+            }
+        });
+
+        if (dqtRoles is not null)
+        {
+            foreach (var dqtRole in dqtRoles)
+            {
+                var roleId = Guid.NewGuid();
+                txnRequestBuilder.AddRequest(new CreateRequest()
+                {
+                    Target = new Role()
+                    {
+                        RoleId = roleId,
+                        Name = dqtRole
+                    }
+                });
+
+                txnRequestBuilder.AddRequest(new CreateRequest()
+                {
+                    Target = new SystemUserRoles()
+                    {
+                        SystemUserId = systemUserId,
+                        RoleId = roleId
+                    }
+                });
+            }
+        }
+
+        await txnRequestBuilder.Execute();
     }
 }

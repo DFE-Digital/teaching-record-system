@@ -9,7 +9,7 @@
         <form action="@LinkGenerator.AddUser()" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input asp-for="Email" type="email" autocomplete="off" />
+            <govuk-input asp-for="Email" label-class="govuk-label--m" type="email" autocomplete="off" />
 
             <govuk-button type="submit">Find user</govuk-button>
         </form>

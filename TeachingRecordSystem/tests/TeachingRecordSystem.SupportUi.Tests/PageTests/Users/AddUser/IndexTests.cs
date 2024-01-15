@@ -142,6 +142,39 @@ public class IndexTests : TestBase
         Assert.Equal($"/users/add/confirm?userId={userId}", response.Headers.Location?.OriginalString);
     }
 
+    [Fact]
+    public async Task Post_UserFound_ButAlreadyExistsInTrs_RedirectsToEditPage()
+    {
+        // Arrange
+        var email = Faker.Internet.Email();
+        var name = Faker.Name.FullName();
+        var userId = Guid.NewGuid();
+        var user = await TestData.CreateUser(name: name, email: email, azureAdUserId: userId);
+
+        ConfigureUserServiceMock(email, new Services.AzureActiveDirectory.User()
+        {
+            Email = email,
+            Name = name,
+            UserId = userId.ToString()
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "Email", email }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/users/{user.UserId}", response.Headers.Location?.OriginalString);
+    }
+
+
     private void ConfigureUserServiceMock(string email, Services.AzureActiveDirectory.User? user) =>
         AzureActiveDirectoryUserServiceMock
             .Setup(mock => mock.GetUserByEmail(email))

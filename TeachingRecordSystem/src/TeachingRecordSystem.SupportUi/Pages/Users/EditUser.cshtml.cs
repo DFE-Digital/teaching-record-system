@@ -5,36 +5,24 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users;
 
 [Authorize(Roles = UserRoles.Administrator)]
-public class EditUser : PageModel
+public class EditUser(
+    TrsDbContext dbContext,
+    ICrmQueryDispatcher crmQueryDispatcher,
+    IClock clock,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
-    private readonly TrsDbContext _dbContext;
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly IClock _clock;
-    private readonly TrsLinkGenerator _linkGenerator;
     private Core.DataStore.Postgres.Models.User? _user;
-
-    public EditUser(
-        TrsDbContext dbContext,
-        ICrmQueryDispatcher crmQueryDispatcher,
-        IClock clock,
-        TrsLinkGenerator linkGenerator)
-    {
-        _dbContext = dbContext;
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _clock = clock;
-        _linkGenerator = linkGenerator;
-    }
 
     [FromRoute]
     public Guid UserId { get; set; }
 
+    [Display(Name = "Email address")]
     public string? Email { get; set; }
 
     [BindProperty]
@@ -46,6 +34,8 @@ public class EditUser : PageModel
     [BindProperty]
     [Display(Name = "Roles")]
     public string[]? Roles { get; set; }
+
+    public string[]? DqtRoles { get; set; }
 
     public bool IsActiveUser { get; set; }
 
@@ -61,12 +51,12 @@ public class EditUser : PageModel
 
         if (_user.AzureAdUserId is not null)
         {
-            var crmUser = await _crmQueryDispatcher.ExecuteQuery(
-                new GetSystemUserByAzureActiveDirectoryObjectIdQuery(
-                    _user.AzureAdUserId, new ColumnSet(SystemUser.Fields.IsDisabled)));
+            var crmUserInfo = await crmQueryDispatcher.ExecuteQuery(
+                new GetSystemUserByAzureActiveDirectoryObjectIdQuery(_user.AzureAdUserId));
 
-            HasCrmAccount = crmUser is not null;
-            CrmAccountIsDisabled = crmUser?.IsDisabled == true;
+            HasCrmAccount = crmUserInfo is not null;
+            CrmAccountIsDisabled = crmUserInfo?.SystemUser.IsDisabled == true;
+            DqtRoles = crmUserInfo?.Roles.Select(r => r.Name).OrderBy(n => n).ToArray();
         }
         else
         {
@@ -86,7 +76,7 @@ public class EditUser : PageModel
             return this.PageWithErrors();
         }
 
-        var user = await _dbContext.Users.SingleAsync(u => u.UserId == UserId);
+        var user = await dbContext.Users.SingleAsync(u => u.UserId == UserId);
 
         var changes = UserUpdatedEventChanges.None |
                       (user.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
@@ -94,31 +84,31 @@ public class EditUser : PageModel
 
         if (changes == UserUpdatedEventChanges.None)
         {
-            return Redirect(_linkGenerator.Users());
+            return Redirect(linkGenerator.Users());
         }
 
         user.Roles = Roles!;
         user.Name = Name!;
 
-        _dbContext.AddEvent(new UserUpdatedEvent
+        dbContext.AddEvent(new UserUpdatedEvent
         {
             EventId = Guid.NewGuid(),
             User = Core.Events.Models.User.FromModel(user),
             RaisedBy = User.GetUserId(),
-            CreatedUtc = _clock.UtcNow,
+            CreatedUtc = clock.UtcNow,
             Changes = changes
         });
 
-        await _dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess("User updated");
-        return Redirect(_linkGenerator.Users());
+        return Redirect(linkGenerator.Users());
 
     }
 
     public async Task<IActionResult> OnPostDeactivate()
     {
-        var user = await _dbContext.Users.SingleAsync(u => u.UserId == UserId);
+        var user = await dbContext.Users.SingleAsync(u => u.UserId == UserId);
 
         if (!user.Active)
         {
@@ -127,23 +117,23 @@ public class EditUser : PageModel
 
         user.Active = false;
 
-        _dbContext.AddEvent(new UserDeactivatedEvent
+        dbContext.AddEvent(new UserDeactivatedEvent
         {
             EventId = Guid.NewGuid(),
             User = Core.Events.Models.User.FromModel(user),
             RaisedBy = User.GetUserId(),
-            CreatedUtc = _clock.UtcNow
+            CreatedUtc = clock.UtcNow
         });
 
-        await _dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess("User deactivated");
-        return Redirect(_linkGenerator.Users());
+        return Redirect(linkGenerator.Users());
     }
 
     public async Task<IActionResult> OnPostActivate()
     {
-        var user = await _dbContext.Users.SingleAsync(u => u.UserId == UserId);
+        var user = await dbContext.Users.SingleAsync(u => u.UserId == UserId);
 
         if (user.Active)
         {
@@ -152,23 +142,23 @@ public class EditUser : PageModel
 
         user.Active = true;
 
-        _dbContext.AddEvent(new UserActivatedEvent
+        dbContext.AddEvent(new UserActivatedEvent
         {
             EventId = Guid.NewGuid(),
             User = Core.Events.Models.User.FromModel(user),
             RaisedBy = User.GetUserId(),
-            CreatedUtc = _clock.UtcNow
+            CreatedUtc = clock.UtcNow
         });
 
-        await _dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
-        TempData.SetFlashSuccess("Activated");
-        return Redirect(_linkGenerator.EditUser(UserId));
+        TempData.SetFlashSuccess("User reactivated");
+        return Redirect(linkGenerator.EditUser(UserId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        _user = await _dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);
+        _user = await dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);
 
         if (_user is null)
         {

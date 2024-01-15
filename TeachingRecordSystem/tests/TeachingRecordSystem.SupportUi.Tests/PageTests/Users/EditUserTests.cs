@@ -41,11 +41,26 @@ public class EditUserTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Get_ValidRequest_RendersExpectedContent()
+    [Theory]
+    [InlineData(true, false, false)]
+    [InlineData(true, false, true)]
+    [InlineData(true, true, false)]
+    [InlineData(true, true, true)]
+    [InlineData(false, false, false)]
+    public async Task Get_ValidRequest_RendersExpectedContent(
+        bool hasCrmAccount,
+        bool hasDisabledCrmAccount,
+        bool hasDqtRoles)
     {
         // Arrange
-        var user = await TestData.CreateUser();
+        string[]? dqtRoles = hasDqtRoles ? [.. Faker.Lorem.Words(2)] : null;
+        Guid? azureAdUserId = hasCrmAccount ? Guid.NewGuid() : null;
+        var user = await TestData.CreateUser(azureAdUserId: azureAdUserId);
+
+        if (hasCrmAccount)
+        {
+            await TestData.CreateCrmUser(azureAdUserId: azureAdUserId!.Value, hasDisabledCrmAccount: hasDisabledCrmAccount, dqtRoles: dqtRoles);
+        }
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(user.UserId));
 
@@ -54,6 +69,51 @@ public class EditUserTests : TestBase
 
         // Assert
         var doc = await response.GetDocument();
+        var noCrmAccountWarning = doc.GetElementByTestId("no-crm-account-warning");
+        if (hasCrmAccount)
+        {
+            Assert.Null(noCrmAccountWarning);
+        }
+        else
+        {
+            Assert.NotNull(noCrmAccountWarning);
+        }
+
+        var disabledCrmAccountWarning = doc.GetElementByTestId("disabled-crm-account-warning");
+        if (hasCrmAccount && hasDisabledCrmAccount)
+        {
+            Assert.NotNull(disabledCrmAccountWarning);
+        }
+        else
+        {
+            Assert.Null(disabledCrmAccountWarning);
+        }
+
+        var noDqtRolesWarning = doc.GetElementByTestId("no-dqt-roles-warning");
+        if (hasCrmAccount && !hasDisabledCrmAccount && !hasDqtRoles)
+        {
+            Assert.NotNull(noDqtRolesWarning);
+        }
+        else
+        {
+            Assert.Null(noDqtRolesWarning);
+        }
+
+        var rolesList = doc.GetElementsByName("Roles");
+        Assert.NotNull(rolesList);
+        Assert.Equal(UserRoles.All.Count(), rolesList!.Count());
+
+        var dqtRolesList = doc.GetElementByTestId("dqt-roles-list");
+        if (hasDqtRoles)
+        {
+            Assert.NotNull(dqtRolesList);
+            Assert.Equal(dqtRoles!.Length, dqtRolesList!.GetElementsByTagName("li").Count());
+        }
+        else
+        {
+            Assert.Null(dqtRolesList);
+        }
+
         Assert.Equal(user.Name, doc.GetElementById("Name")?.GetAttribute("value"));
         Assert.Equal(user.Email, doc.GetElementById("Email")?.GetAttribute("value"));
     }
@@ -300,7 +360,7 @@ public class EditUserTests : TestBase
 
         var redirectResponse = await response.FollowRedirect(HttpClient);
         var redirectDoc = await redirectResponse.GetDocument();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Activated");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "User reactivated");
     }
 
     private static string GetRequestPath(Guid userId) => $"/users/{userId}";

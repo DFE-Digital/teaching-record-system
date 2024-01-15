@@ -36,6 +36,11 @@ public static class PageExtensions
         await page.GotoAsync($"/mqs/add?personId={personId}");
     }
 
+    public static async Task GoToUsersPage(this IPage page)
+    {
+        await page.GotoAsync($"/users");
+    }
+
     public static Task ClickLinkForElementWithTestId(this IPage page, string testId) =>
         page.GetByTestId(testId).ClickAsync();
 
@@ -219,6 +224,26 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete/confirm");
     }
 
+    public static async Task AssertOnUsersPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/users");
+    }
+
+    public static async Task AssertOnAddUserPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/users/add");
+    }
+
+    public static async Task AssertOnAddUserConfirmPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/users/add/confirm");
+    }
+
+    public static async Task AssertOnEditUserPage(this IPage page, Guid userId)
+    {
+        await page.WaitForUrlPathAsync($"/users/{userId}");
+    }
+
     public static async Task AssertFlashMessage(this IPage page, string expectedHeader)
     {
         Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader}')"));
@@ -236,6 +261,11 @@ public static class PageExtensions
         await page.FillAsync("text=First Name", firstName);
         await page.FillAsync("text=Middle Name", middleName);
         await page.FillAsync("text=Last Name", lastName);
+    }
+
+    public static async Task FillEmailInput(this IPage page, string email)
+    {
+        await page.FillAsync("input[type='email']", email);
     }
 
     public static async Task SubmitAddAlertIndexPage(this IPage page, string alertType, string? details, string link, DateOnly startDate)
