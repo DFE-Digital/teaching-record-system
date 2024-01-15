@@ -3,7 +3,6 @@ using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -53,7 +52,7 @@ public partial class TestData
         var systemUserId = Guid.NewGuid();
         txnRequestBuilder.AddRequest(new CreateRequest()
         {
-            Target = new SystemUser()
+            Target = new Core.Dqt.Models.SystemUser()
             {
                 Id = systemUserId,
                 AzureActiveDirectoryObjectId = azureAdUserId,
