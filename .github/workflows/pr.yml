@@ -92,6 +92,7 @@ jobs:
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
+          --verbosity diag
 
     - name: API Tests
       uses: ./.github/workflows/actions/test
