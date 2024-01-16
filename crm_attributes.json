@@ -200,6 +200,7 @@
     "dfeta_personid",
     "dfeta_type",
     "statecode",
+    "statuscode",
     "dfeta_npqsl_date",
     "dfeta_npqml_date",
     "dfeta_NPQH_Date",

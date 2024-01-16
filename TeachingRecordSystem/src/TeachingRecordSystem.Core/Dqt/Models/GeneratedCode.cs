@@ -9448,6 +9448,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_Type = "dfeta_type";
 			public const string ModifiedOn = "modifiedon";
 			public const string StateCode = "statecode";
+			public const string StatusCode = "statuscode";
 			public const string business_unit_dfeta_qualification = "business_unit_dfeta_qualification";
 			public const string dfeta_account_dfeta_qualification_he = "dfeta_account_dfeta_qualification_he";
 			public const string dfeta_contact_dfeta_qualification = "dfeta_contact_dfeta_qualification";
@@ -10403,6 +10404,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
 				}
 				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// Reason for the status of the Qualification
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
+		public virtual dfeta_qualification_StatusCode? StatusCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_qualification_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StatusCode");
+				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("StatusCode");
 			}
 		}
 		
