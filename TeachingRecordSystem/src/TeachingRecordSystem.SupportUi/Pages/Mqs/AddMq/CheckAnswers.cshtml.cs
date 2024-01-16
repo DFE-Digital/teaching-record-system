@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
@@ -41,8 +40,6 @@ public class CheckAnswersModel(
 
         var mqSpecialism = await referenceDataCache.GetMqSpecialismByValue(Specialism!.Value.GetDqtValue());
 
-        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(MqEstablishment, out var provider);
-
         var createdEvent = new MandatoryQualificationCreatedEvent()
         {
             EventId = Guid.NewGuid(),
@@ -52,11 +49,11 @@ public class CheckAnswersModel(
             MandatoryQualification = new()
             {
                 QualificationId = qualificationId,
-                Provider = provider is not null || MqEstablishment is not null ?
+                Provider = MqEstablishment is not null ?
                     new()
                     {
-                        MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
-                        Name = provider?.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = MqEstablishment?.Id,
                         DqtMqEstablishmentName = MqEstablishment?.dfeta_name
                     } :

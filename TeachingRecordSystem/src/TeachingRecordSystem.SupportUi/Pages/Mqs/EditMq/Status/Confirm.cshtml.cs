@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
@@ -48,8 +47,6 @@ public class ConfirmModel(
                 await referenceDataCache.GetMqEstablishmentById(establishmentId) :
                 null;
 
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var provider);
-
             var specialism = qualification.dfeta_MQ_SpecialismId?.Id is Guid specialismId ?
                 await referenceDataCache.GetMqSpecialismById(specialismId) :
                 null;
@@ -57,11 +54,11 @@ public class ConfirmModel(
             var oldMqEventModel = new Core.Events.Models.MandatoryQualification()
             {
                 QualificationId = QualificationId,
-                Provider = provider is not null || establishment is not null ?
+                Provider = establishment is not null ?
                     new()
                     {
-                        MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
-                        Name = provider?.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = establishment?.Id,
                         DqtMqEstablishmentName = establishment?.dfeta_name
                     } :

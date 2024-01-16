@@ -1003,16 +1003,14 @@ public class TrsDataSyncHelper(
                 mqEstablishments.Single(e => e.Id == establishmentId) :
                 null;
 
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var provider);
-
             return new()
             {
                 QualificationId = mapped.QualificationId,
-                Provider = provider is not null || establishment is not null ?
+                Provider = establishment is not null ?
                     new()
                     {
-                        MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
-                        Name = provider?.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = establishment?.Id,
                         DqtMqEstablishmentName = establishment?.dfeta_name
                     } :

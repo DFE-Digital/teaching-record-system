@@ -199,8 +199,8 @@ public class CheckAnswersTests : TestBase
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = mqEstablishment.Id,
                         DqtMqEstablishmentName = mqEstablishment.dfeta_name
                     },
