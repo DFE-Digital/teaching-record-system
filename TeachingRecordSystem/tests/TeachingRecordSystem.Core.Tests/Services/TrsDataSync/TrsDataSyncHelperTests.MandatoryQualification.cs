@@ -119,7 +119,7 @@ public partial class TrsDataSyncHelperTests
         {
             var mq = await dbContext.MandatoryQualifications.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.DqtQualificationId == qualificationId);
             Assert.NotNull(mq);
-            mq.DeletedOn = deletedEvent.CreatedUtc;
+            Assert.Equal(deletedEvent.CreatedUtc, mq.DeletedOn);
         });
     }
 
@@ -143,7 +143,7 @@ public partial class TrsDataSyncHelperTests
         {
             var mq = await dbContext.MandatoryQualifications.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.DqtQualificationId == qualificationId);
             Assert.NotNull(mq);
-            mq.DeletedOn = Clock.UtcNow;
+            Assert.Equal(Clock.UtcNow, mq.DeletedOn);
         });
     }
 
