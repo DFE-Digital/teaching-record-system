@@ -42,7 +42,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state => state.Specialism = Specialism);
 
-        return Redirect(linkGenerator.MqEditSpecialismConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditSpecialismReason(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()

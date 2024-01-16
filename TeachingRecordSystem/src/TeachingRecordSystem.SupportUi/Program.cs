@@ -234,8 +234,8 @@ builder.Services
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.EditMqResult,
-            typeof(EditMqResultState),
+            JourneyNames.EditMqStatus,
+            typeof(EditMqStatusState),
             requestDataKeys: ["qualificationId"],
             appendUniqueKey: true));
 

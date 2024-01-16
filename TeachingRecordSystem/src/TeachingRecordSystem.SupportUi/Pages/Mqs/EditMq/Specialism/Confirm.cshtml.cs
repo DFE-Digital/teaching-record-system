@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
@@ -13,9 +14,12 @@ public class ConfirmModel(
     ICrmQueryDispatcher crmQueryDispatcher,
     ReferenceDataCache referenceDataCache,
     TrsLinkGenerator linkGenerator,
+    IFileService fileService,
     IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock) : PageModel
 {
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+
     public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -28,6 +32,16 @@ public class ConfirmModel(
     public MandatoryQualificationSpecialism? CurrentSpecialism { get; set; }
 
     public MandatoryQualificationSpecialism? NewSpecialism { get; set; }
+
+    public MqChangeSpecialismReasonOption? ChangeReason { get; set; }
+
+    public string? ChangeReasonDetail { get; set; }
+
+    public string? EvidenceFileName { get; set; }
+
+    public string? EvidenceFileSizeDescription { get; set; }
+
+    public string? UploadedEvidenceFileUrl { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
@@ -77,6 +91,15 @@ public class ConfirmModel(
                     Specialism = NewSpecialism
                 },
                 OldMandatoryQualification = oldMqEventModel,
+                ChangeReason = ChangeReason!.GetDisplayName(),
+                ChangeReasonDetail = ChangeReasonDetail,
+                EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
+                    new Core.Events.Models.File()
+                    {
+                        FileId = fileId,
+                        Name = JourneyInstance.State.EvidenceFileName!
+                    } :
+                    null,
                 Changes = changes
             };
 
@@ -102,7 +125,7 @@ public class ConfirmModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (!JourneyInstance!.State.IsComplete)
         {
@@ -116,5 +139,13 @@ public class ConfirmModel(
         PersonName = personInfo.Name;
         CurrentSpecialism = JourneyInstance!.State.CurrentSpecialism;
         NewSpecialism = JourneyInstance!.State.Specialism;
+        ChangeReason = JourneyInstance!.State.ChangeReason;
+        ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
+        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
+        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            null;
+
+        await next();
     }
 }

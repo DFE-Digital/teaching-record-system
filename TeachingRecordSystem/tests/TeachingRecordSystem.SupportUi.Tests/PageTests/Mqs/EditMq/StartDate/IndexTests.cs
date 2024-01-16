@@ -119,7 +119,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenStartDateIsEntered_RedirectsToConfirmPage()
+    public async Task Post_WhenStartDateIsEntered_RedirectsToReasonPage()
     {
         // Arrange
         var oldStartDate = new DateOnly(2021, 10, 5);
@@ -143,7 +143,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/start-date/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/mqs/{qualificationId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

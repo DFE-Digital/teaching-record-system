@@ -5,31 +5,46 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.MqEditProvider(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.MqEditProviderReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
 <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
 <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
+    <div class="govuk-grid-column-full-from-desktop">
         <form action="@LinkGenerator.MqEditProviderConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
-            <table class="govuk-table" data-testid="change-details">
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th class="govuk-table__header" scope="col"></th>
-                        <th class="govuk-table__header" scope="col">Current</th>
-                        <th class="govuk-table__header" scope="col">New</th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    <tr class="govuk-table__row">
-                        <th class="govuk-table__header" scope="row">Training provider</th>
-                        <td class="govuk-table__cell" data-testid="current-value">@Model.CurrentMqEstablishmentName</td>
-                        <td class="govuk-table__cell" data-testid="new-value">@Model.NewMqEstablishment!.dfeta_name</td>
-                    </tr>
-                </tbody>
-            </table>
+            <govuk-summary-list data-testid="change-summary">
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Current training provider</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="current-provider">@(!string.IsNullOrEmpty(Model.CurrentMqEstablishmentName) ? @Model.CurrentMqEstablishmentName : "None")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>New training provider</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="new-provider">@Model.NewMqEstablishment!.dfeta_name</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="change-reason">@Model.ChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>More detail about the reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="change-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")" /></govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="evidence">
+                        @if (Model.UploadedEvidenceFileUrl is not null)
+                        {
+                            <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span>None</span>
+                        }
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm change</govuk-button>

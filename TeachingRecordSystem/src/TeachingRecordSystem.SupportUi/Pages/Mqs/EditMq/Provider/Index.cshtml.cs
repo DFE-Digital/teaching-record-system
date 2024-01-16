@@ -41,7 +41,7 @@ public class IndexModel(
 
         await JourneyInstance!.UpdateStateAsync(state => state.MqEstablishmentValue = MqEstablishmentValue);
 
-        return Redirect(linkGenerator.MqEditProviderConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditProviderReason(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()

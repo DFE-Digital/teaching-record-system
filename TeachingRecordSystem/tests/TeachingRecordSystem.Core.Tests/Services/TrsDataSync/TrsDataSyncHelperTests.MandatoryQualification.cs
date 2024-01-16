@@ -677,6 +677,9 @@ public partial class TrsDataSyncHelperTests
                     StartDate = existingStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     EndDate = existingEndDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
                 },
+                ChangeReason = null,
+                ChangeReasonDetail = null,
+                EvidenceFile = null,
                 Changes = GetChanges(existingQualification, updatedQualification)
             };
 

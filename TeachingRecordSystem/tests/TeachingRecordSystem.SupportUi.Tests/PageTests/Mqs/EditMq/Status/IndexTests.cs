@@ -62,7 +62,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
-            new EditMqResultState()
+            new EditMqStatusState()
             {
                 Initialized = true,
                 Status = journeyStatus,
@@ -177,7 +177,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/status/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/mqs/{qualificationId}/status/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -203,9 +203,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    private async Task<JourneyInstance<EditMqResultState>> CreateJourneyInstance(Guid qualificationId, EditMqResultState? state = null) =>
+    private async Task<JourneyInstance<EditMqStatusState>> CreateJourneyInstance(Guid qualificationId, EditMqStatusState? state = null) =>
         await CreateJourneyInstance(
-            JourneyNames.EditMqResult,
-            state ?? new EditMqResultState(),
+            JourneyNames.EditMqStatus,
+            state ?? new EditMqStatusState(),
             new KeyValuePair<string, object>("qualificationId", qualificationId));
 }

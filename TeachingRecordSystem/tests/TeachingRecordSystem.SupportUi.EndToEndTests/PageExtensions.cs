@@ -179,6 +179,11 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider");
     }
 
+    public static async Task AssertOnEditMqProviderReasonPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/change-reason");
+    }
+
     public static async Task AssertOnEditMqProviderConfirmPage(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/confirm");
@@ -187,6 +192,11 @@ public static class PageExtensions
     public static async Task AssertOnEditMqSpecialismPage(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism");
+    }
+
+    public static async Task AssertOnEditMqSpecialismReasonPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/change-reason");
     }
 
     public static async Task AssertOnEditMqSpecialismConfirmPage(this IPage page, Guid qualificationId)
@@ -199,6 +209,12 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date");
     }
 
+    public static async Task AssertOnEditMqStartDateReasonPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/change-reason");
+    }
+
+
     public static async Task AssertOnEditMqStartDateConfirmPage(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/confirm");
@@ -207,6 +223,11 @@ public static class PageExtensions
     public static async Task AssertOnEditMqStatusPage(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status");
+    }
+
+    public static async Task AssertOnEditMqStatusReasonPage(this IPage page, Guid qualificationId)
+    {
+        await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/change-reason");
     }
 
     public static async Task AssertOnEditMqStatusConfirmPage(this IPage page, Guid qualificationId)

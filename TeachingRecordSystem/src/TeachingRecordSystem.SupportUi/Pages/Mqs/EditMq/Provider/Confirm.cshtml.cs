@@ -5,6 +5,7 @@ using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
@@ -14,9 +15,12 @@ public class ConfirmModel(
     ICrmQueryDispatcher crmQueryDispatcher,
     ReferenceDataCache referenceDataCache,
     TrsLinkGenerator linkGenerator,
+    IFileService fileService,
     IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock) : PageModel
 {
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+
     public JourneyInstance<EditMqProviderState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -29,6 +33,16 @@ public class ConfirmModel(
     public string? CurrentMqEstablishmentName { get; set; }
 
     public dfeta_mqestablishment? NewMqEstablishment { get; set; }
+
+    public MqChangeProviderReasonOption? ChangeReason { get; set; }
+
+    public string? ChangeReasonDetail { get; set; }
+
+    public string? EvidenceFileName { get; set; }
+
+    public string? EvidenceFileSizeDescription { get; set; }
+
+    public string? UploadedEvidenceFileUrl { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
@@ -83,6 +97,15 @@ public class ConfirmModel(
                     }
                 },
                 OldMandatoryQualification = oldMqEventModel,
+                ChangeReason = ChangeReason!.GetDisplayName(),
+                ChangeReasonDetail = ChangeReasonDetail,
+                EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
+                    new Core.Events.Models.File()
+                    {
+                        FileId = fileId,
+                        Name = JourneyInstance.State.EvidenceFileName!
+                    } :
+                    null,
                 Changes = changes
             };
 
@@ -122,6 +145,12 @@ public class ConfirmModel(
         PersonName = personInfo.Name;
         CurrentMqEstablishmentName = JourneyInstance!.State.CurrentMqEstablishmentName;
         NewMqEstablishment = await referenceDataCache.GetMqEstablishmentByValue(JourneyInstance!.State.MqEstablishmentValue!);
+        ChangeReason = JourneyInstance!.State.ChangeReason;
+        ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
+        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
+        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            null;
 
         await next();
     }

@@ -4,19 +4,23 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-[Journey(JourneyNames.EditMqResult), RequireJourneyInstance]
+[Journey(JourneyNames.EditMqStatus), RequireJourneyInstance]
 public class ConfirmModel(
     ICrmQueryDispatcher crmQueryDispatcher,
     ReferenceDataCache referenceDataCache,
     TrsLinkGenerator linkGenerator,
+    IFileService fileService,
     IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock) : PageModel
 {
-    public JourneyInstance<EditMqResultState>? JourneyInstance { get; set; }
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+
+    public JourneyInstance<EditMqStatusState>? JourneyInstance { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -32,6 +36,22 @@ public class ConfirmModel(
     public DateOnly? CurrentEndDate { get; set; }
 
     public DateOnly? NewEndDate { get; set; }
+
+    public MqChangeStatusReasonOption? StatusChangeReason { get; set; }
+
+    public MqChangeEndDateReasonOption? EndDateChangeReason { get; set; }
+
+    public string? ChangeReasonDetail { get; set; }
+
+    public string? EvidenceFileName { get; set; }
+
+    public string? EvidenceFileSizeDescription { get; set; }
+
+    public string? UploadedEvidenceFileUrl { get; set; }
+
+    public bool? IsEndDateChange { get; set; }
+
+    public bool? IsStatusChange { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
@@ -81,6 +101,15 @@ public class ConfirmModel(
                     EndDate = NewEndDate
                 },
                 OldMandatoryQualification = oldMqEventModel,
+                ChangeReason = (IsEndDateChange!.Value && !IsStatusChange!.Value) ? EndDateChangeReason!.GetDisplayName() : StatusChangeReason!.GetDisplayName(),
+                ChangeReasonDetail = ChangeReasonDetail,
+                EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
+                    new Core.Events.Models.File()
+                    {
+                        FileId = fileId,
+                        Name = JourneyInstance.State.EvidenceFileName!
+                    } :
+                    null,
                 Changes = changes
             };
 
@@ -107,7 +136,7 @@ public class ConfirmModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
     }
 
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (!JourneyInstance!.State.IsComplete)
         {
@@ -123,5 +152,16 @@ public class ConfirmModel(
         NewStatus ??= JourneyInstance!.State.Status;
         CurrentEndDate = JourneyInstance!.State.CurrentEndDate;
         NewEndDate ??= JourneyInstance!.State.EndDate;
+        StatusChangeReason = JourneyInstance!.State.StatusChangeReason;
+        EndDateChangeReason = JourneyInstance!.State.EndDateChangeReason;
+        ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
+        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
+        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            null;
+        IsEndDateChange = JourneyInstance!.State.IsEndDateChange;
+        IsStatusChange = JourneyInstance!.State.IsStatusChange;
+
+        await next();
     }
 }

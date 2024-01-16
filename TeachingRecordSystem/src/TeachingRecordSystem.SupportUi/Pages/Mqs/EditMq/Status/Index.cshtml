@@ -17,19 +17,19 @@
         <form action="@LinkGenerator.MqEditStatus(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-radios asp-for="Status" data-testid="result-options">
                 <govuk-radios-item value="@MandatoryQualificationStatus.InProgress" data-testid="result-in-progress">
-                    In Progress
+                    @MandatoryQualificationStatus.InProgress.GetTitle()
                 </govuk-radios-item>
                 <govuk-radios-item value="@MandatoryQualificationStatus.Deferred" data-testid="result-deferred">
-                    Deferred
+                    @MandatoryQualificationStatus.Deferred.GetTitle()
                 </govuk-radios-item>
                 <govuk-radios-item value="@MandatoryQualificationStatus.Extended" data-testid="result-extended">
-                    Extended
+                    @MandatoryQualificationStatus.Extended.GetTitle()
                 </govuk-radios-item>
                 <govuk-radios-item value="@MandatoryQualificationStatus.Failed" data-testid="result-failed">
-                    Failed
+                    @MandatoryQualificationStatus.Failed.GetTitle()
                 </govuk-radios-item>
                 <govuk-radios-item value="@MandatoryQualificationStatus.Passed" data-testid="result-passed">
-                    Passed
+                    @MandatoryQualificationStatus.Passed.GetTitle()
                     <govuk-radios-item-conditional>
                         <govuk-date-input asp-for="EndDate">
                             <govuk-date-input-fieldset>
@@ -39,7 +39,7 @@
                     </govuk-radios-item-conditional>
                 </govuk-radios-item>
                 <govuk-radios-item value="@MandatoryQualificationStatus.Withdrawn" date-testid="result-withdrawn">
-                    Withdrawn
+                    @MandatoryQualificationStatus.Withdrawn.GetTitle()
                 </govuk-radios-item>
             </govuk-radios>
 
