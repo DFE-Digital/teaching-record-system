@@ -887,7 +887,8 @@ public class TrsDataSyncHelper(
 
             return new MandatoryQualificationCreatedEvent()
             {
-                EventId = snapshot.Id,
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Entity.Id}-Created",
                 CreatedUtc = snapshot.Timestamp,
                 RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
@@ -899,7 +900,8 @@ public class TrsDataSyncHelper(
         {
             return new MandatoryQualificationDqtImportedEvent()
             {
-                EventId = snapshot.Id,
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Entity.Id}-Imported",
                 CreatedUtc = snapshot.Timestamp,
                 RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
@@ -951,7 +953,8 @@ public class TrsDataSyncHelper(
                 {
                     return new MandatoryQualificationDqtDeactivatedEvent()
                     {
-                        EventId = snapshot.Id,
+                        EventId = Guid.NewGuid(),
+                        Key = $"{snapshot.Id}",  // The CRM Audit ID
                         CreatedUtc = snapshot.Timestamp,
                         RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                         PersonId = snapshot.Entity.dfeta_PersonId.Id,
@@ -962,7 +965,8 @@ public class TrsDataSyncHelper(
                 {
                     return new MandatoryQualificationDqtReactivatedEvent()
                     {
-                        EventId = snapshot.Id,
+                        EventId = Guid.NewGuid(),
+                        Key = $"{snapshot.Id}",  // The CRM Audit ID
                         CreatedUtc = snapshot.Timestamp,
                         RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                         PersonId = snapshot.Entity.dfeta_PersonId.Id,
@@ -985,7 +989,8 @@ public class TrsDataSyncHelper(
 
             return new MandatoryQualificationUpdatedEvent()
             {
-                EventId = snapshot.Id,
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Id}",  // The CRM Audit ID
                 CreatedUtc = snapshot.Timestamp,
                 RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
@@ -1039,7 +1044,8 @@ public class TrsDataSyncHelper(
             "event_name",
             "created",
             "inserted",
-            "payload"
+            "payload",
+            "key"
         };
 
         var columnList = string.Join(", ", columnNames);
@@ -1050,7 +1056,8 @@ public class TrsDataSyncHelper(
                 event_name VARCHAR(200) NOT NULL,
                 created TIMESTAMP WITH TIME ZONE NOT NULL,
                 inserted TIMESTAMP WITH TIME ZONE NOT NULL,
-                payload JSONB NOT NULL
+                payload JSONB NOT NULL,
+                key VARCHAR(200)
             )
             """;
 
@@ -1060,7 +1067,7 @@ public class TrsDataSyncHelper(
             $"""
             INSERT INTO {tableName} ({columnList}, published)
             SELECT {columnList}, false FROM {tempTableName}
-            ON CONFLICT (event_id) DO NOTHING
+            ON CONFLICT DO NOTHING
             """;
 
         using (var createTempTableCommand = transaction.Connection!.CreateCommand())
@@ -1075,6 +1082,7 @@ public class TrsDataSyncHelper(
         foreach (var e in events)
         {
             var payload = JsonSerializer.Serialize(e, e.GetType(), EventBase.JsonSerializerOptions);
+            var key = e is IEventWithKey eventWithKey ? eventWithKey.Key : null;
 
             writer.StartRow();
             writer.WriteValueOrNull(e.EventId, NpgsqlDbType.Uuid);
@@ -1082,6 +1090,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(e.CreatedUtc, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(clock.UtcNow, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(payload, NpgsqlDbType.Jsonb);
+            writer.WriteValueOrNull(key, NpgsqlDbType.Varchar);
         }
 
         await writer.CompleteAsync(cancellationToken);
