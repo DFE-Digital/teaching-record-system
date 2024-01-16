@@ -1,5 +1,4 @@
 using FormFlow;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
@@ -149,8 +148,6 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(mqEstablishmentDqtValue);
-        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
-        Assert.NotNull(provider);
 
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -193,8 +190,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = mqEstablishment.Id,
                         DqtMqEstablishmentName = mqEstablishment.dfeta_name
                     },

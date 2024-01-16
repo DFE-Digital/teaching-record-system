@@ -98,8 +98,6 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldMqEstablishmentValue = "955"; // University of Birmingham
         var newMqEstablishmentValue = "959"; // University of Leeds
         var oldEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(oldMqEstablishmentValue);
-        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(oldEstablishment, out var oldProvider);
-        Assert.NotNull(oldProvider);
         var newEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(newMqEstablishmentValue);
         MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(newEstablishment, out var newProvider);
         Assert.NotNull(newProvider);
@@ -155,8 +153,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = newProvider.MandatoryQualificationProviderId,
-                        Name = newProvider.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = newEstablishment.Id,
                         DqtMqEstablishmentName = newEstablishment.dfeta_name
                     },
@@ -170,8 +168,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = oldProvider.MandatoryQualificationProviderId,
-                        Name = oldProvider.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = oldEstablishment.Id,
                         DqtMqEstablishmentName = oldEstablishment.dfeta_name
                     },

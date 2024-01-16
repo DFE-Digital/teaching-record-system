@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
@@ -45,9 +44,6 @@ public class ConfirmModel(
                 await referenceDataCache.GetMqEstablishmentById(oldEstablishmentId) :
                 null;
 
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(oldEstablishment, out var oldProvider);
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(NewMqEstablishment, out var newProvider);
-
             var specialism = qualification.dfeta_MQ_SpecialismId?.Id is Guid specialismId ?
                 await referenceDataCache.GetMqSpecialismById(specialismId) :
                 null;
@@ -55,11 +51,11 @@ public class ConfirmModel(
             var oldMqEventModel = new Core.Events.Models.MandatoryQualification()
             {
                 QualificationId = QualificationId,
-                Provider = oldProvider is not null || oldEstablishment is not null ?
+                Provider = oldEstablishment is not null ?
                     new()
                     {
-                        MandatoryQualificationProviderId = oldProvider?.MandatoryQualificationProviderId,
-                        Name = oldProvider?.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = oldEstablishment?.Id,
                         DqtMqEstablishmentName = oldEstablishment?.dfeta_name
                     } :
@@ -80,8 +76,8 @@ public class ConfirmModel(
                 {
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = newProvider!.MandatoryQualificationProviderId,
-                        Name = newProvider.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = NewMqEstablishment!.Id,
                         DqtMqEstablishmentName = NewMqEstablishment.dfeta_name
                     }

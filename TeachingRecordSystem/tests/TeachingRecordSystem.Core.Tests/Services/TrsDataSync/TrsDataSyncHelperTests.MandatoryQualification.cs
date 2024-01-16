@@ -444,8 +444,6 @@ public partial class TrsDataSyncHelperTests
             await TestData.ReferenceDataCache.GetMqEstablishmentById(establishmentId) :
             null;
 
-        Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
-
         var specialism = entity.dfeta_MQ_SpecialismId?.Id is Guid dqtSpecialismId ?
             (await TestData.ReferenceDataCache.GetMqSpecialismById(dqtSpecialismId)).ToMandatoryQualificationSpecialism() :
             (MandatoryQualificationSpecialism?)null;
@@ -455,8 +453,8 @@ public partial class TrsDataSyncHelperTests
             (MandatoryQualificationStatus?)null;
 
         Assert.Equal(entity.Id, eventModel.QualificationId);
-        Assert.Equal(provider?.MandatoryQualificationProviderId, eventModel.Provider?.MandatoryQualificationProviderId);
-        Assert.Equal(provider?.Name, eventModel.Provider?.Name);
+        Assert.False(eventModel.Provider?.MandatoryQualificationProviderId.HasValue);
+        Assert.Null(eventModel.Provider?.Name);
         Assert.Equal(mqEstablishment?.Id, eventModel.Provider?.DqtMqEstablishmentId);
         Assert.Equal(mqEstablishment?.dfeta_name, eventModel.Provider?.DqtMqEstablishmentName);
         Assert.Equal(specialism, eventModel.Specialism);
@@ -512,8 +510,6 @@ public partial class TrsDataSyncHelperTests
 
         if (trsAuditEventId is Guid eventId)
         {
-            Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var provider);
-
             var updatedEvent = new MandatoryQualificationCreatedEvent()
             {
                 EventId = eventId,
@@ -523,11 +519,11 @@ public partial class TrsDataSyncHelperTests
                 MandatoryQualification = new()
                 {
                     QualificationId = newQualification.Id,
-                    Provider = provider is not null || establishment is not null ?
+                    Provider = establishment is not null ?
                         new()
                         {
-                            MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
-                            Name = provider?.Name,
+                            MandatoryQualificationProviderId = null,
+                            Name = null,
                             DqtMqEstablishmentId = establishment?.Id,
                             DqtMqEstablishmentName = establishment?.dfeta_name
                         } :
@@ -641,9 +637,6 @@ public partial class TrsDataSyncHelperTests
 
         if (trsAuditEventId is Guid eventId)
         {
-            Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var provider);
-            Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(existingEstablishment, out var existingProvider);
-
             var updatedEvent = new MandatoryQualificationUpdatedEvent()
             {
                 EventId = eventId,
@@ -653,11 +646,11 @@ public partial class TrsDataSyncHelperTests
                 MandatoryQualification = new()
                 {
                     QualificationId = updatedQualification.Id,
-                    Provider = provider is not null || establishment is not null ?
+                    Provider = establishment is not null ?
                         new()
                         {
-                            MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
-                            Name = provider?.Name,
+                            MandatoryQualificationProviderId = null,
+                            Name = null,
                             DqtMqEstablishmentId = establishment?.Id,
                             DqtMqEstablishmentName = establishment?.dfeta_name
                         } :
@@ -670,11 +663,11 @@ public partial class TrsDataSyncHelperTests
                 OldMandatoryQualification = new()
                 {
                     QualificationId = existingQualification.Id,
-                    Provider = provider is not null || establishment is not null ?
+                    Provider = establishment is not null ?
                         new()
                         {
-                            MandatoryQualificationProviderId = existingProvider?.MandatoryQualificationProviderId,
-                            Name = existingProvider?.Name,
+                            MandatoryQualificationProviderId = null,
+                            Name = null,
                             DqtMqEstablishmentId = existingEstablishment?.Id,
                             DqtMqEstablishmentName = existingEstablishment?.dfeta_name
                         } :
@@ -724,8 +717,6 @@ public partial class TrsDataSyncHelperTests
         var currentDqtUser = await TestData.GetCurrentCrmUser();
 
         var establishment = await TestData.ReferenceDataCache.GetMqEstablishmentById(existingQualification.dfeta_MQ_MQEstablishmentId.Id);
-        Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var provider);
-        Assert.NotNull(provider);
 
         var specialism = (await TestData.ReferenceDataCache.GetMqSpecialismById(existingQualification.dfeta_MQ_SpecialismId.Id))
             .ToMandatoryQualificationSpecialism();
@@ -744,8 +735,8 @@ public partial class TrsDataSyncHelperTests
                 QualificationId = existingQualification.Id,
                 Provider = new()
                 {
-                    MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                    Name = provider.Name,
+                    MandatoryQualificationProviderId = null,
+                    Name = null,
                     DqtMqEstablishmentId = establishment.Id,
                     DqtMqEstablishmentName = establishment.dfeta_name
                 },

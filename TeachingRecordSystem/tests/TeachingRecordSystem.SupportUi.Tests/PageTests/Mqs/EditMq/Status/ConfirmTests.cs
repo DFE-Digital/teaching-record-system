@@ -1,6 +1,5 @@
 using FormFlow;
 using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
@@ -106,8 +105,6 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(qualification.DqtMqEstablishmentValue!);
-        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
-        Assert.NotNull(provider);
 
         EventObserver.Clear();
 
@@ -159,8 +156,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = mqEstablishment.Id,
                         DqtMqEstablishmentName = mqEstablishment.dfeta_name
                     },
@@ -174,8 +171,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                        Name = provider.Name,
+                        MandatoryQualificationProviderId = null,
+                        Name = null,
                         DqtMqEstablishmentId = mqEstablishment.Id,
                         DqtMqEstablishmentName = mqEstablishment.dfeta_name
                     },
