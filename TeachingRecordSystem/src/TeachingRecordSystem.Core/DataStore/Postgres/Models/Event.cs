@@ -4,11 +4,14 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Event
 {
+    public const string KeyUniqueIndexName = "ix_events_key";
+
     public required Guid EventId { get; init; }
     public required string EventName { get; init; }
     public required DateTime Created { get; init; }
     public required DateTime Inserted { get; init; }
     public required string Payload { get; init; }
+    public string? Key { get; init; }
     public bool Published { get; set; }
 
     public static Event FromEventBase(EventBase @event, DateTime? inserted)
@@ -22,7 +25,8 @@ public class Event
             EventName = eventName,
             Created = @event.CreatedUtc,
             Inserted = inserted ?? @event.CreatedUtc,
-            Payload = payload
+            Payload = payload,
+            Key = @event is IEventWithKey eventWithKey ? eventWithKey.Key : null
         };
     }
 

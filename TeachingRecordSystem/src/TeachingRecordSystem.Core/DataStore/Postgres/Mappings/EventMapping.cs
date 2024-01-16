@@ -14,7 +14,9 @@ public class EventMapping : IEntityTypeConfiguration<Event>
         builder.Property(e => e.Inserted).IsRequired();
         builder.Property(e => e.Payload).IsRequired().HasColumnType("jsonb");
         builder.Property(e => e.Published);
+        builder.Property(e => e.Key).HasMaxLength(200);
         builder.HasKey(e => e.EventId);
         builder.HasIndex(e => e.Payload).HasMethod("gin");
+        builder.HasIndex(e => e.Key).IsUnique().HasFilter("key is not null").HasDatabaseName(Event.KeyUniqueIndexName);
     }
 }
