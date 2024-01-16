@@ -93,6 +93,7 @@ jobs:
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
           --verbosity diag
+      timeout-minutes: 5
 
     - name: API Tests
       uses: ./.github/workflows/actions/test
@@ -102,6 +103,7 @@ jobs:
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
+      timeout-minutes: 5
 
     - name: Support UI Tests
       uses: ./.github/workflows/actions/test
@@ -111,6 +113,7 @@ jobs:
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
+      timeout-minutes: 5
 
     - name: Install Playwright
       run: pwsh ./tests/TeachingRecordSystem.SupportUi.EndToEndTests/bin/Release/net8.0/playwright.ps1 install
@@ -124,6 +127,7 @@ jobs:
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
+      timeout-minutes: 5
 
   validate_terraform:
     name: Validate Terraform
@@ -238,6 +242,7 @@ jobs:
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
           ${{ steps.test_filter.outputs.filter_arg }}
         config_json: ${{ steps.get_secrets.outputs.INTEGRATION-TEST-CONFIG }}
+      timeout-minutes: 45
 
   package:
     name: Package application
