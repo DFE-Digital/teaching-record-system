@@ -184,7 +184,7 @@ public partial class TrsDataSyncHelperTests
         // Assert
         var events = await GetEventsForQualification(qualificationId);
         var lastEvent = Assert.Single(events);
-        var migatedEvent = Assert.IsType<MandatoryQualificationDqtMigratedEvent>(lastEvent);
+        var migatedEvent = Assert.IsType<MandatoryQualificationDqtImportedEvent>(lastEvent);
         Assert.Equal(Clock.UtcNow, migatedEvent.CreatedUtc);
         Assert.Equal(await TestData.GetCurrentCrmUserId(), migatedEvent.RaisedBy.DqtUserId);
         Assert.Equal(person.PersonId, migatedEvent.PersonId);
@@ -196,7 +196,7 @@ public partial class TrsDataSyncHelperTests
     {
         // Many migrated records in DQT don't have a 'Create' audit record, since auditing was turned on after migration.
         // In that case, TrsDataSyncHelper will take the current version and 'un-apply' every Update audit in reverse,
-        // leaving the initial version at the end. From that a DqtMigrated event is created.
+        // leaving the initial version at the end. From that a MandatoryQualificationDqtImported event is created.
         // This test is exercising that scenario.
         // The Updates created here are deliberately partial updates to verify that the original version of the entity can
         // be reconstructed from multiple Update audits.
@@ -221,11 +221,11 @@ public partial class TrsDataSyncHelperTests
         var events = await GetEventsForQualification(qualificationId);
         Assert.Equal(3, events.Length);
         var firstEvent = events.First();
-        var migratedEvent = Assert.IsType<MandatoryQualificationDqtMigratedEvent>(firstEvent);
-        Assert.Equal(created, migratedEvent.CreatedUtc);
-        Assert.Equal(await TestData.GetCurrentCrmUserId(), migratedEvent.RaisedBy.DqtUserId);
-        Assert.Equal(person.PersonId, migratedEvent.PersonId);
-        await AssertEventMatchesEntity(initialVersion, migratedEvent.MandatoryQualification);
+        var importedEvent = Assert.IsType<MandatoryQualificationDqtImportedEvent>(firstEvent);
+        Assert.Equal(created, importedEvent.CreatedUtc);
+        Assert.Equal(await TestData.GetCurrentCrmUserId(), importedEvent.RaisedBy.DqtUserId);
+        Assert.Equal(person.PersonId, importedEvent.PersonId);
+        await AssertEventMatchesEntity(initialVersion, importedEvent.MandatoryQualification);
     }
 
     [Fact]

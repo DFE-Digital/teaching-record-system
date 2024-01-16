@@ -833,7 +833,7 @@ public class TrsDataSyncHelper(
 
             events.Add(audits.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create) ?
                 MapCreatedEvent(versions.First()) :
-                MapMigratedEvent(versions.First()));
+                MapImportedEvent(versions.First()));
 
             foreach (var (thisVersion, previousVersion) in versions.Skip(1).Zip(versions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
             {
@@ -895,9 +895,9 @@ public class TrsDataSyncHelper(
             };
         }
 
-        EventBase MapMigratedEvent(EntityVersionInfo<dfeta_qualification> snapshot)
+        EventBase MapImportedEvent(EntityVersionInfo<dfeta_qualification> snapshot)
         {
-            return new MandatoryQualificationDqtMigratedEvent()
+            return new MandatoryQualificationDqtImportedEvent()
             {
                 EventId = snapshot.Id,
                 CreatedUtc = snapshot.Timestamp,
