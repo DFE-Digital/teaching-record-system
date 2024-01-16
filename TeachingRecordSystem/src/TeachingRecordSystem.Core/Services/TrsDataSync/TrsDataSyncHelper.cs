@@ -750,6 +750,7 @@ public class TrsDataSyncHelper(
             dfeta_qualification.Fields.dfeta_Type,
             dfeta_qualification.Fields.dfeta_PersonId,
             dfeta_qualification.Fields.StateCode,
+            dfeta_qualification.Fields.StatusCode,
             dfeta_qualification.Fields.dfeta_MQ_SpecialismId,
             dfeta_qualification.Fields.dfeta_MQ_Status,
             dfeta_qualification.Fields.dfeta_MQStartDate,
@@ -940,7 +941,7 @@ public class TrsDataSyncHelper(
             if (snapshot.ChangedAttributes.Contains(dfeta_qualification.Fields.StateCode))
             {
                 var nonStateAttributes = snapshot.ChangedAttributes
-                    .Where(a => !(a is "statecode" or "statuscode"))
+                    .Where(a => !(a is dfeta_qualification.Fields.StateCode or dfeta_qualification.Fields.StatusCode))
                     .ToArray();
 
                 if (nonStateAttributes.Length > 0)
