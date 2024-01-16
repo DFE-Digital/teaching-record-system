@@ -495,7 +495,7 @@ public class TrsDataSyncHelper(
                     if (!AttributeValuesEqual(attr.Value, initial.Attributes.TryGetValue(attr.Key, out var initialAttr) ? initialAttr : null))
                     {
                         throw new Exception($"Non-contiguous audit records for {initial.LogicalName} '{initial.Id}':\n" +
-                            $"Expected '{attr.Key}' to be '{attr.Value}' but was '{initial.Attributes[attr.Key]}'.");
+                            $"Expected '{attr.Key}' to be '{attr.Value ?? "<null>"}' but was '{initialAttr ?? "<null>"}'.");
                     }
 
                     if (!a.AuditDetail.OldValue.Attributes.Contains(attr.Key))
