@@ -492,7 +492,7 @@ public class TrsDataSyncHelper(
                 // if they don't, then we've got an incomplete history
                 foreach (var attr in a.AuditDetail.NewValue.Attributes)
                 {
-                    if (!AttributeValuesEqual(attr.Value, initial.Attributes[attr.Key]))
+                    if (!AttributeValuesEqual(attr.Value, initial.Attributes.TryGetValue(attr.Key, out var initialAttr) ? initialAttr : null))
                     {
                         throw new Exception($"Non-contiguous audit records for {initial.LogicalName} '{initial.Id}':\n" +
                             $"Expected '{attr.Key}' to be '{attr.Value}' but was '{initial.Attributes[attr.Key]}'.");
