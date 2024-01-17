@@ -1,7 +1,7 @@
-@page "/users"
-@model TeachingRecordSystem.SupportUi.Pages.Users.IndexModel
+@page "/application-users"
+@model TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.IndexModel
 @{
-    ViewBag.Title = "Users";
+    ViewBag.Title = "Application users";
 }
 
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
@@ -10,19 +10,17 @@
     <thead class="govuk-table__head">
         <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Name</th>
-            <th scope="col" class="govuk-table__header">Email</th>
         </tr>
     </thead>
     <tbody class="govuk-table__body">
-        @if (Model.AllUsers!.Length > 0)
+        @if (Model.Users!.Length > 0)
         {
-            @foreach (var user in Model.AllUsers)
+            @foreach (var user in Model.Users!)
             {
                 <tr class="govuk-table__row" data-testid="user-@user.UserId">
                     <td class="govuk-table__cell">
-                        <a href="@LinkGenerator.EditUser(user.UserId)" class="govuk-link" data-testid="edit-user-@user.UserId">@user.Name</a>
+                        <a href="@LinkGenerator.EditApplicationUser(user.UserId)" class="govuk-link" data-testid="edit-user-@user.UserId">@user.Name</a>
                     </td>
-                    <td class="govuk-table__cell empty-hyphens">@Html.ShyEmail(user.Email!)</td>
                 </tr>
             }
         }
@@ -37,4 +35,4 @@
     </tbody>
 </table>
 
-<govuk-button-link href="@LinkGenerator.AddUser()" class="govuk-button--secondary" data-testid="add-user">Add user</govuk-button-link>
+<govuk-button-link href="@LinkGenerator.AddApplicationUser()" class="govuk-button--secondary" data-testid="add-application-user">Add application user</govuk-button-link>

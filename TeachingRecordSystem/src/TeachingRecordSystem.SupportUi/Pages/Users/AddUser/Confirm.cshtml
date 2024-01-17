@@ -33,9 +33,7 @@
 
             <govuk-checkboxes asp-for="Roles">
                 <govuk-checkboxes-fieldset>
-                    <govuk-checkboxes-fieldset-legend>
-                        <h2 class="govuk-heading-m">Roles</h2>
-                    </govuk-checkboxes-fieldset-legend>
+                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m" />
                     @foreach (var role in UserRoles.All)
                     {
                         <govuk-checkboxes-item value="@role">@UserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
@@ -54,7 +52,7 @@
                 </ul>
             }
 
-            <govuk-button type="submit">Add user</govuk-button>
+            <govuk-button type="submit">Save</govuk-button>
         </form>
     </div>
 </div>

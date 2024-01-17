@@ -47,7 +47,7 @@ public class SystemUserMapping : IEntityTypeConfiguration<Models.SystemUser>
 
     private static Models.SystemUser GetSystemUser() => new()
     {
-        UserId = UserBase.SystemUserId,
+        UserId = Models.SystemUser.SystemUserId,
         Name = "System",
         Active = true
     };

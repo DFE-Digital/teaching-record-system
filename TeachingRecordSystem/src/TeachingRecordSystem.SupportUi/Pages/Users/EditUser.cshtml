@@ -2,7 +2,7 @@
 @using TeachingRecordSystem.Core
 @model TeachingRecordSystem.SupportUi.Pages.Users.EditUser
 @{
-    ViewBag.Title = "Edit User";
+    ViewBag.Title = $"Edit {Model.Name}";
 }
 
 @section BeforeContent {
@@ -11,7 +11,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.EditUser(Model.UserId!)" method="post">
+        <form action="@LinkGenerator.EditUser(Model.UserId)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             @if (!Model.HasCrmAccount)
@@ -33,9 +33,7 @@
 
             <govuk-checkboxes asp-for="Roles">
                 <govuk-checkboxes-fieldset>
-                    <govuk-checkboxes-fieldset-legend>
-                        <h2 class="govuk-heading-m">Roles</h2>
-                    </govuk-checkboxes-fieldset-legend>
+                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m" />
                     @foreach (var role in UserRoles.All)
                     {
                         <govuk-checkboxes-item value="@role" disabled="@(!Model.IsActiveUser)">@UserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>

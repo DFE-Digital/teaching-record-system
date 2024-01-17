@@ -1,0 +1,77 @@
+@page "/application-users/{userId}"
+@model TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.EditApplicationUserModel
+@inject IClock Clock
+@{
+    ViewBag.Title = $"Edit {Model.Name}";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form action="@LinkGenerator.EditApplicationUser(Model.UserId!)" method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input asp-for="Name" label-class="govuk-label--m" autocomplete="off" />
+
+            <govuk-checkboxes asp-for="ApiRoles">
+                <govuk-checkboxes-fieldset>
+                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m" />
+                    @foreach (var role in ApiRoles.All)
+                    {
+                        <govuk-checkboxes-item value="@role">@role</govuk-checkboxes-item>
+                    }
+                </govuk-checkboxes-fieldset>
+            </govuk-checkboxes>
+
+            <h2 class="govuk-heading-m">@Html.DisplayNameFor(m => m.ApiKeys)</h2>
+            <table class="govuk-table govuk-!-margin-bottom-3" data-testid="ApiKeysTable">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Key ID</th>
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-third">Expires</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @if (Model.ApiKeys!.Length > 0)
+                    {
+                        @foreach (var key in Model.ApiKeys)
+                        {
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">
+                                    <a href="@LinkGenerator.EditApiKey(key.ApiKeyId)" class="govuk-link">@key.ApiKeyId</a>
+                                </td>
+                                <td class="govuk-table__cell" data-testid="Expiry">
+                                    @if (key.Expires is DateTime expires)
+                                    {
+                                        <time datetime="@expires.ToString("s")">
+                                            <span class="@(expires < Clock.UtcNow ? "govuk-caption-m" : "")">
+                                                @expires.ToString("dd/MM/yyyy HH:mm")
+                                            </span>
+                                        </time>
+                                    }
+                                    else
+                                    {
+                                        <div class="govuk-caption-m">No expiration</div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell" colspan="2">
+                                <div class="govuk-caption-m">No API keys</div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="govuk-!-margin-bottom-1">
+                <govuk-button-link href="@LinkGenerator.AddApiKey(Model.UserId)" class="govuk-button--secondary">Add API key</govuk-button-link>
+            </div>
+
+            <govuk-button type="submit">Save changes</govuk-button>
+        </form>
+    </div>
+</div>

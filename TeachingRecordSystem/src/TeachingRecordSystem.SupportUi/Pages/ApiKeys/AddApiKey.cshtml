@@ -1,0 +1,21 @@
+@page "/api-keys/add"
+@model TeachingRecordSystem.SupportUi.Pages.ApiKeys.AddApiKeyModel
+@{
+    ViewBag.Title = $"Add API key to {Model.ApplicationUserName}";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.EditApplicationUser(Model.ApplicationUserId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form action="@LinkGenerator.AddApiKey(Model.ApplicationUserId)" method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input asp-for="Key" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" label-class="govuk-label--m" autocomplete="off" />
+
+            <govuk-button type="submit">Save</govuk-button>
+        </form>
+    </div>
+</div>
