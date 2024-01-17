@@ -162,6 +162,18 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string EditUser(Guid userId) => GetRequiredPathByPage("/Users/EditUser", routeValues: new { userId });
 
+    public string ApplicationUsers() => GetRequiredPathByPage("/ApplicationUsers/Index");
+
+    public string AddApplicationUser() => GetRequiredPathByPage("/ApplicationUsers/AddApplicationUser");
+
+    public string EditApplicationUser(Guid userId) => GetRequiredPathByPage("/ApplicationUsers/EditApplicationUser", routeValues: new { userId });
+
+    public string AddApiKey(Guid applicationUserId) => GetRequiredPathByPage("/ApiKeys/AddApiKey", routeValues: new { applicationUserId });
+
+    public string EditApiKey(Guid apiKeyId) => GetRequiredPathByPage("/ApiKeys/EditApiKey", routeValues: new { apiKeyId });
+
+    public string ExpireApiKey(Guid apiKeyId) => GetRequiredPathByPage("/ApiKeys/EditApiKey", handler: "Expire", routeValues: new { apiKeyId });
+
     private string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {
         var url = linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");

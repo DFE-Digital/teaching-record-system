@@ -479,7 +479,7 @@ public partial class TestData
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = testData.Clock.UtcNow,
-                RaisedBy = RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.User.SystemUserId),
+                RaisedBy = RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
                 PersonId = personId,
                 MandatoryQualification = new()
                 {

@@ -50,6 +50,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<MandatoryQualification> MandatoryQualifications => Set<MandatoryQualification>();
 
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
     {
         if (connectionString != null)

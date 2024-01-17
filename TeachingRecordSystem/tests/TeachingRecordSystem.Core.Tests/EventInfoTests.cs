@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Models;
-using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.Core.Tests;
 
@@ -14,15 +13,14 @@ public class EventInfoTests
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = DateTime.UtcNow,
-            RaisedBy = Core.DataStore.Postgres.Models.User.SystemUserId,
+            RaisedBy = Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
             User = new()
             {
                 AzureAdUserId = "ad-user-id",
                 Email = "test.user@place.com",
                 Name = "Test User",
                 Roles = ["Administrator"],
-                UserId = Guid.NewGuid(),
-                UserType = UserType.Person
+                UserId = Guid.NewGuid()
             }
         };
 
@@ -41,7 +39,6 @@ public class EventInfoTests
         Assert.Equal(e.User.Name, roundTripped.Event.User.Name);
         Assert.Equal(e.User.Roles, roundTripped.Event.User.Roles);
         Assert.Equal(e.User.UserId, roundTripped.Event.User.UserId);
-        Assert.Equal(e.User.UserType, roundTripped.Event.User.UserType);
     }
 
     [Fact]
@@ -59,8 +56,7 @@ public class EventInfoTests
                 Email = "test.user@place.com",
                 Name = "Test User",
                 Roles = ["Administrator"],
-                UserId = Guid.NewGuid(),
-                UserType = UserType.Person
+                UserId = Guid.NewGuid()
             }
         };
 

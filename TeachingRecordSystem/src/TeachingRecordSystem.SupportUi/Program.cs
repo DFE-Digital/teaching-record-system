@@ -76,6 +76,11 @@ builder.Services.AddAuthorizationBuilder()
             .RequireAuthenticatedUser()
             .RequireRole(UserRoles.Helpdesk, UserRoles.Administrator))
     .AddPolicy(
+        AuthorizationPolicies.UserManagement,
+        policy => policy
+            .RequireAuthenticatedUser()
+            .RequireRole(UserRoles.Administrator))
+    .AddPolicy(
         AuthorizationPolicies.Hangfire,
         policy => policy
             .RequireAuthenticatedUser()

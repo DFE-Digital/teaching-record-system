@@ -91,6 +91,21 @@ public partial class TestData
         return Convert.ToBase64String(buffer);
     }
 
+    public string GenerateApplicationUserName() => Faker.Company.Name();
+
+    public string GenerateChangedApplicationUserName(string currentName)
+    {
+        string newName;
+
+        do
+        {
+            newName = GenerateApplicationUserName();
+        }
+        while (newName == currentName);
+
+        return newName;
+    }
+
     public DateOnly GenerateDateOfBirth() => DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 
     public DateOnly GenerateChangedDateOfBirth(DateOnly currentDateOfBirth)

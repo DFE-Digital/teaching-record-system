@@ -66,6 +66,9 @@ public class EditUser(
 
     public async Task<IActionResult> OnPost()
     {
+        // Sanitize roles
+        var newRoles = Roles!.Where(r => UserRoles.All.Contains(r)).ToArray();
+
         if (Roles?.Length == 0)
         {
             ModelState.AddModelError(nameof(Roles), "Select at least one role");
@@ -79,31 +82,28 @@ public class EditUser(
         var user = await dbContext.Users.SingleAsync(u => u.UserId == UserId);
 
         var changes = UserUpdatedEventChanges.None |
-                      (user.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
-                      (!user.Roles.SequenceEqual(Roles!) ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
+            (user.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
+            (!new HashSet<string>(user.Roles).SetEquals(new HashSet<string>(newRoles)) ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
 
-        if (changes == UserUpdatedEventChanges.None)
+        if (changes != UserUpdatedEventChanges.None)
         {
-            return Redirect(linkGenerator.Users());
+            user.Roles = newRoles;
+            user.Name = Name!;
+
+            dbContext.AddEvent(new UserUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                User = Core.Events.Models.User.FromModel(user),
+                RaisedBy = User.GetUserId(),
+                CreatedUtc = clock.UtcNow,
+                Changes = changes
+            });
+
+            await dbContext.SaveChangesAsync();
         }
-
-        user.Roles = Roles!;
-        user.Name = Name!;
-
-        dbContext.AddEvent(new UserUpdatedEvent
-        {
-            EventId = Guid.NewGuid(),
-            User = Core.Events.Models.User.FromModel(user),
-            RaisedBy = User.GetUserId(),
-            CreatedUtc = clock.UtcNow,
-            Changes = changes
-        });
-
-        await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess("User updated");
         return Redirect(linkGenerator.Users());
-
     }
 
     public async Task<IActionResult> OnPostDeactivate()

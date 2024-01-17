@@ -95,7 +95,7 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
     {
         EventId = Guid.NewGuid(),
         CreatedUtc = TestableClock.Initial.ToUniversalTime(),
-        RaisedBy = User.SystemUserId
+        RaisedBy = SystemUser.SystemUserId
     };
 
     private class TestableEventObserver : IEventObserver

@@ -32,7 +32,7 @@ public class UserTests : TestBase
 
         await page.SetCheckedAsync("label:text-is('Helpdesk')", true);
 
-        await page.ClickButton("Add user");
+        await page.ClickButton("Save");
 
         await page.AssertOnUsersPage();
 

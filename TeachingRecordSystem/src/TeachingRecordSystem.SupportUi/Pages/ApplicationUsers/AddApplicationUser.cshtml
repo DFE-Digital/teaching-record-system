@@ -1,0 +1,21 @@
+@page "/application-users/add"
+@model TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.AddApplicationUserModel
+@{
+    ViewBag.Title = "Add application user";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.ApplicationUsers()" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form action="@LinkGenerator.AddApplicationUser()" method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input asp-for="Name" label-class="govuk-label--m" autocomplete="off" />
+
+            <govuk-button type="submit">Save</govuk-button>
+        </form>
+    </div>
+</div>
