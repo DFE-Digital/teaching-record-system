@@ -69,7 +69,7 @@ jobs:
   deploy_prod:
     name: Deploy production environment
     needs: [package, deploy_preprod]
-    if: always() && (needs.deploy_preprod.result == 'success' || needs.deploy_preprod.result == 'skipped')
+    if: always() && (needs.deploy_preprod.result == 'success' || needs.deploy_preprod.result == 'skipped') && (needs.package.result == 'success')
     uses: ./.github/workflows/deploy-prod.yml
     with:
       docker_image: ${{ needs.package.outputs.docker_image }}
