@@ -565,7 +565,21 @@ public class TrsDataSyncHelper(
 
                 request.Requests.AddRange(chunk.Select(e => new RetrieveRecordChangeHistoryRequest() { Target = e.ToEntityReference(entityLogicalName) }));
 
-                var response = (ExecuteMultipleResponse)await organizationService.ExecuteAsync(request, cancellationToken);
+                ExecuteMultipleResponse response;
+                while (true)
+                {
+                    try
+                    {
+                        response = (ExecuteMultipleResponse)await organizationService.ExecuteAsync(request, cancellationToken);
+                    }
+                    catch (FaultException fex) when (fex.IsCrmRateLimitException(out var retryAfter))
+                    {
+                        await Task.Delay(retryAfter, cancellationToken);
+                        continue;
+                    }
+
+                    break;
+                }
 
                 if (response.IsFaulted)
                 {
