@@ -5,6 +5,10 @@
     ViewBag.Title = $"Edit {Model.Name}";
 }
 
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.ApplicationUsers()" />
+}
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <form action="@LinkGenerator.EditApplicationUser(Model.UserId!)" method="post">
