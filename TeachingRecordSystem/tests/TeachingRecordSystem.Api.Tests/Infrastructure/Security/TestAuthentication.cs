@@ -33,7 +33,7 @@ public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticatio
 
         if (currentApiClientId is not null)
         {
-            var principal = ApiKeyAuthenticationHandler.CreatePrincipal(currentApiClientId, currentRoles);
+            var principal = ApiKeyAuthenticationHandler.CreatePrincipal(currentApiClientId, name: currentApiClientId, currentRoles);
 
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
