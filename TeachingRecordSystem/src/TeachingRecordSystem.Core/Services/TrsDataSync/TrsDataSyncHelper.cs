@@ -578,13 +578,20 @@ public class TrsDataSyncHelper(
                         continue;
                     }
 
-                    break;
-                }
+                    if (response.IsFaulted)
+                    {
+                        var firstFault = response.Responses.First(r => r.Fault is not null).Fault;
 
-                if (response.IsFaulted)
-                {
-                    var firstFault = response.Responses.First(r => r.Fault is not null).Fault;
-                    throw new FaultException<OrganizationServiceFault>(firstFault, new FaultReason(firstFault.Message));
+                        if (firstFault.IsCrmRateLimitFault(out var retryAfter))
+                        {
+                            await Task.Delay(retryAfter, cancellationToken);
+                            continue;
+                        }
+
+                        throw new FaultException<OrganizationServiceFault>(firstFault, new FaultReason(firstFault.Message));
+                    }
+
+                    break;
                 }
 
                 return response.Responses.Zip(
