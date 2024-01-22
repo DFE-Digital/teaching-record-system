@@ -19,7 +19,7 @@
             <govuk-checkboxes asp-for="ApiRoles">
                 <govuk-checkboxes-fieldset>
                     <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m" />
-                    @foreach (var role in ApiRoles.All)
+                    @foreach (var role in ApiRoles.All.OrderBy(r => r))
                     {
                         <govuk-checkboxes-item value="@role">@role</govuk-checkboxes-item>
                     }
