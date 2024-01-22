@@ -30,14 +30,19 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
-    public async Task Get_ValidRequest_DisplaysContentAsExpected()
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData("Some reason", true)]
+    public async Task Get_ValidRequest_DisplaysContentAsExpected(
+        string? changeReasonDetail,
+        bool uploadEvidence)
     {
         // Arrange
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()
@@ -45,6 +50,12 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Initialized = true,
                 Specialism = newMqSpecialism,
                 CurrentSpecialism = oldMqSpecialism,
+                ChangeReason = changeReason,
+                ChangeReasonDetail = changeReasonDetail,
+                UploadEvidence = uploadEvidence,
+                EvidenceFileId = uploadEvidence ? Guid.NewGuid() : null,
+                EvidenceFileName = uploadEvidence ? "test.pdf" : null,
+                EvidenceFileSizeDescription = uploadEvidence ? "1MB" : null
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -56,10 +67,21 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await response.GetDocument();
-        var changeDetails = doc.GetElementByTestId("change-details");
-        Assert.NotNull(changeDetails);
-        Assert.Equal(oldMqSpecialism.GetTitle(), changeDetails.GetElementByTestId("current-value")!.TextContent);
-        Assert.Equal(newMqSpecialism.GetTitle(), changeDetails.GetElementByTestId("new-value")!.TextContent);
+        var changeSummary = doc.GetElementByTestId("change-summary");
+        Assert.NotNull(changeSummary);
+        Assert.Equal(oldMqSpecialism.GetTitle(), changeSummary.GetElementByTestId("current-specialism")!.TextContent);
+        Assert.Equal(newMqSpecialism.GetTitle(), changeSummary.GetElementByTestId("new-specialism")!.TextContent);
+        Assert.Equal(changeReason.GetDisplayName(), changeSummary.GetElementByTestId("change-reason")!.TextContent);
+        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TextContent);
+        var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-link");
+        if (uploadEvidence)
+        {
+            Assert.NotNull(uploadedEvidenceLink);
+        }
+        else
+        {
+            Assert.Null(uploadedEvidenceLink);
+        }
     }
 
     [Fact]
@@ -99,6 +121,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(qualification.DqtMqEstablishmentValue!);
+        var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
+        var changeReasonDetail = "Some reason";
 
         EventObserver.Clear();
 
@@ -107,7 +131,11 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditMqSpecialismState()
             {
                 Initialized = true,
-                Specialism = newMqSpecialism
+                Specialism = newMqSpecialism,
+                CurrentSpecialism = oldMqSpecialism,
+                ChangeReason = changeReason,
+                ChangeReasonDetail = changeReasonDetail,
+                UploadEvidence = false,
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -172,6 +200,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     StartDate = qualification.StartDate,
                     EndDate = qualification.EndDate
                 },
+                ChangeReason = changeReason.GetDisplayName(),
+                ChangeReasonDetail = changeReasonDetail,
+                EvidenceFile = null,
                 Changes = MandatoryQualificationUpdatedEventChanges.Specialism
             };
 
@@ -193,7 +224,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditMqSpecialismState()
             {
                 Initialized = true,
-                Specialism = newMqSpecialism
+                Specialism = newMqSpecialism,
+                ChangeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism,
+                ChangeReasonDetail = "Some reason",
+                UploadEvidence = false
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")

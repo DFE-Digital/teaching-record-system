@@ -120,7 +120,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenProviderIsSelected_RedirectsToConfirmPage()
+    public async Task Post_WhenProviderIsSelected_RedirectsToReasonPage()
     {
         // Arrange
         var oldMqEstablishmentValue = "955"; // University of Birmingham
@@ -148,7 +148,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/mqs/{qualificationId}/provider/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

@@ -3,6 +3,10 @@ using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
+using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
@@ -73,7 +77,9 @@ public class MqTests : TestBase
     public async Task EditMqProvider()
     {
         var oldMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        var newMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("961"); // University of Manchester        
+        var newMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("961"); // University of Manchester
+        var changeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider;
+        var changeReasonDetail = "My change reason detail";
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
@@ -94,6 +100,25 @@ public class MqTests : TestBase
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButton();
 
+        await page.AssertOnEditMqProviderReasonPage(qualificationId);
+
+        await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()}')");
+
+        await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
+
+        await page.CheckAsync($"label:text-is('Yes')");
+
+        await page.SetInputFilesAsync(
+            "label:text-is('Upload a file')",
+            new FilePayload()
+            {
+                Name = "evidence.jpg",
+                MimeType = "image/jpeg",
+                Buffer = TestCommon.TestData.JpegImage
+            });
+
+        await page.ClickContinueButton();
+
         await page.AssertOnEditMqProviderConfirmPage(qualificationId);
 
         await page.ClickConfirmChangeButton();
@@ -108,6 +133,8 @@ public class MqTests : TestBase
     {
         var oldSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newSpecialism = MandatoryQualificationSpecialism.Visual;
+        var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
+        var changeReasonDetail = "My change reason detail";
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
@@ -129,6 +156,25 @@ public class MqTests : TestBase
 
         await page.ClickContinueButton();
 
+        await page.AssertOnEditMqSpecialismReasonPage(qualificationId);
+
+        await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()}')");
+
+        await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
+
+        await page.CheckAsync($"label:text-is('Yes')");
+
+        await page.SetInputFilesAsync(
+            "label:text-is('Upload a file')",
+            new FilePayload()
+            {
+                Name = "evidence.jpg",
+                MimeType = "image/jpeg",
+                Buffer = TestCommon.TestData.JpegImage
+            });
+
+        await page.ClickContinueButton();
+
         await page.AssertOnEditMqSpecialismConfirmPage(qualificationId);
 
         await page.ClickConfirmChangeButton();
@@ -143,6 +189,8 @@ public class MqTests : TestBase
     {
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
+        var changeReason = MqChangeStartDateReasonOption.ChangeOfStartDate;
+        var changeReasonDetail = "My change reason detail";
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
@@ -162,6 +210,25 @@ public class MqTests : TestBase
 
         await page.ClickContinueButton();
 
+        await page.AssertOnEditMqStartDateReasonPage(qualificationId);
+
+        await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()}')");
+
+        await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
+
+        await page.CheckAsync($"label:text-is('Yes')");
+
+        await page.SetInputFilesAsync(
+            "label:text-is('Upload a file')",
+            new FilePayload()
+            {
+                Name = "evidence.jpg",
+                MimeType = "image/jpeg",
+                Buffer = TestCommon.TestData.JpegImage
+            });
+
+        await page.ClickContinueButton();
+
         await page.AssertOnEditMqStartDateConfirmPage(qualificationId);
 
         await page.ClickConfirmChangeButton();
@@ -171,13 +238,50 @@ public class MqTests : TestBase
         await page.AssertFlashMessage("Mandatory qualification changed");
     }
 
-    [Fact]
-    public async Task EditMqResult()
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public async Task EditMqStatus(
+        bool isStatusChange,
+        bool isEndDateChange)
     {
-        var oldStatus = MandatoryQualificationStatus.Failed;
-        var newStatus = MandatoryQualificationStatus.Passed;
-        var newEndDate = new DateOnly(2021, 11, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
+        MandatoryQualificationStatus oldStatus;
+        MandatoryQualificationStatus newStatus;
+        DateOnly? oldEndDate;
+        DateOnly? newEndDate;
+        string changeReason = "";
+
+        if (isStatusChange)
+        {
+            if (isEndDateChange)
+            {
+                oldStatus = MandatoryQualificationStatus.Failed;
+                newStatus = MandatoryQualificationStatus.Passed;
+                oldEndDate = null;
+                newEndDate = new DateOnly(2021, 12, 5);
+                changeReason = MqChangeStatusReasonOption.ChangeOfStatus.GetDisplayName()!;
+            }
+            else
+            {
+                oldStatus = MandatoryQualificationStatus.InProgress;
+                newStatus = MandatoryQualificationStatus.Failed;
+                oldEndDate = null;
+                newEndDate = null;
+                changeReason = MqChangeStatusReasonOption.ChangeOfStatus.GetDisplayName()!;
+            }
+        }
+        else
+        {
+            oldStatus = MandatoryQualificationStatus.Passed;
+            newStatus = MandatoryQualificationStatus.Passed;
+            oldEndDate = new DateOnly(2021, 12, 5);
+            newEndDate = new DateOnly(2021, 12, 6);
+            changeReason = MqChangeEndDateReasonOption.ChangeOfEndDate.GetDisplayName()!;
+        }
+
+        var changeReasonDetail = "My change reason detail";
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus).WithEndDate(oldEndDate)));
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
@@ -192,11 +296,36 @@ public class MqTests : TestBase
 
         await page.AssertOnEditMqStatusPage(qualificationId);
 
-        await page.IsCheckedAsync($"label:text-is('{oldStatus}')");
+        if (isStatusChange)
+        {
+            await page.IsCheckedAsync($"label:text-is('{oldStatus.GetTitle()}')");
 
-        await page.CheckAsync($"label:text-is('{newStatus}')");
+            await page.CheckAsync($"label:text-is('{newStatus.GetTitle()}')");
+        }
 
-        await page.FillDateInput(newEndDate);
+        if (isEndDateChange)
+        {
+            await page.FillDateInput(newEndDate!.Value);
+        }
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnEditMqStatusReasonPage(qualificationId);
+
+        await page.CheckAsync($"label:text-is('{changeReason}')");
+
+        await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
+
+        await page.CheckAsync($"label:text-is('Yes')");
+
+        await page.SetInputFilesAsync(
+           "label:text-is('Upload a file')",
+           new FilePayload()
+           {
+               Name = "evidence.jpg",
+               MimeType = "image/jpeg",
+               Buffer = TestCommon.TestData.JpegImage
+           });
 
         await page.ClickContinueButton();
 

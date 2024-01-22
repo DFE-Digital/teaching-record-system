@@ -122,7 +122,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenSpecialismIsSelected_RedirectsToConfirmPage()
+    public async Task Post_WhenSpecialismIsSelected_RedirectsToReasonPage()
     {
         // Arrange
         var oldSpecialism = MandatoryQualificationSpecialism.Hearing;
@@ -150,7 +150,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/mqs/{qualificationId}/specialism/confirm?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/mqs/{qualificationId}/specialism/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

@@ -31,8 +31,12 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
-    public async Task Get_ValidRequest_DisplaysContentAsExpected()
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData("Some reason", true)]
+    public async Task Get_ValidRequest_DisplaysContentAsExpected(
+        string? changeReasonDetail,
+        bool uploadEvidence)
     {
         // Arrange
         var oldMqEstablishmentValue = "955"; // University of Birmingham
@@ -41,6 +45,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(newMqEstablishmentValue);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var changeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
@@ -48,6 +53,12 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Initialized = true,
                 MqEstablishmentValue = newMqEstablishmentValue,
                 CurrentMqEstablishmentName = oldMqEstablishment.dfeta_name,
+                ChangeReason = changeReason,
+                ChangeReasonDetail = changeReasonDetail,
+                UploadEvidence = uploadEvidence,
+                EvidenceFileId = uploadEvidence ? Guid.NewGuid() : null,
+                EvidenceFileName = uploadEvidence ? "test.pdf" : null,
+                EvidenceFileSizeDescription = uploadEvidence ? "1MB" : null
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -59,10 +70,21 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await response.GetDocument();
-        var changeDetails = doc.GetElementByTestId("change-details");
-        Assert.NotNull(changeDetails);
-        Assert.Equal(oldMqEstablishment.dfeta_name, changeDetails.GetElementByTestId("current-value")!.TextContent);
-        Assert.Equal(newMqEstablishment.dfeta_name, changeDetails.GetElementByTestId("new-value")!.TextContent);
+        var changeSummary = doc.GetElementByTestId("change-summary");
+        Assert.NotNull(changeSummary);
+        Assert.Equal(oldMqEstablishment.dfeta_name, changeSummary.GetElementByTestId("current-provider")!.TextContent);
+        Assert.Equal(newMqEstablishment.dfeta_name, changeSummary.GetElementByTestId("new-provider")!.TextContent);
+        Assert.Equal(changeReason.GetDisplayName(), changeSummary.GetElementByTestId("change-reason")!.TextContent);
+        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TextContent);
+        var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-link");
+        if (uploadEvidence)
+        {
+            Assert.NotNull(uploadedEvidenceLink);
+        }
+        else
+        {
+            Assert.Null(uploadedEvidenceLink);
+        }
     }
 
     [Fact]
@@ -99,8 +121,6 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newMqEstablishmentValue = "959"; // University of Leeds
         var oldEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(oldMqEstablishmentValue);
         var newEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(newMqEstablishmentValue);
-        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(newEstablishment, out var newProvider);
-        Assert.NotNull(newProvider);
 
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
         var qualification = person.MandatoryQualifications.First();
@@ -113,7 +133,11 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = newMqEstablishmentValue
+                MqEstablishmentValue = newMqEstablishmentValue,
+                CurrentMqEstablishmentName = oldEstablishment.dfeta_name,
+                ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider,
+                ChangeReasonDetail = "Some reason",
+                UploadEvidence = false,
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -137,7 +161,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContext(async dbContext =>
         {
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
-            Assert.Equal(newProvider?.MandatoryQualificationProviderId, qualification.ProviderId);
+            Assert.Equal(newEstablishment?.dfeta_mqestablishmentId, qualification.DqtMqEstablishmentId);
         });
 
         EventObserver.AssertEventsSaved(e =>
@@ -178,6 +202,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     StartDate = qualification.StartDate,
                     EndDate = qualification.EndDate
                 },
+                ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider.GetDisplayName(),
+                ChangeReasonDetail = "Some reason",
+                EvidenceFile = null,
                 Changes = MandatoryQualificationUpdatedEventChanges.Provider
             };
 
@@ -192,6 +219,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oldMqEstablishmentValue = "955"; // University of Birmingham
         var newMqEstablishmentValue = "959"; // University of Leeds
+        var oldEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(oldMqEstablishmentValue);
+
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
@@ -199,7 +228,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = newMqEstablishmentValue
+                MqEstablishmentValue = newMqEstablishmentValue,
+                ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider,
+                ChangeReasonDetail = "Some reason",
+                UploadEvidence = false,
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -220,7 +252,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
             MandatoryQualificationProvider.TryMapFromDqtMqEstablishmentValue(oldMqEstablishmentValue, out var expectedProvider);
-            Assert.Equal(expectedProvider?.MandatoryQualificationProviderId, qualification.ProviderId);
+            Assert.Equal(oldEstablishment?.dfeta_mqestablishmentId, qualification.DqtMqEstablishmentId);
         });
     }
 

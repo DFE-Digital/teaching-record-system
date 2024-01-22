@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-[Journey(JourneyNames.EditMqResult), ActivatesJourney, RequireJourneyInstance]
+[Journey(JourneyNames.EditMqStatus), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<EditMqResultState>? JourneyInstance { get; set; }
+    public JourneyInstance<EditMqStatusState>? JourneyInstance { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -50,7 +50,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
                 state.EndDate = Status == MandatoryQualificationStatus.Passed ? EndDate : null;
             });
 
-        return Redirect(linkGenerator.MqEditStatusConfirm(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.MqEditStatusReason(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()

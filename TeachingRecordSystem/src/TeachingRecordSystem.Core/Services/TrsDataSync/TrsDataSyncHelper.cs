@@ -1023,6 +1023,9 @@ public class TrsDataSyncHelper(
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
                 MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity),
                 OldMandatoryQualification = GetEventMandatoryQualification(previous.Entity),
+                ChangeReason = null,
+                ChangeReasonDetail = null,
+                EvidenceFile = null,
                 Changes = changes
             };
         }

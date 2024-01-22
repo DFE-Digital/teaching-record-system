@@ -15,7 +15,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
-            new EditMqResultState()
+            new EditMqStatusState()
             {
                 Initialized = true
             });
@@ -30,23 +30,74 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
-    public async Task Get_ValidRequest_DisplaysContentAsExpected()
+    [Theory]
+    [InlineData(true, false, "some reason", true)]
+    [InlineData(false, true, null, true)]
+    [InlineData(true, true, null, false)]
+    public async Task Get_ValidRequest_DisplaysContentAsExpected(
+        bool isStatusChange,
+        bool isEndDateChange,
+        string? changeReasonDetail,
+        bool uploadEvidence)
     {
         // Arrange
-        var oldStatus = MandatoryQualificationStatus.Failed;
-        var newStatus = MandatoryQualificationStatus.Passed;
-        var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
+        MandatoryQualificationStatus? oldStatus;
+        MandatoryQualificationStatus newStatus;
+        DateOnly? oldEndDate;
+        DateOnly? newEndDate;
+        MqChangeStatusReasonOption? statusChangeReason = null;
+        MqChangeEndDateReasonOption? endDateChangeReason = null;
+        string changeReason = "";
+
+        if (isStatusChange)
+        {
+            if (isEndDateChange)
+            {
+                oldStatus = MandatoryQualificationStatus.Failed;
+                newStatus = MandatoryQualificationStatus.Passed;
+                oldEndDate = null;
+                newEndDate = new DateOnly(2021, 12, 5);
+                statusChangeReason = MqChangeStatusReasonOption.ChangeOfStatus;
+                changeReason = statusChangeReason.GetDisplayName()!;
+            }
+            else
+            {
+                oldStatus = null;
+                newStatus = MandatoryQualificationStatus.Failed;
+                oldEndDate = null;
+                newEndDate = null;
+                statusChangeReason = MqChangeStatusReasonOption.ChangeOfStatus;
+                changeReason = statusChangeReason.GetDisplayName()!;
+            }
+        }
+        else
+        {
+            oldStatus = MandatoryQualificationStatus.Passed;
+            newStatus = MandatoryQualificationStatus.Passed;
+            oldEndDate = new DateOnly(2021, 12, 5);
+            newEndDate = new DateOnly(2021, 12, 6);
+            endDateChangeReason = MqChangeEndDateReasonOption.ChangeOfEndDate;
+            changeReason = endDateChangeReason.GetDisplayName()!;
+        }
+
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus).WithEndDate(oldEndDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
-            new EditMqResultState()
+            new EditMqStatusState()
             {
                 Initialized = true,
-                Status = newStatus,
-                EndDate = newEndDate,
                 CurrentStatus = oldStatus,
+                Status = newStatus,
+                CurrentEndDate = oldEndDate,
+                EndDate = newEndDate,
+                StatusChangeReason = statusChangeReason,
+                EndDateChangeReason = endDateChangeReason,
+                ChangeReasonDetail = changeReasonDetail,
+                UploadEvidence = uploadEvidence,
+                EvidenceFileId = uploadEvidence ? Guid.NewGuid() : null,
+                EvidenceFileName = uploadEvidence ? "test.pdf" : null,
+                EvidenceFileSizeDescription = uploadEvidence ? "1MB" : null
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -58,12 +109,41 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var doc = await response.GetDocument();
-        var changeDetails = doc.GetElementByTestId("change-details");
-        Assert.NotNull(changeDetails);
-        Assert.Equal(oldStatus.GetTitle(), changeDetails.GetElementByTestId("current-status")!.TextContent);
-        Assert.Equal(newStatus.GetTitle(), changeDetails.GetElementByTestId("new-status")!.TextContent);
-        Assert.Equal("None", changeDetails.GetElementByTestId("current-end-date")!.TextContent);
-        Assert.Equal(newEndDate.ToString("d MMMM yyyy"), changeDetails.GetElementByTestId("new-end-date")!.TextContent);
+        var changeSummary = doc.GetElementByTestId("change-summary");
+        Assert.NotNull(changeSummary);
+        if (isStatusChange)
+        {
+            Assert.Equal(oldStatus.HasValue ? oldStatus.Value.GetTitle() : "None", changeSummary.GetElementByTestId("current-status")!.TextContent);
+            Assert.Equal(newStatus.GetTitle(), changeSummary.GetElementByTestId("new-status")!.TextContent);
+        }
+        else
+        {
+            Assert.Null(changeSummary.GetElementByTestId("current-status"));
+            Assert.Null(changeSummary.GetElementByTestId("new-status"));
+        }
+
+        if (isEndDateChange)
+        {
+            Assert.Equal(oldEndDate.HasValue ? oldEndDate.Value.ToString("d MMMM yyyy") : "None", changeSummary.GetElementByTestId("current-end-date")!.TextContent);
+            Assert.Equal(newEndDate.HasValue ? newEndDate.Value.ToString("d MMMM yyyy") : "None", changeSummary.GetElementByTestId("new-end-date")!.TextContent);
+        }
+        else
+        {
+            Assert.Null(changeSummary.GetElementByTestId("current-end-date"));
+            Assert.Null(changeSummary.GetElementByTestId("new-end-date"));
+        }
+
+        Assert.Equal(changeReason, changeSummary.GetElementByTestId("change-reason")!.TextContent);
+        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TextContent);
+        var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-link");
+        if (uploadEvidence)
+        {
+            Assert.NotNull(uploadedEvidenceLink);
+        }
+        else
+        {
+            Assert.Null(uploadedEvidenceLink);
+        }
     }
 
     [Fact]
@@ -74,7 +154,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
-            new EditMqResultState()
+            new EditMqStatusState()
             {
                 Initialized = true
             });
@@ -92,14 +172,59 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    [Fact]
-    public async Task Post_Confirm_UpdatesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
+    [Theory]
+    [InlineData(true, false, "some reason", true)]
+    [InlineData(false, true, null, true)]
+    [InlineData(true, true, null, false)]
+    public async Task Post_Confirm_UpdatesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(
+        bool isStatusChange,
+        bool isEndDateChange,
+        string? changeReasonDetail,
+        bool uploadEvidence)
     {
         // Arrange
-        var oldStatus = MandatoryQualificationStatus.Failed;
-        var newStatus = MandatoryQualificationStatus.Passed;
-        var oldEndDate = (DateOnly?)null;
-        var newEndDate = new DateOnly(2021, 12, 5);
+        MandatoryQualificationStatus? oldStatus;
+        MandatoryQualificationStatus newStatus;
+        DateOnly? oldEndDate;
+        DateOnly? newEndDate;
+        MqChangeStatusReasonOption? statusChangeReason = null;
+        MqChangeEndDateReasonOption? endDateChangeReason = null;
+        string changeReason = "";
+        var changes = MandatoryQualificationUpdatedEventChanges.None;
+
+        if (isStatusChange)
+        {
+            if (isEndDateChange)
+            {
+                oldStatus = MandatoryQualificationStatus.Failed;
+                newStatus = MandatoryQualificationStatus.Passed;
+                oldEndDate = null;
+                newEndDate = new DateOnly(2021, 12, 5);
+                statusChangeReason = MqChangeStatusReasonOption.ChangeOfStatus;
+                changeReason = statusChangeReason.GetDisplayName()!;
+                changes = MandatoryQualificationUpdatedEventChanges.Status | MandatoryQualificationUpdatedEventChanges.EndDate;
+            }
+            else
+            {
+                oldStatus = null;
+                newStatus = MandatoryQualificationStatus.Failed;
+                oldEndDate = null;
+                newEndDate = null;
+                statusChangeReason = MqChangeStatusReasonOption.ChangeOfStatus;
+                changeReason = statusChangeReason.GetDisplayName()!;
+                changes = MandatoryQualificationUpdatedEventChanges.Status;
+            }
+        }
+        else
+        {
+            oldStatus = MandatoryQualificationStatus.Passed;
+            newStatus = MandatoryQualificationStatus.Passed;
+            oldEndDate = new DateOnly(2021, 12, 5);
+            newEndDate = new DateOnly(2021, 12, 6);
+            endDateChangeReason = MqChangeEndDateReasonOption.ChangeOfEndDate;
+            changeReason = endDateChangeReason.GetDisplayName()!;
+            changes = MandatoryQualificationUpdatedEventChanges.EndDate;
+        }
 
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus).WithEndDate(oldEndDate)));
         var qualification = person.MandatoryQualifications.First();
@@ -108,14 +233,25 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventObserver.Clear();
 
+        Guid? evidenceFileId = uploadEvidence ? Guid.NewGuid() : null;
+        string? evidenceFileName = uploadEvidence ? "test.pdf" : null;
+
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
-            new EditMqResultState()
+            new EditMqStatusState()
             {
                 Initialized = true,
-                Status = newStatus,
-                EndDate = newEndDate,
                 CurrentStatus = oldStatus,
+                Status = newStatus,
+                CurrentEndDate = oldEndDate,
+                EndDate = newEndDate,
+                StatusChangeReason = statusChangeReason,
+                EndDateChangeReason = endDateChangeReason,
+                ChangeReasonDetail = changeReasonDetail,
+                UploadEvidence = uploadEvidence,
+                EvidenceFileId = evidenceFileId,
+                EvidenceFileName = evidenceFileName,
+                EvidenceFileSizeDescription = uploadEvidence ? "1MB" : null
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/confirm?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -181,7 +317,16 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     StartDate = qualification.StartDate,
                     EndDate = oldEndDate
                 },
-                Changes = MandatoryQualificationUpdatedEventChanges.Status | MandatoryQualificationUpdatedEventChanges.EndDate
+                ChangeReason = changeReason,
+                ChangeReasonDetail = changeReasonDetail,
+                EvidenceFile = uploadEvidence ?
+                    new Core.Events.Models.File()
+                    {
+                        FileId = evidenceFileId!.Value,
+                        Name = evidenceFileName!
+                    } :
+                    null,
+                Changes = changes
             };
 
             var actualMqUpdatedEvent = Assert.IsType<MandatoryQualificationUpdatedEvent>(e);
@@ -201,13 +346,15 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
-            new EditMqResultState()
+            new EditMqStatusState()
             {
                 Initialized = true,
                 Status = newStatus,
                 EndDate = newEndDate,
                 CurrentStatus = oldStatus,
-                CurrentEndDate = oldEndDate
+                CurrentEndDate = oldEndDate,
+                UploadEvidence = false,
+                StatusChangeReason = MqChangeStatusReasonOption.ChangeOfStatus
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/confirm/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -232,9 +379,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    private async Task<JourneyInstance<EditMqResultState>> CreateJourneyInstance(Guid qualificationId, EditMqResultState? state = null) =>
+    private async Task<JourneyInstance<EditMqStatusState>> CreateJourneyInstance(Guid qualificationId, EditMqStatusState? state = null) =>
         await CreateJourneyInstance(
-            JourneyNames.EditMqResult,
-            state ?? new EditMqResultState(),
+            JourneyNames.EditMqStatus,
+            state ?? new EditMqStatusState(),
             new KeyValuePair<string, object>("qualificationId", qualificationId));
 }

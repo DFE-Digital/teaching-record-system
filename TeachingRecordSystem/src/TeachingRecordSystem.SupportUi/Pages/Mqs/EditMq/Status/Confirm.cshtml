@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.MqEditStatus(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.MqEditStatusReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
 <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
@@ -14,27 +14,61 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqEditStatusConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
-            <table class="govuk-table" data-testid="change-details">
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th class="govuk-table__header" scope="col"></th>
-                        <th class="govuk-table__header" scope="col">Current</th>
-                        <th class="govuk-table__header" scope="col">New</th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    <tr class="govuk-table__row">
-                        <th class="govuk-table__header" scope="row">Status</th>
-                        <td class="govuk-table__cell" data-testid="current-status">@(Model.CurrentStatus.HasValue ? Model.CurrentStatus.Value : "None")</td>
-                        <td class="govuk-table__cell" data-testid="new-status">@(Model.NewStatus.HasValue ? Model.NewStatus.Value : "None")</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                        <th class="govuk-table__header" scope="row">End date</th>
-                        <td class="govuk-table__cell" data-testid="current-end-date">@(Model.CurrentEndDate.HasValue ? Model.CurrentEndDate!.Value.ToString("d MMMM yyyy") : "None")</td>
-                        <td class="govuk-table__cell" data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString("d MMMM yyyy") : "None")</td>
-                    </tr>
-                </tbody>
-            </table>
+            <govuk-summary-list data-testid="change-summary">
+                @if (Model.IsStatusChange!.Value)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Current status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="current-status">@(Model.CurrentStatus.HasValue ? Model.CurrentStatus.Value.GetTitle() : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>                
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>New status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="new-status">@(Model.NewStatus.HasValue ? Model.NewStatus.Value.GetTitle() : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                @if (Model.IsEndDateChange!.Value)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Current end date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="current-end-date">@(Model.CurrentEndDate.HasValue ? Model.CurrentEndDate!.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>New end date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                @if (Model.IsEndDateChange!.Value && !Model.IsStatusChange!.Value)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="change-reason">@Model.EndDateChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                else
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="change-reason">@Model.StatusChangeReason!.GetDisplayName()</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>More detail about the reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="change-reason-detail"><multi-line-text text="@(!string.IsNullOrEmpty(Model.ChangeReasonDetail) ? Model.ChangeReasonDetail : "None")" /></govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="evidence">
+                        @if (Model.UploadedEvidenceFileUrl is not null)
+                        {
+                            <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span>None</span>
+                        }
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Confirm change</govuk-button>

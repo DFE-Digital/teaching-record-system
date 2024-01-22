@@ -77,6 +77,9 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string MqEditProviderCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/Provider/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 
+    public string MqEditProviderReason(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Provider/Reason", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
     public string MqEditProviderConfirm(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/Provider/Confirm", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 
@@ -85,6 +88,9 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string MqEditSpecialism(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/Specialism/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditSpecialismReason(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Specialism/Reason", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 
     public string MqEditSpecialismCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/Specialism/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
@@ -98,6 +104,9 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string MqEditStartDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/StartDate/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 
+    public string MqEditStartDateReason(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/StartDate/Reason", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
     public string MqEditStartDateCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/StartDate/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 
@@ -109,6 +118,9 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string MqEditStatus(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/Status/Index", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string MqEditStatusReason(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Mqs/EditMq/Status/Reason", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 
     public string MqEditStatusCancel(Guid qualificationId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/EditMq/Status/Index", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);

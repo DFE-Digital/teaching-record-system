@@ -11,9 +11,24 @@ public class EditMqStartDateState
 
     public DateOnly? StartDate { get; set; }
 
+    public MqChangeStartDateReasonOption? ChangeReason { get; set; }
+
+    public string? ChangeReasonDetail { get; set; }
+
+    public bool? UploadEvidence { get; set; }
+
+    public Guid? EvidenceFileId { get; set; }
+
+    public string? EvidenceFileName { get; set; }
+
+    public string? EvidenceFileSizeDescription { get; set; }
+
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(StartDate))]
-    public bool IsComplete => StartDate is not null;
+    [MemberNotNullWhen(true, nameof(StartDate), nameof(ChangeReason), nameof(UploadEvidence), nameof(EvidenceFileId))]
+    public bool IsComplete => StartDate is not null &&
+        ChangeReason.HasValue &&
+        UploadEvidence.HasValue &&
+        (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
 
     public void EnsureInitialized(CurrentMandatoryQualificationFeature qualificationInfo)
     {
