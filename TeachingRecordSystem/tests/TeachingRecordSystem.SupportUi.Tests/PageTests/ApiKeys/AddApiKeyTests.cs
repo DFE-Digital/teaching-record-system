@@ -146,7 +146,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Key", "Key must be at least 20 characters");
+        await AssertEx.HtmlResponseHasError(response, "Key", "Key must be at least 16 characters");
     }
 
     [Fact]
