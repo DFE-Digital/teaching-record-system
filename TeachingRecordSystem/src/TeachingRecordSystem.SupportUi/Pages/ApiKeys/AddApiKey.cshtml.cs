@@ -23,7 +23,7 @@ public class AddApiKeyModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerat
     [Display(Name = "Key")]
     [Required(ErrorMessage = "Enter a key")]
     [MaxLength(ApiKey.KeyMaxLength, ErrorMessage = "Key must be 100 characters or less")]
-    [MinLength(ApiKey.KeyMinLength, ErrorMessage = "Key must be at least 20 characters")]
+    [MinLength(ApiKey.KeyMinLength, ErrorMessage = "Key must be at least 16 characters")]
     public string? Key { get; set; }
 
     public void OnGet()
