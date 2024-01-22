@@ -168,7 +168,6 @@ public class Program
         services.AddOpenApi(configuration);
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
-        services.AddSingleton<IApiClientRepository, ConfigurationApiClientRepository>();
         services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
         services.AddSingleton<IClock, Clock>();
         services.AddMemoryCache();
