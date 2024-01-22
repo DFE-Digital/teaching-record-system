@@ -587,6 +587,11 @@ public class TrsDataSyncHelper(
                             await Task.Delay(retryAfter, cancellationToken);
                             continue;
                         }
+                        else if (firstFault.Message.Contains("The HTTP status code of the response was not expected (429)"))
+                        {
+                            await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken);
+                            continue;
+                        }
 
                         throw new FaultException<OrganizationServiceFault>(firstFault, new FaultReason(firstFault.Message));
                     }
