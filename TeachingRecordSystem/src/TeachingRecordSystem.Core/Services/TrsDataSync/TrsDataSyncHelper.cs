@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.ServiceModel;
@@ -873,11 +874,13 @@ public class TrsDataSyncHelper(
             }
 
             // If the record is deactivated, the final event should be a MandatoryQualificationDeletedEvent or MandatoryQualificationDqtDeactivatedEvent
+            // or we should have a MandatoryQualificationDqtImportedEvent (with inactive status)
             if (q.StateCode == dfeta_qualificationState.Inactive)
             {
                 var lastEvent = events.Last();
 
-                if (lastEvent is MandatoryQualificationDqtDeactivatedEvent or MandatoryQualificationDeletedEvent)
+                if (lastEvent is MandatoryQualificationDqtDeactivatedEvent or MandatoryQualificationDeletedEvent ||
+                    lastEvent is MandatoryQualificationDqtImportedEvent { DqtState: (int)dfeta_qualificationState.Inactive })
                 {
                     mapped.DeletedOn = lastEvent.CreatedUtc;
                 }
@@ -897,20 +900,15 @@ public class TrsDataSyncHelper(
 
         EventBase MapCreatedEvent(EntityVersionInfo<dfeta_qualification> snapshot)
         {
-            if (snapshot.Entity.Attributes.ContainsKey(dfeta_qualification.Fields.dfeta_TRSEvent))
+            if (TryDeserializeEventAttribute(snapshot.Entity.Attributes, dfeta_qualification.Fields.dfeta_TRSEvent, out var eventFromAttr))
             {
-                var eventFromAttr = EventInfo.Deserialize(snapshot.Entity.dfeta_TRSEvent).Event;
-
-                if (!(eventFromAttr is DummyEvent))
+                if (!(eventFromAttr is MandatoryQualificationCreatedEvent))
                 {
-                    if (!(eventFromAttr is MandatoryQualificationCreatedEvent))
-                    {
-                        throw new InvalidOperationException(
-                            $"Expected event to be {nameof(MandatoryQualificationCreatedEvent)} but got {eventFromAttr.GetEventName()}.");
-                    }
-
-                    return eventFromAttr;
+                    throw new InvalidOperationException(
+                        $"Expected event to be {nameof(MandatoryQualificationCreatedEvent)} but got {eventFromAttr.GetEventName()}.");
                 }
+
+                return eventFromAttr;
             }
 
             return new MandatoryQualificationCreatedEvent()
@@ -933,36 +931,27 @@ public class TrsDataSyncHelper(
                 CreatedUtc = snapshot.Timestamp,
                 RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity)
+                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity),
+                DqtState = (int)snapshot.Entity.StateCode!
             };
         }
 
         EventBase? MapUpdatedEvent(EntityVersionInfo<dfeta_qualification> snapshot, EntityVersionInfo<dfeta_qualification> previous)
         {
-            if (snapshot.Entity.Attributes.ContainsKey(dfeta_qualification.Fields.dfeta_TRSEvent))
+            if (TryDeserializeEventAttribute(snapshot.Entity.Attributes, dfeta_qualification.Fields.dfeta_TRSEvent, out var eventFromAttr))
             {
-                var eventFromAttr = EventInfo.Deserialize(snapshot.Entity.dfeta_TRSEvent).Event;
-
-                if (!(eventFromAttr is DummyEvent))
-                {
-                    // dfeta_TRSEvent may contain a stale value from a previous version
-                    // (if the record was updated from the CRM UI then dfeta_TRSEvent won't have been updated).
-                    // Check the previous events we've created; if we've seen it before we know we should ignore it this time.
-                    if (!events.Any(e => e.EventId == eventFromAttr.EventId))
-                    {
-                        return eventFromAttr;
-                    }
-                }
-            }
-
-            if (snapshot.Entity.Attributes.ContainsKey(dfeta_qualification.Fields.dfeta_TrsDeletedEvent))
-            {
-                var eventFromAttr = EventInfo.Deserialize(snapshot.Entity.dfeta_TrsDeletedEvent).Event;
-
-                if (!(eventFromAttr is DummyEvent))
+                // dfeta_TRSEvent may contain a stale value from a previous version
+                // (if the record was updated from the CRM UI then dfeta_TRSEvent won't have been updated).
+                // Check the previous events we've created; if we've seen it before we know we should ignore it this time.
+                if (!events.Any(e => e.EventId == eventFromAttr.EventId))
                 {
                     return eventFromAttr;
                 }
+            }
+
+            if (TryDeserializeEventAttribute(snapshot.Entity.Attributes, dfeta_qualification.Fields.dfeta_TrsDeletedEvent, out eventFromAttr))
+            {
+                return eventFromAttr;
             }
 
             if (snapshot.ChangedAttributes.Contains(dfeta_qualification.Fields.StateCode))
@@ -1056,6 +1045,23 @@ public class TrsDataSyncHelper(
                 StartDate = mapped.StartDate,
                 EndDate = mapped.EndDate,
             };
+        }
+
+        bool TryDeserializeEventAttribute(AttributeCollection attributes, string key, [NotNullWhen(true)] out EventBase? @event)
+        {
+            if (attributes.TryGetValue(key, out var attrValue) && attrValue is string serializedEvent)
+            {
+                var evt = EventInfo.Deserialize(serializedEvent);
+
+                if (!(evt.Event is DummyEvent))
+                {
+                    @event = evt.Event;
+                    return true;
+                }
+            }
+
+            @event = default;
+            return false;
         }
     }
 
