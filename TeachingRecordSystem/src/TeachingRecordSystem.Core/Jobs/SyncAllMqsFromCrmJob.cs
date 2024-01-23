@@ -73,7 +73,7 @@ public class SyncAllMqsFromCrmJob
             await _trsDataSyncHelper.SyncMandatoryQualifications(
                 result.Entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(),
                 ignoreInvalid: _syncOptionsAccessor.Value.IgnoreInvalidData,
-                createdMigratedEvent: true,
+                createdMigratedEvent: false,
                 cancellationToken);
 
             if (result.MoreRecords)
