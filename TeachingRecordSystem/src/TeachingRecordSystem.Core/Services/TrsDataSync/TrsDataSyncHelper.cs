@@ -885,7 +885,8 @@ public class TrsDataSyncHelper(
                 {
                     throw new InvalidOperationException(
                         $"Expected last event to be a {nameof(MandatoryQualificationDqtDeactivatedEvent)}" +
-                        $" or {nameof(MandatoryQualificationDeletedEvent)} but was {lastEvent.GetEventName()}.");
+                        $" or {nameof(MandatoryQualificationDeletedEvent)} but was {lastEvent.GetEventName()}" +
+                        $" (qualification ID: '{q.Id}').");
                 }
             }
 
