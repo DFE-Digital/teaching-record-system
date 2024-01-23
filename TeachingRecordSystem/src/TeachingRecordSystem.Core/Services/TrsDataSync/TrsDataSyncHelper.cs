@@ -1035,6 +1035,11 @@ public class TrsDataSyncHelper(
 
         EventBase MapMigratedEvent(EntityVersionInfo<dfeta_qualification> snapshot)
         {
+            var eventMandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: true);
+
+            var changes = MandatoryQualificationMigratedEventChanges.None |
+                (eventMandatoryQualification.Provider?.Name != eventMandatoryQualification.Provider?.DqtMqEstablishmentName ? MandatoryQualificationMigratedEventChanges.Provider : 0);
+
             return new MandatoryQualificationMigratedEvent()
             {
                 EventId = Guid.NewGuid(),
@@ -1042,7 +1047,8 @@ public class TrsDataSyncHelper(
                 CreatedUtc = clock.UtcNow,
                 RaisedBy = Events.Models.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: true)
+                MandatoryQualification = eventMandatoryQualification,
+                Changes = changes
             };
         }
 

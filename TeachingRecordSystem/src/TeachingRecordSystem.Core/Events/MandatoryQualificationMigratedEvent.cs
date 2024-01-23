@@ -7,4 +7,11 @@ public record MandatoryQualificationMigratedEvent : EventBase, IEventWithPersonI
     public string? Key { get; init; }
     public required Guid PersonId { get; init; }
     public required MandatoryQualification MandatoryQualification { get; init; }
+    public required MandatoryQualificationMigratedEventChanges Changes { get; init; }
+}
+
+public enum MandatoryQualificationMigratedEventChanges
+{
+    None = 0,
+    Provider = 1 << 0,
 }
