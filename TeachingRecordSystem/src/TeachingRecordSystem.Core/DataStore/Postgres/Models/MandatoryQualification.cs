@@ -19,6 +19,6 @@ public class MandatoryQualification : Qualification
         var mqEstablishments = await referenceDataCache.GetMqEstablishments();
         var mqSpecialisms = await referenceDataCache.GetMqSpecialisms();
 
-        return TrsDataSyncHelper.MapMandatoryQualificationFromDqtQualification(qualification, mqEstablishments, mqSpecialisms);
+        return TrsDataSyncHelper.MapMandatoryQualificationFromDqtQualification(qualification, mqEstablishments, mqSpecialisms, applyMigrationMappings: true);
     }
 }
