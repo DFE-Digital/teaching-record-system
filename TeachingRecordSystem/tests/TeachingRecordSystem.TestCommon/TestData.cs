@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -226,8 +227,9 @@ public partial class TestData
 
         max ??= min.AddYears(1);
 
-        var daysDiff = Math.Min(1, (int)(max.Value.ToDateTime(TimeOnly.MinValue) - min.ToDateTime(TimeOnly.MinValue)).TotalDays);
-        return min.AddDays(Random.Shared.Next(minValue: 1, maxValue: daysDiff));
+        var daysDiff = (int)(max.Value.ToDateTime(TimeOnly.MinValue) - min.ToDateTime(TimeOnly.MinValue)).TotalDays;
+        Debug.Assert(daysDiff > 0);
+        return min.AddDays(Random.Shared.Next(minValue: 1, maxValue: daysDiff + 1));
     }
 
     public DateOnly GenerateChangedDate(DateOnly currentDate, DateOnly min, DateOnly? max = null)
