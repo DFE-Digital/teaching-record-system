@@ -407,7 +407,7 @@ public class TrsDataSyncHelper(
         return toSync.Count;
     }
 
-    private EntityVersionInfo<TEntity>[] GetEntityVersions<TEntity>(TEntity latest, IEnumerable<AuditDetail> auditDetails)
+    private EntityVersionInfo<TEntity>[] GetEntityVersions<TEntity>(TEntity latest, IEnumerable<AuditDetail> auditDetails, string[] attributeNames)
         where TEntity : Entity
     {
         var created = latest.GetAttributeValue<DateTime?>("createdon")!.Value;
@@ -490,7 +490,7 @@ public class TrsDataSyncHelper(
             {
                 // Check that new attributes align with what we have in `initial`;
                 // if they don't, then we've got an incomplete history
-                foreach (var attr in a.AuditDetail.NewValue.Attributes)
+                foreach (var attr in a.AuditDetail.NewValue.Attributes.Where(kvp => attributeNames.Contains(kvp.Key)))
                 {
                     if (!AttributeValuesEqual(attr.Value, initial.Attributes.TryGetValue(attr.Key, out var initialAttr) ? initialAttr : null))
                     {
@@ -504,7 +504,7 @@ public class TrsDataSyncHelper(
                     }
                 }
 
-                foreach (var attr in a.AuditDetail.OldValue.Attributes)
+                foreach (var attr in a.AuditDetail.OldValue.Attributes.Where(kvp => attributeNames.Contains(kvp.Key)))
                 {
                     initial.Attributes[attr.Key] = attr.Value;
                 }
@@ -856,7 +856,7 @@ public class TrsDataSyncHelper(
             var mapped = MapMandatoryQualificationFromDqtQualification(q, mqEstablishments, mqSpecialisms);
 
             var audits = auditDetails[q.Id].AuditDetails;
-            var versions = GetEntityVersions(q, audits);
+            var versions = GetEntityVersions(q, audits, GetModelTypeSyncInfoForMandatoryQualification().AttributeNames);
 
             events.Add(audits.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create) ?
                 MapCreatedEvent(versions.First()) :
