@@ -53,15 +53,20 @@ public class TrsDataSyncHelper(
     public static MandatoryQualification MapMandatoryQualificationFromDqtQualification(
         dfeta_qualification qualification,
         IEnumerable<dfeta_mqestablishment> mqEstablishments,
-        IEnumerable<dfeta_specialism> mqSpecialisms)
+        IEnumerable<dfeta_specialism> mqSpecialisms,
+        bool applyMigrationMappings)
     {
         if (qualification.dfeta_Type != dfeta_qualification_dfeta_Type.MandatoryQualification)
         {
             throw new ArgumentException("Qualification is not a mandatory qualification.", nameof(qualification));
         }
 
-        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(
-            mqEstablishments.SingleOrDefault(e => e.Id == qualification.dfeta_MQ_MQEstablishmentId!?.Id), out var provider);
+        MandatoryQualificationProvider? provider = null;
+        if (applyMigrationMappings)
+        {
+            MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(
+                mqEstablishments.SingleOrDefault(e => e.Id == qualification.dfeta_MQ_MQEstablishmentId!?.Id), out provider);
+        }
 
         MandatoryQualificationSpecialism? specialism = qualification.dfeta_MQ_SpecialismId is not null ?
             mqSpecialisms.Single(s => s.Id == qualification.dfeta_MQ_SpecialismId.Id).ToMandatoryQualificationSpecialism() :
@@ -261,13 +266,13 @@ public class TrsDataSyncHelper(
             var mqEstablishments = await referenceDataCache.GetMqEstablishments();
             var mqSpecialisms = await referenceDataCache.GetMqSpecialisms();
 
-            var mqs = qualifications.Select(q => MapMandatoryQualificationFromDqtQualification(q, mqEstablishments, mqSpecialisms)).ToArray();
+            var mqs = qualifications.Select(q => MapMandatoryQualificationFromDqtQualification(q, mqEstablishments, mqSpecialisms, applyMigrationMappings: false)).ToArray();
 
             return await SyncMandatoryQualifications(mqs, events, ignoreInvalid: false, cancellationToken) == 1;
         }
         else
         {
-            return await SyncMandatoryQualifications(qualifications, ignoreInvalid: false, cancellationToken) == 1;
+            return await SyncMandatoryQualifications(qualifications, ignoreInvalid: false, createdMigratedEvent: false, cancellationToken) == 1;
         }
     }
 
@@ -275,6 +280,7 @@ public class TrsDataSyncHelper(
         dfeta_qualification entity,
         AuditDetailCollection auditDetails,
         bool ignoreInvalid,
+        bool createdMigratedEvent,
         CancellationToken cancellationToken = default)
     {
         var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
@@ -282,29 +288,31 @@ public class TrsDataSyncHelper(
             { entity.Id, auditDetails }
         };
 
-        return await SyncMandatoryQualifications(new[] { entity }, auditDetailsDict, ignoreInvalid, cancellationToken) == 1;
+        return await SyncMandatoryQualifications(new[] { entity }, auditDetailsDict, ignoreInvalid, createdMigratedEvent, cancellationToken) == 1;
     }
 
     public async Task<int> SyncMandatoryQualifications(
         IReadOnlyCollection<dfeta_qualification> entities,
         bool ignoreInvalid,
+        bool createdMigratedEvent,
         CancellationToken cancellationToken)
     {
         var auditDetails = await GetAuditRecords(dfeta_qualification.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
 
-        return await SyncMandatoryQualifications(entities, auditDetails, ignoreInvalid, cancellationToken);
+        return await SyncMandatoryQualifications(entities, auditDetails, ignoreInvalid, createdMigratedEvent, cancellationToken);
     }
 
     public async Task<int> SyncMandatoryQualifications(
         IReadOnlyCollection<dfeta_qualification> entities,
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
         bool ignoreInvalid,
+        bool createdMigratedEvent,
         CancellationToken cancellationToken = default)
     {
         // Not all dfeta_qualification records are MQs..
         var toSync = entities.Where(q => q.dfeta_Type == dfeta_qualification_dfeta_Type.MandatoryQualification);
 
-        var (mqs, events) = await MapMandatoryQualificationsAndAudits(toSync, auditDetails);
+        var (mqs, events) = await MapMandatoryQualificationsAndAudits(toSync, auditDetails, createdMigratedEvent);
 
         return await SyncMandatoryQualifications(mqs, events, ignoreInvalid, cancellationToken);
     }
@@ -816,7 +824,7 @@ public class TrsDataSyncHelper(
             EntityLogicalName = dfeta_qualification.EntityLogicalName,
             AttributeNames = attributeNames,
             GetSyncHandler = helper => (entities, ignoreInvalid, ct) =>
-                helper.SyncMandatoryQualifications(entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(), ignoreInvalid, ct),
+                helper.SyncMandatoryQualifications(entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(), ignoreInvalid, createdMigratedEvent: false, ct),
             WriteRecord = writeRecord
         };
     }
@@ -844,7 +852,8 @@ public class TrsDataSyncHelper(
 
     private async Task<(List<MandatoryQualification> MandatoryQualifications, List<EventBase> Events)> MapMandatoryQualificationsAndAudits(
         IEnumerable<dfeta_qualification> qualifications,
-        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails)
+        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
+        bool createMigratedEvent)
     {
         var mqEstablishments = await referenceDataCache.GetMqEstablishments();
         var mqSpecialisms = await referenceDataCache.GetMqSpecialisms();
@@ -854,7 +863,7 @@ public class TrsDataSyncHelper(
 
         foreach (var q in qualifications)
         {
-            var mapped = MapMandatoryQualificationFromDqtQualification(q, mqEstablishments, mqSpecialisms);
+            var mapped = MapMandatoryQualificationFromDqtQualification(q, mqEstablishments, mqSpecialisms, applyMigrationMappings: true);
 
             var audits = auditDetails[q.Id].AuditDetails;
             var versions = GetEntityVersions(q, audits, GetModelTypeSyncInfoForMandatoryQualification().AttributeNames);
@@ -892,6 +901,10 @@ public class TrsDataSyncHelper(
                         $" (qualification ID: '{q.Id}').");
                 }
             }
+            else if (createMigratedEvent)
+            {
+                events.Add(MapMigratedEvent(versions.Last()));
+            }
 
             mqs.Add(mapped);
         }
@@ -918,7 +931,7 @@ public class TrsDataSyncHelper(
                 CreatedUtc = snapshot.Timestamp,
                 RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity)
+                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: false)
             };
         }
 
@@ -931,7 +944,7 @@ public class TrsDataSyncHelper(
                 CreatedUtc = snapshot.Timestamp,
                 RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity),
+                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: false),
                 DqtState = (int)snapshot.Entity.StateCode!
             };
         }
@@ -975,7 +988,7 @@ public class TrsDataSyncHelper(
                         CreatedUtc = snapshot.Timestamp,
                         RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                         PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                        MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity)
+                        MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: false)
                     };
                 }
                 else
@@ -987,7 +1000,7 @@ public class TrsDataSyncHelper(
                         CreatedUtc = snapshot.Timestamp,
                         RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                         PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                        MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity)
+                        MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: false)
                     };
                 }
             }
@@ -1011,8 +1024,8 @@ public class TrsDataSyncHelper(
                 CreatedUtc = snapshot.Timestamp,
                 RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity),
-                OldMandatoryQualification = GetEventMandatoryQualification(previous.Entity),
+                MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: false),
+                OldMandatoryQualification = GetEventMandatoryQualification(previous.Entity, applyMigrationMappings: false),
                 ChangeReason = null,
                 ChangeReasonDetail = null,
                 EvidenceFile = null,
@@ -1020,13 +1033,34 @@ public class TrsDataSyncHelper(
             };
         }
 
-        Events.Models.MandatoryQualification GetEventMandatoryQualification(dfeta_qualification snapshot)
+        EventBase MapMigratedEvent(EntityVersionInfo<dfeta_qualification> snapshot)
         {
-            var mapped = MapMandatoryQualificationFromDqtQualification(snapshot, mqEstablishments, mqSpecialisms);
+            var eventMandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: true);
+
+            var changes = MandatoryQualificationMigratedEventChanges.None |
+                (eventMandatoryQualification.Provider?.Name != eventMandatoryQualification.Provider?.DqtMqEstablishmentName ? MandatoryQualificationMigratedEventChanges.Provider : 0);
+
+            return new MandatoryQualificationMigratedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Entity.Id}-Migrated",
+                CreatedUtc = clock.UtcNow,
+                RaisedBy = Events.Models.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                MandatoryQualification = eventMandatoryQualification,
+                Changes = changes
+            };
+        }
+
+        Events.Models.MandatoryQualification GetEventMandatoryQualification(dfeta_qualification snapshot, bool applyMigrationMappings)
+        {
+            var mapped = MapMandatoryQualificationFromDqtQualification(snapshot, mqEstablishments, mqSpecialisms, applyMigrationMappings);
 
             var establishment = snapshot.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
                 mqEstablishments.Single(e => e.Id == establishmentId) :
                 null;
+
+            var provider = MandatoryQualificationProvider.All.SingleOrDefault(p => p.MandatoryQualificationProviderId == mapped.ProviderId);
 
             return new()
             {
@@ -1034,8 +1068,8 @@ public class TrsDataSyncHelper(
                 Provider = establishment is not null ?
                     new()
                     {
-                        MandatoryQualificationProviderId = null,
-                        Name = null,
+                        MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
+                        Name = provider?.Name,
                         DqtMqEstablishmentId = establishment?.Id,
                         DqtMqEstablishmentName = establishment?.dfeta_name
                     } :

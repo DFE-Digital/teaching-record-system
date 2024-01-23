@@ -92,7 +92,6 @@ jobs:
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
-          --verbosity diag
       timeout-minutes: 5
 
     - name: API Tests
