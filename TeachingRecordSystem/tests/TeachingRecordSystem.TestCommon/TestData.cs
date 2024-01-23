@@ -222,7 +222,7 @@ public partial class TestData
     {
         if (max is not null && max <= min)
         {
-            throw new ArgumentOutOfRangeException("max", "max must be after min.");
+            throw new ArgumentOutOfRangeException(nameof(max), "max must be after min.");
         }
 
         max ??= min.AddYears(1);

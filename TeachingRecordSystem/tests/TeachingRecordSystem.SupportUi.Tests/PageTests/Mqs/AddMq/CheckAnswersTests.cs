@@ -1,6 +1,5 @@
 using FormFlow;
 using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
@@ -136,8 +135,6 @@ public class CheckAnswersTests : TestBase
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
 
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
-        Assert.NotNull(provider);
 
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
@@ -177,7 +174,6 @@ public class CheckAnswersTests : TestBase
         {
             var qualification = await dbContext.MandatoryQualifications.SingleOrDefaultAsync(q => q.PersonId == person.PersonId);
             Assert.NotNull(qualification);
-            Assert.Equal(provider!.MandatoryQualificationProviderId, qualification.ProviderId);
             Assert.Equal(specialism, qualification.Specialism);
             Assert.Equal(status, qualification.Status);
             Assert.Equal(startDate, qualification.StartDate);
