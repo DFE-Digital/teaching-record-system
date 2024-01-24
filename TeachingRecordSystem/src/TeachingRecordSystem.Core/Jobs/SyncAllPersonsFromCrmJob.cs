@@ -1,5 +1,7 @@
+using System.ServiceModel;
 using Hangfire;
 using Microsoft.Extensions.Options;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -31,14 +33,7 @@ public class SyncAllPersonsFromCrmJob
         var columns = new ColumnSet(TrsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person).AttributeNames);
 
         // Ensure this is kept in sync with the predicate in TrsDataSyncHelper.SyncContacts
-        var filter = new FilterExpression(LogicalOperator.And)
-        {
-            Conditions =
-            {
-                new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull),
-                new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.NotEqual, ""),
-            }
-        };
+        var filter = new FilterExpression(LogicalOperator.And);
 
         var query = new QueryExpression(Contact.EntityLogicalName)
         {
@@ -59,7 +54,16 @@ public class SyncAllPersonsFromCrmJob
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var result = await serviceClient.RetrieveMultipleAsync(query);
+            EntityCollection result;
+            try
+            {
+                result = await serviceClient.RetrieveMultipleAsync(query);
+            }
+            catch (FaultException<OrganizationServiceFault> fex) when (fex.IsCrmRateLimitException(out var retryAfter))
+            {
+                await Task.Delay(retryAfter, cancellationToken);
+                continue;
+            }
 
             await _trsDataSyncHelper.SyncPersons(
                 result.Entities.Select(e => e.ToEntity<Contact>()).ToArray(),
