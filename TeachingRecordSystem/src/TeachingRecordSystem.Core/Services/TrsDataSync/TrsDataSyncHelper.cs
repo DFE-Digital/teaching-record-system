@@ -168,7 +168,7 @@ public class TrsDataSyncHelper(
         if (ignoreInvalid)
         {
             // Some bad data in the build environment has a TRN that's longer than 7 digits
-            toSync = toSync.Where(e => e.dfeta_TRN.Length == 7);
+            toSync = toSync.Where(e => string.IsNullOrEmpty(e.dfeta_TRN) || e.dfeta_TRN.Length == 7);
         }
 
         var people = MapPersons(toSync);
