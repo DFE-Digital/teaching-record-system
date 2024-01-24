@@ -700,19 +700,19 @@ public class TrsDataSyncHelper(
         Action<NpgsqlBinaryImporter, Person> writeRecord = (writer, person) =>
         {
             writer.WriteValueOrNull(person.PersonId, NpgsqlDbType.Uuid);
-            writer.WriteNullableValueOrNull(person.CreatedOn, NpgsqlDbType.TimestampTz);
-            writer.WriteNullableValueOrNull(person.UpdatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(person.CreatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(person.UpdatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(person.Trn, NpgsqlDbType.Char);
             writer.WriteValueOrNull(person.FirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.MiddleName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.LastName, NpgsqlDbType.Varchar);
-            writer.WriteNullableValueOrNull(person.DateOfBirth, NpgsqlDbType.Date);
+            writer.WriteValueOrNull(person.DateOfBirth, NpgsqlDbType.Date);
             writer.WriteValueOrNull(person.EmailAddress, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.NationalInsuranceNumber, NpgsqlDbType.Char);
-            writer.WriteNullableValueOrNull(person.DqtContactId, NpgsqlDbType.Uuid);
-            writer.WriteNullableValueOrNull(person.DqtState, NpgsqlDbType.Integer);
-            writer.WriteNullableValueOrNull(person.DqtCreatedOn, NpgsqlDbType.TimestampTz);
-            writer.WriteNullableValueOrNull(person.DqtModifiedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(person.DqtContactId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(person.DqtState, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(person.DqtCreatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(person.DqtModifiedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(person.DqtFirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtMiddleName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
@@ -802,20 +802,20 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(mq.QualificationId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(mq.CreatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(mq.UpdatedOn, NpgsqlDbType.TimestampTz);
-            writer.WriteNullableValueOrNull(mq.DeletedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(mq.DeletedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull((int)QualificationType.MandatoryQualification, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(mq.PersonId, NpgsqlDbType.Uuid);
-            writer.WriteNullableValueOrNull(mq.DqtQualificationId, NpgsqlDbType.Uuid);
-            writer.WriteNullableValueOrNull(mq.DqtState, NpgsqlDbType.Integer);
-            writer.WriteNullableValueOrNull(mq.DqtCreatedOn, NpgsqlDbType.TimestampTz);
-            writer.WriteNullableValueOrNull(mq.DqtModifiedOn, NpgsqlDbType.TimestampTz);
-            writer.WriteNullableValueOrNull(mq.ProviderId, NpgsqlDbType.Uuid);
-            writer.WriteNullableValueOrNull((int?)mq.Specialism, NpgsqlDbType.Integer);
-            writer.WriteNullableValueOrNull((int?)mq.Status, NpgsqlDbType.Integer);
-            writer.WriteNullableValueOrNull(mq.StartDate, NpgsqlDbType.Date);
-            writer.WriteNullableValueOrNull(mq.EndDate, NpgsqlDbType.Date);
-            writer.WriteNullableValueOrNull(mq.DqtMqEstablishmentId, NpgsqlDbType.Uuid);
-            writer.WriteNullableValueOrNull(mq.DqtSpecialismId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(mq.DqtQualificationId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(mq.DqtState, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(mq.DqtCreatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(mq.DqtModifiedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(mq.ProviderId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull((int?)mq.Specialism, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull((int?)mq.Status, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(mq.StartDate, NpgsqlDbType.Date);
+            writer.WriteValueOrNull(mq.EndDate, NpgsqlDbType.Date);
+            writer.WriteValueOrNull(mq.DqtMqEstablishmentId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(mq.DqtSpecialismId, NpgsqlDbType.Uuid);
         };
 
         return new ModelTypeSyncInfo<MandatoryQualification>()
@@ -1238,7 +1238,7 @@ file static class Extensions
     /// </summary>
     public static string? NormalizeString(this string? value) => string.IsNullOrWhiteSpace(value) ? null : value;
 
-    public static void WriteNullableValueOrNull<T>(this NpgsqlBinaryImporter writer, T? value, NpgsqlDbType dbType)
+    public static void WriteValueOrNull<T>(this NpgsqlBinaryImporter writer, T? value, NpgsqlDbType dbType)
         where T : struct
     {
         if (value.HasValue)
