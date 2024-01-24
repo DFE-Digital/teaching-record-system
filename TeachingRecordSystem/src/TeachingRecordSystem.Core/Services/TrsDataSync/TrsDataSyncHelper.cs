@@ -786,6 +786,7 @@ public class TrsDataSyncHelper(
             dfeta_qualification.Fields.CreatedBy,
             dfeta_qualification.Fields.ModifiedOn,
             dfeta_qualification.Fields.dfeta_TrsDeletedEvent,
+            dfeta_qualification.Fields.dfeta_TRSEvent,
             dfeta_qualification.Fields.dfeta_Type,
             dfeta_qualification.Fields.dfeta_PersonId,
             dfeta_qualification.Fields.StateCode,
