@@ -161,9 +161,9 @@ public class TrsDataSyncHelper(
 
     public async Task<int> SyncPersons(IReadOnlyCollection<Contact> entities, bool ignoreInvalid, CancellationToken cancellationToken = default)
     {
-        // For now, only sync records that have TRNs.
+        // We're syncing all contacts for now.
         // Keep this in sync with the filter in the SyncAllContactsFromCrmJob job.
-        var toSync = entities.Where(e => !string.IsNullOrEmpty(e.dfeta_TRN));
+        IEnumerable<Contact> toSync = entities;
 
         if (ignoreInvalid)
         {
