@@ -93,6 +93,8 @@ public partial class TrsDataSyncHelperTests
             var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == entity.Id);
             Assert.NotNull(person);
             Assert.Equal(entity.Id, person.PersonId);
+            Assert.Equal(entity.CreatedOn, person.CreatedOn);
+            Assert.Equal(entity.ModifiedOn, person.UpdatedOn);
             Assert.Equal(entity.Id, person.DqtContactId);
             Assert.Equal(entity.dfeta_TRN, person.Trn);
             Assert.Equal(entity.FirstName, person.FirstName);

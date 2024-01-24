@@ -640,6 +640,8 @@ public class TrsDataSyncHelper(
         var columnNames = new[]
         {
             "person_id",
+            "created_on",
+            "updated_on",
             "trn",
             "first_name",
             "middle_name",
@@ -698,6 +700,8 @@ public class TrsDataSyncHelper(
         Action<NpgsqlBinaryImporter, Person> writeRecord = (writer, person) =>
         {
             writer.WriteValueOrNull(person.PersonId, NpgsqlDbType.Uuid);
+            writer.WriteNullableValueOrNull(person.CreatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteNullableValueOrNull(person.UpdatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(person.Trn, NpgsqlDbType.Char);
             writer.WriteValueOrNull(person.FirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.MiddleName, NpgsqlDbType.Varchar);
@@ -833,6 +837,8 @@ public class TrsDataSyncHelper(
         .Select(c => new Person()
         {
             PersonId = c.ContactId!.Value,
+            CreatedOn = c.CreatedOn!.Value,
+            UpdatedOn = c.ModifiedOn!.Value,
             Trn = c.dfeta_TRN,
             FirstName = (c.HasStatedNames() ? c.dfeta_StatedFirstName : c.FirstName) ?? string.Empty,
             MiddleName = (c.HasStatedNames() ? c.dfeta_StatedMiddleName : c.MiddleName) ?? string.Empty,
