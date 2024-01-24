@@ -5,7 +5,7 @@
     var mandatoryQualification = deactivatedEvent.MandatoryQualification;
 }
 
-<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item">
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-mq-dqt-deactivated-event">
     <div class="moj-timeline__header">
         <h2 class="moj-timeline__title">Mandatory qualification deactivated</h2>
     </div>
@@ -16,27 +16,32 @@
         </time>
     </p>
     <div class="moj-timeline__description">
-        <govuk-summary-list>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="provider">@(mandatoryQualification.Provider is not null ? mandatoryQualification.Provider.Name : "None")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="specialism">@(mandatoryQualification.Specialism.HasValue ? mandatoryQualification.Specialism.Value.GetTitle() : "None")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="start-date">@(mandatoryQualification.StartDate.HasValue ? mandatoryQualification.StartDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="status">@(mandatoryQualification.Status.HasValue ? mandatoryQualification.Status.Value.GetTitle() : "None")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="end-date">@(mandatoryQualification.EndDate.HasValue ? mandatoryQualification.EndDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-        </govuk-summary-list>
+        <govuk-details>
+            <govuk-details-summary>Deactivated data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="provider">@(mandatoryQualification.Provider is not null ? mandatoryQualification.Provider.Name ?? mandatoryQualification.Provider.DqtMqEstablishmentName : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="specialism">@(mandatoryQualification.Specialism.HasValue ? mandatoryQualification.Specialism.Value.GetTitle() : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="start-date">@(mandatoryQualification.StartDate.HasValue ? mandatoryQualification.StartDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="status">@(mandatoryQualification.Status.HasValue ? mandatoryQualification.Status.Value.GetTitle() : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="end-date">@(mandatoryQualification.EndDate.HasValue ? mandatoryQualification.EndDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>        
     </div>
 </div>

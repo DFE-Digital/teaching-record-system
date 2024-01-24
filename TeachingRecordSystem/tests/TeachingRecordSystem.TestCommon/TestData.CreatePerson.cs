@@ -420,6 +420,8 @@ public partial class TestData
         private Option<MandatoryQualificationStatus?> _status;
         private Option<DateOnly?> _startDate;
         private Option<DateOnly?> _endDate;
+        private Option<DateTime?> _createdUtc;
+        private Option<RaisedByUserInfo?> _raisedByUser;
 
         public Guid QualificationId { get; } = Guid.NewGuid();
 
@@ -453,6 +455,18 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonMandatoryQualificationBuilder WithCreatedUtc(DateTime? createdUtc)
+        {
+            _createdUtc = Option.Some(createdUtc);
+            return this;
+        }
+
+        public CreatePersonMandatoryQualificationBuilder WithRaisedByUser(RaisedByUserInfo? raisedByUser)
+        {
+            _raisedByUser = Option.Some(raisedByUser);
+            return this;
+        }
+
         internal async Task<(MandatoryQualificationInfo, EventBase)> AppendRequests(CreatePersonBuilder createPersonBuilder, TestData testData, RequestBuilder requestBuilder)
         {
             var mqEstablishments = await testData.ReferenceDataCache.GetMqEstablishments();
@@ -464,6 +478,8 @@ public partial class TestData
             var status = _status.ValueOr(_endDate.ValueOrDefault() is DateOnly ? MandatoryQualificationStatus.Passed : MandatoryQualificationStatusRegistry.All.RandomOne().Value);
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
             var endDate = _endDate.ValueOr(status == MandatoryQualificationStatus.Passed ? testData.GenerateDate(min: (startDate ?? new DateOnly(2000, 1, 1)).AddYears(1)) : null);
+            var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
+            var raisedByUser = _raisedByUser.ValueOr(RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
 
             var mqEstablishment = dqtMqEstablishmentValue is not null ?
                 await testData.ReferenceDataCache.GetMqEstablishmentByValue(dqtMqEstablishmentValue) :
@@ -478,8 +494,8 @@ public partial class TestData
             var createdEvent = new MandatoryQualificationCreatedEvent()
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = testData.Clock.UtcNow,
-                RaisedBy = RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
+                CreatedUtc = createdUtc!.Value,
+                RaisedBy = raisedByUser!,
                 PersonId = personId,
                 MandatoryQualification = new()
                 {

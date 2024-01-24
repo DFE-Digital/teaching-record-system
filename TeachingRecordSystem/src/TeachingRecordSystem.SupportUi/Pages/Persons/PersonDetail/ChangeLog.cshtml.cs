@@ -65,7 +65,7 @@ public class ChangeLogModel(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFa
                             END = u.user_id
                 WHERE
                     e.payload ->> 'PersonId' = {personIdString}
-                    AND e.event_name in ('MandatoryQualificationDeletedEvent', 'MandatoryQualificationDqtDeactivatedEvent')
+                    AND e.event_name in ('MandatoryQualificationDeletedEvent', 'MandatoryQualificationDqtDeactivatedEvent', 'MandatoryQualificationUpdatedEvent', 'MandatoryQualificationDqtReactivatedEvent', 'MandatoryQualificationCreatedEvent', 'MandatoryQualificationDqtImportedEvent', 'MandatoryQualificationMigratedEvent')
                 """)
             .ToListAsync();
 

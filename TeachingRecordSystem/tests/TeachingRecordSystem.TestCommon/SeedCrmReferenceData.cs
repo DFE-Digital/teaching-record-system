@@ -225,6 +225,12 @@ public class SeedCrmReferenceData : IStartupTask
 
         _xrmFakedContext.CreateEntity(new dfeta_mqestablishment()
         {
+            dfeta_Value = "210",
+            dfeta_name = "Postgraduate Diploma in Multi-Sensory Impairment and Deafblindness, University of Birmingham, School of Education"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_mqestablishment()
+        {
             dfeta_Value = "957",
             dfeta_name = "University of Edinburgh"
         });
