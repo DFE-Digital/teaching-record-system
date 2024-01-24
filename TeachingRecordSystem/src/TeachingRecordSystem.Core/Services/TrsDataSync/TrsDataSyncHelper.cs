@@ -785,7 +785,6 @@ public class TrsDataSyncHelper(
             dfeta_qualification.Fields.CreatedOn,
             dfeta_qualification.Fields.CreatedBy,
             dfeta_qualification.Fields.ModifiedOn,
-            dfeta_qualification.Fields.dfeta_TrsDeletedEvent,
             dfeta_qualification.Fields.dfeta_TRSEvent,
             dfeta_qualification.Fields.dfeta_Type,
             dfeta_qualification.Fields.dfeta_PersonId,
@@ -967,11 +966,6 @@ public class TrsDataSyncHelper(
                 {
                     return eventFromAttr;
                 }
-            }
-
-            if (TryDeserializeEventAttribute(snapshot.Entity.Attributes, dfeta_qualification.Fields.dfeta_TrsDeletedEvent, out eventFromAttr))
-            {
-                return eventFromAttr;
             }
 
             if (snapshot.ChangedAttributes.Contains(dfeta_qualification.Fields.StateCode))

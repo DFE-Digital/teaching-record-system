@@ -888,13 +888,13 @@ public partial class TrsDataSyncHelperTests
             RaisedBy = RaisedByUserInfo.FromDqtUser(currentDqtUser.Id, currentDqtUser.Name)
         };
 
-        updatedQualification.dfeta_TrsDeletedEvent = EventInfo.Create(deletedEvent).Serialize();
+        updatedQualification.dfeta_TRSEvent = EventInfo.Create(deletedEvent).Serialize();
         updatedQualification.StateCode = dfeta_qualificationState.Inactive;
 
         var oldValue = new Entity(dfeta_qualification.EntityLogicalName, existingQualification.Id);
 
         var newValue = new Entity(dfeta_qualification.EntityLogicalName, existingQualification.Id);
-        newValue.Attributes[dfeta_qualification.Fields.dfeta_TrsDeletedEvent] = updatedQualification.dfeta_TrsDeletedEvent;
+        newValue.Attributes[dfeta_qualification.Fields.dfeta_TRSEvent] = updatedQualification.dfeta_TRSEvent;
 
         var auditId = Guid.NewGuid();
         auditDetailCollection.Add(new AttributeAuditDetail()
