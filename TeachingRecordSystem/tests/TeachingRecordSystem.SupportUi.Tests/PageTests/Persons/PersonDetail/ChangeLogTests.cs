@@ -500,8 +500,8 @@ public class ChangeLogTests : TestBase
         var dateTimeOutsideBst = new DateTime(2021, 1, 1, 10, 30, 0, DateTimeKind.Utc);
         var dateTimeInsideBst = new DateTime(2021, 6, 1, 10, 30, 0, DateTimeKind.Utc);
         var person = await TestData.CreatePerson(b => b
-            .WithMandatoryQualification(b => b.WithCreatedUtc(dateTimeOutsideBst).WithRaisedByUser(RaisedByUserInfo.FromDqtUser(dqtUserId, "Test User")))
-            .WithMandatoryQualification(b => b.WithCreatedUtc(dateTimeInsideBst).WithRaisedByUser(RaisedByUserInfo.FromUserId(user.UserId))));
+            .WithMandatoryQualification(b => b.WithCreatedUtc(dateTimeOutsideBst).WithCreatedByUser(RaisedByUserInfo.FromDqtUser(dqtUserId, "Test User")))
+            .WithMandatoryQualification(b => b.WithCreatedUtc(dateTimeInsideBst).WithCreatedByUser(RaisedByUserInfo.FromUserId(user.UserId))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
 

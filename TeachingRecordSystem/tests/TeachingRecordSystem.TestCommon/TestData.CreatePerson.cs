@@ -461,7 +461,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonMandatoryQualificationBuilder WithRaisedByUser(RaisedByUserInfo? raisedByUser)
+        public CreatePersonMandatoryQualificationBuilder WithCreatedByUser(RaisedByUserInfo? raisedByUser)
         {
             _raisedByUser = Option.Some(raisedByUser);
             return this;
