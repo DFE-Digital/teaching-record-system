@@ -14,7 +14,7 @@ public partial class TestData
             Target = new dfeta_qualification()
             {
                 Id = qualificationId,
-                dfeta_TrsDeletedEvent = EventInfo.Create(@event).Serialize(),
+                dfeta_TRSEvent = EventInfo.Create(@event).Serialize(),
                 StateCode = dfeta_qualificationState.Inactive
             }
         });

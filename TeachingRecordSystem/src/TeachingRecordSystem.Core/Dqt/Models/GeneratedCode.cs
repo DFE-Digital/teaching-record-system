@@ -9443,7 +9443,6 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_qualificationId = "dfeta_qualificationid";
 			public const string Id = "dfeta_qualificationid";
-			public const string dfeta_TrsDeletedEvent = "dfeta_trsdeletedevent";
 			public const string dfeta_TRSEvent = "dfeta_trsevent";
 			public const string dfeta_Type = "dfeta_type";
 			public const string ModifiedOn = "modifiedon";
@@ -10289,26 +10288,6 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			set
 			{
 				this.dfeta_qualificationId = value;
-			}
-		}
-		
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trsdeletedevent")]
-		public string dfeta_TrsDeletedEvent
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<string>("dfeta_trsdeletedevent");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_TrsDeletedEvent");
-				this.SetAttributeValue("dfeta_trsdeletedevent", value);
-				this.OnPropertyChanged("dfeta_TrsDeletedEvent");
 			}
 		}
 		
