@@ -1,5 +1,7 @@
+using System.ServiceModel;
 using Hangfire;
 using Microsoft.Extensions.Options;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -52,7 +54,16 @@ public class SyncAllPersonsFromCrmJob
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var result = await serviceClient.RetrieveMultipleAsync(query);
+            EntityCollection result;
+            try
+            {
+                result = await serviceClient.RetrieveMultipleAsync(query);
+            }
+            catch (FaultException<OrganizationServiceFault> fex) when (fex.IsCrmRateLimitException(out var retryAfter))
+            {
+                await Task.Delay(retryAfter, cancellationToken);
+                continue;
+            }
 
             await _trsDataSyncHelper.SyncPersons(
                 result.Entities.Select(e => e.ToEntity<Contact>()).ToArray(),
