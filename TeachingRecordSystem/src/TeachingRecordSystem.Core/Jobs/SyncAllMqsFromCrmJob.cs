@@ -46,7 +46,7 @@ public class SyncAllMqsFromCrmJob
             Criteria = filter,
             Orders =
             {
-                new OrderExpression(dfeta_qualification.Fields.CreatedOn, OrderType.Ascending)
+                new OrderExpression(dfeta_qualification.PrimaryIdAttribute, OrderType.Ascending)
             },
             PageInfo = new PagingInfo()
             {
