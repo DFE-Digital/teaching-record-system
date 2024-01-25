@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
@@ -13,8 +14,8 @@ public class TrsDbContext : DbContext
     {
     }
 
-    public static TrsDbContext Create(string connectionString) =>
-        new TrsDbContext(CreateOptions(connectionString));
+    public static TrsDbContext Create(string connectionString, int? commandTimeout = null) =>
+        new TrsDbContext(CreateOptions(connectionString, commandTimeout));
 
     public DbSet<TrnRequest> TrnRequests => Set<TrnRequest>();
 
@@ -52,15 +53,17 @@ public class TrsDbContext : DbContext
 
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
 
-    public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString)
+    public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString, int? commandTimeout = null)
     {
+        Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);
+
         if (connectionString != null)
         {
-            optionsBuilder.UseNpgsql(connectionString);
+            optionsBuilder.UseNpgsql(connectionString, configureOptions);
         }
         else
         {
-            optionsBuilder.UseNpgsql();
+            optionsBuilder.UseNpgsql(configureOptions);
         }
 
         optionsBuilder
@@ -82,10 +85,10 @@ public class TrsDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TrsDbContext).Assembly);
     }
 
-    private static DbContextOptions<TrsDbContext> CreateOptions(string connectionString)
+    private static DbContextOptions<TrsDbContext> CreateOptions(string connectionString, int? commandTimeout)
     {
         var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
-        ConfigureOptions(optionsBuilder, connectionString);
+        ConfigureOptions(optionsBuilder, connectionString, commandTimeout);
         return optionsBuilder.Options;
     }
 }
