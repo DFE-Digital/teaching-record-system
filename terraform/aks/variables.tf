@@ -77,6 +77,16 @@ variable "api_max_memory" {
   default = "1Gi"
 }
 
+variable "authz_replicas" {
+  type    = number
+  default = 1
+}
+
+variable "authz_max_memory" {
+  type    = string
+  default = "1Gi"
+}
+
 variable "ui_replicas" {
   type    = number
   default = 1

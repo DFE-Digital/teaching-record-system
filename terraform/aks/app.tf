@@ -99,6 +99,56 @@ module "api_application" {
   max_memory   = var.api_max_memory
 }
 
+module "authz_application_configuration" {
+  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
+
+  namespace              = var.namespace
+  environment            = var.environment_name
+  azure_resource_prefix  = var.azure_resource_prefix
+  service_short          = var.service_short_name
+  config_short           = var.environment_short_name
+  secret_key_vault_short = "authz"
+
+  config_variables = {
+    DataProtectionKeysContainerName = azurerm_storage_container.keys.name
+    SENTRY_ENVIRONMENT              = var.environment_name
+    DUMMY                           = "Dummy variable to force new Kubernetes config map to be created"
+  }
+
+  secret_variables = {
+    ApplicationInsights__ConnectionString = azurerm_application_insights.app.connection_string
+    ConnectionStrings__DefaultConnection  = module.postgres.dotnet_connection_string
+    ConnectionStrings__Redis              = "${module.redis.connection_string},defaultDatabase=1"
+    Sentry__Dsn                           = module.infrastructure_secrets.map.SENTRY-DSN
+    SharedConfig                          = module.infrastructure_secrets.map.SharedConfig
+    StorageConnectionString               = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
+  }
+}
+
+module "authz_application" {
+  source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+  depends_on = [kubernetes_job.migrations]
+
+  name   = "authz"
+  is_web = true
+
+  namespace    = var.namespace
+  environment  = var.environment_name
+  service_name = var.service_name
+
+  cluster_configuration_map = module.cluster_data.configuration_map
+
+  kubernetes_config_map_name = module.authz_application_configuration.kubernetes_config_map_name
+  kubernetes_secret_name     = module.authz_application_configuration.kubernetes_secret_name
+
+  docker_image = var.docker_image
+  command      = ["/bin/ash", "-c", "cd /Apps/Authorize/; dotnet TeachingRecordSystem.AuthorizeAccessToATeacherRecord.dll;"]
+  web_port     = 80
+  probe_path   = "/health"
+  replicas     = var.authz_replicas
+  max_memory   = var.authz_max_memory
+}
+
 module "ui_application_configuration" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
 
