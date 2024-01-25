@@ -3,15 +3,8 @@ using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Tests.Infrastructure.FormFlow;
 
-public class TestUserCurrentUserIdProvider : ICurrentUserIdProvider
+public class TestUserCurrentUserIdProvider(CurrentUserProvider currentUserProvider) : ICurrentUserIdProvider
 {
-    private readonly CurrentUserProvider _currentUserProvider;
-
-    public TestUserCurrentUserIdProvider(CurrentUserProvider currentUserProvider)
-    {
-        _currentUserProvider = currentUserProvider;
-    }
-
-    public Guid GetCurrentUserId() =>
-        _currentUserProvider.CurrentUser?.UserId ?? throw new InvalidOperationException("No current user.");
+    public string GetCurrentUserId() =>
+        currentUserProvider.CurrentUser?.UserId.ToString() ?? throw new InvalidOperationException("No current user.");
 }

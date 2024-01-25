@@ -11,7 +11,7 @@ public class JourneyStateMapping : IEntityTypeConfiguration<JourneyState>
         builder.ToTable("journey_states");
         builder.HasKey(s => s.InstanceId);
         builder.Property(s => s.InstanceId).IsRequired().HasMaxLength(300);
-        builder.Property(s => s.UserId).IsRequired();
+        builder.Property(s => s.UserId).IsRequired().HasMaxLength(200);
         builder.Property(s => s.State).IsRequired();
         builder.Property(s => s.Created).IsRequired();
         builder.Property(s => s.Updated).IsRequired();
