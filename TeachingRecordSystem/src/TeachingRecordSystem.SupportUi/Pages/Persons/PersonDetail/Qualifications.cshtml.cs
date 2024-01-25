@@ -52,6 +52,7 @@ public class QualificationsModel : PageModel
             {
                 var mqEstablishment = q.dfeta_MQ_MQEstablishmentId is not null ? await _referenceDataCache.GetMqEstablishmentById(q.dfeta_MQ_MQEstablishmentId.Id) : null;
                 var specialism = q.dfeta_MQ_SpecialismId is not null ? await _referenceDataCache.GetMqSpecialismById(q.dfeta_MQ_SpecialismId.Id) : null;
+                var status = q.dfeta_MQ_Status ?? (q.dfeta_MQ_Date.HasValue ? dfeta_qualification_dfeta_MQ_Status.Passed : null);
 
                 return new MandatoryQualificationInfo
                 {
@@ -60,7 +61,7 @@ public class QualificationsModel : PageModel
                     Specialism = specialism?.ToMandatoryQualificationSpecialism(),
                     StartDate = q.dfeta_MQStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     EndDate = q.dfeta_MQ_Date.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    Status = q.dfeta_MQ_Status?.ToMandatoryQualificationStatus()
+                    Status = status?.ToMandatoryQualificationStatus()
                 };
             });
 

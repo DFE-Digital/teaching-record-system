@@ -62,18 +62,20 @@ public class TrsDataSyncHelper(
         }
 
         MandatoryQualificationProvider? provider = null;
+        var dqtMqStatus = qualification.dfeta_MQ_Status;
         if (applyMigrationMappings)
         {
             MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(
                 mqEstablishments.SingleOrDefault(e => e.Id == qualification.dfeta_MQ_MQEstablishmentId!?.Id), out provider);
+
+            dqtMqStatus ??= (qualification.dfeta_MQ_Date.HasValue ? dfeta_qualification_dfeta_MQ_Status.Passed : null);
         }
 
         MandatoryQualificationSpecialism? specialism = qualification.dfeta_MQ_SpecialismId is not null ?
             mqSpecialisms.Single(s => s.Id == qualification.dfeta_MQ_SpecialismId.Id).ToMandatoryQualificationSpecialism() :
             null;
 
-        MandatoryQualificationStatus? status = qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus() ??
-            (qualification.dfeta_MQ_Date.HasValue ? MandatoryQualificationStatus.Passed : null);
+        MandatoryQualificationStatus? status = dqtMqStatus?.ToMandatoryQualificationStatus();
 
         return new MandatoryQualification()
         {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
@@ -57,8 +58,9 @@ public class ConfirmModel(
     {
         var qualification = (await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId)))!;
 
+        var dqtMqStatus = qualification.dfeta_MQ_Status ?? (qualification.dfeta_MQ_Date.HasValue ? dfeta_qualification_dfeta_MQ_Status.Passed : null);
         var changes = MandatoryQualificationUpdatedEventChanges.None |
-            (NewStatus != qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus() ? MandatoryQualificationUpdatedEventChanges.Status : 0) |
+            (NewStatus != dqtMqStatus?.ToMandatoryQualificationStatus() ? MandatoryQualificationUpdatedEventChanges.Status : 0) |
             (NewEndDate != qualification.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true) ? MandatoryQualificationUpdatedEventChanges.EndDate : 0);
 
         if (changes != MandatoryQualificationUpdatedEventChanges.None)
@@ -84,7 +86,7 @@ public class ConfirmModel(
                     } :
                     null,
                 Specialism = specialism?.ToMandatoryQualificationSpecialism(),
-                Status = qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus(),
+                Status = dqtMqStatus?.ToMandatoryQualificationStatus(),
                 StartDate = qualification.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 EndDate = qualification.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             };
