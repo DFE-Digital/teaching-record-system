@@ -48,7 +48,7 @@ public class EditMqStatusState
             return;
         }
 
-        Status = CurrentStatus = qualificationInfo.MandatoryQualification.Status ?? (qualificationInfo.MandatoryQualification.EndDate.HasValue ? MandatoryQualificationStatus.Passed : null);
+        Status = CurrentStatus = qualificationInfo.MandatoryQualification.Status;
         EndDate = CurrentEndDate = qualificationInfo.MandatoryQualification.EndDate;
         Initialized = true;
     }

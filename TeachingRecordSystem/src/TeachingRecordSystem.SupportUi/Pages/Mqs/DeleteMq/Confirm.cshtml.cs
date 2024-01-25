@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
@@ -51,6 +52,7 @@ public class ConfirmModel(
     {
         var qualification = (await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId)))!;
 
+        var dqtMqStatus = qualification.dfeta_MQ_Status ?? (qualification.dfeta_MQ_Date.HasValue ? dfeta_qualification_dfeta_MQ_Status.Passed : null);
         var establishment = qualification.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
             await referenceDataCache.GetMqEstablishmentById(establishmentId) :
             null;
@@ -78,7 +80,7 @@ public class ConfirmModel(
                     } :
                     null,
                 Specialism = specialism?.ToMandatoryQualificationSpecialism(),
-                Status = qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus(),
+                Status = dqtMqStatus?.ToMandatoryQualificationStatus(),
                 StartDate = qualification.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 EndDate = qualification.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             },
