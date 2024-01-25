@@ -27,7 +27,7 @@ public static partial class Commands
         migrateDbCommand.SetHandler(
             async (string connectionString, string? targetMigration) =>
             {
-                using var dbContext = TrsDbContext.Create(connectionString, commandTimeout: (int)TimeSpan.FromMinutes(5).TotalSeconds);
+                using var dbContext = TrsDbContext.Create(connectionString, commandTimeout: (int)TimeSpan.FromMinutes(10).TotalSeconds);
                 await dbContext.GetService<IMigrator>().MigrateAsync(targetMigration);
             },
             connectionStringOption,
