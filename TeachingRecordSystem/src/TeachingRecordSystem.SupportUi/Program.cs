@@ -180,7 +180,6 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 }
 
 builder.Services
-    .AddTransient<FormFlow.State.IUserInstanceStateProvider, DbUserInstanceStateProvider>()
     .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
     .AddTransient<CheckMandatoryQualificationExistsFilter>()
     .AddFormFlow(options =>
