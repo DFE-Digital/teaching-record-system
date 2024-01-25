@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,10 +18,11 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         services.AddSingleton<JourneyInstanceProvider>();
         services.TryAddSingleton<IStateSerializer, JsonStateSerializer>();
-        services.TryAddSingleton<IUserInstanceStateProvider, DbUserInstanceStateProvider>();
+        services.TryAddSingleton<IUserInstanceStateProvider, DbWithHttpContextTransactionUserInstanceStateProvider>();
         services.AddOptions<State.JsonOptions>();
         services.AddScoped<MissingInstanceFilter>();
         services.AddScoped<ActivateInstanceFilter>();
+        services.AddSingleton<IStartupFilter, CommitStateChangesStartupFilter>();
 
         var conventions = new FormFlowConventions();
 
@@ -50,5 +53,14 @@ public static class ServiceCollectionExtensions
         services.AddFormFlow();
 
         return services;
+    }
+
+    private class CommitStateChangesStartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+        {
+            app.UseMiddleware<CommitStateChangesMiddleware>();
+            next(app);
+        };
     }
 }

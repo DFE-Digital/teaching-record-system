@@ -11,7 +11,7 @@ using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Processing;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
-using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
+using TeachingRecordSystem.FormFlow.State;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
@@ -74,7 +74,7 @@ public class HostFixture : WebApplicationFactory<Program>
                     (IClock)new ForwardToTestScopedClock(),
                     TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
             services.AddFakeXrm();
-            services.AddTransient<ICurrentUserIdProvider, TestUserCurrentUserIdProvider>();
+            services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
             services.AddSingleton<FakeTrnGenerator>();
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton(GetMockFileService());
