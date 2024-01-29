@@ -94,7 +94,7 @@ jobs:
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
       timeout-minutes: 5
 
-    - name: API Tests
+    - name: API tests
       uses: ./.github/workflows/actions/test
       with:
         test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.Api.Tests
@@ -104,11 +104,21 @@ jobs:
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
       timeout-minutes: 5
 
-    - name: Support UI Tests
+    - name: Support UI tests
       uses: ./.github/workflows/actions/test
       with:
         test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.SupportUi.Tests
         report_name: "Support UI test results"
+        dotnet_test_args: >-
+          --no-build
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
+      timeout-minutes: 5
+
+    - name: Authorize access to a teaching record tests
+      uses: ./.github/workflows/actions/test
+      with:
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.AuthorizeAccessToATeachingRecordTests
+        report_name: "Authorize access to a teaching record test results"
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
