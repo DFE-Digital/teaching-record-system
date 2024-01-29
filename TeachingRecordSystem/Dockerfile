@@ -7,6 +7,7 @@ COPY src/TeachingRecordSystem.Api/bin/Release/net8.0/publish/ Apps/Api/
 COPY src/TeachingRecordSystem.Cli/bin/Release/net8.0/publish/ Apps/TrsCli/
 COPY src/TeachingRecordSystem.SupportUi/bin/Release/net8.0/publish/ Apps/SupportUi/
 COPY src/TeachingRecordSystem.Worker/bin/Release/net8.0/publish/ Apps/Worker/
+COPY src/TeachingRecordSystem.AuthorizeAccessToATeacherRecord/bin/Release/net8.0/publish/ Apps/Authorize/
 WORKDIR /Apps
 
 # Install Culture prerequisities
