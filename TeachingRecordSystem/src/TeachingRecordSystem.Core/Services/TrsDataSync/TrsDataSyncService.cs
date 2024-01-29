@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using Polly;
 using TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -17,6 +18,15 @@ public class TrsDataSyncService(
     public const string CrmClientName = "TrsDataSync";
     private const string ChangesKeyPrefix = "TrsDataSync";
 
+    private static readonly ResiliencePipeline _resiliencePipeline = new ResiliencePipelineBuilder()
+        .AddRetry(new Polly.Retry.RetryStrategyOptions()
+        {
+            BackoffType = DelayBackoffType.Exponential,
+            Delay = TimeSpan.FromSeconds(30),
+            MaxRetryAttempts = 3
+        })
+        .Build();
+
     private const int PageSize = 1000;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -27,7 +37,7 @@ public class TrsDataSyncService(
         {
             try
             {
-                await ProcessChanges(stoppingToken);
+                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessChanges(ct), stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {

@@ -74,6 +74,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Optional" />
     <PackageReference Include="PdfSharpCore" />
+    <PackageReference Include="Polly.Core" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="System.Net.Http.Json" />
     <PackageReference Include="System.Reactive" />

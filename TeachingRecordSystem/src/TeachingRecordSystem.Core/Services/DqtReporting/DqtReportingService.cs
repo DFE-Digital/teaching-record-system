@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
+using Polly;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.CrmEntityChanges;
@@ -26,6 +27,15 @@ public partial class DqtReportingService : BackgroundService
     private const int PageSize = 500;
     private const int MaxUpsertBatchSize = 100;
     private const int MaxEntityTypesToProcessConcurrently = 10;
+
+    private static readonly ResiliencePipeline _resiliencePipeline = new ResiliencePipelineBuilder()
+        .AddRetry(new Polly.Retry.RetryStrategyOptions()
+        {
+            BackoffType = DelayBackoffType.Exponential,
+            Delay = TimeSpan.FromSeconds(30),
+            MaxRetryAttempts = 3
+        })
+        .Build();
 
     private readonly DqtReportingOptions _options;
     private readonly ICrmEntityChangesService _crmEntityChangesService;
@@ -61,7 +71,7 @@ public partial class DqtReportingService : BackgroundService
         {
             try
             {
-                await ProcessChanges(stoppingToken);
+                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessChanges(ct), stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
