@@ -28,7 +28,7 @@ public static partial class Commands
 
                 var services = new ServiceCollection()
                     .AddCrmQueries()
-                    .AddSingleton<IOrganizationServiceAsync>(serviceClient)
+                    .AddDefaultServiceClient(ServiceLifetime.Singleton, _ => serviceClient)
                     .BuildServiceProvider();
 
                 var crmQueryDispatcher = services.GetRequiredService<ICrmQueryDispatcher>();
