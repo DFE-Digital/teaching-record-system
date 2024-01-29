@@ -34,7 +34,7 @@ public class JourneyInstanceIdTests
             keys: null,
             expectedInstanceKeyCount: 0,
             assertions: instanceId => { },
-            expectedSerializableId: () => $"key");
+            expectedSerializedValue: () => $"key");
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class JourneyInstanceIdTests
                 randomKey = instanceId.Keys[Constants.UniqueKeyQueryParameterName];
                 Assert.NotNull(randomKey);
             },
-            expectedSerializableId: () => $"key?ffiid={randomKey}");
+            expectedSerializedValue: () => $"key?ffiid={randomKey}");
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class JourneyInstanceIdTests
             {
                 Assert.Equal(id, instanceId.Keys["id"]);
             },
-            expectedSerializableId: () => $"key?id={id}");
+            expectedSerializedValue: () => $"key?id={id}");
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class JourneyInstanceIdTests
                 randomKey = instanceId.Keys[Constants.UniqueKeyQueryParameterName];
                 Assert.Equal(id, instanceId.Keys["id"]);
             },
-            expectedSerializableId: () => $"key?id={id}&ffiid={randomKey}");
+            expectedSerializedValue: () => $"key?id={id}&ffiid={randomKey}");
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class JourneyInstanceIdTests
                 Assert.NotNull(newRandomKey);
                 Assert.NotEqual(currentRandomKey, newRandomKey);
             },
-            expectedSerializableId: () => $"key?ffiid={newRandomKey}");
+            expectedSerializedValue: () => $"key?ffiid={newRandomKey}");
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class JourneyInstanceIdTests
             {
                 Assert.Equal(id, instanceId.Keys["id"]);
             },
-            expectedSerializableId: () => $"key?id={id}");
+            expectedSerializedValue: () => $"key?id={id}");
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class JourneyInstanceIdTests
             keys: null,
             expectedInstanceKeyCount: 0,
             assertions: instanceId => { },
-            expectedSerializableId: () => $"key");
+            expectedSerializedValue: () => $"key");
     }
 
     [Fact]
@@ -309,7 +309,7 @@ public class JourneyInstanceIdTests
         IDictionary<string, string>? keys,
         int expectedInstanceKeyCount,
         Action<JourneyInstanceId> assertions,
-        Func<string> expectedSerializableId)
+        Func<string> expectedSerializedValue)
     {
         // Arrange
         var journeyDescriptor = new JourneyDescriptor(
@@ -327,7 +327,7 @@ public class JourneyInstanceIdTests
         Assert.Equal("key", instanceId.JourneyName);
         Assert.Equal(expectedInstanceKeyCount, instanceId.Keys.Count);
         assertions(instanceId);
-        Assert.Equal(expectedSerializableId(), instanceId.SerializableId);
+        Assert.Equal(expectedSerializedValue(), instanceId.Serialize());
     }
 
     private void TryResolveReturnsExpectedInstance(

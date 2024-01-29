@@ -2,12 +2,17 @@ using System.Security.Cryptography;
 using GovUk.Frontend.AspNetCore;
 using GovUk.OneLogin.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem;
+using TeachingRecordSystem.AuthorizeAccessToATeacherRecord;
+using TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.Logging;
+using TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.Security;
 using TeachingRecordSystem.Core;
+using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.ServiceDefaults;
+using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,10 +26,9 @@ builder.Services.AddGovUkFrontend();
 builder.Services.AddCsp(nonceByteAmount: 32);
 
 builder.Services.AddAuthentication(defaultScheme: OneLoginDefaults.AuthenticationScheme)
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddOneLogin(options =>
     {
-        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.SignInScheme = AuthenticationSchemes.FormFlowJourney;
 
         var rsa = RSA.Create();
         var privateKeyPem = builder.Configuration.GetRequiredValue("OneLogin:PrivateKeyPem");
@@ -49,8 +53,34 @@ builder.Services.AddAuthentication(defaultScheme: OneLoginDefaults.Authenticatio
         options.SignedOutCallbackPath = "/_onelogin/aytq/logout-callback";
     });
 
+builder.Services.Configure<AuthenticationOptions>(options =>
+{
+    options.AddScheme(AuthenticationSchemes.FormFlowJourney, scheme =>
+    {
+        scheme.HandlerType = typeof(FormFlowJourneySignInHandler);
+    });
+
+    options.AddScheme(AuthenticationSchemes.MatchToTeachingRecord, scheme =>
+    {
+        scheme.HandlerType = typeof(MatchToTeachingRecordAuthenticationHandler);
+    });
+});
+
 builder.Services
     .AddRazorPages();
+
+builder.Services
+    .AddSingleton<IClock, Clock>()
+    .AddTransient<AuthorizeAccessLinkGenerator>()
+    .AddTransient<FormFlowJourneySignInHandler>()
+    .AddTransient<MatchToTeachingRecordAuthenticationHandler>()
+    .AddFormFlow(options =>
+    {
+        options.JourneyRegistry.RegisterJourney(
+            new JourneyDescriptor(SignInJourneyState.JourneyName, typeof(SignInJourneyState), requestDataKeys: [], appendUniqueKey: true));
+    })
+    .AddSingleton<ICurrentUserIdProvider, DummyCurrentUserIdProvider>()
+    .AddSingleton<SignInJourneyHelper>();
 
 var app = builder.Build();
 

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace TeachingRecordSystem.FormFlow;
 
-[DebuggerDisplay("{SerializableId}")]
+[DebuggerDisplay("{Serialize(),nq}")]
 public readonly struct JourneyInstanceId(string journeyName, IReadOnlyDictionary<string, StringValues> keys) : IEquatable<JourneyInstanceId>
 {
     public string JourneyName { get; } = journeyName;
@@ -16,29 +16,37 @@ public readonly struct JourneyInstanceId(string journeyName, IReadOnlyDictionary
 
     public string? UniqueKey => Keys.GetValueOrDefault(Constants.UniqueKeyQueryParameterName);
 
-    public string SerializableId
+    public static JourneyInstanceId Deserialize(string serialized)
     {
-        get
+        var parts = serialized.Split('?');
+        var journeyName = parts[0];
+        var qs = parts[1];
+
+        var keys = QueryHelpers.ParseQuery(qs);
+
+        return new JourneyInstanceId(journeyName, keys);
+    }
+
+    public string Serialize()
+    {
+        var urlEncoder = UrlEncoder.Default;
+
+        var url = urlEncoder.Encode(JourneyName);
+
+        foreach (var kvp in Keys)
         {
-            var urlEncoder = UrlEncoder.Default;
+            var value = kvp.Value;
 
-            var url = urlEncoder.Encode(JourneyName);
-
-            foreach (var kvp in Keys)
+            foreach (var sv in value)
             {
-                var value = kvp.Value;
-
-                foreach (var sv in value)
+                if (sv is not null)
                 {
-                    if (sv is not null)
-                    {
-                        url = QueryHelpers.AddQueryString(url, kvp.Key, sv);
-                    }
+                    url = QueryHelpers.AddQueryString(url, kvp.Key, sv);
                 }
             }
-
-            return url;
         }
+
+        return url;
     }
 
     public static JourneyInstanceId Create(JourneyDescriptor journeyDescriptor, IValueProvider valueProvider)
@@ -131,7 +139,7 @@ public readonly struct JourneyInstanceId(string journeyName, IReadOnlyDictionary
 
     public override int GetHashCode() => HashCode.Combine(JourneyName, Keys);
 
-    public override string ToString() => SerializableId;
+    public override string ToString() => Serialize();
 
     public static bool operator ==(JourneyInstanceId left, JourneyInstanceId right) => left.Equals(right);
 
