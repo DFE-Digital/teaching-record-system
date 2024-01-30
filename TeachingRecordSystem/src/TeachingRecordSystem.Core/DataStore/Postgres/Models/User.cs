@@ -20,10 +20,13 @@ public class User : UserBase
 
 public class ApplicationUser : UserBase
 {
+    public const int OneLoginClientIdMaxLength = 50;
     public const string NameUniqueIndexName = "ix_users_application_user_name";
 
     public required string[] ApiRoles { get; set; }
     public ICollection<ApiKey> ApiKeys { get; } = null!;
+    public string? OneLoginClientId { get; set; }
+    public string? OneLoginPrivateKeyPem { get; set; }
 }
 
 public class SystemUser : UserBase

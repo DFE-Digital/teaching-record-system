@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
 
@@ -7,18 +8,28 @@ public partial class TestData
 {
     public async Task<ApplicationUser> CreateApplicationUser(
         string? name = null,
-        string[]? apiRoles = null)
+        string[]? apiRoles = null,
+        bool? hasOneLoginSettings = false)
     {
         var user = await WithDbContext(async dbContext =>
         {
             name ??= GenerateApplicationUserName();
             apiRoles ??= [];
+            string? oneLoginClientId = null;
+            string? oneLoginPrivateKeyPem = null;
+            if (hasOneLoginSettings == true)
+            {
+                oneLoginClientId = Guid.NewGuid().ToString();
+                oneLoginPrivateKeyPem = GeneratePrivateKeyPem();
+            }
 
             var user = new ApplicationUser()
             {
                 Name = name,
                 UserId = Guid.NewGuid(),
-                ApiRoles = apiRoles
+                ApiRoles = apiRoles,
+                OneLoginClientId = oneLoginClientId,
+                OneLoginPrivateKeyPem = oneLoginPrivateKeyPem
             };
 
             dbContext.ApplicationUsers.Add(user);
@@ -38,5 +49,10 @@ public partial class TestData
         });
 
         return user;
+    }
+
+    public static string GeneratePrivateKeyPem()
+    {
+        return RSA.Create().ExportRSAPrivateKeyPem();
     }
 }

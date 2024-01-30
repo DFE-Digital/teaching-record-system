@@ -42,7 +42,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: [ApiRoles.GetPerson, ApiRoles.UpdatePerson]);
+        var applicationUser = await TestData.CreateApplicationUser(apiRoles: [ApiRoles.GetPerson, ApiRoles.UpdatePerson], hasOneLoginSettings: true);
         var apiKeyUnexpired = await TestData.CreateApiKey(applicationUser.UserId, expired: false);
         var apiKeyExpired = await TestData.CreateApiKey(applicationUser.UserId, expired: true);
 
@@ -73,6 +73,9 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 var expiry = row.GetElementByTestId("Expiry")?.TextContent?.Trim();
                 Assert.Equal(apiKeyExpired.Expires!.Value.ToString("dd/MM/yyyy HH:mm"), expiry);
             });
+
+        Assert.Equal(applicationUser.OneLoginClientId, doc.GetElementById("OneLoginClientId")?.GetAttribute("value"));
+        Assert.Equal(applicationUser.OneLoginPrivateKeyPem, doc.GetElementById("OneLoginPrivateKeyPem")?.TextContent?.Trim());
     }
 
     [Fact]
@@ -123,7 +126,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     }
 
     [Fact]
-    public async Task Post_NameNotProvider_RendersError()
+    public async Task Post_NameNotProvided_RendersError()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
@@ -169,20 +172,93 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     }
 
     [Fact]
-    public async Task Post_ValidRequest_UpdatesNameAndRolesCreatesEventAndRedirectsWithFlashMessage()
+    public async Task Post_OneLoginClientIdButNoPem_RendersError()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
+        var oneLoginClientId = Guid.NewGuid().ToString();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "Name", applicationUser.Name },
+                { "OneLoginClientId", oneLoginClientId }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "OneLoginPrivateKeyPem", "One Login Private Key PEM is required if One Login Client ID is set");
+    }
+
+    [Fact]
+    public async Task Post_OneLoginClientIdTooLong_RendersError()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
+        var oneLoginClientId = new string('x', ApplicationUser.OneLoginClientIdMaxLength + 1);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "Name", applicationUser.Name },
+                { "OneLoginClientId", oneLoginClientId }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "OneLoginClientId", "One Login Client ID must be 50 characters or less");
+    }
+
+    [Fact]
+    public async Task Post_OneLoginPrivateKeyPemButNoClientId_RendersError()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
+        var oneLoginPrivateKeyPem = TestData.GeneratePrivateKeyPem();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "Name", applicationUser.Name },
+                { "OneLoginPrivateKeyPem", oneLoginPrivateKeyPem! }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "OneLoginClientId", "One Login Client ID is required if One Login Private Key PEM is set");
+    }
+
+    [Fact]
+    public async Task Post_ValidRequest_UpdatesNameAndRolesAndOneLoginSettinsAndCreatesEventAndRedirectsWithFlashMessage()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUser(apiRoles: [], hasOneLoginSettings: false);
         var originalName = applicationUser.Name;
         var newName = TestData.GenerateChangedApplicationUserName(originalName);
         var newRoles = new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson };
+        var oneLoginClientId = Guid.NewGuid().ToString();
+        var oneLoginPrivateKeyPem = TestData.GeneratePrivateKeyPem();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
                 { "Name", newName },
-                { "ApiRoles", newRoles }
+                { "ApiRoles", newRoles },
+                { "OneLoginClientId", oneLoginClientId },
+                { "OneLoginPrivateKeyPem", oneLoginPrivateKeyPem! }
             }
         };
 
@@ -211,7 +287,11 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 Assert.Equal(newName, applicationUserUpdatedEvent.ApplicationUser.Name);
                 Assert.True(applicationUserUpdatedEvent.ApplicationUser.ApiRoles.SequenceEqual(newRoles));
                 Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.ApiRoles);
-                Assert.Equal(ApplicationUserUpdatedEventChanges.ApiRoles | ApplicationUserUpdatedEventChanges.Name, applicationUserUpdatedEvent.Changes);
+                Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginClientId);
+                Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginPrivateKeyPem);
+                Assert.Equal(oneLoginClientId, applicationUserUpdatedEvent.ApplicationUser.OneLoginClientId);
+                Assert.Equal(oneLoginPrivateKeyPem, applicationUserUpdatedEvent.ApplicationUser.OneLoginPrivateKeyPem);
+                Assert.Equal(ApplicationUserUpdatedEventChanges.ApiRoles | ApplicationUserUpdatedEventChanges.Name | ApplicationUserUpdatedEventChanges.OneLoginClientId | ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem, applicationUserUpdatedEvent.Changes);
             });
 
         var redirectResponse = await response.FollowRedirect(HttpClient);

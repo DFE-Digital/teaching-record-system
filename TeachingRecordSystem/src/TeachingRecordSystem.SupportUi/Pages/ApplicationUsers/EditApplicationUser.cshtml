@@ -41,7 +41,7 @@
                         {
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell">
-                                    <a href="@LinkGenerator.EditApiKey(key.ApiKeyId)" class="govuk-link">@key.ApiKeyId</a>
+                                    <a href="@LinkGenerator.EditApiKey(key.ApiKeyId)" class="govuk-link" data-testid="EditApiKey-@key.ApiKeyId">@key.ApiKeyId</a>
                                 </td>
                                 <td class="govuk-table__cell" data-testid="Expiry">
                                     @if (key.Expires is DateTime expires)
@@ -72,8 +72,12 @@
             </table>
 
             <div class="govuk-!-margin-bottom-1">
-                <govuk-button-link href="@LinkGenerator.AddApiKey(Model.UserId)" class="govuk-button--secondary">Add API key</govuk-button-link>
+                <govuk-button-link href="@LinkGenerator.AddApiKey(Model.UserId)" class="govuk-button--secondary" data-testid="AddApiKey">Add API key</govuk-button-link>
             </div>
+
+            <h2 class="govuk-heading-m">One Login</h2>
+            <govuk-input asp-for="OneLoginClientId" label-class="govuk-label--s" autocomplete="off" />
+            <govuk-textarea asp-for="OneLoginPrivateKeyPem" label-class="govuk-label--s" />
 
             <govuk-button type="submit">Save changes</govuk-button>
         </form>
