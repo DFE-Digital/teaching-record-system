@@ -35,6 +35,8 @@ public class ApplicationUserMapping : IEntityTypeConfiguration<ApplicationUser>
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
         builder.Property(e => e.ApiRoles).HasColumnType("varchar[]");
+        builder.Property(e => e.OneLoginClientId).HasMaxLength(50);
+        builder.Property(e => e.OneLoginPrivateKeyPem).HasMaxLength(2000);
     }
 }
 

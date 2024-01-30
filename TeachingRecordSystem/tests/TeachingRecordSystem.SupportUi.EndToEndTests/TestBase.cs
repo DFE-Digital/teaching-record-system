@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon;
@@ -16,6 +18,13 @@ public abstract class TestBase
     public HostFixture HostFixture { get; }
 
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+
+    public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
+    {
+        var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+        return await action(dbContext);
+    }
 
     protected void SetCurrentUser(User user)
     {

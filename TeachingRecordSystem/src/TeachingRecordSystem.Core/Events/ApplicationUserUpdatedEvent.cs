@@ -14,4 +14,6 @@ public enum ApplicationUserUpdatedEventChanges
     None = 0,
     Name = 1 << 0,
     ApiRoles = 1 << 1,
+    OneLoginClientId = 1 << 2,
+    OneLoginPrivateKeyPem = 1 << 3
 }

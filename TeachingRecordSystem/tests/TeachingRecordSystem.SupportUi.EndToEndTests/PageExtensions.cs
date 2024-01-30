@@ -41,6 +41,11 @@ public static class PageExtensions
         await page.GotoAsync($"/users");
     }
 
+    public static async Task GoToApplicationUsersPage(this IPage page)
+    {
+        await page.GotoAsync($"/application-users");
+    }
+
     public static Task ClickLinkForElementWithTestId(this IPage page, string testId) =>
         page.GetByTestId(testId).ClickAsync();
 
@@ -263,6 +268,31 @@ public static class PageExtensions
     public static async Task AssertOnEditUserPage(this IPage page, Guid userId)
     {
         await page.WaitForUrlPathAsync($"/users/{userId}");
+    }
+
+    public static async Task AssertOnApplicationUsersPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/application-users");
+    }
+
+    public static async Task AssertOnAddApplicationUserPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/application-users/add");
+    }
+
+    public static async Task AssertOnEditApplicationUserPage(this IPage page, Guid applicationUserId)
+    {
+        await page.WaitForUrlPathAsync($"/application-users/{applicationUserId}");
+    }
+
+    public static async Task AssertOnAddApiKeyPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/api-keys/add");
+    }
+
+    public static async Task AssertOnEditApiKeyPage(this IPage page, Guid apiKeyId)
+    {
+        await page.WaitForUrlPathAsync($"/api-keys/{apiKeyId}");
     }
 
     public static async Task AssertFlashMessage(this IPage page, string expectedHeader)
