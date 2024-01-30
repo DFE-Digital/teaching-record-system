@@ -16,5 +16,6 @@ public static class AttributeConstraints
         public const int Address1_PostalCodeLength = 20;
         public const int Address1_CountryMaxLength = 80;
         public const int SlugId_MaxLength = 150;
+        public const int NationalInsuranceNumber_MaxLength = 9;
     }
 }

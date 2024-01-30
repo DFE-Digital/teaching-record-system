@@ -6,6 +6,7 @@ public static class ApiRoles
     public const string UpdatePerson = "UpdatePerson";
     public const string UpdateNpq = "UpdateNpq";
     public const string UnlockPerson = "UnlockPerson";
+    public const string CreateTrn = "CreateTrn";
 
     public static IReadOnlyCollection<string> All { get; } = new[]
     {
@@ -13,5 +14,6 @@ public static class ApiRoles
         UpdatePerson,
         UpdateNpq,
         UnlockPerson,
+        CreateTrn
     };
 }

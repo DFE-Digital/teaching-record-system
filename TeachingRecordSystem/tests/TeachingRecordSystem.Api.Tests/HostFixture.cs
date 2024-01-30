@@ -11,6 +11,7 @@ using TeachingRecordSystem.Api.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Api.Tests;
@@ -53,7 +54,6 @@ public class HostFixture : WebApplicationFactory<Program>
 
             // Add controllers defined in this test assembly
             services.AddMvc().AddApplicationPart(typeof(HostFixture).Assembly);
-
             services.AddSingleton<CurrentApiClientProvider>();
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
@@ -68,6 +68,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddFakeXrm();
             services.AddSingleton<FakeTrnGenerator>();
             services.AddSingleton<TrsDataSyncHelper>();
+            services.AddSingleton<ITrnGenerationApiClient, FakeTrnGenerationApiClient>();
 
             services.Configure<GetAnIdentityOptions>(options =>
             {
