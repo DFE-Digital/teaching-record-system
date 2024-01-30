@@ -34,7 +34,7 @@ jobs:
         uses: azure/setup-kubectl@v3
 
       - name: Get k8s credentials
-        run: az aks get-credentials -g ${{ env.CLUSTER_RESOURCE_GROUP }} -n ${{ env.CLUSTER_NAME }}
+        run: make production_aks get-cluster-credentials
 
       - name: Install konduit
         run: make install-konduit
@@ -42,7 +42,7 @@ jobs:
       - name: Dump database
         run: bin/konduit.sh -k ${{ env.KEYVAULT_NAME }} -d trs trs-production-worker -- pg_dump -E utf8 --compress=1 --clean --if-exists --no-owner --verbose -f backup.sql.gz
 
-      - uses: DFE-Digital/github-actions/set-arm-environment-variables@master
+      - uses: DFE-Digital/github-actions/set-kubelogin-environment@master
         with:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
 

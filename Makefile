@@ -60,7 +60,7 @@ production: paas
 	$(eval AZURE_BACKUP_STORAGE_CONTAINER_NAME=dqt-api)
 
 .PHONY: dev_aks
-dev_aks: aks
+dev_aks: aks test-cluster
 	$(eval DEPLOY_ENV=dev)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
 	$(eval RESOURCE_NAME_PREFIX=s189t01)
@@ -68,7 +68,7 @@ dev_aks: aks
 	$(eval ENV_TAG=dev)
 
 .PHONY: test_aks
-test_aks: aks
+test_aks: aks test-cluster
 	$(eval DEPLOY_ENV=test)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
 	$(eval RESOURCE_NAME_PREFIX=s189t01)
@@ -76,7 +76,7 @@ test_aks: aks
 	$(eval ENV_TAG=test)
 
 .PHONY: pre-production_aks
-pre-production_aks: aks
+pre-production_aks: aks test-cluster
 	$(eval DEPLOY_ENV=pre-production)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
 	$(eval RESOURCE_NAME_PREFIX=s189t01)
@@ -84,7 +84,7 @@ pre-production_aks: aks
 	$(eval ENV_TAG=pre-prod)
 
 .PHONY: production_aks
-production_aks: aks
+production_aks: aks production-cluster
 	$(eval DEPLOY_ENV=production)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-production)
 	$(eval RESOURCE_NAME_PREFIX=s189p01)
@@ -255,3 +255,16 @@ install-konduit: ## Install the konduit script, for accessing backend services
 		&& curl -s https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/master/scripts/konduit.sh -o bin/konduit.sh \
 		&& chmod +x bin/konduit.sh \
 		|| true
+
+test-cluster:
+	$(eval CLUSTER_RESOURCE_GROUP_NAME=s189t01-tsc-ts-rg)
+	$(eval CLUSTER_NAME=s189t01-tsc-test-aks)
+
+production-cluster:
+	$(eval CLUSTER_RESOURCE_GROUP_NAME=s189p01-tsc-pd-rg)
+	$(eval CLUSTER_NAME=s189p01-tsc-production-aks)
+
+get-cluster-credentials: set-azure-account
+	az aks get-credentials --overwrite-existing -g ${CLUSTER_RESOURCE_GROUP_NAME} -n ${CLUSTER_NAME}
+	kubelogin convert-kubeconfig -l $(if ${GITHUB_ACTIONS},spn,azurecli)
+
