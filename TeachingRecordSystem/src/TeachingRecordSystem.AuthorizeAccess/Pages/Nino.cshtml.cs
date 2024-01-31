@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.FormFlow;
 
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Pages;
+namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Authorize]
 [Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]

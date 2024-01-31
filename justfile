@@ -66,7 +66,7 @@ watch-api:
 
 # Run the AuthorizeAccess project in Development mode and watch for file changes
 watch-authz:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.AuthorizeAccessToATeacherRecord"}} && dotnet watch
+  @cd {{solution-root / "src" / "TeachingRecordSystem.AuthorizeAccess"}} && dotnet watch
 
 # Run the UI project in Development mode and watch for file changes
 watch-ui:

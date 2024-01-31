@@ -142,7 +142,7 @@ module "authz_application" {
   kubernetes_secret_name     = module.authz_application_configuration.kubernetes_secret_name
 
   docker_image = var.docker_image
-  command      = ["/bin/ash", "-c", "cd /Apps/Authorize/; dotnet TeachingRecordSystem.AuthorizeAccessToATeacherRecord.dll;"]
+  command      = ["/bin/ash", "-c", "cd /Apps/AuthorizeAccess/; dotnet TeachingRecordSystem.AuthorizeAccess.dll;"]
   web_port     = 80
   probe_path   = "/health"
   replicas     = var.authz_replicas

@@ -1,10 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
-using TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.FormFlow;
+using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.FormFlow;
 
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.Security;
+namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
 /// <summary>
 /// An <see cref="IAuthenticationSignInHandler"/> that persists an <see cref="AuthenticationTicket"/> to

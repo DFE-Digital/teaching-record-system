@@ -1,7 +1,7 @@
 using Serilog;
 using TeachingRecordSystem.Hosting;
 
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.Logging;
+namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Logging;
 
 public static class WebApplicationBuilderExtensions
 {

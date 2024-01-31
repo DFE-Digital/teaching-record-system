@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
 
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord;
+namespace TeachingRecordSystem.AuthorizeAccess;
 
 public class SignInJourneyState
 {

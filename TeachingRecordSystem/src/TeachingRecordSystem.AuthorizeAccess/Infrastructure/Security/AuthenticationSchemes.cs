@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.Security;
+namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
 public static class AuthenticationSchemes
 {

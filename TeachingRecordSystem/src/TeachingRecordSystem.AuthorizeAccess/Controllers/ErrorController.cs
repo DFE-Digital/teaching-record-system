@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Controllers;
+namespace TeachingRecordSystem.AuthorizeAccess.Controllers;
 
 [Route("error")]
 public class ErrorController : Controller

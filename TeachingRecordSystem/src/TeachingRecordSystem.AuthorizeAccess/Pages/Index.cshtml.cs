@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.Security;
+using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.FormFlow;
 
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Pages;
+namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyState.JourneyName)]
 [Authorize(AuthenticationSchemes = AuthenticationSchemes.MatchToTeachingRecord)]

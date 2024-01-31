@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
 
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.FormFlow;
+namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 
 public class SignInJourneyHelper
 {

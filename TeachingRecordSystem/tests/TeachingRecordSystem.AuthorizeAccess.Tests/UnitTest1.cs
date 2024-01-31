@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.AuthorizeAccessToATeachingRecordTests;
+namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
 public class UnitTest1
 {
