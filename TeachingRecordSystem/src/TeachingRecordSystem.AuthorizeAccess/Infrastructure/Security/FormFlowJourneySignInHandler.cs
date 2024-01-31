@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 /// An <see cref="IAuthenticationSignInHandler"/> that persists an <see cref="AuthenticationTicket"/> to
 /// the current FormFlow instance's state.
 /// </summary>
-public class FormFlowJourneySignInHandler(SignInJourneyHelper signInJourneyHelper) : IAuthenticationSignInHandler
+public class FormFlowJourneySignInHandler(SignInJourneyHelper helper) : IAuthenticationSignInHandler
 {
     private AuthenticationScheme? _scheme;
     private HttpContext? _context;
@@ -19,7 +19,7 @@ public class FormFlowJourneySignInHandler(SignInJourneyHelper signInJourneyHelpe
     {
         EnsureInitialized();
 
-        var journeyInstance = await signInJourneyHelper.GetInstanceAsync(_context);
+        var journeyInstance = await helper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(_context);
 
         if (journeyInstance is null || journeyInstance.State.OneLoginAuthenticationTicket is null)
         {
@@ -58,19 +58,19 @@ public class FormFlowJourneySignInHandler(SignInJourneyHelper signInJourneyHelpe
 
         var journeyInstanceId = JourneyInstanceId.Deserialize(serializedInstanceId);
 
-        var journeyInstance = await signInJourneyHelper.GetInstanceAsync(_context, journeyInstanceId) ??
+        var journeyInstance = await helper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(_context, journeyInstanceId) ??
             throw new InvalidOperationException("No FormFlow journey.");
 
         var ticket = new AuthenticationTicket(user, properties, _scheme.Name);
 
-        await journeyInstance.UpdateStateAsync(state => state.OnSignedInWithOneLogin(ticket));
+        await journeyInstance.UpdateStateAsync(async state => await helper.OnSignedInWithOneLogin(state, ticket));
     }
 
     public async Task SignOutAsync(AuthenticationProperties? properties)
     {
         EnsureInitialized();
 
-        var journeyInstance = await signInJourneyHelper.GetInstanceAsync(_context) ??
+        var journeyInstance = await helper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(_context) ??
             throw new InvalidOperationException("No FormFlow journey.");
 
         await journeyInstance.UpdateStateAsync(state => state.Reset());
