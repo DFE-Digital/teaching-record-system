@@ -6,7 +6,7 @@ using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
 public class MatchToTeachingRecordAuthenticationHandler(
-    SignInJourneyHelper signInJourneyHelper,
+    SignInJourneyHelper helper,
     AuthorizeAccessLinkGenerator linkGenerator) : IAuthenticationHandler
 {
     private AuthenticationScheme? _scheme;
@@ -16,7 +16,7 @@ public class MatchToTeachingRecordAuthenticationHandler(
     {
         EnsureInitialized();
 
-        var journeyInstance = await signInJourneyHelper.GetInstanceAsync(_context);
+        var journeyInstance = await helper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(_context);
 
         if (journeyInstance is null)
         {
@@ -40,14 +40,15 @@ public class MatchToTeachingRecordAuthenticationHandler(
         properties ??= new();
         properties.RedirectUri ??= "/";
 
-        var journeyInstance = await signInJourneyHelper.GetOrCreateInstanceAsync(
+        var journeyInstance = await helper.UserInstanceStateProvider.GetOrCreateSignInJourneyInstanceAsync(
             _context,
-            createState: () => new SignInJourneyState(properties.RedirectUri!, OneLoginDefaults.AuthenticationScheme),
+            createState: () => new SignInJourneyState(properties.RedirectUri!, properties),
             updateState: state => state.Reset());
 
-        properties.RedirectUri = linkGenerator.Start(journeyInstance.InstanceId);
-        properties.Items.Add(FormFlowJourneySignInHandler.PropertyKeys.JourneyInstanceId, journeyInstance.InstanceId.Serialize());
-        await _context!.ChallengeAsync(OneLoginDefaults.AuthenticationScheme, properties);
+        var delegatedProperties = new AuthenticationProperties();
+        delegatedProperties.RedirectUri = linkGenerator.Start(journeyInstance.InstanceId);
+        delegatedProperties.Items.Add(FormFlowJourneySignInHandler.PropertyKeys.JourneyInstanceId, journeyInstance.InstanceId.Serialize());
+        await _context!.ChallengeAsync(OneLoginDefaults.AuthenticationScheme, delegatedProperties);
     }
 
     public Task ForbidAsync(AuthenticationProperties? properties)

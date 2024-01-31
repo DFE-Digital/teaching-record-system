@@ -9,7 +9,6 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow.State;
-using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Tests;

@@ -139,6 +139,12 @@ public sealed class JourneyInstance<TState> : JourneyInstance
         await UpdateStateAsync(State);
     }
 
+    public async Task UpdateStateAsync(Func<TState, Task> update)
+    {
+        await update(State);
+        await UpdateStateAsync(State);
+    }
+
     public async Task UpdateStateAsync(Func<TState, TState> update)
     {
         var newState = update(State);

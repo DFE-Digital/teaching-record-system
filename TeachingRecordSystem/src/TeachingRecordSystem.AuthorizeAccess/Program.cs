@@ -70,17 +70,16 @@ builder.Services
     .AddRazorPages();
 
 builder.Services
-    .AddSingleton<IClock, Clock>()
+    .AddTrsBaseServices()
     .AddTransient<AuthorizeAccessLinkGenerator>()
     .AddTransient<FormFlowJourneySignInHandler>()
     .AddTransient<MatchToTeachingRecordAuthenticationHandler>()
     .AddFormFlow(options =>
     {
-        options.JourneyRegistry.RegisterJourney(
-            new JourneyDescriptor(SignInJourneyState.JourneyName, typeof(SignInJourneyState), requestDataKeys: [], appendUniqueKey: true));
+        options.JourneyRegistry.RegisterJourney(SignInJourneyState.JourneyDescriptor);
     })
     .AddSingleton<ICurrentUserIdProvider, DummyCurrentUserIdProvider>()
-    .AddSingleton<SignInJourneyHelper>();
+    .AddTransient<SignInJourneyHelper>();
 
 var app = builder.Build();
 
@@ -128,3 +127,5 @@ app.MapRazorPages();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
