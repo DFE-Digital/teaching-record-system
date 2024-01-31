@@ -90,7 +90,7 @@ production_aks: aks production-cluster
 	$(eval RESOURCE_NAME_PREFIX=s189p01)
 	$(eval ENV_SHORT=pd)
 	$(eval ENV_TAG=prod)
-	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
+	$(if $(or ${SKIP_CONFIRM}, ${CONFIRM_DEPLOY}), , $(error can only run with CONFIRM_DEPLOY))
 
 .PHONY: domain
 domain:
@@ -131,6 +131,7 @@ ci:	## Run in automation environment
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SP_AUTH=true)
 	$(eval CONFIRM_DEPLOY=true)
+	$(eval SKIP_CONFIRM=true)
 
 bin/terrafile: ## Install terrafile to manage terraform modules
 	curl -sL https://github.com/coretech/terrafile/releases/download/v${TERRAFILE_VERSION}/terrafile_${TERRAFILE_VERSION}_$$(uname)_x86_64.tar.gz \
@@ -267,4 +268,3 @@ production-cluster:
 get-cluster-credentials: set-azure-account
 	az aks get-credentials --overwrite-existing -g ${CLUSTER_RESOURCE_GROUP_NAME} -n ${CLUSTER_NAME}
 	kubelogin convert-kubeconfig -l $(if ${GITHUB_ACTIONS},spn,azurecli)
-

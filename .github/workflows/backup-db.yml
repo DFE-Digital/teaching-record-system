@@ -30,21 +30,21 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - uses: DFE-Digital/github-actions/set-kubelogin-environment@master
+        with:
+          azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
 
       - name: Get k8s credentials
-        run: make production_aks get-cluster-credentials
+        run: make ci production_aks get-cluster-credentials
 
       - name: Install konduit
         run: make install-konduit
 
       - name: Dump database
         run: bin/konduit.sh -k ${{ env.KEYVAULT_NAME }} -d trs trs-production-worker -- pg_dump -E utf8 --compress=1 --clean --if-exists --no-owner --verbose -f backup.sql.gz
-
-      - uses: DFE-Digital/github-actions/set-kubelogin-environment@master
-        with:
-          azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Get backup storage account
         id: azure-backup-storage
