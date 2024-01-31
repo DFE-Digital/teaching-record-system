@@ -3,6 +3,7 @@ using System.Text.Json;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -10,24 +11,43 @@ using TeachingRecordSystem.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
-public class SignInJourneyHelper(TrsDbContext dbContext, IUserInstanceStateProvider userInstanceStateProvider, IClock clock)
+public class SignInJourneyHelper(
+    TrsDbContext dbContext,
+    IOptions<AuthorizeAccessOptions> optionsAccessor,
+    IUserInstanceStateProvider userInstanceStateProvider,
+    IClock clock)
 {
     public IUserInstanceStateProvider UserInstanceStateProvider { get; } = userInstanceStateProvider;
 
     public async Task OnSignedInWithOneLogin(SignInJourneyState state, AuthenticationTicket ticket)
     {
-        var subject = ticket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
-        var email = ticket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
-        var vc = ticket.Principal.FindFirstValue("vc") is string vcStr ? JsonDocument.Parse(vcStr) : null;
-
         state.Reset();
         state.OneLoginAuthenticationTicket = ticket;
 
-        if (vc is not null)
+        var vc = ticket.Principal.FindFirstValue("vc") is string vcStr ? JsonDocument.Parse(vcStr) : null;
+        state.IdentityVerified = vc is not null;
+        if (state.IdentityVerified)
         {
             state.VerifiedNames = ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray();
             state.VerifiedDatesOfBirth = ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray();
         }
+
+        if (!optionsAccessor.Value.ShowDebugPages)
+        {
+            await CreateOrUpdateOneLoginUser(state);
+        }
+    }
+
+    public async Task CreateOrUpdateOneLoginUser(SignInJourneyState state)
+    {
+        if (state.OneLoginAuthenticationTicket is null)
+        {
+            throw new InvalidOperationException($"{nameof(state.OneLoginAuthenticationTicket)} is not set.");
+        }
+
+        var subject = state.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
+        var email = state.OneLoginAuthenticationTicket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
+        var vc = state.OneLoginAuthenticationTicket.Principal.FindFirstValue("vc") is string vcStr ? JsonDocument.Parse(vcStr) : null;
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Include(o => o.Person)

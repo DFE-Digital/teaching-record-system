@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.FormFlow;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.TestCommon;
@@ -15,9 +16,10 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
+            var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
             var userInstanceStateProvider = new InMemoryInstanceStateProvider();
             var clock = new TestableClock();
-            var helper = new SignInJourneyHelper(dbContext, userInstanceStateProvider, clock);
+            var helper = new SignInJourneyHelper(dbContext, options, userInstanceStateProvider, clock);
 
             var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
 
@@ -31,6 +33,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
+            Assert.True(state.IdentityVerified);
             Assert.NotNull(state.VerifiedNames);
             Assert.Collection(state.VerifiedNames, nameParts => Assert.Collection(nameParts, name => Assert.Equal(firstName, name), name => Assert.Equal(lastName, name)));
             Assert.NotNull(state.VerifiedDatesOfBirth);
@@ -42,9 +45,10 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
+            var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
             var userInstanceStateProvider = new InMemoryInstanceStateProvider();
             var clock = new TestableClock();
-            var helper = new SignInJourneyHelper(dbContext, userInstanceStateProvider, clock);
+            var helper = new SignInJourneyHelper(dbContext, options, userInstanceStateProvider, clock);
 
             var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
 
@@ -55,6 +59,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
+            Assert.False(state.IdentityVerified);
             Assert.Null(state.VerifiedNames);
             Assert.Null(state.VerifiedDatesOfBirth);
         });
@@ -64,9 +69,10 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
+            var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
             var userInstanceStateProvider = new InMemoryInstanceStateProvider();
             var clock = new TestableClock();
-            var helper = new SignInJourneyHelper(dbContext, userInstanceStateProvider, clock);
+            var helper = new SignInJourneyHelper(dbContext, options, userInstanceStateProvider, clock);
 
             var person = await TestData.CreatePerson(b => b.WithTrn(true));
             var user = await TestData.CreateOneLoginUser(personId: person.PersonId);
@@ -93,9 +99,10 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
+            var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
             var userInstanceStateProvider = new InMemoryInstanceStateProvider();
             var clock = new TestableClock();
-            var helper = new SignInJourneyHelper(dbContext, userInstanceStateProvider, clock);
+            var helper = new SignInJourneyHelper(dbContext, options, userInstanceStateProvider, clock);
 
             var user = await TestData.CreateOneLoginUser(personId: null);
             clock.Advance();
@@ -120,9 +127,10 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
+            var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
             var userInstanceStateProvider = new InMemoryInstanceStateProvider();
             var clock = new TestableClock();
-            var helper = new SignInJourneyHelper(dbContext, userInstanceStateProvider, clock);
+            var helper = new SignInJourneyHelper(dbContext, options, userInstanceStateProvider, clock);
 
             var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
 
