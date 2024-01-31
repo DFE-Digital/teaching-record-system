@@ -1,46 +1,64 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication;
+using TeachingRecordSystem.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
-public class SignInJourneyState
+[method: JsonConstructor]
+public class SignInJourneyState(string redirectUri, AuthenticationProperties? authenticationProperties)
 {
     public const string JourneyName = "SignInJourney";
 
-    private readonly TicketSerializer _ticketSerializer = TicketSerializer.Default;
+    public static JourneyDescriptor JourneyDescriptor { get; } =
+        new JourneyDescriptor(JourneyName, typeof(SignInJourneyState), requestDataKeys: [], appendUniqueKey: true);
 
-    [JsonInclude]
-    private byte[]? _oneLoginAuthenticationTicket;
+    public string RedirectUri { get; } = redirectUri;
 
-    [JsonConstructor]
-    public SignInJourneyState(string redirectUri, string oneLoginAuthenticationScheme)
-    {
-        RedirectUri = redirectUri;
-        OneLoginAuthenticationScheme = oneLoginAuthenticationScheme;
-    }
+    [JsonConverter(typeof(AuthenticationTicketJsonConverter))]
+    public AuthenticationTicket? AuthenticationTicket { get; set; }
 
-    public AuthenticationTicket? AuthenticationTicket { get; private set; }
+    [JsonConverter(typeof(AuthenticationTicketJsonConverter))]
+    public AuthenticationTicket? OneLoginAuthenticationTicket { get; set; }
 
-    [JsonIgnore]
-    public AuthenticationTicket? OneLoginAuthenticationTicket =>
-        _oneLoginAuthenticationTicket is not null ? _ticketSerializer.Deserialize(_oneLoginAuthenticationTicket) : null;
+    public string[][]? VerifiedNames { get; set; }
 
-    [JsonIgnore]
-    public bool AuthenticatedWithOneLogin => OneLoginAuthenticationTicket is not null;
+    public DateOnly[]? VerifiedDatesOfBirth { get; set; }
 
-    public string RedirectUri { get; }
-
-    public string OneLoginAuthenticationScheme { get; }
-
-    public void OnSignedInWithOneLogin(AuthenticationTicket ticket)
-    {
-        _oneLoginAuthenticationTicket = _ticketSerializer.Serialize(ticket);
-        // TODO Should we reset all other state here?
-    }
+    public AuthenticationProperties? AuthenticationProperties { get; } = authenticationProperties;
 
     public void Reset()
     {
         AuthenticationTicket = null;
-        _oneLoginAuthenticationTicket = null;
+        OneLoginAuthenticationTicket = null;
+        VerifiedNames = null;
+        VerifiedDatesOfBirth = null;
+    }
+}
+
+public class AuthenticationTicketJsonConverter : JsonConverter<AuthenticationTicket>
+{
+    private readonly TicketSerializer _ticketSerializer = TicketSerializer.Default;
+
+    public override AuthenticationTicket? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+        {
+            return null;
+        }
+
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            var bytes = reader.GetBytesFromBase64();
+            return _ticketSerializer.Deserialize(bytes);
+        }
+
+        throw new JsonException($"Unknown TokenType: '{reader.TokenType}'.");
+    }
+
+    public override void Write(Utf8JsonWriter writer, AuthenticationTicket value, JsonSerializerOptions options)
+    {
+        var bytes = _ticketSerializer.Serialize(value);
+        writer.WriteBase64StringValue(bytes);
     }
 }

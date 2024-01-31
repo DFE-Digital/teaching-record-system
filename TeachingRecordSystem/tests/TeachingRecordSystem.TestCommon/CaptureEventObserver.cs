@@ -1,8 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Processing;
+using Xunit;
 
-namespace TeachingRecordSystem.SupportUi.Tests.Infrastructure;
+namespace TeachingRecordSystem.TestCommon;
 
 public class CaptureEventObserver : IEventObserver
 {

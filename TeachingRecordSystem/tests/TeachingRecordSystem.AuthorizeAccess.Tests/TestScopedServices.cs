@@ -1,7 +1,6 @@
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+using TeachingRecordSystem.TestCommon;
 
-namespace TeachingRecordSystem.SupportUi.Tests;
+namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
 public class TestScopedServices
 {
@@ -10,8 +9,6 @@ public class TestScopedServices
     public TestScopedServices()
     {
         Clock = new();
-        DataverseAdapterMock = new();
-        AzureActiveDirectoryUserServiceMock = new();
         EventObserver = new();
     }
 
@@ -29,10 +26,6 @@ public class TestScopedServices
     }
 
     public TestableClock Clock { get; }
-
-    public Mock<IDataverseAdapter> DataverseAdapterMock { get; }
-
-    public Mock<IAadUserService> AzureActiveDirectoryUserServiceMock { get; }
 
     public CaptureEventObserver EventObserver { get; }
 }
