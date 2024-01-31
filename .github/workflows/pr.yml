@@ -114,11 +114,11 @@ jobs:
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
       timeout-minutes: 5
 
-    - name: Authorize access to a teaching record tests
+    - name: Authorize access tests
       uses: ./.github/workflows/actions/test
       with:
-        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.AuthorizeAccessToATeachingRecordTests
-        report_name: "Authorize access to a teaching record test results"
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.AuthorizeAccess.Tests
+        report_name: "Authorize access test results"
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.WebUtilities;
 using TeachingRecordSystem.FormFlow;
 
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord;
+namespace TeachingRecordSystem.AuthorizeAccess;
 
 public class AuthorizeAccessLinkGenerator(LinkGenerator linkGenerator)
 {

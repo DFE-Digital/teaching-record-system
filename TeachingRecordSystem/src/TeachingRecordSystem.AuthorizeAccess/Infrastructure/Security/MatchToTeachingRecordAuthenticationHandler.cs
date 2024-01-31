@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.FormFlow;
+using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.Security;
+namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
 public class MatchToTeachingRecordAuthenticationHandler(
     SignInJourneyHelper signInJourneyHelper,

@@ -1,6 +1,6 @@
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 
-namespace TeachingRecordSystem.AuthorizeAccessToATeacherRecord.Infrastructure.FormFlow;
+namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 
 public class DummyCurrentUserIdProvider : ICurrentUserIdProvider
 {
