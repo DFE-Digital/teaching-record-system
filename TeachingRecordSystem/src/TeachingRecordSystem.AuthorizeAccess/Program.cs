@@ -3,12 +3,16 @@ using GovUk.Frontend.AspNetCore;
 using GovUk.OneLogin.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem;
 using TeachingRecordSystem.AuthorizeAccess;
+using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Conventions;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Logging;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
+using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.ServiceDefaults;
@@ -67,7 +71,10 @@ builder.Services.Configure<AuthenticationOptions>(options =>
 });
 
 builder.Services
-    .AddRazorPages();
+    .AddRazorPages(options =>
+    {
+        options.Conventions.Add(new BindJourneyInstancePropertiesConvention());
+    });
 
 builder.Services
     .AddTrsBaseServices()
@@ -79,7 +86,8 @@ builder.Services
         options.JourneyRegistry.RegisterJourney(SignInJourneyState.JourneyDescriptor);
     })
     .AddSingleton<ICurrentUserIdProvider, DummyCurrentUserIdProvider>()
-    .AddTransient<SignInJourneyHelper>();
+    .AddTransient<SignInJourneyHelper>()
+    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
 
 var app = builder.Build();
 
