@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.AuthorizeAccess;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Conventions;
@@ -14,6 +15,7 @@ using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Logging;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
 using TeachingRecordSystem.Core;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
@@ -76,6 +78,18 @@ builder.Services
         options.Conventions.Add(new BindJourneyInstancePropertiesConvention());
     });
 
+if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+{
+    var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
+    {
+        DisableCrossThreadSafeties = true,
+        EnableAffinityCookie = true,
+        MaxRetryCount = 2,
+        RetryPauseTime = TimeSpan.FromSeconds(1)
+    };
+    builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
+}
+
 builder.Services
     .AddTrsBaseServices()
     .AddTransient<AuthorizeAccessLinkGenerator>()
@@ -88,6 +102,11 @@ builder.Services
     .AddSingleton<ICurrentUserIdProvider, DummyCurrentUserIdProvider>()
     .AddTransient<SignInJourneyHelper>()
     .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
+
+builder.Services.AddOptions<AuthorizeAccessOptions>()
+    .Bind(builder.Configuration)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 var app = builder.Build();
 

@@ -1,0 +1,66 @@
+@page "/debug"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.DebugIdentityModel
+@{
+    ViewBag.Title = "Identity information";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.DebugIdentity(Model.JourneyInstance!.InstanceId)" method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input asp-for="Subject" disabled="true" />
+
+            <govuk-input asp-for="Email" type="email" disabled="true" />
+
+            <govuk-checkboxes asp-for="IdentityVerified">
+                <govuk-checkboxes-item value="@true">
+                    Identity verified
+
+                    <govuk-checkboxes-item-conditional>
+                        <govuk-textarea asp-for="VerifiedNames" input-class="govuk-" />
+                        <govuk-textarea asp-for="VerifiedDatesOfBirth" />
+                    </govuk-checkboxes-item-conditional>
+                </govuk-checkboxes-item>
+            </govuk-checkboxes>
+
+            <div class="govuk-!-margin-bottom-5">
+                <h2 class="govuk-heading-m">Teaching record</h2>
+
+                @if (Model.Person is not null)
+                {
+                    <govuk-summary-list class="govuk-!-margin-bottom-3">
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@Model.Person.Trn</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@Model.Person.FirstName @Model.Person.LastName</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@Model.Person.DateOfBirth?.ToString("dd/MM/yyyy")</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>National insurance number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@Model.Person.NationalInsuranceNumber</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    </govuk-summary-list>
+
+                    <govuk-checkboxes asp-for="DetachPerson" class="govuk-checkboxes--small">
+                        <govuk-checkboxes-item value="@true">Detach teaching record</govuk-checkboxes-item>
+                    </govuk-checkboxes>
+                }
+                else
+                {
+                    <p class="govuk-body">
+                        <div class="govuk-caption-m">User is not linked to a teaching record.</div>
+                    </p>
+                }
+            </div>
+
+            <govuk-button type="submit">Save and continue</govuk-button>
+        </form>
+    </div>
+</div>
