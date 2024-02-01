@@ -1,4 +1,4 @@
-# 1. Record architecture decisions
+# 1. Move ID into TRS
 
 Date: 2023-11-30
 
@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-With the adoption of Gov.OneLogin into our services, it renders a proportion of Teaching Identity's functionality either duplicated or obsolete. Therefore, we reviewed how best to enable our services to 
+With the adoption of Gov.OneLogin into our services, it renders a proportion of Teaching Identity's functionality either duplicated or obsolete. Therefore, we reviewed how best to enable our services to
 integrate with Gov.OneLogin and also provide the necessary teaching record authorisation (that Teaching Identity currently provides). We chose to keep the OAUTH based journey that allows services to pass a set of PII data to be checked against the database of qualified teachers (soon to be Teaching Record System).
 
 ## Decision

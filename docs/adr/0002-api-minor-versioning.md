@@ -1,4 +1,4 @@
-# 1. Record architecture decisions
+# 2. Use minor versioning on the API
 
 Date: 2023-12-22
 
