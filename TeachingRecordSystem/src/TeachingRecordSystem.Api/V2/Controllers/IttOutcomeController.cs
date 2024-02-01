@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
+using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
 using TeachingRecordSystem.Api.Infrastructure.Security;
@@ -23,10 +23,10 @@ public class IttOutcomeController : ControllerBase
     }
 
     [HttpPut("")]
-    [OpenApiOperation(
-        operationId: "SetIttOutcome",
-        summary: "Set ITT outcome",
-        description: "Sets the ITT outcome for a teacher")]
+    [SwaggerOperation(
+        OperationId = "SetIttOutcome",
+        Summary = "Set ITT outcome",
+        Description = "Sets the ITT outcome for a teacher")]
     [ProducesResponseType(typeof(SetIttOutcomeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]

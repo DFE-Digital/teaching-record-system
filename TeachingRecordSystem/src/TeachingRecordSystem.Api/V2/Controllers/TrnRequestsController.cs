@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
+using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
@@ -21,10 +21,10 @@ public class TrnRequestsController : ControllerBase
     }
 
     [HttpGet("{requestId}")]
-    [OpenApiOperation(
-        operationId: "GetTrnRequest",
-        summary: "Get TRN request",
-        description: "Gets a TRN request and the associated teacher's TRN")]
+    [SwaggerOperation(
+        OperationId = "GetTrnRequest",
+        Summary = "Get TRN request",
+        Description = "Gets a TRN request and the associated teacher's TRN")]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetTrnRequest(GetTrnRequest request)
@@ -34,10 +34,10 @@ public class TrnRequestsController : ControllerBase
     }
 
     [HttpPut("{requestId}")]
-    [OpenApiOperation(
-        operationId: "GetOrCreateTrnRequest",
-        summary: "Get or create TRN request",
-        description: "Gets or creates a request for a TRN")]
+    [SwaggerOperation(
+        OperationId = "GetOrCreateTrnRequest",
+        Summary = "Get or create TRN request",
+        Description = "Gets or creates a request for a TRN")]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

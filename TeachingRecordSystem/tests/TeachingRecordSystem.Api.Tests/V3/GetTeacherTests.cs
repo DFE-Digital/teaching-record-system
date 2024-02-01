@@ -10,7 +10,7 @@ public class GetTeacherTests : GetTeacherTestBase
     }
 
     [Fact]
-    public async Task Get_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
+    public async Task Get_TeacherWithTrnDoesNotExist_ReturnsForbidden()
     {
         // Arrange
         var trn = "1234567";
@@ -22,7 +22,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Theory]

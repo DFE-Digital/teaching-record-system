@@ -1,4 +1,5 @@
-using NSwag.Examples;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;
 
@@ -6,61 +7,70 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddOpenApi(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddExampleProviders(typeof(Program).Assembly);
-
-        foreach (var version in Constants.AllVersions)
+        services.AddSwaggerGen(options =>
         {
-            services.AddOpenApiDocument((settings, provider) =>
+            options.EnableAnnotations();
+
+            options.DocInclusionPredicate((docName, apiDescription) => apiDescription.GroupName == docName);
+
+            options.AddSecurityDefinition(SecuritySchemes.ApiKey, new OpenApiSecurityScheme()
             {
-                settings.DocumentName = OpenApiDocumentHelper.GetDocumentName(version);
-                settings.Version = OpenApiDocumentHelper.GetVersionName(version);
-                settings.Title = "Teaching Record System API";
-                settings.ApiGroupNames = new[] { OpenApiDocumentHelper.GetVersionName(version) };
-                //settings.AddExamples(provider);   // Broken with the current NSwag.Examples library
-                settings.SchemaSettings.TypeNameGenerator = new GeneratedCrmTypeNameGenerator(settings.SchemaSettings.TypeNameGenerator);
-
-                settings.DocumentProcessors.Add(new PopulateResponseDescriptionOperationProcessor());
-
-                settings.SchemaSettings.SchemaProcessors.Add(new RemoveCompositeValuesFromFlagsEnumSchemaProcessor());
-                settings.SchemaSettings.SchemaProcessors.Add(new RemoveExcludedEnumOptionsSchemaProcessor());
-
-                settings.OperationProcessors.Add(new ResponseContentTypeOperationProcessor());
-                settings.OperationProcessors.Add(new PopulateResponseDescriptionOperationProcessor());
-                settings.OperationProcessors.Add(new AssignBinaryContentTypeFromProducesOperationProcessor());
-
-                settings.SchemaSettings.ReflectionService = new UnwrapOptionTypesReflectionService();
-
-                settings.AddSecurity(SecuritySchemes.ApiKey, new NSwag.OpenApiSecurityScheme()
-                {
-                    In = NSwag.OpenApiSecurityApiKeyLocation.Header,
-                    Name = "Authorization",
-                    Scheme = "Bearer",
-                    Type = NSwag.OpenApiSecuritySchemeType.Http
-                });
-
-                if (version == 3)
-                {
-                    // Only V3 uses ID access tokens for auth
-                    settings.AddSecurity(SecuritySchemes.GetAnIdentityAccessToken, new NSwag.OpenApiSecurityScheme()
-                    {
-                        In = NSwag.OpenApiSecurityApiKeyLocation.Header,
-                        Scheme = "Bearer",
-                        Type = NSwag.OpenApiSecuritySchemeType.OpenIdConnect,
-                        OpenIdConnectUrl = configuration["GetAnIdentity:BaseAddress"] + ".well-known/openid-configuration"
-                    });
-
-                    // Add operation-level security scheme instead of document-level
-                    settings.OperationProcessors.Add(new AddSecuritySchemeOperationProcessor());
-                }
-                else
-                {
-                    settings.DocumentProcessors.Add(new AddApiKeySecuritySchemeDocumentProcessor());
-                }
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Scheme = "Bearer",
+                Type = SecuritySchemeType.Http
             });
-        }
+
+            options.AddSecurityDefinition(SecuritySchemes.GetAnIdentityAccessToken, new OpenApiSecurityScheme()
+            {
+                In = ParameterLocation.Header,
+                Scheme = "Bearer",
+                Type = SecuritySchemeType.OpenIdConnect,
+                OpenIdConnectUrl = new Uri(configuration.GetRequiredValue("GetAnIdentity:BaseAddress") + ".well-known/openid-configuration")
+            });
+
+            options.SupportNonNullableReferenceTypes();
+            options.SchemaFilter<RemoveExcludedEnumOptionsSchemaFilter>();
+            options.SchemaFilter<RemoveEnumValuesForFlagsEnumSchemaFilter>();
+            options.OperationFilter<ContentTypesOperationFilter>();
+            options.OperationFilter<AddSecuritySchemeOperationFilter>();
+
+            foreach (var version in Constants.AllVersions)
+            {
+                options.SwaggerDoc(
+                    OpenApiDocumentHelper.GetDocumentName(version),
+                    new OpenApiInfo()
+                    {
+                        Version = OpenApiDocumentHelper.GetVersionName(version),
+                        Title = OpenApiDocumentHelper.Title
+                    });
+            }
+        });
+
+        services.Decorate<ISerializerDataContractResolver, UnwrapOptionSerializerDataContractResolver>();
 
         services.AddSingleton<IStartupFilter, OpenApiEndpointsStartupFilter>();
 
         return services;
     }
+}
+
+public class OpenApiEndpointsStartupFilter : IStartupFilter
+{
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+    {
+        next(app);
+
+        app.UseSwagger(o => o.RouteTemplate = "/swagger/{documentName}.json");
+
+        app.UseSwaggerUI(options =>
+        {
+            foreach (var version in Constants.AllVersions)
+            {
+                options.SwaggerEndpoint($"/swagger/v{version}.json", $"{OpenApiDocumentHelper.Title} {OpenApiDocumentHelper.GetVersionName(version)}");
+            }
+
+            options.EnablePersistAuthorization();
+        });
+    };
 }

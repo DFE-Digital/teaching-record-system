@@ -1,9 +1,8 @@
-using System.ComponentModel;
 using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
+using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Requests;
@@ -24,14 +23,14 @@ public class TeacherController : Controller
 
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     [HttpGet]
-    [OpenApiOperation(
-        operationId: "GetCurrentTeacher",
-        summary: "Get the current teacher's details",
-        description: "Gets the details for the authenticated teacher.")]
+    [SwaggerOperation(
+        OperationId = "GetCurrentTeacher",
+        Summary = "Get the current teacher's details",
+        Description = "Gets the details for the authenticated teacher.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Get(
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), Description("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
     {
         var trn = User.FindFirstValue("trn");
 
@@ -56,6 +55,6 @@ public class TeacherController : Controller
 
         return Ok(response);
 
-        IActionResult MissingOrInvalidTrn() => BadRequest();
+        IActionResult MissingOrInvalidTrn() => Forbid();
     }
 }

@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Examples;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Responses;
 
@@ -29,16 +28,4 @@ public class SetIttOutcomeRequest : IRequest<SetIttOutcomeResponse>
 
     [Description("SlugId of Teacher"), FromQuery(Name = "slugid"), JsonIgnore]
     public string SlugId { get; set; }
-}
-
-public class SetQtsRequestExample : IExampleProvider<SetIttOutcomeRequest>
-{
-    public SetIttOutcomeRequest GetExample() => new()
-    {
-        Trn = "1234567",
-        IttProviderUkprn = "1001234",
-        Outcome = IttOutcome.Pass,
-        AssessmentDate = new DateOnly(2021, 12, 22),
-        SlugId = "2c408fff-de46-4a6e-bf5a-e77aa9d36961"
-    };
 }

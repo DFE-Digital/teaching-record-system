@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
+using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
 using TeachingRecordSystem.Api.Infrastructure.Security;
@@ -12,7 +12,6 @@ namespace TeachingRecordSystem.Api.V2.Controllers;
 
 [ApiController]
 [Route("teachers")]
-[Authorize(Policy = AuthorizationPolicies.GetPerson)]
 public class TeachersController : Controller
 {
     private readonly IMediator _mediator;
@@ -23,11 +22,12 @@ public class TeachersController : Controller
     }
 
     [HttpGet("find")]
-    [OpenApiOperation(
-        operationId: "FindTeachers",
-        summary: "Find teachers",
-        description: "Returns teachers matching the specified criteria")]
+    [SwaggerOperation(
+        OperationId = "FindTeachers",
+        Summary = "Find teachers",
+        Description = "Returns teachers matching the specified criteria")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
+    [Authorize(Policy = AuthorizationPolicies.GetPerson)]
     public async Task<IActionResult> FindTeachers(FindTeachersRequest request)
     {
         var response = await _mediator.Send(request);
@@ -35,23 +35,23 @@ public class TeachersController : Controller
     }
 
     [HttpGet("{trn}")]
-    [OpenApiOperation(
-        operationId: "GetTeacher",
-        summary: "Get teacher",
-        description: "Gets an individual teacher by their TRN")]
+    [SwaggerOperation(
+        OperationId = "GetTeacher",
+        Summary = "Get teacher",
+        Description = "Gets an individual teacher by their TRN")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
+    [Authorize(Policy = AuthorizationPolicies.GetPerson)]
     public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)
     {
         var response = await _mediator.Send(request);
         return response != null ? Ok(response) : NotFound();
     }
 
-
     [HttpPatch("update/{trn}")]
-    [OpenApiOperation(
-        operationId: "UpdateTeacher",
-        summary: "Update teacher",
-        description: "Updates a teacher")]
+    [SwaggerOperation(
+        OperationId = "UpdateTeacher",
+        Summary = "Update teacher",
+        Description = "Updates a teacher")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
     [MapError(10002, statusCode: StatusCodes.Status409Conflict)]

@@ -4,6 +4,7 @@ using FluentValidation.AspNetCore;
 using idunno.Authentication.Basic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
@@ -158,7 +159,11 @@ public class Program
 
         services.AddTransient<IApiDescriptionProvider, HybridBodyApiDescriptionProvider>();
 
-        services.AddControllers()
+        services
+            .AddControllers(options =>
+            {
+                options.OutputFormatters.RemoveType<StringOutputFormatter>();
+            })
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Configure();
