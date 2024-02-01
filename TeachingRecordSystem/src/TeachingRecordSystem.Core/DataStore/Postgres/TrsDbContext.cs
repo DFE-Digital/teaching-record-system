@@ -55,6 +55,10 @@ public class TrsDbContext : DbContext
 
     public DbSet<OneLoginUser> OneLoginUsers => Set<OneLoginUser>();
 
+    public DbSet<NameSynonyms> NameSynonyms => Set<NameSynonyms>();
+
+    public DbSet<PersonSearchAttribute> PersonSearchAttributes => Set<PersonSearchAttribute>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);

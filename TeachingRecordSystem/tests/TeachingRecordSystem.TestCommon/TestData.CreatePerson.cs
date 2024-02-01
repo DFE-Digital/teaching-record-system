@@ -35,6 +35,7 @@ public partial class TestData
         private string? _mobileNumber;
         private Contact_GenderCode? _gender;
         private bool? _hasNationalInsuranceNumber;
+        private string? _nationalInsuranceNumber;
         private readonly List<MandatoryQualificationInfo> _mandatoryQualifications = new();
         private readonly List<QtsRegistration> _qtsRegistrations = new();
         private readonly List<Sanction> _sanctions = [];
@@ -158,14 +159,16 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithNationalInsuranceNumber(bool? hasNationalInsuranceNumber = true)
+        public CreatePersonBuilder WithNationalInsuranceNumber(bool? hasNationalInsuranceNumber = true, string? nationalInsuranceNumber = null)
         {
-            if (_hasNationalInsuranceNumber is not null && _hasNationalInsuranceNumber != hasNationalInsuranceNumber)
+            if ((_hasNationalInsuranceNumber is not null && _hasNationalInsuranceNumber != hasNationalInsuranceNumber)
+                || (_nationalInsuranceNumber is not null && _nationalInsuranceNumber != nationalInsuranceNumber))
             {
                 throw new InvalidOperationException("WithNationalInsuranceNumber cannot be changed after it's set.");
             }
 
             _hasNationalInsuranceNumber = hasNationalInsuranceNumber;
+            _nationalInsuranceNumber = nationalInsuranceNumber;
             return this;
         }
 
@@ -226,7 +229,7 @@ public partial class TestData
 
             if (_hasNationalInsuranceNumber ?? false)
             {
-                contact.dfeta_NINumber = testData.GenerateNationalInsuranceNumber();
+                contact.dfeta_NINumber = _nationalInsuranceNumber ?? testData.GenerateNationalInsuranceNumber();
             }
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);

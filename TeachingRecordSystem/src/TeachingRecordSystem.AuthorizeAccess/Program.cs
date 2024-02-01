@@ -16,6 +16,7 @@ using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.PersonSearch;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
@@ -101,7 +102,8 @@ builder.Services
     })
     .AddSingleton<ICurrentUserIdProvider, DummyCurrentUserIdProvider>()
     .AddTransient<SignInJourneyHelper>()
-    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
+    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
+    .AddPersonSearch();
 
 builder.Services.AddOptions<AuthorizeAccessOptions>()
     .Bind(builder.Configuration)
