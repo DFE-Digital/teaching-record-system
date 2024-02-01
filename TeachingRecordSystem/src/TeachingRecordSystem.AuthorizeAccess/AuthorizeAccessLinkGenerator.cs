@@ -1,22 +1,17 @@
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Options;
 using TeachingRecordSystem.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
-public class AuthorizeAccessLinkGenerator(LinkGenerator linkGenerator, IOptions<AuthorizeAccessOptions> optionsAccessor)
+public abstract class AuthorizeAccessLinkGenerator
 {
-    public string Start(JourneyInstanceId journeyInstanceId, bool skipDebugPage = false) => optionsAccessor.Value.ShowDebugPages && !skipDebugPage ?
-        DebugIdentity(journeyInstanceId) :
-        Nino(journeyInstanceId);
-
     public string DebugIdentity(JourneyInstanceId journeyInstanceId) => GetRequiredPathByPage("/DebugIdentity", journeyInstanceId: journeyInstanceId);
 
     public string Nino(JourneyInstanceId journeyInstanceId) => GetRequiredPathByPage("/Nino", journeyInstanceId: journeyInstanceId);
 
-    private string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
+    protected virtual string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {
-        var url = linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
+        var url = GetRequiredPathByPage(page, handler, routeValues);
 
         if (journeyInstanceId?.UniqueKey is string journeyInstanceUniqueKey)
         {
@@ -25,4 +20,12 @@ public class AuthorizeAccessLinkGenerator(LinkGenerator linkGenerator, IOptions<
 
         return url;
     }
+
+    protected abstract string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null);
+}
+
+public class RoutingAuthorizeAccessLinkGenerator(LinkGenerator linkGenerator) : AuthorizeAccessLinkGenerator
+{
+    protected override string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null) =>
+        linkGenerator.GetPathByPage(page, handler, values: routeValues) ?? throw new InvalidOperationException("Page was not found.");
 }

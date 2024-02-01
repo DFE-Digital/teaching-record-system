@@ -92,7 +92,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 
 builder.Services
     .AddTrsBaseServices()
-    .AddTransient<AuthorizeAccessLinkGenerator>()
+    .AddTransient<AuthorizeAccessLinkGenerator, RoutingAuthorizeAccessLinkGenerator>()
     .AddTransient<FormFlowJourneySignInHandler>()
     .AddTransient<MatchToTeachingRecordAuthenticationHandler>()
     .AddFormFlow(options =>
