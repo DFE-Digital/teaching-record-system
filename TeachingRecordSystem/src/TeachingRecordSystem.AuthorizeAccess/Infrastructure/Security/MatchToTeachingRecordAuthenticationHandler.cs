@@ -5,9 +5,7 @@ using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
-public class MatchToTeachingRecordAuthenticationHandler(
-    SignInJourneyHelper helper,
-    AuthorizeAccessLinkGenerator linkGenerator) : IAuthenticationHandler
+public class MatchToTeachingRecordAuthenticationHandler(SignInJourneyHelper helper) : IAuthenticationHandler
 {
     private AuthenticationScheme? _scheme;
     private HttpContext? _context;
@@ -37,18 +35,14 @@ public class MatchToTeachingRecordAuthenticationHandler(
     {
         EnsureInitialized();
 
-        properties ??= new();
-        properties.RedirectUri ??= "/";
-
         var journeyInstance = await helper.UserInstanceStateProvider.GetOrCreateSignInJourneyInstanceAsync(
             _context,
-            createState: () => new SignInJourneyState(properties.RedirectUri!, properties),
+            createState: () => new SignInJourneyState(properties?.RedirectUri ?? "/", properties),
             updateState: state => state.Reset());
 
         var delegatedProperties = new AuthenticationProperties();
-        delegatedProperties.RedirectUri = linkGenerator.Start(journeyInstance.InstanceId);
         delegatedProperties.Items.Add(FormFlowJourneySignInHandler.PropertyKeys.JourneyInstanceId, journeyInstance.InstanceId.Serialize());
-        await _context!.ChallengeAsync(OneLoginDefaults.AuthenticationScheme, delegatedProperties);
+        await _context.ChallengeAsync(OneLoginDefaults.AuthenticationScheme, delegatedProperties);
     }
 
     public Task ForbidAsync(AuthenticationProperties? properties)

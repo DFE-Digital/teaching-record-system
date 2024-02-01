@@ -63,7 +63,15 @@ public class FormFlowJourneySignInHandler(SignInJourneyHelper helper) : IAuthent
 
         var ticket = new AuthenticationTicket(user, properties, _scheme.Name);
 
-        await journeyInstance.UpdateStateAsync(async state => await helper.OnSignedInWithOneLogin(state, ticket));
+        var result = await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
+
+        // Override the redirect done by RemoteAuthenticationHandler
+        _context.Response.OnStarting(
+            () =>
+            {
+                _context.Response.Redirect(result.Location);
+                return Task.CompletedTask;
+            });
     }
 
     public async Task SignOutAsync(AuthenticationProperties? properties)

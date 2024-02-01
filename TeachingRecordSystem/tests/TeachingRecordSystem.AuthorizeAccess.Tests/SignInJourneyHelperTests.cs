@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Moq.Protected;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.FormFlow;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.TestCommon;
@@ -16,12 +17,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
+            var linkGenerator = GetMockLinkGenerator();
             var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
             var userInstanceStateProvider = new InMemoryInstanceStateProvider();
             var clock = new TestableClock();
-            var helper = new SignInJourneyHelper(dbContext, options, userInstanceStateProvider, clock);
+            var helper = new SignInJourneyHelper(dbContext, linkGenerator, options, userInstanceStateProvider, clock);
 
             var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var journeyInstance = await CreateJourneyInstance(state);
 
             var firstName = Faker.Name.First();
             var lastName = Faker.Name.Last();
@@ -29,7 +32,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var ticket = CreateOneLoginAuthenticationTicket(firstName: firstName, lastName: lastName, dateOfBirth: dateOfBirth);
 
             // Act
-            await helper.OnSignedInWithOneLogin(state, ticket);
+            await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
@@ -45,17 +48,19 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
+            var linkGenerator = GetMockLinkGenerator();
             var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
             var userInstanceStateProvider = new InMemoryInstanceStateProvider();
             var clock = new TestableClock();
-            var helper = new SignInJourneyHelper(dbContext, options, userInstanceStateProvider, clock);
+            var helper = new SignInJourneyHelper(dbContext, linkGenerator, options, userInstanceStateProvider, clock);
 
             var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var journeyInstance = await CreateJourneyInstance(state);
 
             var ticket = CreateOneLoginAuthenticationTicket(createCoreIdentityVc: false);
 
             // Act
-            await helper.OnSignedInWithOneLogin(state, ticket);
+            await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
@@ -69,21 +74,23 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
+            var linkGenerator = GetMockLinkGenerator();
             var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
             var userInstanceStateProvider = new InMemoryInstanceStateProvider();
             var clock = new TestableClock();
-            var helper = new SignInJourneyHelper(dbContext, options, userInstanceStateProvider, clock);
+            var helper = new SignInJourneyHelper(dbContext, linkGenerator, options, userInstanceStateProvider, clock);
 
             var person = await TestData.CreatePerson(b => b.WithTrn(true));
             var user = await TestData.CreateOneLoginUser(personId: person.PersonId);
             clock.Advance();
 
             var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var journeyInstance = await CreateJourneyInstance(state);
 
             var ticket = CreateOneLoginAuthenticationTicket(user);
 
             // Act
-            await helper.OnSignedInWithOneLogin(state, ticket);
+            await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
 
             // Assert
             user = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject);
@@ -99,20 +106,22 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
+            var linkGenerator = GetMockLinkGenerator();
             var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
             var userInstanceStateProvider = new InMemoryInstanceStateProvider();
             var clock = new TestableClock();
-            var helper = new SignInJourneyHelper(dbContext, options, userInstanceStateProvider, clock);
+            var helper = new SignInJourneyHelper(dbContext, linkGenerator, options, userInstanceStateProvider, clock);
 
             var user = await TestData.CreateOneLoginUser(personId: null);
             clock.Advance();
 
             var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var journeyInstance = await CreateJourneyInstance(state);
 
             var ticket = CreateOneLoginAuthenticationTicket(user);
 
             // Act
-            await helper.OnSignedInWithOneLogin(state, ticket);
+            await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
 
             // Assert
             user = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject);
@@ -127,12 +136,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
+            var linkGenerator = GetMockLinkGenerator();
             var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
             var userInstanceStateProvider = new InMemoryInstanceStateProvider();
             var clock = new TestableClock();
-            var helper = new SignInJourneyHelper(dbContext, options, userInstanceStateProvider, clock);
+            var helper = new SignInJourneyHelper(dbContext, linkGenerator, options, userInstanceStateProvider, clock);
 
             var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var journeyInstance = await CreateJourneyInstance(state);
 
             var subject = Faker.Internet.UserName();
             var email = Faker.Internet.Email();
@@ -142,7 +153,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var ticket = CreateOneLoginAuthenticationTicket(sub: subject, email, firstName, lastName, dateOfBirth);
 
             // Act
-            await helper.OnSignedInWithOneLogin(state, ticket);
+            await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
 
             // Assert
             var user = await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == subject);
@@ -215,5 +226,24 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         var principal = new ClaimsPrincipal(identity);
 
         return new AuthenticationTicket(principal, authenticationScheme: "OneLogin");
+    }
+
+    private AuthorizeAccessLinkGenerator GetMockLinkGenerator()
+    {
+        var mock = new Mock<AuthorizeAccessLinkGenerator>();
+
+        mock.Protected()
+            .Setup<string>("GetRequiredPathByPage", ItExpr.IsNull<string>(), ItExpr.IsNull<string>(), ItExpr.IsNull<object>())
+            .Returns<string, string, object>((page, handler, routeValues) =>
+            {
+                if (handler is not null || routeValues is not null)
+                {
+                    throw new NotImplementedException();
+                }
+
+                return page;
+            });
+
+        return mock.Object;
     }
 }

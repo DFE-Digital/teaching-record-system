@@ -15,7 +15,6 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 public class DebugIdentityModel(
     TrsDbContext dbContext,
     SignInJourneyHelper helper,
-    AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor) : PageModel
 {
     private OneLoginUser? _oneLoginUser;
@@ -117,9 +116,8 @@ public class DebugIdentityModel(
             await dbContext.SaveChangesAsync();
         }
 
-        await helper.CreateOrUpdateOneLoginUser(JourneyInstance.State);
-
-        return Redirect(linkGenerator.Start(JourneyInstance.InstanceId, skipDebugPage: true));
+        var nextPage = await helper.CreateOrUpdateOneLoginUser(JourneyInstance);
+        return nextPage.ToActionResult();
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

@@ -2,52 +2,62 @@ using System.Security.Claims;
 using System.Text.Json;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
 public class SignInJourneyHelper(
     TrsDbContext dbContext,
+    AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
     IUserInstanceStateProvider userInstanceStateProvider,
     IClock clock)
 {
     public IUserInstanceStateProvider UserInstanceStateProvider { get; } = userInstanceStateProvider;
 
-    public async Task OnSignedInWithOneLogin(SignInJourneyState state, AuthenticationTicket ticket)
+    public bool ShowDebugPages => optionsAccessor.Value.ShowDebugPages;
+
+    public async Task<NextPageInfo> OnSignedInWithOneLogin(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
     {
-        state.Reset();
-        state.OneLoginAuthenticationTicket = ticket;
-
-        var vc = ticket.Principal.FindFirstValue("vc") is string vcStr ? JsonDocument.Parse(vcStr) : null;
-        state.IdentityVerified = vc is not null;
-        if (state.IdentityVerified)
+        await journeyInstance.UpdateStateAsync(state =>
         {
-            state.VerifiedNames = ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray();
-            state.VerifiedDatesOfBirth = ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray();
+            state.Reset();
+            state.OneLoginAuthenticationTicket = ticket;
+
+            var vc = ticket.Principal.FindFirstValue("vc") is string vcStr ? JsonDocument.Parse(vcStr) : null;
+            state.IdentityVerified = vc is not null;
+            if (state.IdentityVerified)
+            {
+                state.VerifiedNames = ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray();
+                state.VerifiedDatesOfBirth = ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray();
+            }
+        });
+
+        if (ShowDebugPages)
+        {
+            return new NextPageInfo(linkGenerator.DebugIdentity(journeyInstance.InstanceId));
         }
 
-        if (!optionsAccessor.Value.ShowDebugPages)
-        {
-            await CreateOrUpdateOneLoginUser(state);
-        }
+        return await CreateOrUpdateOneLoginUser(journeyInstance);
     }
 
-    public async Task CreateOrUpdateOneLoginUser(SignInJourneyState state)
+    public async Task<NextPageInfo> CreateOrUpdateOneLoginUser(JourneyInstance<SignInJourneyState> journeyInstance)
     {
-        if (state.OneLoginAuthenticationTicket is null)
+        if (journeyInstance.State.OneLoginAuthenticationTicket is null)
         {
-            throw new InvalidOperationException($"{nameof(state.OneLoginAuthenticationTicket)} is not set.");
+            throw new InvalidOperationException($"{nameof(journeyInstance.State.OneLoginAuthenticationTicket)} is not set.");
         }
 
-        var subject = state.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
-        var email = state.OneLoginAuthenticationTicket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
-        var vc = state.OneLoginAuthenticationTicket.Principal.FindFirstValue("vc") is string vcStr ? JsonDocument.Parse(vcStr) : null;
+        var subject = journeyInstance.State.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
+        var email = journeyInstance.State.OneLoginAuthenticationTicket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
+        var vc = journeyInstance.State.OneLoginAuthenticationTicket.Principal.FindFirstValue("vc") is string vcStr ? JsonDocument.Parse(vcStr) : null;
 
         var oneLoginUser = await dbContext.OneLoginUsers
             .Include(o => o.Person)
@@ -63,7 +73,7 @@ public class SignInJourneyHelper(
             {
                 oneLoginUser.LastSignIn = clock.UtcNow;
 
-                CreateAndAssignPrincipal(state, oneLoginUser.Person.PersonId, oneLoginUser.Person.Trn!);
+                CreateAndAssignPrincipal(journeyInstance.State, oneLoginUser.Person.PersonId, oneLoginUser.Person.Trn!);
             }
         }
         else
@@ -80,7 +90,29 @@ public class SignInJourneyHelper(
         }
 
         await dbContext.SaveChangesAsync();
+
+        return GetNextPage(journeyInstance);
     }
+
+    public NextPageInfo GetNextPage(JourneyInstance<SignInJourneyState> journeyInstance) => journeyInstance.State switch
+    {
+        // Authentication is complete
+        { AuthenticationTicket: not null } => new NextPageInfo(journeyInstance.State.RedirectUri),
+
+        // Authenticated with OneLogin, identity verification succeeded, person lookup failed
+        // TODO
+
+        // Authenticated with OneLogin, identity verification succeeded, TRN not yet specified
+        // TODO
+
+        // Authenticated with OneLogin, identity verification succeeded, NINO not yet specified
+        { OneLoginAuthenticationTicket: not null } => new NextPageInfo(linkGenerator.Nino(journeyInstance.InstanceId)),
+
+        // Authenticated with OneLogin, identity verification failed
+        // TODO
+
+        _ => throw new InvalidOperationException("Cannot determine next page.")
+    };
 
     private static void CreateAndAssignPrincipal(SignInJourneyState state, Guid personId, string trn)
     {
@@ -101,4 +133,9 @@ public class SignInJourneyHelper(
 
         state.AuthenticationTicket = new AuthenticationTicket(principal, state.AuthenticationProperties, AuthenticationSchemes.MatchToTeachingRecord);
     }
+}
+
+public sealed record NextPageInfo(string Location)
+{
+    public IActionResult ToActionResult() => new RedirectResult(Location);
 }
