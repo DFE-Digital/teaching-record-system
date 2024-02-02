@@ -1,26 +1,37 @@
 using System.Collections.Immutable;
-using MediatR;
 using Microsoft.Xrm.Sdk.Query;
-using TeachingRecordSystem.Api.V3.ApiModels;
-using TeachingRecordSystem.Api.V3.Requests;
-using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
-namespace TeachingRecordSystem.Api.V3.Handlers;
+namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
-public class FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfiguration configuration) :
-    IRequestHandler<FindTeachersRequest, FindTeachersResponse>
+public record FindTeachersCommand(string LastName, DateOnly? DateOfBirth);
+
+public record FindTeachersResult(int Total, IReadOnlyCollection<FindTeachersResultItem> Items);
+
+public record FindTeachersResultItem
 {
-    private readonly TimeSpan _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue<int>("ConcurrentNameChangeWindowSeconds", 5));
+    public required string Trn { get; init; }
+    public required DateOnly DateOfBirth { get; init; }
+    public required string FirstName { get; init; }
+    public required string MiddleName { get; init; }
+    public required string LastName { get; init; }
+    public required IReadOnlyCollection<SanctionInfo> Sanctions { get; init; }
+    public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
+}
 
-    public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
+public class FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfiguration configuration)
+{
+    private readonly TimeSpan _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue("ConcurrentNameChangeWindowSeconds", 5));
+
+    public async Task<FindTeachersResult> Handle(FindTeachersCommand command)
     {
         var contacts = await crmQueryDispatcher.ExecuteQuery(
             new GetContactsByLastNameAndDateOfBirthQuery(
-                request.LastName!,
-                request.DateOfBirth!.Value,
+                command.LastName!,
+                command.DateOfBirth!.Value,
                 new ColumnSet(
                     Contact.Fields.dfeta_TRN,
                     Contact.Fields.BirthDate,
@@ -44,11 +55,9 @@ public class FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfig
                 kvp => kvp.Key,
                 kvp => PreviousNameHelper.GetFullPreviousNames(kvp.Value, contactsById[kvp.Key], _concurrentNameChangeWindow));
 
-        return new FindTeachersResponse()
-        {
-            Query = request,
-            Total = contacts.Length,
-            Results = contacts.Select(r => new FindTeachersResponseResult()
+        return new FindTeachersResult(
+            Total: contacts.Length,
+            Items: contacts.Select(r => new FindTeachersResultItem()
             {
                 Trn = r.dfeta_TRN,
                 DateOfBirth = r.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),
@@ -73,7 +82,6 @@ public class FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfig
                     .AsReadOnly()
             })
             .OrderBy(c => c.Trn)
-            .AsReadOnly()
-        };
+            .AsReadOnly());
     }
 }

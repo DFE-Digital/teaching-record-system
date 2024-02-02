@@ -1,11 +1,15 @@
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.V3.Core.Operations;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Api.V3.V20240101.Requests;
+using TeachingRecordSystem.Api.V3.V20240101.Responses;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
@@ -86,9 +90,20 @@ public class TeachersController : ControllerBase
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.GetPerson)]
-    public async Task<IActionResult> FindTeachers(FindTeachersRequest request)
+    public async Task<IActionResult> FindTeachers(
+        FindTeachersRequest request,
+        [FromServices] FindTeachersHandler handler)
     {
-        var response = await _mediator.Send(request);
+        var command = new FindTeachersCommand(request.LastName!, request.DateOfBirth!.Value);
+        var result = await handler.Handle(command);
+
+        var response = new FindTeachersResponse()
+        {
+            Total = result.Total,
+            Query = request,
+            Results = result.Items.Select(i => i.Adapt<FindTeachersResponseResult>()).AsReadOnly()
+        };
+
         return Ok(response);
     }
 }
