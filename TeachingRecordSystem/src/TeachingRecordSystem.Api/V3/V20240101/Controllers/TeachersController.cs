@@ -1,8 +1,7 @@
-using System.ComponentModel;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
+using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Requests;
@@ -22,18 +21,17 @@ public class TeachersController : ControllerBase
     }
 
     [HttpGet("{trn}")]
-    [OpenApiOperation(
-        operationId: "GetTeacherByTrn",
-        summary: "Get teacher details by TRN",
-        description: "Gets the details of the teacher corresponding to the given TRN.")]
+    [SwaggerOperation(
+        OperationId = "GetTeacherByTrn",
+        Summary = "Get teacher details by TRN",
+        Description = "Gets the details of the teacher corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.GetPerson)]
     public async Task<IActionResult> Get(
         [FromRoute] string trn,
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), Description("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
     {
         var request = new GetTeacherRequest()
         {
@@ -53,10 +51,10 @@ public class TeachersController : ControllerBase
     }
 
     [HttpPost("name-changes")]
-    [OpenApiOperation(
-        operationId: "CreateNameChange",
-        summary: "Create name change request",
-        description: "Creates a name change request for the teacher with the given TRN.")]
+    [SwaggerOperation(
+        OperationId = "CreateNameChange",
+        Summary = "Create name change request",
+        Description = "Creates a name change request for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
@@ -67,10 +65,10 @@ public class TeachersController : ControllerBase
     }
 
     [HttpPost("date-of-birth-changes")]
-    [OpenApiOperation(
-        operationId: "CreateDobChange",
-        summary: "Create DOB change request",
-        description: "Creates a date of birth change request for the teacher with the given TRN.")]
+    [SwaggerOperation(
+        OperationId = "CreateDobChange",
+        Summary = "Create DOB change request",
+        Description = "Creates a date of birth change request for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
@@ -81,10 +79,10 @@ public class TeachersController : ControllerBase
     }
 
     [HttpGet("")]
-    [OpenApiOperation(
-        operationId: "FindTeachers",
-        summary: "Find teachers",
-        description: "Finds teachers with a TRN matching the specified criteria.")]
+    [SwaggerOperation(
+        OperationId = "FindTeachers",
+        Summary = "Find teachers",
+        Description = "Finds teachers with a TRN matching the specified criteria.")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.GetPerson)]

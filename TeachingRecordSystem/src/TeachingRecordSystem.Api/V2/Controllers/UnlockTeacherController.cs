@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
+using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
@@ -21,10 +21,10 @@ public class UnlockTeacherController : ControllerBase
     }
 
     [HttpPut("{teacherId}")]
-    [OpenApiOperation(
-        operationId: "UnlockTeacher",
-        summary: "Unlock teacher",
-        description: "Unlocks the teacher record allowing the teacher to sign in to the portals")]
+    [SwaggerOperation(
+        OperationId = "UnlockTeacher",
+        Summary = "Unlock teacher",
+        Description = "Unlocks the teacher record allowing the teacher to sign in to the portals")]
     [ProducesResponseType(typeof(UnlockTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UnlockTeacher([FromRoute] UnlockTeacherRequest request)

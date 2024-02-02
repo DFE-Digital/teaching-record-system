@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
+using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.Requests;
@@ -21,10 +21,10 @@ public class NpqQualificationsController : ControllerBase
     }
 
     [HttpPut]
-    [OpenApiOperation(
-        operationId: "SetNpqQualification",
-        summary: "Set NPQ qualification",
-        description: "Sets the NPQ qualification for a teacher and qualification type")]
+    [SwaggerOperation(
+        OperationId = "SetNpqQualification",
+        Summary = "Set NPQ qualification",
+        Description = "Sets the NPQ qualification for a teacher and qualification type")]
     [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
     [MapError(10002, statusCode: StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]

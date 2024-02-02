@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using TeachingRecordSystem.Api.Infrastructure.OpenApi;
 
 namespace TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 
@@ -27,7 +28,7 @@ public class ApiVersionConvention : IControllerModelConvention
         }
 
         // Group name is used to partition the operations by version into different swagger docs
-        controller.ApiExplorer.GroupName = $"v{version}";
+        controller.ApiExplorer.GroupName = OpenApiDocumentHelper.GetDocumentName(version);
 
         // Store the version so other components can easily query it later
         controller.Properties.Add("Version", version);

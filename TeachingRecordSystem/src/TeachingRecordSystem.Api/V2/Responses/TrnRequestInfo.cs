@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using NSwag.Examples;
 using Optional;
 
 namespace TeachingRecordSystem.Api.V2.Responses;
@@ -22,17 +21,4 @@ public class TrnRequestInfo
     public string? SlugId { get; set; }
 
     public required Option<string> AccessYourTeachingQualificationsLink { get; set; }
-}
-
-public class TrnRequestInfoExample : IExampleProvider<TrnRequestInfo>
-{
-    public TrnRequestInfo GetExample() => new()
-    {
-        RequestId = "72888c5d-db14-4222-829b-7db9c2ec0dc3",
-        Status = TrnRequestStatus.Completed,
-        Trn = "1234567",
-        PotentialDuplicate = false,
-        QtsDate = null,
-        AccessYourTeachingQualificationsLink = Option.Some("https://urltoaccessyourteachingqualifications")
-    };
 }

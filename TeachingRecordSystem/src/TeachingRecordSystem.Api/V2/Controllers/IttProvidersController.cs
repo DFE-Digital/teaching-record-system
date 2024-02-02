@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
+using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
@@ -21,10 +21,10 @@ public class IttProvidersController : ControllerBase
     }
 
     [HttpGet("")]
-    [OpenApiOperation(
-        operationId: "GetIttProviders",
-        summary: "Get ITT Providers",
-        description: "Gets the list of ITT providers")]
+    [SwaggerOperation(
+        OperationId = "GetIttProviders",
+        Summary = "Get ITT Providers",
+        Description = "Gets the list of ITT providers")]
     [ProducesResponseType(typeof(GetIttProvidersResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetIttProviders()
     {
