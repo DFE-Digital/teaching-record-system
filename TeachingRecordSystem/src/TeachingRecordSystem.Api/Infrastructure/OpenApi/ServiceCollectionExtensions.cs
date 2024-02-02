@@ -8,7 +8,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddExampleProviders(typeof(Program).Assembly);
 
-        foreach (var version in Api.Constants.Versions)
+        foreach (var version in Constants.AllVersions)
         {
             services.AddOpenApiDocument((settings, provider) =>
             {

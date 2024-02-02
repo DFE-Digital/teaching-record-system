@@ -18,7 +18,7 @@ public class OpenApiEndpointsStartupFilter : IStartupFilter
     {
         next(app);
 
-        foreach (var version in Api.Constants.Versions)
+        foreach (var version in Constants.AllVersions)
         {
             app.UseOpenApi(settings =>
             {
@@ -36,7 +36,7 @@ public class OpenApiEndpointsStartupFilter : IStartupFilter
 
         app.UseSwaggerUi(settings =>
         {
-            foreach (var version in Api.Constants.Versions)
+            foreach (var version in Constants.AllVersions)
             {
                 settings.SwaggerRoutes.Add(new NSwag.AspNetCore.SwaggerUi3Route($"v{version}", OpenApiDocumentHelper.GetDocumentPath(version)));
             }

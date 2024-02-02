@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 
-namespace TeachingRecordSystem.Api.V3.Controllers;
+namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey)]

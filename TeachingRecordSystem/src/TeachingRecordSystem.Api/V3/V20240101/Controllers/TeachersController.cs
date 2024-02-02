@@ -8,7 +8,7 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
 
-namespace TeachingRecordSystem.Api.V3.Controllers;
+namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
 [ApiController]
 [Route("teachers")]
