@@ -1,10 +1,9 @@
 using System.Security.Claims;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.V3.Requests;
+using TeachingRecordSystem.Api.V3.Core.Operations;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
@@ -13,13 +12,6 @@ namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
 public class CertificatesController : Controller
 {
-    private readonly IMediator _mediator;
-
-    public CertificatesController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet]
     [Route("qts")]
     [SwaggerOperation(
@@ -29,7 +21,7 @@ public class CertificatesController : Controller
     [Produces("application/pdf")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetQts()
+    public async Task<IActionResult> GetQts([FromServices] GetQtsCertificateHandler handler)
     {
         var trn = User.FindFirstValue("trn");
         if (trn is null)
@@ -37,21 +29,15 @@ public class CertificatesController : Controller
             return NotFound();
         }
 
-        var request = new GetQtsCertificateRequest()
-        {
-            Trn = trn
-        };
+        var command = new GetQtsCertificateCommand(trn);
+        var result = await handler.Handle(command);
 
-        var response = await _mediator.Send(request);
-        if (response is null)
+        if (result is null)
         {
             return NotFound();
         }
 
-        return new FileStreamResult(response.FileContents, "application/pdf")
-        {
-            FileDownloadName = response.FileDownloadName
-        };
+        return result.ToFileResult();
     }
 
     [HttpGet]
@@ -63,7 +49,7 @@ public class CertificatesController : Controller
     [Produces("application/pdf")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEyts()
+    public async Task<IActionResult> GetEyts([FromServices] GetEytsCertificateHandler handler)
     {
         var trn = User.FindFirstValue("trn");
         if (trn is null)
@@ -71,21 +57,15 @@ public class CertificatesController : Controller
             return NotFound();
         }
 
-        var request = new GetEytsCertificateRequest()
-        {
-            Trn = trn
-        };
+        var command = new GetEytsCertificateCommand(trn);
+        var result = await handler.Handle(command);
 
-        var response = await _mediator.Send(request);
-        if (response is null)
+        if (result is null)
         {
             return NotFound();
         }
 
-        return new FileStreamResult(response.FileContents, "application/pdf")
-        {
-            FileDownloadName = response.FileDownloadName
-        };
+        return result.ToFileResult();
     }
 
     [HttpGet]
@@ -97,7 +77,7 @@ public class CertificatesController : Controller
     [Produces("application/pdf")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetInduction()
+    public async Task<IActionResult> GetInduction([FromServices] GetInductionCertificateHandler handler)
     {
         var trn = User.FindFirstValue("trn");
         if (trn is null)
@@ -105,21 +85,15 @@ public class CertificatesController : Controller
             return NotFound();
         }
 
-        var request = new GetInductionCertificateRequest()
-        {
-            Trn = trn
-        };
+        var command = new GetInductionCertificateCommand(trn);
+        var result = await handler.Handle(command);
 
-        var response = await _mediator.Send(request);
-        if (response is null)
+        if (result is null)
         {
             return NotFound();
         }
 
-        return new FileStreamResult(response.FileContents, "application/pdf")
-        {
-            FileDownloadName = response.FileDownloadName
-        };
+        return result.ToFileResult();
     }
 
     [HttpGet]
@@ -132,7 +106,8 @@ public class CertificatesController : Controller
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetNpq(
-        [FromRoute, SwaggerParameter("The ID of the qualification record associated with the certificate.")] Guid qualificationId)
+        [FromRoute, SwaggerParameter("The ID of the qualification record associated with the certificate.")] Guid qualificationId,
+        [FromServices] GetNpqCertificateHandler handler)
     {
         var trn = User.FindFirstValue("trn");
         if (trn is null)
@@ -140,21 +115,14 @@ public class CertificatesController : Controller
             return NotFound();
         }
 
-        var request = new GetNpqCertificateRequest()
-        {
-            QualificationId = qualificationId,
-            Trn = trn
-        };
+        var command = new GetNpqCertificateCommand(trn, qualificationId);
+        var result = await handler.Handle(command);
 
-        var response = await _mediator.Send(request);
-        if (response is null)
+        if (result is null)
         {
             return NotFound();
         }
 
-        return new FileStreamResult(response.FileContents, "application/pdf")
-        {
-            FileDownloadName = response.FileDownloadName
-        };
+        return result.ToFileResult();
     }
 }

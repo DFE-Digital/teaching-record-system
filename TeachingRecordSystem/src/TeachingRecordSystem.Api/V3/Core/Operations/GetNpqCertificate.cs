@@ -1,32 +1,22 @@
 using System.Text;
-using MediatR;
-using TeachingRecordSystem.Api.V3.Requests;
-using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.Certificates;
 
-namespace TeachingRecordSystem.Api.V3.Handlers;
+namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
-public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest, GetCertificateResponse?>
+public record GetNpqCertificateCommand(string Trn, Guid QualificationId);
+
+public class GetNpqCertificateHandler(IDataverseAdapter dataverseAdapter, ICertificateGenerator certificateGenerator)
 {
     private const string FullNameFormField = "Full Name";
     private const string PassDateFormField = "Pass Date";
-    private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly ICertificateGenerator _certificateGenerator;
 
-    public GetNpqCertificateHandler(
-        IDataverseAdapter dataverseAdapter,
-        ICertificateGenerator certificateGenerator)
+    public async Task<FileDownloadInfo?> Handle(GetNpqCertificateCommand command)
     {
-        _dataverseAdapter = dataverseAdapter;
-        _certificateGenerator = certificateGenerator;
-    }
-
-    public async Task<GetCertificateResponse?> Handle(GetNpqCertificateRequest request, CancellationToken cancellationToken)
-    {
-        var qualification = await _dataverseAdapter.GetQualificationById(
-            request.QualificationId,
+        var qualification = await dataverseAdapter.GetQualificationById(
+            command.QualificationId,
             columnNames: new[]
             {
                 dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
@@ -43,17 +33,16 @@ public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest
                 Contact.Fields.dfeta_TRN
             });
 
-        if (qualification == null
-            || !qualification.dfeta_CompletionorAwardDate.HasValue
-            || !qualification.dfeta_Type!.Value.IsNpq()
-            || qualification.StateCode != dfeta_qualificationState.Active)
+        if (qualification == null ||
+            !qualification.dfeta_CompletionorAwardDate.HasValue ||
+            !qualification.dfeta_Type!.Value.IsNpq() ||
+            qualification.StateCode != dfeta_qualificationState.Active)
         {
             return null;
         }
 
         var teacher = qualification.Extract<Contact>(Contact.EntityLogicalName, Contact.PrimaryIdAttribute);
-        if (teacher == null
-            || teacher.dfeta_TRN != request.Trn)
+        if (teacher == null || teacher.dfeta_TRN != command.Trn)
         {
             return null;
         }
@@ -73,12 +62,8 @@ public class GetNpqCertificateHandler : IRequestHandler<GetNpqCertificateRequest
             { PassDateFormField, qualification.dfeta_CompletionorAwardDate.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("d MMMM yyyy") }
         };
 
-        var pdfStream = await _certificateGenerator.GenerateCertificate($"{qualification.dfeta_Type} Certificate.pdf", fieldValues);
+        var pdfStream = await certificateGenerator.GenerateCertificate($"{qualification.dfeta_Type} Certificate.pdf", fieldValues);
 
-        return new GetCertificateResponse()
-        {
-            FileDownloadName = $"{qualification.dfeta_Type}Certificate.pdf",
-            FileContents = pdfStream
-        };
+        return new FileDownloadInfo(pdfStream, $"{qualification.dfeta_Type}Certificate.pdf", "application/pdf");
     }
 }
