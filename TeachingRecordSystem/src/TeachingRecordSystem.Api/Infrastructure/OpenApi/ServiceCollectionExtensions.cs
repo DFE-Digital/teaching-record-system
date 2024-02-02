@@ -34,14 +34,15 @@ public static class ServiceCollectionExtensions
             options.SchemaFilter<RemoveEnumValuesForFlagsEnumSchemaFilter>();
             options.OperationFilter<ContentTypesOperationFilter>();
             options.OperationFilter<AddSecuritySchemeOperationFilter>();
+            options.DocumentFilter<MinorVersionHeaderDocumentFilter>();
 
-            foreach (var version in Constants.AllVersions)
+            foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions())
             {
                 options.SwaggerDoc(
-                    OpenApiDocumentHelper.GetDocumentName(version),
+                    OpenApiDocumentHelper.GetDocumentName(version, minorVersion),
                     new OpenApiInfo()
                     {
-                        Version = OpenApiDocumentHelper.GetVersionName(version),
+                        Version = OpenApiDocumentHelper.GetVersionName(version, minorVersion),
                         Title = OpenApiDocumentHelper.Title
                     });
             }
@@ -61,13 +62,14 @@ public class OpenApiEndpointsStartupFilter : IStartupFilter
     {
         next(app);
 
-        app.UseSwagger(o => o.RouteTemplate = "/swagger/{documentName}.json");
+        app.UseSwagger(o => o.RouteTemplate = OpenApiDocumentHelper.DocumentRouteTemplate);
 
         app.UseSwaggerUI(options =>
         {
-            foreach (var version in Constants.AllVersions)
+            foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions())
             {
-                options.SwaggerEndpoint($"/swagger/v{version}.json", $"{OpenApiDocumentHelper.Title} {OpenApiDocumentHelper.GetVersionName(version)}");
+                var documentName = OpenApiDocumentHelper.GetDocumentName(version, minorVersion);
+                options.SwaggerEndpoint(OpenApiDocumentHelper.DocumentRouteTemplate.Replace("{documentName}", documentName), documentName);
             }
 
             options.EnablePersistAuthorization();

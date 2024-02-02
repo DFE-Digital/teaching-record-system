@@ -77,9 +77,9 @@ public class BackFillVersionedEndpointsConvention : IApplicationModelConvention
         {
             // Use the version specified in the X-Api-Version header.
             // If the header isn't specified fallback to our default version.
-            var requestedVersion = context.RouteContext.HttpContext.Request.Headers.TryGetValue("X-Api-Version", out var requestedVersionValues) ?
+            var requestedVersion = context.RouteContext.HttpContext.Request.Headers.TryGetValue(VersionRegistry.MinorVersionHeaderName, out var requestedVersionValues) ?
                 requestedVersionValues.ToString() :
-                Constants.DefaultV3MinorVersion;
+                VersionRegistry.DefaultV3MinorVersion;
 
             return acceptedVersions.Contains(requestedVersion);
         }
