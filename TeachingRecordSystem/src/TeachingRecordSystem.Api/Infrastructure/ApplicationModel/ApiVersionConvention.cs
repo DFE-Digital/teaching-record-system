@@ -27,11 +27,7 @@ public class ApiVersionConvention : IControllerModelConvention
             throw new InvalidOperationException($"{controller.ControllerName} is not defined in a properly-versioned namespace.");
         }
 
-        // Group name is used to partition the operations by version into different swagger docs
-        controller.ApiExplorer.GroupName = OpenApiDocumentHelper.GetDocumentName(version);
-
-        // Store the version so other components can easily query it later
-        controller.Properties.Add("Version", version);
+        string? minorVersion = null;
 
         // A V1 operation gets a /v1 route prefix, V2 operation a /v2 route prefix etc.
         {
@@ -55,15 +51,21 @@ public class ApiVersionConvention : IControllerModelConvention
                 throw new InvalidOperationException($"{controller.ControllerName} is not defined within a properly-versioned namespace.");
             }
 
-            var minorVersion = namespaceMinorVersion[1..];
+            minorVersion = namespaceMinorVersion[1..];
 
-            if (!Constants.AllV3MinorVersions.Contains(minorVersion))
+            if (!VersionRegistry.AllV3MinorVersions.Contains(minorVersion))
             {
                 throw new InvalidOperationException(
-                    $"{controller.ControllerName} minor version '{minorVersion}' has not been defined in {nameof(Constants)}.{nameof(Constants.AllV3MinorVersions)}.");
+                    $"{controller.ControllerName} minor version '{minorVersion}' has not been defined in {nameof(VersionRegistry)}.{nameof(VersionRegistry.AllV3MinorVersions)}.");
             }
 
             controller.Properties.Add("MinorVersion", minorVersion);
         }
+
+        // Group name is used to partition the operations by version into different swagger docs
+        controller.ApiExplorer.GroupName = OpenApiDocumentHelper.GetDocumentName(version, minorVersion);
+
+        // Store the version so other components can easily query it later
+        controller.Properties.Add("Version", version);
     }
 }
