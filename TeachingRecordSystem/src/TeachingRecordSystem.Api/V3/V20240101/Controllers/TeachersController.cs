@@ -62,9 +62,12 @@ public class TeachersController : ControllerBase
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
-    public async Task<IActionResult> CreateNameChange([FromBody] CreateNameChangeRequest request)
+    public async Task<IActionResult> CreateNameChange(
+        [FromBody] CreateNameChangeRequestRequest request,
+        [FromServices] CreateNameChangeRequestHandler handler)
     {
-        await _mediator.Send(request);
+        var command = request.Adapt<CreateNameChangeRequestCommand>();
+        await handler.Handle(command);
         return NoContent();
     }
 
@@ -76,9 +79,12 @@ public class TeachersController : ControllerBase
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
-    public async Task<IActionResult> CreateDateOfBirthChange([FromBody] CreateDateOfBirthChangeRequest request)
+    public async Task<IActionResult> CreateDateOfBirthChange(
+        [FromBody] CreateDateOfBirthChangeRequestRequest request,
+        [FromServices] CreateDateOfBirthChangeRequestHandler handler)
     {
-        await _mediator.Send(request);
+        var command = request.Adapt<CreateDateOfBirthChangeRequestCommand>();
+        await handler.Handle(command);
         return NoContent();
     }
 

@@ -1,9 +1,9 @@
 using FluentValidation;
-using TeachingRecordSystem.Api.V3.Requests;
+using TeachingRecordSystem.Api.V3.V20240101.Requests;
 
-namespace TeachingRecordSystem.Api.V3.Validators;
+namespace TeachingRecordSystem.Api.V3.V20240101.Validators;
 
-public class CreateDateOfBirthChangeRequestValidator : AbstractValidator<CreateDateOfBirthChangeRequest>
+public class CreateDateOfBirthChangeRequestValidator : AbstractValidator<CreateDateOfBirthChangeRequestRequest>
 {
     public CreateDateOfBirthChangeRequestValidator()
     {
