@@ -43,5 +43,19 @@ public class TrnRequestsController(IMediator _mediator) : ControllerBase
         """)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public IActionResult GetTrnRequest([FromQuery] string requestId) => throw new NotImplementedException();
+    public async Task<IActionResult> GetTrnRequest([FromQuery] string requestId)
+    {
+        var request = new GetTrnRequest()
+        {
+            RequestId = Guid.Parse(requestId)
+        };
+
+        var response = await _mediator.Send(request);
+
+        if (response is null)
+        {
+            return NotFound();
+        }
+        return Ok(response);
+    }
 }
