@@ -3,6 +3,7 @@ namespace TeachingRecordSystem.Api;
 public static class VersionRegistry
 {
     public const string MinorVersionHeaderName = "X-Api-Version";
+    public const string VNextVersion = "Next";
 
     public static IReadOnlyCollection<int> AllVersions { get; } = [1, 2, 3];
 
@@ -14,19 +15,24 @@ public static class VersionRegistry
 
     public static string DefaultV3MinorVersion => V3MinorVersions.V20240101;
 
-    public static IReadOnlyCollection<(int Version, string? MinorVersion)> GetAllVersions()
+    public static IReadOnlyCollection<(int Version, string? MinorVersion)> GetAllVersions(IConfiguration configuration)
     {
         return Core().AsReadOnly();
 
-        static IEnumerable<(int Version, string? MinorVersion)> Core()
+        IEnumerable<(int Version, string? MinorVersion)> Core()
         {
+            var allowVNextEndpoints = configuration.GetValue<bool>("AllowVNextEndpoints");
+
             foreach (var version in AllVersions)
             {
                 if (version == 3)
                 {
                     foreach (var minorVersion in AllV3MinorVersions)
                     {
-                        yield return (version, minorVersion);
+                        if (minorVersion != VersionRegistry.VNextVersion || allowVNextEndpoints)
+                        {
+                            yield return (version, minorVersion);
+                        }
                     }
                 }
                 else
@@ -40,6 +46,6 @@ public static class VersionRegistry
     public static class V3MinorVersions
     {
         public const string V20240101 = "20240101";
-        public const string VNext = "Next";
+        public const string VNext = VNextVersion;
     }
 }

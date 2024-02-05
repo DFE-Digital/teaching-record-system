@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using TeachingRecordSystem.Api.Infrastructure.OpenApi;
 
 namespace TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 
-public class ApiVersionConvention : IControllerModelConvention
+public class ApiVersionConvention(IConfiguration configuration) : IControllerModelConvention
 {
     public void Apply(ControllerModel controller)
     {
@@ -13,6 +12,8 @@ public class ApiVersionConvention : IControllerModelConvention
         {
             return;
         }
+
+        var allowVNextEndpoints = configuration.GetValue<bool>("AllowVNextEndpoints");
 
         var controllerNamespace = controller.ControllerType.Namespace ??
             throw new InvalidOperationException($"{controller.ControllerType} is not defined within a namespace.");
@@ -59,11 +60,13 @@ public class ApiVersionConvention : IControllerModelConvention
                     $"{controller.ControllerName} minor version '{minorVersion}' has not been defined in {nameof(VersionRegistry)}.{nameof(VersionRegistry.AllV3MinorVersions)}.");
             }
 
+            if (minorVersion == VersionRegistry.VNextVersion && !allowVNextEndpoints)
+            {
+                controller.Application!.Controllers.Remove(controller);
+            }
+
             controller.Properties.Add(Constants.DeclaredMinorVersionPropertyKey, minorVersion);
         }
-
-        // Group name is used to partition the operations by version into different swagger docs
-        controller.ApiExplorer.GroupName = OpenApiDocumentHelper.GetDocumentName(version, minorVersion);
 
         // Store the version so other components can easily query it later
         controller.Properties.Add(Constants.VersionPropertyKey, version);
