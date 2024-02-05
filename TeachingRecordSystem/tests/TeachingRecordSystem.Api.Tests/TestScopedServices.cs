@@ -44,5 +44,4 @@ public class TestScopedServices
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
     public IOptions<AccessYourTeachingQualificationsOptions> AccessYourTeachingQualificationsOptions { get; }
-
 }

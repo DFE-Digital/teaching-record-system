@@ -8,6 +8,7 @@ public static class AuthorizationPolicies
     public const string UpdatePerson = nameof(UpdatePerson);
     public const string UpdateNpq = nameof(UpdateNpq);
     public const string UnlockPerson = nameof(UnlockPerson);
+    public const string CreateTrn = nameof(CreateTrn);
 
     public static bool IsApiKeyAuthentication(string policy)
     {
@@ -18,6 +19,7 @@ public static class AuthorizationPolicies
             case UpdatePerson:
             case UpdateNpq:
             case UnlockPerson:
+            case CreateTrn:
                 return true;
             default:
                 return false;

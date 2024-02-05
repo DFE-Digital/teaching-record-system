@@ -1,13 +1,18 @@
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.V3.Requests;
+using TeachingRecordSystem.Api.V3.Responses;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
+[ApiController]
 [Route("trn-requests")]
-[Authorize(Policy = AuthorizationPolicies.ApiKey)]
-public class TrnRequestsController : ControllerBase
+[Authorize(Policy = AuthorizationPolicies.CreateTrn)]
+public class TrnRequestsController(IMediator _mediator) : ControllerBase
 {
     [HttpPost("")]
     [SwaggerOperation(
@@ -21,7 +26,12 @@ public class TrnRequestsController : ControllerBase
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public IActionResult CreateTrnRequest([FromBody] CreateTrnRequestBody request) => throw new NotImplementedException();
+    [MapError(10029, statusCode: StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> CreateTrnRequest([FromBody] CreateTrnRequestBody request)
+    {
+        var response = await _mediator.Send(request);
+        return Ok(response);
+    }
 
     [HttpGet("")]
     [SwaggerOperation(
@@ -34,34 +44,4 @@ public class TrnRequestsController : ControllerBase
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public IActionResult GetTrnRequest([FromQuery] string requestId) => throw new NotImplementedException();
-
-    public record CreateTrnRequestBody
-    {
-        public required string RequestId { get; init; }
-        public required TrnRequestPerson Person { get; init; }
-    }
-
-    public record TrnRequestPerson
-    {
-        public required string FirstName { get; init; }
-        public string? MiddleName { get; init; }
-        public required string LastName { get; init; }
-        public required DateOnly DateOfBirth { get; init; }
-        public string? Email { get; init; }
-        public string? NationalInsuranceNumber { get; init; }
-    }
-
-    public record TrnRequestInfo
-    {
-        public required string RequestId { get; init; }
-        public required TrnRequestPerson Person { get; init; }
-        public required TrnRequestStatus Status { get; init; }
-        public string? Trn { get; init; }
-    }
-
-    public enum TrnRequestStatus
-    {
-        Pending = 0,
-        Completed = 1
-    }
 }

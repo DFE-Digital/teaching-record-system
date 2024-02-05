@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using MediatR;
-using TeachingRecordSystem.Api.Infrastructure.OpenApi;
 using TeachingRecordSystem.Api.V3.Responses;
 
 namespace TeachingRecordSystem.Api.V3.Requests;

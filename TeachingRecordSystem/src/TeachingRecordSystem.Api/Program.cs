@@ -129,6 +129,12 @@ public class Program
                 policy => policy
                     .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
                     .RequireRole([ApiRoles.UnlockPerson]));
+
+            options.AddPolicy(
+              AuthorizationPolicies.CreateTrn,
+              policy => policy
+                  .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                  .RequireRole([ApiRoles.CreateTrn]));
         });
 
         services
@@ -189,7 +195,6 @@ public class Program
             .AddDistributedLocks()
             .AddIdentityApi();
 
-        services.AddTrnGenerationApi(configuration);
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();
         services.AddCrmQueries();
@@ -197,7 +202,7 @@ public class Program
         if (!env.IsUnitTests())
         {
             var crmServiceClient = GetCrmServiceClient();
-
+            services.AddTrnGenerationApi(configuration);
             services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
             services.AddTransient<IDataverseAdapter, DataverseAdapter>();
 

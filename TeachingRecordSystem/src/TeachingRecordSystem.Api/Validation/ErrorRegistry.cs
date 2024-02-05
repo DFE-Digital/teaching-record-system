@@ -31,6 +31,7 @@ public static class ErrorRegistry
         ErrorDescriptor.Create(10026),  // Result cannot be unwithdrawn to deferred
         ErrorDescriptor.Create(10027),  // Unable to change Failed Result.
         ErrorDescriptor.Create(10028),  // The specified URL does not exist
+        ErrorDescriptor.Create(10029),  // Request has already been submitted
     }.ToDictionary(d => d.ErrorCode, d => d);
 
     public static Error TeacherWithSpecifiedTrnNotFound() => CreateError(10001);
@@ -86,6 +87,8 @@ public static class ErrorRegistry
     public static Error UnableToChangeFailedResult() => CreateError(10027);
 
     public static Error SpecifiedUrlDoesNotExist() => CreateError(10028);
+
+    public static Error CannotResubmitRequest() => CreateError(10029);
 
     private static Error CreateError(int errorCode)
     {

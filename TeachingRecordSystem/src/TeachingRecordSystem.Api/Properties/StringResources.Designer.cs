@@ -115,6 +115,15 @@ namespace TeachingRecordSystem.Api.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The length of National Insurance Number must be 9 characters or fewer.
+        /// </summary>
+        public static string ErrorMessages_NationalInsuranceNumberMustBe9CharactersOrLess {
+            get {
+                return ResourceManager.GetString("ErrorMessages.NationalInsuranceNumberMustBe9CharactersOrLess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Outcome can only be set to Deferred, InTraining or UnderAssessment..
         /// </summary>
         public static string ErrorMessages_OutcomeMustBeDeferredInTrainingOrUnderAssessment {
@@ -426,6 +435,15 @@ namespace TeachingRecordSystem.Api.Properties {
         public static string Errors_10028_Title {
             get {
                 return ResourceManager.GetString("Errors.10028.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request has already been submitted.
+        /// </summary>
+        public static string Errors_10029_Title {
+            get {
+                return ResourceManager.GetString("Errors.10029.Title", resourceCulture);
             }
         }
     }
