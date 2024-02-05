@@ -18,12 +18,23 @@ All DfE services will adopt the standard GOV.UK One-Login service to provide sta
 
 ## Calling the API
 
-The API is versioned and each endpoint is prefixed with the version number e.g. `/v2/`. You can view the API specifications for each version by visiting `/swagger` (see [Environments](#environments) below for the base addresses).
+The API is versioned and each endpoint is prefixed with the version number e.g. `/v3/`. V3 is further split into minor versions; a header should be added to your requests indicating which minor version you want e.g.
+```
+X-Api-Version: 20240101
+```
+
+Wherever possible you should call the latest version.
+
+You can view the API specifications for each version by visiting `/swagger` (see [Environments](#environments) below for the base addresses).
 
 An API key is required for calling the API; speak to one of the developers to get one. The key must be passed in an `Authorization` header e.g.
 ```
 Authorization: Bearer your_api_key
 ```
+
+### Upgrading V3 versions
+
+See the [changelog](CHANGELOG.md) for the details of what has changed between versions.
 
 
 ## Environments
