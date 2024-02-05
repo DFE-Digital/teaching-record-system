@@ -13,23 +13,29 @@ public class BackFillVersionedEndpointsConvention : IApplicationModelConvention
 
         var versionedEndpoints = application.Controllers
             .Where(c => c.ControllerType.Assembly == typeof(BackFillVersionedEndpointsConvention).Assembly)
-            .Select(c => (Controller: c, MinorVersion: c.Properties.TryGetValue("MinorVersion", out var minorVersion) ? (string)minorVersion! : null))
+            .Select(c => (Controller: c, MinorVersion: c.Properties.TryGetValue(Constants.DeclaredMinorVersionPropertyKey, out var minorVersion) ? (string)minorVersion! : null))
             .Where(c => c.MinorVersion is not null)
             .SelectMany(c => c.Controller.Actions.Select(a => (Action: a, c.Controller, MinorVersion: c.MinorVersion!)))
             .Select(m =>
             {
-                var selectorModel = m.Action.Selectors.Single();
+                if (m.Action.Controller.Selectors.Count != 1)
+                {
+                    throw new NotSupportedException("Controllers with multiple selectors are not supported.");
+                }
 
-                var routeTemplate = selectorModel.AttributeRouteModel?.Template ?? "";
+                var controllerSelectorModel = m.Controller.Selectors.Single();
+                var actionSelectorModel = m.Action.Selectors.Single();
 
-                var httpMethod = selectorModel.ActionConstraints.OfType<HttpMethodActionConstraint>().SingleOrDefault()?.HttpMethods.SingleOrDefault() ??
+                var routeTemplate = AttributeRouteModel.CombineTemplates(controllerSelectorModel.AttributeRouteModel?.Template, actionSelectorModel.AttributeRouteModel?.Template);
+
+                var httpMethod = actionSelectorModel.ActionConstraints.OfType<HttpMethodActionConstraint>().SingleOrDefault()?.HttpMethods.SingleOrDefault() ??
                     throw new NotSupportedException($"The {m.Action.ActionName} action on the {m.Action.Controller.ControllerName} controller does not have exactly one HTTP method assigned.");
 
                 return (m.Action, m.Controller, m.MinorVersion, RouteTemplate: routeTemplate, HttpMethod: httpMethod);
             })
             .ToArray();
 
-        var sortedVersions = versionedEndpoints.Select(a => a.MinorVersion).Distinct().Order().ToArray();
+        var sortedVersions = VersionRegistry.AllV3MinorVersions.Order().ToArray();
 
         foreach (var ep in versionedEndpoints)
         {
@@ -65,7 +71,7 @@ public class BackFillVersionedEndpointsConvention : IApplicationModelConvention
             }
 
             // Stash away the minor versions this endpoint supports to aid Swagger API generation later
-            ep.Action.Properties.Add(typeof(ApiMinorVersionsMetadata), new ApiMinorVersionsMetadata(acceptedVersions));
+            ep.Action.Properties.Add(Constants.MinorVersionsPropertyKey, new ApiMinorVersionsMetadata(acceptedVersions));
         }
     }
 

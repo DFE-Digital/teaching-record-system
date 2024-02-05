@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 
 namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;
 
@@ -11,7 +12,32 @@ public static class ServiceCollectionExtensions
         {
             options.EnableAnnotations();
 
-            options.DocInclusionPredicate((docName, apiDescription) => apiDescription.GroupName == docName);
+            options.DocInclusionPredicate((docName, apiDescription) =>
+            {
+                var properties = apiDescription.ActionDescriptor.Properties;
+
+                if (properties.TryGetValue(Constants.VersionPropertyKey, out var versionObj) &&
+                    versionObj is int version)
+                {
+                    if (properties.TryGetValue(Constants.MinorVersionsPropertyKey, out var minorVersionsObj) &&
+                        minorVersionsObj is ApiMinorVersionsMetadata minorVersionsMetadata)
+                    {
+                        foreach (var minorVersion in minorVersionsMetadata.MinorVersions)
+                        {
+                            if (docName == OpenApiDocumentHelper.GetDocumentName(version, minorVersion))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return docName == OpenApiDocumentHelper.GetDocumentName(version, minorVersion: null);
+                    }
+                }
+
+                return false;
+            });
 
             options.AddSecurityDefinition(SecuritySchemes.ApiKey, new OpenApiSecurityScheme()
             {

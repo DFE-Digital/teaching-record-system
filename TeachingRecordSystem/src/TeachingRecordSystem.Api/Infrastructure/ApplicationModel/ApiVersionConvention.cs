@@ -59,13 +59,13 @@ public class ApiVersionConvention : IControllerModelConvention
                     $"{controller.ControllerName} minor version '{minorVersion}' has not been defined in {nameof(VersionRegistry)}.{nameof(VersionRegistry.AllV3MinorVersions)}.");
             }
 
-            controller.Properties.Add("MinorVersion", minorVersion);
+            controller.Properties.Add(Constants.DeclaredMinorVersionPropertyKey, minorVersion);
         }
 
         // Group name is used to partition the operations by version into different swagger docs
         controller.ApiExplorer.GroupName = OpenApiDocumentHelper.GetDocumentName(version, minorVersion);
 
         // Store the version so other components can easily query it later
-        controller.Properties.Add("Version", version);
+        controller.Properties.Add(Constants.VersionPropertyKey, version);
     }
 }
