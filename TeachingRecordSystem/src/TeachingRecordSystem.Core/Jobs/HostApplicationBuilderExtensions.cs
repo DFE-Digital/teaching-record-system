@@ -44,6 +44,7 @@ public static class HostApplicationBuilderExtensions
                 builder.Services.AddTransient<EytsAwardedEmailJobDispatcher>();
                 builder.Services.AddTransient<SendInductionCompletedEmailJob>();
                 builder.Services.AddTransient<InductionCompletedEmailJobDispatcher>();
+                builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
 
                 builder.Services.AddStartupTask(sp =>
                 {
@@ -88,6 +89,16 @@ public static class HostApplicationBuilderExtensions
                 recurringJobManager.AddOrUpdate<SyncAllMqsFromCrmJob>(
                     nameof(SyncAllMqsFromCrmJob),
                     job => job.Execute(CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<PopulateNameSynonymsJob>(
+                    nameof(PopulateNameSynonymsJob),
+                    job => job.Execute(CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<PopulateAllPersonsSearchAttributesJob>(
+                    nameof(PopulateAllPersonsSearchAttributesJob),
+                    job => job.Execute(),
                     Cron.Never);
 
                 return Task.CompletedTask;
