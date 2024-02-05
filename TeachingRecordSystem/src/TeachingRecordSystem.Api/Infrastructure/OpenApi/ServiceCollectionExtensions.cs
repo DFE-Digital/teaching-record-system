@@ -62,7 +62,7 @@ public static class ServiceCollectionExtensions
             options.OperationFilter<AddSecuritySchemeOperationFilter>();
             options.DocumentFilter<MinorVersionHeaderDocumentFilter>();
 
-            foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions())
+            foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions(configuration))
             {
                 options.SwaggerDoc(
                     OpenApiDocumentHelper.GetDocumentName(version, minorVersion),
@@ -82,7 +82,7 @@ public static class ServiceCollectionExtensions
     }
 }
 
-public class OpenApiEndpointsStartupFilter : IStartupFilter
+public class OpenApiEndpointsStartupFilter(IConfiguration configuration) : IStartupFilter
 {
     public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
     {
@@ -92,7 +92,7 @@ public class OpenApiEndpointsStartupFilter : IStartupFilter
 
         app.UseSwaggerUI(options =>
         {
-            foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions())
+            foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions(configuration))
             {
                 var documentName = OpenApiDocumentHelper.GetDocumentName(version, minorVersion);
                 options.SwaggerEndpoint(OpenApiDocumentHelper.DocumentRouteTemplate.Replace("{documentName}", documentName), documentName);

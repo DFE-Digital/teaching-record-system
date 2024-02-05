@@ -140,7 +140,7 @@ public class Program
                 options.Filters.Add(new DefaultErrorExceptionFilter(statusCode: StatusCodes.Status400BadRequest));
                 options.Filters.Add(new ValidationExceptionFilter());
 
-                options.Conventions.Add(new ApiVersionConvention());
+                options.Conventions.Add(new ApiVersionConvention(builder.Configuration));
                 options.Conventions.Add(new AuthorizationPolicyConvention());
                 options.Conventions.Add(new BackFillVersionedEndpointsConvention());
             })
