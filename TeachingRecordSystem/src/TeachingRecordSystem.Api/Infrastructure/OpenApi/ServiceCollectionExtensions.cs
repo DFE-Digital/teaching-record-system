@@ -99,6 +99,7 @@ public class OpenApiEndpointsStartupFilter : IStartupFilter
             }
 
             options.EnablePersistAuthorization();
+            options.EnableTryItOutByDefault();
         });
     };
 }
