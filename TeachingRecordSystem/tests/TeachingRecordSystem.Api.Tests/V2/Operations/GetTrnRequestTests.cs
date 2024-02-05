@@ -21,7 +21,7 @@ public class GetTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
 
         // Act
-        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
+        var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
@@ -34,7 +34,7 @@ public class GetTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
 
         // Act
-        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
+        var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -63,7 +63,7 @@ public class GetTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
+        var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -99,7 +99,7 @@ public class GetTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
+        var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -147,7 +147,7 @@ public class GetTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
+        var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -199,7 +199,7 @@ public class GetTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.GetAsync($"v2/trn-requests/{requestId}");
+        var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
         await AssertEx.JsonResponseEquals(

@@ -21,11 +21,6 @@ public abstract class TestBase
         HostFixture = hostFixture;
         _testServices = TestScopedServices.Reset();
         SetCurrentApiClient(Array.Empty<string>());
-
-        {
-            HttpClientWithApiKey = hostFixture.CreateClient();
-            HttpClientWithApiKey.DefaultRequestHeaders.Add("X-Use-CurrentClientIdProvider", "true");  // Signal for TestAuthenticationHandler to run
-        }
     }
 
     public HostFixture HostFixture { get; }
@@ -40,14 +35,25 @@ public abstract class TestBase
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => _testServices.GetAnIdentityApiClientMock;
 
-    public HttpClient HttpClientWithApiKey { get; }
-
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
     public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     public JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().Configure());
+
+    public HttpClient GetHttpClientWithApiKey(string? version = null)
+    {
+        var client = HostFixture.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Use-CurrentClientIdProvider", "true");  // Signal for TestAuthenticationHandler to run
+
+        if (version is not null)
+        {
+            client.DefaultRequestHeaders.Add(VersionRegistry.MinorVersionHeaderName, version);
+        }
+
+        return client;
+    }
 
     public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read")
     {

@@ -36,7 +36,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
@@ -51,7 +51,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{trn}");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
@@ -63,7 +63,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
+        await ValidRequestForTeacher_ReturnsExpectedContent(GetHttpClientWithApiKey(), baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact(qts);
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestForTeacher_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), "Qualified"), expectedEyts: null);
+        await ValidRequestForTeacher_ReturnsExpectedContent(GetHttpClientWithApiKey(), baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), "Qualified"), expectedEyts: null);
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(HttpClientWithApiKey, baseUrl, contact, expectCertificateUrls: false, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
+        await ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(GetHttpClientWithApiKey(), baseUrl, contact, expectCertificateUrls: false, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithInduction_ReturnsExpectedInductionContent(HttpClientWithApiKey, baseUrl, contact);
+        await ValidRequestWithInduction_ReturnsExpectedInductionContent(GetHttpClientWithApiKey(), baseUrl, contact);
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(HttpClientWithApiKey, baseUrl, contact);
+        await ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(GetHttpClientWithApiKey(), baseUrl, contact);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(HttpClientWithApiKey, baseUrl, contact, expectCertificateUrls: false);
+        await ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(GetHttpClientWithApiKey(), baseUrl, contact, expectCertificateUrls: false);
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(HttpClientWithApiKey, baseUrl, contact);
+        await ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(GetHttpClientWithApiKey(), baseUrl, contact);
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(HttpClientWithApiKey, baseUrl, contact);
+        await ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(GetHttpClientWithApiKey(), baseUrl, contact);
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(HttpClientWithApiKey, baseUrl, contact);
+        await ValidRequestForContactWithPendingNameChange_ReturnsPendingNameChangeTrue(GetHttpClientWithApiKey(), baseUrl, contact);
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(HttpClientWithApiKey, baseUrl, contact);
+        await ValidRequestForContactWithPendingDateOfBirthChange_ReturnsPendingDateOfBirthChangeTrue(GetHttpClientWithApiKey(), baseUrl, contact);
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(HttpClientWithApiKey, baseUrl, contact);
+        await ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(GetHttpClientWithApiKey(), baseUrl, contact);
     }
 
     [Fact]
@@ -168,7 +168,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(HttpClientWithApiKey, baseUrl, contact);
+        await ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(GetHttpClientWithApiKey(), baseUrl, contact);
     }
 
     [Fact]
@@ -177,6 +177,6 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithPreviousNames_ReturnsExpectedPreviousNamesContent(HttpClientWithApiKey, baseUrl, contact);
+        await ValidRequestWithPreviousNames_ReturnsExpectedPreviousNamesContent(GetHttpClientWithApiKey(), baseUrl, contact);
     }
 }

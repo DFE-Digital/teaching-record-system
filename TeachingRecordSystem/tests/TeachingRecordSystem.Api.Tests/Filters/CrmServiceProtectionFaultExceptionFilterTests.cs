@@ -16,7 +16,7 @@ public class CrmServiceProtectionFaultExceptionFilterTests : TestBase
     [InlineData("concurrent_requests")]
     public async Task ServiceProtectionFaultThrown_Returns429Response(string testEndpoint)
     {
-        var response = await HttpClientWithApiKey.GetAsync($"CrmServiceProtectionFaultExceptionFilterTests/{testEndpoint}");
+        var response = await GetHttpClientWithApiKey().GetAsync($"CrmServiceProtectionFaultExceptionFilterTests/{testEndpoint}");
 
         Assert.Equal(StatusCodes.Status429TooManyRequests, (int)response.StatusCode);
     }

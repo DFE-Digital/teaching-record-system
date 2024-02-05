@@ -38,7 +38,7 @@ public class UpdateTeacherTests : TestBase
         var request = CreateRequest(req => req.Qualification = null);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob:yyyy-MM-dd}",
             request);
 
@@ -54,7 +54,7 @@ public class UpdateTeacherTests : TestBase
         var trn = "1234567";
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ""));
 
@@ -73,7 +73,7 @@ public class UpdateTeacherTests : TestBase
         var ukprn = "123456";
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}",
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
 
@@ -102,7 +102,7 @@ public class UpdateTeacherTests : TestBase
             .ReturnsAsync(contactList);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.Qualification.Subject2 = "some invalid subject"));
 
@@ -128,7 +128,7 @@ public class UpdateTeacherTests : TestBase
             .ReturnsAsync(contactList);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.Qualification.Subject3 = "some invalid"));
 
@@ -147,7 +147,7 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.InitialTeacherTraining = null));
 
@@ -174,7 +174,7 @@ public class UpdateTeacherTests : TestBase
             .ReturnsAsync(contactList);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
 
@@ -201,7 +201,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(contactList);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.InitialTeacherTraining.Subject1 = subject));
 
@@ -228,7 +228,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(contactList);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.InitialTeacherTraining.Subject2 = subject));
 
@@ -255,7 +255,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(contactList);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.InitialTeacherTraining.Subject3 = subject));
 
@@ -284,7 +284,7 @@ public class UpdateTeacherTests : TestBase
         var request = CreateRequest(req => req.InitialTeacherTraining.IttQualificationType = ittQualificationType);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob:yyyy-MM-dd)}",
             request);
 
@@ -311,7 +311,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationCountryNotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.Qualification.CountryCode = country));
 
@@ -338,7 +338,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationNotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob:yyyy-MM-dd}",
             CreateRequest(req => req.Qualification.HeQualificationType = heQualificationType));
 
@@ -365,7 +365,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubjectNotFound | UpdateTeacherFailedReasons.Subject2NotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.Qualification.Subject = subject));
 
@@ -398,7 +398,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubjectNotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.Qualification.Subject = subject));
 
@@ -427,7 +427,7 @@ public class UpdateTeacherTests : TestBase
         var request = CreateRequest(req => req.Qualification = null);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob:yyyy-MM-dd}",
             request);
 
@@ -455,7 +455,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(result);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.Qualification.Subject = subject));
 
@@ -484,7 +484,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(result);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}&slugid={slugid}",
             CreateRequest(req => req.Qualification.Subject = subject));
 
@@ -521,7 +521,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(result);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}&slugid={slugid}",
             CreateRequest(req => req.Qualification.Subject = subject));
 
@@ -553,7 +553,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(result);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req => req.Qualification.Subject = subject));
 
@@ -583,7 +583,7 @@ public class UpdateTeacherTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}", request);
 
         // Assert
@@ -630,7 +630,7 @@ public class UpdateTeacherTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -680,7 +680,7 @@ public class UpdateTeacherTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
@@ -730,7 +730,7 @@ public class UpdateTeacherTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_OutcomeMustBeDeferredInTrainingOrUnderAssessment);
@@ -781,7 +781,7 @@ public class UpdateTeacherTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute);
@@ -844,7 +844,7 @@ public class UpdateTeacherTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
@@ -875,7 +875,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(result);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest());
 
@@ -905,7 +905,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(result);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest());
 
@@ -928,7 +928,7 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}&slugid={slugId}",
             CreateRequest());
 
@@ -948,7 +948,7 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req =>
             {
@@ -970,7 +970,7 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req =>
             {
@@ -992,7 +992,7 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req =>
             {
@@ -1015,7 +1015,7 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}",
             CreateRequest(req =>
             {
@@ -1037,7 +1037,7 @@ public class UpdateTeacherTests : TestBase
         var emailAddress = $"{new string('x', 99)}@test.com";  // Limit is 100
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req =>
             {
@@ -1060,7 +1060,7 @@ public class UpdateTeacherTests : TestBase
         var firstName = new string('x', 150);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req =>
             {
@@ -1083,7 +1083,7 @@ public class UpdateTeacherTests : TestBase
         var middleName = new string('x', 150);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req =>
             {
@@ -1106,7 +1106,7 @@ public class UpdateTeacherTests : TestBase
         var lastName = new string('x', 150);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req =>
             {
@@ -1129,7 +1129,7 @@ public class UpdateTeacherTests : TestBase
         var firstName = string.Empty;
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req =>
             {
@@ -1152,7 +1152,7 @@ public class UpdateTeacherTests : TestBase
         var middleName = string.Empty;
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req =>
             {
@@ -1175,7 +1175,7 @@ public class UpdateTeacherTests : TestBase
         var lastname = string.Empty;
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req =>
             {
@@ -1198,7 +1198,7 @@ public class UpdateTeacherTests : TestBase
         var email = "invalid email";
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req =>
             {
@@ -1221,7 +1221,7 @@ public class UpdateTeacherTests : TestBase
         var gender = ((Gender)(-1));
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req =>
             {
@@ -1244,7 +1244,7 @@ public class UpdateTeacherTests : TestBase
         var dateonly = new DateOnly(01, 01, 01);
 
         // Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1985-01-01",
             CreateRequest(req =>
             {
@@ -1284,7 +1284,7 @@ public class UpdateTeacherTests : TestBase
                 .ReturnsAsync(result);
 
         //Act
-        var response = await HttpClientWithApiKey.PatchAsync(
+        var response = await GetHttpClientWithApiKey().PatchAsync(
             $"v2/teachers/update/{trn}?birthdate=1987-01-01",
              CreateRequest(req =>
              {

@@ -23,7 +23,7 @@ public class FindTeachersTests : TestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
@@ -41,7 +41,7 @@ public class FindTeachersTests : TestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -75,7 +75,7 @@ public class FindTeachersTests : TestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -112,7 +112,7 @@ public class FindTeachersTests : TestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?dateOfBirth&emailAddress&firstName&ittProviderName&lastName&nationalInsuranceNumber");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -160,7 +160,7 @@ public class FindTeachersTests : TestBase
             $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn={providerUkprn}&IttProviderName={providerName}");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -210,7 +210,7 @@ public class FindTeachersTests : TestBase
             $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}&IttProviderUkPrn=12345678910&IttProviderName=provider");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
@@ -228,7 +228,7 @@ public class FindTeachersTests : TestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -279,7 +279,7 @@ public class FindTeachersTests : TestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
