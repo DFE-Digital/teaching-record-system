@@ -46,7 +46,7 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
@@ -97,7 +97,7 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
@@ -147,7 +147,7 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsError(response, 10001, StatusCodes.Status400BadRequest);
@@ -179,7 +179,7 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsError(response, 10028, StatusCodes.Status400BadRequest);
@@ -229,7 +229,7 @@ public class CreateNameChangeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode);

@@ -31,7 +31,7 @@ public class GetIttProvidersTests : TestBase
         var request = new HttpRequestMessage(HttpMethod.Get, "/v2/itt-providers");
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseEquals(

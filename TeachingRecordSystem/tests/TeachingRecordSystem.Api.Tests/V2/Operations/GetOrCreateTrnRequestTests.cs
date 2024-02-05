@@ -50,7 +50,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
@@ -90,7 +90,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -132,7 +132,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -156,7 +156,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var requestId = "$";
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -172,7 +172,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var requestId = new string('x', 101);  // Limit is 100
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -204,7 +204,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         DataverseAdapterMock.Verify();
@@ -239,7 +239,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var request = CreateRequest(req => req.Qualification = null);
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);
@@ -261,7 +261,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var request = CreateRequest(req => req.Qualification.Subject2 = null);
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);
@@ -283,7 +283,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var request = CreateRequest(req => req.Qualification.Subject3 = null);
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);
@@ -300,7 +300,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubject2NotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.Qualification.Subject2 = "some invalid subject"));
 
@@ -322,7 +322,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubject3NotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.Qualification.Subject3 = "some invalid subject"));
 
@@ -345,7 +345,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.IttProviderNotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
         CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn);
@@ -369,7 +369,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.Subject1NotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.InitialTeacherTraining.Subject1 = subject));
 
@@ -392,7 +392,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.Subject2NotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.InitialTeacherTraining.Subject2 = subject));
 
@@ -415,7 +415,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.IttQualificationNotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.InitialTeacherTraining.IttQualificationType = ittQualificationType));
 
@@ -435,7 +435,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationCountryNotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.Qualification.CountryCode = country));
 
@@ -458,7 +458,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubjectNotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.Qualification.Subject = subject));
 
@@ -481,7 +481,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationProviderNotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.Qualification.ProviderUkprn = ukprn));
 
@@ -500,7 +500,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var heQualificationType = (HeQualificationType)(-1);
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.Qualification.HeQualificationType = heQualificationType));
 
@@ -520,7 +520,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationNotFound));
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync(
+        var response = await GetHttpClientWithApiKey().PutAsync(
             $"v2/trn-requests/{requestId}",
             CreateRequest(req => req.Qualification.HeQualificationType = heQualificationType));
 
@@ -546,7 +546,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -570,7 +570,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -597,7 +597,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -631,7 +631,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         DataverseAdapterMock
@@ -663,7 +663,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
@@ -706,7 +706,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);
@@ -749,7 +749,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         Assert.True(response.IsSuccessStatusCode);
@@ -768,7 +768,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -790,7 +790,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         });
 
         // Act
-        var response = await HttpClientWithApiKey.PutAsync($"v2/trn-requests/{requestId}", request);
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(

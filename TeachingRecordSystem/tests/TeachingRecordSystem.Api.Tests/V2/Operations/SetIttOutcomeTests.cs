@@ -36,7 +36,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
@@ -67,7 +67,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
@@ -100,7 +100,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
@@ -125,7 +125,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -155,7 +155,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -185,7 +185,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -219,7 +219,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -249,7 +249,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -292,7 +292,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsError(response, 10003, expectedStatusCode: StatusCodes.Status400BadRequest);
@@ -331,7 +331,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -378,7 +378,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsError(response, expectedErrorCode, expectedStatusCode: StatusCodes.Status400BadRequest);
@@ -418,7 +418,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         DataverseAdapterMock.Verify(x => x.GetTeachersBySlugIdAndTrn(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
@@ -459,7 +459,7 @@ public class SetIttOutcomeTests : TestBase
         };
 
         // Act
-        var response = await HttpClientWithApiKey.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         DataverseAdapterMock.Verify(x => x.GetTeachersBySlugIdAndTrn(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Never);
