@@ -32,7 +32,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Contact.Fields.dfeta_ActiveSanctions,
                 Contact.Fields.dfeta_NINumber,
                 Contact.Fields.dfeta_TRN,
-                Contact.Fields.dfeta_HUSID
+                Contact.Fields.dfeta_HUSID,
+                Contact.Fields.dfeta_AllowPiiUpdatesFromRegister
             },
             activeOnly: true);
 
@@ -116,7 +117,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                     HusId = i.dfeta_TraineeID,
                     Active = i.StateCode == dfeta_initialteachertrainingState.Active
                 };
-            })
+            }),
+            AllowPIIUpdates = teacher.dfeta_AllowPiiUpdatesFromRegister ?? false
         };
     }
 }

@@ -17,6 +17,7 @@ public class GetTeacherResponse
     public string HusId { get; set; }
     public GetTeacherResponseEarlyYearsStatus EarlyYearsStatus { get; set; }
     public IEnumerable<GetTeacherResponseInitialTeacherTraining> InitialTeacherTraining { get; set; }
+    public bool AllowPIIUpdates { get; set; }
 }
 
 public class GetTeacherResponseEarlyYearsStatus
