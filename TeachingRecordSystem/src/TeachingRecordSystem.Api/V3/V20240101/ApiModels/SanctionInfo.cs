@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.V3.Responses;
+namespace TeachingRecordSystem.Api.V3.V20240101.ApiModels;
 
 public record SanctionInfo
 {

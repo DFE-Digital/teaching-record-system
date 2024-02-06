@@ -1,7 +1,7 @@
-using TeachingRecordSystem.Api.V3.ApiModels;
-using TeachingRecordSystem.Api.V3.Requests;
+using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+using TeachingRecordSystem.Api.V3.V20240101.Requests;
 
-namespace TeachingRecordSystem.Api.V3.Responses;
+namespace TeachingRecordSystem.Api.V3.V20240101.Responses;
 
 public record FindTeachersResponse
 {

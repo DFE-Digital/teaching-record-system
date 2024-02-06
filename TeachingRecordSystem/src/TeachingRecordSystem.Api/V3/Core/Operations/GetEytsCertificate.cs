@@ -1,34 +1,23 @@
 using System.Text;
-using MediatR;
-using TeachingRecordSystem.Api.V3.Requests;
-using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.Certificates;
 
-namespace TeachingRecordSystem.Api.V3.Handlers;
+namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
-public class GetEytsCertificateHandler : IRequestHandler<GetEytsCertificateRequest, GetCertificateResponse?>
+public record GetEytsCertificateCommand(string Trn);
+
+public class GetEytsCertificateHandler(IDataverseAdapter dataverseAdapter, ICertificateGenerator certificateGenerator)
 {
     private const string FullNameFormField = "Full Name";
     private const string TrnFormField = "TRN";
     private const string EytsDateFormField = "EYTSDate";
 
-    private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly ICertificateGenerator _certificateGenerator;
-
-    public GetEytsCertificateHandler(
-        IDataverseAdapter dataverseAdapter,
-        ICertificateGenerator certificateGenerator)
+    public async Task<FileDownloadInfo?> Handle(GetEytsCertificateCommand command)
     {
-        _dataverseAdapter = dataverseAdapter;
-        _certificateGenerator = certificateGenerator;
-    }
-
-    public async Task<GetCertificateResponse?> Handle(GetEytsCertificateRequest request, CancellationToken cancellationToken)
-    {
-        var teacher = await _dataverseAdapter.GetTeacherByTrn(
-            request.Trn,
+        var teacher = await dataverseAdapter.GetTeacherByTrn(
+            command.Trn,
             columnNames: new[]
             {
                 Contact.Fields.dfeta_TRN,
@@ -59,12 +48,8 @@ public class GetEytsCertificateHandler : IRequestHandler<GetEytsCertificateReque
             { EytsDateFormField, teacher.dfeta_EYTSDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("d MMMM yyyy") }
         };
 
-        var pdfStream = await _certificateGenerator.GenerateCertificate("EYTS certificate.pdf", fieldValues);
+        var pdfStream = await certificateGenerator.GenerateCertificate("EYTS certificate.pdf", fieldValues);
 
-        return new GetCertificateResponse()
-        {
-            FileDownloadName = $"EYTSCertificate.pdf",
-            FileContents = pdfStream
-        };
+        return new FileDownloadInfo(pdfStream, $"EYTSCertificate.pdf", "application/pdf");
     }
 }

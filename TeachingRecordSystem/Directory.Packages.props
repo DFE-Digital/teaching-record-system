@@ -30,6 +30,7 @@
     <PackageVersion Include="Joonasw.AspNetCore.SecurityHeaders" Version="5.0.0" />
     <PackageVersion Include="JustEat.HttpClientInterception" Version="4.1.0" />
     <PackageVersion Include="LinqKit" Version="1.2.5" />
+    <PackageVersion Include="Mapster" Version="7.4.0" />
     <PackageVersion Include="MediatR" Version="12.2.0" />
     <PackageVersion Include="Microsoft.ApplicationInsights" Version="2.22.0" />
     <PackageVersion Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />

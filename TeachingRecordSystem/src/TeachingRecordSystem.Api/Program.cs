@@ -179,6 +179,14 @@ public class Program
 
         services.AddOpenApi(configuration);
 
+        services.Scan(scan =>
+        {
+            scan.FromAssemblyOf<Program>()
+                .AddClasses(filter => filter.InNamespaces("TeachingRecordSystem.Api.V3.Core.Operations").Where(type => type.Name.EndsWith("Handler")))
+                    .AsSelf()
+                    .WithTransientLifetime();
+        });
+
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
         services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
         services.AddSingleton<IClock, Clock>();

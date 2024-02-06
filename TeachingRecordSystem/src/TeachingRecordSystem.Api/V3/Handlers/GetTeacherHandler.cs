@@ -5,6 +5,7 @@ using Optional;
 using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.Api.V3.Requests;
 using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;

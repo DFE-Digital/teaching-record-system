@@ -1,10 +1,8 @@
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TeachingRecordSystem.Api.V3.Responses;
 
-namespace TeachingRecordSystem.Api.V3.Requests;
+namespace TeachingRecordSystem.Api.V3.V20240101.Requests;
 
-public record FindTeachersRequest : IRequest<FindTeachersResponse>
+public record FindTeachersRequest
 {
     [FromQuery(Name = "findBy")]
     public FindTeachersFindBy FindBy { get; init; }

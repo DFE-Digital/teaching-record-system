@@ -1,14 +1,14 @@
 using System.Text;
-using MediatR;
-using TeachingRecordSystem.Api.V3.Requests;
-using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.Certificates;
 
-namespace TeachingRecordSystem.Api.V3.Handlers;
+namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
-public class GetInductionCertificateHandler : IRequestHandler<GetInductionCertificateRequest, GetCertificateResponse?>
+public record GetInductionCertificateCommand(string Trn);
+
+public class GetInductionCertificateHandler
 {
     private const string FullNameFormField = "Full Name";
     private const string TrnFormField = "TRN";
@@ -25,10 +25,10 @@ public class GetInductionCertificateHandler : IRequestHandler<GetInductionCertif
         _certificateGenerator = certificateGenerator;
     }
 
-    public async Task<GetCertificateResponse?> Handle(GetInductionCertificateRequest request, CancellationToken cancellationToken)
+    public async Task<FileDownloadInfo?> Handle(GetInductionCertificateCommand command)
     {
         var teacher = await _dataverseAdapter.GetTeacherByTrn(
-            request.Trn,
+            command.Trn,
             columnNames: new[]
             {
                 Contact.Fields.dfeta_TRN
@@ -56,9 +56,9 @@ public class GetInductionCertificateHandler : IRequestHandler<GetInductionCertif
                 Contact.Fields.LastName
             });
 
-        if ((induction?.dfeta_InductionStatus != dfeta_InductionStatus.Pass
-            && induction?.dfeta_InductionStatus != dfeta_InductionStatus.PassedinWales)
-            || induction?.dfeta_CompletionDate == null)
+        if (induction?.dfeta_InductionStatus != dfeta_InductionStatus.Pass &&
+            induction?.dfeta_InductionStatus != dfeta_InductionStatus.PassedinWales ||
+            induction?.dfeta_CompletionDate == null)
         {
             return null;
         }
@@ -77,7 +77,7 @@ public class GetInductionCertificateHandler : IRequestHandler<GetInductionCertif
         var fieldValues = new Dictionary<string, string>()
         {
             { FullNameFormField, fullName.ToString() },
-            { TrnFormField, request.Trn },
+            { TrnFormField, command.Trn },
             {
                 InductionDateFormField,
                 induction.dfeta_CompletionDate.HasValue ?
@@ -88,10 +88,6 @@ public class GetInductionCertificateHandler : IRequestHandler<GetInductionCertif
 
         var pdfStream = await _certificateGenerator.GenerateCertificate("Induction certificate.pdf", fieldValues);
 
-        return new GetCertificateResponse()
-        {
-            FileDownloadName = $"InductionCertificate.pdf",
-            FileContents = pdfStream
-        };
+        return new FileDownloadInfo(pdfStream, $"InductionCertificate.pdf", "application/pdf");
     }
 }

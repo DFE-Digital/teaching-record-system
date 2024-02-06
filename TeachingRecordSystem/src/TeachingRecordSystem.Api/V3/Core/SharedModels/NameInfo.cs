@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.V3.ApiModels;
+namespace TeachingRecordSystem.Api.V3.Core.SharedModels;
 
 public record NameInfo
 {

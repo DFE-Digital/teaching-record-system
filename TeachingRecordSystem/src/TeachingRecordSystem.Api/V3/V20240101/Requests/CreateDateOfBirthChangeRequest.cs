@@ -1,8 +1,6 @@
-using MediatR;
+namespace TeachingRecordSystem.Api.V3.V20240101.Requests;
 
-namespace TeachingRecordSystem.Api.V3.Requests;
-
-public record CreateDateOfBirthChangeRequest : IRequest
+public record CreateDateOfBirthChangeRequestRequest
 {
     public required string Trn { get; init; }
     public required DateOnly DateOfBirth { get; init; }
