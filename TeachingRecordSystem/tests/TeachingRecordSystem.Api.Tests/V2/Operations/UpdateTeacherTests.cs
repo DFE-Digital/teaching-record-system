@@ -2,7 +2,6 @@
 using System.Net;
 using Optional;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.Validation;

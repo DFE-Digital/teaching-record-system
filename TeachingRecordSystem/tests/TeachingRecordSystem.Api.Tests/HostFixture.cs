@@ -69,6 +69,10 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<FakeTrnGenerator>();
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton<ITrnGenerationApiClient, FakeTrnGenerationApiClient>();
+            services.Decorate<ICrmQueryDispatcher>(
+                inner => new CrmQueryDispatcherDecorator(
+                    inner,
+                    TestScopedServices.TryGetCurrent(out var tss) ? tss.CrmQueryDispatcherSpy : new()));
 
             services.Configure<GetAnIdentityOptions>(options =>
             {

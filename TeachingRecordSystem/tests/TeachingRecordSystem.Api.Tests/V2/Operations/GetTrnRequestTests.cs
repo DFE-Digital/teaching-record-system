@@ -1,6 +1,5 @@
 #nullable disable
 using System.Net;
-using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 

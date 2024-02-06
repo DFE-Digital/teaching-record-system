@@ -1,6 +1,5 @@
 #nullable disable
 using System.Net;
-using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 

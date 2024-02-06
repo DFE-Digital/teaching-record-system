@@ -11,105 +11,46 @@ public class GetTrnRequestTests : TestBase
         SetCurrentApiClient(new[] { ApiRoles.CreateTrn });
     }
 
-    [Theory]
-    [InlineData(ApiRoles.UnlockPerson)]
-    [InlineData(ApiRoles.UpdateNpq)]
-    public async Task Get_TrnRequestWithoutPermission_returns_NotPermitted(string role)
+    [Theory, RoleNamesData(except: ApiRoles.CreateTrn)]
+    public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
-        SetCurrentApiClient(new[] { role });
-        var teacherId = Guid.NewGuid();
+        SetCurrentApiClient(roles);
+
         var requestId = Guid.NewGuid().ToString();
         var firstName = Faker.Name.First();
         var middleName = Faker.Name.Middle();
         var lastName = Faker.Name.Last();
         var dateOfBirth = new DateOnly(1990, 01, 01);
         var email = Faker.Internet.Email();
-        var existing = await TestData.CreatePerson(p =>
-        {
-            p.WithFirstName(firstName);
-            p.WithMiddleName(middleName);
-            p.WithLastName(lastName);
-            p.WithDateOfBirth(dateOfBirth);
-            p.WithEmail(email);
-            p.WithTrn(hasTrn: true);
-            p.WithNationalInsuranceNumber(hasNationalInsuranceNumber: true);
-        });
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var existingContact = await TestData.CreatePerson(p => p
+            .WithTrn(hasTrn: true)
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithEmail(email)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
+
         await WithDbContext(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
                 ClientId = ClientId,
                 RequestId = requestId,
-                TeacherId = existing.ContactId
+                TeacherId = existingContact.ContactId
             });
 
             await dbContext.SaveChangesAsync();
         });
 
         // Act
-        var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestid={requestId}");
+        var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Get_ValidCompletedTrnRequest_ReturnsExpectedResponse()
-    {
-        // Arrange
-        var teacherId = Guid.NewGuid();
-        var requestId = Guid.NewGuid().ToString();
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email = Faker.Internet.Email();
-        var existing = await TestData.CreatePerson(p =>
-        {
-            p.WithFirstName(firstName);
-            p.WithMiddleName(middleName);
-            p.WithLastName(lastName);
-            p.WithDateOfBirth(dateOfBirth);
-            p.WithEmail(email);
-            p.WithTrn(hasTrn: true);
-            p.WithNationalInsuranceNumber(hasNationalInsuranceNumber: true);
-        });
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.Add(new TrnRequest()
-            {
-                ClientId = ClientId,
-                RequestId = requestId,
-                TeacherId = existing.ContactId
-            });
-
-            await dbContext.SaveChangesAsync();
-        });
-
-        // Act
-        var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestid={requestId}");
-        var contact = XrmFakedContext.CreateQuery<Contact>().Where(x => x.FirstName == firstName && x.MiddleName == middleName && x.LastName == lastName).FirstOrDefault();
-
-        // Assert
-        await AssertEx.JsonResponseEquals(
-            response,
-            expected: new
-            {
-                requestId = requestId,
-                Person = new
-                {
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-                    Email = email,
-                    DateOfBirth = dateOfBirth,
-                    NationalInsuranceNumber = contact!.dfeta_NINumber,
-                },
-                trn = contact.dfeta_TRN,
-                status = "Completed"
-            },
-            expectedStatusCode: 200);
     }
 
     [Fact]
@@ -119,14 +60,14 @@ public class GetTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
 
         // Act
-        var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestid={requestId}");
+        var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
-    public async Task Get_ValidIncompleteTrnRequest_ReturnsExpectedResponse()
+    public async Task Get_ValidCompletedTrnRequest_ReturnsExpectedResponse()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -135,17 +76,16 @@ public class GetTrnRequestTests : TestBase
         var lastName = Faker.Name.Last();
         var dateOfBirth = new DateOnly(1990, 01, 01);
         var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var existing = await TestData.CreatePerson(p =>
-        {
-            p.WithFirstName(firstName);
-            p.WithMiddleName(middleName);
-            p.WithLastName(lastName);
-            p.WithDateOfBirth(dateOfBirth);
-            p.WithEmail(email);
-            p.WithTrn(hasTrn: false);
-            p.WithNationalInsuranceNumber(hasNationalInsuranceNumber: true);
-        });
+        var existingContact = await TestData.CreatePerson(p => p
+            .WithTrn(hasTrn: true)
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithEmail(email)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
 
         await WithDbContext(async dbContext =>
         {
@@ -153,14 +93,73 @@ public class GetTrnRequestTests : TestBase
             {
                 ClientId = ClientId,
                 RequestId = requestId,
-                TeacherId = existing.ContactId
+                TeacherId = existingContact.ContactId
             });
+
             await dbContext.SaveChangesAsync();
         });
 
+        // Act
+        var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
+
+        // Assert
+        var contact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == existingContact.ContactId);
+
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId = requestId,
+                person = new
+                {
+                    firstName = firstName,
+                    middleName = middleName,
+                    lastName = lastName,
+                    email = email,
+                    dateOfBirth = dateOfBirth,
+                    nationalInsuranceNumber = contact.dfeta_NINumber,
+                },
+                trn = contact.dfeta_TRN,
+                status = "Completed"
+            },
+            expectedStatusCode: 200);
+    }
+
+    [Fact]
+    public async Task Get_ValidPendingTrnRequest_ReturnsExpectedResponse()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var existingContact = await TestData.CreatePerson(p => p
+            .WithTrn(hasTrn: false)
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithEmail(email)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Add(new TrnRequest()
+            {
+                ClientId = ClientId,
+                RequestId = requestId,
+                TeacherId = existingContact.ContactId
+            });
+
+            await dbContext.SaveChangesAsync();
+        });
 
         // Act
-        var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestid={requestId}");
+        var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
         await AssertEx.JsonResponseEquals(
@@ -168,16 +167,16 @@ public class GetTrnRequestTests : TestBase
             expected: new
             {
                 requestId = requestId,
-                Person = new
+                person = new
                 {
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-                    Email = email,
-                    DateOfBirth = dateOfBirth,
-                    NationalInsuranceNumber = existing.NationalInsuranceNumber,
+                    firstName = firstName,
+                    middleName = middleName,
+                    lastName = lastName,
+                    email = email,
+                    dateOfBirth = dateOfBirth,
+                    nationalInsuranceNumber = nationalInsuranceNumber,
                 },
-                trn = default(string),
+                trn = (string?)null,
                 status = "Pending"
             },
             expectedStatusCode: 200);

@@ -1,7 +1,6 @@
 #nullable disable
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.ApiModels;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;

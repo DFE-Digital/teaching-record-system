@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Certificates;
@@ -15,6 +16,7 @@ public class TestScopedServices
         Clock = new();
         DataverseAdapterMock = new();
         GetAnIdentityApiClientMock = new();
+        CrmQueryDispatcherSpy = new();
 
         AccessYourTeachingQualificationsOptions = Options.Create(new AccessYourTeachingQualificationsOptions()
         {
@@ -23,7 +25,7 @@ public class TestScopedServices
     }
 
     public static TestScopedServices GetCurrent() =>
-        _current.Value ?? throw new InvalidOperationException("No current instance has been set.");
+        TryGetCurrent(out var current) ? current : throw new InvalidOperationException("No current instance has been set.");
 
     public static TestScopedServices Reset()
     {
@@ -35,6 +37,18 @@ public class TestScopedServices
         return _current.Value = new();
     }
 
+    public static bool TryGetCurrent([NotNullWhen(true)] out TestScopedServices? current)
+    {
+        if (_current.Value is TestScopedServices tss)
+        {
+            current = tss;
+            return true;
+        }
+
+        current = default;
+        return false;
+    }
+
     public Mock<ICertificateGenerator> CertificateGeneratorMock { get; }
 
     public TestableClock Clock { get; }
@@ -44,4 +58,6 @@ public class TestScopedServices
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock { get; }
 
     public IOptions<AccessYourTeachingQualificationsOptions> AccessYourTeachingQualificationsOptions { get; }
+
+    public CrmQueryDispatcherSpy CrmQueryDispatcherSpy { get; }
 }

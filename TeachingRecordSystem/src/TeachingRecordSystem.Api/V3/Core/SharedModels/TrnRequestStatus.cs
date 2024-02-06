@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.V3.Responses;
+namespace TeachingRecordSystem.Api.V3.Core.SharedModels;
 
 public enum TrnRequestStatus
 {

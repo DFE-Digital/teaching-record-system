@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
@@ -13,7 +12,7 @@ public class FindTeachersTests : TestBase
         SetCurrentApiClient(new[] { ApiRoles.GetPerson });
     }
 
-    [Theory, RoleNamesData([ApiRoles.GetPerson, ApiRoles.UpdatePerson])]
+    [Theory, RoleNamesData(except: [ApiRoles.GetPerson, ApiRoles.UpdatePerson])]
     public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange

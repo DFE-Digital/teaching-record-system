@@ -6,9 +6,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class CreateTeacherHandler : ICrmQueryHandler<CreateTeacherQuery, Guid>
+public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 {
-    public async Task<Guid> Execute(CreateTeacherQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Guid> Execute(CreateContactQuery query, IOrganizationServiceAsync organizationService)
     {
         var TeacherId = Guid.NewGuid();
 
@@ -54,7 +54,7 @@ public class CreateTeacherHandler : ICrmQueryHandler<CreateTeacherQuery, Guid>
         return TeacherId;
     }
 
-    public void FlagBadData(ExecuteTransactionRequest txnRequest, CreateTeacherQuery createTeacherRequest, Guid teacherId)
+    public void FlagBadData(ExecuteTransactionRequest txnRequest, CreateContactQuery createTeacherRequest, Guid teacherId)
     {
         var firstNameContainsDigit = createTeacherRequest.FirstName.Any(Char.IsDigit);
         var middleNameContainsDigit = createTeacherRequest.MiddleName?.Any(Char.IsDigit) ?? false;
@@ -69,7 +69,7 @@ public class CreateTeacherHandler : ICrmQueryHandler<CreateTeacherQuery, Guid>
         }
     }
 
-    public CrmTask CreateDuplicateReviewTaskEntity(FindExistingTrnResult duplicate, CreateTeacherQuery createTeacherRequest, Guid TeacherId)
+    public CrmTask CreateDuplicateReviewTaskEntity(FindExistingTrnResult duplicate, CreateContactQuery createTeacherRequest, Guid TeacherId)
     {
         var description = GetDescription();
 

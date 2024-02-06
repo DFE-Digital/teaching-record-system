@@ -1,8 +1,9 @@
 using System.Net;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.V3.Requests;
+using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+using TeachingRecordSystem.Api.V3.V20240101.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
@@ -10,27 +11,27 @@ namespace TeachingRecordSystem.Api.Tests.V3;
 public class CreateTrnRequestTests : TestBase
 {
     public CreateTrnRequestTests(HostFixture hostFixture)
-    : base(hostFixture)
+        : base(hostFixture)
     {
         SetCurrentApiClient(new[] { ApiRoles.CreateTrn });
     }
 
-    [Theory]
-    [InlineData(ApiRoles.UnlockPerson)]
-    [InlineData(ApiRoles.UpdateNpq)]
-    [InlineData(ApiRoles.GetPerson)]
-    public async Task Post_ClientDoesNotHavePermission_ReturnsForbidden(string role)
+    [Theory, RoleNamesData(except: ApiRoles.CreateTrn)]
+    public async Task Post_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
-        SetCurrentApiClient(new[] { role });
+        SetCurrentApiClient(roles);
+
         var requestId = new string('x', 101);  // Limit is 100
-        var req = CreateRequest(r =>
+        var requestBody = CreateJsonContent(CreateDummyRequest() with { RequestId = requestId });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
         {
-            r.RequestId = requestId;
-        });
+            Content = requestBody
+        };
 
         // Act
-        var response = await GetHttpClientWithApiKey().PostAsync($"v3/trn-requests", req);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -41,13 +42,11 @@ public class CreateTrnRequestTests : TestBase
     {
         // Arrange
         var requestId = "$";
-        var req = CreateRequest(r =>
+        var requestBody = CreateJsonContent(CreateDummyRequest() with { RequestId = requestId });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
         {
-            r.RequestId = requestId;
-        });
-        var request = new HttpRequestMessage(HttpMethod.Post, $"v3/trn-requests")
-        {
-            Content = req
+            Content = requestBody
         };
 
         // Act
@@ -56,7 +55,7 @@ public class CreateTrnRequestTests : TestBase
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
-            propertyName: nameof(CreateTrnRequestBody.RequestId),
+            propertyName: nameof(CreateTrnRequestRequest.RequestId),
             expectedError: Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
     }
 
@@ -65,138 +64,40 @@ public class CreateTrnRequestTests : TestBase
     {
         // Arrange
         var requestId = new string('x', 101);  // Limit is 100
-        var req = CreateRequest(r =>
+        var requestBody = CreateJsonContent(CreateDummyRequest() with { RequestId = requestId });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
         {
-            r.RequestId = requestId;
-        });
+            Content = requestBody
+        };
 
         // Act
-        var response = await GetHttpClientWithApiKey().PostAsync($"v3/trn-requests", req);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
-            propertyName: nameof(CreateTrnRequestBody.RequestId),
+            propertyName: nameof(CreateTrnRequestRequest.RequestId),
             expectedError: Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
-    }
-
-    [Fact]
-    public async Task Post__ValidRequestCreatesTeacherWithTrn_ReturnsCompleteStatus()
-    {
-        // Arrange
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email = Faker.Internet.Email();
-        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-        var requestId = Guid.NewGuid().ToString();
-        var request = CreateRequest(req =>
-        {
-            req.RequestId = requestId;
-            req.Person.FirstName = firstName;
-            req.Person.MiddleName = middleName;
-            req.Person.LastName = lastName;
-            req.Person.DateOfBirth = dateOfBirth;
-            req.Person.Email = email;
-            req.Person.NationalInsuranceNumber = nationalInsuranceNumber;
-        });
-
-        // Act
-        var response = await GetHttpClientWithApiKey().PostAsync($"v3/trn-requests", request);
-        var contact = XrmFakedContext.CreateQuery<Contact>().Where(x => x.FirstName == firstName && x.MiddleName == middleName && x.LastName == lastName).FirstOrDefault();
-
-        // Assert
-        await AssertEx.JsonResponseEquals(
-            response,
-            expected: new
-            {
-                requestId = requestId,
-                Person = new
-                {
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-                    Email = email,
-                    DateOfBirth = dateOfBirth,
-                    NationalInsuranceNumber = nationalInsuranceNumber,
-                },
-                trn = contact!.dfeta_TRN,
-                status = "Completed"
-            },
-            expectedStatusCode: 200);
-    }
-
-    [Fact]
-    public async Task Post_PotentialDuplicateRequest_ReturnsPendingStatus()
-    {
-        // Arrange
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email = Faker.Internet.Email();
-        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-        var existingTeacherId = Guid.NewGuid();
-        var requestId = Guid.NewGuid().ToString();
-        var request = CreateRequest(req =>
-        {
-            req.RequestId = requestId;
-            req.Person.FirstName = firstName;
-            req.Person.MiddleName = middleName;
-            req.Person.LastName = lastName;
-            req.Person.DateOfBirth = dateOfBirth;
-            req.Person.Email = email;
-            req.Person.NationalInsuranceNumber = nationalInsuranceNumber;
-        });
-        await TestData.CreatePerson(p =>
-        {
-            p.WithFirstName(firstName);
-            p.WithMiddleName(middleName);
-            p.WithLastName(lastName);
-            p.WithDateOfBirth(dateOfBirth);
-        });
-
-        // Act
-        var response = await GetHttpClientWithApiKey().PostAsync($"v3/trn-requests", request);
-
-        // Assert
-        await AssertEx.JsonResponseEquals(
-            response,
-            expected: new
-            {
-                requestId = requestId,
-                Person = new
-                {
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-                    Email = email,
-                    DateOfBirth = dateOfBirth,
-                    NationalInsuranceNumber = nationalInsuranceNumber,
-                },
-                trn = "",
-                status = "Pending"
-            },
-            expectedStatusCode: 200);
     }
 
     [Theory]
     [InlineData(1900, 1, 1)]
-    public async Task Post_Before_1_1_1940_ReturnsError(int year, int month, int day)
+    public async Task Post_DateOfBirthBefore01011940_ReturnsError(int year, int month, int day)
     {
         // Arrange
-        var dob = new DateOnly(year, month, day);
-        var requestId = Guid.NewGuid().ToString();
-        Clock.UtcNow = new DateTime(2022, 1, 1);
-
-        var request = CreateRequest(cmd =>
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
         {
-            cmd.Person.DateOfBirth = dob;
+            Person = CreateDummyRequestPerson() with { DateOfBirth = new DateOnly(year, month, day) }
         });
 
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
         // Act
-        var response = await GetHttpClientWithApiKey().PostAsync($"v3/trn-requests", request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -206,20 +107,25 @@ public class CreateTrnRequestTests : TestBase
     }
 
     [Theory]
-    [InlineData(2022, 1, 1)]
-    [InlineData(2023, 1, 1)]
-    public async Task Post_RequestWithDOBEqualOrAfterToday_ReturnsError(int year, int month, int day)
+    [InlineData(0)]
+    [InlineData(1)]
+    public async Task Post_RequestWithDateOfBirthEqualOrAfterToday_ReturnsError(int daysAfterToday)
     {
         // Arrange
-        var dob = new DateOnly(year, month, day);
-        var requestId = Guid.NewGuid().ToString();
-        var request = CreateRequest(cmd =>
+        var dateOfBirth = Clock.Today.AddDays(daysAfterToday);
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
         {
-            cmd.Person.DateOfBirth = dob;
+            Person = CreateDummyRequestPerson() with { DateOfBirth = dateOfBirth }
         });
 
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
         // Act
-        var response = await GetHttpClientWithApiKey().PostAsync($"v3/trn-requests", request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -232,14 +138,20 @@ public class CreateTrnRequestTests : TestBase
     public async Task Post_NationalInsuranceNumberExceedingMaxLength_ReturnsError()
     {
         // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var request = CreateRequest(cmd =>
+        var nationalInsuranceNumber = new string('x', 10);
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
         {
-            cmd.Person.NationalInsuranceNumber = new string('x', 10);
+            Person = CreateDummyRequestPerson() with { NationalInsuranceNumber = nationalInsuranceNumber }
         });
 
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
         // Act
-        var response = await GetHttpClientWithApiKey().PostAsync($"v3/trn-requests", request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForProperty(
@@ -253,61 +165,198 @@ public class CreateTrnRequestTests : TestBase
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
-        var teacherId = Guid.NewGuid();
         var firstName = Faker.Name.First();
-        var lastName = Faker.Name.Last();
         var middleName = Faker.Name.Middle();
-        DateTime? dateOfBirth = new DateTime(1990, 5, 23);
-        var email = "minnie.van.ryder@example.com";
-        var nationalInsuranceNumber = "1234567D";
-        var request = CreateRequest(req =>
-        {
-            req.RequestId = requestId;
-            req.Person.FirstName = firstName;
-            req.Person.LastName = lastName;
-            req.Person.MiddleName = middleName;
-            req.Person.Email = email;
-            req.Person.NationalInsuranceNumber = nationalInsuranceNumber;
-            req.Person.DateOfBirth = dateOfBirth!.Value.ToDateOnlyWithDqtBstFix(true);
-        });
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var existingContact = await TestData.CreatePerson(p => p
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithEmail(email)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
+
         await WithDbContext(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
                 ClientId = ClientId,
                 RequestId = requestId,
-                TeacherId = teacherId
+                TeacherId = existingContact.ContactId
             });
 
             await dbContext.SaveChangesAsync();
         });
 
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
         // Act
-        var response = await GetHttpClientWithApiKey().PostAsync($"v3/trn-requests", request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
-    private JsonContent CreateRequest(Action<CreateTrnRequestBody>? configureRequest = null)
+    [Fact]
+    public async Task Post_NotMatchedToExistingRecord_CreatesTeacherWithTrnAndReturnsCompletedStatus()
     {
-        var request = new CreateTrnRequestBody()
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
         {
-            RequestId = Guid.NewGuid().ToString(),
-            Person = new TrnRequestPerson()
+            RequestId = requestId,
+            Person = new()
             {
-                FirstName = "Minnie",
-                MiddleName = "Van",
-                LastName = "Ryder",
-                DateOfBirth = new(1990, 5, 23),
-                Email = "minnie.van.ryder@example.com",
-                NationalInsuranceNumber = "1234567D"
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email,
+                NationalInsuranceNumber = nationalInsuranceNumber,
             }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
         };
 
-        configureRequest?.Invoke(request);
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
-        return CreateJsonContent(request);
+        // Assert
+        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
+        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
+        Assert.NotNull(contact);
+        Assert.NotEmpty(contact.dfeta_TRN);
+
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId = requestId,
+                person = new
+                {
+                    firstName = firstName,
+                    middleName = middleName,
+                    lastName = lastName,
+                    email = email,
+                    dateOfBirth = dateOfBirth,
+                    nationalInsuranceNumber = nationalInsuranceNumber,
+                },
+                trn = contact.dfeta_TRN,
+                status = "Completed"
+            },
+            expectedStatusCode: 200);
     }
-}
 
+    [Fact]
+    public async Task Post_PotentialDuplicateRequest_CreatesContactWithoutTrnAndReturnsPendingStatus()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        await TestData.CreatePerson(p => p
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth));
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
+        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
+        Assert.NotNull(contact);
+        Assert.Null(contact.dfeta_TRN);
+
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId = requestId,
+                person = new
+                {
+                    firstName = firstName,
+                    middleName = middleName,
+                    lastName = lastName,
+                    email = email,
+                    dateOfBirth = dateOfBirth,
+                    nationalInsuranceNumber = nationalInsuranceNumber,
+                },
+                trn = (string?)null,
+                status = "Pending"
+            },
+            expectedStatusCode: 200);
+    }
+
+    private static CreateTrnRequestRequest CreateDummyRequest() => new()
+    {
+        RequestId = Guid.NewGuid().ToString(),
+        Person = CreateDummyRequestPerson()
+    };
+
+    private static TrnRequestPerson CreateDummyRequestPerson() => new()
+    {
+        FirstName = "Minnie",
+        MiddleName = "Van",
+        LastName = "Ryder",
+        DateOfBirth = new(1990, 5, 23),
+        Email = "minnie.van.ryder@example.com",
+        NationalInsuranceNumber = "1234567D"
+    };
+}
