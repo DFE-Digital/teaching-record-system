@@ -1,5 +1,4 @@
 #nullable disable
-using TeachingRecordSystem.Api.Tests.Attributes;
 using TeachingRecordSystem.Api.V2.Requests;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;

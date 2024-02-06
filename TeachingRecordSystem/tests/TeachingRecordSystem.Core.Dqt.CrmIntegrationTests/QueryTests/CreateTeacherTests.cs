@@ -29,7 +29,7 @@ public class CreateTeacherTests : IAsyncLifetime
         var dob = _dataScope.TestData.GenerateDateOfBirth();
         var trn = await _dataScope.TestData.GenerateTrn();
 
-        var query = new CreateTeacherQuery()
+        var query = new CreateContactQuery()
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -72,7 +72,7 @@ public class CreateTeacherTests : IAsyncLifetime
         var dob = _dataScope.TestData.GenerateDateOfBirth();
         var trn = await _dataScope.TestData.GenerateTrn();
 
-        var query = new CreateTeacherQuery()
+        var query = new CreateContactQuery()
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -109,7 +109,7 @@ public class CreateTeacherTests : IAsyncLifetime
         var trn1 = await _dataScope.TestData.GenerateTrn();
         var trn2 = await _dataScope.TestData.GenerateTrn();
 
-        var query1 = new CreateTeacherQuery()
+        var query1 = new CreateContactQuery()
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -122,7 +122,7 @@ public class CreateTeacherTests : IAsyncLifetime
 
         // Act
         var createdTeacherId1 = await _crmQueryDispatcher.ExecuteQuery(query1);
-        var query2 = new CreateTeacherQuery()
+        var query2 = new CreateContactQuery()
         {
             FirstName = firstName,
             MiddleName = middleName,

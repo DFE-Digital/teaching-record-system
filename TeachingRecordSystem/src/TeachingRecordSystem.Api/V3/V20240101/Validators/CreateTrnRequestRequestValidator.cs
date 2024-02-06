@@ -1,20 +1,20 @@
 using FluentValidation;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.V3.Requests;
+using TeachingRecordSystem.Api.V3.V20240101.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 
-namespace TeachingRecordSystem.Api.V3.Validators;
+namespace TeachingRecordSystem.Api.V3.V20240101.Validators;
 
-public class CreateTrnRequestValidator : AbstractValidator<CreateTrnRequestBody>
+public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnRequestRequest>
 {
-    public CreateTrnRequestValidator(IClock clock)
+    public CreateTrnRequestRequestValidator(IClock clock)
     {
         RuleFor(r => r.RequestId)
             .Matches(TrnRequest.ValidRequestIdPattern)
-            .WithMessage(Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes)
+            .WithMessage(StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes)
             .MaximumLength(TrnRequest.RequestIdMaxLength)
-            .WithMessage(Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
+            .WithMessage(StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
 
         RuleFor(r => r.Person.FirstName)
             .NotEmpty()
@@ -43,7 +43,6 @@ public class CreateTrnRequestValidator : AbstractValidator<CreateTrnRequestBody>
 
         RuleFor(r => r.Person.NationalInsuranceNumber)
             .MaximumLength(AttributeConstraints.Contact.NationalInsuranceNumber_MaxLength)
-            .WithMessage(Properties.StringResources.ErrorMessages_NationalInsuranceNumberMustBe9CharactersOrLess);
-
+            .WithMessage(StringResources.ErrorMessages_NationalInsuranceNumberMustBe9CharactersOrLess);
     }
 }

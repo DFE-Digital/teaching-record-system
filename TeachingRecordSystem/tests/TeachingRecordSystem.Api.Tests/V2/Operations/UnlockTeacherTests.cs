@@ -1,6 +1,5 @@
 #nullable disable
 using System.Net;
-using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 

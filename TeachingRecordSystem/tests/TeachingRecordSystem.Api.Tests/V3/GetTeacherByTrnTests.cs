@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Api.Tests.Attributes;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
@@ -26,7 +25,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
     }
 
-    [Theory, RoleNamesData(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson })]
+    [Theory, RoleNamesData(except: [ApiRoles.GetPerson, ApiRoles.UpdatePerson])]
     public async Task GetTeacher_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange

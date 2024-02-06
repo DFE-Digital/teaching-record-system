@@ -2,7 +2,6 @@ using System.Text;
 using JustEat.HttpClientInterception;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
@@ -15,44 +14,7 @@ public class CreateNameChangeTests : TestBase
         SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }
 
-    [Theory]
-    [InlineData(false, "First", "Middle", "Last", "evidence.jpg", "https://place.com/evidence.jpg")]
-    [InlineData(true, null, "Middle", "Last", "evidence.jpg", "https://place.com/evidence.jpg")]
-    [InlineData(true, "First", "Middle", null, "evidence.jpg", "https://place.com/evidence.jpg")]
-    [InlineData(true, "First", "Middle", "Last", null, "https://place.com/evidence.jpg")]
-    [InlineData(true, "First", "Middle", "Last", "evidence.jpg", null)]
-    public async Task Post_InvalidRequest_ReturnsBadRequest(
-        bool includeTrn,
-        string? newFirstName,
-        string? newMiddleName,
-        string? newLastName,
-        string? evidenceFileName,
-        string? evidenceFileUrl)
-    {
-        // Arrange
-        var createPersonResult = await TestData.CreatePerson();
-
-        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/name-changes")
-        {
-            Content = CreateJsonContent(new
-            {
-                trn = includeTrn ? createPersonResult.Trn : "",
-                firstName = newFirstName,
-                middleName = newMiddleName,
-                lastName = newLastName,
-                evidenceFileName,
-                evidenceFileUrl
-            })
-        };
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-    }
-
-    [Theory, RoleNamesData(new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson })]
+    [Theory, RoleNamesData(except: [ApiRoles.GetPerson, ApiRoles.UpdatePerson])]
     public async Task PostNameChanges_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
@@ -101,6 +63,43 @@ public class CreateNameChangeTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(false, "First", "Middle", "Last", "evidence.jpg", "https://place.com/evidence.jpg")]
+    [InlineData(true, null, "Middle", "Last", "evidence.jpg", "https://place.com/evidence.jpg")]
+    [InlineData(true, "First", "Middle", null, "evidence.jpg", "https://place.com/evidence.jpg")]
+    [InlineData(true, "First", "Middle", "Last", null, "https://place.com/evidence.jpg")]
+    [InlineData(true, "First", "Middle", "Last", "evidence.jpg", null)]
+    public async Task Post_InvalidRequest_ReturnsBadRequest(
+        bool includeTrn,
+        string? newFirstName,
+        string? newMiddleName,
+        string? newLastName,
+        string? evidenceFileName,
+        string? evidenceFileUrl)
+    {
+        // Arrange
+        var createPersonResult = await TestData.CreatePerson();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/name-changes")
+        {
+            Content = CreateJsonContent(new
+            {
+                trn = includeTrn ? createPersonResult.Trn : "",
+                firstName = newFirstName,
+                middleName = newMiddleName,
+                lastName = newLastName,
+                evidenceFileName,
+                evidenceFileUrl
+            })
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
     [Fact]

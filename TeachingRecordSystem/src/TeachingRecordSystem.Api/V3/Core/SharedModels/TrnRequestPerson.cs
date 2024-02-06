@@ -1,6 +1,6 @@
-namespace TeachingRecordSystem.Core.Dqt.Queries;
+namespace TeachingRecordSystem.Api.V3.Core.SharedModels;
 
-public class CreateContactQuery : ICrmQuery<Guid>
+public record TrnRequestPerson
 {
     public required string FirstName { get; init; }
     public required string? MiddleName { get; init; }
@@ -8,6 +8,4 @@ public class CreateContactQuery : ICrmQuery<Guid>
     public required DateOnly DateOfBirth { get; init; }
     public required string? Email { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
-    public FindExistingTrnResult? ExistingTeacherResult { get; init; }
-    public required string? Trn { get; init; }
 }

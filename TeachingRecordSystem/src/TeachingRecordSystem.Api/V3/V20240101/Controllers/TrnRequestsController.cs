@@ -1,18 +1,19 @@
-using MediatR;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.V3.Requests;
-using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Api.V3.Core.Operations;
+using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+using TeachingRecordSystem.Api.V3.V20240101.Requests;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
 [ApiController]
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.CreateTrn)]
-public class TrnRequestsController(IMediator _mediator) : ControllerBase
+public class TrnRequestsController : ControllerBase
 {
     [HttpPost("")]
     [SwaggerOperation(
@@ -27,9 +28,23 @@ public class TrnRequestsController(IMediator _mediator) : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [MapError(10029, statusCode: StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> CreateTrnRequest([FromBody] CreateTrnRequestBody request)
+    public async Task<IActionResult> CreateTrnRequest(
+        [FromBody] CreateTrnRequestRequest request,
+        [FromServices] CreateTrnRequestHandler handler)
     {
-        var response = await _mediator.Send(request);
+        var command = new CreateTrnRequestCommand()
+        {
+            RequestId = request.RequestId,
+            FirstName = request.Person.FirstName,
+            MiddleName = request.Person.MiddleName,
+            LastName = request.Person.LastName,
+            DateOfBirth = request.Person.DateOfBirth,
+            Email = request.Person.Email,
+            NationalInsuranceNumber = request.Person.NationalInsuranceNumber
+        };
+        var result = await handler.Handle(command);
+
+        var response = result.Adapt<TrnRequestInfo>();
         return Ok(response);
     }
 
@@ -43,19 +58,19 @@ public class TrnRequestsController(IMediator _mediator) : ControllerBase
         """)]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTrnRequest([FromQuery] string requestId)
+    public async Task<IActionResult> GetTrnRequest(
+        [FromQuery] string requestId,
+        [FromServices] GetTrnRequestHandler handler)
     {
-        var request = new GetTrnRequest()
-        {
-            RequestId = Guid.Parse(requestId)
-        };
+        var command = new GetTrnRequestCommand(requestId);
+        var result = await handler.Handle(command);
 
-        var response = await _mediator.Send(request);
-
-        if (response is null)
+        if (result is null)
         {
             return NotFound();
         }
+
+        var response = result.Adapt<TrnRequestInfo>();
         return Ok(response);
     }
 }

@@ -2,7 +2,6 @@ using System.Text;
 using JustEat.HttpClientInterception;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using TeachingRecordSystem.Api.Tests.Attributes;
 
 namespace TeachingRecordSystem.Api.Tests.V3;
 
@@ -15,7 +14,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }
 
-    [Theory, RoleNamesData(new[] { ApiRoles.UpdatePerson })]
+    [Theory, RoleNamesData(except: [ApiRoles.UpdatePerson])]
     public async Task PostCreateDateOfBirthChange_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
