@@ -29,6 +29,8 @@ public abstract class TestBase
 
     public string ClientId { get; } = "tests";
 
+    public CrmQueryDispatcherSpy CrmQueryDispatcherSpy => _testServices.CrmQueryDispatcherSpy;
+
     public Mock<IDataverseAdapter> DataverseAdapterMock => _testServices.DataverseAdapterMock;
 
     public TestableClock Clock => _testServices.Clock;
