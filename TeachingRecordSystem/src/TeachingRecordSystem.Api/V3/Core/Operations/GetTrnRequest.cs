@@ -28,8 +28,8 @@ public class GetTrnRequestHandler(
             return null;
         }
 
-        var (contact, _) = (await _crmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByIdQuery(
+        var (contact, parent) = (await _crmQueryDispatcher.ExecuteQuery(
+            new GetContactWithParentById(
                 trnRequest.TeacherId,
                 new ColumnSet(
                     Contact.Fields.dfeta_TRN,
@@ -38,9 +38,11 @@ public class GetTrnRequestHandler(
                     Contact.Fields.LastName,
                     Contact.Fields.EMailAddress1,
                     Contact.Fields.dfeta_NINumber,
-                    Contact.Fields.BirthDate))))!;
+                    Contact.Fields.BirthDate,
+                    Contact.Fields.Merged,
+                    Contact.Fields.MasterId))))!;
 
-        var status = !string.IsNullOrEmpty(contact.dfeta_TRN) ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
+        var status = !string.IsNullOrEmpty(contact.dfeta_TRN ?? parent?.dfeta_TRN) ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
 
         return new TrnRequestInfo()
         {
@@ -54,7 +56,7 @@ public class GetTrnRequestHandler(
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 DateOfBirth = contact.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false)
             },
-            Trn = contact.dfeta_TRN,
+            Trn = contact.dfeta_TRN ?? parent?.dfeta_TRN,
             Status = status,
         };
     }
