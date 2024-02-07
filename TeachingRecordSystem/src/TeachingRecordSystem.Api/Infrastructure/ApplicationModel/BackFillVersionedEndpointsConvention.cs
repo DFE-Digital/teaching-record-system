@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using TeachingRecordSystem.Api.Infrastructure.Features;
 
 namespace TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 
@@ -81,13 +83,9 @@ public class BackFillVersionedEndpointsConvention : IApplicationModelConvention
 
         public bool Accept(ActionConstraintContext context)
         {
-            // Use the version specified in the X-Api-Version header.
-            // If the header isn't specified fallback to our default version.
-            var requestedVersion = context.RouteContext.HttpContext.Request.Headers.TryGetValue(VersionRegistry.MinorVersionHeaderName, out var requestedVersionValues) ?
-                requestedVersionValues.ToString() :
-                VersionRegistry.DefaultV3MinorVersion;
-
-            return acceptedVersions.Contains(requestedVersion);
+            var requestedVersionFeature = context.RouteContext.HttpContext.Features.GetRequiredFeature<RequestedVersionFeature>();
+            var requestEffectiveMinorVersion = requestedVersionFeature.EffectiveMinorVersion;
+            return acceptedVersions.Contains(requestEffectiveMinorVersion);
         }
     }
 }

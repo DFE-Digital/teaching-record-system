@@ -12,6 +12,7 @@ using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Json;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
+using TeachingRecordSystem.Api.Infrastructure.Middleware;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.OpenApi;
 using TeachingRecordSystem.Api.Infrastructure.RateLimiting;
@@ -224,6 +225,8 @@ public class Program
         var app = builder.Build();
 
         app.MapDefaultEndpoints();
+
+        app.UseMiddleware<AssignRequestedVersionMiddleware>();
 
         app.UseRouting();
 
