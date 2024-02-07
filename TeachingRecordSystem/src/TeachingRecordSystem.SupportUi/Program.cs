@@ -128,6 +128,8 @@ builder.Services
 
         options.Filters.Add(new CheckUserExistsFilter());
 
+        options.Filters.Add(new NoCachePageFilter());
+
         options.ModelBinderProviders.Insert(2, new DateOnlyModelBinderProvider());
     })
     .AddCookieTempDataProvider(options =>

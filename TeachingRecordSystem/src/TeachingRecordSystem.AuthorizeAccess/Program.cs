@@ -10,6 +10,7 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.AuthorizeAccess;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Conventions;
+using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Logging;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
@@ -77,6 +78,10 @@ builder.Services
     .AddRazorPages(options =>
     {
         options.Conventions.Add(new BindJourneyInstancePropertiesConvention());
+    })
+    .AddMvcOptions(options =>
+    {
+        options.Filters.Add(new NoCachePageFilter());
     });
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
