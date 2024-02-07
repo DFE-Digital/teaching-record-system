@@ -27,6 +27,14 @@ public class SignInJourneyState(string redirectUri, AuthenticationProperties? au
 
     public DateOnly[]? VerifiedDatesOfBirth { get; set; }
 
+    public string? NationalInsuranceNumber { get; set; }
+
+    public bool NationalInsuranceNumberSpecified { get; set; }
+
+    public string? Trn { get; set; }
+
+    public bool TrnSpecified { get; set; }
+
     public AuthenticationProperties? AuthenticationProperties { get; } = authenticationProperties;
 
     public void Reset()

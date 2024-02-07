@@ -3,11 +3,13 @@ using System.Text.Json;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.PersonSearch;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
 
@@ -15,6 +17,7 @@ namespace TeachingRecordSystem.AuthorizeAccess;
 
 public class SignInJourneyHelper(
     TrsDbContext dbContext,
+    IPersonSearchService personSearchService,
     AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
     IUserInstanceStateProvider userInstanceStateProvider,
@@ -72,6 +75,7 @@ public class SignInJourneyHelper(
             if (oneLoginUser.Person is not null)
             {
                 oneLoginUser.LastSignIn = clock.UtcNow;
+                await dbContext.SaveChangesAsync();
 
                 CreateAndAssignPrincipal(journeyInstance.State, oneLoginUser.Person.PersonId, oneLoginUser.Person.Trn!);
             }
@@ -97,7 +101,7 @@ public class SignInJourneyHelper(
     public NextPageInfo GetNextPage(JourneyInstance<SignInJourneyState> journeyInstance) => journeyInstance.State switch
     {
         // Authentication is complete
-        { AuthenticationTicket: not null } => new NextPageInfo(journeyInstance.State.RedirectUri),
+        { AuthenticationTicket: not null } => new NextPageInfo(GetSafeRedirectUri(journeyInstance)),
 
         // Authenticated with OneLogin, identity verification succeeded, person lookup failed
         // TODO
@@ -113,6 +117,61 @@ public class SignInJourneyHelper(
 
         _ => throw new InvalidOperationException("Cannot determine next page.")
     };
+
+    public string GetSafeRedirectUri(JourneyInstance<SignInJourneyState> journeyInstance) =>
+        EnsureUrlHasJourneyId(journeyInstance.State.RedirectUri, journeyInstance.InstanceId);
+
+    public async Task<bool> TryMatchToTeachingRecord(JourneyInstance<SignInJourneyState> journeyInstance)
+    {
+        var state = journeyInstance.State;
+
+        if (state.OneLoginAuthenticationTicket is null || !state.IdentityVerified)
+        {
+            throw new InvalidOperationException("Cannot match to a teaching record without a verified One Login user.");
+        }
+
+        var names = state.VerifiedNames;
+        var datesOfBirth = state.VerifiedDatesOfBirth;
+        var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(state.NationalInsuranceNumber);
+        var trn = NormalizeTrn(state.Trn);
+
+        var personSearchResults = await personSearchService.Search(names!, datesOfBirth!, nationalInsuranceNumber, trn);
+
+        if (personSearchResults.Count == 1)
+        {
+            var result = personSearchResults.Single();
+            var matchedPersonId = result.PersonId;
+            var matchedTrn = result.Trn;
+
+            // It's possible we match on a record that doesn't have a TRN; we don't want to proceed in that case;
+            // downstream consumers can't do anything without a TRN
+            if (matchedTrn is null)
+            {
+                return false;
+            }
+
+            var subject = state.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
+
+            var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == subject);
+            oneLoginUser.PersonId = matchedPersonId;
+            oneLoginUser.FirstSignIn = clock.UtcNow;
+            oneLoginUser.LastSignIn = clock.UtcNow;
+            await dbContext.SaveChangesAsync();
+
+            await journeyInstance.UpdateStateAsync(state =>
+                CreateAndAssignPrincipal(state, matchedPersonId, matchedTrn));
+
+            return true;
+        }
+
+        return false;
+
+        static string? NormalizeNationalInsuranceNumber(string? value) =>
+            string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiLetterOrDigit).ToArray());
+
+        static string? NormalizeTrn(string? value) =>
+            string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiDigit).ToArray());
+    }
 
     private static void CreateAndAssignPrincipal(SignInJourneyState state, Guid personId, string trn)
     {
@@ -132,6 +191,20 @@ public class SignInJourneyHelper(
         var principal = new ClaimsPrincipal(new[] { oneLoginIdentity, teachingRecordIdentity });
 
         state.AuthenticationTicket = new AuthenticationTicket(principal, state.AuthenticationProperties, AuthenticationSchemes.MatchToTeachingRecord);
+    }
+
+    private static string EnsureUrlHasJourneyId(string url, JourneyInstanceId instanceId)
+    {
+        var queryParamName = Constants.UniqueKeyQueryParameterName;
+
+        if (url.IndexOf($"{queryParamName}=") == -1)
+        {
+            return QueryHelpers.AddQueryString(url, queryParamName, instanceId.UniqueKey!);
+        }
+        else
+        {
+            return url;
+        }
     }
 }
 

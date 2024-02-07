@@ -6,7 +6,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPersonSearch(this IServiceCollection services)
     {
-        services.AddSingleton<IPersonSearchService, PersonSearchService>();
+        services.AddTransient<IPersonSearchService, PersonSearchService>();
         return services;
     }
 }
