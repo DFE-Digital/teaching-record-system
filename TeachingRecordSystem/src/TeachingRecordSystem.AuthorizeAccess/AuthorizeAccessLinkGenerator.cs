@@ -5,9 +5,17 @@ namespace TeachingRecordSystem.AuthorizeAccess;
 
 public abstract class AuthorizeAccessLinkGenerator
 {
-    public string DebugIdentity(JourneyInstanceId journeyInstanceId) => GetRequiredPathByPage("/DebugIdentity", journeyInstanceId: journeyInstanceId);
+    public string DebugIdentity(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/DebugIdentity", journeyInstanceId: journeyInstanceId);
 
-    public string Nino(JourneyInstanceId journeyInstanceId) => GetRequiredPathByPage("/Nino", journeyInstanceId: journeyInstanceId);
+    public string NationalInsuranceNumber(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/NationalInsuranceNumber", journeyInstanceId: journeyInstanceId);
+
+    public string NationalInsuranceNumberContinueWithout(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/NationalInsuranceNumber", handler: "ContinueWithout", journeyInstanceId: journeyInstanceId);
+
+    public string Trn(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Trn", journeyInstanceId: journeyInstanceId);
 
     protected virtual string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {
