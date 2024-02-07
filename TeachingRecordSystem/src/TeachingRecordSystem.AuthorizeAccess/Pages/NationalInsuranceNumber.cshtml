@@ -1,0 +1,31 @@
+@page "/national-insurance-number/{handler?}"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.NationalInsuranceNumberModel
+@{
+    ViewBag.Title = Html.DisplayNameFor(m => m.NationalInsuranceNumber);
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.NationalInsuranceNumber(Model.JourneyInstance!.InstanceId)" method="post" asp-antiforgery="true">
+            <govuk-input asp-for="NationalInsuranceNumber" input-class="govuk-input--width-10 govuk-input--extra-letter-spacing">
+                <govuk-input-label is-page-heading="true" class="govuk-label--l" />
+            </govuk-input>
+
+            @* Pressing the Enter key will submit the first submit button - make sure it's the default action *@
+            <button type="submit" class="govuk-!-display-none" tabindex="-1"></button>
+
+            <govuk-details>
+                <govuk-details-summary>I cannot provide my National Insurance number</govuk-details-summary>
+                <govuk-details-text>
+                    <p class="govuk-body">You can <a href="https://www.gov.uk/lost-national-insurance-number" rel="noreferrer noopener" target="_blank" class="govuk-link">find a lost National Insurance number (opens in new tab)</a>.</p>
+                    <p class="govuk-body">If you do not have a National Insurance number you can continue without it</p>
+                    <govuk-button type="submit" formaction="@LinkGenerator.NationalInsuranceNumberContinueWithout(Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary">
+                        Continue without it
+                    </govuk-button>
+                </govuk-details-text>
+            </govuk-details>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

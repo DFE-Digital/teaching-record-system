@@ -110,7 +110,7 @@ public class SignInJourneyHelper(
         // TODO
 
         // Authenticated with OneLogin, identity verification succeeded, NINO not yet specified
-        { OneLoginAuthenticationTicket: not null } => new NextPageInfo(linkGenerator.Nino(journeyInstance.InstanceId)),
+        { OneLoginAuthenticationTicket: not null } => new NextPageInfo(linkGenerator.NationalInsuranceNumber(journeyInstance.InstanceId)),
 
         // Authenticated with OneLogin, identity verification failed
         // TODO
