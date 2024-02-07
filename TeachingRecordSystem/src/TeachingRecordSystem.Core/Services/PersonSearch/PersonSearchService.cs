@@ -7,16 +7,20 @@ namespace TeachingRecordSystem.Core.Services.PersonSearch;
 
 public class PersonSearchService(TrsDbContext dbContext) : IPersonSearchService
 {
-    public async Task<IReadOnlyCollection<PersonSearchResult>> Search(IEnumerable<string[]> name, IEnumerable<DateOnly> dateOfBirth, string? nino, string? trn)
+    public async Task<IReadOnlyCollection<PersonSearchResult>> Search(
+        IEnumerable<string[]> names,
+        IEnumerable<DateOnly> datesOfBirth,
+        string? nationalInsuranceNumber,
+        string? trn)
     {
-        var fullNames = name.Select(n => (FirstName: n.First(), LastName: n.Where(n => n.Length > 1).LastOrDefault())).Where(n => n.LastName is not null).Select(n => $"{n.FirstName} {n.LastName}").ToList();
-        if (!fullNames.Any() || !dateOfBirth.Any() || (nino is null && trn is null))
+        var fullNames = names.Select(n => (FirstName: n.First(), LastName: n.Where(n => n.Length > 1).LastOrDefault())).Where(n => n.LastName is not null).Select(n => $"{n.FirstName} {n.LastName}").ToList();
+        if (!fullNames.Any() || !datesOfBirth.Any() || (nationalInsuranceNumber is null && trn is null))
         {
             return Array.Empty<PersonSearchResult>();
         }
 
         var searchResults = new List<PersonSearchResult>();
-        var dateOfBirthList = dateOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToList();
+        var dateOfBirthList = datesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToList();
 
         var searchPredicate = PredicateBuilder.New<PersonSearchAttribute>(false);
         foreach (var fullName in fullNames)
@@ -31,9 +35,9 @@ public class PersonSearchService(TrsDbContext dbContext) : IPersonSearchService
             searchPredicate = searchPredicate.Or(a => a.AttributeType == "Trn" && a.AttributeValue == trn);
         }
 
-        if (nino is not null)
+        if (nationalInsuranceNumber is not null)
         {
-            searchPredicate = searchPredicate.Or(a => a.AttributeType == "NationalInsuranceNumber" && a.AttributeValue == nino);
+            searchPredicate = searchPredicate.Or(a => a.AttributeType == "NationalInsuranceNumber" && a.AttributeValue == nationalInsuranceNumber);
         }
 
         var results = await dbContext.PersonSearchAttributes
