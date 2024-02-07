@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Api.Validation;
 
-namespace TeachingRecordSystem.Api.Infrastructure.Filters;
+namespace TeachingRecordSystem.Api;
 
 public class MapErrorAttribute : ExceptionFilterAttribute
 {
