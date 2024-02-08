@@ -2,4 +2,8 @@
     Layout = "_GovUkPageTemplate";
 }
 
+@section BeforeContent {
+    @RenderSection("BeforeContent", required: false)
+}
+
 @RenderBody()

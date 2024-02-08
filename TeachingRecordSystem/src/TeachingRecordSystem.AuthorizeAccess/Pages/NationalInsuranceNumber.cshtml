@@ -6,7 +6,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.NationalInsuranceNumber(Model.JourneyInstance!.InstanceId)" method="post" asp-antiforgery="true">
+        <form action="@LinkGenerator.NationalInsuranceNumber(Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-input asp-for="NationalInsuranceNumber" input-class="govuk-input--width-10 govuk-input--extra-letter-spacing">
                 <govuk-input-label is-page-heading="true" class="govuk-label--l" />
             </govuk-input>
@@ -14,7 +14,7 @@
             @* Pressing the Enter key will submit the first submit button - make sure it's the default action *@
             <button type="submit" class="govuk-!-display-none" tabindex="-1"></button>
 
-            <govuk-details>
+            <govuk-details open="@Model.PreviouslyAnsweredCannotProvide">
                 <govuk-details-summary>I cannot provide my National Insurance number</govuk-details-summary>
                 <govuk-details-text>
                     <p class="govuk-body">You can <a href="https://www.gov.uk/lost-national-insurance-number" rel="noreferrer noopener" target="_blank" class="govuk-link">find a lost National Insurance number (opens in new tab)</a>.</p>

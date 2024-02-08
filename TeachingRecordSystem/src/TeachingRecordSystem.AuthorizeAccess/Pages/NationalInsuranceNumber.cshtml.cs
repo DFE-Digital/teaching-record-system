@@ -16,6 +16,8 @@ public class NationalInsuranceNumberModel(SignInJourneyHelper helper, AuthorizeA
     [Required(ErrorMessage = "Enter a National Insurance number")]
     public string? NationalInsuranceNumber { get; set; }
 
+    public bool PreviouslyAnsweredCannotProvide { get; set; }
+
     public void OnGet()
     {
         NationalInsuranceNumber = JourneyInstance!.State.NationalInsuranceNumber;
@@ -46,8 +48,10 @@ public class NationalInsuranceNumberModel(SignInJourneyHelper helper, AuthorizeA
         {
             return helper.GetNextPage(JourneyInstance).ToActionResult();
         }
-
-        return RedirectToNextPage();
+        else
+        {
+            return RedirectToNextPage();
+        }
     }
 
     public async Task<IActionResult> OnPostContinueWithout()
@@ -75,6 +79,8 @@ public class NationalInsuranceNumberModel(SignInJourneyHelper helper, AuthorizeA
             // Already matched to a Teaching Record
             context.Result = Redirect(helper.GetSafeRedirectUri(JourneyInstance));
         }
+
+        PreviouslyAnsweredCannotProvide = state.NationalInsuranceNumberSpecified && state.NationalInsuranceNumber is null;
     }
 
     private IActionResult RedirectToNextPage() => Redirect(linkGenerator.Trn(JourneyInstance!.InstanceId));

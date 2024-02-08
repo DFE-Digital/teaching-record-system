@@ -103,14 +103,8 @@ public class SignInJourneyHelper(
         // Authentication is complete
         { AuthenticationTicket: not null } => new NextPageInfo(GetSafeRedirectUri(journeyInstance)),
 
-        // Authenticated with OneLogin, identity verification succeeded, person lookup failed
-        // TODO
-
-        // Authenticated with OneLogin, identity verification succeeded, TRN not yet specified
-        // TODO
-
-        // Authenticated with OneLogin, identity verification succeeded, NINO not yet specified
-        { OneLoginAuthenticationTicket: not null } => new NextPageInfo(linkGenerator.NationalInsuranceNumber(journeyInstance.InstanceId)),
+        // Authenticated with OneLogin, identity verification succeeded, not yet matched to teaching record
+        { OneLoginAuthenticationTicket: not null, AuthenticationTicket: null } => new NextPageInfo(linkGenerator.NationalInsuranceNumber(journeyInstance.InstanceId)),
 
         // Authenticated with OneLogin, identity verification failed
         // TODO
