@@ -1,4 +1,29 @@
 @page "/trn"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.TrnModel
 @{
+    ViewBag.Title = "What is your teacher reference number (TRN)?";
 }
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.NationalInsuranceNumber(Model.JourneyInstance!.InstanceId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.Trn(Model.JourneyInstance!.InstanceId)" method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <p class="govuk-body">A TRN is 7 digits long, for example 4567814</p>
+            <p class="govuk-body">It might include the letters RP and a slash, for example RP99/12345</p>
+            <p class="govuk-body">It’s previously been known as a QTS, GTC, DfE, DfES and DCSF number</p>
+
+            <govuk-input
+                asp-for="Trn"
+                input-class="govuk-!-width-one-quarter govuk-input--extra-letter-spacing"
+                spellcheck="false"
+                label-class="govuk-label--s" />
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

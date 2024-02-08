@@ -1,0 +1,11 @@
+@page "/not-found"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.NotFoundModel
+@{
+    ViewBag.Title = "[PLACEHOLDER] Not found";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Trn(Model.JourneyInstance!.InstanceId)" />
+}
+
+<h1>@ViewBag.Title</h1>

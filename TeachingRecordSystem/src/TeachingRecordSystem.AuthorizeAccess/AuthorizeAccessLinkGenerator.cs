@@ -17,6 +17,9 @@ public abstract class AuthorizeAccessLinkGenerator
     public string Trn(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Trn", journeyInstanceId: journeyInstanceId);
 
+    public string NotFound(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/NotFound", journeyInstanceId: journeyInstanceId);
+
     protected virtual string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {
         var url = GetRequiredPathByPage(page, handler, routeValues);
