@@ -104,10 +104,11 @@ public class SignInJourneyHelper(
         { AuthenticationTicket: not null } => new NextPageInfo(GetSafeRedirectUri(journeyInstance)),
 
         // Authenticated with OneLogin, identity verification succeeded, not yet matched to teaching record
-        { OneLoginAuthenticationTicket: not null, AuthenticationTicket: null } => new NextPageInfo(linkGenerator.NationalInsuranceNumber(journeyInstance.InstanceId)),
+        { OneLoginAuthenticationTicket: not null, IdentityVerified: true, AuthenticationTicket: null } =>
+            new NextPageInfo(linkGenerator.NationalInsuranceNumber(journeyInstance.InstanceId)),
 
         // Authenticated with OneLogin, identity verification failed
-        // TODO
+        { OneLoginAuthenticationTicket: not null, IdentityVerified: false } => new NextPageInfo(linkGenerator.NotVerified(journeyInstance.InstanceId)),
 
         _ => throw new InvalidOperationException("Cannot determine next page.")
     };

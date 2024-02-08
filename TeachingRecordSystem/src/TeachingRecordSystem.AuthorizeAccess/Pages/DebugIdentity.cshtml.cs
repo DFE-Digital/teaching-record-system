@@ -110,7 +110,7 @@ public class DebugIdentityModel(
             state.VerifiedDatesOfBirth = verifiedDatesOfBirth;
         });
 
-        if (DetachPerson && _oneLoginUser?.PersonId is not null)
+        if ((DetachPerson || !IdentityVerified) && _oneLoginUser?.PersonId is not null)
         {
             _oneLoginUser.PersonId = null;
             await dbContext.SaveChangesAsync();
