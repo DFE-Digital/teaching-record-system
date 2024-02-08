@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public abstract class UserBase
@@ -34,6 +36,40 @@ public class ApplicationUser : UserBase
     public string? OneLoginAuthenticationSchemeName { get; set; }
     public string? OneLoginRedirectUriPath { get; set; }
     public string? OneLoginPostLogoutRedirectUriPath { get; set; }
+
+    [MemberNotNull(
+        nameof(OneLoginClientId),
+        nameof(OneLoginPrivateKeyPem),
+        nameof(OneLoginAuthenticationSchemeName),
+        nameof(OneLoginRedirectUriPath),
+        nameof(OneLoginPostLogoutRedirectUriPath))]
+    public void EnsureConfiguredForOneLogin()
+    {
+        if (OneLoginClientId is null)
+        {
+            throw new InvalidOperationException($"{nameof(OneLoginClientId)} is not set.");
+        }
+
+        if (OneLoginPrivateKeyPem is null)
+        {
+            throw new InvalidOperationException($"{nameof(OneLoginPrivateKeyPem)} is not set.");
+        }
+
+        if (OneLoginAuthenticationSchemeName is null)
+        {
+            throw new InvalidOperationException($"{nameof(OneLoginAuthenticationSchemeName)} is not set.");
+        }
+
+        if (OneLoginRedirectUriPath is null)
+        {
+            throw new InvalidOperationException($"{nameof(OneLoginRedirectUriPath)} is not set.");
+        }
+
+        if (OneLoginPostLogoutRedirectUriPath is null)
+        {
+            throw new InvalidOperationException($"{nameof(OneLoginPostLogoutRedirectUriPath)} is not set.");
+        }
+    }
 }
 
 public class SystemUser : UserBase

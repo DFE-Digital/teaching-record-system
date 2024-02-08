@@ -2,7 +2,6 @@ using System.Buffers;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -57,8 +56,6 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
     [Display(Name = "One Login private key", Description = "Enter a key in the PEM format")]
     [Required(ErrorMessage = "Enter the One Login private key")]
     public string? OneLoginPrivateKeyPem { get; set; }
-
-    public string? OneLoginRedirectUriBase { get; set; }
 
     [BindProperty]
     [Display(Name = "One Login redirect URI path")]
@@ -132,6 +129,8 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             return this.PageWithErrors();
         }
 
+        string? flashMessage = null;
+
         var changes = ApplicationUserUpdatedEventChanges.None |
             (Name != _user!.Name ? ApplicationUserUpdatedEventChanges.Name : 0) |
             (!new HashSet<string>(_user.ApiRoles).SetEquals(new HashSet<string>(newApiRoles)) ? ApplicationUserUpdatedEventChanges.ApiRoles : 0) |
@@ -139,17 +138,25 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
 
         if (IsOidcClient)
         {
+            var oldChanges = changes;
+
             changes |=
                 (OneLoginClientId != _user.OneLoginClientId ? ApplicationUserUpdatedEventChanges.OneLoginClientId : 0) |
                 (OneLoginPrivateKeyPem != _user.OneLoginPrivateKeyPem ? ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem : 0) |
                 (OneLoginAuthenticationSchemeName != _user.OneLoginAuthenticationSchemeName ? ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName : 0) |
                 (OneLoginRedirectUriPath != _user.OneLoginRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginRedirectUriPath : 0) |
                 (OneLoginPostLogoutRedirectUriPath != _user.OneLoginPostLogoutRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginPostLogoutRedirectUriPath : 0);
+
+            var oneLoginPropertyHasChanged = changes != oldChanges;
+            if (oneLoginPropertyHasChanged)
+            {
+                flashMessage = "Changes to One Login configuration make take a few minutes before they’re updated everywhere.";
+            }
         }
 
         if (changes != ApplicationUserUpdatedEventChanges.None)
         {
-            var oldApplicationUser = Core.Events.Models.ApplicationUser.FromModel(_user);
+            var oldApplicationUser = EventModels.ApplicationUser.FromModel(_user);
 
             _user.Name = Name!;
             _user.ApiRoles = newApiRoles;
@@ -169,7 +176,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
                 EventId = Guid.NewGuid(),
                 CreatedUtc = clock.UtcNow,
                 RaisedBy = User.GetUserId(),
-                ApplicationUser = Core.Events.Models.ApplicationUser.FromModel(_user),
+                ApplicationUser = EventModels.ApplicationUser.FromModel(_user),
                 OldApplicationUser = oldApplicationUser,
                 Changes = changes
             };
@@ -178,7 +185,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             await dbContext.SaveChangesAsync();
         }
 
-        TempData.SetFlashSuccess("Application user updated");
+        TempData.SetFlashSuccess("Application user updated", message: flashMessage);
         return Redirect(linkGenerator.ApplicationUsers());
     }
 
@@ -198,15 +205,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             .OrderBy(k => k.CreatedOn)
             .Select(k => new ApiKeyInfo(k.ApiKeyId, k.Key, k.Expires)).ToArray();
 
-        OneLoginRedirectUriBase = GetCurrentBaseUrl();
-
         await next();
-
-        string GetCurrentBaseUrl()
-        {
-            var request = HttpContext.Request;
-            return UriHelper.BuildAbsolute(request.Scheme, request.Host);
-        }
     }
 
     public record ApiKeyInfo(Guid ApiKeyId, string Key, DateTime? Expires);

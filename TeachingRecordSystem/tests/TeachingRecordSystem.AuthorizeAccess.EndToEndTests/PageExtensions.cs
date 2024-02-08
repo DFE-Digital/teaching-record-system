@@ -11,14 +11,14 @@ public static class PageExtensions
             return asUri.LocalPath == path;
         });
 
-    public static async Task GoToStartPage(this IPage page)
+    public static async Task GoToTestStartPage(this IPage page)
     {
-        await page.GotoAsync("/");
+        await page.GotoAsync($"/test?scheme={Uri.EscapeDataString(HostFixture.FakeOneLoginAuthenticationScheme)}");
     }
 
     public static async Task AssertSignedIn(this IPage page, string trn)
     {
-        await page.WaitForUrlPathAsync("/");
+        await page.WaitForUrlPathAsync("/test");
         Assert.Equal(trn, await page.GetByTestId("trn").InnerTextAsync());
     }
 

@@ -107,7 +107,7 @@ public class SignInJourneyHelper(
 
         await dbContext.SaveChangesAsync();
 
-        if (oneLoginUser.PersonId is null && !journeyInstance.State.AttemptedIdentityVerification)
+        if (oneLoginUser.PersonId is null && !journeyInstance.State.IdentityVerified && !journeyInstance.State.AttemptedIdentityVerification)
         {
             return VerifyIdentityWithOneLogin(journeyInstance);
         }
@@ -200,7 +200,7 @@ public class SignInJourneyHelper(
             new Claim(ClaimTypes.PersonId, personId.ToString())
         });
 
-        var principal = new ClaimsPrincipal(new[] { oneLoginIdentity, teachingRecordIdentity });
+        var principal = new ClaimsPrincipal([oneLoginIdentity, teachingRecordIdentity]);
 
         state.AuthenticationTicket = new AuthenticationTicket(principal, state.AuthenticationProperties, AuthenticationSchemes.MatchToTeachingRecord);
     }
@@ -224,6 +224,6 @@ public class SignInJourneyHelper(
         var delegatedProperties = new AuthenticationProperties();
         delegatedProperties.SetVectorOfTrust(vtr);
         delegatedProperties.Items.Add(FormFlowJourneySignInHandler.PropertyKeys.JourneyInstanceId, journeyInstance.InstanceId.Serialize());
-        return Results.Challenge(delegatedProperties, authenticationSchemes: [OneLoginDefaults.AuthenticationScheme]);
+        return Results.Challenge(delegatedProperties, authenticationSchemes: [journeyInstance.State.OneLoginAuthenticationScheme]);
     }
 }

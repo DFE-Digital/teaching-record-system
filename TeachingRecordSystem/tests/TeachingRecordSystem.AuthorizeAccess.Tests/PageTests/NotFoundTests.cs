@@ -6,7 +6,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NotAuthenticatedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -22,7 +22,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NotVerifiedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: false);
@@ -42,7 +42,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri, oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn());
@@ -71,7 +71,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NationalInsuranceNumberNotSpecified_RedirectsToStartOfMatchingQuestions()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
@@ -96,7 +96,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_TrnNotSpecified_RedirectsToStartOfMatchingQuestions()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
@@ -122,7 +122,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);

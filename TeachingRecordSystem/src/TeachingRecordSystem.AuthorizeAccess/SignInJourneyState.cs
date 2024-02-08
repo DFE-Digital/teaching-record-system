@@ -6,7 +6,7 @@ using TeachingRecordSystem.FormFlow;
 namespace TeachingRecordSystem.AuthorizeAccess;
 
 [method: JsonConstructor]
-public class SignInJourneyState(string redirectUri, AuthenticationProperties? authenticationProperties)
+public class SignInJourneyState(string redirectUri, string oneLoginAuthenticationScheme, AuthenticationProperties? authenticationProperties)
 {
     public const string JourneyName = "SignInJourney";
 
@@ -14,6 +14,8 @@ public class SignInJourneyState(string redirectUri, AuthenticationProperties? au
         new JourneyDescriptor(JourneyName, typeof(SignInJourneyState), requestDataKeys: [], appendUniqueKey: true);
 
     public string RedirectUri { get; } = redirectUri;
+
+    public string OneLoginAuthenticationScheme { get; } = oneLoginAuthenticationScheme;
 
     [JsonConverter(typeof(AuthenticationTicketJsonConverter))]
     public AuthenticationTicket? AuthenticationTicket { get; set; }
