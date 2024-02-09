@@ -44,7 +44,7 @@ public abstract class TestBase
     public JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().Configure());
 
-    public HttpClient GetHttpClientWithApiKey(string? version = null)
+    public virtual HttpClient GetHttpClientWithApiKey(string? version = null)
     {
         var client = HostFixture.CreateClient();
         client.DefaultRequestHeaders.Add("X-Use-CurrentClientIdProvider", "true");  // Signal for TestAuthenticationHandler to run

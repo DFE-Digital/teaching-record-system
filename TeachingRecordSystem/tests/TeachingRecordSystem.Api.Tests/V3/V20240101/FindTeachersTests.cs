@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace TeachingRecordSystem.Api.Tests.V3;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240101;
 
 [Collection(nameof(DisableParallelization))]
 public class FindTeachersTests : TestBase

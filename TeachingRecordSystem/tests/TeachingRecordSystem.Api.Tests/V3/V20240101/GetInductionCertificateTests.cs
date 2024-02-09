@@ -1,6 +1,6 @@
 using Microsoft.Xrm.Sdk;
 
-namespace TeachingRecordSystem.Api.Tests.V3;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240101;
 
 public class GetInductionCertificateTests : TestBase
 {
@@ -16,9 +16,9 @@ public class GetInductionCertificateTests : TestBase
         var trn = "1234567";
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/induction");
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/induction");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -40,9 +40,9 @@ public class GetInductionCertificateTests : TestBase
             });
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/induction");
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/induction");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -74,19 +74,19 @@ public class GetInductionCertificateTests : TestBase
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>()))
             .ReturnsAsync(
-            (new dfeta_induction()
-            {
-                Id = Guid.NewGuid(),
-                dfeta_StartDate = inductionStartDate.ToDateTime(),
-                dfeta_InductionStatus = inductionStatus
-            },
-            new dfeta_inductionperiod[] { }
-            ));
+                (new dfeta_induction()
+                {
+                    Id = Guid.NewGuid(),
+                    dfeta_StartDate = inductionStartDate.ToDateTime(),
+                    dfeta_InductionStatus = inductionStatus
+                },
+                Array.Empty<dfeta_inductionperiod>()
+                ));
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/induction");
 
         // Act        
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/induction");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -118,19 +118,19 @@ public class GetInductionCertificateTests : TestBase
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>()))
             .ReturnsAsync(
-            (new dfeta_induction()
-            {
-                Id = Guid.NewGuid(),
-                dfeta_StartDate = inductionStartDate.ToDateTime(),
-                dfeta_InductionStatus = inductionStatus
-            },
-            new dfeta_inductionperiod[] { }
-            ));
+                (new dfeta_induction()
+                {
+                    Id = Guid.NewGuid(),
+                    dfeta_StartDate = inductionStartDate.ToDateTime(),
+                    dfeta_InductionStatus = inductionStatus
+                },
+                Array.Empty<dfeta_inductionperiod>()
+                ));
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/induction");
 
         // Act        
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/induction");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -192,8 +192,9 @@ public class GetInductionCertificateTests : TestBase
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
 
-        // Act
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/induction");
+
+        // Act
         var response = await httpClient.SendAsync(request);
 
         // Assert

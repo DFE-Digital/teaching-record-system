@@ -5,7 +5,7 @@ using TeachingRecordSystem.Api.V3.ApiModels;
 using TeachingRecordSystem.Core.Dqt;
 using static TeachingRecordSystem.TestCommon.TestData;
 
-namespace TeachingRecordSystem.Api.Tests.V3;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240101;
 
 public abstract class GetTeacherTestBase : TestBase
 {

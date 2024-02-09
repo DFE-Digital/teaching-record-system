@@ -2,7 +2,7 @@ using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 
-namespace TeachingRecordSystem.Api.Tests.V3;
+namespace TeachingRecordSystem.Api.Tests.V3.VNext;
 
 public class GetTrnRequestTests : TestBase
 {
@@ -125,14 +125,14 @@ public class GetTrnRequestTests : TestBase
             response,
             expected: new
             {
-                requestId = requestId,
+                requestId,
                 person = new
                 {
-                    firstName = firstName,
-                    middleName = middleName,
-                    lastName = lastName,
-                    email = email,
-                    dateOfBirth = dateOfBirth,
+                    firstName,
+                    middleName,
+                    lastName,
+                    email,
+                    dateOfBirth,
                     nationalInsuranceNumber = existingContact.NationalInsuranceNumber,
                 },
                 trn = masterContact.Trn,
@@ -182,14 +182,14 @@ public class GetTrnRequestTests : TestBase
             response,
             expected: new
             {
-                requestId = requestId,
+                requestId,
                 person = new
                 {
-                    firstName = firstName,
-                    middleName = middleName,
-                    lastName = lastName,
-                    email = email,
-                    dateOfBirth = dateOfBirth,
+                    firstName,
+                    middleName,
+                    lastName,
+                    email,
+                    dateOfBirth,
                     nationalInsuranceNumber = existingContact.NationalInsuranceNumber,
                 },
                 trn = existingContact.Trn,
@@ -239,15 +239,15 @@ public class GetTrnRequestTests : TestBase
             response,
             expected: new
             {
-                requestId = requestId,
+                requestId,
                 person = new
                 {
-                    firstName = firstName,
-                    middleName = middleName,
-                    lastName = lastName,
-                    email = email,
-                    dateOfBirth = dateOfBirth,
-                    nationalInsuranceNumber = nationalInsuranceNumber,
+                    firstName,
+                    middleName,
+                    lastName,
+                    email,
+                    dateOfBirth,
+                    nationalInsuranceNumber,
                 },
                 trn = (string?)null,
                 status = "Pending"

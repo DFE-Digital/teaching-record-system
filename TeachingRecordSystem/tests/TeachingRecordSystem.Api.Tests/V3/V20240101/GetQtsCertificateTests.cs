@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Dqt;
 
-namespace TeachingRecordSystem.Api.Tests.V3;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240101;
 
 public class GetQtsCertificateTests : TestBase
 {
@@ -17,10 +17,11 @@ public class GetQtsCertificateTests : TestBase
     {
         // Arrange
         var trn = "1234567";
+
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/certificates/qts");
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/certificates/qts");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -32,7 +33,6 @@ public class GetQtsCertificateTests : TestBase
     {
         // Arrange
         var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
 
         var firstName = Faker.Name.First();
         var middleName = Faker.Name.Middle();
@@ -49,8 +49,10 @@ public class GetQtsCertificateTests : TestBase
                 LastName = lastName,
             });
 
-        // Act
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/certificates/qts");
+
+        // Act
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -62,7 +64,6 @@ public class GetQtsCertificateTests : TestBase
     {
         // Arrange
         var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
 
         var firstName = Faker.Name.First();
         var middleName = Faker.Name.Middle();
@@ -116,8 +117,10 @@ public class GetQtsCertificateTests : TestBase
                 It.IsAny<string[]>()))
             .ReturnsAsync(qtsRegistrations);
 
-        // Act
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/certificates/qts");
+
+        // Act
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -131,7 +134,6 @@ public class GetQtsCertificateTests : TestBase
     {
         // Arrange
         var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
 
         var firstName = Faker.Name.First();
         var middleName = Faker.Name.Middle();
@@ -203,8 +205,10 @@ public class GetQtsCertificateTests : TestBase
                 })
             .ReturnsAsync(pdfStream);
 
-        // Act
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/certificates/qts");
+
+        // Act
         var response = await httpClient.SendAsync(request);
 
         // Assert
