@@ -1,6 +1,6 @@
 using Microsoft.Xrm.Sdk;
 
-namespace TeachingRecordSystem.Api.Tests.V3;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240101;
 
 public class GetNpqCertificateTests : TestBase
 {
@@ -17,9 +17,9 @@ public class GetNpqCertificateTests : TestBase
         var qualificationId = Guid.NewGuid();
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -42,9 +42,9 @@ public class GetNpqCertificateTests : TestBase
             });
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -66,9 +66,9 @@ public class GetNpqCertificateTests : TestBase
             });
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
 
         // Act        
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -92,9 +92,9 @@ public class GetNpqCertificateTests : TestBase
             });
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -118,9 +118,9 @@ public class GetNpqCertificateTests : TestBase
             });
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -165,9 +165,9 @@ public class GetNpqCertificateTests : TestBase
             .ReturnsAsync(qualification);
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -218,9 +218,9 @@ public class GetNpqCertificateTests : TestBase
             .ReturnsAsync(pdfStream);
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/certificates/npq/{qualificationId}");
         var response = await httpClient.SendAsync(request);
 
         // Assert

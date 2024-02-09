@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.Tests.V3;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240101;
 
 public class GetEytsCertificateTests : TestBase
 {
@@ -12,10 +12,11 @@ public class GetEytsCertificateTests : TestBase
     {
         // Arrange
         var trn = "1234567";
+
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/certificates/eyts");
 
         // Act
-        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/certificates/eyts");
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -27,7 +28,6 @@ public class GetEytsCertificateTests : TestBase
     {
         // Arrange
         var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
 
         var firstName = Faker.Name.First();
         var middleName = Faker.Name.Middle();
@@ -44,8 +44,10 @@ public class GetEytsCertificateTests : TestBase
                 LastName = lastName,
             });
 
-        // Act
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/certificates/eyts");
+
+        // Act
         var response = await httpClient.SendAsync(request);
 
         // Assert
@@ -57,7 +59,6 @@ public class GetEytsCertificateTests : TestBase
     {
         // Arrange
         var trn = "1234567";
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
 
         var firstName = Faker.Name.First();
         var middleName = Faker.Name.Middle();
@@ -83,8 +84,10 @@ public class GetEytsCertificateTests : TestBase
             .Setup(g => g.GenerateCertificate(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
             .ReturnsAsync(pdfStream);
 
-        // Act
+        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/certificates/eyts");
+
+        // Act
         var response = await httpClient.SendAsync(request);
 
         // Assert

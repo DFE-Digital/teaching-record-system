@@ -1,10 +1,10 @@
 using FluentValidation;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.V3.V20240101.Requests;
+using TeachingRecordSystem.Api.V3.VNext.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 
-namespace TeachingRecordSystem.Api.V3.V20240101.Validators;
+namespace TeachingRecordSystem.Api.V3.VNext.Validators;
 
 public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnRequestRequest>
 {

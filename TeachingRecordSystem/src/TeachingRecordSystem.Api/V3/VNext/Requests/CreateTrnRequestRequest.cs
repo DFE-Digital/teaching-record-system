@@ -1,7 +1,7 @@
 using Swashbuckle.AspNetCore.Annotations;
-using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+using TeachingRecordSystem.Api.V3.VNext.ApiModels;
 
-namespace TeachingRecordSystem.Api.V3.V20240101.Requests;
+namespace TeachingRecordSystem.Api.V3.VNext.Requests;
 
 public record CreateTrnRequestRequest
 {

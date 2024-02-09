@@ -1,6 +1,6 @@
 using static TeachingRecordSystem.TestCommon.TestData;
 
-namespace TeachingRecordSystem.Api.Tests.V3;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240101;
 
 public class GetTeacherByTrnTests : GetTeacherTestBase
 {

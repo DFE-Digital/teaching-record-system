@@ -1,11 +1,11 @@
 using System.Net;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
-using TeachingRecordSystem.Api.V3.V20240101.Requests;
+using TeachingRecordSystem.Api.V3.VNext.ApiModels;
+using TeachingRecordSystem.Api.V3.VNext.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
-namespace TeachingRecordSystem.Api.Tests.V3;
+namespace TeachingRecordSystem.Api.Tests.V3.VNext;
 
 [Collection(nameof(DisableParallelization))]
 public class CreateTrnRequestTests : TestBase
@@ -56,7 +56,7 @@ public class CreateTrnRequestTests : TestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(CreateTrnRequestRequest.RequestId),
-            expectedError: Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
+            expectedError: StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class CreateTrnRequestTests : TestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(CreateTrnRequestRequest.RequestId),
-            expectedError: Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
+            expectedError: StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
     }
 
     [Theory]
@@ -262,15 +262,15 @@ public class CreateTrnRequestTests : TestBase
             response,
             expected: new
             {
-                requestId = requestId,
+                requestId,
                 person = new
                 {
-                    firstName = firstName,
-                    middleName = middleName,
-                    lastName = lastName,
-                    email = email,
-                    dateOfBirth = dateOfBirth,
-                    nationalInsuranceNumber = nationalInsuranceNumber,
+                    firstName,
+                    middleName,
+                    lastName,
+                    email,
+                    dateOfBirth,
+                    nationalInsuranceNumber,
                 },
                 trn = contact.dfeta_TRN,
                 status = "Completed"
@@ -328,15 +328,15 @@ public class CreateTrnRequestTests : TestBase
             response,
             expected: new
             {
-                requestId = requestId,
+                requestId,
                 person = new
                 {
-                    firstName = firstName,
-                    middleName = middleName,
-                    lastName = lastName,
-                    email = email,
-                    dateOfBirth = dateOfBirth,
-                    nationalInsuranceNumber = nationalInsuranceNumber,
+                    firstName,
+                    middleName,
+                    lastName,
+                    email,
+                    dateOfBirth,
+                    nationalInsuranceNumber,
                 },
                 trn = (string?)null,
                 status = "Pending"

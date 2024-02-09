@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+namespace TeachingRecordSystem.Api.V3.VNext.ApiModels;
 
 public enum TrnRequestStatus
 {
