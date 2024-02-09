@@ -13,9 +13,9 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow.State;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
-using TeachingRecordSystem.SupportUi.Tests.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
+using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
