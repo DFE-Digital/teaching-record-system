@@ -1,10 +1,12 @@
+using System.Collections.Concurrent;
+using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
 
-namespace TeachingRecordSystem.SupportUi.Tests.Infrastructure.FormFlow;
+namespace TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 
 public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
 {
-    private readonly Dictionary<string, Entry> _instances;
+    private readonly ConcurrentDictionary<string, Entry> _instances;
 
     public InMemoryInstanceStateProvider()
     {
@@ -19,7 +21,7 @@ public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
         object state,
         IReadOnlyDictionary<object, object>? properties)
     {
-        _instances.Add(instanceId, new Entry()
+        _instances.TryAdd(instanceId, new Entry()
         {
             StateType = stateType,
             State = state,
@@ -44,7 +46,7 @@ public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
 
     public Task DeleteInstanceAsync(JourneyInstanceId instanceId, Type stateType)
     {
-        _instances.Remove(instanceId);
+        _instances.Remove(instanceId, out _);
         return Task.CompletedTask;
     }
 

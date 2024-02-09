@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -17,6 +16,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow.State;
 using TeachingRecordSystem.TestCommon;
 using TeachingRecordSystem.TestCommon.Infrastructure;
+using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
