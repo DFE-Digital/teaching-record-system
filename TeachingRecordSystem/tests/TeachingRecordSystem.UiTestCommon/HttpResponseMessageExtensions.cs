@@ -2,9 +2,10 @@ using System.Resources;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using Microsoft.AspNetCore.Http;
 using Xunit.Sdk;
 
-namespace TeachingRecordSystem.SupportUi.Tests;
+namespace TeachingRecordSystem.UiTestCommon;
 
 public static class HttpResponseMessageExtensions
 {

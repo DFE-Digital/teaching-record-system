@@ -4,12 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Processing;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -54,17 +50,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<IPageApplicationModelProvider, RemoveAutoValidateAntiforgeryPageApplicationModelProvider>();
 
             // Publish events synchronously
-            services.AddSingleton<PublishEventsDbCommandInterceptor>();
-            services.Decorate<DbContextOptions<TrsDbContext>>((inner, sp) =>
-            {
-                var coreOptionsExtension = inner.GetExtension<CoreOptionsExtension>();
-
-                return (DbContextOptions<TrsDbContext>)inner.WithExtension(
-                    coreOptionsExtension.WithInterceptors(new IInterceptor[]
-                    {
-                        sp.GetRequiredService<PublishEventsDbCommandInterceptor>(),
-                    }));
-            });
+            PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
             services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
             services.AddTestScoped<IClock>(tss => tss.Clock);
