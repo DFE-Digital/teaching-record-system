@@ -8,7 +8,6 @@ using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.V2.Controllers;
 
-[ApiController]
 [Route("unlock-teacher")]
 [Authorize(Policy = AuthorizationPolicies.UnlockPerson)]
 public class UnlockTeacherController : ControllerBase

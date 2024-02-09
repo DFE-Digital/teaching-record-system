@@ -9,7 +9,6 @@ using TeachingRecordSystem.Api.V3.VNext.Requests;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 
-[ApiController]
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.CreateTrn)]
 public class TrnRequestsController : ControllerBase

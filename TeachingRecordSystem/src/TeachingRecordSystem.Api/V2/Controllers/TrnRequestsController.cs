@@ -8,7 +8,6 @@ using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.V2.Controllers;
 
-[ApiController]
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
 public class TrnRequestsController : ControllerBase

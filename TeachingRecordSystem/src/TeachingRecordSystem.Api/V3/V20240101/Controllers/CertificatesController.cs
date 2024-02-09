@@ -7,10 +7,9 @@ using TeachingRecordSystem.Api.V3.Core.Operations;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
-[ApiController]
 [Route("certificates")]
 [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
-public class CertificatesController : Controller
+public class CertificatesController : ControllerBase
 {
     [HttpGet]
     [Route("qts")]

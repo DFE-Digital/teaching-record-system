@@ -9,7 +9,6 @@ using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.V2.Controllers;
 
-[ApiController]
 [Route("teachers/{trn}/itt-outcome")]
 [Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
 public class IttOutcomeController : ControllerBase
