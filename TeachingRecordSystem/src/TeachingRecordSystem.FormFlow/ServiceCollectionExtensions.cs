@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using TeachingRecordSystem.FormFlow.Conventions;
 using TeachingRecordSystem.FormFlow.Filters;
 using TeachingRecordSystem.FormFlow.ModelBinding;
 using TeachingRecordSystem.FormFlow.State;
@@ -40,6 +41,7 @@ public static class ServiceCollectionExtensions
         services.Configure<RazorPagesOptions>(options =>
         {
             options.Conventions.Add(conventions);
+            options.Conventions.Add(new BindJourneyInstancePropertiesConvention());
         });
 
         return services;

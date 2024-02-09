@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace TeachingRecordSystem.SupportUi.Infrastructure.Conventions;
+namespace TeachingRecordSystem.FormFlow.Conventions;
 
 public class BindJourneyInstancePropertiesConvention : IPageApplicationModelConvention
 {
@@ -9,7 +9,7 @@ public class BindJourneyInstancePropertiesConvention : IPageApplicationModelConv
     {
         var journeyInstanceProperties = model.HandlerProperties.Where(p =>
             p.ParameterType == typeof(JourneyInstance) ||
-                (p.ParameterType.IsGenericType && p.ParameterType.GetGenericTypeDefinition() == typeof(JourneyInstance<>)));
+                p.ParameterType.IsGenericType && p.ParameterType.GetGenericTypeDefinition() == typeof(JourneyInstance<>));
 
         foreach (var journeyInstanceProperty in journeyInstanceProperties)
         {

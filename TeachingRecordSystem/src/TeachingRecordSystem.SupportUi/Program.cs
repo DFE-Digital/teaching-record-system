@@ -18,7 +18,6 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
-using TeachingRecordSystem.SupportUi.Infrastructure.Conventions;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Infrastructure.Logging;
@@ -89,8 +88,6 @@ builder.Services.AddAuthorizationBuilder()
 builder.Services
     .AddRazorPages(options =>
     {
-        options.Conventions.Add(new BindJourneyInstancePropertiesConvention());
-
         options.Conventions.AddFolderApplicationModelConvention(
             "/Persons/PersonDetail",
             model =>
