@@ -8,6 +8,9 @@ public abstract class AuthorizeAccessLinkGenerator
     public string DebugIdentity(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/DebugIdentity", journeyInstanceId: journeyInstanceId);
 
+    public string NotVerified(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/NotVerified", journeyInstanceId: journeyInstanceId);
+
     public string NationalInsuranceNumber(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/NationalInsuranceNumber", journeyInstanceId: journeyInstanceId);
 

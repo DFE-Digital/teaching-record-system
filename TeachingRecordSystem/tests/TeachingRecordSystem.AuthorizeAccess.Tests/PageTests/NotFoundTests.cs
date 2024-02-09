@@ -137,6 +137,6 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var doc = await response.GetDocument();
+        await response.GetDocument();
     }
 }
