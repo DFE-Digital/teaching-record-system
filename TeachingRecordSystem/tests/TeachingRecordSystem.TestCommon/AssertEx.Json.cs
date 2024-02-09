@@ -7,7 +7,10 @@ namespace TeachingRecordSystem.TestCommon;
 
 public static partial class AssertEx
 {
-    public static JsonSerializerOptions SerializerOptions { get; } = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+    public static JsonSerializerOptions SerializerOptions { get; } = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+    {
+        PropertyNameCaseInsensitive = false
+    };
 
     public static void JsonEquals(string expected, string actual) =>
         JsonEquals(JsonNode.Parse(expected), JsonNode.Parse(actual));
