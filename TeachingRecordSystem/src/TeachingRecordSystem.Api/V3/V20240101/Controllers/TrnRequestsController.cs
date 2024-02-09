@@ -2,7 +2,6 @@ using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.Operations;
 using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
