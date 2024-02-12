@@ -1,4 +1,5 @@
 @page "/application-users/{userId}"
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @model TeachingRecordSystem.SupportUi.Pages.ApplicationUsers.EditApplicationUserModel
 @inject IClock Clock
 @{
@@ -41,7 +42,7 @@
                         {
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell">
-                                    <a href="@LinkGenerator.EditApiKey(key.ApiKeyId)" class="govuk-link" data-testid="EditApiKey-@key.ApiKeyId">@key.ApiKeyId</a>
+                                    <a href="@LinkGenerator.EditApiKey(key.ApiKeyId)" class="govuk-link trs-monospace" data-testid="EditApiKey-@key.ApiKeyId">@key.ApiKeyId</a>
                                 </td>
                                 <td class="govuk-table__cell" data-testid="Expiry">
                                     @if (key.Expires is DateTime expires)
@@ -75,11 +76,54 @@
                 <govuk-button-link href="@LinkGenerator.AddApiKey(Model.UserId)" class="govuk-button--secondary" data-testid="AddApiKey">Add API key</govuk-button-link>
             </div>
 
-            <h2 class="govuk-heading-m">One Login</h2>
-            <govuk-input asp-for="OneLoginClientId" label-class="govuk-label--s" autocomplete="off" />
-            <govuk-textarea asp-for="OneLoginPrivateKeyPem" label-class="govuk-label--s" />
+            <govuk-checkboxes asp-for="IsOidcClient">
+                <govuk-checkboxes-item value="@true" label-class="govuk-label--m">
+                    @Html.DisplayNameFor(m => m.IsOidcClient)
+                    <govuk-checkboxes-item-conditional>
+                        <govuk-input asp-for="OneLoginAuthenticationSchemeName" label-class="govuk-label--s" input-class="govuk-!-width-one-half trs-monospace" autocomplete="off" spellcheck="false" />
+
+                        <govuk-input asp-for="OneLoginClientId" label-class="govuk-label--s" input-class="trs-monospace" autocomplete="off" spellcheck="false" />
+
+                        <govuk-textarea asp-for="OneLoginPrivateKeyPem" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap" autocomplete="off" spellcheck="false" />
+
+                        <govuk-input asp-for="OneLoginRedirectUriPath" label-class="govuk-label--s" autocomplete="off" spellcheck="false">
+                            <govuk-input-prefix>@Model.OneLoginRedirectUriBase</govuk-input-prefix>
+                        </govuk-input>
+
+                        <govuk-input asp-for="OneLoginPostLogoutRedirectUriPath" label-class="govuk-label--s" autocomplete="off" spellcheck="false">
+                            <govuk-input-prefix>@Model.OneLoginRedirectUriBase</govuk-input-prefix>
+                        </govuk-input>
+                    </govuk-checkboxes-item-conditional>
+                </govuk-checkboxes-item>
+            </govuk-checkboxes>
 
             <govuk-button type="submit">Save changes</govuk-button>
         </form>
     </div>
 </div>
+
+<template id="showkey">
+    <govuk-checkboxes name="ShowKey" input-id="ShowKey" class="govuk-checkboxes--small">
+        <govuk-checkboxes-item value="true">Show key</govuk-checkboxes-item>
+    </govuk-checkboxes>
+</template>
+
+<script type="text/javascript" asp-add-nonce="true">
+    if ('content' in document.createElement('template')) {
+        const keyInput = document.querySelector("#@Html.IdFor(m => m.OneLoginPrivateKeyPem)");
+
+        if (keyInput.value) {
+            const showKeyTemplate = document.querySelector('#showkey');
+            const showKey = showKeyTemplate.content.cloneNode(true);
+            const showKeyCheckbox = showKey.querySelector('input');
+            const setInputTypeFromShowKeyValue = () => keyInput.style.display = showKeyCheckbox.checked ? '' : 'none';
+
+            setInputTypeFromShowKeyValue();
+            showKeyCheckbox.addEventListener('change', setInputTypeFromShowKeyValue);
+
+            const keyFormGroup = keyInput.parentNode;
+            keyInput.classList.add('govuk-!-margin-bottom-0');
+            keyFormGroup.querySelector('.govuk-hint').after(showKey);
+        }
+    }
+</script>

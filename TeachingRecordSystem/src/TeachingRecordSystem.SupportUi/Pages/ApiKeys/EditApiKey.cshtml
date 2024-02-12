@@ -14,7 +14,7 @@
         <form method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input asp-for="Key" disabled="true" input-class="govuk-input--width-20 govuk-input--extra-letter-spacing" label-class="govuk-label--m" />
+            <govuk-input asp-for="Key" disabled="true" input-class="govuk-input--width-20 trs-monospace" label-class="govuk-label--m" />
 
             <govuk-button
                 type="submit"
@@ -36,7 +36,7 @@
 
 <script type="text/javascript" asp-add-nonce="true">
     if ('content' in document.createElement('template')) {
-        const keyInput = document.querySelector("#Key");
+        const keyInput = document.querySelector("#@Html.IdFor(m => m.Key)");
 
         const showKeyTemplate = document.querySelector('#showkey');
         const showKey = showKeyTemplate.content.cloneNode(true);

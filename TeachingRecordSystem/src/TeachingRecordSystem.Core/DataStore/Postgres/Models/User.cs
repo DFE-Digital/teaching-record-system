@@ -20,13 +20,20 @@ public class User : UserBase
 
 public class ApplicationUser : UserBase
 {
+    public const int AuthenticationSchemeNameMaxLength = 50;
+    public const int RedirectUriPathMaxLength = 100;
     public const int OneLoginClientIdMaxLength = 50;
     public const string NameUniqueIndexName = "ix_users_application_user_name";
+    public const string OneLoginAuthenticationSchemeNameUniqueIndexName = "ix_users_one_login_authentication_scheme_name";
 
     public required string[] ApiRoles { get; set; }
     public ICollection<ApiKey> ApiKeys { get; } = null!;
+    public bool IsOidcClient { get; set; }
     public string? OneLoginClientId { get; set; }
     public string? OneLoginPrivateKeyPem { get; set; }
+    public string? OneLoginAuthenticationSchemeName { get; set; }
+    public string? OneLoginRedirectUriPath { get; set; }
+    public string? OneLoginPostLogoutRedirectUriPath { get; set; }
 }
 
 public class SystemUser : UserBase

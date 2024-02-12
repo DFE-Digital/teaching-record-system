@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
@@ -171,19 +172,32 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         await AssertEx.HtmlResponseHasError(response, "Name", "Name must be 200 characters or less");
     }
 
-    [Fact]
-    public async Task Post_OneLoginClientIdButNoPem_RendersError()
+    [Theory]
+    [MemberData(nameof(InvalidOneLoginDetailsData))]
+    public async Task Post_WithOidcClientButInvalidDetails_RendersExpectedError(
+        string oneLoginClientId,
+        string oneLoginClientKeyPem,
+        string oneLoginAuthenticationSchemeName,
+        string oneLoginRedirectUriPath,
+        string oneLoginPostLogoutRedirectUriPath,
+        string expectedErrorField,
+        string expectedErrorMessage)
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
-        var oneLoginClientId = Guid.NewGuid().ToString();
+        var applicationUser = await TestData.CreateApplicationUser();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
                 { "Name", applicationUser.Name },
-                { "OneLoginClientId", oneLoginClientId }
+                { "ApiRoles", applicationUser.ApiRoles },
+                { "IsOidcClient", bool.TrueString },
+                { "OneLoginClientId", oneLoginClientId },
+                { "OneLoginClientKeyPem", oneLoginClientKeyPem },
+                { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
+                { "OneLoginRedirectUriPath", oneLoginRedirectUriPath },
+                { "OneLoginPostLogoutRedirectUriPath", oneLoginPostLogoutRedirectUriPath },
             }
         };
 
@@ -191,57 +205,11 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "OneLoginPrivateKeyPem", "One Login Private Key PEM is required if One Login Client ID is set");
+        await AssertEx.HtmlResponseHasError(response, expectedErrorField, expectedErrorMessage);
     }
 
     [Fact]
-    public async Task Post_OneLoginClientIdTooLong_RendersError()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
-        var oneLoginClientId = new string('x', ApplicationUser.OneLoginClientIdMaxLength + 1);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "Name", applicationUser.Name },
-                { "OneLoginClientId", oneLoginClientId }
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        await AssertEx.HtmlResponseHasError(response, "OneLoginClientId", "One Login Client ID must be 50 characters or less");
-    }
-
-    [Fact]
-    public async Task Post_OneLoginPrivateKeyPemButNoClientId_RendersError()
-    {
-        // Arrange
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
-        var oneLoginPrivateKeyPem = TestData.GeneratePrivateKeyPem();
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "Name", applicationUser.Name },
-                { "OneLoginPrivateKeyPem", oneLoginPrivateKeyPem! }
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        await AssertEx.HtmlResponseHasError(response, "OneLoginClientId", "One Login Client ID is required if One Login Private Key PEM is set");
-    }
-
-    [Fact]
-    public async Task Post_ValidRequest_UpdatesNameAndRolesAndOneLoginSettinsAndCreatesEventAndRedirectsWithFlashMessage()
+    public async Task Post_ValidRequest_UpdatesNameAndRolesAndOneLoginSettingsAndCreatesEventAndRedirectsWithFlashMessage()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUser(apiRoles: [], hasOneLoginSettings: false);
@@ -250,6 +218,9 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         var newRoles = new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson };
         var oneLoginClientId = Guid.NewGuid().ToString();
         var oneLoginPrivateKeyPem = TestData.GeneratePrivateKeyPem();
+        var oneLoginAuthenticationSchemeName = Guid.NewGuid().ToString();
+        var oneLoginRedirectUriPath = $"/_onelogin/{oneLoginAuthenticationSchemeName}/callback";
+        var oneLoginPostLogoutRedirectUriPath = $"/_onelogin/{oneLoginAuthenticationSchemeName}/logout-callback";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
@@ -257,8 +228,12 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             {
                 { "Name", newName },
                 { "ApiRoles", newRoles },
+                { "IsOidcClient", bool.TrueString },
                 { "OneLoginClientId", oneLoginClientId },
-                { "OneLoginPrivateKeyPem", oneLoginPrivateKeyPem! }
+                { "OneLoginPrivateKeyPem", oneLoginPrivateKeyPem },
+                { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
+                { "OneLoginRedirectUriPath", oneLoginRedirectUriPath },
+                { "OneLoginPostLogoutRedirectUriPath", oneLoginPostLogoutRedirectUriPath },
             }
         };
 
@@ -287,15 +262,111 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 Assert.Equal(newName, applicationUserUpdatedEvent.ApplicationUser.Name);
                 Assert.True(applicationUserUpdatedEvent.ApplicationUser.ApiRoles.SequenceEqual(newRoles));
                 Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.ApiRoles);
+                Assert.False(applicationUserUpdatedEvent.OldApplicationUser.IsOidcClient);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginClientId);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginPrivateKeyPem);
+                Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginAuthenticationSchemeName);
+                Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginRedirectUriPath);
+                Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginPostLogoutRedirectUriPath);
+                Assert.True(applicationUserUpdatedEvent.ApplicationUser.IsOidcClient);
                 Assert.Equal(oneLoginClientId, applicationUserUpdatedEvent.ApplicationUser.OneLoginClientId);
                 Assert.Equal(oneLoginPrivateKeyPem, applicationUserUpdatedEvent.ApplicationUser.OneLoginPrivateKeyPem);
-                Assert.Equal(ApplicationUserUpdatedEventChanges.ApiRoles | ApplicationUserUpdatedEventChanges.Name | ApplicationUserUpdatedEventChanges.OneLoginClientId | ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem, applicationUserUpdatedEvent.Changes);
+                Assert.Equal(oneLoginAuthenticationSchemeName, applicationUserUpdatedEvent.ApplicationUser.OneLoginAuthenticationSchemeName);
+                Assert.Equal(oneLoginRedirectUriPath, applicationUserUpdatedEvent.ApplicationUser.OneLoginRedirectUriPath);
+                Assert.Equal(oneLoginPostLogoutRedirectUriPath, applicationUserUpdatedEvent.ApplicationUser.OneLoginPostLogoutRedirectUriPath);
+                Assert.Equal(
+                    ApplicationUserUpdatedEventChanges.ApiRoles |
+                        ApplicationUserUpdatedEventChanges.Name |
+                        ApplicationUserUpdatedEventChanges.IsOidcClient |
+                        ApplicationUserUpdatedEventChanges.OneLoginClientId |
+                        ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem |
+                        ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName |
+                        ApplicationUserUpdatedEventChanges.OneLoginRedirectUriPath |
+                        ApplicationUserUpdatedEventChanges.OneLoginPostLogoutRedirectUriPath,
+                    applicationUserUpdatedEvent.Changes);
             });
 
         var redirectResponse = await response.FollowRedirect(HttpClient);
         var redirectDoc = await redirectResponse.GetDocument();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Application user updated");
     }
+
+    public static TheoryData<string, string, string, string, string, string, string> InvalidOneLoginDetailsData => new()
+    {
+        {
+            "client_id",
+            _privateKeyPem,
+            "",  // OneLoginAuthenticationSchemeName
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "OneLoginAuthenticationSchemeName",
+            "Enter an authentication scheme name"
+        },
+        {
+            "client_id",
+            _privateKeyPem,
+            new string('x', 51),  // OneLoginAuthenticationSchemeName
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "OneLoginAuthenticationSchemeName",
+            "Authentication scheme name must be 50 characters or less"
+        },
+        {
+            "client_id",
+            "",  // OneLoginPrivateKeyPem
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "OneLoginPrivateKeyPem",
+            "Enter the One Login private key"
+        },
+
+        {
+            "",  // OneLoginClientId
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "OneLoginClientId",
+            "Enter the One Login client ID"
+        },
+        {
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            "",  // OneLoginRedirectUriPath
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "OneLoginRedirectUriPath",
+            "Enter the One Login redirect URI"
+        },
+        {
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            "",  // OneLoginPostLogoutRedirectUriPath
+            "OneLoginPostLogoutRedirectUriPath",
+            "Enter the One Login post logout redirect URI"
+        },
+        {
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            new string('x', 101),  // OneLoginRedirectUriPath
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "OneLoginRedirectUriPath",
+            "One Login redirect URI must be 100 characters or less"
+        },
+        {
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            new string('x', 101),  // OneLoginPostLogoutRedirectUriPath
+            "OneLoginPostLogoutRedirectUriPath",
+            "One Login post logout redirect URI must be 100 characters or less"
+        }
+    };
+
+    private static readonly string _privateKeyPem = RSA.Create().ExportPkcs8PrivateKeyPem();
 }

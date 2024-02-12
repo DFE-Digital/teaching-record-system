@@ -15,12 +15,20 @@ public partial class TestData
         {
             name ??= GenerateApplicationUserName();
             apiRoles ??= [];
+            hasOneLoginSettings ??= false;
             string? oneLoginClientId = null;
             string? oneLoginPrivateKeyPem = null;
+            string? oneLoginAuthenticationSchemeName = null;
+            string? oneLoginRedirectUriPath = null;
+            string? oneLoginPostLogoutRedirectUriPath = null;
+
             if (hasOneLoginSettings == true)
             {
                 oneLoginClientId = Guid.NewGuid().ToString();
                 oneLoginPrivateKeyPem = GeneratePrivateKeyPem();
+                oneLoginAuthenticationSchemeName = Guid.NewGuid().ToString();
+                oneLoginRedirectUriPath = $"/_onelogin/{oneLoginAuthenticationSchemeName}/callback";
+                oneLoginPostLogoutRedirectUriPath = $"/_onelogin/{oneLoginAuthenticationSchemeName}/logout-callback";
             }
 
             var user = new ApplicationUser()
@@ -28,8 +36,12 @@ public partial class TestData
                 Name = name,
                 UserId = Guid.NewGuid(),
                 ApiRoles = apiRoles,
+                IsOidcClient = hasOneLoginSettings.Value,
                 OneLoginClientId = oneLoginClientId,
-                OneLoginPrivateKeyPem = oneLoginPrivateKeyPem
+                OneLoginPrivateKeyPem = oneLoginPrivateKeyPem,
+                OneLoginAuthenticationSchemeName = oneLoginAuthenticationSchemeName,
+                OneLoginRedirectUriPath = oneLoginRedirectUriPath,
+                OneLoginPostLogoutRedirectUriPath = oneLoginPostLogoutRedirectUriPath
             };
 
             dbContext.ApplicationUsers.Add(user);
@@ -53,6 +65,7 @@ public partial class TestData
 
     public static string GeneratePrivateKeyPem()
     {
-        return RSA.Create().ExportRSAPrivateKeyPem();
+        using var rsa = RSA.Create();
+        return rsa.ExportRSAPrivateKeyPem();
     }
 }
