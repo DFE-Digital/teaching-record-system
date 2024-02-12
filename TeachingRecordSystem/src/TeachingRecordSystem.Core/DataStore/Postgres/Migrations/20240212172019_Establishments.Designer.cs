@@ -3,6 +3,7 @@ using System;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -12,9 +13,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240212172019_Establishments")]
+    partial class Establishments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1110,39 +1113,15 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("varchar[]")
                         .HasColumnName("api_roles");
 
-                    b.Property<bool>("IsOidcClient")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_oidc_client");
-
-                    b.Property<string>("OneLoginAuthenticationSchemeName")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("one_login_authentication_scheme_name");
-
                     b.Property<string>("OneLoginClientId")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("one_login_client_id");
 
-                    b.Property<string>("OneLoginPostLogoutRedirectUriPath")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("one_login_post_logout_redirect_uri_path");
-
                     b.Property<string>("OneLoginPrivateKeyPem")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)")
                         .HasColumnName("one_login_private_key_pem");
-
-                    b.Property<string>("OneLoginRedirectUriPath")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("one_login_redirect_uri_path");
-
-                    b.HasIndex("OneLoginAuthenticationSchemeName")
-                        .IsUnique()
-                        .HasDatabaseName("ix_users_one_login_authentication_scheme_name")
-                        .HasFilter("one_login_authentication_scheme_name is not null");
 
                     b.HasDiscriminator().HasValue(2);
                 });

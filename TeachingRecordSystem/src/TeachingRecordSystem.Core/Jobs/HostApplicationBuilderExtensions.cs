@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Establishments;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
@@ -100,6 +101,12 @@ public static class HostApplicationBuilderExtensions
                     nameof(PopulateAllPersonsSearchAttributesJob),
                     job => job.Execute(),
                     Cron.Never);
+
+                var giasOptions = sp.GetRequiredService<IOptions<GiasOptions>>();
+                recurringJobManager.AddOrUpdate<RefreshEstablishmentsJob>(
+                    nameof(RefreshEstablishmentsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    giasOptions!.Value.RefreshEstablishmentsJobSchedule);
 
                 return Task.CompletedTask;
             });
