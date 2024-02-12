@@ -1,6 +1,8 @@
+using System.Buffers;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -15,6 +17,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers;
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
+    // From PathString
+    private static readonly SearchValues<char> _validPathChars =
+        SearchValues.Create("!$&'()*+,-./0123456789:;=@ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~");
+
     private ApplicationUser? _user;
 
     [FromRoute]
@@ -34,20 +40,50 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
     public ApiKeyInfo[]? ApiKeys { get; set; }
 
     [BindProperty]
-    [Display(Name = "Client ID")]
-    [MaxLength(ApplicationUser.OneLoginClientIdMaxLength, ErrorMessage = "One Login Client ID must be 50 characters or less")]
+    [Display(Name = "OIDC client")]
+    public bool IsOidcClient { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Authentication scheme name")]
+    [Required(ErrorMessage = "Enter an authentication scheme name")]
+    [MaxLength(ApplicationUser.AuthenticationSchemeNameMaxLength, ErrorMessage = "Authentication scheme name must be 50 characters or less")]
+    public string? OneLoginAuthenticationSchemeName { get; set; }
+
+    [BindProperty]
+    [Display(Name = "One Login client ID")]
+    [Required(ErrorMessage = "Enter the One Login client ID")]
+    [MaxLength(ApplicationUser.OneLoginClientIdMaxLength, ErrorMessage = "One Login client ID must be 50 characters or less")]
     public string? OneLoginClientId { get; set; }
 
     [BindProperty]
-    [Display(Name = "Private Key PEM")]
+    [Display(Name = "One Login private key", Description = "Enter a key in the PEM format")]
+    [Required(ErrorMessage = "Enter the One Login private key")]
     public string? OneLoginPrivateKeyPem { get; set; }
+
+    public string? OneLoginRedirectUriBase { get; set; }
+
+    [BindProperty]
+    [Display(Name = "One Login redirect URI path")]
+    [Required(ErrorMessage = "Enter the One Login redirect URI")]
+    [MaxLength(ApplicationUser.RedirectUriPathMaxLength, ErrorMessage = "One Login redirect URI must be 100 characters or less")]
+    public string? OneLoginRedirectUriPath { get; set; }
+
+    [BindProperty]
+    [Display(Name = "One Login post logout redirect URI path")]
+    [Required(ErrorMessage = "Enter the One Login post logout redirect URI")]
+    [MaxLength(ApplicationUser.RedirectUriPathMaxLength, ErrorMessage = "One Login post logout redirect URI must be 100 characters or less")]
+    public string? OneLoginPostLogoutRedirectUriPath { get; set; }
 
     public void OnGet()
     {
         Name = _user!.Name;
         ApiRoles = _user.ApiRoles;
+        IsOidcClient = _user.IsOidcClient;
+        OneLoginAuthenticationSchemeName = _user.OneLoginAuthenticationSchemeName;
         OneLoginClientId = _user.OneLoginClientId;
         OneLoginPrivateKeyPem = _user.OneLoginPrivateKeyPem;
+        OneLoginRedirectUriPath = _user.OneLoginRedirectUriPath;
+        OneLoginPostLogoutRedirectUriPath = _user.OneLoginPostLogoutRedirectUriPath;
     }
 
     public async Task<IActionResult> OnPost()
@@ -55,25 +91,41 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
         // Sanitize roles
         var newApiRoles = ApiRoles!.Where(r => Core.ApiRoles.All.Contains(r)).ToArray();
 
-        if (OneLoginClientId is not null && OneLoginPrivateKeyPem is null)
+        if (IsOidcClient)
         {
-            ModelState.AddModelError(nameof(OneLoginPrivateKeyPem), "One Login Private Key PEM is required if One Login Client ID is set");
-        }
-
-        if (OneLoginPrivateKeyPem is not null && OneLoginClientId is null)
-        {
-            ModelState.AddModelError(nameof(OneLoginClientId), "One Login Client ID is required if One Login Private Key PEM is set");
-        }
-
-        if (OneLoginPrivateKeyPem is not null && OneLoginClientId is not null)
-        {
-            try
+            if (ModelState[nameof(OneLoginPrivateKeyPem)]!.Errors.Count == 0)
             {
-                RSA.Create().ImportFromPem(OneLoginPrivateKeyPem);
+                try
+                {
+                    RSA.Create().ImportFromPem(OneLoginPrivateKeyPem);
+                }
+                catch (ArgumentException)
+                {
+                    ModelState.AddModelError(nameof(OneLoginPrivateKeyPem), "One Login Private Key PEM is invalid");
+                }
             }
-            catch (ArgumentException)
+
+            if (ModelState[nameof(OneLoginRedirectUriPath)]!.Errors.Count == 0 &&
+                !OneLoginRedirectUriPath!.All(c => _validPathChars.Contains(c)))
             {
-                ModelState.AddModelError(nameof(OneLoginPrivateKeyPem), "One Login Private Key PEM is invalid");
+                ModelState.AddModelError(nameof(OneLoginRedirectUriPath), "Enter a valid redirect URI path");
+            }
+
+            if (ModelState[nameof(OneLoginPostLogoutRedirectUriPath)]!.Errors.Count == 0 &&
+                !OneLoginPostLogoutRedirectUriPath!.All(c => _validPathChars.Contains(c)))
+            {
+                ModelState.AddModelError(nameof(OneLoginPostLogoutRedirectUriPath), "Enter a valid post logout redirect URI path");
+            }
+        }
+        else
+        {
+            // Clear any errors for any One Login-related fields (since we're not persisting them any way)
+            foreach (var key in ModelState.Keys)
+            {
+                if (key.StartsWith("OneLogin"))
+                {
+                    ModelState.Remove(key);
+                }
             }
         }
 
@@ -82,29 +134,44 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             return this.PageWithErrors();
         }
 
-        var applicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.UserId == UserId);
-
         var changes = ApplicationUserUpdatedEventChanges.None |
-            (Name != applicationUser.Name ? ApplicationUserUpdatedEventChanges.Name : 0) |
-            (!new HashSet<string>(applicationUser.ApiRoles).SetEquals(new HashSet<string>(newApiRoles)) ? ApplicationUserUpdatedEventChanges.ApiRoles : 0) |
-            (OneLoginClientId != applicationUser.OneLoginClientId ? ApplicationUserUpdatedEventChanges.OneLoginClientId : 0) |
-            (OneLoginPrivateKeyPem != applicationUser.OneLoginPrivateKeyPem ? ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem : 0);
+            (Name != _user!.Name ? ApplicationUserUpdatedEventChanges.Name : 0) |
+            (!new HashSet<string>(_user.ApiRoles).SetEquals(new HashSet<string>(newApiRoles)) ? ApplicationUserUpdatedEventChanges.ApiRoles : 0) |
+            (IsOidcClient != _user.IsOidcClient ? ApplicationUserUpdatedEventChanges.IsOidcClient : 0);
+
+        if (IsOidcClient)
+        {
+            changes |=
+                (OneLoginClientId != _user.OneLoginClientId ? ApplicationUserUpdatedEventChanges.OneLoginClientId : 0) |
+                (OneLoginPrivateKeyPem != _user.OneLoginPrivateKeyPem ? ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem : 0) |
+                (OneLoginAuthenticationSchemeName != _user.OneLoginAuthenticationSchemeName ? ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName : 0) |
+                (OneLoginRedirectUriPath != _user.OneLoginRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginRedirectUriPath : 0) |
+                (OneLoginPostLogoutRedirectUriPath != _user.OneLoginPostLogoutRedirectUriPath ? ApplicationUserUpdatedEventChanges.OneLoginPostLogoutRedirectUriPath : 0);
+        }
 
         if (changes != ApplicationUserUpdatedEventChanges.None)
         {
-            var oldApplicationUser = Core.Events.Models.ApplicationUser.FromModel(applicationUser);
+            var oldApplicationUser = Core.Events.Models.ApplicationUser.FromModel(_user);
 
-            applicationUser.Name = Name!;
-            applicationUser.ApiRoles = newApiRoles;
-            applicationUser.OneLoginClientId = OneLoginClientId;
-            applicationUser.OneLoginPrivateKeyPem = OneLoginPrivateKeyPem;
+            _user.Name = Name!;
+            _user.ApiRoles = newApiRoles;
+
+            if (IsOidcClient)
+            {
+                _user.IsOidcClient = IsOidcClient;
+                _user.OneLoginAuthenticationSchemeName = OneLoginAuthenticationSchemeName;
+                _user.OneLoginClientId = OneLoginClientId;
+                _user.OneLoginPrivateKeyPem = OneLoginPrivateKeyPem;
+                _user.OneLoginRedirectUriPath = OneLoginRedirectUriPath;
+                _user.OneLoginPostLogoutRedirectUriPath = OneLoginPostLogoutRedirectUriPath;
+            }
 
             var @event = new ApplicationUserUpdatedEvent()
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = clock.UtcNow,
                 RaisedBy = User.GetUserId(),
-                ApplicationUser = Core.Events.Models.ApplicationUser.FromModel(applicationUser),
+                ApplicationUser = Core.Events.Models.ApplicationUser.FromModel(_user),
                 OldApplicationUser = oldApplicationUser,
                 Changes = changes
             };
@@ -133,7 +200,15 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             .OrderBy(k => k.CreatedOn)
             .Select(k => new ApiKeyInfo(k.ApiKeyId, k.Key, k.Expires)).ToArray();
 
+        OneLoginRedirectUriBase = GetCurrentBaseUrl();
+
         await next();
+
+        string GetCurrentBaseUrl()
+        {
+            var request = HttpContext.Request;
+            return UriHelper.BuildAbsolute(request.Scheme, request.Host);
+        }
     }
 
     public record ApiKeyInfo(Guid ApiKeyId, string Key, DateTime? Expires);

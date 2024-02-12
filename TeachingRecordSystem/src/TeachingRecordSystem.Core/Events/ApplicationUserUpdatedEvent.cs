@@ -15,5 +15,9 @@ public enum ApplicationUserUpdatedEventChanges
     Name = 1 << 0,
     ApiRoles = 1 << 1,
     OneLoginClientId = 1 << 2,
-    OneLoginPrivateKeyPem = 1 << 3
+    OneLoginPrivateKeyPem = 1 << 3,
+    IsOidcClient = 1 << 4,
+    OneLoginAuthenticationSchemeName = 1 << 5,
+    OneLoginRedirectUriPath = 1 << 6,
+    OneLoginPostLogoutRedirectUriPath = 1 << 7,
 }

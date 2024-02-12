@@ -35,8 +35,13 @@ public class ApplicationUserMapping : IEntityTypeConfiguration<ApplicationUser>
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
         builder.Property(e => e.ApiRoles).HasColumnType("varchar[]");
-        builder.Property(e => e.OneLoginClientId).HasMaxLength(50);
+        builder.Property(e => e.OneLoginClientId).HasMaxLength(ApplicationUser.OneLoginClientIdMaxLength);
         builder.Property(e => e.OneLoginPrivateKeyPem).HasMaxLength(2000);
+        builder.Property(e => e.OneLoginAuthenticationSchemeName).HasMaxLength(ApplicationUser.AuthenticationSchemeNameMaxLength);
+        builder.Property(e => e.OneLoginRedirectUriPath).HasMaxLength(ApplicationUser.RedirectUriPathMaxLength);
+        builder.Property(e => e.OneLoginPostLogoutRedirectUriPath).HasMaxLength(ApplicationUser.RedirectUriPathMaxLength);
+        builder.HasIndex(e => e.OneLoginAuthenticationSchemeName).IsUnique().HasDatabaseName(ApplicationUser.OneLoginAuthenticationSchemeNameUniqueIndexName)
+            .HasFilter("one_login_authentication_scheme_name is not null");
     }
 }
 
