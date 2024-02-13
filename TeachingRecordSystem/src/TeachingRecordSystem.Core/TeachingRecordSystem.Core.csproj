@@ -46,6 +46,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="CsvHelper" />
     <PackageReference Include="dbup-sqlserver" />
     <PackageReference Include="DistributedLock.Azure" />
     <PackageReference Include="DistributedLock.FileSystem" />

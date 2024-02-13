@@ -9,6 +9,7 @@ using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.DqtReporting;
+using TeachingRecordSystem.Core.Services.Establishments;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
@@ -35,6 +36,7 @@ builder
     .AddDistributedLocks()
     .AddDqtReporting()
     .AddTrsSyncService()
+    .AddGias()
     .AddHangfire()
     .AddBackgroundJobs()
     .AddBackgroundWorkScheduler()

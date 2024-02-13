@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events;
+using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
@@ -58,6 +59,8 @@ public class TrsDbContext : DbContext
     public DbSet<NameSynonyms> NameSynonyms => Set<NameSynonyms>();
 
     public DbSet<PersonSearchAttribute> PersonSearchAttributes => Set<PersonSearchAttribute>();
+
+    public DbSet<Establishment> Establishments => Set<Establishment>();
 
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString, int? commandTimeout = null)
     {
