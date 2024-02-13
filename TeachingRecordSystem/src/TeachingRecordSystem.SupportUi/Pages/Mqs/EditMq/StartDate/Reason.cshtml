@@ -8,17 +8,15 @@
     <govuk-back-link href="@LinkGenerator.MqEditStartDate(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
-<span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
-<h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqEditStartDateReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post" enctype="multipart/form-data">
+            <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
+            <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+
             <govuk-radios asp-for="ChangeReason" data-testid="change-reason-options">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend>
-                        <h3 class="govuk-heading-m">Reason for change</h3>
-                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">Reason for change</govuk-radios-fieldset-legend>
                     <govuk-radios-item value="@MqChangeStartDateReasonOption.IncorrectStartDate">
                         @MqChangeStartDateReasonOption.IncorrectStartDate.GetDisplayName()
                     </govuk-radios-item>

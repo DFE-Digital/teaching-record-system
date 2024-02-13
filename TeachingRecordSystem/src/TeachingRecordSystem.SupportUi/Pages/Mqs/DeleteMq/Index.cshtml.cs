@@ -35,8 +35,8 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
     public DateOnly? EndDate { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason for deleting")]
     [Display(Name = "Reason for deleting")]
+    [Required(ErrorMessage = "Select a reason for deleting")]
     public MqDeletionReasonOption? DeletionReason { get; set; }
 
     [BindProperty]

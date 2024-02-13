@@ -61,7 +61,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
 
-        Specialisms = MandatoryQualificationSpecialismRegistry.All
+        Specialisms = MandatoryQualificationSpecialismRegistry.GetAll()
             .OrderBy(t => t.Title)
             .ToArray();
 

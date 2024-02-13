@@ -576,7 +576,7 @@ public class ChangeLogTests : TestBase
 
                 if (changes.HasFlag(MandatoryQualificationUpdatedEventChanges.Specialism))
                 {
-                    newSpecialism = MandatoryQualificationSpecialismRegistry.All.Where(s => s.Title != "Deaf education").RandomOne().Value;
+                    newSpecialism = MandatoryQualificationSpecialismRegistry.GetAll().Where(s => s.Title != "Deaf education").RandomOne().Value;
                     changeReason = "Change of specialism";
                     changeCount++;
                 }
