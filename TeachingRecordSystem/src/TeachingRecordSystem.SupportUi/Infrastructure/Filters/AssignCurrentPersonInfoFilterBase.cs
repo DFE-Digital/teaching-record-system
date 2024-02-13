@@ -15,6 +15,7 @@ public abstract class AssignCurrentPersonInfoFilterBase(ICrmQueryDispatcher crmQ
                 new ColumnSet(
                     Contact.Fields.Id,
                     Contact.Fields.FirstName,
+                    Contact.Fields.MiddleName,
                     Contact.Fields.LastName)));
 
         if (contactDetail is null)
@@ -26,6 +27,7 @@ public abstract class AssignCurrentPersonInfoFilterBase(ICrmQueryDispatcher crmQ
             new CurrentPersonFeature(
                 contactDetail.Contact.Id,
                 contactDetail.Contact.FirstName,
+                contactDetail.Contact.MiddleName ?? "",
                 contactDetail.Contact.LastName));
         return true;
     }

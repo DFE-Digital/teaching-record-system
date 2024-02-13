@@ -6,19 +6,10 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-public class QualificationsModel : PageModel
+public class QualificationsModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    ReferenceDataCache referenceDataCache) : PageModel
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly ReferenceDataCache _referenceDataCache;
-
-    public QualificationsModel(
-        ICrmQueryDispatcher crmQueryDispatcher,
-        ReferenceDataCache referenceDataCache)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _referenceDataCache = referenceDataCache;
-    }
-
     [FromRoute]
     public Guid PersonId { get; set; }
 
@@ -37,7 +28,7 @@ public class QualificationsModel : PageModel
 
     public async Task<IActionResult> OnGet()
     {
-        var qualifications = await _crmQueryDispatcher.ExecuteQuery(new GetQualificationsByContactIdQuery(PersonId));
+        var qualifications = await crmQueryDispatcher.ExecuteQuery(new GetQualificationsByContactIdQuery(PersonId));
         MandatoryQualifications = await MapMandatoryQualifications(qualifications!);
 
         return Page();
@@ -50,8 +41,8 @@ public class QualificationsModel : PageModel
             .OrderByDescending(q => q.dfeta_CompletionorAwardDate)
             .Select(async q =>
             {
-                var mqEstablishment = q.dfeta_MQ_MQEstablishmentId is not null ? await _referenceDataCache.GetMqEstablishmentById(q.dfeta_MQ_MQEstablishmentId.Id) : null;
-                var specialism = q.dfeta_MQ_SpecialismId is not null ? await _referenceDataCache.GetMqSpecialismById(q.dfeta_MQ_SpecialismId.Id) : null;
+                var mqEstablishment = q.dfeta_MQ_MQEstablishmentId is not null ? await referenceDataCache.GetMqEstablishmentById(q.dfeta_MQ_MQEstablishmentId.Id) : null;
+                var specialism = q.dfeta_MQ_SpecialismId is not null ? await referenceDataCache.GetMqSpecialismById(q.dfeta_MQ_SpecialismId.Id) : null;
                 var status = q.dfeta_MQ_Status ?? (q.dfeta_MQ_Date.HasValue ? dfeta_qualification_dfeta_MQ_Status.Passed : null);
 
                 return new MandatoryQualificationInfo
