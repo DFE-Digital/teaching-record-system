@@ -29,18 +29,9 @@ public class ChangeLogModel(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFa
 
     public async Task<IActionResult> OnGet()
     {
-        var contactDetail = await crmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByIdQuery(
-                PersonId,
-                new ColumnSet(
-                    Contact.Fields.FirstName,
-                    Contact.Fields.MiddleName,
-                    Contact.Fields.LastName,
-                    Contact.Fields.dfeta_StatedFirstName,
-                    Contact.Fields.dfeta_StatedMiddleName,
-                    Contact.Fields.dfeta_StatedLastName)));
+        var personInfo = HttpContext.GetCurrentPersonFeature();
 
-        Name = contactDetail!.Contact.ResolveFullName(includeMiddleName: false);
+        Name = personInfo.Name;
 
         var notesResult = await crmQueryDispatcher.ExecuteQuery(new GetNotesByContactIdQuery(PersonId));
 

@@ -18,6 +18,7 @@ public static class HttpContextExtensions
             new CurrentPersonFeature(
                 contactDetail.Contact.Id,
                 contactDetail.Contact.FirstName,
+                contactDetail.Contact.MiddleName ?? "",
                 contactDetail.Contact.LastName));
 
     public static CurrentMandatoryQualificationFeature GetCurrentMandatoryQualificationFeature(this HttpContext context) =>
@@ -27,9 +28,9 @@ public static class HttpContextExtensions
         context.Features.Set(currentMandatoryQualificationFeature);
 }
 
-public record CurrentPersonFeature(Guid PersonId, string FirstName, string LastName)
+public record CurrentPersonFeature(Guid PersonId, string FirstName, string MiddleName, string LastName)
 {
-    public string Name => FirstName + " " + LastName;
+    public string Name => (FirstName + " " + MiddleName).Trim() + " " + LastName;
 }
 
 public record CurrentMandatoryQualificationFeature(

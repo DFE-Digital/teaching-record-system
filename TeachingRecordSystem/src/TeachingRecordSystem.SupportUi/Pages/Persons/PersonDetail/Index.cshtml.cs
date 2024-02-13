@@ -6,18 +6,11 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-public class IndexModel : PageModel
+public class IndexModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    IConfiguration configuration) : PageModel
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-    private readonly TimeSpan _concurrentNameChangeWindow;
-
-    public IndexModel(
-        ICrmQueryDispatcher crmQueryDispatcher,
-        IConfiguration configuration)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-        _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue<int>("ConcurrentNameChangeWindowSeconds", 5));
-    }
+    private readonly TimeSpan _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue<int>("ConcurrentNameChangeWindowSeconds", 5));
 
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -35,7 +28,7 @@ public class IndexModel : PageModel
 
     public async Task OnGet()
     {
-        var contactDetail = await _crmQueryDispatcher.ExecuteQuery(
+        var contactDetail = await crmQueryDispatcher.ExecuteQuery(
             new GetContactDetailByIdQuery(
                 PersonId,
                 new ColumnSet(
@@ -59,8 +52,7 @@ public class IndexModel : PageModel
 
         Person = new PersonInfo()
         {
-            Name = contact.ResolveFullName(includeMiddleName: false),
-            FullName = contact.ResolveFullName(includeMiddleName: true),
+            Name = contact.ResolveFullName(includeMiddleName: true),
             DateOfBirth = contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
             Trn = contact.dfeta_TRN,
             NationalInsuranceNumber = contact.dfeta_NINumber,
@@ -103,7 +95,6 @@ public class IndexModel : PageModel
     public record PersonInfo
     {
         public required string Name { get; init; }
-        public required string FullName { get; init; }
         public required DateOnly? DateOfBirth { get; init; }
         public required string? Trn { get; init; }
         public required string? NationalInsuranceNumber { get; init; }

@@ -19,7 +19,6 @@
             <a class="govuk-notification-banner__link" href="@LinkGenerator.PersonAlerts(Model.PersonId, Model.Search, Model.SortBy, Model.PageNumber)">View alerts</a>.
         </p>
     </govuk-notification-banner>
-
 }
 
 <govuk-summary-card>
@@ -27,7 +26,7 @@
     <govuk-summary-list data-testid="personal-details">
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-name">@Model.Person.FullName</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value data-testid="personal-details-name">@Model.Person.Name</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
                 <govuk-summary-list-row-action href="@LinkGenerator.PersonEditName(Model.PersonId, null)" visually-hidden-text="change name" data-testid="name-change-link">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
@@ -38,10 +37,10 @@
                 <govuk-summary-list-row-key>Previous name(s)</govuk-summary-list-row-key>
                 <govuk-summary-list-row-value>
                     <ul class="govuk-list">
-            @for (int i = 0; i < Model.Person.PreviousNames.Length; i++)
-            {
-                        <li data-testid="personal-details-previous-names-@i">@Model.Person.PreviousNames[i]</li>                
-            }
+                        @for (int i = 0; i < Model.Person.PreviousNames.Length; i++)
+                        {
+                            <li data-testid="personal-details-previous-names-@i">@Model.Person.PreviousNames[i]</li>                
+                        }
                     </ul>
                 </govuk-summary-list-row-value>
             </govuk-summary-list-row>
@@ -51,7 +50,7 @@
             <govuk-summary-list-row-value data-testid="personal-details-date-of-birth" use-empty-fallback>@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : string.Empty)</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
                 <govuk-summary-list-row-action href="@LinkGenerator.PersonEditDateOfBirth(Model.PersonId, null)" visually-hidden-text="change date of birth" data-testid="date-of-birth-change-link">Change</govuk-summary-list-row-action>
-                </govuk-summary-list-row-actions>
+            </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>

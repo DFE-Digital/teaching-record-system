@@ -51,7 +51,7 @@ public class IndexTests : TestBase
 
         var doc = await response.GetDocument();
 
-        Assert.Equal($"{updatedFirstName} {updatedLastName}", doc.GetElementByTestId("page-title")!.TextContent);
+        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetElementByTestId("page-title")!.TextContent);
         var summaryList = doc.GetElementByTestId("personal-details");
         Assert.NotNull(summaryList);
         Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", summaryList.GetElementByTestId("personal-details-name")!.TextContent);
@@ -83,7 +83,7 @@ public class IndexTests : TestBase
 
         var doc = await response.GetDocument();
 
-        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("page-title")!.TextContent);
+        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("page-title")!.TextContent);
         var summaryList = doc.GetElementByTestId("personal-details");
         Assert.NotNull(summaryList);
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", summaryList.GetElementByTestId("personal-details-name")!.TextContent);
