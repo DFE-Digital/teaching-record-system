@@ -1,11 +1,11 @@
-@page "/persons/{personId}/changelog"
+@page "/persons/{personId}/change-history"
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.SupportUi.Pages.Common;
 @using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events
-@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ChangeLogModel
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.ChangeHistoryModel
 @{
     Layout = "Layout";
-    ViewBag.SelectedTab = PersonSubNavigationTab.ChangeLog;
+    ViewBag.SelectedTab = PersonSubNavigationTab.ChangeHistory;
     ViewBag.PersonId = Model.PersonId;
     ViewBag.Search = Model.Search;
     ViewBag.SortBy = Model.SortBy;

@@ -5,5 +5,5 @@ public enum PersonSubNavigationTab
     General,
     Qualifications,
     Alerts,
-    ChangeLog
+    ChangeHistory
 }

@@ -19,9 +19,7 @@
         <govuk-tag class="@statusTagClass" data-testid="timeline-item-status">@status</govuk-tag>
     </div>
     <p class="moj-timeline__date">
-        <time datetime="@Model.Timestamp.ToUniversalTime().ToString("O")" data-testid="timeline-item-time">
-            @Model.Timestamp.ToString("dd MMMMM yyyy 'at' h:mm tt")
-        </time>
+        <time datetime="@Model.Timestamp.ToUniversalTime().ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         <p class="govuk-body" data-testid="timeline-item-summary">@crmTask.Subject</p>
