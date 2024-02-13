@@ -10,9 +10,7 @@
         <p class="moj-timeline__byline" data-testid="timeline-item-user">by @user.FirstName @user.LastName</p>
     </div>
     <p class="moj-timeline__date">
-        <time datetime="@Model.Timestamp.ToUniversalTime().ToString("O")" data-testid="timeline-item-time">
-            @Model.Timestamp.ToString("dd MMMMM yyyy 'at' h:mm tt")
-        </time>
+        <time datetime="@Model.Timestamp.ToUniversalTime().ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         <p class="govuk-body" data-testid="timeline-item-summary">@Model.ItemModel.Subject</p>

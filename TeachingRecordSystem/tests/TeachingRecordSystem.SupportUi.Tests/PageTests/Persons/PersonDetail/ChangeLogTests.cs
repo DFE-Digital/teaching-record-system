@@ -17,7 +17,7 @@ public class ChangeLogTests : TestBase
         // Arrange        
         var nonExistentPersonId = Guid.NewGuid().ToString();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{nonExistentPersonId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{nonExistentPersonId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -32,7 +32,7 @@ public class ChangeLogTests : TestBase
         // Arrange
         var person = await TestData.CreatePerson();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -53,7 +53,7 @@ public class ChangeLogTests : TestBase
         await TestData.CreateNote(b => b.WithPersonId(person.ContactId).WithSubject("Note 1 Subject").WithDescription("Note 1 Description"));
         await TestData.CreateNote(b => b.WithPersonId(person.ContactId).WithSubject("Note 2 Subject").WithDescription("Note 2 Description"));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -88,7 +88,7 @@ public class ChangeLogTests : TestBase
         await TestData.CreateCrmTask(b => b.WithPersonId(person.ContactId).WithSubject("Task 2 Subject").WithDescription("Task 2 Description").WithDueDate(Clock.UtcNow.AddDays(-2)));
         await TestData.CreateCrmTask(b => b.WithPersonId(person.ContactId).WithSubject("Task 3 Subject").WithDescription("Task 3 Description").WithCompletedStatus());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -128,7 +128,7 @@ public class ChangeLogTests : TestBase
         await TestData.CreateNameChangeIncident(b => b.WithCustomerId(person.ContactId).WithRejectedStatus());
         await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(person.ContactId).WithApprovedStatus());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -210,7 +210,7 @@ public class ChangeLogTests : TestBase
                 syncEnabled: true);
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -303,7 +303,7 @@ public class ChangeLogTests : TestBase
             await dbContext.SaveChangesAsync();
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -317,7 +317,7 @@ public class ChangeLogTests : TestBase
         Assert.Equal(2, changes.Count);
         Assert.Null(changes[0].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By {user.Name} on", changes[0].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 June 2021 at 11:30 AM", changes[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 June 2021 at 11:30 AM", changes[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[1].MandatoryQualification.Provider!.Name, changes[0].GetElementByTestId("provider")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[1].MandatoryQualification.Specialism!.Value.GetTitle(), changes[0].GetElementByTestId("specialism")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[1].MandatoryQualification.StartDate!.Value.ToString("d MMMM yyyy"), changes[0].GetElementByTestId("start-date")!.TextContent.Trim());
@@ -326,7 +326,7 @@ public class ChangeLogTests : TestBase
 
         Assert.Null(changes[1].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By Test User on", changes[1].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 January 2021 at 10:30 AM", changes[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 January 2021 at 10:30 AM", changes[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[0].MandatoryQualification.Provider!.DqtMqEstablishmentName, changes[1].GetElementByTestId("provider")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[0].MandatoryQualification.Specialism!.Value.GetTitle(), changes[1].GetElementByTestId("specialism")!.TextContent.Trim());
         Assert.Equal(deactivatedEvents[0].MandatoryQualification.StartDate!.Value.ToString("d MMMM yyyy"), changes[1].GetElementByTestId("start-date")!.TextContent.Trim());
@@ -392,7 +392,7 @@ public class ChangeLogTests : TestBase
             await dbContext.SaveChangesAsync();
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -406,10 +406,10 @@ public class ChangeLogTests : TestBase
         Assert.Equal(2, changes.Count);
         Assert.Null(changes[0].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By {user.Name} on", changes[0].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 June 2021 at 11:30 AM", changes[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 June 2021 at 11:30 AM", changes[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
         Assert.Null(changes[1].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By Test User on", changes[1].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 January 2021 at 10:30 AM", changes[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 January 2021 at 10:30 AM", changes[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
     }
 
     [Fact]
@@ -471,7 +471,7 @@ public class ChangeLogTests : TestBase
             await dbContext.SaveChangesAsync();
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -485,10 +485,10 @@ public class ChangeLogTests : TestBase
         Assert.Equal(2, changes.Count);
         Assert.Null(changes[0].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By {user.Name} on", changes[0].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 June 2021 at 11:30 AM", changes[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 June 2021 at 11:30 AM", changes[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
         Assert.Null(changes[1].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By Test User on", changes[1].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 January 2021 at 10:30 AM", changes[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 January 2021 at 10:30 AM", changes[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
     }
 
     [Fact]
@@ -503,7 +503,7 @@ public class ChangeLogTests : TestBase
             .WithMandatoryQualification(b => b.WithCreatedUtc(dateTimeOutsideBst).WithCreatedByUser(RaisedByUserInfo.FromDqtUser(dqtUserId, "Test User")))
             .WithMandatoryQualification(b => b.WithCreatedUtc(dateTimeInsideBst).WithCreatedByUser(RaisedByUserInfo.FromUserId(user.UserId))));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -517,10 +517,10 @@ public class ChangeLogTests : TestBase
         Assert.Equal(2, changes.Count);
         Assert.Null(changes[0].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By {user.Name} on", changes[0].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 June 2021 at 11:30 AM", changes[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 June 2021 at 11:30 AM", changes[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
         Assert.Null(changes[1].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By Test User on", changes[1].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 January 2021 at 10:30 AM", changes[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 January 2021 at 10:30 AM", changes[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
     }
 
     [Theory]
@@ -667,7 +667,7 @@ public class ChangeLogTests : TestBase
             await dbContext.SaveChangesAsync();
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -681,7 +681,7 @@ public class ChangeLogTests : TestBase
         Assert.Equal(2, timelineItems.Count);
         Assert.Null(timelineItems[0].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By {user.Name} on", timelineItems[0].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 June 2021 at 11:30 AM", timelineItems[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 June 2021 at 11:30 AM", timelineItems[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
         var reasonForChange1 = timelineItems[0].GetElementByTestId("reason-for-change");
         if (updatedEvents[1].ChangeReason is null)
         {
@@ -753,7 +753,7 @@ public class ChangeLogTests : TestBase
 
         Assert.Null(timelineItems[1].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By Test User on", timelineItems[1].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 January 2021 at 10:30 AM", timelineItems[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 January 2021 at 10:30 AM", timelineItems[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
 
         var reasonForChange2 = timelineItems[1].GetElementByTestId("reason-for-change");
         if (updatedEvents[0].ChangeReason is null)
@@ -888,7 +888,7 @@ public class ChangeLogTests : TestBase
             await dbContext.SaveChangesAsync();
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/changelog");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/change-history");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -902,13 +902,13 @@ public class ChangeLogTests : TestBase
         Assert.Equal(2, timelineItems.Count);
         Assert.Null(timelineItems[0].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By {user.Name} on", timelineItems[0].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 June 2021 at 11:30 AM", timelineItems[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 June 2021 at 11:30 AM", timelineItems[0].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
         var previousData1 = timelineItems[0].GetElementByTestId("previous-data");
         Assert.Null(previousData1);
 
         Assert.Null(timelineItems[1].GetElementByTestId("timeline-item-status"));
         Assert.Equal($"By Test User on", timelineItems[1].GetElementByTestId("raised-by")!.TextContent.Trim());
-        Assert.Equal("01 January 2021 at 10:30 AM", timelineItems[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
+        Assert.Equal("1 January 2021 at 10:30 AM", timelineItems[1].GetElementByTestId("timeline-item-time")!.TextContent.Trim());
         var previousData2 = timelineItems[1].GetElementByTestId("previous-data");
         Assert.NotNull(previousData2);
         Assert.Equal(migratedEvents[0].MandatoryQualification.Provider!.DqtMqEstablishmentName, previousData2.GetElementByTestId("provider")!.TextContent.Trim());

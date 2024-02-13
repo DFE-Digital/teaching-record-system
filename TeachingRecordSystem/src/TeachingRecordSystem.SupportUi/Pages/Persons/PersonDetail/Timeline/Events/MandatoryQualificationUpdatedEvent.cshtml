@@ -15,14 +15,12 @@
     </div>
     <p class="moj-timeline__date">
         <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">
-            @Model.Timestamp.ToString("dd MMMMM yyyy 'at' h:mm tt")
-        </time>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
     </p>
     <div class="moj-timeline__description">
         @if (updatedEvent.ChangeReason is not null)
         {
-            <govuk-details data-testid="reason-for-change">
+            <govuk-details class="govuk-!-margin-bottom-2" data-testid="reason-for-change">
                 <govuk-details-summary>Reason for change</govuk-details-summary>
                 <govuk-details-text>
                     <govuk-summary-list>
@@ -45,7 +43,7 @@
                 </govuk-details-text>
             </govuk-details>
         }
-        <govuk-details data-testid="previous-data">
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
             <govuk-details-summary>Previous data</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>                

@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-public class ChangeLogModel(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFactory<TrsDbContext> dbContextFactory) : PageModel
+public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFactory<TrsDbContext> dbContextFactory) : PageModel
 {
     [FromRoute]
     public Guid PersonId { get; set; }
