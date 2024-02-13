@@ -25,8 +25,8 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a reason for change")]
     [Display(Name = "Reason for change")]
+    [Required(ErrorMessage = "Select a reason for change")]
     public MqChangeSpecialismReasonOption? ChangeReason { get; set; }
 
     [BindProperty]

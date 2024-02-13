@@ -9,38 +9,40 @@
     <govuk-back-link href="@LinkGenerator.MqAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId)" />
 }
 
-<span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
-<h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqAddStatus(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
+
             <govuk-radios asp-for="Status" data-testid="status-options">
-                <govuk-radios-item value="@MandatoryQualificationStatus.Deferred" data-testid="status-deferred">
-                    Deferred
-                </govuk-radios-item>
-                <govuk-radios-item value="@MandatoryQualificationStatus.Extended" data-testid="status-extended">
-                    Extended
-                </govuk-radios-item>
-                <govuk-radios-item value="@MandatoryQualificationStatus.Failed" data-testid="status-failed">
-                    Failed
-                </govuk-radios-item>
-                <govuk-radios-item value="@MandatoryQualificationStatus.InProgress" data-testid="status-in-progress">
-                    In Progress
-                </govuk-radios-item>
-                <govuk-radios-item value="@MandatoryQualificationStatus.Passed" data-testid="status-passed">
-                    Passed
-                    <govuk-radios-item-conditional>
-                        <govuk-date-input asp-for="EndDate">
-                            <govuk-date-input-fieldset>
-                                <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
-                            </govuk-date-input-fieldset>
-                        </govuk-date-input>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
-                <govuk-radios-item value="@MandatoryQualificationStatus.Withdrawn">
-                    Withdrawn
-                </govuk-radios-item>                    
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" />
+                    <govuk-radios-item value="@MandatoryQualificationStatus.Deferred" data-testid="status-deferred">
+                        @MandatoryQualificationStatus.Deferred.GetTitle()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.Extended" data-testid="status-extended">
+                        @MandatoryQualificationStatus.Extended.GetTitle()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.Failed" data-testid="status-failed">
+                        @MandatoryQualificationStatus.Failed.GetTitle()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.InProgress" data-testid="status-in-progress">
+                        @MandatoryQualificationStatus.InProgress.GetTitle()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.Passed" data-testid="status-passed">
+                        @MandatoryQualificationStatus.Passed.GetTitle()
+                        <govuk-radios-item-conditional>
+                            <govuk-date-input asp-for="EndDate">
+                                <govuk-date-input-fieldset>
+                                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
+                                </govuk-date-input-fieldset>
+                            </govuk-date-input>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.Withdrawn">
+                        Withdrawn
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
             </govuk-radios>
 
             <div class="govuk-button-group">

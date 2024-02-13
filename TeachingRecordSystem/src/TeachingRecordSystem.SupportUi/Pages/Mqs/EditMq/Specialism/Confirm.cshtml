@@ -8,12 +8,12 @@
     <govuk-back-link href="@LinkGenerator.MqEditSpecialismReason(Model.QualificationId, Model.JourneyInstance!.InstanceId)" />
 }
 
-<span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
-<h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
         <form action="@LinkGenerator.MqEditSpecialismConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
+            <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+
             <govuk-summary-list data-testid="change-summary">
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Current specialism</govuk-summary-list-row-key>

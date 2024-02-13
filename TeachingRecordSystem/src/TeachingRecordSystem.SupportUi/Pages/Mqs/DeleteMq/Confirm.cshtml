@@ -8,12 +8,12 @@
     <govuk-back-link href="@LinkGenerator.MqDelete(Model.QualificationId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
 }
 
-<span class="govuk-caption-l">Delete qualification - @Model.PersonName</span>
-<h1 class="govuk-heading-l" data-testid="title">Confirm deletion of mandatory qualification</h1>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqDeleteConfirm(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Delete qualification - @Model.PersonName</span>
+            <h1 class="govuk-heading-l" data-testid="title">Confirm deletion of mandatory qualification</h1>
+
             <govuk-summary-list data-testid="deletion-summary">
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for deleting</govuk-summary-list-row-key>

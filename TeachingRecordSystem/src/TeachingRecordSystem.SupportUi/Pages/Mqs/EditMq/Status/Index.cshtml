@@ -9,38 +9,42 @@
     <govuk-back-link href="@LinkGenerator.PersonQualifications(Model.PersonId!.Value)">Back</govuk-back-link>
 }
 
-<span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
-<h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqEditStatus(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Change a mandatory qualification - @Model.PersonName</span>
+
             <govuk-radios asp-for="Status" data-testid="result-options">
-                <govuk-radios-item value="@MandatoryQualificationStatus.InProgress" data-testid="result-in-progress">
-                    @MandatoryQualificationStatus.InProgress.GetTitle()
-                </govuk-radios-item>
-                <govuk-radios-item value="@MandatoryQualificationStatus.Deferred" data-testid="result-deferred">
-                    @MandatoryQualificationStatus.Deferred.GetTitle()
-                </govuk-radios-item>
-                <govuk-radios-item value="@MandatoryQualificationStatus.Extended" data-testid="result-extended">
-                    @MandatoryQualificationStatus.Extended.GetTitle()
-                </govuk-radios-item>
-                <govuk-radios-item value="@MandatoryQualificationStatus.Failed" data-testid="result-failed">
-                    @MandatoryQualificationStatus.Failed.GetTitle()
-                </govuk-radios-item>
-                <govuk-radios-item value="@MandatoryQualificationStatus.Passed" data-testid="result-passed">
-                    @MandatoryQualificationStatus.Passed.GetTitle()
-                    <govuk-radios-item-conditional>
-                        <govuk-date-input asp-for="EndDate">
-                            <govuk-date-input-fieldset>
-                                <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
-                            </govuk-date-input-fieldset>
-                        </govuk-date-input>
-                    </govuk-radios-item-conditional>
-                </govuk-radios-item>
-                <govuk-radios-item value="@MandatoryQualificationStatus.Withdrawn" date-testid="result-withdrawn">
-                    @MandatoryQualificationStatus.Withdrawn.GetTitle()
-                </govuk-radios-item>
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l">
+                        @ViewBag.Title
+                    </govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.InProgress" data-testid="result-in-progress">
+                        @MandatoryQualificationStatus.InProgress.GetTitle()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.Deferred" data-testid="result-deferred">
+                        @MandatoryQualificationStatus.Deferred.GetTitle()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.Extended" data-testid="result-extended">
+                        @MandatoryQualificationStatus.Extended.GetTitle()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.Failed" data-testid="result-failed">
+                        @MandatoryQualificationStatus.Failed.GetTitle()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.Passed" data-testid="result-passed">
+                        @MandatoryQualificationStatus.Passed.GetTitle()
+                        <govuk-radios-item-conditional>
+                            <govuk-date-input asp-for="EndDate">
+                                <govuk-date-input-fieldset>
+                                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--m" />
+                                </govuk-date-input-fieldset>
+                            </govuk-date-input>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@MandatoryQualificationStatus.Withdrawn" date-testid="result-withdrawn">
+                        @MandatoryQualificationStatus.Withdrawn.GetTitle()
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
             </govuk-radios>
 
             <div class="govuk-button-group">

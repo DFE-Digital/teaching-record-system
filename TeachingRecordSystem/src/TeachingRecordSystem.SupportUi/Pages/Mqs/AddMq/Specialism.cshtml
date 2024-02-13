@@ -8,22 +8,21 @@
     <govuk-back-link href="@LinkGenerator.MqAddProvider(Model.PersonId, Model.JourneyInstance!.InstanceId)" />
 }
 
-<span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
-<h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqAddSpecialism(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
+
             <govuk-radios asp-for="Specialism" data-testid="specialism-list">
-                @if (Model.Specialisms is not null)
-                {
-                    @foreach (var specialism in Model.Specialisms)
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" />
+                    @foreach (var specialism in Model.Specialisms!)
                     {
                         <govuk-radios-item value="@specialism.Value">
                             @specialism.Title
                         </govuk-radios-item>
                     }
-                }
+                </govuk-radios-fieldset>
             </govuk-radios>
 
             <div class="govuk-button-group">

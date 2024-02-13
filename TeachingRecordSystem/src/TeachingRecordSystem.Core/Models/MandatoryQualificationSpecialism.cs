@@ -7,7 +7,7 @@ public enum MandatoryQualificationSpecialism
     [MandatoryQualificationSpecialismInfo(name: "auditory", dqtValue: "Auditory", isValidForNewRecord: false)]
     Auditory = 0,
 
-    [MandatoryQualificationSpecialismInfo(name: "deaf education", dqtValue: "Deaf education")]
+    [MandatoryQualificationSpecialismInfo(name: "deaf education", dqtValue: "Deaf education", isValidForNewRecord: false)]
     DeafEducation = 1,
 
     [MandatoryQualificationSpecialismInfo(name: "hearing", dqtValue: "Hearing")]
@@ -16,7 +16,7 @@ public enum MandatoryQualificationSpecialism
     [MandatoryQualificationSpecialismInfo(name: "multi-sensory", dqtValue: "Multi-Sensory")]
     MultiSensory = 3,
 
-    [MandatoryQualificationSpecialismInfo(name: "N/A", dqtValue: "N/A")]
+    [MandatoryQualificationSpecialismInfo(name: "N/A", dqtValue: "N/A", isValidForNewRecord: false)]
     NotApplicable = 4,
 
     [MandatoryQualificationSpecialismInfo(name: "visual", dqtValue: "Visual")]
@@ -28,7 +28,8 @@ public static class MandatoryQualificationSpecialismRegistry
     private static readonly IReadOnlyDictionary<MandatoryQualificationSpecialism, MandatoryQualificationSpecialismInfo> _info =
         Enum.GetValues<MandatoryQualificationSpecialism>().ToDictionary(s => s, s => GetInfo(s));
 
-    public static IReadOnlyCollection<MandatoryQualificationSpecialismInfo> All => _info.Values.ToArray();
+    public static IReadOnlyCollection<MandatoryQualificationSpecialismInfo> GetAll(bool forNewRecord = false) =>
+        _info.Values.Where(i => i.IsValidForNewRecord || !forNewRecord).ToArray();
 
     public static string GetName(this MandatoryQualificationSpecialism specialism) => _info[specialism].Name;
 

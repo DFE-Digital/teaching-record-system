@@ -9,12 +9,12 @@
     <govuk-back-link href="@LinkGenerator.MqAddStatus(Model.PersonId, Model.JourneyInstance!.InstanceId)" />
 }
 
-<span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
-<h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
         <form action="@LinkGenerator.MqAddCheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
+            <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+
             <govuk-summary-list>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
@@ -39,7 +39,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="status">@Model.Status</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="status">@Model.Status!.Value.GetTitle()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqAddStatus(Model.PersonId, Model.JourneyInstance!.InstanceId)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>

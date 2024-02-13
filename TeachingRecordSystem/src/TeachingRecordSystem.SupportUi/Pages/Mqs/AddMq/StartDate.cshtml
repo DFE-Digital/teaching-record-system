@@ -8,11 +8,11 @@
     <govuk-back-link href="@LinkGenerator.MqAddSpecialism(Model.PersonId, Model.JourneyInstance!.InstanceId)" />
 }
 
-<span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.MqAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
+
             <govuk-date-input asp-for="StartDate">
                 <govuk-date-input-fieldset>
                     <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />

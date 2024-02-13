@@ -17,6 +17,7 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Required(ErrorMessage = "Select a specialism")]
+    [ValidSpecialism(ErrorMessage = "Select a valid specialism")]
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
     public MandatoryQualificationSpecialismInfo[]? Specialisms { get; set; }
@@ -43,11 +44,22 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
     {
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        Specialisms = MandatoryQualificationSpecialismRegistry.All
+        Specialisms = MandatoryQualificationSpecialismRegistry.GetAll(forNewRecord: true)
             .OrderBy(t => t.Title)
             .ToArray();
 
         PersonName = personInfo.Name;
         Specialism ??= JourneyInstance!.State.Specialism;
+    }
+
+    private class ValidSpecialismAttribute : AllowedValuesAttribute
+    {
+        public ValidSpecialismAttribute()
+            : base(GetAllowedValues())
+        {
+        }
+
+        private static object[] GetAllowedValues() =>
+            MandatoryQualificationSpecialismRegistry.GetAll(forNewRecord: true).Select(v => (object)v.Value).ToArray();
     }
 }

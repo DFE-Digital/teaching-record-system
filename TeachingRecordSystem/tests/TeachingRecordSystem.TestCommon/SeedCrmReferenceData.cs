@@ -250,7 +250,7 @@ public class SeedCrmReferenceData : IStartupTask
 
     private void AddSpecialisms()
     {
-        foreach (var specialism in MandatoryQualificationSpecialismRegistry.All)
+        foreach (var specialism in MandatoryQualificationSpecialismRegistry.GetAll())
         {
             _xrmFakedContext.CreateEntity(new dfeta_specialism()
             {
