@@ -25,6 +25,8 @@ public class IndexTests : TestBase
         Assert.NotNull(searchForm);
         var searchResults = doc.GetElementByTestId("search-results");
         Assert.Null(searchResults);
+        var sortByForm = doc.GetElementByTestId("search-sortby-form");
+        Assert.Null(searchResults);
     }
 
     [Fact]

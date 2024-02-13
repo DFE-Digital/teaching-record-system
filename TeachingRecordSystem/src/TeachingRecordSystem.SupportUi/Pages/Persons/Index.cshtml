@@ -10,7 +10,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <div class="govuk-!-margin-bottom-6">
-            <form action="@LinkGenerator.Persons()" method="get" data-testid="search-form">
+            <form action="@LinkGenerator.Persons()" method="get" data-testid="search-form" asp-antiforgery="false">
                 <div class="moj-search trs-search govuk-!-margin-bottom-4">
                     <govuk-input asp-for="Search"
                                  input-class="moj-search__input"
@@ -19,17 +19,27 @@
                                  type="search">
                         <govuk-input-hint class="moj-search__hint">Search by: Name, TRN or date of birth (DD/MM/YYYY)</govuk-input-hint>
                     </govuk-input>
+                    <input type="hidden" asp-for="SortBy" />
                     <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
                 </div>
-                <govuk-select asp-for="SortBy">
-                    <govuk-select-item value="@ContactSearchSortByOption.LastNameAscending">@ContactSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@ContactSearchSortByOption.LastNameDescending">@ContactSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@ContactSearchSortByOption.FirstNameAscending">@ContactSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@ContactSearchSortByOption.FirstNameDescending">@ContactSearchSortByOption.FirstNameDescending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthAscending">@ContactSearchSortByOption.DateOfBirthAscending.GetDisplayName()</govuk-select-item>
-                    <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthDescending">@ContactSearchSortByOption.DateOfBirthDescending.GetDisplayName()</govuk-select-item>
-                </govuk-select>
             </form>
+            @if (!string.IsNullOrEmpty(Model.Search))
+            {
+                <form action="@LinkGenerator.Persons()" method="get" data-testid="search-sortby-form" asp-antiforgery="false">
+                    <div class="moj-search trs-search govuk-!-margin-bottom-4">
+                        <govuk-select asp-for="SortBy">
+                            <govuk-select-item value="@ContactSearchSortByOption.LastNameAscending">@ContactSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
+                            <govuk-select-item value="@ContactSearchSortByOption.LastNameDescending">@ContactSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
+                            <govuk-select-item value="@ContactSearchSortByOption.FirstNameAscending">@ContactSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
+                            <govuk-select-item value="@ContactSearchSortByOption.FirstNameDescending">@ContactSearchSortByOption.FirstNameDescending.GetDisplayName()</govuk-select-item>
+                            <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthAscending">@ContactSearchSortByOption.DateOfBirthAscending.GetDisplayName()</govuk-select-item>
+                            <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthDescending">@ContactSearchSortByOption.DateOfBirthDescending.GetDisplayName()</govuk-select-item>
+                        </govuk-select>
+                        <input type="hidden" asp-for="Search" />
+                        <govuk-button class="moj-search__button" type="submit">Apply</govuk-button>
+                    </div>
+                </form>
+            }
         </div>
     </div>
 </div>
@@ -87,7 +97,7 @@
                                 <govuk-pagination-ellipsis />
                             }
 
-                            <govuk-pagination-item asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@item" is-current="@(item == Model.PageNumber)">@item</govuk-pagination-item>
+                            <govuk-pagination-item asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@item" asp-route-sortby="@Model.SortBy" is-current="@(item == Model.PageNumber)">@item</govuk-pagination-item>
                         }
                     }                    
 
