@@ -4,10 +4,6 @@ on:
   pull_request:
   merge_group:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false  # temporary - can corrupt PAAS Terraform state if deployments are cancelled
-
 permissions:
   checks: write
   deployments: write
