@@ -45,7 +45,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services
                 .Configure<AuthenticationOptions>(options =>
                 {
-                    options.SchemeMap[OneLoginDefaults.AuthenticationScheme].HandlerType = typeof(DummyOneLoginHandler);
+                    options.AddScheme(OneLoginDefaults.AuthenticationScheme, b => b.HandlerType = typeof(DummyOneLoginHandler));
                 })
                 .AddSingleton<DummyOneLoginHandler>();
 

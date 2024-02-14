@@ -138,6 +138,16 @@ jobs:
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
       timeout-minutes: 5
 
+    - name: Authorize access end-to-end tests
+      uses: ./.github/workflows/actions/test
+      with:
+        test_project_path: TeachingRecordSystem/tests/TeachingRecordSystem.AuthorizeAccess.EndToEndTests
+        report_name: "Authorize access end-to-end test results"
+        dotnet_test_args: >-
+          --no-build
+          -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
+      timeout-minutes: 5
+
   validate_terraform:
     name: Validate Terraform
     runs-on: ubuntu-latest

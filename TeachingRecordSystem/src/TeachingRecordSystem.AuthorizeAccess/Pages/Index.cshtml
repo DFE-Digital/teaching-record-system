@@ -1,7 +1,10 @@
 @page "/"
 @using GovUk.OneLogin.AspNetCore
+@using System.Security.Claims
 @model TeachingRecordSystem.AuthorizeAccess.Pages.IndexModel
 @{
 }
 
-<h1>Hello @User.GetCoreIdentityName()</h1>
+<h1>Hello @User.FindFirstValue("person_id")</h1>
+
+<div data-testid="trn">@User.FindFirstValue("trn")</div>
