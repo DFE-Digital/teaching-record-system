@@ -267,6 +267,8 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/trn?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        state = journeyInstance.State;
         Assert.Equal(nationalInsuranceNumber, state.NationalInsuranceNumber);
         Assert.True(state.NationalInsuranceNumberSpecified);
         Assert.Null(state.AuthenticationTicket);
@@ -302,6 +304,8 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"{redirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        state = journeyInstance.State;
         Assert.Equal(nationalInsuranceNumber, state.NationalInsuranceNumber);
         Assert.True(state.NationalInsuranceNumberSpecified);
         Assert.NotNull(state.AuthenticationTicket);
@@ -336,6 +340,8 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/trn?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        state = journeyInstance.State;
         Assert.Null(state.NationalInsuranceNumber);
         Assert.True(state.NationalInsuranceNumberSpecified);
     }

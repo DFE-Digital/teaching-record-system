@@ -278,6 +278,8 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        state = journeyInstance.State;
         Assert.Equal(trn, state.Trn);
         Assert.True(state.TrnSpecified);
         Assert.Null(state.AuthenticationTicket);
@@ -315,6 +317,8 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"{redirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        state = journeyInstance.State;
         Assert.Equal(trn, state.Trn);
         Assert.True(state.TrnSpecified);
         Assert.NotNull(state.AuthenticationTicket);

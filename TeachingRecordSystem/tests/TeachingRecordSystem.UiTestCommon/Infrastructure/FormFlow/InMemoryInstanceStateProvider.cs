@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text.Json;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
 
@@ -24,7 +25,7 @@ public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
         _instances.TryAdd(instanceId, new Entry()
         {
             StateType = stateType,
-            State = state,
+            State = CloneState(state, stateType),
             Properties = properties
         });
 
@@ -55,7 +56,7 @@ public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
         _instances.TryGetValue(instanceId, out var entry);
 
         var instance = entry != null ?
-            JourneyInstance.Create(this, instanceId, entry.StateType!, entry.State!, entry.Properties!, entry.Completed) :
+            JourneyInstance.Create(this, instanceId, entry.StateType!, CloneState(entry.State!, entry.StateType!), entry.Properties!, entry.Completed) :
             null;
 
         return Task.FromResult(instance);
@@ -63,9 +64,14 @@ public class InMemoryInstanceStateProvider : IUserInstanceStateProvider
 
     public Task UpdateInstanceStateAsync(JourneyInstanceId instanceId, Type stateType, object state)
     {
-        _instances[instanceId].State = state;
+        _instances[instanceId].State = CloneState(state, stateType);
         return Task.CompletedTask;
     }
+
+    private static object CloneState(object state, Type stateType) =>
+        JsonSerializer.Deserialize(
+            JsonSerializer.Serialize(state, stateType)!,
+            stateType)!;
 
     private class Entry
     {
