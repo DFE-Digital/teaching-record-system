@@ -77,7 +77,8 @@ public class SignInJourneyHelper(
                 oneLoginUser.LastSignIn = clock.UtcNow;
                 await dbContext.SaveChangesAsync();
 
-                CreateAndAssignPrincipal(journeyInstance.State, oneLoginUser.Person.PersonId, oneLoginUser.Person.Trn!);
+                await journeyInstance.UpdateStateAsync(state =>
+                    CreateAndAssignPrincipal(state, oneLoginUser.Person.PersonId, oneLoginUser.Person.Trn!));
             }
         }
         else

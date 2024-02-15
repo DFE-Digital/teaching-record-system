@@ -74,6 +74,14 @@ public abstract class TestBase : IDisposable
         return (JourneyInstance<SignInJourneyState>)instance;
     }
 
+    public async Task<JourneyInstance<SignInJourneyState>> ReloadJourneyInstance(JourneyInstance<SignInJourneyState> journeyInstance)
+    {
+        await using var scope = HostFixture.Services.CreateAsyncScope();
+        var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
+        var reloadedInstance = await stateProvider.GetInstanceAsync(journeyInstance.InstanceId, typeof(SignInJourneyState));
+        return (JourneyInstance<SignInJourneyState>)reloadedInstance!;
+    }
+
     public virtual void Dispose()
     {
         _trsSyncSubscription.Dispose();
