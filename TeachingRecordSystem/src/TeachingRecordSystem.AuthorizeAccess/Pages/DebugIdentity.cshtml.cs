@@ -116,7 +116,7 @@ public class DebugIdentityModel(
         }
 
         var nextPage = await helper.CreateOrUpdateOneLoginUser(JourneyInstance);
-        return nextPage.ToActionResult();
+        return new HttpResultActionResult(nextPage);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

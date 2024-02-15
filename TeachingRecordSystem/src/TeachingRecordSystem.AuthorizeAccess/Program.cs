@@ -66,7 +66,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
         options.CoreIdentityClaimIssuerSigningKey = new ECDsaSecurityKey(coreIdentityIssuer);
         options.CoreIdentityClaimIssuer = "https://identity.integration.account.gov.uk/";
 
-        options.VectorsOfTrust = @"[""Cl.Cm.P2""]";
+        options.VectorOfTrust = @"[""Cl.Cm""]";
 
         options.Claims.Add(OneLoginClaimTypes.CoreIdentity);
 

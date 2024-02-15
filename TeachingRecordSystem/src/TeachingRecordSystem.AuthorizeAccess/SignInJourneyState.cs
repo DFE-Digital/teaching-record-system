@@ -21,6 +21,8 @@ public class SignInJourneyState(string redirectUri, AuthenticationProperties? au
     [JsonConverter(typeof(AuthenticationTicketJsonConverter))]
     public AuthenticationTicket? OneLoginAuthenticationTicket { get; set; }
 
+    public bool AttemptedIdentityVerification { get; set; }
+
     public bool IdentityVerified { get; set; }
 
     public string[][]? VerifiedNames { get; set; }

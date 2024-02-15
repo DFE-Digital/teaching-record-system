@@ -25,7 +25,7 @@ public class NotVerifiedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(createCoreIdentityVc: true);
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: true);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-verified?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -44,7 +44,7 @@ public class NotVerifiedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(createCoreIdentityVc: false);
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: false);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-verified?{journeyInstance.GetUniqueIdQueryParameter()}");

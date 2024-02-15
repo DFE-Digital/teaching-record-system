@@ -25,7 +25,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(createCoreIdentityVc: false);
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: false);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -48,7 +48,13 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePerson(b => b.WithTrn());
         var oneLoginUser = await TestData.CreateOneLoginUser(person.PersonId);
 
-        var ticket = CreateOneLoginAuthenticationTicket(oneLoginUser);
+        var ticket = CreateOneLoginAuthenticationTicket(
+            vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
+            sub: oneLoginUser.Subject,
+            email: oneLoginUser.Email,
+            firstName: person.FirstName,
+            lastName: person.LastName,
+            dateOfBirth: person.DateOfBirth);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -68,7 +74,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket();
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         await journeyInstance.UpdateStateAsync(state =>
@@ -93,7 +99,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket();
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         await journeyInstance.UpdateStateAsync(state =>
@@ -119,7 +125,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket();
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         await journeyInstance.UpdateStateAsync(async state =>

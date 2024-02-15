@@ -50,7 +50,8 @@ public class FormFlowJourneySignInHandler(SignInJourneyHelper helper) : IAuthent
     {
         EnsureInitialized();
 
-        if (properties is null || !properties.Items.TryGetValue(PropertyKeys.JourneyInstanceId, out var serializedInstanceId) ||
+        if (properties is null ||
+            !properties.Items.TryGetValue(PropertyKeys.JourneyInstanceId, out var serializedInstanceId) ||
             serializedInstanceId is null)
         {
             throw new InvalidOperationException($"{PropertyKeys.JourneyInstanceId} must be specified in {nameof(properties)}.");
@@ -66,12 +67,7 @@ public class FormFlowJourneySignInHandler(SignInJourneyHelper helper) : IAuthent
         var result = await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
 
         // Override the redirect done by RemoteAuthenticationHandler
-        _context.Response.OnStarting(
-            () =>
-            {
-                _context.Response.Redirect(result.Location);
-                return Task.CompletedTask;
-            });
+        _context.Response.OnStarting(() => result.ExecuteAsync(_context));
     }
 
     public async Task SignOutAsync(AuthenticationProperties? properties)

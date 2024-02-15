@@ -37,7 +37,7 @@ public class TrnModel(SignInJourneyHelper helper, AuthorizeAccessLinkGenerator l
 
         if (await helper.TryMatchToTeachingRecord(JourneyInstance!))
         {
-            return helper.GetNextPage(JourneyInstance).ToActionResult();
+            return new RedirectResult(helper.GetNextPage(JourneyInstance));
         }
         else
         {

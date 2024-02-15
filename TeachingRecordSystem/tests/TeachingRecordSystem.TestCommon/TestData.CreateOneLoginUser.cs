@@ -9,18 +9,12 @@ public partial class TestData
     public Task<OneLoginUser> CreateOneLoginUser(
         Guid? personId,
         string? subject = null,
-        string? email = null,
-        string? firstName = null,
-        string? lastName = null,
-        DateOnly? dateOfBirth = null)
+        string? email = null)
     {
         return WithDbContext(async dbContext =>
         {
             subject ??= CreateOneLoginUserSubject();
             email ??= Faker.Internet.Email();
-            firstName ??= Faker.Name.First();
-            lastName ??= Faker.Name.Last();
-            dateOfBirth ??= DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 
             var user = new OneLoginUser()
             {
@@ -28,7 +22,6 @@ public partial class TestData
                 Email = email,
                 FirstOneLoginSignIn = Clock.UtcNow,
                 LastOneLoginSignIn = Clock.UtcNow,
-                CoreIdentityVc = CreateOneLoginCoreIdentityVc(firstName, lastName, dateOfBirth.Value),
                 PersonId = personId
             };
 

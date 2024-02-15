@@ -1,12 +1,11 @@
 using System.Reactive.Linq;
 using System.Security.Claims;
-using System.Text.Json;
 using FakeXrmEasy.Abstractions;
+using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
@@ -100,41 +99,16 @@ public abstract class TestBase : IDisposable
 
     public SignInJourneyHelper GetSignInJourneyHelper() => HostFixture.Services.GetRequiredService<SignInJourneyHelper>();
 
-    public AuthenticationTicket CreateOneLoginAuthenticationTicket(OneLoginUser user)
-    {
-        bool createCoreIdentityVc = false;
-        string? firstName = null;
-        string? lastName = null;
-        DateOnly? dateOfBirth = null;
-
-        if (user.CoreIdentityVc is JsonDocument vc)
-        {
-            var credentialSubject = vc.RootElement.GetProperty("credentialSubject");
-            var nameParts = credentialSubject.GetProperty("name").EnumerateArray().Single().GetProperty("nameParts").EnumerateArray();
-            firstName = nameParts.First().GetProperty("value").GetString();
-            lastName = nameParts.Last().GetProperty("value").GetString();
-            dateOfBirth = DateOnly.FromDateTime(credentialSubject.GetProperty("birthDate").EnumerateArray().Single().GetProperty("value").GetDateTime());
-            createCoreIdentityVc = true;
-        }
-
-        return CreateOneLoginAuthenticationTicket(
-            user.Subject,
-            user.Email,
-            firstName,
-            lastName,
-            dateOfBirth,
-            createCoreIdentityVc);
-    }
-
     public AuthenticationTicket CreateOneLoginAuthenticationTicket(
+        string vtr,
         string? sub = null,
         string? email = null,
         string? firstName = null,
         string? lastName = null,
         DateOnly? dateOfBirth = null,
-        bool createCoreIdentityVc = true)
+        bool? createCoreIdentityVc = null)
     {
-        sub ??= Faker.Internet.UserName();
+        sub ??= TestData.CreateOneLoginUserSubject();
         email ??= Faker.Internet.Email();
 
         var claims = new List<Claim>()
@@ -143,8 +117,15 @@ public abstract class TestBase : IDisposable
             new("email", email)
         };
 
-        if (createCoreIdentityVc)
+        createCoreIdentityVc ??= vtr == SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr;
+
+        if (createCoreIdentityVc == true)
         {
+            if (vtr == SignInJourneyHelper.AuthenticationOnlyVtr)
+            {
+                throw new ArgumentException("Cannot assign core identity VC with authentication-only vtr.", nameof(vtr));
+            }
+
             firstName ??= Faker.Name.First();
             lastName ??= Faker.Name.Last();
             dateOfBirth ??= DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
@@ -157,6 +138,9 @@ public abstract class TestBase : IDisposable
 
         var principal = new ClaimsPrincipal(identity);
 
-        return new AuthenticationTicket(principal, authenticationScheme: "OneLogin");
+        var properties = new AuthenticationProperties();
+        properties.SetVectorOfTrust(vtr);
+
+        return new AuthenticationTicket(principal, properties, authenticationScheme: "OneLogin");
     }
 }
