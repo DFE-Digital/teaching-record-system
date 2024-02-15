@@ -41,6 +41,7 @@ public class ApiKeyAuthenticationHandler(
             async cacheEntry =>
             {
                 var apiKey = await dbContext.ApiKeys
+                    .AsNoTracking()
                     .Where(k => k.Key == key)
                     .Include(k => k.ApplicationUser)
                     .SingleOrDefaultAsync();
