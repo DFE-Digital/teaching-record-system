@@ -2,7 +2,6 @@ using System.Security.Cryptography;
 using GovUk.Frontend.AspNetCore;
 using GovUk.OneLogin.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.IdentityModel.Tokens;
@@ -33,8 +32,25 @@ builder.ConfigureLogging();
 builder.Services.AddGovUkFrontend();
 builder.Services.AddCsp(nonceByteAmount: 32);
 
-builder.Services.AddAuthentication(defaultScheme: OneLoginDefaults.AuthenticationScheme)
-    .AddOneLogin(options =>
+var authenticationBuilder = builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultScheme = OneLoginDefaults.AuthenticationScheme;
+
+        options.AddScheme(AuthenticationSchemes.FormFlowJourney, scheme =>
+        {
+            scheme.HandlerType = typeof(FormFlowJourneySignInHandler);
+        });
+
+        options.AddScheme(AuthenticationSchemes.MatchToTeachingRecord, scheme =>
+        {
+            scheme.HandlerType = typeof(MatchToTeachingRecordAuthenticationHandler);
+        });
+    });
+
+if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
+{
+    authenticationBuilder.AddOneLogin(options =>
     {
         options.SignInScheme = AuthenticationSchemes.FormFlowJourney;
 
@@ -60,19 +76,7 @@ builder.Services.AddAuthentication(defaultScheme: OneLoginDefaults.Authenticatio
         options.CallbackPath = "/_onelogin/aytq/callback";
         options.SignedOutCallbackPath = "/_onelogin/aytq/logout-callback";
     });
-
-builder.Services.Configure<AuthenticationOptions>(options =>
-{
-    options.AddScheme(AuthenticationSchemes.FormFlowJourney, scheme =>
-    {
-        scheme.HandlerType = typeof(FormFlowJourneySignInHandler);
-    });
-
-    options.AddScheme(AuthenticationSchemes.MatchToTeachingRecord, scheme =>
-    {
-        scheme.HandlerType = typeof(MatchToTeachingRecordAuthenticationHandler);
-    });
-});
+}
 
 builder.Services
     .AddRazorPages(options =>

@@ -16,7 +16,7 @@ public partial class TestData
     {
         return WithDbContext(async dbContext =>
         {
-            subject ??= Faker.Internet.UserName();
+            subject ??= CreateOneLoginUserSubject();
             email ??= Faker.Internet.Email();
             firstName ??= Faker.Name.First();
             lastName ??= Faker.Name.Last();
@@ -39,6 +39,8 @@ public partial class TestData
             return user;
         });
     }
+
+    public string CreateOneLoginUserSubject() => Guid.NewGuid().ToString("N");
 
     public JsonDocument CreateOneLoginCoreIdentityVc(string firstName, string lastName, DateOnly dateOfBirth) =>
         JsonDocument.Parse(
