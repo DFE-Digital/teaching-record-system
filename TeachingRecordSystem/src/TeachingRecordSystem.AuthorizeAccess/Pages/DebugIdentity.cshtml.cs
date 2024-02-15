@@ -78,7 +78,7 @@ public class DebugIdentityModel(
             }
 
             var dobs = (VerifiedDatesOfBirth ?? string.Empty).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(line => DateOnly.TryParse(line, out var parsed) ? parsed : (DateOnly?)null)
+                .Select(line => DateOnly.TryParseExact(line, "d/M/yyyy", out var parsed) ? parsed : (DateOnly?)null)
                 .ToArray();
 
             if (dobs.Length == 0)
