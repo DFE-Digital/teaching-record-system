@@ -20,7 +20,7 @@
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageVersion Include="GovUk.OneLogin.AspNetCore" Version="0.2.1" />
     <PackageVersion Include="GovukNotify" Version="6.1.0" />
-    <PackageVersion Include="GovUk.Frontend.AspNetCore" Version="1.4.0" />
+    <PackageVersion Include="GovUk.Frontend.AspNetCore" Version="1.5.0" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.7" />
     <PackageVersion Include="Hangfire.Core" Version="1.8.7" />
     <PackageVersion Include="Hangfire.NetCore" Version="1.8.7" />
