@@ -53,15 +53,22 @@ jobs:
     - name: Lint
       run: |
         git fetch origin main --quiet --depth=1
-        CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA | { grep -oP '^TeachingRecordSystem\/\K.*\.cs$' || true; })
+        CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA | { grep -oP '^TeachingRecordSystem\/\K.*\.cs(proj)?$' || true; })
 
         if [ "$CHANGED_FILES" == "" ]; then
           echo "::notice::No changes to lint"
           exit 0
         fi
 
-        INCLUDE_ARG="--include $(echo "$CHANGED_FILES" | tr '\n' ' ')"
-        echo "::notice::Linting changed files only"
+        # If project files have changed then dependencies may have been updated, which may effect lint results (e.g. namespace imports);
+        # lint everything.
+        if [ $(echo "$CHANGED_FILES" | grep -c '\.csproj$') -gt 0 ]; then
+          INCLUDE_ARG=""
+          echo "::notice::Linting entire codebase"
+        else
+          INCLUDE_ARG="--include $(echo "$CHANGED_FILES" | grep '\.cs$' | tr '\n' ' ')"
+          echo "::notice::Linting changed files only"
+        fi
 
         dotnet format --no-restore --verify-no-changes $INCLUDE_ARG
       working-directory: TeachingRecordSystem
