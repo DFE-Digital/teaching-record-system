@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
-namespace TeachingRecordSystem.FormFlow;
+namespace TeachingRecordSystem.FormFlow.Conventions;
 
 internal class FormFlowConventions :
     IPageApplicationModelConvention,

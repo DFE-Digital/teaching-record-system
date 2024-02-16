@@ -8,7 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.AuthorizeAccess;
-using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Conventions;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Logging;
@@ -79,10 +78,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 }
 
 builder.Services
-    .AddRazorPages(options =>
-    {
-        options.Conventions.Add(new BindJourneyInstancePropertiesConvention());
-    })
+    .AddRazorPages()
     .AddMvcOptions(options =>
     {
         options.Filters.Add(new NoCachePageFilter());
