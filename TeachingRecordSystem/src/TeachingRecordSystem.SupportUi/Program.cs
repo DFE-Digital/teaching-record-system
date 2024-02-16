@@ -176,6 +176,11 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 
     builder.Services.AddHealthChecks()
         .AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
+
+    if (!builder.Environment.IsDevelopment())
+    {
+        builder.Services.AddStartupTask<ReferenceDataCache>();
+    }
 }
 
 builder.Services

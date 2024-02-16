@@ -217,6 +217,11 @@ public class Program
 
             services.AddHealthChecks()
                 .AddCheck("CRM", () => crmServiceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
+
+            if (!env.IsDevelopment())
+            {
+                services.AddStartupTask<ReferenceDataCache>();
+            }
         }
 
         services.AddRedis(env, configuration);
