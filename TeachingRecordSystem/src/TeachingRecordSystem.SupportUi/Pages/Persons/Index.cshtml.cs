@@ -27,7 +27,7 @@ public partial class IndexModel : PageModel
     }
 
     [BindProperty(SupportsGet = true)]
-    [Display(Name = "Search")]
+    [Display(Name = "Search", Description = "TRN, name or date of birth, for example 4/3/1975")]
     public string? Search { get; set; }
 
     [BindProperty(SupportsGet = true)]
