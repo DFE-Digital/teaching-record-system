@@ -225,7 +225,7 @@ public class GetTeacherTests : TestBase
                         active = false
                     },
                 },
-                allowpiiupdates = false
+                allowPIIUpdates = false
             });
     }
 
@@ -357,7 +357,7 @@ public class GetTeacherTests : TestBase
                         active = true
                     }
                 },
-                allowpiiupdates = false
+                allowPIIUpdates = false
             });
     }
 
@@ -365,7 +365,7 @@ public class GetTeacherTests : TestBase
     [InlineData(true, true)]
     [InlineData(false, false)]
     [InlineData(null, false)]
-    public async Task Given_match_returns_returns_ok_with_correct_allowpiiupdates(bool? allowPiiUpdates, bool expectedAllowPiiUpdates)
+    public async Task Given_match_returns_returns_ok_with_correct_allowPIIUpdates(bool? allowPiiUpdates, bool expectedAllowPiiUpdates)
     {
         // Arrange
         var trn = "1234567";
@@ -493,7 +493,7 @@ public class GetTeacherTests : TestBase
                         active = true
                     }
                 },
-                allowpiiupdates = expectedAllowPiiUpdates
+                allowPIIUpdates = expectedAllowPiiUpdates
             });
     }
 }
