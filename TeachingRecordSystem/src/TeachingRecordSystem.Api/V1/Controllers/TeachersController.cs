@@ -9,7 +9,6 @@ using TeachingRecordSystem.Api.V1.Responses;
 
 namespace TeachingRecordSystem.Api.V1.Controllers;
 
-[ApiController]
 [Route("teachers")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey)]
 public class TeachersController : ControllerBase

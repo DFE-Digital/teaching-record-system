@@ -8,7 +8,6 @@ using TeachingRecordSystem.Api.V2.Responses;
 
 namespace TeachingRecordSystem.Api.V2.Controllers;
 
-[ApiController]
 [Route("itt-providers")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey)]
 public class IttProvidersController : ControllerBase

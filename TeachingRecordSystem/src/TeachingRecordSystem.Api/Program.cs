@@ -3,6 +3,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using idunno.Authentication.Basic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -26,6 +27,7 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.ServiceDefaults;
 
+[assembly: ApiController]
 namespace TeachingRecordSystem.Api;
 
 public class Program

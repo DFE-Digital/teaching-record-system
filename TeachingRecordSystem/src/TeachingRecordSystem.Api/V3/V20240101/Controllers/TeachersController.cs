@@ -13,7 +13,6 @@ using TeachingRecordSystem.Api.V3.V20240101.Responses;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
-[ApiController]
 [Route("teachers")]
 public class TeachersController : ControllerBase
 {

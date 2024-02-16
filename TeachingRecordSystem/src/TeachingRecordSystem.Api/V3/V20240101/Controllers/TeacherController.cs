@@ -10,9 +10,8 @@ using TeachingRecordSystem.Api.V3.Responses;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
-[ApiController]
 [Route("teacher")]
-public class TeacherController : Controller
+public class TeacherController : ControllerBase
 {
     private readonly IMediator _mediator;
 
