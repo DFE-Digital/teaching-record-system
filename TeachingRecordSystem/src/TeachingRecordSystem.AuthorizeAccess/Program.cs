@@ -53,10 +53,13 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     {
         options.SignInScheme = AuthenticationSchemes.FormFlowJourney;
 
-        var rsa = RSA.Create();
-        var privateKeyPem = builder.Configuration.GetRequiredValue("OneLogin:PrivateKeyPem");
-        rsa.ImportPkcs8PrivateKey(Convert.FromBase64String(privateKeyPem), out _);
-        options.ClientAuthenticationCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256);
+        using (var rsa = RSA.Create())
+        {
+            var privateKeyPem = builder.Configuration.GetRequiredValue("OneLogin:PrivateKeyPem");
+            rsa.ImportPkcs8PrivateKey(Convert.FromBase64String(privateKeyPem), out _);
+            options.ClientAuthenticationCredentials = new SigningCredentials(
+                new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)), SecurityAlgorithms.RsaSha256);
+        }
 
         var coreIdentityIssuer = ECDsa.Create();
         var coreIdentityIssuerPem = builder.Configuration.GetRequiredValue("OneLogin:CoreIdentityIssuerPem");
