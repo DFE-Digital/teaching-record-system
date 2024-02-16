@@ -42,7 +42,12 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
             .MaximumLength(AttributeConstraints.Contact.EMailAddress1MaxLength);
 
         RuleFor(r => r.Person.NationalInsuranceNumber)
-            .MaximumLength(AttributeConstraints.Contact.NationalInsuranceNumber_MaxLength)
-            .WithMessage(StringResources.ErrorMessages_NationalInsuranceNumberMustBe9CharactersOrLess);
+            .Custom((value, ctx) =>
+            {
+                if (!string.IsNullOrEmpty(value) && !NationalInsuranceNumberHelper.IsValid(value))
+                {
+                    ctx.AddFailure(ctx.PropertyName, StringResources.ErrorMessages_EnterNinoNumberInCorrectFormat);
+                }
+            });
     }
 }

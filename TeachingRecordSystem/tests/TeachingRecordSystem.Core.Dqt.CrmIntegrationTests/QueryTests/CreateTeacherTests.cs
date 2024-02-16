@@ -52,7 +52,7 @@ public class CreateTeacherTests : IAsyncLifetime
         Assert.Equal(middleName, contact.MiddleName);
         Assert.Equal(lastName, contact.LastName);
         Assert.Equal(email, contact.EMailAddress1);
-        Assert.True(contact.dfeta_AllowPiiUpdatesFromRegister);
+        Assert.False(contact.dfeta_AllowPiiUpdatesFromRegister);
         Assert.Equal(ni, contact.dfeta_NINumber);
         Assert.Equal(dob, contact.BirthDate.ToDateOnlyWithDqtBstFix(true));
     }

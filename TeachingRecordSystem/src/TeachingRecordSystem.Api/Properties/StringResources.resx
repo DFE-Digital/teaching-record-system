@@ -129,6 +129,9 @@
   <data name="ErrorMessages.BirthDateIsOutOfRange" xml:space="preserve">
     <value>Birth date is out of expected range.</value>
   </data>
+  <data name="ErrorMessages.EnterNinoNumberInCorrectFormat" xml:space="preserve">
+    <value>Enter a National Insurance number in the correct format</value>
+  </data>
   <data name="ErrorMessages.InTrainingOutcomeNotValidForAssessmentOnlyRoute" xml:space="preserve">
     <value>InTraining outcome not permitted for AssessmentOnlyRoute ProgrammeType.</value>
   </data>
