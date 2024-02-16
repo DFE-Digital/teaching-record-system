@@ -1,4 +1,3 @@
-using Sentry;
 using Sentry.Extensibility;
 
 namespace TeachingRecordSystem.Api.Infrastructure.Logging;

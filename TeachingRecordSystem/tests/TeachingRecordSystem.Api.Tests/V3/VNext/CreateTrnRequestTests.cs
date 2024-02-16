@@ -157,7 +157,7 @@ public class CreateTrnRequestTests : TestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             "Person.NationalInsuranceNumber",
-            StringResources.ErrorMessages_NationalInsuranceNumberMustBe9CharactersOrLess);
+            StringResources.ErrorMessages_EnterNinoNumberInCorrectFormat);
     }
 
     [Fact]
@@ -276,6 +276,103 @@ public class CreateTrnRequestTests : TestBase
                 status = "Completed"
             },
             expectedStatusCode: 200);
+    }
+
+    [Fact]
+    public async Task Post_RequestWithInvalidNino_ReturnsError()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var invalidNino = "IvalidNi";
+
+        var existingContact = await TestData.CreatePerson(p => p
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithEmail(email)
+            .WithNationalInsuranceNumber());
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Add(new TrnRequest()
+            {
+                ClientId = ClientId,
+                RequestId = requestId,
+                TeacherId = existingContact.ContactId
+            });
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email,
+                NationalInsuranceNumber = invalidNino,
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForProperty(
+            response,
+            "Person.NationalInsuranceNumber",
+            StringResources.ErrorMessages_EnterNinoNumberInCorrectFormat);
+    }
+
+    [Fact]
+    public async Task Post_RequestWithoutNino_ReturnsOk()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]

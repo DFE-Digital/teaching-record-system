@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace TeachingRecordSystem.AuthorizeAccess;
+namespace TeachingRecordSystem.Core;
 
 public static partial class NationalInsuranceNumberHelper
 {

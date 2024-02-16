@@ -97,6 +97,15 @@ namespace TeachingRecordSystem.Api.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter a National Insurance number in the correct format.
+        /// </summary>
+        public static string ErrorMessages_EnterNinoNumberInCorrectFormat {
+            get {
+                return ResourceManager.GetString("ErrorMessages.EnterNinoNumberInCorrectFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to InTraining outcome not permitted for AssessmentOnlyRoute ProgrammeType..
         /// </summary>
         public static string ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute {

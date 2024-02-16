@@ -29,7 +29,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             BirthDate = query.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false),
             dfeta_NINumber = query.NationalInsuranceNumber,
             EMailAddress1 = query.Email,
-            dfeta_AllowPiiUpdatesFromRegister = true
+            dfeta_AllowPiiUpdatesFromRegister = false
         };
 
         // only set trn if there is not any potential duplicate matches on the query
