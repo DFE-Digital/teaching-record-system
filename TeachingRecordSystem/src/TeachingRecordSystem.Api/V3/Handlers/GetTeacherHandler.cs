@@ -73,8 +73,8 @@ public class GetTeacherHandler(
                 },
                 appropriateBodyColumnNames: new[]
                 {
-                    Account.PrimaryIdAttribute,
-                    Account.Fields.Name
+                    TeachingRecordSystem.Core.Dqt.Models.Account.PrimaryIdAttribute,
+                    TeachingRecordSystem.Core.Dqt.Models.Account.Fields.Name
                 });
         }
 
@@ -98,9 +98,9 @@ public class GetTeacherHandler(
                 },
                 establishmentColumnNames: new[]
                 {
-                    Account.PrimaryIdAttribute,
-                    Account.Fields.dfeta_UKPRN,
-                    Account.Fields.Name
+                    TeachingRecordSystem.Core.Dqt.Models.Account.PrimaryIdAttribute,
+                    TeachingRecordSystem.Core.Dqt.Models.Account.Fields.dfeta_UKPRN,
+                    TeachingRecordSystem.Core.Dqt.Models.Account.Fields.Name
                 },
                 subjectColumnNames: new[]
                 {
@@ -351,7 +351,7 @@ public class GetTeacherHandler(
 
     private static GetTeacherResponseInductionPeriod MapInductionPeriod(dfeta_inductionperiod inductionPeriod)
     {
-        var appropriateBody = inductionPeriod.Extract<Account>("appropriatebody", Account.PrimaryIdAttribute);
+        var appropriateBody = inductionPeriod.Extract<TeachingRecordSystem.Core.Dqt.Models.Account>("appropriatebody", TeachingRecordSystem.Core.Dqt.Models.Account.PrimaryIdAttribute);
 
         return new GetTeacherResponseInductionPeriod()
         {
@@ -410,7 +410,7 @@ public class GetTeacherHandler(
 
     private static GetTeacherResponseInitialTeacherTrainingProvider? MapIttProvider(dfeta_initialteachertraining initialTeacherTraining)
     {
-        var establishment = initialTeacherTraining.Extract<Account>("establishment", Account.PrimaryIdAttribute);
+        var establishment = initialTeacherTraining.Extract<TeachingRecordSystem.Core.Dqt.Models.Account>("establishment", TeachingRecordSystem.Core.Dqt.Models.Account.PrimaryIdAttribute);
 
         return establishment != null ?
             new GetTeacherResponseInitialTeacherTrainingProvider()

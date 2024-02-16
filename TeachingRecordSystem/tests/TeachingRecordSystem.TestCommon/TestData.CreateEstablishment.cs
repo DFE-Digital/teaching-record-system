@@ -66,7 +66,7 @@ public partial class TestData
                 Address3 = null,
                 Town = null,
                 County = null,
-                Postcode = postcode,
+                Postcode = postcode
             };
 
             dbContext.Establishments.Add(establishment);
