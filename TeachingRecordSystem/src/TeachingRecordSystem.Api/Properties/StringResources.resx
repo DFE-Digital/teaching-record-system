@@ -249,4 +249,7 @@
   <data name="Errors.10029.Title" xml:space="preserve">
     <value>Request has already been submitted</value>
   </data>
+  <data name="Errors.10030.Title" xml:space="preserve">
+    <value>Unable to set QTLS date</value>
+  </data>
 </root>
