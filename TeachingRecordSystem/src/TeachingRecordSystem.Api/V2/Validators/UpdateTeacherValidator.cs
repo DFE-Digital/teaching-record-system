@@ -127,10 +127,8 @@ public class UpdateTeacherValidator : AbstractValidator<UpdateTeacherRequest>
             .When(x => x.FirstName.HasValue || x.LastName.HasValue || x.MiddleName.HasValue);
 
         RuleFor(r => r.MiddleName.ValueOrDefault())
-            .NotEmpty()
             .MaximumLength(AttributeConstraints.Contact.MiddleNameMaxLength)
-            .OverridePropertyName(nameof(UpdateTeacherRequest.MiddleName))
-            .When(x => x.MiddleName.HasValue);
+            .OverridePropertyName(nameof(UpdateTeacherRequest.MiddleName));
 
         RuleFor(r => r.LastName.ValueOrDefault())
             .NotEmpty()
