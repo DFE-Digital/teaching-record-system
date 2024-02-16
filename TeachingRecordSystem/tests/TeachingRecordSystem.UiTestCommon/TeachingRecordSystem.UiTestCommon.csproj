@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AngleSharp" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.FormFlow\TeachingRecordSystem.FormFlow.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj" />
   </ItemGroup>

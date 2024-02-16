@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 
-namespace TeachingRecordSystem.AuthorizeAccess.Tests;
+namespace TeachingRecordSystem.UiTestCommon;
 
 public static class AngleSharpExtensions
 {

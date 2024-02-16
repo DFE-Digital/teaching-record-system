@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Processing;
 
@@ -40,5 +43,23 @@ public class PublishEventsDbCommandInterceptor : SaveChangesInterceptor
         }
 
         return base.SavingChangesAsync(eventData, result, cancellationToken);
+    }
+
+    public static IServiceCollection ConfigureServices(IServiceCollection services)
+    {
+        services.AddSingleton<PublishEventsDbCommandInterceptor>();
+
+        services.Decorate<DbContextOptions<TrsDbContext>>((inner, sp) =>
+        {
+            var coreOptionsExtension = inner.GetExtension<CoreOptionsExtension>();
+
+            return (DbContextOptions<TrsDbContext>)inner.WithExtension(
+                coreOptionsExtension.WithInterceptors(new IInterceptor[]
+                {
+                        sp.GetRequiredService<PublishEventsDbCommandInterceptor>(),
+                }));
+        });
+
+        return services;
     }
 }

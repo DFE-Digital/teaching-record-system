@@ -1,7 +1,8 @@
 using AngleSharp.Html.Dom;
+using Xunit;
 using Xunit.Sdk;
 
-namespace TeachingRecordSystem.SupportUi.Tests;
+namespace TeachingRecordSystem.UiTestCommon;
 
 public static partial class AssertEx
 {

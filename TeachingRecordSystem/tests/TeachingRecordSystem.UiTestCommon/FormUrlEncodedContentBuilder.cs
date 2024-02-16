@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace TeachingRecordSystem.SupportUi.Tests;
+namespace TeachingRecordSystem.UiTestCommon;
 
 public class FormUrlEncodedContentBuilder : IEnumerable<KeyValuePair<string, string?>>
 {
