@@ -455,5 +455,14 @@ namespace TeachingRecordSystem.Api.Properties {
                 return ResourceManager.GetString("Errors.10029.Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to set QTLS date.
+        /// </summary>
+        public static string Errors_10030_Title {
+            get {
+                return ResourceManager.GetString("Errors.10030.Title", resourceCulture);
+            }
+        }
     }
 }

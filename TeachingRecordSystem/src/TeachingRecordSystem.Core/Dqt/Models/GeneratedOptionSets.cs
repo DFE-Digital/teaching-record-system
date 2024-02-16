@@ -562,6 +562,14 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		AddToQueue = 52,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("ApplicationBasedAccessAllowed", 82)]
+		ApplicationBasedAccessAllowed = 122,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("ApplicationBasedAccessDenied", 81)]
+		ApplicationBasedAccessDenied = 121,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Approve", 22)]
 		Approve = 28,
 		
@@ -2555,27 +2563,27 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	{
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Email", 1, "#00B294")]
+		[OptionSetMetadataAttribute("Email", 2, "#00B294")]
 		Email = 2,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Facebook", 3, "#0086FF")]
+		[OptionSetMetadataAttribute("Facebook", 4, "#0086FF")]
 		Facebook = 2483,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("IoT", 5, "#0000ff")]
+		[OptionSetMetadataAttribute("IoT", 0, "#0000ff")]
 		IoT = 700610000,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Phone", 0, "#FCD116")]
+		[OptionSetMetadataAttribute("Phone", 1, "#FCD116")]
 		Phone = 1,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Twitter", 4, "#0086FF")]
+		[OptionSetMetadataAttribute("Twitter", 5, "#0086FF")]
 		Twitter = 3986,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
-		[OptionSetMetadataAttribute("Web", 2, "#FF8C00")]
+		[OptionSetMetadataAttribute("Web", 3, "#FF8C00")]
 		Web = 3,
 	}
 	
@@ -2822,6 +2830,19 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Open", 0)]
 		Open = 1,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum IsInherited
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Direct User (Basic) access level and Team privileges", 1)]
+		DirectUser_BasicaccesslevelandTeamprivileges = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Team privileges only", 0)]
+		Teamprivilegesonly = 0,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]

@@ -1,5 +1,6 @@
 {
   "account": [
+    "accountid",
     "dfeta_trainingprovider",
     "dfeta_ukprn",
     "name",
@@ -73,7 +74,9 @@
     "dfeta_slugid",
     "dfeta_allowpiiupdatesfromregister",
     "dfeta_previouslastname",
-    "dfeta_AllowIDSignInWithProhibitions"
+    "dfeta_AllowIDSignInWithProhibitions",
+    "dfeta_qtlsdate",
+    "dfeta_qtlsdatehasbeenset"
   ],
   "dfeta_businesseventaudit":[
     "createdon",
@@ -115,6 +118,7 @@
     "statecode"
   ],
   "dfeta_induction": [
+    "dfeta_inductionid",
     "dfeta_completiondate",
     "dfeta_inductionexemptionreason",
     "dfeta_inductionstatus",
