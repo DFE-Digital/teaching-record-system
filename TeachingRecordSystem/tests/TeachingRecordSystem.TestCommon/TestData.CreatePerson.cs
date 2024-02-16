@@ -40,6 +40,7 @@ public partial class TestData
         private readonly List<QtsRegistration> _qtsRegistrations = new();
         private readonly List<Sanction> _sanctions = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
+        private DateOnly? _qtlsDate;
 
         public Guid PersonId { get; } = Guid.NewGuid();
 
@@ -178,6 +179,12 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithQTLSDate(DateOnly qtlsDate)
+        {
+            _qtlsDate = qtlsDate;
+            return this;
+        }
+
         public CreatePersonBuilder WithQtsRegistration(DateOnly? qtsDate, string? teacherStatusValue, DateTime? createdDate, DateOnly? eytsDate, string? eytsTeacherStatus)
         {
             _qtsRegistrations.Add(new QtsRegistration(qtsDate, teacherStatusValue, createdDate, eytsDate, eytsTeacherStatus));
@@ -230,6 +237,11 @@ public partial class TestData
             if (_hasNationalInsuranceNumber ?? false)
             {
                 contact.dfeta_NINumber = _nationalInsuranceNumber ?? testData.GenerateNationalInsuranceNumber();
+            }
+
+            if(_qtlsDate is not null)
+            {
+                //contact.dfeta_QTLS_Date = _qtlsDate;
             }
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
