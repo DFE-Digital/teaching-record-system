@@ -39,6 +39,7 @@ public class QualificationsModel(
         var mqs = qualifications
             .Where(q => q.dfeta_Type == dfeta_qualification_dfeta_Type.MandatoryQualification)
             .OrderByDescending(q => q.dfeta_CompletionorAwardDate)
+            .ThenByDescending(q => q.CreatedOn)
             .Select(async q =>
             {
                 var mqEstablishment = q.dfeta_MQ_MQEstablishmentId is not null ? await referenceDataCache.GetMqEstablishmentById(q.dfeta_MQ_MQEstablishmentId.Id) : null;
