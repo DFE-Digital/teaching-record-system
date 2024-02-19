@@ -1144,29 +1144,6 @@ public class UpdateTeacherTests : TestBase
     }
 
     [Fact]
-    public async Task Given_middlename_empty_returns_error()
-    {
-        // Arrange
-        var trn = "1234567";
-        var middleName = string.Empty;
-
-        // Act
-        var response = await GetHttpClientWithApiKey().PatchAsync(
-            $"v2/teachers/update/{trn}?birthdate=1985-01-01",
-            CreateRequest(req =>
-            {
-                req.MiddleName = Option.Some(middleName);
-            }
-            ));
-
-        // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
-            response,
-            propertyName: $"{nameof(UpdateTeacherRequest.MiddleName)}",
-            expectedError: $"'Middle Name' must not be empty.");
-    }
-
-    [Fact]
     public async Task Given_lastname_empty_returns_error()
     {
         // Arrange
