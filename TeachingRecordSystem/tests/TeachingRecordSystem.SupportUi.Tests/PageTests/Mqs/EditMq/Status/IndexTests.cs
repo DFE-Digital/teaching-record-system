@@ -150,9 +150,41 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasError(response, "EndDate", "Enter an end date");
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public async Task Post_EndDateIsBeforeOrEqualToStartDate_RendersError(int daysBefore)
+    {
+        // Arrange
+        var startDate = new DateOnly(2021, 12, 5);
+        var newStatus = dfeta_qualification_dfeta_MQ_Status.Passed;
+        var newEndDate = startDate.AddDays(-daysBefore);
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(startDate)));
+        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var journeyInstance = await CreateJourneyInstance(qualificationId);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "Status", newStatus.ToString() },
+                { "EndDate.Day", $"{newEndDate:%d}" },
+                { "EndDate.Month", $"{newEndDate:%M}" },
+                { "EndDate.Year", $"{newEndDate:yyyy}" },
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "EndDate", "End date must be after start date");
+    }
+
     [Fact]
     public async Task Post_ValidRequest_RedirectsToConfirmPage()
     {
+        // Arrange
         var oldStatus = MandatoryQualificationStatus.Failed;
         var newStatus = dfeta_qualification_dfeta_MQ_Status.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);

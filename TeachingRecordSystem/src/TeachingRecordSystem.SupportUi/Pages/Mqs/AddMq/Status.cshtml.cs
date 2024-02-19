@@ -23,11 +23,20 @@ public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
     [Display(Name = "End date")]
     public DateOnly? EndDate { get; set; }
 
+    public DateOnly? StartDate { get; set; }
+
     public async Task<IActionResult> OnPost()
     {
-        if (Status == MandatoryQualificationStatus.Passed && EndDate is null)
+        if (Status == MandatoryQualificationStatus.Passed)
         {
-            ModelState.AddModelError(nameof(EndDate), "Enter an end date");
+            if (EndDate is null)
+            {
+                ModelState.AddModelError(nameof(EndDate), "Enter an end date");
+            }
+            else if (EndDate <= StartDate)
+            {
+                ModelState.AddModelError(nameof(EndDate), "End date must be after start date");
+            }
         }
 
         if (!ModelState.IsValid)
@@ -56,7 +65,8 @@ public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        Status ??= JourneyInstance!.State.Status;
-        EndDate ??= JourneyInstance!.State.EndDate;
+        StartDate = JourneyInstance!.State.StartDate;
+        Status ??= JourneyInstance.State.Status;
+        EndDate ??= JourneyInstance.State.EndDate;
     }
 }

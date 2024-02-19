@@ -117,6 +117,35 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasError(response, "StartDate", "Enter a start date");
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public async Task Post_StartDateIsAfterOrEqualToEndDate_RendersError(int daysAfter)
+    {
+        // Arrange
+        var endDate = new DateOnly(2022, 9, 1);
+        var newStartDate = endDate.AddDays(daysAfter);
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(MandatoryQualificationStatus.Passed).WithEndDate(endDate)));
+        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var journeyInstance = await CreateJourneyInstance(qualificationId);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "StartDate.Day", $"{newStartDate:%d}" },
+                { "StartDate.Month", $"{newStartDate:%M}" },
+                { "StartDate.Year", $"{newStartDate:yyyy}" },
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "StartDate", "Start date must be after end date");
+    }
+
     [Fact]
     public async Task Post_WhenStartDateIsEntered_RedirectsToReasonPage()
     {
