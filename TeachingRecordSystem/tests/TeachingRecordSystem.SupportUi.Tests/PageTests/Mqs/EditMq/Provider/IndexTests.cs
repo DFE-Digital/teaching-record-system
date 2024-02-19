@@ -36,9 +36,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var selectedProvider = doc.GetElementById("MqEstablishmentValue") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
         Assert.Equal(databaseMqEstablishmentValue, selectedProvider.Value);
@@ -66,9 +64,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var selectedProvider = doc.GetElementById("MqEstablishmentValue") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
         Assert.Equal(journeyMqEstablishmentValue, selectedProvider.Value);

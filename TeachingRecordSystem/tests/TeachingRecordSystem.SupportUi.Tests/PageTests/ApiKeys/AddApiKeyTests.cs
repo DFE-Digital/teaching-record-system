@@ -36,7 +36,6 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await response.GetDocument();
     }
 
     [Fact]
@@ -51,8 +50,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
     }
 
     [Fact]

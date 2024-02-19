@@ -31,8 +31,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        await response.GetDocument();
+        await AssertEx.HtmlResponse(response);
     }
 
     [Fact]

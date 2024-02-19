@@ -103,9 +103,8 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var doc = await AssertEx.HtmlResponse(response);
 
-        var doc = await response.GetDocument();
         Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TextContent);
 
         var firstNameRow = doc.GetElementByTestId("first-name");
@@ -164,9 +163,8 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var doc = await AssertEx.HtmlResponse(response);
 
-        var doc = await response.GetDocument();
         Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TextContent);
 
         var dateOfBirthRow = doc.GetElementByTestId("date-of-birth");

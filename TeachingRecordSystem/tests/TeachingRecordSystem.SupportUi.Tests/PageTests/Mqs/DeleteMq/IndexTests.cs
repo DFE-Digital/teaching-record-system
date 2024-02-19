@@ -67,9 +67,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var deletionReasonOptions = doc.GetElementByTestId("deletion-reason-options");
         var deletionReasonRadioButtons = deletionReasonOptions!.GetElementsByTagName("input");
         var selectedDeletionReason = deletionReasonRadioButtons.SingleOrDefault(r => r.HasAttribute("checked"));

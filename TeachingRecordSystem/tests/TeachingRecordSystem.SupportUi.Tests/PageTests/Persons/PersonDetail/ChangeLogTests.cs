@@ -38,9 +38,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var noChanges = doc.GetElementByTestId("no-changes");
         Assert.NotNull(noChanges);
     }
@@ -59,9 +57,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var changes = doc.GetAllElementsByTestId("timeline-item");
         Assert.NotEmpty(changes);
         Assert.Equal(2, changes.Count);
@@ -94,9 +90,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var changes = doc.GetAllElementsByTestId("timeline-item");
         Assert.NotEmpty(changes);
         Assert.Equal(3, changes.Count);
@@ -134,9 +128,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var changes = doc.GetAllElementsByTestId("timeline-item");
         Assert.NotEmpty(changes);
         Assert.Equal(2, changes.Count);
@@ -216,9 +208,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var changes = doc.GetAllElementsByTestId("timeline-item-mq-deleted-event");
         Assert.NotEmpty(changes);
         Assert.Equal(2, changes.Count);
@@ -309,9 +299,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var changes = doc.GetAllElementsByTestId("timeline-item-mq-dqt-deactivated-event");
         Assert.NotEmpty(changes);
         Assert.Equal(2, changes.Count);
@@ -398,9 +386,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var changes = doc.GetAllElementsByTestId("timeline-item-mq-dqt-reactivated-event");
         Assert.NotEmpty(changes);
         Assert.Equal(2, changes.Count);
@@ -477,9 +463,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var changes = doc.GetAllElementsByTestId("timeline-item-mq-dqt-imported-event");
         Assert.NotEmpty(changes);
         Assert.Equal(2, changes.Count);
@@ -509,9 +493,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var changes = doc.GetAllElementsByTestId("timeline-item-mq-created-event");
         Assert.NotEmpty(changes);
         Assert.Equal(2, changes.Count);
@@ -673,9 +655,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var timelineItems = doc.GetAllElementsByTestId("timeline-item-mq-updated-event");
         Assert.NotEmpty(timelineItems);
         Assert.Equal(2, timelineItems.Count);
@@ -894,9 +874,7 @@ public class ChangeLogTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var timelineItems = doc.GetAllElementsByTestId("timeline-item-mq-migrated-event");
         Assert.NotEmpty(timelineItems);
         Assert.Equal(2, timelineItems.Count);

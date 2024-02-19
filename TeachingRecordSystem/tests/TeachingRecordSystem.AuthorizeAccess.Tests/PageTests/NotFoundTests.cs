@@ -135,8 +135,6 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
     }
 }

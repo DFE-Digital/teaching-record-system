@@ -36,9 +36,7 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-
         var redirectResponse = await response.FollowRedirect(HttpClient);
-
         var doc = await redirectResponse.GetDocument();
         Assert.Equal($"{person.DateOfBirth:%d}", doc.GetElementById("DateOfBirth.Day")!.GetAttribute("value"));
         Assert.Equal($"{person.DateOfBirth:%M}", doc.GetElementById("DateOfBirth.Month")!.GetAttribute("value"));
@@ -65,9 +63,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal($"{newDateOfBirth:%d}", doc.GetElementById("DateOfBirth.Day")!.GetAttribute("value"));
         Assert.Equal($"{newDateOfBirth:%M}", doc.GetElementById("DateOfBirth.Month")!.GetAttribute("value"));
         Assert.Equal($"{newDateOfBirth:yyyy}", doc.GetElementById("DateOfBirth.Year")!.GetAttribute("value"));

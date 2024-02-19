@@ -54,7 +54,7 @@ public class UsersTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var element = doc.GetElementByTestId($"user-{user.UserId}")!.InnerHtml;
 
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);

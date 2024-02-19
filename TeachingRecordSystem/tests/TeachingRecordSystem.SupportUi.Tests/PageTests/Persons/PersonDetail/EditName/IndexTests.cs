@@ -37,9 +37,7 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-
         var redirectResponse = await response.FollowRedirect(HttpClient);
-
         var doc = await redirectResponse.GetDocument();
         Assert.Equal(person.FirstName, doc.GetElementById("FirstName")!.GetAttribute("value"));
         Assert.Equal(person.MiddleName, doc.GetElementById("MiddleName")!.GetAttribute("value"));
@@ -70,9 +68,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(newFirstName, doc.GetElementById("FirstName")!.GetAttribute("value"));
         Assert.Equal(newMiddleName, doc.GetElementById("MiddleName")!.GetAttribute("value"));
         Assert.Equal(newLastName, doc.GetElementById("LastName")!.GetAttribute("value"));

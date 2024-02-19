@@ -41,9 +41,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var tableRow1 = doc.GetElementByTestId($"change-request-{createIncident1Result.TicketNumber}");
         Assert.NotNull(tableRow1);
         Assert.Equal(createIncident1Result.TicketNumber, tableRow1.GetElementByTestId($"request-reference-{createIncident1Result.TicketNumber}")!.TextContent);
@@ -68,8 +66,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         Assert.NotNull(doc.GetElementByTestId("no-change-requests"));
     }
 }
