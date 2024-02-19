@@ -16,6 +16,9 @@ public class ProviderModel(
     [FromQuery]
     public Guid PersonId { get; set; }
 
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
     public string? PersonName { get; set; }
 
     [BindProperty]
@@ -34,7 +37,9 @@ public class ProviderModel(
 
         await JourneyInstance!.UpdateStateAsync(state => state.MqEstablishmentValue = MqEstablishmentValue);
 
-        return Redirect(linkGenerator.MqAddSpecialism(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(FromCheckAnswers ?
+            linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
+            linkGenerator.MqAddSpecialism(PersonId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()

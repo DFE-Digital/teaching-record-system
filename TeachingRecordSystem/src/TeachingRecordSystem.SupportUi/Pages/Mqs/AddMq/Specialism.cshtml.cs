@@ -13,6 +13,9 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
     [FromQuery]
     public Guid PersonId { get; set; }
 
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
     public string? PersonName { get; set; }
 
     [BindProperty]
@@ -31,7 +34,9 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state => state.Specialism = Specialism);
 
-        return Redirect(linkGenerator.MqAddStartDate(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(FromCheckAnswers ?
+            linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
+            linkGenerator.MqAddStartDate(PersonId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()

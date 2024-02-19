@@ -13,6 +13,9 @@ public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
     [FromQuery]
     public Guid PersonId { get; set; }
 
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
     public string? PersonName { get; set; }
 
     [BindProperty]
@@ -51,7 +54,9 @@ public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
                 state.EndDate = Status == MandatoryQualificationStatus.Passed ? EndDate : null;
             });
 
-        return Redirect(linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(FromCheckAnswers ?
+            linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
+            linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()

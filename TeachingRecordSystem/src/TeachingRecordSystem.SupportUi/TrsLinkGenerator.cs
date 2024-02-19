@@ -41,32 +41,32 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string MqAdd(Guid personId) =>
         GetRequiredPathByPage("/Mqs/AddMq/Index", routeValues: new { personId });
 
-    public string MqAddProvider(Guid personId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Mqs/AddMq/Provider", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string MqAddProvider(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Mqs/AddMq/Provider", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string MqAddProviderCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/AddMq/Provider", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string MqAddSpecialism(Guid personId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Mqs/AddMq/Specialism", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string MqAddSpecialism(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Mqs/AddMq/Specialism", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string MqAddSpecialismCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/AddMq/Specialism", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string MqAddStartDate(Guid personId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Mqs/AddMq/StartDate", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string MqAddStartDate(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Mqs/AddMq/StartDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string MqAddStartDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/AddMq/StartDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string MqAddStatus(Guid personId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Mqs/AddMq/Status", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string MqAddStatus(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Mqs/AddMq/Status", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string MqAddStatusCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/AddMq/Status", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string MqAddCheckAnswers(Guid personId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Mqs/AddMq/CheckAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string MqAddCheckAnswers(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Mqs/AddMq/CheckAnswers", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string MqAddCheckAnswersCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Mqs/AddMq/CheckAnswers", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
