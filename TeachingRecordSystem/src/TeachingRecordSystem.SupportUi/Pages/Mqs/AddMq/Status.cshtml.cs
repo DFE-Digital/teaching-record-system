@@ -67,6 +67,12 @@ public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
+        if (JourneyInstance!.State.StartDate is null)
+        {
+            context.Result = Redirect(linkGenerator.MqAddStartDate(PersonId, JourneyInstance.InstanceId));
+            return;
+        }
+
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;

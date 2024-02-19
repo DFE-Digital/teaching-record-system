@@ -2,13 +2,8 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
-public class StatusTests : TestBase
+public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public StatusTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
@@ -26,18 +21,39 @@ public class StatusTests : TestBase
     }
 
     [Fact]
+    public async Task Get_StartDateMissingFromState_RedirectsToStartDate()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+
+        var journeyInstance = await CreateJourneyInstance(
+            person.ContactId,
+            state => state.StartDate = null);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
         var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
+
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
-            new AddMqState()
+            state =>
             {
-                Status = status,
-                EndDate = endDate,
+                state.Status = status;
+                state.EndDate = endDate;
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -62,6 +78,7 @@ public class StatusTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -80,6 +97,7 @@ public class StatusTests : TestBase
         var personId = Guid.NewGuid();
         var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
+
         var journeyInstance = await CreateJourneyInstance(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -101,10 +119,40 @@ public class StatusTests : TestBase
     }
 
     [Fact]
+    public async Task Post_StartDateMissingFromState_RedirectsToStartDate()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var status = MandatoryQualificationStatus.Passed;
+        var endDate = new DateOnly(2021, 11, 5);
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, state => state.StartDate = null);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "Status", status.ToString() },
+                { "EndDate.Day", $"{endDate:%d}" },
+                { "EndDate.Month", $"{endDate:%M}" },
+                { "EndDate.Year", $"{endDate:yyyy}" },
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
     public async Task Post_WhenResultIsNotSelected_ReturnsError()
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -125,6 +173,7 @@ public class StatusTests : TestBase
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
         var status = MandatoryQualificationStatus.Passed;
+
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -152,7 +201,8 @@ public class StatusTests : TestBase
         var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
         var startDate = endDate.AddDays(daysBefore);
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddMqState() { StartDate = startDate });
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, state => state.StartDate = startDate);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -179,6 +229,7 @@ public class StatusTests : TestBase
         var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
         var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
+
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -200,10 +251,19 @@ public class StatusTests : TestBase
         Assert.Equal($"/mqs/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    private async Task<JourneyInstance<AddMqState>> CreateJourneyInstance(Guid personId, AddMqState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.AddMq,
-            state ?? new AddMqState(),
-            new KeyValuePair<string, object>("personId", personId));
+    private Task<JourneyInstance<AddMqState>> CreateJourneyInstance(Guid personId, Action<AddMqState>? configureState = null)
+    {
+        var state = new AddMqState()
+        {
+            MqEstablishmentValue = "959",
+            Specialism = MandatoryQualificationSpecialism.Visual,
+            StartDate = new(2020, 9, 1)
+        };
+        configureState?.Invoke(state);
 
+        return CreateJourneyInstance(
+            JourneyNames.AddMq,
+            state,
+            new KeyValuePair<string, object>("personId", personId));
+    }
 }

@@ -47,6 +47,12 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
+        if (JourneyInstance!.State.MqEstablishmentValue is null)
+        {
+            context.Result = Redirect(linkGenerator.MqAddProvider(PersonId, JourneyInstance.InstanceId));
+            return;
+        }
+
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         Specialisms = MandatoryQualificationSpecialismRegistry.GetAll(forNewRecord: true)
@@ -54,7 +60,7 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
             .ToArray();
 
         PersonName = personInfo.Name;
-        Specialism ??= JourneyInstance!.State.Specialism;
+        Specialism ??= JourneyInstance.State.Specialism;
     }
 
     private class ValidSpecialismAttribute : AllowedValuesAttribute
