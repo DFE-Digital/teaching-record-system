@@ -23,7 +23,6 @@ public partial class TestData
     public class CreatePersonBuilder
     {
         private const string TeacherStatusQualifiedTeacherTrained = "71";
-        private const string EaryYearsStatusProfessionalStatus = "222";
 
         private bool? _syncEnabledOverride;
         private DateOnly? _dateOfBirth;
@@ -172,9 +171,16 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithQts(DateOnly? qtsDate, string? teacherStatusValue, DateTime? createdDate)
+        public CreatePersonBuilder WithQts(DateOnly? qtsDate = null)
         {
-            _qtsRegistrations.Add(new QtsRegistration(qtsDate, teacherStatusValue, createdDate, null, null));
+            _qtsRegistrations.Add(
+                new QtsRegistration(
+                    qtsDate ?? new DateOnly(2022, 9, 1),
+                    TeacherStatusValue: TeacherStatusQualifiedTeacherTrained,
+                    CreatedOn: null,
+                    EytsDate: null,
+                    EytsStatusValue: null));
+
             return this;
         }
 

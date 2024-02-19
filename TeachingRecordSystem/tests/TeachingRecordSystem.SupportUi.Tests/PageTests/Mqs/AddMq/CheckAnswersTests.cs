@@ -4,18 +4,14 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
 
-public class CheckAnswersTests : TestBase
+public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public CheckAnswersTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
         var personId = Guid.NewGuid();
+
         var journeyInstance = await CreateJourneyInstance(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/check-answers?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -31,8 +27,7 @@ public class CheckAnswersTests : TestBase
     public async Task Get_WithPersonIdForValidPersonReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
-
+        var person = await TestData.CreatePerson();
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
@@ -66,8 +61,7 @@ public class CheckAnswersTests : TestBase
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState(MandatoryQualificationStatus status)
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
-
+        var person = await TestData.CreatePerson();
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
@@ -110,6 +104,7 @@ public class CheckAnswersTests : TestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
+
         var journeyInstance = await CreateJourneyInstance(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/check-answers?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -131,10 +126,8 @@ public class CheckAnswersTests : TestBase
     public async Task Post_Confirm_CreatesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(MandatoryQualificationStatus status)
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
-
+        var person = await TestData.CreatePerson();
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
@@ -214,12 +207,13 @@ public class CheckAnswersTests : TestBase
     public async Task Post_Cancel_DeletesJourneyRedirectsAndDoesNotCreateMq()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         var status = MandatoryQualificationStatus.Passed;
         DateOnly? endDate = new DateOnly(2021, 11, 5);
+
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
             new AddMqState()

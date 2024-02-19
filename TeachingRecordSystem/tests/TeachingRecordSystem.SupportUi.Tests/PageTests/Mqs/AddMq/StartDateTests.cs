@@ -25,7 +25,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SpecialismMissingFromState_RedirectsToSpecialism()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId, state => state.Specialism = null);
 
@@ -43,7 +43,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
@@ -60,7 +60,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var startDate = new DateOnly(2021, 10, 5);
 
         var journeyInstance = await CreateJourneyInstance(
@@ -109,7 +109,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SpecialismMissingFromState_RedirectToSpecialism()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var startDate = new DateOnly(2021, 11, 5);
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId, state => state.Specialism = null);
@@ -136,13 +136,13 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenNoStartDateIsEntered_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+            Content = new FormUrlEncodedContentBuilder()
         };
 
         // Act
@@ -158,7 +158,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StartDateIsAfterOrEqualToEndDate_RendersError(int daysAfter)
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var startDate = new DateOnly(2021, 11, 5);
         var endDate = startDate.AddDays(-daysAfter);
 
@@ -185,7 +185,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenStartDateIsEntered_RedirectsToResultPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var startDate = new DateOnly(2021, 11, 5);
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
