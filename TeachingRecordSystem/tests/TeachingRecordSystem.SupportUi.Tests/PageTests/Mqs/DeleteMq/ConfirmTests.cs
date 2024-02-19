@@ -51,8 +51,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithDqtMqEstablishmentValue(providerValue)
             .WithSpecialism(specialism)
             .WithStartDate(startDate)
-            .WithEndDate(endDate)
-            .WithStatus(status)));
+            .WithStatus(status, endDate)));
         var qualification = person.MandatoryQualifications.Single();
         var journeyInstance = await CreateJourneyInstance(
             qualification.QualificationId,
@@ -139,9 +138,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q
             .WithDqtMqEstablishmentValue(mqEstablishmentDqtValue)
             .WithSpecialism(specialism)
-            .WithStatus(status)
             .WithStartDate(startDate)
-            .WithEndDate(endDate)));
+            .WithStatus(status, endDate)));
 
         EventObserver.Clear();
 

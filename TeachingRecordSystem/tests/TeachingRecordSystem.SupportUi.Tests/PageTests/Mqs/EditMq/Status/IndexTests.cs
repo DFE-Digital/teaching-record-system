@@ -27,7 +27,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var databaseStatus = MandatoryQualificationStatus.Passed;
         var databaseEndDate = new DateOnly(2021, 11, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus).WithEndDate(databaseEndDate)));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus, databaseEndDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 

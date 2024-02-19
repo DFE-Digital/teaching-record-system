@@ -32,7 +32,7 @@ public class UpdateMandatoryQualificationStatusTests : IAsyncLifetime
 
         var person = await _dataScope.TestData.CreatePerson(x => x
             .WithQts(qtsDate: new DateOnly(2021, 10, 5), "213", new DateTime(2021, 10, 5))
-            .WithMandatoryQualification(q => q.WithStatus(originalMqStatus).WithEndDate(originalEndDate)));
+            .WithMandatoryQualification(q => q.WithStatus(originalMqStatus, originalEndDate)));
 
         var qualification = person.MandatoryQualifications.First();
 
