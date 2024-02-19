@@ -6,6 +6,13 @@ namespace TeachingRecordSystem.UiTestCommon;
 
 public static partial class AssertEx
 {
+    public static async Task<IHtmlDocument> HtmlResponse(HttpResponseMessage response, int expectedStatusCode = 200)
+    {
+        Assert.Equal(expectedStatusCode, (int)response.StatusCode);
+
+        return await response.GetDocument();
+    }
+
     public static void HtmlDocumentHasError(IHtmlDocument doc, string fieldName, string expectedMessage)
     {
         var errorElementId = $"{fieldName}-error";
@@ -41,9 +48,7 @@ public static partial class AssertEx
         string expectedMessage,
         int expectedStatusCode = 400)
     {
-        Assert.Equal(expectedStatusCode, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await HtmlResponse(response, expectedStatusCode);
         HtmlDocumentHasError(doc, fieldName, expectedMessage);
     }
 }

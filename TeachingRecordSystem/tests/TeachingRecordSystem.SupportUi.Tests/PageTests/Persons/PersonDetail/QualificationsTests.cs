@@ -34,9 +34,7 @@ public class QualificationsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var noMandatoryQualifications = doc.GetElementByTestId("no-mandatory-qualifications");
         Assert.NotNull(noMandatoryQualifications);
     }
@@ -71,9 +69,7 @@ public class QualificationsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var noMandatoryQualifications = doc.GetElementByTestId("no-mandatory-qualifications");
         Assert.Null(noMandatoryQualifications);
 

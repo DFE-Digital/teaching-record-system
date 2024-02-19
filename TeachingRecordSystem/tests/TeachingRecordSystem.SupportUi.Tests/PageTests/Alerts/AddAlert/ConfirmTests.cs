@@ -94,9 +94,7 @@ public class ConfirmTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(sanctionCodeName, doc.GetElementByTestId("alert-type")!.TextContent);
         var detailsElement = doc.GetElementByTestId("details");
         Assert.NotNull(detailsElement);
@@ -138,7 +136,6 @@ public class ConfirmTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-
         var redirectResponse = await response.FollowRedirect(HttpClient);
         var redirectDoc = await redirectResponse.GetDocument();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert added");
@@ -148,8 +145,8 @@ public class ConfirmTests : TestBase
     }
 
     private async Task<JourneyInstance<AddAlertState>> CreateJourneyInstance(Guid personId, AddAlertState? state = null) =>
-    await CreateJourneyInstance(
-        JourneyNames.AddAlert,
-        state ?? new AddAlertState(),
-        new KeyValuePair<string, object>("personId", personId));
+        await CreateJourneyInstance(
+            JourneyNames.AddAlert,
+            state ?? new AddAlertState(),
+            new KeyValuePair<string, object>("personId", personId));
 }

@@ -44,9 +44,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
 
         Assert.Equal(sanctionCodeName, doc.GetElementByTestId("title")!.TextContent);
 

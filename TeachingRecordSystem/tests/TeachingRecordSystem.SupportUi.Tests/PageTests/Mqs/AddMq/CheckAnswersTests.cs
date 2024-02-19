@@ -90,7 +90,7 @@ public class CheckAnswersTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(mqEstablishment.dfeta_name, doc.GetElementByTestId("provider")!.TextContent);
         Assert.Equal(specialism.GetTitle(), doc.GetElementByTestId("specialism")!.TextContent);
         Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("start-date")!.TextContent);
@@ -160,7 +160,6 @@ public class CheckAnswersTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-
         var redirectResponse = await response.FollowRedirect(HttpClient);
         var redirectDoc = await redirectResponse.GetDocument();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification added");

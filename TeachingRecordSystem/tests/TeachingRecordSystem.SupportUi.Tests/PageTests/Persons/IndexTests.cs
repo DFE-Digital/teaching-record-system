@@ -17,9 +17,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
 
         var searchForm = doc.GetElementByTestId("search-form");
         Assert.NotNull(searchForm);
@@ -39,9 +37,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
 
         var searchForm = doc.GetElementByTestId("search-form");
         Assert.NotNull(searchForm);
@@ -61,9 +57,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
 
         var searchForm = doc.GetElementByTestId("search-form");
         Assert.NotNull(searchForm);
@@ -95,9 +89,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
 
         var searchResults = doc.GetElementByTestId("search-results");
         Assert.NotNull(searchResults);
@@ -123,9 +115,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
 
         var searchResults = doc.GetElementByTestId("search-results");
         Assert.NotNull(searchResults);
@@ -150,9 +140,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
 
         var searchResults = doc.GetElementByTestId("search-results");
         Assert.NotNull(searchResults);

@@ -87,7 +87,8 @@ public class ConfirmTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
+
         var noCrmAccountWarning = doc.GetElementByTestId("no-crm-account-warning");
         if (hasCrmAccount)
         {

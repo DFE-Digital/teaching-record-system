@@ -34,9 +34,7 @@ public class AlertsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var noCurrentAlerts = doc.GetElementByTestId("no-current-alerts");
         Assert.NotNull(noCurrentAlerts);
     }
@@ -57,9 +55,8 @@ public class AlertsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var doc = await AssertEx.HtmlResponse(response);
 
-        var doc = await response.GetDocument();
         var noCurrentAlerts = doc.GetElementByTestId("no-current-alerts");
         Assert.NotNull(noCurrentAlerts);
 
@@ -89,9 +86,8 @@ public class AlertsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var doc = await AssertEx.HtmlResponse(response);
 
-        var doc = await response.GetDocument();
         var currentAlert = doc.GetElementByTestId($"current-alert-{person.Sanctions.First().SanctionId}");
         Assert.NotNull(currentAlert);
         Assert.Equal(sanctionStartDate.ToString("dd/MM/yyyy"), currentAlert.GetElementByTestId($"current-alert-start-date-{person.Sanctions.First().SanctionId}")!.TextContent);
@@ -123,9 +119,8 @@ public class AlertsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var doc = await AssertEx.HtmlResponse(response);
 
-        var doc = await response.GetDocument();
         var currentAlert = doc.GetElementByTestId($"current-alert-{person.Sanctions.First().SanctionId}");
         Assert.NotNull(currentAlert);
         Assert.Equal(sanction1StartDate.ToString("dd/MM/yyyy"), currentAlert.GetElementByTestId($"current-alert-start-date-{person.Sanctions.First().SanctionId}")!.TextContent);

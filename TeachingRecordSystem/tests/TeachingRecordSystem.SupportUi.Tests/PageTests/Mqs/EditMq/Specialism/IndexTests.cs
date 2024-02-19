@@ -35,9 +35,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var specialismList = doc.GetElementByTestId("specialism-list");
         var radioButtons = specialismList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -67,9 +65,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var specialismList = doc.GetElementByTestId("specialism-list");
         var radioButtons = specialismList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));

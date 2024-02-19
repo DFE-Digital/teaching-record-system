@@ -90,9 +90,7 @@ public class ConfirmTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", doc.GetElementByTestId("current-value")!.TextContent);
         Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", doc.GetElementByTestId("new-value")!.TextContent);
     }

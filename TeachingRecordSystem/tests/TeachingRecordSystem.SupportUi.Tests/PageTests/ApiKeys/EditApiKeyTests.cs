@@ -51,8 +51,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(apiKey.Key, doc.GetElementById("Key")?.GetAttribute("value"));
     }
 
@@ -69,8 +68,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         Assert.NotNull(doc.GetElementByTestId("ExpireButton")?.GetAttribute("disabled"));
     }
 
@@ -87,8 +85,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         Assert.Null(doc.GetElementByTestId("ExpireButton")?.GetAttribute("disabled"));
     }
 

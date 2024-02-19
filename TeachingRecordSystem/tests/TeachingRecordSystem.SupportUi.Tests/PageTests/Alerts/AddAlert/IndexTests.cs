@@ -71,7 +71,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var alertTypeIdElement = doc.GetElementById("AlertTypeId") as IHtmlSelectElement;
         Assert.NotNull(alertTypeIdElement);
         Assert.Equal(sanctionCodeId!.Value.ToString(), alertTypeIdElement.Value);

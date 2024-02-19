@@ -67,9 +67,7 @@ public class ConfirmTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
-
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(person.DateOfBirth.ToString("dd/MM/yyyy"), doc.GetElementByTestId("current-value")!.TextContent);
         Assert.Equal(newDateOfBirth.ToString("dd/MM/yyyy"), doc.GetElementByTestId("new-value")!.TextContent);
     }
@@ -116,7 +114,6 @@ public class ConfirmTests : TestBase
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
-
         var redirectResponse = await response.FollowRedirect(HttpClient);
         var redirectDoc = await redirectResponse.GetDocument();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Record has been updated");

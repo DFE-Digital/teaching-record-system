@@ -62,7 +62,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await response.GetDocument();
+        var doc = await AssertEx.HtmlResponse(response);
         var resultOptions = doc.GetElementByTestId("status-options");
         var radioButtons = resultOptions!.GetElementsByTagName("input");
         var selectedResult = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
