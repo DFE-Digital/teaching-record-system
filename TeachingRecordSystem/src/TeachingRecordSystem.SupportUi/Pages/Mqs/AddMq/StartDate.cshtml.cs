@@ -13,6 +13,9 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
     [FromQuery]
     public Guid PersonId { get; set; }
 
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
     public string? PersonName { get; set; }
 
     [BindProperty]
@@ -34,7 +37,9 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state => state.StartDate = StartDate);
 
-        return Redirect(linkGenerator.MqAddStatus(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(FromCheckAnswers ?
+            linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
+            linkGenerator.MqAddStatus(PersonId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
