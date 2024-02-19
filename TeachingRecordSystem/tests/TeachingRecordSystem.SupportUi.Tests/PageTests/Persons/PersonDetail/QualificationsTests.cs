@@ -61,9 +61,8 @@ public class QualificationsTests : TestBase
             .WithMandatoryQualification(q => q
                 .WithDqtMqEstablishmentValue(providerValue)
                 .WithSpecialism(specialism)
-                .WithStatus(status)
                 .WithStartDate(startDate)
-                .WithEndDate(endDate)));
+                .WithStatus(status, endDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");

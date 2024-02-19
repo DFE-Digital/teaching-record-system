@@ -440,21 +440,25 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonMandatoryQualificationBuilder WithStatus(MandatoryQualificationStatus? status)
+        public CreatePersonMandatoryQualificationBuilder WithStatus(MandatoryQualificationStatus? status, DateOnly? endDate = null)
         {
+            if (status == MandatoryQualificationStatus.Passed && !endDate.HasValue)
+            {
+                throw new ArgumentException($"{nameof(_endDate)} must be specified when {nameof(status)} is '{MandatoryQualificationStatus.Passed}'.");
+            }
+            else if (status != MandatoryQualificationStatus.Passed && endDate.HasValue)
+            {
+                throw new ArgumentException($"{nameof(_endDate)} cannot be specified unless {nameof(status)} is '{MandatoryQualificationStatus.Passed}'.");
+            }
+
             _status = Option.Some(status);
+            _endDate = Option.Some(endDate);
             return this;
         }
 
         public CreatePersonMandatoryQualificationBuilder WithStartDate(DateOnly? startDate)
         {
             _startDate = Option.Some(startDate);
-            return this;
-        }
-
-        public CreatePersonMandatoryQualificationBuilder WithEndDate(DateOnly? endDate)
-        {
-            _endDate = Option.Some(endDate);
             return this;
         }
 

@@ -79,7 +79,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             changeReason = endDateChangeReason.GetDisplayName()!;
         }
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus).WithEndDate(oldEndDate)));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -225,7 +225,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             changes = MandatoryQualificationUpdatedEventChanges.EndDate;
         }
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus).WithEndDate(oldEndDate)));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
         var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(qualification.DqtMqEstablishmentValue!);

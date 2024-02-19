@@ -130,7 +130,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             expectedErrorField = "EndDateChangeReason";
         }
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus).WithEndDate(oldEndDate)));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -310,7 +310,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             changeReason = MqChangeEndDateReasonOption.ChangeOfEndDate.ToString();
         }
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus).WithEndDate(oldEndDate)));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,

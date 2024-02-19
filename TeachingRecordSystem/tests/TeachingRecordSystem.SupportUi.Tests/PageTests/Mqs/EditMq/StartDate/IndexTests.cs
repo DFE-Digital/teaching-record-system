@@ -125,7 +125,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var endDate = new DateOnly(2022, 9, 1);
         var newStartDate = endDate.AddDays(daysAfter);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(MandatoryQualificationStatus.Passed).WithEndDate(endDate)));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(MandatoryQualificationStatus.Passed, endDate)));
         var qualificationId = person.MandatoryQualifications!.First().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
