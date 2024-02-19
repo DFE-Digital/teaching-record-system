@@ -26,7 +26,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
@@ -43,7 +43,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var mqEstablishmentValue = "959"; // University of Leeds
 
         var journeyInstance = await CreateJourneyInstance(
@@ -90,7 +90,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenNoProviderIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
@@ -110,7 +110,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenProviderIsSelected_RedirectsToSpecialismPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var mqEstablishmentValue = "959"; // University of Leeds
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);

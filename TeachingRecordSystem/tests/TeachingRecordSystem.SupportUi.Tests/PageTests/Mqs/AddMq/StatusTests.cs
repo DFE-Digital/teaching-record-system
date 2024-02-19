@@ -24,7 +24,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_StartDateMissingFromState_RedirectsToStartDate()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
 
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
@@ -44,7 +44,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
 
@@ -77,7 +77,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
@@ -122,7 +122,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StartDateMissingFromState_RedirectsToStartDate()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
 
@@ -151,7 +151,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenResultIsNotSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
@@ -171,7 +171,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenResultIsPassedAndEndDateHasNotBeenEntered_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var status = MandatoryQualificationStatus.Passed;
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
@@ -197,7 +197,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_EndDateIsBeforeOrEqualToStartDate_RendersError(int daysBefore)
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
         var startDate = endDate.AddDays(daysBefore);
@@ -226,7 +226,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ValidRequest_RedirectsToResultPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var status = MandatoryQualificationStatus.Passed;
         var endDate = new DateOnly(2021, 11, 5);
 

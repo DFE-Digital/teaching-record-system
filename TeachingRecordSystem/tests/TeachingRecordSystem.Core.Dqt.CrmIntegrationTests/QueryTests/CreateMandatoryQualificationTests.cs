@@ -22,7 +22,7 @@ public class CreateMandatoryQualificationTests : IAsyncLifetime
     {
         // Arrange
         var qualificationId = Guid.NewGuid();
-        var person = await _dataScope.TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), teacherStatusValue: "213", createdDate: new DateTime(2021, 10, 5)));
+        var person = await _dataScope.TestData.CreatePerson();
         var mqEstablishment = await _dataScope.TestData.ReferenceDataCache.GetMqEstablishmentByValue("955"); // University of Birmingham
         var specialism = await _dataScope.TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
         var startDate = new DateOnly(2023, 01, 5);

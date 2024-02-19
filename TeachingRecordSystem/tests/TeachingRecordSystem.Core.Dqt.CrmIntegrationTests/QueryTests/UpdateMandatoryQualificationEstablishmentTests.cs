@@ -25,7 +25,6 @@ public class UpdateMandatoryQualificationEstablishmentTests : IAsyncLifetime
         var newMqEstablishment = await _dataScope.TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
 
         var person = await _dataScope.TestData.CreatePerson(x => x
-            .WithQts(qtsDate: new DateOnly(2021, 10, 5), teacherStatusValue: "213", createdDate: new DateTime(2021, 10, 5))
             .WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(originalMqEstablishmentValue)));
 
         var qualification = person.MandatoryQualifications.First();

@@ -32,9 +32,7 @@ public class GetQualificationByIdTests : IAsyncLifetime
     public async Task WhenCalled_WithQualificationIdForExistingQualification_ReturnsQualification()
     {
         // Arrange
-        var person = await _dataScope.TestData.CreatePerson(
-            x => x.WithQts(qtsDate: new DateOnly(2021, 10, 5), "213", new DateTime(2021, 10, 5))
-                    .WithMandatoryQualification());
+        var person = await _dataScope.TestData.CreatePerson(x => x.WithMandatoryQualification());
 
         var qualification = person.MandatoryQualifications.First();
 

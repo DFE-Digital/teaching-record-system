@@ -25,7 +25,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ProviderMissingFromState_RedirectsToProvider()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
 
         var journeyInstance = await CreateJourneyInstance(person.ContactId, state => state.MqEstablishmentValue = null);
 
@@ -43,7 +43,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
         var specialism = MandatoryQualificationSpecialism.Hearing;
 
         var journeyInstance = await CreateJourneyInstance(person.ContactId, state => state.Specialism = specialism);
@@ -90,8 +90,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ProviderMissingFromState_RedirectsToProvider()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
-
+        var person = await TestData.CreatePerson();
         var specialism = MandatoryQualificationSpecialism.Hearing;
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId, state => state.MqEstablishmentValue = null);
@@ -116,7 +115,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenNoSpecialismIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var person = await TestData.CreatePerson();
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
@@ -136,8 +135,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenSpecialismIsSelected_RedirectsToStartDatePage()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
-
+        var person = await TestData.CreatePerson();
         var specialism = MandatoryQualificationSpecialism.Hearing;
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);

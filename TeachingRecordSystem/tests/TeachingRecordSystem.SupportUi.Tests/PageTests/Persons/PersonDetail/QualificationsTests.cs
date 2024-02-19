@@ -1,12 +1,7 @@
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
-public class QualificationsTests : TestBase
+public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public QualificationsTests(HostFixture hostFixture)
-        : base(hostFixture)
-    {
-    }
-
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
@@ -54,8 +49,8 @@ public class QualificationsTests : TestBase
         var mqEstablishment = !string.IsNullOrEmpty(providerValue) ? await TestData.ReferenceDataCache.GetMqEstablishmentByValue(providerValue) : null;
         DateOnly? startDate = !string.IsNullOrEmpty(startDateString) ? DateOnly.Parse(startDateString) : null;
         DateOnly? endDate = !string.IsNullOrEmpty(endDateString) ? DateOnly.Parse(endDateString) : null;
+
         var person = await TestData.CreatePerson(x => x
-            .WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5))
             .WithMandatoryQualification(q => q
                 .WithDqtMqEstablishmentValue(providerValue)
                 .WithSpecialism(specialism)
