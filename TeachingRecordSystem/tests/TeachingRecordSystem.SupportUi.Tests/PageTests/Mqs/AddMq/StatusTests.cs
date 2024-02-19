@@ -142,6 +142,36 @@ public class StatusTests : TestBase
         await AssertEx.HtmlResponseHasError(response, "EndDate", "Enter an end date");
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public async Task Post_EndDateIsBeforeOrEqualToStartDate_RendersError(int daysBefore)
+    {
+        // Arrange
+        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var status = MandatoryQualificationStatus.Passed;
+        var endDate = new DateOnly(2021, 11, 5);
+        var startDate = endDate.AddDays(daysBefore);
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddMqState() { StartDate = startDate });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "Status", status.ToString() },
+                { "EndDate.Day", $"{endDate:%d}" },
+                { "EndDate.Month", $"{endDate:%M}" },
+                { "EndDate.Year", $"{endDate:yyyy}" },
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "EndDate", "End date must be after start date");
+    }
+
     [Fact]
     public async Task Post_ValidRequest_RedirectsToResultPage()
     {

@@ -21,6 +21,8 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
     [Display(Name = "Start date")]
     public DateOnly? StartDate { get; set; }
 
+    public DateOnly? EndDate { get; set; }
+
     public void OnGet()
     {
         StartDate ??= JourneyInstance!.State.StartDate;
@@ -31,6 +33,10 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         if (StartDate is null)
         {
             ModelState.AddModelError(nameof(StartDate), "Enter a start date");
+        }
+        else if (StartDate >= EndDate)
+        {
+            ModelState.AddModelError(nameof(StartDate), "Start date must be after end date");
         }
 
         if (!ModelState.IsValid)
@@ -58,5 +64,6 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
+        EndDate = qualificationInfo.MandatoryQualification.EndDate;
     }
 }

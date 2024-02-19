@@ -110,6 +110,34 @@ public class StartDateTests : TestBase
         await AssertEx.HtmlResponseHasError(response, "StartDate", "Enter a start date");
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public async Task Post_StartDateIsAfterOrEqualToEndDate_RendersError(int daysAfter)
+    {
+        // Arrange
+        var person = await TestData.CreatePerson(b => b.WithQts(qtsDate: new DateOnly(2021, 10, 5), "212", new DateTime(2021, 10, 5)));
+        var startDate = new DateOnly(2021, 11, 5);
+        var endDate = startDate.AddDays(-daysAfter);
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddMqState() { EndDate = endDate });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "StartDate.Day", $"{startDate:%d}" },
+                { "StartDate.Month", $"{startDate:%M}" },
+                { "StartDate.Year", $"{startDate:yyyy}" },
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "StartDate", "Start date must be after end date");
+    }
+
     [Fact]
     public async Task Post_WhenStartDateIsEntered_RedirectsToResultPage()
     {

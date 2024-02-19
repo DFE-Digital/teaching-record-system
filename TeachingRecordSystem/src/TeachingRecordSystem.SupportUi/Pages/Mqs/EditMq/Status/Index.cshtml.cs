@@ -25,6 +25,8 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
     [Display(Name = "End date")]
     public DateOnly? EndDate { get; set; }
 
+    public DateOnly? StartDate { get; set; }
+
     public void OnGet()
     {
         Status ??= JourneyInstance!.State.Status;
@@ -33,9 +35,16 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        if (Status == MandatoryQualificationStatus.Passed && EndDate is null)
+        if (Status == MandatoryQualificationStatus.Passed)
         {
-            ModelState.AddModelError(nameof(EndDate), "Enter an end date");
+            if (EndDate is null)
+            {
+                ModelState.AddModelError(nameof(EndDate), "Enter an end date");
+            }
+            else if (EndDate <= StartDate)
+            {
+                ModelState.AddModelError(nameof(EndDate), "End date must be after start date");
+            }
         }
 
         if (!ModelState.IsValid)
@@ -68,5 +77,6 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
+        StartDate = qualificationInfo.MandatoryQualification.StartDate;
     }
 }

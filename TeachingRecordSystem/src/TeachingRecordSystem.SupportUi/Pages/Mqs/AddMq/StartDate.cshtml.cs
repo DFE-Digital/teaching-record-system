@@ -22,6 +22,11 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPost()
     {
+        if (StartDate.HasValue && JourneyInstance!.State.EndDate is DateOnly endDate && StartDate >= endDate)
+        {
+            ModelState.AddModelError(nameof(StartDate), "Start date must be after end date");
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
