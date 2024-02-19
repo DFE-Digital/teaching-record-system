@@ -50,9 +50,15 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
+        if (JourneyInstance!.State.Specialism is null)
+        {
+            context.Result = Redirect(linkGenerator.MqAddSpecialism(PersonId, JourneyInstance.InstanceId));
+            return;
+        }
+
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        StartDate ??= JourneyInstance!.State.StartDate;
+        StartDate ??= JourneyInstance.State.StartDate;
     }
 }
