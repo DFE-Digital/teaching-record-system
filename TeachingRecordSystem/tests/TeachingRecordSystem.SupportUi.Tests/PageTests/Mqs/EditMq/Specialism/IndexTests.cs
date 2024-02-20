@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Specialism;
@@ -71,6 +72,72 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
         Assert.NotNull(selectedSpecialism);
         Assert.Equal(journeySpecialism.ToString(), selectedSpecialism.GetAttribute("value"));
+    }
+
+    [Fact]
+    public async Task Get_QualificationWasMigratedFromDqtWithLegacySpecialism_ShowsLegacySpecialisms()
+    {
+        // Arrange
+        var specialism = MandatoryQualificationSpecialism.DeafEducation;
+        Debug.Assert(MandatoryQualificationSpecialismRegistry.IsLegacy(specialism));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+
+        var journeyInstance = await CreateJourneyInstance(
+            qualificationId,
+            new EditMqSpecialismState()
+            {
+                Initialized = true,
+                Specialism = specialism
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+
+        var legacySpecialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true).Where(s => s.Legacy).ToArray();
+        var specialismRadios = doc.GetElementsByName("Specialism");
+        foreach (var s in legacySpecialisms)
+        {
+            Assert.Contains(specialismRadios, r => r.GetAttribute("value") == s.Value.ToString());
+        }
+    }
+
+    [Fact]
+    public async Task Get_QualificationWasMigratedFromDqtWithNonLegacySpecialism_DoesNotShowLegacySpecialisms()
+    {
+        // Arrange
+        var specialism = MandatoryQualificationSpecialism.Hearing;
+        Debug.Assert(!MandatoryQualificationSpecialismRegistry.IsLegacy(specialism));
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
+
+        var journeyInstance = await CreateJourneyInstance(
+            qualificationId,
+            new EditMqSpecialismState()
+            {
+                Initialized = true,
+                Specialism = specialism
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+
+        var legacySpecialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true).Where(s => s.Legacy).ToArray();
+        var specialismRadios = doc.GetElementsByName("Specialism");
+        foreach (var s in legacySpecialisms)
+        {
+            Assert.DoesNotContain(specialismRadios, r => r.GetAttribute("value") == s.Value.ToString());
+        }
     }
 
     [Fact]

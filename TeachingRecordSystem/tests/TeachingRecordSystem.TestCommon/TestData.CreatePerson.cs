@@ -487,7 +487,7 @@ public partial class TestData
             var personId = createPersonBuilder.PersonId;
 
             var dqtMqEstablishmentValue = _dqtMqEstablishmentValue.ValueOr(mqEstablishments.RandomOne().dfeta_Value);
-            var specialism = _specialism.ValueOr(MandatoryQualificationSpecialismRegistry.GetAll().Where(s => s.Title != "Deaf education").RandomOne().Value);  // Build env is missing Deaf education
+            var specialism = _specialism.ValueOr(MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true).RandomOne().Value);
             var status = _status.ValueOr(_endDate.ValueOrDefault() is DateOnly ? MandatoryQualificationStatus.Passed : MandatoryQualificationStatusRegistry.All.RandomOne().Value);
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
             var endDate = _endDate.ValueOr(status == MandatoryQualificationStatus.Passed ? testData.GenerateDate(min: (startDate ?? new DateOnly(2000, 1, 1)).AddYears(1)) : null);

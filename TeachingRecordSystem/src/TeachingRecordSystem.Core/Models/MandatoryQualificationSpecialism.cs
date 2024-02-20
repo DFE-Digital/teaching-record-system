@@ -5,10 +5,10 @@ namespace TeachingRecordSystem.Core.Models;
 
 public enum MandatoryQualificationSpecialism
 {
-    [MandatoryQualificationSpecialismInfo(name: "auditory", dqtValue: "Auditory Impairment", isValidForNewRecord: false)]
+    [MandatoryQualificationSpecialismInfo(name: "auditory", dqtValue: "Auditory", legacy: true)]
     Auditory = 0,
 
-    [MandatoryQualificationSpecialismInfo(name: "deaf education", dqtValue: "Deaf education", isValidForNewRecord: false)]
+    [MandatoryQualificationSpecialismInfo(name: "deaf education", dqtValue: "Deaf education", legacy: true)]
     DeafEducation = 1,
 
     [MandatoryQualificationSpecialismInfo(name: "hearing", dqtValue: "Hearing")]
@@ -17,7 +17,7 @@ public enum MandatoryQualificationSpecialism
     [MandatoryQualificationSpecialismInfo(name: "multi-sensory", dqtValue: "Multi_Sensory Impairment")]
     MultiSensory = 3,
 
-    [MandatoryQualificationSpecialismInfo(name: "N/A", dqtValue: "N/A", isValidForNewRecord: false)]
+    [MandatoryQualificationSpecialismInfo(name: "N/A", dqtValue: "N/A", legacy: true)]
     NotApplicable = 4,
 
     [MandatoryQualificationSpecialismInfo(name: "visual", dqtValue: "Visual Impairment")]
@@ -29,16 +29,18 @@ public static class MandatoryQualificationSpecialismRegistry
     private static readonly IReadOnlyDictionary<MandatoryQualificationSpecialism, MandatoryQualificationSpecialismInfo> _info =
         Enum.GetValues<MandatoryQualificationSpecialism>().ToDictionary(s => s, s => GetInfo(s));
 
-    public static IReadOnlyCollection<MandatoryQualificationSpecialismInfo> GetAll(bool forNewRecord = false) =>
-        _info.Values.Where(i => i.IsValidForNewRecord || !forNewRecord).ToArray();
+    public static IReadOnlyCollection<MandatoryQualificationSpecialismInfo> GetAll(bool includeLegacy) =>
+        _info.Values.Where(i => includeLegacy || !i.Legacy).OrderBy(s => s.Title).ToArray();
 
     public static string GetName(this MandatoryQualificationSpecialism specialism) => _info[specialism].Name;
 
     public static string GetTitle(this MandatoryQualificationSpecialism specialism) => _info[specialism].Title;
 
+    public static MandatoryQualificationSpecialism GetByDqtValue(string dqtValue) => _info.Single(i => i.Value.DqtValue == dqtValue).Key;
+
     public static string GetDqtValue(this MandatoryQualificationSpecialism specialism) => _info[specialism].DqtValue;
 
-    public static bool IsValidForNewRecord(this MandatoryQualificationSpecialism specialism) => _info[specialism].IsValidForNewRecord;
+    public static bool IsLegacy(this MandatoryQualificationSpecialism specialism) => _info[specialism].Legacy;
 
     public static MandatoryQualificationSpecialism ToMandatoryQualificationSpecialism(this dfeta_specialism specialism) =>
         _info.Values.Single(s => s.DqtValue == specialism.dfeta_Value).Value;
@@ -184,11 +186,11 @@ public static class MandatoryQualificationSpecialismRegistry
             .GetCustomAttribute<MandatoryQualificationSpecialismInfoAttribute>() ??
             throw new Exception($"{nameof(MandatoryQualificationSpecialism)}.{specialism} is missing the {nameof(MandatoryQualificationSpecialismInfoAttribute)} attribute.");
 
-        return new MandatoryQualificationSpecialismInfo(specialism, attr.Name, attr.DqtValue, attr.IsValidForNewRecord);
+        return new MandatoryQualificationSpecialismInfo(specialism, attr.Name, attr.DqtValue, attr.Legacy);
     }
 }
 
-public sealed record MandatoryQualificationSpecialismInfo(MandatoryQualificationSpecialism Value, string Name, string DqtValue, bool IsValidForNewRecord)
+public sealed record MandatoryQualificationSpecialismInfo(MandatoryQualificationSpecialism Value, string Name, string DqtValue, bool Legacy)
 {
     public string Title => Name[0..1].ToUpper() + Name[1..];
 }
@@ -197,9 +199,9 @@ public sealed record MandatoryQualificationSpecialismInfo(MandatoryQualification
 file sealed class MandatoryQualificationSpecialismInfoAttribute(
     string name,
     string dqtValue,
-    bool isValidForNewRecord = true) : Attribute
+    bool legacy = false) : Attribute
 {
     public string Name => name;
     public string DqtValue => dqtValue;
-    public bool IsValidForNewRecord => isValidForNewRecord;
+    public bool Legacy => legacy;
 }
