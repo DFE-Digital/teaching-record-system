@@ -1,21 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 [Journey(JourneyNames.DeleteMq), RequireJourneyInstance]
 public class ConfirmModel(
-    ICrmQueryDispatcher crmQueryDispatcher,
+    TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
-    ReferenceDataCache referenceDataCache,
-    IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
@@ -25,11 +20,11 @@ public class ConfirmModel(
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public Guid? PersonId { get; set; }
+    public Guid PersonId { get; set; }
 
     public string? PersonName { get; set; }
 
-    public string? TrainingProvider { get; set; }
+    public string? ProviderName { get; set; }
 
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
@@ -49,63 +44,39 @@ public class ConfirmModel(
 
     public async Task<IActionResult> OnPost()
     {
-        var qualification = (await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId)))!;
+        var now = clock.UtcNow;
 
-        var dqtMqStatus = qualification.dfeta_MQ_Status ?? (qualification.dfeta_MQ_Date.HasValue ? dfeta_qualification_dfeta_MQ_Status.Passed : null);
-        var establishment = qualification.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
-            await referenceDataCache.GetMqEstablishmentById(establishmentId) :
-            null;
+        var qualification = await dbContext.MandatoryQualifications
+            .Include(q => q.Provider)
+            .SingleAsync(q => q.QualificationId == QualificationId);
 
-        var specialism = qualification.dfeta_MQ_SpecialismId?.Id is Guid specialismId ?
-            await referenceDataCache.GetMqSpecialismById(specialismId) :
-            null;
+        qualification.DeletedOn = now;
 
         var deletedEvent = new MandatoryQualificationDeletedEvent()
         {
             EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
+            CreatedUtc = now,
             RaisedBy = User.GetUserId(),
-            PersonId = PersonId!.Value,
-            MandatoryQualification = new()
-            {
-                QualificationId = QualificationId,
-                Provider = establishment is not null ?
-                    new()
-                    {
-                        MandatoryQualificationProviderId = null,
-                        Name = null,
-                        DqtMqEstablishmentId = establishment?.Id,
-                        DqtMqEstablishmentName = establishment?.dfeta_name
-                    } :
-                    null,
-                Specialism = specialism?.ToMandatoryQualificationSpecialism(),
-                Status = dqtMqStatus?.ToMandatoryQualificationStatus(),
-                StartDate = qualification.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                EndDate = qualification.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-            },
+            PersonId = PersonId,
+            MandatoryQualification = EventModels.MandatoryQualification.FromModel(qualification),
             DeletionReason = DeletionReason!.GetDisplayName(),
             DeletionReasonDetail = DeletionReasonDetail,
             EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
-                new Core.Events.Models.File()
+                new EventModels.File()
                 {
                     FileId = fileId,
                     Name = JourneyInstance.State.EvidenceFileName!
                 } :
                 null
         };
+        dbContext.AddEvent(deletedEvent);
 
-        await crmQueryDispatcher.ExecuteQuery(
-            new DeleteQualificationQuery(
-                QualificationId,
-                deletedEvent));
-
-        await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(
-            helper => helper.SyncMandatoryQualification(QualificationId, new[] { deletedEvent }, CancellationToken.None));
+        await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification deleted");
 
-        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancel()
@@ -116,7 +87,7 @@ public class ConfirmModel(
         }
 
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -132,7 +103,7 @@ public class ConfirmModel(
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        TrainingProvider = qualificationInfo.DqtEstablishmentName;
+        ProviderName = qualificationInfo.MandatoryQualification.Provider?.Name;
         Specialism = qualificationInfo.MandatoryQualification.Specialism;
         Status = qualificationInfo.MandatoryQualification.Status;
         StartDate = qualificationInfo.MandatoryQualification.StartDate;
@@ -140,7 +111,9 @@ public class ConfirmModel(
         DeletionReason = JourneyInstance!.State.DeletionReason;
         DeletionReasonDetail = JourneyInstance?.State.DeletionReasonDetail;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ? await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) : null;
+        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            null;
 
         await next();
     }

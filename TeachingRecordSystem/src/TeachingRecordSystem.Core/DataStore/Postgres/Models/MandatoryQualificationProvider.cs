@@ -81,6 +81,8 @@ public class MandatoryQualificationProvider
         }
     }
 
+    public static MandatoryQualificationProvider GetById(Guid id) => All.Single(p => p.MandatoryQualificationProviderId == id);
+
     public static MandatoryQualificationProvider[] All { get; } =
     [
         new MandatoryQualificationProvider()

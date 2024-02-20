@@ -1,9 +1,9 @@
 using Microsoft.Xrm.Sdk.Messages;
 using Optional;
 using Optional.Unsafe;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Events.Models;
 using static TeachingRecordSystem.Core.Dqt.RequestBuilder;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -367,12 +367,6 @@ public partial class TestData
                 }
             }
 
-            var mqs = new List<(MandatoryQualificationInfo Mq, EventBase CreatedEvent)>();
-            foreach (var mqBuilder in _mqBuilders)
-            {
-                mqs.Add(await mqBuilder.AppendRequests(this, testData, txnRequestBuilder));
-            }
-
             var retrieveContactHandle = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
             {
                 ColumnSet = new(allColumns: true),
@@ -388,12 +382,7 @@ public partial class TestData
                 helper => helper.SyncPerson(contact, ignoreInvalid: false, CancellationToken.None),
                 _syncEnabledOverride);
 
-            foreach (var (mq, createdEvent) in mqs)
-            {
-                await testData.SyncConfiguration.SyncIfEnabled(
-                    helper => helper.SyncMandatoryQualification(mq.QualificationId, [createdEvent], CancellationToken.None),
-                    _syncEnabledOverride);
-            }
+            var mqs = await Task.WhenAll(_mqBuilders.Select(mqb => mqb.Execute(this, testData)));
 
             return new CreatePersonResult()
             {
@@ -414,48 +403,73 @@ public partial class TestData
                 QtsDate = getQtsRegistationTask != null ? getQtsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_QTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 Sanctions = [.. _sanctions],
-                MandatoryQualifications = [.. mqs.Select(t => t.Mq)]
+                MandatoryQualifications = mqs
             };
         }
     }
 
     public class CreatePersonMandatoryQualificationBuilder
     {
-        private Option<string?> _dqtMqEstablishmentValue;
+        private Option<Guid?> _mandatoryQualificationProviderId;
+        private Option<Guid?> _mqEstablishmentId;
         private Option<MandatoryQualificationSpecialism?> _specialism;
+        private Option<Guid?> _dqtSpecialismId;
         private Option<MandatoryQualificationStatus?> _status;
         private Option<DateOnly?> _startDate;
         private Option<DateOnly?> _endDate;
         private Option<DateTime?> _createdUtc;
-        private Option<RaisedByUserInfo?> _raisedByUser;
+        private Option<EventModels.RaisedByUserInfo> _createdByUser;
+        private Option<EventModels.RaisedByUserInfo> _importedByUser;
 
         public Guid QualificationId { get; } = Guid.NewGuid();
 
-        public CreatePersonMandatoryQualificationBuilder WithDqtMqEstablishmentValue(string? value)
+        public CreatePersonMandatoryQualificationBuilder WithProvider(Guid? mandatoryQualificationProviderId)
         {
-            _dqtMqEstablishmentValue = Option.Some(value);
+            _mandatoryQualificationProviderId = Option.Some(mandatoryQualificationProviderId);
+            _mqEstablishmentId = default;
             return this;
         }
 
-        public CreatePersonMandatoryQualificationBuilder WithSpecialism(MandatoryQualificationSpecialism? specialism)
+        public CreatePersonMandatoryQualificationBuilder WithDqtMqEstablishment(dfeta_mqestablishment? mqEstablishment)
+        {
+            Guid? mandatoryQualificationProviderId = null;
+
+            if (mqEstablishment is not null)
+            {
+                MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
+                mandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId;
+            }
+
+            return WithDqtMqEstablishment(mqEstablishment, mandatoryQualificationProviderId);
+        }
+
+        public CreatePersonMandatoryQualificationBuilder WithDqtMqEstablishment(dfeta_mqestablishment? mqEstablishment, Guid? mandatoryQualificationProviderId)
+        {
+            _mqEstablishmentId = Option.Some(mqEstablishment?.Id);
+            _mandatoryQualificationProviderId = Option.Some(mandatoryQualificationProviderId);
+            return this;
+        }
+
+        public CreatePersonMandatoryQualificationBuilder WithSpecialism(MandatoryQualificationSpecialism? specialism, Guid? dqtSpecialismId = null)
         {
             _specialism = Option.Some(specialism);
+            _dqtSpecialismId = Option.Some(dqtSpecialismId);
             return this;
         }
 
         public CreatePersonMandatoryQualificationBuilder WithStatus(MandatoryQualificationStatus? status, DateOnly? endDate = null)
         {
-            if (status == MandatoryQualificationStatus.Passed && !endDate.HasValue)
+            if (endDate.HasValue)
             {
-                throw new ArgumentException($"{nameof(_endDate)} must be specified when {nameof(status)} is '{MandatoryQualificationStatus.Passed}'.");
-            }
-            else if (status != MandatoryQualificationStatus.Passed && endDate.HasValue)
-            {
-                throw new ArgumentException($"{nameof(_endDate)} cannot be specified unless {nameof(status)} is '{MandatoryQualificationStatus.Passed}'.");
+                if (status != MandatoryQualificationStatus.Passed)
+                {
+                    throw new ArgumentException($"{nameof(_endDate)} cannot be specified unless {nameof(status)} is '{MandatoryQualificationStatus.Passed}'.");
+                }
+
+                _endDate = Option.Some(endDate);
             }
 
             _status = Option.Some(status);
-            _endDate = Option.Some(endDate);
             return this;
         }
 
@@ -471,89 +485,134 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonMandatoryQualificationBuilder WithCreatedByUser(RaisedByUserInfo? raisedByUser)
+        public CreatePersonMandatoryQualificationBuilder WithCreatedByUser(EventModels.RaisedByUserInfo user)
         {
-            _raisedByUser = Option.Some(raisedByUser);
+            if (_importedByUser.HasValue)
+            {
+                throw new InvalidOperationException("Cannot define both an 'imported by' and 'created by' user.");
+            }
+
+            _createdByUser = Option.Some(user);
             return this;
         }
 
-        internal async Task<(MandatoryQualificationInfo, EventBase)> AppendRequests(CreatePersonBuilder createPersonBuilder, TestData testData, RequestBuilder requestBuilder)
+        public CreatePersonMandatoryQualificationBuilder WithImportedByDqtUser(EventModels.RaisedByUserInfo user)
         {
-            var mqEstablishments = await testData.ReferenceDataCache.GetMqEstablishments();
+            if (!user.IsDqtUser)
+            {
+                throw new ArgumentException("User must be a DQT user.", nameof(user));
+            }
 
+            if (_createdByUser.HasValue)
+            {
+                throw new InvalidOperationException("Cannot define both an 'imported by' and 'created by' user.");
+            }
+
+            _importedByUser = Option.Some(user);
+            return this;
+        }
+
+        internal async Task<MandatoryQualificationInfo> Execute(CreatePersonBuilder createPersonBuilder, TestData testData)
+        {
             var personId = createPersonBuilder.PersonId;
 
-            var dqtMqEstablishmentValue = _dqtMqEstablishmentValue.ValueOr(mqEstablishments.RandomOne().dfeta_Value);
+            var providerId = _mandatoryQualificationProviderId.ValueOr(MandatoryQualificationProvider.All.RandomOne().MandatoryQualificationProviderId);
             var specialism = _specialism.ValueOr(MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true).RandomOne().Value);
             var status = _status.ValueOr(_endDate.ValueOrDefault() is DateOnly ? MandatoryQualificationStatus.Passed : MandatoryQualificationStatusRegistry.All.RandomOne().Value);
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
             var endDate = _endDate.ValueOr(status == MandatoryQualificationStatus.Passed ? testData.GenerateDate(min: (startDate ?? new DateOnly(2000, 1, 1)).AddYears(1)) : null);
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
-            var raisedByUser = _raisedByUser.ValueOr(RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
 
-            var mqEstablishment = dqtMqEstablishmentValue is not null ?
-                await testData.ReferenceDataCache.GetMqEstablishmentByValue(dqtMqEstablishmentValue) :
-                null;
-
-            var dqtSpecialism = specialism is not null ?
-                await testData.ReferenceDataCache.GetMqSpecialismByValue(specialism.Value.GetDqtValue()) :
-                null;
-
-            Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var provider);
-
-            var createdEvent = new MandatoryQualificationCreatedEvent()
+            await testData.WithDbContext(async dbContext =>
             {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = createdUtc!.Value,
-                RaisedBy = raisedByUser!,
-                PersonId = personId,
-                MandatoryQualification = new()
+                var provider = providerId.HasValue ?
+                    await dbContext.MandatoryQualificationProviders.SingleAsync(p => p.MandatoryQualificationProviderId == providerId) :
+                    null;
+
+                dbContext.MandatoryQualifications.Add(new MandatoryQualification()
                 {
                     QualificationId = QualificationId,
-                    Provider = provider is not null || mqEstablishment is not null ?
-                        new()
-                        {
-                            MandatoryQualificationProviderId = provider?.MandatoryQualificationProviderId,
-                            Name = provider?.Name,
-                            DqtMqEstablishmentId = mqEstablishment?.Id,
-                            DqtMqEstablishmentName = mqEstablishment?.dfeta_name
-                        } :
-                        null,
-                    Specialism = specialism,
+                    CreatedOn = testData.Clock.UtcNow,
+                    UpdatedOn = testData.Clock.UtcNow,
+                    PersonId = personId,
+                    ProviderId = providerId,
                     Status = status,
+                    Specialism = specialism,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
+                    DqtSpecialismId = _dqtSpecialismId.ValueOr((Guid?)null),
+                    DqtMqEstablishmentId = _mqEstablishmentId.ValueOr((Guid?)null)
+                });
+
+                if (_importedByUser.HasValue)
+                {
+                    var createdEvent = new MandatoryQualificationDqtImportedEvent()
+                    {
+                        EventId = Guid.NewGuid(),
+                        CreatedUtc = createdUtc!.Value,
+                        RaisedBy = _importedByUser.ValueOrFailure(),
+                        PersonId = personId,
+                        MandatoryQualification = new()
+                        {
+                            QualificationId = QualificationId,
+                            Provider = provider is not null ?
+                                new()
+                                {
+                                    MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                                    Name = provider.Name,
+                                } :
+                                null,
+                            Specialism = specialism,
+                            Status = status,
+                            StartDate = startDate,
+                            EndDate = endDate
+                        },
+                        DqtState = 0
+                    };
+                    dbContext.AddEvent(createdEvent);
                 }
-            };
+                else
+                {
+                    var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
 
-            var qualification = new dfeta_qualification()
-            {
-                Id = QualificationId,
-                dfeta_PersonId = personId.ToEntityReference(Contact.EntityLogicalName),
-                dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
-                dfeta_MQ_MQEstablishmentId = mqEstablishment?.Id.ToEntityReference(dfeta_mqestablishment.EntityLogicalName),
-                dfeta_MQ_SpecialismId = dqtSpecialism?.Id.ToEntityReference(dfeta_specialism.EntityLogicalName),
-                dfeta_MQStartDate = startDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                dfeta_MQ_Date = endDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                dfeta_MQ_Status = status?.GetDqtStatus(),
-                dfeta_TRSEvent = EventInfo.Create(createdEvent).Serialize()
-            };
+                    var createdEvent = new MandatoryQualificationCreatedEvent()
+                    {
+                        EventId = Guid.NewGuid(),
+                        CreatedUtc = createdUtc!.Value,
+                        RaisedBy = createdByUser,
+                        PersonId = personId,
+                        MandatoryQualification = new()
+                        {
+                            QualificationId = QualificationId,
+                            Provider = provider is not null ?
+                                new()
+                                {
+                                    MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                                    Name = provider.Name,
+                                } :
+                                null,
+                            Specialism = specialism,
+                            Status = status,
+                            StartDate = startDate,
+                            EndDate = endDate
+                        }
+                    };
+                    dbContext.AddEvent(createdEvent);
+                }
 
-            requestBuilder.AddRequest(new CreateRequest()
-            {
-                Target = qualification
+                await dbContext.SaveChangesAsync();
             });
 
             var mqInfo = new MandatoryQualificationInfo(
                 QualificationId,
-                dqtMqEstablishmentValue,
+                providerId,
                 specialism,
                 status,
                 startDate,
                 endDate
             );
 
-            return (mqInfo, createdEvent);
+            return mqInfo;
         }
     }
 
@@ -584,7 +643,7 @@ public partial class TestData
 
     public record MandatoryQualificationInfo(
         Guid QualificationId,
-        string? DqtMqEstablishmentValue,
+        Guid? ProviderId,
         MandatoryQualificationSpecialism? Specialism,
         MandatoryQualificationStatus? Status,
         DateOnly? StartDate,

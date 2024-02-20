@@ -25,7 +25,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange        
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()
@@ -50,7 +50,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()
@@ -91,7 +91,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()
@@ -122,7 +122,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()
@@ -153,7 +153,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()
@@ -185,7 +185,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()
@@ -217,7 +217,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()
@@ -250,7 +250,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()

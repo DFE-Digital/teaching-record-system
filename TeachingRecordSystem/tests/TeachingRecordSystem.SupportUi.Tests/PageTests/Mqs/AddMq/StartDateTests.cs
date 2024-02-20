@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
@@ -212,7 +213,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var state = new AddMqState()
         {
-            MqEstablishmentValue = "959",
+            ProviderId = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham").MandatoryQualificationProviderId,
             Specialism = MandatoryQualificationSpecialism.Visual
         };
         configureState?.Invoke(state);

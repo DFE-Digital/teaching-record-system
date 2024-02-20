@@ -15,7 +15,7 @@
         window.onload = function () {
             accessibleAutocomplete.enhanceSelectElement({
                 defaultValue: '',
-                selectElement: document.querySelector('#@nameof(Model.MqEstablishmentValue)')
+                selectElement: document.querySelector('#@nameof(Model.ProviderId)')
             })
         }
     </script>
@@ -30,12 +30,12 @@
         <form action="@LinkGenerator.MqAddProvider(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Add a mandatory qualification - @Model.PersonName</span>
 
-            <govuk-select asp-for="MqEstablishmentValue" label-class="govuk-label--l">
-                <govuk-select-label is-page-heading="true">Training provider</govuk-select-label>
+            <govuk-select asp-for="ProviderId" label-class="govuk-label--l">
+                <govuk-select-label is-page-heading="true" />
                 <govuk-select-item value=""></govuk-select-item>
-                @foreach (var establishment in Model.MqEstablishments!)
+                @foreach (var provider in Model.Providers!)
                 {
-                    <govuk-select-item value="@establishment.dfeta_Value">@establishment.dfeta_name</govuk-select-item>
+                    <govuk-select-item value="@provider.MandatoryQualificationProviderId">@provider.Name</govuk-select-item>
                 }
             </govuk-select>
 

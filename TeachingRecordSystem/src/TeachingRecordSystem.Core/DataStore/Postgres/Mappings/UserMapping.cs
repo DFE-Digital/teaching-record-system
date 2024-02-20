@@ -48,13 +48,6 @@ public class SystemUserMapping : IEntityTypeConfiguration<Models.SystemUser>
 {
     public void Configure(EntityTypeBuilder<Models.SystemUser> builder)
     {
-        builder.HasData(GetSystemUser());
+        builder.HasData(Models.SystemUser.Instance);
     }
-
-    private static Models.SystemUser GetSystemUser() => new()
-    {
-        UserId = Models.SystemUser.SystemUserId,
-        Name = "System",
-        Active = true
-    };
 }

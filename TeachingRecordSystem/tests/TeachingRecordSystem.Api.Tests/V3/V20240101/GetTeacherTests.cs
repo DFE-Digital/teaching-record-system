@@ -163,7 +163,7 @@ public class GetTeacherTests : GetTeacherTestBase
         {
             new QtsRegistration(qtsDate, "212", createdDate, eytsDate, "220")
         };
-        var contact = await CreateContact(hasMultiWordFirstName: true, qtsQualifications: qts);
+        var contact = await CreateContact(hasMultiWordFirstName: true, qtsRegistrations: qts);
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
@@ -203,11 +203,40 @@ public class GetTeacherTests : GetTeacherTestBase
     [Fact]
     public async Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
     {
-        var contact = await CreateContact();
-        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
-        var baseUrl = "/v3/teacher";
+        // Arrange
+        var person = await TestData.CreatePerson(b => b
+            .WithTrn()
+            // MQ with no EndDate
+            .WithMandatoryQualification(b => b.WithStatus(MandatoryQualificationStatus.InProgress))
+            // MQ with no Specialism
+            .WithMandatoryQualification(b => b.WithSpecialism(null))
+            // MQ with EndDate and Specialism
+            .WithMandatoryQualification(b => b
+                .WithStatus(MandatoryQualificationStatus.Passed, endDate: new(2022, 9, 1))
+                .WithSpecialism(MandatoryQualificationSpecialism.Auditory)));
 
-        await ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(httpClient, baseUrl, contact);
+        var validMq = person.MandatoryQualifications.Last();
+
+        // Arrange
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/teacher?include=MandatoryQualifications");
+
+        // Act
+        var response = await GetHttpClientWithIdentityAccessToken(person.Trn!).SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responseMandatoryQualifications = jsonResponse.RootElement.GetProperty("mandatoryQualifications");
+
+        AssertEx.JsonObjectEquals(
+            new[]
+            {
+                new
+                {
+                    awarded = validMq.EndDate?.ToString("yyyy-MM-dd"),
+                    specialism = validMq.Specialism?.GetTitle()
+                }
+            },
+            responseMandatoryQualifications);
     }
 
     [Fact]

@@ -52,7 +52,7 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.MqEstablishmentValue is null)
+        if (JourneyInstance!.State.ProviderId is null)
         {
             context.Result = Redirect(linkGenerator.MqAddProvider(PersonId, JourneyInstance.InstanceId));
             return;

@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
@@ -44,11 +45,11 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var mqEstablishmentValue = "959"; // University of Leeds
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
 
         var journeyInstance = await CreateJourneyInstance(
             person.ContactId,
-            state => state.MqEstablishmentValue = mqEstablishmentValue);
+            state => state.ProviderId = provider.MandatoryQualificationProviderId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -57,9 +58,9 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        var selectedProvider = doc.GetElementById("MqEstablishmentValue") as IHtmlSelectElement;
+        var selectedProvider = doc.GetElementById("ProviderId") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
-        Assert.Equal(mqEstablishmentValue, selectedProvider.Value);
+        Assert.Equal(provider.MandatoryQualificationProviderId.ToString(), selectedProvider.Value);
     }
 
     [Fact]
@@ -67,7 +68,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var mqEstablishmentValue = "959"; // University of Leeds
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
 
         var journeyInstance = await CreateJourneyInstance(personId);
 
@@ -75,7 +76,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "MqEstablishmentValue", mqEstablishmentValue }
+                { "ProviderId", provider.MandatoryQualificationProviderId }
             }
         };
 
@@ -96,14 +97,14 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
+            Content = new FormUrlEncodedContentBuilder()
         };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "MqEstablishmentValue", "Select a training provider");
+        await AssertEx.HtmlResponseHasError(response, "ProviderId", "Select a training provider");
     }
 
     [Fact]
@@ -111,7 +112,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var mqEstablishmentValue = "959"; // University of Leeds
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId);
 
@@ -119,7 +120,7 @@ public class ProviderTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "MqEstablishmentValue", mqEstablishmentValue }
+                { "ProviderId", provider.MandatoryQualificationProviderId }
             }
         };
 

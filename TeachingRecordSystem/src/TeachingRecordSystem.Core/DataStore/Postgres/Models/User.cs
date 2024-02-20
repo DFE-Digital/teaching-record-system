@@ -75,4 +75,12 @@ public class ApplicationUser : UserBase
 public class SystemUser : UserBase
 {
     public static Guid SystemUserId { get; } = new Guid("a81394d1-a498-46d8-af3e-e077596ab303");
+    public const string SystemUserName = "System";
+
+    public static SystemUser Instance { get; } = new()
+    {
+        UserId = SystemUserId,
+        Name = SystemUserName,
+        Active = true
+    };
 }

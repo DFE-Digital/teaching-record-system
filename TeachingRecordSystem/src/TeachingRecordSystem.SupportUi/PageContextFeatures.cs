@@ -33,8 +33,4 @@ public record CurrentPersonFeature(Guid PersonId, string FirstName, string Middl
     public string Name => (FirstName + " " + MiddleName).Trim() + " " + LastName;
 }
 
-public record CurrentMandatoryQualificationFeature(
-    MandatoryQualification MandatoryQualification,
-    MandatoryQualificationProvider? Provider,
-    string? DqtEstablishmentName,
-    string? DqtEstablishmentValue);
+public record CurrentMandatoryQualificationFeature(MandatoryQualification MandatoryQualification);

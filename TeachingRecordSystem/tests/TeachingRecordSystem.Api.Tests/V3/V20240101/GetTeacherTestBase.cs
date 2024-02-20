@@ -322,48 +322,6 @@ public abstract class GetTeacherTestBase : TestBase
         AssertEx.JsonObjectEquals(expectedJson, responseNpqQualifications);
     }
 
-    protected async Task ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(
-        HttpClient httpClient,
-        string baseUrl,
-        Contact contact)
-    {
-        // Arrange
-        var mandatoryQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, null, dfeta_qualificationState.Active, "Visual Impairment");
-        var mandatoryQualificationNoSpecialism = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 2, 3), dfeta_qualificationState.Active, null);
-        var mandatoryQualificationValid = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 4, 6), dfeta_qualificationState.Active, "Hearing");
-        var mandatoryQualificationInactive = CreateQualification(dfeta_qualification_dfeta_Type.MandatoryQualification, new DateTime(2022, 4, 8), dfeta_qualificationState.Inactive, "Multi Sensory Impairment");
-
-        var qualifications = new dfeta_qualification[]
-        {
-            mandatoryQualificationNoAwardDate,
-            mandatoryQualificationNoSpecialism,
-            mandatoryQualificationValid,
-            mandatoryQualificationInactive
-        };
-
-        await ConfigureMocks(contact, qualifications: qualifications);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=MandatoryQualifications");
-
-        // Act
-        var response = await httpClient.SendAsync(request);
-
-        // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
-        var responseMandatoryQualifications = jsonResponse.RootElement.GetProperty("mandatoryQualifications");
-
-        AssertEx.JsonObjectEquals(
-            new[]
-            {
-                new
-                {
-                    awarded = mandatoryQualificationValid.dfeta_MQ_Date?.ToString("yyyy-MM-dd"),
-                    specialism = mandatoryQualificationValid.GetAttributeValue<AliasedValue>($"{dfeta_specialism.EntityLogicalName}.{dfeta_specialism.Fields.dfeta_name}").Value
-                }
-            },
-            responseMandatoryQualifications);
-    }
-
     protected async Task ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(
         HttpClient httpClient,
         string baseUrl,
@@ -665,7 +623,7 @@ public abstract class GetTeacherTestBase : TestBase
     }
 
     protected async Task<Contact> CreateContact(
-        QtsRegistration[]? qtsQualifications = null,
+        QtsRegistration[]? qtsRegistrations = null,
         bool hasMultiWordFirstName = false)
     {
         var firstName = hasMultiWordFirstName ? $"{Faker.Name.First()} {Faker.Name.First()}" : Faker.Name.First();
@@ -673,10 +631,9 @@ public abstract class GetTeacherTestBase : TestBase
         var person = await TestData.CreatePerson(
             b =>
             {
-                b.WithFirstName(firstName)
-                .WithTrn();
+                b.WithFirstName(firstName).WithTrn();
 
-                foreach (var item in qtsQualifications ?? Array.Empty<QtsRegistration>())
+                foreach (var item in qtsRegistrations ?? Array.Empty<QtsRegistration>())
                 {
                     b.WithQtsRegistration(item!.QtsDate, item!.TeacherStatusValue, item.CreatedOn, item!.EytsDate, item!.EytsStatusValue);
                 }
@@ -730,7 +687,6 @@ public abstract class GetTeacherTestBase : TestBase
         DataverseAdapterMock
              .Setup(mock => mock.GetQualificationsForTeacher(
                  contact.Id,
-                 It.IsAny<string[]>(),
                  It.IsAny<string[]>(),
                  It.IsAny<string[]>(),
                  It.IsAny<string[]>()))

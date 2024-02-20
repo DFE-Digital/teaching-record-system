@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests;
 

@@ -20,19 +20,11 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public Guid? PersonId { get; set; }
+    public Guid PersonId { get; set; }
 
     public string? PersonName { get; set; }
 
-    public string? TrainingProvider { get; set; }
-
     public MandatoryQualificationSpecialism? Specialism { get; set; }
-
-    public MandatoryQualificationStatus? Status { get; set; }
-
-    public DateOnly? StartDate { get; set; }
-
-    public DateOnly? EndDate { get; set; }
 
     [BindProperty]
     [Display(Name = "Reason for deleting")]
@@ -131,7 +123,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
         }
 
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -141,11 +133,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        TrainingProvider = qualificationInfo.DqtEstablishmentName;
         Specialism = qualificationInfo.MandatoryQualification.Specialism;
-        Status = qualificationInfo.MandatoryQualification.Status;
-        StartDate = qualificationInfo.MandatoryQualification.StartDate;
-        EndDate = qualificationInfo.MandatoryQualification.EndDate;
         EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;

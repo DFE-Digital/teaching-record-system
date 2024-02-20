@@ -2,14 +2,12 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 [Journey(JourneyNames.AddMq), RequireJourneyInstance]
-public class ProviderModel(
-    ReferenceDataCache referenceDataCache,
-    TrsLinkGenerator linkGenerator) : PageModel
+public class ProviderModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<AddMqState>? JourneyInstance { get; set; }
 
@@ -24,9 +22,9 @@ public class ProviderModel(
     [BindProperty]
     [Required(ErrorMessage = "Select a training provider")]
     [Display(Name = "Training provider")]
-    public string? MqEstablishmentValue { get; set; }
+    public Guid? ProviderId { get; set; }
 
-    public dfeta_mqestablishment[]? MqEstablishments { get; set; }
+    public ProviderInfo[]? Providers { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
@@ -35,7 +33,7 @@ public class ProviderModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.MqEstablishmentValue = MqEstablishmentValue);
+        await JourneyInstance!.UpdateStateAsync(state => state.ProviderId = ProviderId);
 
         return Redirect(FromCheckAnswers ?
             linkGenerator.MqAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
@@ -48,18 +46,14 @@ public class ProviderModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        var establishments = await referenceDataCache.GetMqEstablishments();
-        MqEstablishments = establishments
-            .OrderBy(e => e.dfeta_name)
-            .ToArray();
-
         PersonName = personInfo.Name;
-        MqEstablishmentValue ??= JourneyInstance!.State.MqEstablishmentValue;
-
-        await next();
+        ProviderId ??= JourneyInstance!.State.ProviderId;
+        Providers = MandatoryQualificationProvider.All.Select(p => new ProviderInfo(p.MandatoryQualificationProviderId, p.Name)).ToArray();
     }
+
+    public record ProviderInfo(Guid MandatoryQualificationProviderId, string Name);
 }

@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
@@ -27,7 +28,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePerson();
 
-        var journeyInstance = await CreateJourneyInstance(person.ContactId, state => state.MqEstablishmentValue = null);
+        var journeyInstance = await CreateJourneyInstance(person.ContactId, state => state.ProviderId = null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -93,7 +94,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePerson();
         var specialism = MandatoryQualificationSpecialism.Hearing;
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, state => state.MqEstablishmentValue = null);
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, state => state.ProviderId = null);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -160,7 +161,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var state = new AddMqState()
         {
-            MqEstablishmentValue = "959"
+            ProviderId = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham").MandatoryQualificationProviderId
         };
         configureState?.Invoke(state);
 

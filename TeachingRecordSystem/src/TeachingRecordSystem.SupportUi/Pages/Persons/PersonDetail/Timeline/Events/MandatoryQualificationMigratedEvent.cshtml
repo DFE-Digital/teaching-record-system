@@ -20,10 +20,20 @@
                 <govuk-details-summary>Previous data</govuk-details-summary>
                 <govuk-details-text>
                     <govuk-summary-list>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="provider">@(mandatoryQualification.Provider is not null ? mandatoryQualification.Provider.DqtMqEstablishmentName : "None")</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
+                        @if (migratedEvent.Changes.HasFlag(MandatoryQualificationMigratedEventChanges.Provider))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value data-testid="provider">@(mandatoryQualification.Provider!.Name)</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+                        @if (migratedEvent.Changes.HasFlag(MandatoryQualificationMigratedEventChanges.Specialism))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value data-testid="specialism">@(mandatoryQualification.Specialism!.Value.GetTitle())</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
                     </govuk-summary-list>
                 </govuk-details-text>
             </govuk-details>

@@ -19,18 +19,13 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
     }
 
     [Theory]
-    [InlineData(false, false, false)]
-    [InlineData(true, false, false)]
-    [InlineData(false, true, false)]
-    [InlineData(true, true, false)]
-    [InlineData(true, true, true)]
-    [InlineData(false, false, true)]
-    [InlineData(true, false, true)]
-    [InlineData(false, true, true)]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
     public async Task Given_QualificationsExistForTeacher_ReturnsExpectedColumnValues(
         bool setHeQualificationColumnNames,
-        bool setHeSubjectColumnNames,
-        bool setSpecialismColumnNames)
+        bool setHeSubjectColumnNames)
     {
         // Arrange
         var firstName = Faker.Name.First();
@@ -162,14 +157,6 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
             dfeta_Value = mqSpecialismValue
         });
 
-        var mqQualificationId = await _organizationService.CreateAsync(new dfeta_qualification()
-        {
-            dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
-            dfeta_Type = dfeta_qualification_dfeta_Type.MandatoryQualification,
-            StateCode = dfeta_qualificationState.Active,
-            dfeta_MQ_SpecialismId = new EntityReference(dfeta_specialism.EntityLogicalName, mqSpecialismId)
-        });
-
         // Act
         var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
             teacherId,
@@ -193,14 +180,7 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
                     dfeta_hesubject.Fields.dfeta_name,
                     dfeta_hesubject.Fields.dfeta_Value
                 } :
-                null,
-            setSpecialismColumnNames ?
-                new[]
-                {
-                    dfeta_specialism.PrimaryIdAttribute,
-                    dfeta_specialism.Fields.dfeta_name
-                }
-                : null);
+                null);
 
         // Assert
         Assert.Collection(
@@ -249,22 +229,6 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
                     Assert.Null(heSubject1);
                     Assert.Null(heSubject2);
                     Assert.Null(heSubject3);
-                }
-            },
-            item3 =>
-            {
-                Assert.Equal(mqQualificationId, item3.Id);
-                Assert.Equal(dfeta_qualification_dfeta_Type.MandatoryQualification, item3.dfeta_Type);
-                Assert.Equal(dfeta_qualificationState.Active, item3.StateCode);
-
-                var mqSpecialism = item3.Extract<dfeta_specialism>(dfeta_specialism.EntityLogicalName, dfeta_specialism.PrimaryIdAttribute);
-                if (setSpecialismColumnNames)
-                {
-                    Assert.NotNull(mqSpecialism);
-                }
-                else
-                {
-                    Assert.Null(mqSpecialism);
                 }
             }
         );

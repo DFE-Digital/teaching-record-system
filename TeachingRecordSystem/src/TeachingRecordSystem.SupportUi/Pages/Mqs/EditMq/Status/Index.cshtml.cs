@@ -13,7 +13,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public Guid? PersonId { get; set; }
+    public Guid PersonId { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -29,8 +29,8 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public void OnGet()
     {
-        Status ??= JourneyInstance!.State.Status;
-        EndDate ??= JourneyInstance!.State.EndDate;
+        Status = JourneyInstance!.State.Status;
+        EndDate = JourneyInstance!.State.EndDate;
     }
 
     public async Task<IActionResult> OnPost()
@@ -65,7 +65,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

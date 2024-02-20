@@ -13,7 +13,7 @@ public class IndexModel(ReferenceDataCache referenceDataCache, TrsLinkGenerator 
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public Guid? PersonId { get; set; }
+    public Guid PersonId { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -26,7 +26,7 @@ public class IndexModel(ReferenceDataCache referenceDataCache, TrsLinkGenerator 
 
     public void OnGet()
     {
-        Specialism ??= JourneyInstance!.State.Specialism;
+        Specialism = JourneyInstance!.State.Specialism;
     }
 
     public async Task<IActionResult> OnPost()
@@ -49,7 +49,7 @@ public class IndexModel(ReferenceDataCache referenceDataCache, TrsLinkGenerator 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

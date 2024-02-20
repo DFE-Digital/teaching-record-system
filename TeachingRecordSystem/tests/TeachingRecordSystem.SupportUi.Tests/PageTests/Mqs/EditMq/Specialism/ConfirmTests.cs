@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Specialism;
@@ -9,7 +10,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()
@@ -38,7 +39,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -84,7 +85,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange        
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()
@@ -115,7 +116,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
-        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(qualification.DqtMqEstablishmentValue!);
+        var provider = MandatoryQualificationProvider.GetById(qualification.ProviderId!.Value);
         var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
         var changeReasonDetail = "Some reason";
 
@@ -169,10 +170,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = null,
-                        Name = null,
-                        DqtMqEstablishmentId = mqEstablishment.Id,
-                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name,
+                        DqtMqEstablishmentId = null,
+                        DqtMqEstablishmentName = null
                     },
                     Specialism = newMqSpecialism,
                     Status = qualification.Status,
@@ -184,10 +185,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = null,
-                        Name = null,
-                        DqtMqEstablishmentId = mqEstablishment.Id,
-                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name,
+                        DqtMqEstablishmentId = null,
+                        DqtMqEstablishmentName = null
                     },
                     Specialism = oldMqSpecialism,
                     Status = qualification.Status,
@@ -212,7 +213,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldMqSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newMqSpecialism = MandatoryQualificationSpecialism.Visual;
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldMqSpecialism)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqSpecialismState()

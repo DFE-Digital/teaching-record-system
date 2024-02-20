@@ -119,10 +119,40 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     [Fact]
     public async Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
     {
-        var contact = await CreateContact();
-        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
+        // Arrange
+        var person = await TestData.CreatePerson(b => b
+            .WithTrn()
+            // MQ with no EndDate
+            .WithMandatoryQualification(b => b.WithStatus(MandatoryQualificationStatus.InProgress))
+            // MQ with no Specialism
+            .WithMandatoryQualification(b => b.WithSpecialism(null))
+            // MQ with EndDate and Specialism
+            .WithMandatoryQualification(b => b
+                .WithStatus(MandatoryQualificationStatus.Passed, endDate: new(2022, 9, 1))
+                .WithSpecialism(MandatoryQualificationSpecialism.Auditory)));
 
-        await ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent(GetHttpClientWithApiKey(), baseUrl, contact);
+        var validMq = person.MandatoryQualifications.Last();
+
+        // Arrange
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{person.Trn}?include=MandatoryQualifications");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responseMandatoryQualifications = jsonResponse.RootElement.GetProperty("mandatoryQualifications");
+
+        AssertEx.JsonObjectEquals(
+            new[]
+            {
+                new
+                {
+                    awarded = validMq.EndDate?.ToString("yyyy-MM-dd"),
+                    specialism = validMq.Specialism?.GetTitle()
+                }
+            },
+            responseMandatoryQualifications);
     }
 
     [Fact]

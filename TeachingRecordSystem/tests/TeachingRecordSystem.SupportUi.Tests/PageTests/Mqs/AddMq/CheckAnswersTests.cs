@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;
@@ -26,7 +27,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         var status = MandatoryQualificationStatus.Passed;
@@ -36,7 +37,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             person.ContactId,
             new AddMqState()
             {
-                MqEstablishmentValue = mqEstablishment.dfeta_Value,
+                ProviderId = provider.MandatoryQualificationProviderId,
                 Specialism = specialism,
                 StartDate = startDate,
                 Status = status,
@@ -60,7 +61,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
@@ -69,7 +70,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             person.ContactId,
             new AddMqState()
             {
-                MqEstablishmentValue = mqEstablishment.dfeta_Value,
+                ProviderId = provider.MandatoryQualificationProviderId,
                 Specialism = specialism,
                 StartDate = startDate,
                 Status = status,
@@ -83,7 +84,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(mqEstablishment.dfeta_name, doc.GetElementByTestId("provider")!.TextContent);
+        Assert.Equal(provider.Name, doc.GetElementByTestId("provider")!.TextContent);
         Assert.Equal(specialism.GetTitle(), doc.GetElementByTestId("specialism")!.TextContent);
         Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("start-date")!.TextContent);
         Assert.Equal(status.GetTitle(), doc.GetElementByTestId("status")!.TextContent);
@@ -125,7 +126,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
@@ -134,7 +135,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             person.ContactId,
             new AddMqState()
             {
-                MqEstablishmentValue = mqEstablishment.dfeta_Value,
+                ProviderId = provider.MandatoryQualificationProviderId,
                 Specialism = specialism,
                 StartDate = startDate,
                 Status = status,
@@ -184,10 +185,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = null,
-                        Name = null,
-                        DqtMqEstablishmentId = mqEstablishment.Id,
-                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name,
+                        DqtMqEstablishmentId = null,
+                        DqtMqEstablishmentName = null
                     },
                     Specialism = specialism,
                     Status = status,
@@ -206,7 +207,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
+        var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         var status = MandatoryQualificationStatus.Passed;
@@ -216,7 +217,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             person.ContactId,
             new AddMqState()
             {
-                MqEstablishmentValue = mqEstablishment.dfeta_Value,
+                ProviderId = provider.MandatoryQualificationProviderId,
                 Specialism = specialism,
                 StartDate = startDate,
                 Status = status,

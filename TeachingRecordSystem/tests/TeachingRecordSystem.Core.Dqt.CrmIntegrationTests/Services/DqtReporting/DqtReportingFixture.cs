@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.Services.DqtReporting;
+using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.Services.DqtReporting;
 

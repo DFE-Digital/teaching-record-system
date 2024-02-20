@@ -50,6 +50,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<MandatoryQualification> MandatoryQualifications => Set<MandatoryQualification>();
 
+    public DbSet<MandatoryQualificationProvider> MandatoryQualificationProviders => Set<MandatoryQualificationProvider>();
+
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
 
     public DbSet<OneLoginUser> OneLoginUsers => Set<OneLoginUser>();
