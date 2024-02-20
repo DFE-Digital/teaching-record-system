@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 [Journey(JourneyNames.EditMqSpecialism), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(ReferenceDataCache referenceDataCache, TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditMqSpecialismState>? JourneyInstance { get; set; }
 
@@ -19,9 +19,10 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Display(Name = "Specialism")]
+    [Required(ErrorMessage = "Select a specialism")]
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
-    public MandatoryQualificationSpecialismInfo[]? Specialisms { get; set; }
+    public IReadOnlyCollection<MandatoryQualificationSpecialismInfo>? Specialisms { get; set; }
 
     public void OnGet()
     {
@@ -30,9 +31,9 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        if (Specialism is null)
+        if (Specialism is MandatoryQualificationSpecialism specialism && !Specialisms!.Any(s => s.Value == specialism))
         {
-            ModelState.AddModelError(nameof(Specialism), "Select a specialism");
+            ModelState.AddModelError(nameof(Specialism), "Select a valid specialism");
         }
 
         if (!ModelState.IsValid)
@@ -61,9 +62,10 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
 
-        Specialisms = MandatoryQualificationSpecialismRegistry.GetAll()
-            .OrderBy(t => t.Title)
-            .ToArray();
+        var migratedFromDqtWithLegacySpecialism = qualificationInfo.MandatoryQualification.DqtSpecialismId is Guid dqtSpecialismId &&
+            MandatoryQualificationSpecialismRegistry.GetByDqtValue((await referenceDataCache.GetMqSpecialismById(dqtSpecialismId)).dfeta_Value).IsLegacy();
+
+        Specialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: migratedFromDqtWithLegacySpecialism);
 
         await next();
     }

@@ -19,14 +19,19 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [Display(Name = "Specialism")]
     [Required(ErrorMessage = "Select a specialism")]
-    [ValidSpecialism(ErrorMessage = "Select a valid specialism")]
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
-    public MandatoryQualificationSpecialismInfo[]? Specialisms { get; set; }
+    public IReadOnlyCollection<MandatoryQualificationSpecialismInfo>? Specialisms { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
+        if (Specialism is MandatoryQualificationSpecialism specialism && !Specialisms!.Any(s => s.Value == specialism))
+        {
+            ModelState.AddModelError(nameof(Specialism), "Select a valid specialism");
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -55,22 +60,9 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
-        Specialisms = MandatoryQualificationSpecialismRegistry.GetAll(forNewRecord: true)
-            .OrderBy(t => t.Title)
-            .ToArray();
+        Specialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: false);
 
         PersonName = personInfo.Name;
         Specialism ??= JourneyInstance.State.Specialism;
-    }
-
-    private class ValidSpecialismAttribute : AllowedValuesAttribute
-    {
-        public ValidSpecialismAttribute()
-            : base(GetAllowedValues())
-        {
-        }
-
-        private static object[] GetAllowedValues() =>
-            MandatoryQualificationSpecialismRegistry.GetAll(forNewRecord: true).Select(v => (object)v.Value).ToArray();
     }
 }

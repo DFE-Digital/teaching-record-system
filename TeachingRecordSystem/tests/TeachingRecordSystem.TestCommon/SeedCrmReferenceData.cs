@@ -250,13 +250,13 @@ public class SeedCrmReferenceData : IStartupTask
 
     private void AddSpecialisms()
     {
-        foreach (var specialism in MandatoryQualificationSpecialismRegistry.GetAll())
+        foreach (var specialism in MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true))
         {
             _xrmFakedContext.CreateEntity(new dfeta_specialism()
             {
                 dfeta_Value = specialism.DqtValue,
                 dfeta_name = specialism.Title,
-                StateCode = specialism.IsValidForNewRecord ? dfeta_specialismState.Active : dfeta_specialismState.Inactive
+                StateCode = !specialism.Legacy ? dfeta_specialismState.Active : dfeta_specialismState.Inactive
             });
         }
     }
