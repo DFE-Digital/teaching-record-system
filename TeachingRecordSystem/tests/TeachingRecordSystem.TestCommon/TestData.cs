@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;

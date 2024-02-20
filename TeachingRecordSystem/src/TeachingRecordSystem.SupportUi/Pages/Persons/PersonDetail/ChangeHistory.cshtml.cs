@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;

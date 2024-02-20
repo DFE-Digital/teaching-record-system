@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.AddMq;

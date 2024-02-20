@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Events;
-
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Event

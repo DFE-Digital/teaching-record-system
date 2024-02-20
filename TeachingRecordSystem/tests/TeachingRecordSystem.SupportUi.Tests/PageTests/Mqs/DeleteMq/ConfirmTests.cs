@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.DeleteMq;

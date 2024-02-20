@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.TestCommon;
-
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests;
 
 public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)

@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 
 public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)

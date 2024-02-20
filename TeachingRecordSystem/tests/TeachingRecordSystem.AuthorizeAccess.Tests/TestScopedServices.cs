@@ -1,5 +1,3 @@
-using TeachingRecordSystem.TestCommon;
-
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
 public class TestScopedServices

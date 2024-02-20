@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.StartDate;

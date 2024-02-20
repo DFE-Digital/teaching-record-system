@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Establishments;
 using Establishment = TeachingRecordSystem.Core.Models.Establishment;

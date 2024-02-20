@@ -1,7 +1,5 @@
 using FakeXrmEasy.Abstractions;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 

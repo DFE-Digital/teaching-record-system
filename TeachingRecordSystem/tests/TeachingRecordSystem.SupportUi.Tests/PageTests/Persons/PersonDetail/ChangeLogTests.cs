@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Models;
 using File = TeachingRecordSystem.Core.Events.Models.File;
 

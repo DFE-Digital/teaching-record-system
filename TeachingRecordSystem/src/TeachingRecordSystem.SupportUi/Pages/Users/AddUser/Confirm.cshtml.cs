@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;

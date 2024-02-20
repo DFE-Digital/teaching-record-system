@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using Medallion.Threading;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;

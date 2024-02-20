@@ -1,5 +1,3 @@
-using TeachingRecordSystem.TestCommon;
-
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
 public class ChangeRequestTests : TestBase

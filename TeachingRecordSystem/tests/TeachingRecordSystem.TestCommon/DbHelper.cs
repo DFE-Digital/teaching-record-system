@@ -1,10 +1,8 @@
 using System.Data.Common;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;

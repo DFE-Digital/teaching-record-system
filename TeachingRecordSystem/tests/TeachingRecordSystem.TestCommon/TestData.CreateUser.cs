@@ -1,5 +1,4 @@
 using Microsoft.Xrm.Sdk.Messages;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;

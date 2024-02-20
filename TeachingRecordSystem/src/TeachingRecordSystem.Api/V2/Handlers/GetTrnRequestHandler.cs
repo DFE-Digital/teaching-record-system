@@ -1,6 +1,5 @@
 #nullable disable
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Optional;
 using TeachingRecordSystem.Api.Infrastructure.Security;

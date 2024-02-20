@@ -1,6 +1,4 @@
 using System.Security.Cryptography;
-using Microsoft.EntityFrameworkCore;
-using TeachingRecordSystem.Core;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 

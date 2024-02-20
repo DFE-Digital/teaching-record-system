@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using AzAdUser = TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory.User;

@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Serilog;
 using Serilog.Formatting.Compact;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 

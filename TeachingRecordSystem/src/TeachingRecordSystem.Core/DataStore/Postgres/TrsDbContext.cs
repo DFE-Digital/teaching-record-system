@@ -1,8 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events;
 using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
