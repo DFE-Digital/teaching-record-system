@@ -61,19 +61,29 @@ public class TrsDataSyncHelper(
             throw new ArgumentException("Qualification is not a mandatory qualification.", nameof(qualification));
         }
 
+        var dqtSpecialism = qualification.dfeta_MQ_SpecialismId is not null ?
+            mqSpecialisms.Single(s => s.Id == qualification.dfeta_MQ_SpecialismId.Id) :
+            null;
+        MandatoryQualificationSpecialism? specialism = dqtSpecialism?.ToMandatoryQualificationSpecialism();
+
         MandatoryQualificationProvider? provider = null;
         var dqtMqStatus = qualification.dfeta_MQ_Status;
         if (applyMigrationMappings)
         {
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(
-                mqEstablishments.SingleOrDefault(e => e.Id == qualification.dfeta_MQ_MQEstablishmentId!?.Id), out provider);
+            if (qualification.dfeta_MQ_MQEstablishmentId!?.Id is Guid establishmentId)
+            {
+                var establishment = mqEstablishments.Single(e => e.Id == establishmentId);
+
+                MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out provider);
+
+                if (specialism is null && dqtSpecialism is not null)
+                {
+                    MandatoryQualificationSpecialismRegistry.TryMapFromDqtMqEstablishment(establishment.dfeta_Value, dqtSpecialism.dfeta_Value, out specialism);
+                }
+            }
 
             dqtMqStatus ??= (qualification.dfeta_MQ_Date.HasValue ? dfeta_qualification_dfeta_MQ_Status.Passed : null);
         }
-
-        MandatoryQualificationSpecialism? specialism = qualification.dfeta_MQ_SpecialismId is not null ?
-            mqSpecialisms.Single(s => s.Id == qualification.dfeta_MQ_SpecialismId.Id).ToMandatoryQualificationSpecialism() :
-            null;
 
         MandatoryQualificationStatus? status = dqtMqStatus?.ToMandatoryQualificationStatus();
 
