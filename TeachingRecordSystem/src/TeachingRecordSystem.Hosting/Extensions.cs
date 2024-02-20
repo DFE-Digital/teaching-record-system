@@ -53,7 +53,9 @@ public static class Extensions
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(o => o.UseNpgsqlConnection(pgConnectionString)));
+                .UsePostgreSqlStorage(
+                    o => o.UseNpgsqlConnection(pgConnectionString),
+                    new PostgreSqlStorageOptions() { InvisibilityTimeout = TimeSpan.FromHours(1) }));
         }
 
         return builder;

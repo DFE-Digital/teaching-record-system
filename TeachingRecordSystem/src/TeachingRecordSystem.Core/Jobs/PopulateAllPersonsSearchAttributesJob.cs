@@ -1,18 +1,29 @@
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
 [AutomaticRetry(Attempts = 0)]
-public class PopulateAllPersonsSearchAttributesJob(TrsDbContext dbContext, IBackgroundJobScheduler backgroundJobScheduler)
+public class PopulateAllPersonsSearchAttributesJob(IDbContextFactory<TrsDbContext> dbContextFactory)
 {
-    public async Task Execute()
+    public async Task Execute(CancellationToken cancellationToken)
     {
-        await foreach (var personId in dbContext.Persons.AsNoTracking().Select(p => p.PersonId).AsAsyncEnumerable())
+        await using var outerDbContext = await dbContextFactory.CreateDbContextAsync();
+        await using var innerDbContext = await dbContextFactory.CreateDbContextAsync();
+
+        await foreach (var person in outerDbContext.Persons.AsNoTracking().AsAsyncEnumerable().WithCancellation(cancellationToken))
         {
-            await backgroundJobScheduler.Enqueue<PopulatePersonSearchAttributesJob>(j => j.Execute(personId));
+            await innerDbContext.Database.ExecuteSqlAsync(
+                $"""
+                CALL p_refresh_person_search_attributes(
+                    {person.PersonId},
+                    {person.FirstName},
+                    {person.LastName},
+                    {person.DateOfBirth},
+                    {person.NationalInsuranceNumber},
+                    {person.Trn})
+                """);
         }
     }
 }
