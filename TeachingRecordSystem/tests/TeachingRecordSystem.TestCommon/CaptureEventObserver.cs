@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Processing;
 using Xunit;
 

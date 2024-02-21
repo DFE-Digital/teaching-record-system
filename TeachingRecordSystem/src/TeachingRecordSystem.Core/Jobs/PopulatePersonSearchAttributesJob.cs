@@ -1,5 +1,4 @@
 using Hangfire;
-using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Core.Jobs;

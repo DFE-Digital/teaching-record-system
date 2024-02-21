@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core;
-
 namespace TeachingRecordSystem.TestCommon;
 
 public class TestableClock : IClock

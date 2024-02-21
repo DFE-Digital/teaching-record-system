@@ -1,8 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Processing;
 
 namespace TeachingRecordSystem.Core.Tests.Events.Processing;

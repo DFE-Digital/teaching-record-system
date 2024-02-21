@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using FakeXrmEasy.Abstractions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Json;
 using TeachingRecordSystem.Api.Tests.Infrastructure.Security;

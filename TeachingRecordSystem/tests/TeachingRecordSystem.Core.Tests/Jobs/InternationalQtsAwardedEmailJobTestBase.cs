@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 [Collection("InternationalQtsAwardedEmailJob")]

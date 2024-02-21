@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.Core;
 

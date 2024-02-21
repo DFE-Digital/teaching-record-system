@@ -5,12 +5,9 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
-using TeachingRecordSystem.Core;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Processing;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow.State;
-using TeachingRecordSystem.TestCommon;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 

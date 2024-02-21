@@ -1,7 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 

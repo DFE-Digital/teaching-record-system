@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;

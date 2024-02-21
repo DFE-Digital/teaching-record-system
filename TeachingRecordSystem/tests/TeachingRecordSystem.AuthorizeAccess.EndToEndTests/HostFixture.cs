@@ -6,10 +6,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow.State;
-using TeachingRecordSystem.TestCommon;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;

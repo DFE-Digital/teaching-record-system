@@ -1,5 +1,4 @@
 using Microsoft.Playwright;
-using Xunit;
 
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 

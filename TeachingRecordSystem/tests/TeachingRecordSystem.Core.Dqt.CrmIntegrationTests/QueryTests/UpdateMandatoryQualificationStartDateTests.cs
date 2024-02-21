@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Events;
-
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
 public class UpdateMandatoryQualificationStartDateTests : IAsyncLifetime

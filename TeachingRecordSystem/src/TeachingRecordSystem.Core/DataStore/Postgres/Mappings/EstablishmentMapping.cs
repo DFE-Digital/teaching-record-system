@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;
 

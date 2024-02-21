@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Events;
-
 namespace TeachingRecordSystem.Core.Dqt.Queries;
 
 public record CreateMandatoryQualificationQuery : ICrmQuery<bool>

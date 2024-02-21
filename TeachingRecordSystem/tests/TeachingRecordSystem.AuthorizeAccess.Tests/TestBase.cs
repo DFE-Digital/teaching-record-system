@@ -3,16 +3,13 @@ using System.Security.Claims;
 using System.Text.Json;
 using FakeXrmEasy.Abstractions;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 

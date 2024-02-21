@@ -1,13 +1,10 @@
 using System.Diagnostics;
 using FakeXrmEasy.Extensions;
 using Microsoft.Crm.Sdk.Messages;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Models;
-using TeachingRecordSystem.Core.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Services.TrsDataSync;

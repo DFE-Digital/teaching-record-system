@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
 namespace TeachingRecordSystem.Core;

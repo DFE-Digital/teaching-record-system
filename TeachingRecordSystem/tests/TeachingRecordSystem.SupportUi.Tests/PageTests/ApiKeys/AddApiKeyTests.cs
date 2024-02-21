@@ -1,6 +1,4 @@
-using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.ApiKeys;
 

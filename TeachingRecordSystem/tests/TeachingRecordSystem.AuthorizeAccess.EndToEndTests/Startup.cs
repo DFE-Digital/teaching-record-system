@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core;
-
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 
 public class Startup

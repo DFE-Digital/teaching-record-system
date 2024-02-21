@@ -1,12 +1,9 @@
 using Microsoft.Xrm.Sdk.Messages;
 using Optional;
 using Optional.Unsafe;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Events;
 using TeachingRecordSystem.Core.Events.Models;
-using TeachingRecordSystem.Core.Models;
 using static TeachingRecordSystem.Core.Dqt.RequestBuilder;
 
 namespace TeachingRecordSystem.TestCommon;

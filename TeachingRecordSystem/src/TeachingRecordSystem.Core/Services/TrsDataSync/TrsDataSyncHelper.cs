@@ -5,7 +5,6 @@ using System.Reactive.Subjects;
 using System.ServiceModel;
 using System.Text.Json;
 using Microsoft.Crm.Sdk.Messages;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
@@ -16,7 +15,6 @@ using NpgsqlTypes;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Events;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 

@@ -3,13 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
-using Moq;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 

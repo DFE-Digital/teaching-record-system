@@ -1,5 +1,4 @@
 using System.Transactions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;

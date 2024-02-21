@@ -1,12 +1,8 @@
 using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq.Protected;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Models;
 using TeachingRecordSystem.Core.Services.PersonSearch;
-using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 

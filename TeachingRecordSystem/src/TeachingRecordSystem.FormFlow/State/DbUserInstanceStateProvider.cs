@@ -1,8 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 

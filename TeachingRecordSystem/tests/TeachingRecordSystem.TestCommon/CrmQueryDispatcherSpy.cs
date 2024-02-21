@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.TestCommon;
