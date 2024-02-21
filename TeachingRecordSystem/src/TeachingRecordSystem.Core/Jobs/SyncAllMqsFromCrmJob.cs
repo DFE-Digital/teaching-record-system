@@ -31,7 +31,7 @@ public class SyncAllMqsFromCrmJob
 
     public async Task Execute(CancellationToken cancellationToken)
     {
-        await _dbContext.Database.ExecuteSqlAsync($"delete from events where event_name = 'MandatoryQualificationMigratedEvent';");
+        await _dbContext.Database.ExecuteSqlAsync($"delete from events where event_name in ('MandatoryQualificationMigratedEvent', 'MandatoryQualificationDqtImportedEvent');");
 
         const int pageSize = 1000;
 
