@@ -33,14 +33,13 @@ public class FindExistingTeacherQueryTests : IAsyncLifetime
             b.WithDateOfBirth(dob.ToDateOnlyWithDqtBstFix(isLocalTime: false));
         });
 
-        var query = new FindExistingTrnQuery(firstName, middleName, lastName, dob.ToDateOnlyWithDqtBstFix(isLocalTime: false));
+        var query = new FindingExistingTeachersQuery(firstName, middleName, lastName, dob.ToDateOnlyWithDqtBstFix(isLocalTime: false));
 
         // Act
         var result = await _crmQueryDispatcher.ExecuteQuery(query);
 
-
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(person.PersonId, result.TeacherId);
+        Assert.Contains(person.PersonId, result!.Select(x => x.TeacherId));
     }
 }

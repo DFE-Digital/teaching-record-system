@@ -8,6 +8,6 @@ public class CreateContactQuery : ICrmQuery<Guid>
     public required DateOnly DateOfBirth { get; init; }
     public required string? Email { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
-    public FindExistingTrnResult? ExistingTeacherResult { get; init; }
+    public required FindingExistingTeachersResult[] ExistingTeacherResults { get; init; }
     public required string? Trn { get; init; }
 }

@@ -1,8 +1,8 @@
 namespace TeachingRecordSystem.Core.Dqt.Queries;
 
-public record FindExistingTrnQuery(string FirstName, string? MiddleName, string LastName, DateOnly birthDate) : ICrmQuery<FindExistingTrnResult?>;
+public record FindingExistingTeachersQuery(string FirstName, string? MiddleName, string LastName, DateOnly birthDate) : ICrmQuery<FindingExistingTeachersResult[]>;
 
-public record FindExistingTrnResult
+public record FindingExistingTeachersResult
 {
     public required Guid TeacherId { get; init; }
     public required string[] MatchedAttributes { get; init; }

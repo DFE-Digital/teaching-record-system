@@ -33,21 +33,24 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         };
 
         // only set trn if there is not any potential duplicate matches on the query
-        if (query.ExistingTeacherResult is null)
+        if (query.ExistingTeacherResults.Length == 0)
         {
             contact.dfeta_TRN = query.Trn;
         }
 
         txnRequest.Requests.Add(new CreateRequest() { Target = contact });
-        if (query.ExistingTeacherResult is null)
+        if (query.ExistingTeacherResults.Length == 0)
         {
             FlagBadData(txnRequest, query, TeacherId);
         }
         else
         {
             //add duplicate review task
-            var task = CreateDuplicateReviewTaskEntity(query.ExistingTeacherResult, query, TeacherId);
-            txnRequest.Requests.Add(new CreateRequest() { Target = task });
+            foreach (var duplicate in query.ExistingTeacherResults)
+            {
+                var task = CreateDuplicateReviewTaskEntity(duplicate, query, TeacherId);
+                txnRequest.Requests.Add(new CreateRequest() { Target = task });
+            }
         }
 
         await organizationService.ExecuteAsync(txnRequest);
@@ -69,7 +72,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         }
     }
 
-    public CrmTask CreateDuplicateReviewTaskEntity(FindExistingTrnResult duplicate, CreateContactQuery createTeacherRequest, Guid TeacherId)
+    public CrmTask CreateDuplicateReviewTaskEntity(FindingExistingTeachersResult duplicate, CreateContactQuery createTeacherRequest, Guid TeacherId)
     {
         var description = GetDescription();
 

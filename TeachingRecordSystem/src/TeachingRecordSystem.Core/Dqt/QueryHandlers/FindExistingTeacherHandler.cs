@@ -5,11 +5,12 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class FindExistingTeacherHandler : ICrmQueryHandler<FindExistingTrnQuery, FindExistingTrnResult?>
+public class FindExistingTeacherHandler : ICrmQueryHandler<FindingExistingTeachersQuery, FindingExistingTeachersResult[]>
 {
-    public async Task<FindExistingTrnResult?> Execute(FindExistingTrnQuery findQuery, IOrganizationServiceAsync organizationService)
+    public async Task<FindingExistingTeachersResult[]> Execute(FindingExistingTeachersQuery findQuery, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
+        var existing = new List<FindingExistingTeachersResult>();
         filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
 
         if (TryGetMatchCombinationsFilter(out var matchCombinationsFilter))
@@ -19,7 +20,7 @@ public class FindExistingTeacherHandler : ICrmQueryHandler<FindExistingTrnQuery,
         else
         {
             // Not enough data in the input to match on
-            return null;
+            return Array.Empty<FindingExistingTeachersResult>();
         }
 
         var query = new QueryExpression(Contact.EntityLogicalName)
@@ -47,44 +48,46 @@ public class FindExistingTeacherHandler : ICrmQueryHandler<FindExistingTrnQuery,
         // Old implementation returns the first record that matches on at least three attributes; replicating that here
         var matches = result.Entities.Select(entity => entity.ToEntity<Contact>()).ToList();
 
-
-        var match = matches.FirstOrDefault();
-
-        if (match == null)
+        foreach (var match in matches)
         {
-            return null;
+            if (match == null)
+            {
+                return Array.Empty<FindingExistingTeachersResult>(); ;
+            }
+
+            var attributeMatches = new[]
+            {
+                (
+                    Attribute: Contact.Fields.FirstName,
+                    Matches: NamesAreEqual(findQuery.FirstName, match.FirstName)
+                ),
+                (
+                    Attribute: Contact.Fields.MiddleName,
+                    Matches: NamesAreEqual(findQuery.MiddleName ?? "", match.MiddleName)
+                ),
+                (
+                    Attribute: Contact.Fields.LastName,
+                    Matches: NamesAreEqual(findQuery.LastName, match.LastName)
+                ),
+                (
+                    Attribute: Contact.Fields.BirthDate,
+                    Matches: findQuery.birthDate.ToDateTime().Equals(match.BirthDate)
+                )
+            };
+
+            var matchedAttributeNames = attributeMatches.Where(m => m.Matches).Select(m => m.Attribute).ToArray();
+            existing.Add(new FindingExistingTeachersResult()
+            {
+                TeacherId = match.Id,
+                MatchedAttributes = matchedAttributeNames,
+                HasActiveSanctions = match.dfeta_ActiveSanctions == true,
+                HasQtsDate = match.dfeta_QTSDate.HasValue,
+                HasEytsDate = match.dfeta_EYTSDate.HasValue,
+            });
         }
 
-        var attributeMatches = new[]
-        {
-            (
-                Attribute: Contact.Fields.FirstName,
-                Matches: NamesAreEqual(findQuery.FirstName, match.FirstName)
-            ),
-            (
-                Attribute: Contact.Fields.MiddleName,
-                Matches: NamesAreEqual(findQuery.MiddleName ?? "", match.MiddleName)
-            ),
-            (
-                Attribute: Contact.Fields.LastName,
-                Matches: NamesAreEqual(findQuery.LastName, match.LastName)
-            ),
-            (
-                Attribute: Contact.Fields.BirthDate,
-                Matches: findQuery.birthDate.Equals(match.BirthDate)
-            )
-        };
+        return existing != null ? existing.ToArray() : Array.Empty<FindingExistingTeachersResult>();
 
-        var matchedAttributeNames = attributeMatches.Where(m => m.Matches).Select(m => m.Attribute).ToArray();
-
-        return new FindExistingTrnResult()
-        {
-            TeacherId = match.Id,
-            MatchedAttributes = matchedAttributeNames,
-            HasActiveSanctions = match.dfeta_ActiveSanctions == true,
-            HasQtsDate = match.dfeta_QTSDate.HasValue,
-            HasEytsDate = match.dfeta_EYTSDate.HasValue,
-        };
 
         bool TryGetMatchCombinationsFilter(out FilterExpression? filter)
         {

@@ -50,10 +50,10 @@ public class CreateTrnRequestHandler(
 
         string? trn = null;
 
-        var duplicateCheckResult = await _crmQueryDispatcher.ExecuteQuery(
-            new FindExistingTrnQuery(command.FirstName, command.MiddleName, command.LastName, command.DateOfBirth));
+        var existingTeachers = await _crmQueryDispatcher.ExecuteQuery(
+            new FindingExistingTeachersQuery(command.FirstName, command.MiddleName, command.LastName, command.DateOfBirth));
 
-        if (duplicateCheckResult is null)
+        if (existingTeachers.Length == 0)
         {
             trn = await _trnGenerationApiClient.GenerateTrn();
         }
@@ -66,7 +66,7 @@ public class CreateTrnRequestHandler(
             DateOfBirth = command.DateOfBirth,
             Email = command.Email,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.NormalizeNationalInsuranceNumber(command.NationalInsuranceNumber),
-            ExistingTeacherResult = duplicateCheckResult,
+            ExistingTeacherResults = existingTeachers,
             Trn = trn
         });
 
