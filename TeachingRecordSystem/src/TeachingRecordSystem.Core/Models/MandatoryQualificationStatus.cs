@@ -32,7 +32,7 @@ public static class MandatoryQualificationStatusRegistry
     public static dfeta_qualification_dfeta_MQ_Status GetDqtStatus(this MandatoryQualificationStatus status) => _info[status].DqtStatus;
 
     public static MandatoryQualificationStatus ToMandatoryQualificationStatus(this dfeta_qualification_dfeta_MQ_Status status) =>
-        _info.Values.Single(s => s.DqtStatus == status).Value;
+        _info.Values.Single(s => s.DqtStatus == status, $"Failed mapping '{status}' to {nameof(MandatoryQualificationStatus)}.").Value;
 
     private static MandatoryQualificationStatusInfo GetInfo(MandatoryQualificationStatus status)
     {
