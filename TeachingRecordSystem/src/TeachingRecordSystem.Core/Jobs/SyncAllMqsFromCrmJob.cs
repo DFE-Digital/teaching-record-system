@@ -3,6 +3,7 @@ using Hangfire;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -13,20 +14,25 @@ public class SyncAllMqsFromCrmJob
 {
     private readonly ICrmServiceClientProvider _crmServiceClientProvider;
     private readonly TrsDataSyncHelper _trsDataSyncHelper;
+    private readonly TrsDbContext _dbContext;
     private readonly IOptions<TrsDataSyncServiceOptions> _syncOptionsAccessor;
 
     public SyncAllMqsFromCrmJob(
         ICrmServiceClientProvider crmServiceClientProvider,
         TrsDataSyncHelper trsDataSyncHelper,
+        TrsDbContext dbContext,
         IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor)
     {
         _crmServiceClientProvider = crmServiceClientProvider;
         _trsDataSyncHelper = trsDataSyncHelper;
+        _dbContext = dbContext;
         _syncOptionsAccessor = syncOptionsAccessor;
     }
 
     public async Task Execute(CancellationToken cancellationToken)
     {
+        await _dbContext.Database.ExecuteSqlAsync($"delete from events where event_name = 'MandatoryQualificationMigratedEvent';");
+
         const int pageSize = 1000;
 
         var serviceClient = _crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
@@ -73,7 +79,7 @@ public class SyncAllMqsFromCrmJob
             await _trsDataSyncHelper.SyncMandatoryQualifications(
                 result.Entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(),
                 ignoreInvalid: _syncOptionsAccessor.Value.IgnoreInvalidData,
-                createdMigratedEvent: false,
+                createdMigratedEvent: true,
                 cancellationToken);
 
             if (result.MoreRecords)
