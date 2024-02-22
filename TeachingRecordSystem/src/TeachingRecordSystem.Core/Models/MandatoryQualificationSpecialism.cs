@@ -14,13 +14,13 @@ public enum MandatoryQualificationSpecialism
     [MandatoryQualificationSpecialismInfo(name: "hearing", dqtValue: "Hearing")]
     Hearing = 2,
 
-    [MandatoryQualificationSpecialismInfo(name: "multi-sensory", dqtValue: "Multi_Sensory Impairment")]
+    [MandatoryQualificationSpecialismInfo(name: "multi-sensory", dqtValue: "Multi-Sensory")]
     MultiSensory = 3,
 
     [MandatoryQualificationSpecialismInfo(name: "N/A", dqtValue: "N/A", legacy: true)]
     NotApplicable = 4,
 
-    [MandatoryQualificationSpecialismInfo(name: "visual", dqtValue: "Visual Impairment")]
+    [MandatoryQualificationSpecialismInfo(name: "visual", dqtValue: "Visual")]
     Visual = 5,
 }
 
