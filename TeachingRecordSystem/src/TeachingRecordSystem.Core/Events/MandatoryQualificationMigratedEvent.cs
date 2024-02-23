@@ -14,4 +14,5 @@ public enum MandatoryQualificationMigratedEventChanges
 {
     None = 0,
     Provider = 1 << 0,
+    Specialism = 1 << 1,
 }

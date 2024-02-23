@@ -55,7 +55,7 @@ public partial class Commands
                 var mqs = await crmQueryDispatcher.ExecuteQuery(new GetQualificationsByContactIdQuery(contact.Id));
 
                 await syncHelper.SyncPerson(contact, ignoreInvalid: false);
-                await syncHelper.SyncMandatoryQualifications(mqs, ignoreInvalid: false, createdMigratedEvent: false, CancellationToken.None);
+                await syncHelper.SyncMandatoryQualifications(mqs, ignoreInvalid: false, createMigratedEvent: false, CancellationToken.None);
                 //return 0;
             },
             connectionStringOption,
