@@ -62,7 +62,7 @@ public class TrsDataSyncHelper(
         var dqtSpecialism = qualification.dfeta_MQ_SpecialismId is not null ?
             mqSpecialisms.Single(s => s.Id == qualification.dfeta_MQ_SpecialismId.Id) :
             null;
-        MandatoryQualificationSpecialism? specialism = dqtSpecialism?.ToMandatoryQualificationSpecialism();
+        MandatoryQualificationSpecialism? specialism = null;
 
         MandatoryQualificationProvider? provider = null;
         var dqtMqStatus = qualification.dfeta_MQ_Status;
@@ -74,7 +74,7 @@ public class TrsDataSyncHelper(
 
                 MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out provider);
 
-                if (specialism is null && dqtSpecialism is not null)
+                if (dqtSpecialism is not null)
                 {
                     MandatoryQualificationSpecialismRegistry.TryMapFromDqtMqEstablishment(establishment.dfeta_Value, dqtSpecialism.dfeta_Value, out specialism);
                 }
@@ -83,6 +83,7 @@ public class TrsDataSyncHelper(
             dqtMqStatus ??= (qualification.dfeta_MQ_Date.HasValue ? dfeta_qualification_dfeta_MQ_Status.Passed : null);
         }
 
+        specialism ??= dqtSpecialism?.ToMandatoryQualificationSpecialism();
         MandatoryQualificationStatus? status = dqtMqStatus?.ToMandatoryQualificationStatus();
 
         return new MandatoryQualification()
@@ -282,7 +283,7 @@ public class TrsDataSyncHelper(
         }
         else
         {
-            return await SyncMandatoryQualifications(qualifications, ignoreInvalid: false, createdMigratedEvent: false, cancellationToken) == 1;
+            return await SyncMandatoryQualifications(qualifications, ignoreInvalid: false, createMigratedEvent: false, cancellationToken) == 1;
         }
     }
 
@@ -290,7 +291,7 @@ public class TrsDataSyncHelper(
         dfeta_qualification entity,
         AuditDetailCollection auditDetails,
         bool ignoreInvalid,
-        bool createdMigratedEvent,
+        bool createMigratedEvent,
         CancellationToken cancellationToken = default)
     {
         var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
@@ -298,31 +299,31 @@ public class TrsDataSyncHelper(
             { entity.Id, auditDetails }
         };
 
-        return await SyncMandatoryQualifications(new[] { entity }, auditDetailsDict, ignoreInvalid, createdMigratedEvent, cancellationToken) == 1;
+        return await SyncMandatoryQualifications(new[] { entity }, auditDetailsDict, ignoreInvalid, createMigratedEvent, cancellationToken) == 1;
     }
 
     public async Task<int> SyncMandatoryQualifications(
         IReadOnlyCollection<dfeta_qualification> entities,
         bool ignoreInvalid,
-        bool createdMigratedEvent,
+        bool createMigratedEvent,
         CancellationToken cancellationToken)
     {
         var auditDetails = await GetAuditRecords(dfeta_qualification.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
 
-        return await SyncMandatoryQualifications(entities, auditDetails, ignoreInvalid, createdMigratedEvent, cancellationToken);
+        return await SyncMandatoryQualifications(entities, auditDetails, ignoreInvalid, createMigratedEvent, cancellationToken);
     }
 
     public async Task<int> SyncMandatoryQualifications(
         IReadOnlyCollection<dfeta_qualification> entities,
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
         bool ignoreInvalid,
-        bool createdMigratedEvent,
+        bool createMigratedEvent,
         CancellationToken cancellationToken = default)
     {
         // Not all dfeta_qualification records are MQs..
         var toSync = entities.Where(q => q.dfeta_Type == dfeta_qualification_dfeta_Type.MandatoryQualification);
 
-        var (mqs, events) = await MapMandatoryQualificationsAndAudits(toSync, auditDetails, createdMigratedEvent);
+        var (mqs, events) = await MapMandatoryQualificationsAndAudits(toSync, auditDetails, createMigratedEvent);
 
         return await SyncMandatoryQualifications(mqs, events, ignoreInvalid, cancellationToken);
     }
@@ -838,7 +839,7 @@ public class TrsDataSyncHelper(
             EntityLogicalName = dfeta_qualification.EntityLogicalName,
             AttributeNames = attributeNames,
             GetSyncHandler = helper => (entities, ignoreInvalid, ct) =>
-                helper.SyncMandatoryQualifications(entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(), ignoreInvalid, createdMigratedEvent: false, ct),
+                helper.SyncMandatoryQualifications(entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(), ignoreInvalid, createMigratedEvent: false, ct),
             WriteRecord = writeRecord
         };
     }
@@ -919,7 +920,7 @@ public class TrsDataSyncHelper(
             }
             else if (createMigratedEvent)
             {
-                events.Add(MapMigratedEvent(versions.Last()));
+                events.Add(MapMigratedEvent(versions.Last(), mqSpecialisms));
             }
 
             mqs.Add(mapped);
@@ -945,7 +946,7 @@ public class TrsDataSyncHelper(
                 EventId = Guid.NewGuid(),
                 Key = $"{snapshot.Entity.Id}-Created",
                 CreatedUtc = snapshot.Timestamp,
-                RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
                 MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: false)
             };
@@ -958,7 +959,7 @@ public class TrsDataSyncHelper(
                 EventId = Guid.NewGuid(),
                 Key = $"{snapshot.Entity.Id}-Imported",
                 CreatedUtc = snapshot.Timestamp,
-                RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
                 MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: false),
                 DqtState = (int)snapshot.Entity.StateCode!
@@ -997,7 +998,7 @@ public class TrsDataSyncHelper(
                         EventId = Guid.NewGuid(),
                         Key = $"{snapshot.Id}",  // The CRM Audit ID
                         CreatedUtc = snapshot.Timestamp,
-                        RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                         PersonId = snapshot.Entity.dfeta_PersonId.Id,
                         MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: false)
                     };
@@ -1009,7 +1010,7 @@ public class TrsDataSyncHelper(
                         EventId = Guid.NewGuid(),
                         Key = $"{snapshot.Id}",  // The CRM Audit ID
                         CreatedUtc = snapshot.Timestamp,
-                        RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                         PersonId = snapshot.Entity.dfeta_PersonId.Id,
                         MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: false)
                     };
@@ -1033,7 +1034,7 @@ public class TrsDataSyncHelper(
                 EventId = Guid.NewGuid(),
                 Key = $"{snapshot.Id}",  // The CRM Audit ID
                 CreatedUtc = snapshot.Timestamp,
-                RaisedBy = Events.Models.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
                 MandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: false),
                 OldMandatoryQualification = GetEventMandatoryQualification(previous.Entity, applyMigrationMappings: false),
@@ -1044,26 +1045,33 @@ public class TrsDataSyncHelper(
             };
         }
 
-        EventBase MapMigratedEvent(EntityVersionInfo<dfeta_qualification> snapshot)
+        EventBase MapMigratedEvent(EntityVersionInfo<dfeta_qualification> snapshot, dfeta_specialism[] mqSpecialisms)
         {
             var eventMandatoryQualification = GetEventMandatoryQualification(snapshot.Entity, applyMigrationMappings: true);
 
+            var providerChanged = eventMandatoryQualification.Provider?.Name != eventMandatoryQualification.Provider?.DqtMqEstablishmentName;
+
+            var specialismChanged = snapshot.Entity.dfeta_MQ_SpecialismId?.Id is Guid dqtSpecialismId ?
+                mqSpecialisms.Single(s => s.Id == dqtSpecialismId).ToMandatoryQualificationSpecialism() != eventMandatoryQualification.Specialism :
+                false;
+
             var changes = MandatoryQualificationMigratedEventChanges.None |
-                (eventMandatoryQualification.Provider?.Name != eventMandatoryQualification.Provider?.DqtMqEstablishmentName ? MandatoryQualificationMigratedEventChanges.Provider : 0);
+                (providerChanged ? MandatoryQualificationMigratedEventChanges.Provider : 0) |
+                (specialismChanged ? MandatoryQualificationMigratedEventChanges.Specialism : 0);
 
             return new MandatoryQualificationMigratedEvent()
             {
                 EventId = Guid.NewGuid(),
                 Key = $"{snapshot.Entity.Id}-Migrated",
                 CreatedUtc = clock.UtcNow,
-                RaisedBy = Events.Models.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
+                RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
                 MandatoryQualification = eventMandatoryQualification,
                 Changes = changes
             };
         }
 
-        Events.Models.MandatoryQualification GetEventMandatoryQualification(dfeta_qualification snapshot, bool applyMigrationMappings)
+        EventModels.MandatoryQualification GetEventMandatoryQualification(dfeta_qualification snapshot, bool applyMigrationMappings)
         {
             var mapped = MapMandatoryQualificationFromDqtQualification(snapshot, mqEstablishments, mqSpecialisms, applyMigrationMappings);
 

@@ -4,7 +4,6 @@ using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Services.TrsDataSync;
@@ -23,7 +22,7 @@ public partial class TrsDataSyncHelperTests
         var entity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         // Act
-        await Helper.SyncMandatoryQualification(entity, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(entity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         await AssertDatabaseMandatoryQualificationMatchesEntity(entity);
@@ -38,14 +37,14 @@ public partial class TrsDataSyncHelperTests
         var auditDetailCollection = new AuditDetailCollection();
         var existingEntity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
-        await Helper.SyncMandatoryQualification(existingEntity, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(existingEntity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
         var expectedFirstSync = Clock.UtcNow;
 
         Clock.Advance();
         var updatedVersion = await CreateUpdatedVersionVersion(existingEntity, auditDetailCollection);
 
         // Act
-        await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         await AssertDatabaseMandatoryQualificationMatchesEntity(updatedVersion, expectedFirstSync);
@@ -60,7 +59,7 @@ public partial class TrsDataSyncHelperTests
         var auditDetailCollection = new AuditDetailCollection();
         var existingEntity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
-        await Helper.SyncMandatoryQualification(existingEntity, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(existingEntity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Act
         await Helper.DeleteRecords(TrsDataSyncHelper.ModelTypes.MandatoryQualification, new[] { qualificationId });
@@ -85,12 +84,12 @@ public partial class TrsDataSyncHelperTests
         Clock.Advance();
         var updatedVersion = await CreateUpdatedVersionVersion(initialVersion, auditDetailCollection);
 
-        await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
         var expectedFirstSync = Clock.UtcNow;
         var expectedLastSync = Clock.UtcNow;
 
         // Act
-        await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         await AssertDatabaseMandatoryQualificationMatchesEntity(updatedVersion, expectedFirstSync, expectedLastSync);
@@ -109,7 +108,7 @@ public partial class TrsDataSyncHelperTests
         var (deletedVersion, deletedEvent) = await CreateDeletedEntityVersion(entity, auditDetailCollection);
 
         // Act
-        await Helper.SyncMandatoryQualification(deletedVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(deletedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         await DbFixture.WithDbContext(async dbContext =>
@@ -133,7 +132,7 @@ public partial class TrsDataSyncHelperTests
         var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, auditDetailCollection);
 
         // Act
-        await Helper.SyncMandatoryQualification(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         await DbFixture.WithDbContext(async dbContext =>
@@ -154,7 +153,7 @@ public partial class TrsDataSyncHelperTests
         var initialVersion = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection, addCreateAudit: true);
 
         // Act
-        await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForQualification(qualificationId);
@@ -189,7 +188,7 @@ public partial class TrsDataSyncHelperTests
         var initialVersion = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection, addCreateAudit: false);
 
         // Act
-        await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForQualification(qualificationId);
@@ -238,7 +237,7 @@ public partial class TrsDataSyncHelperTests
         updatedVersion = await CreateUpdatedVersionVersion(updatedVersion, auditDetailCollection, changes: MandatoryQualificationUpdatedEventChanges.Provider);
 
         // Act
-        await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForQualification(qualificationId);
@@ -286,7 +285,7 @@ public partial class TrsDataSyncHelperTests
         var initialVersion = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection, trsAuditEventId: trsEventId);
 
         // Act
-        await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForQualification(qualificationId);
@@ -325,7 +324,7 @@ public partial class TrsDataSyncHelperTests
         var updatedVersion = await CreateUpdatedVersionVersion(initialVersion, auditDetailCollection);
 
         // Act
-        await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForQualification(qualificationId);
@@ -371,7 +370,7 @@ public partial class TrsDataSyncHelperTests
         var updatedVersion = await CreateUpdatedVersionVersion(initialVersion, auditDetailCollection, trsEventId);
 
         // Act
-        await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForQualification(qualificationId);
@@ -417,7 +416,7 @@ public partial class TrsDataSyncHelperTests
         var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, auditDetailCollection);
 
         // Act
-        await Helper.SyncMandatoryQualification(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForQualification(qualificationId);
@@ -446,7 +445,7 @@ public partial class TrsDataSyncHelperTests
         var reactivatedVersion = await CreateReactivatedEntityVersion(deactivatedVersion, auditDetailCollection);
 
         // Act
-        await Helper.SyncMandatoryQualification(reactivatedVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(reactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForQualification(qualificationId);
@@ -494,7 +493,7 @@ public partial class TrsDataSyncHelperTests
         var (deletedVersion, deletedEvent) = await CreateDeletedEntityVersion(entity, auditDetailCollection);
 
         // Act
-        await Helper.SyncMandatoryQualification(deletedVersion, auditDetailCollection, ignoreInvalid: false, createdMigratedEvent: true);
+        await Helper.SyncMandatoryQualification(deletedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForQualification(qualificationId);
@@ -558,16 +557,16 @@ public partial class TrsDataSyncHelperTests
 
     private async Task AssertEventMatchesEntity(
         dfeta_qualification entity,
-        Core.Events.Models.MandatoryQualification eventModel,
+        EventModels.MandatoryQualification eventModel,
         bool expectMigrationMappingsApplied)
     {
         var mqEstablishment = entity.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
             await TestData.ReferenceDataCache.GetMqEstablishmentById(establishmentId) :
             null;
 
-        var specialism = entity.dfeta_MQ_SpecialismId?.Id is Guid dqtSpecialismId ?
-            (await TestData.ReferenceDataCache.GetMqSpecialismById(dqtSpecialismId)).ToMandatoryQualificationSpecialism() :
-            (MandatoryQualificationSpecialism?)null;
+        var mqSpecialism = entity.dfeta_MQ_SpecialismId?.Id is Guid dqtSpecialismId ?
+            (await TestData.ReferenceDataCache.GetMqSpecialismById(dqtSpecialismId)) :
+            (dfeta_specialism?)null;
 
         var status = entity.dfeta_MQ_Status is dfeta_qualification_dfeta_MQ_Status dqtStatus ?
             dqtStatus.ToMandatoryQualificationStatus() :
@@ -576,7 +575,6 @@ public partial class TrsDataSyncHelperTests
         Assert.Equal(entity.Id, eventModel.QualificationId);
         Assert.Equal(mqEstablishment?.Id, eventModel.Provider?.DqtMqEstablishmentId);
         Assert.Equal(mqEstablishment?.dfeta_name, eventModel.Provider?.DqtMqEstablishmentName);
-        Assert.Equal(specialism, eventModel.Specialism);
         Assert.Equal(status, eventModel.Status);
         Assert.Equal(entity.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), eventModel.StartDate);
         Assert.Equal(entity.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true), eventModel.EndDate);
@@ -593,6 +591,17 @@ public partial class TrsDataSyncHelperTests
         {
             Assert.False(eventModel.Provider?.MandatoryQualificationProviderId.HasValue);
             Assert.Null(eventModel.Provider?.Name);
+        }
+
+        if (expectMigrationMappingsApplied && mqEstablishment is not null && mqSpecialism is not null)
+        {
+            MandatoryQualificationSpecialismRegistry.TryMapFromDqtMqEstablishment(mqEstablishment.dfeta_Value, mqSpecialism.dfeta_Value, out var expectedSpecialism);
+            expectedSpecialism ??= mqSpecialism?.ToMandatoryQualificationSpecialism();
+            Assert.Equal(expectedSpecialism, eventModel.Specialism);
+        }
+        else
+        {
+            Assert.Equal(mqSpecialism?.ToMandatoryQualificationSpecialism(), eventModel.Specialism);
         }
     }
 
@@ -647,7 +656,7 @@ public partial class TrsDataSyncHelperTests
             {
                 EventId = eventId,
                 CreatedUtc = Clock.UtcNow,
-                RaisedBy = RaisedByUserInfo.FromDqtUser(currentDqtUser.Id, currentDqtUser.Name),
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(currentDqtUser.Id, currentDqtUser.Name),
                 PersonId = newQualification.dfeta_PersonId.Id,
                 MandatoryQualification = new()
                 {
@@ -774,7 +783,7 @@ public partial class TrsDataSyncHelperTests
             {
                 EventId = eventId,
                 CreatedUtc = Clock.UtcNow,
-                RaisedBy = RaisedByUserInfo.FromDqtUser(currentDqtUser.Id, currentDqtUser.Name),
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(currentDqtUser.Id, currentDqtUser.Name),
                 PersonId = updatedQualification.dfeta_PersonId.Id,
                 MandatoryQualification = new()
                 {
@@ -882,7 +891,7 @@ public partial class TrsDataSyncHelperTests
                 StartDate = existingQualification.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             },
             PersonId = existingQualification.dfeta_PersonId.Id,
-            RaisedBy = RaisedByUserInfo.FromDqtUser(currentDqtUser.Id, currentDqtUser.Name)
+            RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(currentDqtUser.Id, currentDqtUser.Name)
         };
 
         updatedQualification.dfeta_TRSEvent = EventInfo.Create(deletedEvent).Serialize();
