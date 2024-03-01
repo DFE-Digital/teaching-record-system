@@ -127,6 +127,12 @@ variable "redis_sku_name" {
   default = "Standard"
 }
 
+# StatusCake variables
+variable "ssl_urls" {
+  type    = list(string)
+  default = []
+}
+
 variable "statuscake_extra_urls" {
   type        = list(string)
   description = "List of extra URLs for StatusCake, on top of the internal teacherservices.cloud ones"
