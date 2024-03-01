@@ -11,5 +11,7 @@ module "statuscake" {
     var.statuscake_extra_urls
   )
 
+  ssl_urls = var.ssl_urls
+
   contact_groups = [288912]
 }
