@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.FormFlow;
@@ -25,7 +26,7 @@ public class NotFoundModel(SignInJourneyHelper helper) : PageModel
         else if (!state.NationalInsuranceNumberSpecified || !state.TrnSpecified)
         {
             // Not specified NINO or TRN
-            context.Result = helper.GetNextPage(JourneyInstance).ToActionResult();
+            context.Result = new RedirectResult(helper.GetNextPage(JourneyInstance));
         }
         else if (state.AuthenticationTicket is not null)
         {

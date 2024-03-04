@@ -2,7 +2,6 @@ using System.Security.Claims;
 using System.Text.Json;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
@@ -21,16 +20,32 @@ public class SignInJourneyHelper(
     IUserInstanceStateProvider userInstanceStateProvider,
     IClock clock)
 {
+    public const string AuthenticationOnlyVtr = @"[""Cl.Cm""]";
+    public const string AuthenticationAndIdentityVerificationVtr = @"[""Cl.Cm.P2""]";
+
     public IUserInstanceStateProvider UserInstanceStateProvider { get; } = userInstanceStateProvider;
 
     public bool ShowDebugPages => optionsAccessor.Value.ShowDebugPages;
 
-    public async Task<NextPageInfo> OnSignedInWithOneLogin(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
+    public IResult SignInWithOneLogin(JourneyInstance<SignInJourneyState> journeyInstance) =>
+        OneLoginChallenge(journeyInstance, AuthenticationOnlyVtr);
+
+    public IResult VerifyIdentityWithOneLogin(JourneyInstance<SignInJourneyState> journeyInstance) =>
+        OneLoginChallenge(journeyInstance, AuthenticationAndIdentityVerificationVtr);
+
+    public async Task<IResult> OnSignedInWithOneLogin(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
     {
+        if (!ticket.Properties.TryGetVectorOfTrust(out var vtr))
+        {
+            throw new InvalidOperationException("No vtr.");
+        }
+        var attemptedIdentityVerification = vtr == AuthenticationAndIdentityVerificationVtr;
+
         await journeyInstance.UpdateStateAsync(state =>
         {
             state.Reset();
             state.OneLoginAuthenticationTicket = ticket;
+            state.AttemptedIdentityVerification = attemptedIdentityVerification;
 
             var vc = ticket.Principal.FindFirstValue("vc") is string vcStr ? JsonDocument.Parse(vcStr) : null;
             state.IdentityVerified = vc is not null;
@@ -43,13 +58,13 @@ public class SignInJourneyHelper(
 
         if (ShowDebugPages)
         {
-            return new NextPageInfo(linkGenerator.DebugIdentity(journeyInstance.InstanceId));
+            return Results.Redirect(linkGenerator.DebugIdentity(journeyInstance.InstanceId));
         }
 
         return await CreateOrUpdateOneLoginUser(journeyInstance);
     }
 
-    public async Task<NextPageInfo> CreateOrUpdateOneLoginUser(JourneyInstance<SignInJourneyState> journeyInstance)
+    public async Task<IResult> CreateOrUpdateOneLoginUser(JourneyInstance<SignInJourneyState> journeyInstance)
     {
         if (journeyInstance.State.OneLoginAuthenticationTicket is null)
         {
@@ -66,7 +81,6 @@ public class SignInJourneyHelper(
 
         if (oneLoginUser is not null)
         {
-            oneLoginUser.CoreIdentityVc = vc;
             oneLoginUser.LastOneLoginSignIn = clock.UtcNow;
             oneLoginUser.Email = email;
 
@@ -86,28 +100,32 @@ public class SignInJourneyHelper(
                 Subject = subject,
                 Email = email,
                 FirstOneLoginSignIn = clock.UtcNow,
-                LastOneLoginSignIn = clock.UtcNow,
-                CoreIdentityVc = vc
+                LastOneLoginSignIn = clock.UtcNow
             };
             dbContext.OneLoginUsers.Add(oneLoginUser);
         }
 
         await dbContext.SaveChangesAsync();
 
-        return GetNextPage(journeyInstance);
+        if (oneLoginUser.PersonId is null && !journeyInstance.State.AttemptedIdentityVerification)
+        {
+            return VerifyIdentityWithOneLogin(journeyInstance);
+        }
+
+        return Results.Redirect(GetNextPage(journeyInstance));
     }
 
-    public NextPageInfo GetNextPage(JourneyInstance<SignInJourneyState> journeyInstance) => journeyInstance.State switch
+    public string GetNextPage(JourneyInstance<SignInJourneyState> journeyInstance) => journeyInstance.State switch
     {
         // Authentication is complete
-        { AuthenticationTicket: not null } => new NextPageInfo(GetSafeRedirectUri(journeyInstance)),
+        { AuthenticationTicket: not null } => GetSafeRedirectUri(journeyInstance),
 
         // Authenticated with OneLogin, identity verification succeeded, not yet matched to teaching record
         { OneLoginAuthenticationTicket: not null, IdentityVerified: true, AuthenticationTicket: null } =>
-            new NextPageInfo(linkGenerator.NationalInsuranceNumber(journeyInstance.InstanceId)),
+            linkGenerator.NationalInsuranceNumber(journeyInstance.InstanceId),
 
         // Authenticated with OneLogin, identity verification failed
-        { OneLoginAuthenticationTicket: not null, IdentityVerified: false } => new NextPageInfo(linkGenerator.NotVerified(journeyInstance.InstanceId)),
+        { OneLoginAuthenticationTicket: not null, IdentityVerified: false } => linkGenerator.NotVerified(journeyInstance.InstanceId),
 
         _ => throw new InvalidOperationException("Cannot determine next page.")
     };
@@ -191,7 +209,7 @@ public class SignInJourneyHelper(
     {
         var queryParamName = Constants.UniqueKeyQueryParameterName;
 
-        if (url.IndexOf($"{queryParamName}=") == -1)
+        if (!url.Contains($"{queryParamName}=", StringComparison.Ordinal))
         {
             return QueryHelpers.AddQueryString(url, queryParamName, instanceId.UniqueKey!);
         }
@@ -200,9 +218,12 @@ public class SignInJourneyHelper(
             return url;
         }
     }
-}
 
-public sealed record NextPageInfo(string Location)
-{
-    public IActionResult ToActionResult() => new RedirectResult(Location);
+    private IResult OneLoginChallenge(JourneyInstance<SignInJourneyState> journeyInstance, string vtr)
+    {
+        var delegatedProperties = new AuthenticationProperties();
+        delegatedProperties.SetVectorOfTrust(vtr);
+        delegatedProperties.Items.Add(FormFlowJourneySignInHandler.PropertyKeys.JourneyInstanceId, journeyInstance.InstanceId.Serialize());
+        return Results.Challenge(delegatedProperties, authenticationSchemes: [OneLoginDefaults.AuthenticationScheme]);
+    }
 }

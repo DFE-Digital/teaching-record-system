@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 
@@ -40,9 +39,8 @@ public class MatchToTeachingRecordAuthenticationHandler(SignInJourneyHelper help
             createState: () => new SignInJourneyState(properties?.RedirectUri ?? "/", properties),
             updateState: state => state.Reset());
 
-        var delegatedProperties = new AuthenticationProperties();
-        delegatedProperties.Items.Add(FormFlowJourneySignInHandler.PropertyKeys.JourneyInstanceId, journeyInstance.InstanceId.Serialize());
-        await _context.ChallengeAsync(OneLoginDefaults.AuthenticationScheme, delegatedProperties);
+        var result = helper.SignInWithOneLogin(journeyInstance);
+        await result.ExecuteAsync(_context);
     }
 
     public Task ForbidAsync(AuthenticationProperties? properties)
