@@ -157,6 +157,50 @@ public class GetAnIdentityEndpointsTests : TestBase
     }
 
     [Fact]
+    public async Task Post_WithValidUserMergedMessage_ReturnsNoContent()
+    {
+        // Arrange
+        var now = DateTime.UtcNow;
+        var masterContactId = Guid.NewGuid();
+        var mergedContactId = Guid.NewGuid();
+        var content = new
+        {
+            NotificationId = Guid.NewGuid(),
+            TimeUtc = now,
+            MessageType = UserMergedMessage.MessageTypeName,
+            Message = new
+            {
+                MasterUser = new
+                {
+                    UserId = masterContactId,
+                    EmailAddress = Faker.Internet.Email(),
+                    Trn = "7654321",
+                    MobileNumber = "07968987654"
+                },
+                MergedUserId = mergedContactId,
+                Changes = new { }
+            }
+        };
+
+        var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
+        var signature = GenerateSignature(GetAnIdentityOptions.Value.WebHookClientSecret, jsonContent);
+        var httpClient = HostFixture.CreateClient();
+        httpClient.DefaultRequestHeaders.Add("X-Hub-Signature-256", signature);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/webhooks/identity")
+        {
+            Content = CreateJsonContent(jsonContent)
+        };
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode);
+        DataverseAdapterMock.Verify(mock => mock.ClearTeacherIdentityInfo(mergedContactId, now));
+    }
+
+    [Fact]
     public async Task Post_WithValidUserUpdatedMessage_ReturnsNoContent()
     {
         // Arrange
