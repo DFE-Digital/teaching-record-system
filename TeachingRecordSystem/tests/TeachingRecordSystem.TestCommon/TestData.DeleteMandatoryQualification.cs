@@ -6,7 +6,7 @@ public partial class TestData
 {
     public Task DeleteMandatoryQualification(
         Guid qualificationId,
-        RaisedByUserInfo raisedBy,
+        RaisedByUserInfo deletedBy,
         string? deletionReason = null,
         string? deletionReasonDetail = null,
         (Guid FileId, string Name)? evidenceFile = null)
@@ -29,7 +29,7 @@ public partial class TestData
             {
                 EventId = Guid.NewGuid(),
                 CreatedUtc = now,
-                RaisedBy = raisedBy ?? Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
+                RaisedBy = deletedBy ?? Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
                 PersonId = qualification.PersonId,
                 MandatoryQualification = new()
                 {
