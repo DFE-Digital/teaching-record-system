@@ -223,7 +223,7 @@ jobs:
 
     - uses: extractions/setup-just@v2
 
-    - uses: Azure/login@v1
+    - uses: Azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 

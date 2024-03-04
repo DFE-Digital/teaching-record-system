@@ -26,7 +26,7 @@ jobs:
           terraform_version: 1.5.0
           terraform_wrapper: false
 
-      - uses: Azure/login@v1
+      - uses: Azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
