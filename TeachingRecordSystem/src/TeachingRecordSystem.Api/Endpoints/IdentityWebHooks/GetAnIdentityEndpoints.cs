@@ -80,6 +80,11 @@ public static class GetAnIdentityEndpoints
                 {
                     user = userCreatedMessage.User;
                 }
+                else if (notification.Message is UserMergedMessage userMergeMessage)
+                {
+                    await dataverseAdapter.ClearTeacherIdentityInfo(userMergeMessage.MergedUserId, notification.TimeUtc);
+                    return CreateResult();
+                }
                 else
                 {
                     return CreateResult();
