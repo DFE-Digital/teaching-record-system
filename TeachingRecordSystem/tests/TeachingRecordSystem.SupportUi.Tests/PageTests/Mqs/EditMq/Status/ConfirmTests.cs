@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Status;
@@ -9,7 +10,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -78,7 +79,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
 
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -148,7 +149,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -226,7 +227,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
-        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(qualification.DqtMqEstablishmentValue!);
+        var provider = MandatoryQualificationProvider.GetById(qualification.ProviderId!.Value);
 
         EventObserver.Clear();
 
@@ -288,10 +289,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = null,
-                        Name = null,
-                        DqtMqEstablishmentId = mqEstablishment.Id,
-                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name,
+                        DqtMqEstablishmentId = null,
+                        DqtMqEstablishmentName = null
                     },
                     Specialism = qualification.Specialism,
                     Status = newStatus,
@@ -303,10 +304,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = null,
-                        Name = null,
-                        DqtMqEstablishmentId = mqEstablishment.Id,
-                        DqtMqEstablishmentName = mqEstablishment.dfeta_name
+                        MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                        Name = provider.Name,
+                        DqtMqEstablishmentId = null,
+                        DqtMqEstablishmentName = null
                     },
                     Specialism = qualification.Specialism,
                     Status = oldStatus,
@@ -339,7 +340,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()

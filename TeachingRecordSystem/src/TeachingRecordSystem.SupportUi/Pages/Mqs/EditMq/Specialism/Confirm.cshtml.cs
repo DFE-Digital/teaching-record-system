@@ -1,20 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
 [Journey(JourneyNames.EditMqSpecialism), RequireJourneyInstance]
 public class ConfirmModel(
-    ICrmQueryDispatcher crmQueryDispatcher,
-    ReferenceDataCache referenceDataCache,
+    TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
-    IBackgroundJobScheduler backgroundJobScheduler,
     IClock clock) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
@@ -24,7 +20,7 @@ public class ConfirmModel(
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public Guid? PersonId { get; set; }
+    public Guid PersonId { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -32,7 +28,7 @@ public class ConfirmModel(
 
     public MandatoryQualificationSpecialism? NewSpecialism { get; set; }
 
-    public MqChangeSpecialismReasonOption? ChangeReason { get; set; }
+    public MqChangeSpecialismReasonOption ChangeReason { get; set; }
 
     public string? ChangeReasonDetail { get; set; }
 
@@ -44,56 +40,35 @@ public class ConfirmModel(
 
     public async Task<IActionResult> OnPost()
     {
-        var qualification = (await crmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(QualificationId)))!;
-        var mqSpecialism = await referenceDataCache.GetMqSpecialismByValue(NewSpecialism!.Value.GetDqtValue());
+        var now = clock.UtcNow;
 
-        var changes = mqSpecialism.Id != qualification.dfeta_MQ_SpecialismId?.Id ?
+        var qualification = await dbContext.MandatoryQualifications
+            .Include(q => q.Provider)
+            .SingleAsync(q => q.QualificationId == QualificationId);
+
+        var changes = NewSpecialism != qualification.Specialism ?
             MandatoryQualificationUpdatedEventChanges.Specialism :
             MandatoryQualificationUpdatedEventChanges.None;
 
         if (changes != MandatoryQualificationUpdatedEventChanges.None)
         {
-            var establishment = qualification.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
-                await referenceDataCache.GetMqEstablishmentById(establishmentId) :
-                null;
+            var oldMqEventModel = EventModels.MandatoryQualification.FromModel(qualification);
 
-            var specialism = qualification.dfeta_MQ_SpecialismId?.Id is Guid specialismId ?
-                await referenceDataCache.GetMqSpecialismById(specialismId) :
-                null;
-
-            var oldMqEventModel = new Core.Events.Models.MandatoryQualification()
-            {
-                QualificationId = QualificationId,
-                Provider = establishment is not null ?
-                    new()
-                    {
-                        MandatoryQualificationProviderId = null,
-                        Name = null,
-                        DqtMqEstablishmentId = establishment?.Id,
-                        DqtMqEstablishmentName = establishment?.dfeta_name
-                    } :
-                    null,
-                Specialism = specialism?.ToMandatoryQualificationSpecialism(),
-                Status = qualification.dfeta_MQ_Status?.ToMandatoryQualificationStatus(),
-                StartDate = qualification.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                EndDate = qualification.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-            };
+            qualification.Specialism = NewSpecialism;
+            qualification.UpdatedOn = now;
 
             var updatedEvent = new MandatoryQualificationUpdatedEvent()
             {
                 EventId = Guid.NewGuid(),
-                CreatedUtc = clock.UtcNow,
+                CreatedUtc = now,
                 RaisedBy = User.GetUserId(),
-                PersonId = PersonId!.Value,
-                MandatoryQualification = oldMqEventModel with
-                {
-                    Specialism = NewSpecialism
-                },
+                PersonId = PersonId,
+                MandatoryQualification = EventModels.MandatoryQualification.FromModel(qualification),
                 OldMandatoryQualification = oldMqEventModel,
                 ChangeReason = ChangeReason!.GetDisplayName(),
                 ChangeReasonDetail = ChangeReasonDetail,
                 EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
-                    new Core.Events.Models.File()
+                    new EventModels.File()
                     {
                         FileId = fileId,
                         Name = JourneyInstance.State.EvidenceFileName!
@@ -101,27 +76,21 @@ public class ConfirmModel(
                     null,
                 Changes = changes
             };
+            dbContext.AddEvent(updatedEvent);
 
-            await crmQueryDispatcher.ExecuteQuery(
-                new UpdateMandatoryQualificationSpecialismQuery(
-                    QualificationId,
-                    mqSpecialism!.Id,
-                    updatedEvent));
-
-            await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(
-                helper => helper.SyncMandatoryQualification(QualificationId, new[] { updatedEvent }, CancellationToken.None));
+            await dbContext.SaveChangesAsync();
         }
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Mandatory qualification changed");
 
-        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -136,12 +105,12 @@ public class ConfirmModel(
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        CurrentSpecialism = JourneyInstance!.State.CurrentSpecialism;
-        NewSpecialism = JourneyInstance!.State.Specialism;
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
-        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
+        CurrentSpecialism = JourneyInstance.State.CurrentSpecialism;
+        NewSpecialism = JourneyInstance.State.Specialism;
+        ChangeReason = JourneyInstance.State.ChangeReason!.Value;
+        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
+        EvidenceFileName = JourneyInstance.State.EvidenceFileName;
+        UploadedEvidenceFileUrl ??= JourneyInstance.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
             null;
 

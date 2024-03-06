@@ -25,7 +25,7 @@ public partial class TrsDataSyncHelperTests
         await Helper.SyncMandatoryQualification(entity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
-        await AssertDatabaseMandatoryQualificationMatchesEntity(entity);
+        await AssertDatabaseMandatoryQualificationMatchesEntity(entity, expectMigrationMappingsApplied: true);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public partial class TrsDataSyncHelperTests
         await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
-        await AssertDatabaseMandatoryQualificationMatchesEntity(updatedVersion, expectedFirstSync);
+        await AssertDatabaseMandatoryQualificationMatchesEntity(updatedVersion, expectMigrationMappingsApplied: true, expectedFirstSync);
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public partial class TrsDataSyncHelperTests
         await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
-        await AssertDatabaseMandatoryQualificationMatchesEntity(updatedVersion, expectedFirstSync, expectedLastSync);
+        await AssertDatabaseMandatoryQualificationMatchesEntity(updatedVersion, expectMigrationMappingsApplied: true, expectedFirstSync, expectedLastSync);
     }
 
     [Fact]
@@ -517,20 +517,21 @@ public partial class TrsDataSyncHelperTests
 
     private async Task AssertDatabaseMandatoryQualificationMatchesEntity(
         dfeta_qualification entity,
+        bool expectMigrationMappingsApplied,
         DateTime? expectedFirstSync = null,
         DateTime? expectedLastSync = null)
     {
         await DbFixture.WithDbContext(async dbContext =>
         {
-            var establishment = entity.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
+            var mqEstablishment = entity.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
                 await TestData.ReferenceDataCache.GetMqEstablishmentById(establishmentId) :
                 null;
 
-            Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(establishment, out var expectedProvider);
+            Core.DataStore.Postgres.Models.MandatoryQualificationProvider.TryMapFromDqtMqEstablishment(mqEstablishment, out var expectedProvider);
 
-            var expectedSpecialism = (await TestData.ReferenceDataCache.GetMqSpecialisms())
-                .Single(s => s.Id == entity.dfeta_MQ_SpecialismId?.Id)
-                .ToMandatoryQualificationSpecialism();
+            var mqSpecialism = entity.dfeta_MQ_SpecialismId?.Id is Guid dqtSpecialismId ?
+                (await TestData.ReferenceDataCache.GetMqSpecialismById(dqtSpecialismId)) :
+                (dfeta_specialism?)null;
 
             var mq = await dbContext.MandatoryQualifications.SingleOrDefaultAsync(p => p.DqtQualificationId == entity.Id);
             Assert.NotNull(mq);
@@ -546,12 +547,23 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal(entity.CreatedOn, mq.DqtCreatedOn);
             Assert.Equal(entity.ModifiedOn, mq.DqtModifiedOn);
             Assert.Equal(expectedProvider?.MandatoryQualificationProviderId, mq.ProviderId);
-            Assert.Equal(expectedSpecialism, mq.Specialism);
+            //Assert.Equal(expectedSpecialism, mq.Specialism);
             Assert.Equal(entity.dfeta_MQ_Status?.ToMandatoryQualificationStatus(), mq.Status);
             Assert.Equal(entity.dfeta_MQStartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), mq.StartDate);
             Assert.Equal(entity.dfeta_MQ_Date?.ToDateOnlyWithDqtBstFix(isLocalTime: true), mq.EndDate);
             Assert.Equal(entity.dfeta_MQ_MQEstablishmentId?.Id, mq.DqtMqEstablishmentId);
             Assert.Equal(entity.dfeta_MQ_SpecialismId?.Id, mq.DqtSpecialismId);
+
+            if (expectMigrationMappingsApplied && mqEstablishment is not null && mqSpecialism is not null)
+            {
+                MandatoryQualificationSpecialismRegistry.TryMapFromDqtMqEstablishment(mqEstablishment.dfeta_Value, mqSpecialism.dfeta_Value, out var expectedSpecialism);
+                expectedSpecialism ??= mqSpecialism?.ToMandatoryQualificationSpecialism();
+                Assert.Equal(expectedSpecialism, mq.Specialism);
+            }
+            else
+            {
+                Assert.Equal(mqSpecialism?.ToMandatoryQualificationSpecialism(), mq.Specialism);
+            }
         });
     }
 

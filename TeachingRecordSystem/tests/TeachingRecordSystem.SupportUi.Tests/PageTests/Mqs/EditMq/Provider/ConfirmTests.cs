@@ -10,7 +10,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange        
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
@@ -36,20 +36,18 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         bool uploadEvidence)
     {
         // Arrange
-        var oldMqEstablishmentValue = "955"; // University of Birmingham
-        var oldMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(oldMqEstablishmentValue);
-        var newMqEstablishmentValue = "959"; // University of Leeds
-        var newMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(newMqEstablishmentValue);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var changeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = newMqEstablishmentValue,
-                CurrentMqEstablishmentName = oldMqEstablishment.dfeta_name,
+                ProviderId = newProvider.MandatoryQualificationProviderId,
+                CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
                 ChangeReason = changeReason,
                 ChangeReasonDetail = changeReasonDetail,
                 UploadEvidence = uploadEvidence,
@@ -67,8 +65,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponse(response);
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
-        Assert.Equal(oldMqEstablishment.dfeta_name, changeSummary.GetElementByTestId("current-provider")!.TextContent);
-        Assert.Equal(newMqEstablishment.dfeta_name, changeSummary.GetElementByTestId("new-provider")!.TextContent);
+        Assert.Equal(oldProvider.Name, changeSummary.GetElementByTestId("current-provider")!.TextContent);
+        Assert.Equal(newProvider.Name, changeSummary.GetElementByTestId("new-provider")!.TextContent);
         Assert.Equal(changeReason.GetDisplayName(), changeSummary.GetElementByTestId("change-reason")!.TextContent);
         Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TextContent);
         var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-link");
@@ -87,7 +85,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange        
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
@@ -112,12 +110,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Confirm_UpdatesMqCreatesEventAndCompletesJourneyRedirectsWithFlashMessage()
     {
         // Arrange
-        var oldMqEstablishmentValue = "955"; // University of Birmingham
-        var newMqEstablishmentValue = "959"; // University of Leeds
-        var oldEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(oldMqEstablishmentValue);
-        var newEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(newMqEstablishmentValue);
-
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
+        var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
 
@@ -128,8 +123,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = newMqEstablishmentValue,
-                CurrentMqEstablishmentName = oldEstablishment.dfeta_name,
+                ProviderId = newProvider.MandatoryQualificationProviderId,
+                CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
                 ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider,
                 ChangeReasonDetail = "Some reason",
                 UploadEvidence = false,
@@ -155,7 +150,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContext(async dbContext =>
         {
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
-            Assert.Equal(newEstablishment?.dfeta_mqestablishmentId, qualification.DqtMqEstablishmentId);
+            Assert.Equal(newProvider.MandatoryQualificationProviderId, qualification.ProviderId);
         });
 
         EventObserver.AssertEventsSaved(e =>
@@ -171,10 +166,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = null,
-                        Name = null,
-                        DqtMqEstablishmentId = newEstablishment.Id,
-                        DqtMqEstablishmentName = newEstablishment.dfeta_name
+                        MandatoryQualificationProviderId = newProvider.MandatoryQualificationProviderId,
+                        Name = newProvider.Name,
+                        DqtMqEstablishmentId = null,
+                        DqtMqEstablishmentName = null
                     },
                     Specialism = qualification.Specialism,
                     Status = qualification.Status,
@@ -186,10 +181,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                     QualificationId = qualificationId,
                     Provider = new()
                     {
-                        MandatoryQualificationProviderId = null,
-                        Name = null,
-                        DqtMqEstablishmentId = oldEstablishment.Id,
-                        DqtMqEstablishmentName = oldEstablishment.dfeta_name
+                        MandatoryQualificationProviderId = oldProvider.MandatoryQualificationProviderId,
+                        Name = oldProvider.Name,
+                        DqtMqEstablishmentId = null,
+                        DqtMqEstablishmentName = null
                     },
                     Specialism = qualification.Specialism,
                     Status = qualification.Status,
@@ -211,18 +206,17 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Cancel_DeletesJourneyAndRedirectsAndDoesNotUpdateMq()
     {
         // Arrange
-        var oldMqEstablishmentValue = "955"; // University of Birmingham
-        var newMqEstablishmentValue = "959"; // University of Leeds
-        var oldEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue(oldMqEstablishmentValue);
-
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(oldMqEstablishmentValue)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = newMqEstablishmentValue,
+                ProviderId = newProvider.MandatoryQualificationProviderId,
+                CurrentProviderId = oldProvider.MandatoryQualificationProviderId,
                 ChangeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider,
                 ChangeReasonDetail = "Some reason",
                 UploadEvidence = false,
@@ -245,8 +239,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContext(async dbContext =>
         {
             var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.PersonId == person.PersonId);
-            MandatoryQualificationProvider.TryMapFromDqtMqEstablishmentValue(oldMqEstablishmentValue, out var expectedProvider);
-            Assert.Equal(oldEstablishment?.dfeta_mqestablishmentId, qualification.DqtMqEstablishmentId);
+            Assert.Equal(oldProvider.MandatoryQualificationProviderId, qualification.ProviderId);
         });
     }
 

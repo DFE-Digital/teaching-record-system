@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Mqs.EditMq.Provider;
@@ -30,7 +31,7 @@ public class ReasonTests : TestBase
     {
         // Arrange        
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
@@ -52,16 +53,16 @@ public class ReasonTests : TestBase
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_ReturnsOK()
     {
         // Arrange        
-        var databaseMqEstablishmentValue = "955"; // University of Birmingham
-        var journeyMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(databaseMqEstablishmentValue)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = journeyMqEstablishmentValue
+                ProviderId = journeyProvider.MandatoryQualificationProviderId
             });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -93,16 +94,16 @@ public class ReasonTests : TestBase
     public async Task Post_WhenNoChangeReasonIsSelected_ReturnsError()
     {
         // Arrange
-        var databaseMqEstablishmentValue = "955"; // University of Birmingham
-        var journeyMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(databaseMqEstablishmentValue)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = journeyMqEstablishmentValue
+                ProviderId = journeyProvider.MandatoryQualificationProviderId
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -124,16 +125,16 @@ public class ReasonTests : TestBase
     public async Task Post_WhenNoUploadEvidenceOptionIsSelected_ReturnsError()
     {
         // Arrange
-        var databaseMqEstablishmentValue = "955"; // University of Birmingham
-        var journeyMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(databaseMqEstablishmentValue)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = journeyMqEstablishmentValue
+                ProviderId = journeyProvider.MandatoryQualificationProviderId
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -155,16 +156,16 @@ public class ReasonTests : TestBase
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
     {
         // Arrange
-        var databaseMqEstablishmentValue = "955"; // University of Birmingham
-        var journeyMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(databaseMqEstablishmentValue)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = journeyMqEstablishmentValue
+                ProviderId = journeyProvider.MandatoryQualificationProviderId
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -187,16 +188,16 @@ public class ReasonTests : TestBase
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
     {
         // Arrange
-        var databaseMqEstablishmentValue = "955"; // University of Birmingham
-        var journeyMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(databaseMqEstablishmentValue)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = journeyMqEstablishmentValue
+                ProviderId = journeyProvider.MandatoryQualificationProviderId
             });
 
         var multipartContent = CreateFormFileUpload(".cs");
@@ -219,16 +220,17 @@ public class ReasonTests : TestBase
     [Fact]
     public async Task Post_ValidInput_RedirectsToConfirmPage()
     {
-        var databaseMqEstablishmentValue = "955"; // University of Birmingham
-        var journeyMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(databaseMqEstablishmentValue)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        // Arrange
+        var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = journeyMqEstablishmentValue
+                ProviderId = journeyProvider.MandatoryQualificationProviderId
             });
 
         var multipartContent = CreateFormFileUpload(".png");
@@ -252,16 +254,16 @@ public class ReasonTests : TestBase
     [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
-        var databaseMqEstablishmentValue = "955"; // University of Birmingham
-        var journeyMqEstablishmentValue = "959"; // University of Leeds
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithDqtMqEstablishmentValue(databaseMqEstablishmentValue)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
+        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqProviderState()
             {
                 Initialized = true,
-                MqEstablishmentValue = journeyMqEstablishmentValue
+                ProviderId = journeyProvider.MandatoryQualificationProviderId
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider/change-reason/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")

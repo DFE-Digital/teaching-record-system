@@ -25,7 +25,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange        
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -51,7 +51,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -131,7 +131,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
 
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -166,7 +166,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -200,7 +200,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -235,7 +235,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -311,7 +311,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
 
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -349,7 +349,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()

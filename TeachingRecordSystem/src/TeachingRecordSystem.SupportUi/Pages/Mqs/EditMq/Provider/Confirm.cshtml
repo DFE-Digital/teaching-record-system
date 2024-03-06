@@ -17,11 +17,11 @@
             <govuk-summary-list data-testid="change-summary">
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Current training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="current-provider">@(!string.IsNullOrEmpty(Model.CurrentMqEstablishmentName) ? @Model.CurrentMqEstablishmentName : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="current-provider">@(@Model.CurrentProviderName ?? "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>New training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="new-provider">@Model.NewMqEstablishment!.dfeta_name</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="new-provider">@Model.ProviderName</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>

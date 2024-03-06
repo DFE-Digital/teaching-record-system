@@ -2,34 +2,32 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
 [Journey(JourneyNames.EditMqProvider), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(
-    ReferenceDataCache referenceDataCache,
-    TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditMqProviderState>? JourneyInstance { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public Guid? PersonId { get; set; }
+    public Guid PersonId { get; set; }
 
     public string? PersonName { get; set; }
 
     [BindProperty]
     [Required(ErrorMessage = "Select a training provider")]
-    [Display(Name = "Training Provider")]
-    public string? MqEstablishmentValue { get; set; }
+    [Display(Name = "Training provider")]
+    public Guid? ProviderId { get; set; }
 
-    public dfeta_mqestablishment[]? MqEstablishments { get; set; }
+    public ProviderInfo[]? Providers { get; set; }
 
     public void OnGet()
     {
-        MqEstablishmentValue ??= JourneyInstance!.State.MqEstablishmentValue;
+        ProviderId = JourneyInstance!.State.ProviderId;
     }
 
     public async Task<IActionResult> OnPost()
@@ -39,7 +37,7 @@ public class IndexModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.MqEstablishmentValue = MqEstablishmentValue);
+        await JourneyInstance!.UpdateStateAsync(state => state.ProviderId = ProviderId);
 
         return Redirect(linkGenerator.MqEditProviderReason(QualificationId, JourneyInstance!.InstanceId));
     }
@@ -47,10 +45,10 @@ public class IndexModel(
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         var qualificationInfo = context.HttpContext.GetCurrentMandatoryQualificationFeature();
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
@@ -59,12 +57,8 @@ public class IndexModel(
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-
-        var establishments = await referenceDataCache.GetMqEstablishments();
-        MqEstablishments = establishments
-            .OrderBy(e => e.dfeta_name)
-            .ToArray();
-
-        await next();
+        Providers = MandatoryQualificationProvider.All.Select(p => new ProviderInfo(p.MandatoryQualificationProviderId, p.Name)).ToArray();
     }
+
+    public record ProviderInfo(Guid MandatoryQualificationProviderId, string Name);
 }

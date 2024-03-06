@@ -26,7 +26,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(databaseStartDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -48,7 +48,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var journeyStartDate = new DateOnly(2021, 10, 6);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(databaseStartDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStartDateState()
@@ -98,7 +98,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(databaseStartDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -122,7 +122,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = new DateOnly(2022, 9, 1);
         var newStartDate = endDate.AddDays(daysAfter);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(MandatoryQualificationStatus.Passed, endDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -149,7 +149,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -176,7 +176,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oldStartDate = new DateOnly(2021, 10, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/start-date/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")

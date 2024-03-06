@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.TestCommon;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests;
 

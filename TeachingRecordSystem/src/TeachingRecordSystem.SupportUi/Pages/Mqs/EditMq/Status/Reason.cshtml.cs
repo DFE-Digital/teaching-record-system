@@ -20,7 +20,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public Guid? PersonId { get; set; }
+    public Guid PersonId { get; set; }
 
     public string? PersonName { get; set; }
 
@@ -140,7 +140,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         }
 
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId!.Value));
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

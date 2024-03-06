@@ -1271,10 +1271,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.MandatoryQualification", b =>
                 {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.MandatoryQualificationProvider", null)
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.MandatoryQualificationProvider", "Provider")
                         .WithMany()
                         .HasForeignKey("ProviderId")
                         .HasConstraintName("fk_qualifications_mandatory_qualification_provider");
+
+                    b.Navigation("Provider");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.EytsAwardedEmailsJob", b =>

@@ -7,9 +7,9 @@ public class EditMqProviderState
 {
     public bool Initialized { get; set; }
 
-    public string? CurrentMqEstablishmentName { get; set; }
+    public Guid? CurrentProviderId { get; set; }
 
-    public string? MqEstablishmentValue { get; set; }
+    public Guid? ProviderId { get; set; }
 
     public MqChangeProviderReasonOption? ChangeReason { get; set; }
 
@@ -24,8 +24,9 @@ public class EditMqProviderState
     public string? EvidenceFileSizeDescription { get; set; }
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(MqEstablishmentValue), nameof(ChangeReason), nameof(UploadEvidence), nameof(EvidenceFileId))]
-    public bool IsComplete => !string.IsNullOrWhiteSpace(MqEstablishmentValue) &&
+    [MemberNotNullWhen(true, nameof(ProviderId), nameof(ChangeReason), nameof(UploadEvidence), nameof(EvidenceFileId))]
+    public bool IsComplete =>
+        ProviderId.HasValue &&
         ChangeReason.HasValue &&
         UploadEvidence.HasValue &&
         (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
@@ -37,8 +38,7 @@ public class EditMqProviderState
             return;
         }
 
-        CurrentMqEstablishmentName = qualificationInfo.DqtEstablishmentName;
-        MqEstablishmentValue = qualificationInfo.DqtEstablishmentValue;
+        ProviderId = CurrentProviderId = qualificationInfo.MandatoryQualification.ProviderId;
         Initialized = true;
     }
 }

@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -36,6 +37,10 @@ public class DbHelper(string connectionString)
         var connection = dbContext.Database.GetDbConnection();
         await EnsureRespawner(connection);
         await _respawner!.ResetAsync(connection);
+
+        // Ensure we have the System User around
+        dbContext.Set<SystemUser>().Add(SystemUser.Instance);
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task EnsureSchema()

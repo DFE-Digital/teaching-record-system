@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
@@ -13,7 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 /// <para>Returns a <see cref="StatusCodes.Status404NotFound"/> response if no Mandatory Qualification with the specified ID exists.</para>
 /// <para>Assigns the <see cref="CurrentMandatoryQualificationFeature"/> and <see cref="CurrentPersonFeature"/> on success.</para>
 /// </remarks>
-public class CheckMandatoryQualificationExistsFilter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCache referenceDataCache) :
+public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher) :
     AssignCurrentPersonInfoFilterBase(crmQueryDispatcher), IAsyncResourceFilter
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
@@ -25,28 +24,19 @@ public class CheckMandatoryQualificationExistsFilter(ICrmQueryDispatcher crmQuer
             return;
         }
 
-        var qualification = await CrmQueryDispatcher.ExecuteQuery(new GetQualificationByIdQuery(qualificationId));
+        var currentMq = await dbContext.MandatoryQualifications
+            .Include(mq => mq.Provider)
+            .SingleOrDefaultAsync(mq => mq.QualificationId == qualificationId);
 
-        if (qualification is null ||
-            qualification.dfeta_Type != Core.Dqt.Models.dfeta_qualification_dfeta_Type.MandatoryQualification)
+        if (currentMq is null)
         {
             context.Result = new NotFoundResult();
             return;
         }
 
-        var mq = await MandatoryQualification.MapFromDqtQualification(qualification, referenceDataCache);
+        context.HttpContext.SetCurrentMandatoryQualificationFeature(new(currentMq));
 
-        var provider = mq.ProviderId is Guid providerId ?
-            MandatoryQualificationProvider.All.Single(p => p.MandatoryQualificationProviderId == providerId) :
-            null;
-
-        var dqtEstablishment = qualification.dfeta_MQ_MQEstablishmentId?.Id is Guid establishmentId ?
-            await referenceDataCache.GetMqEstablishmentById(establishmentId) :
-            null;
-
-        context.HttpContext.SetCurrentMandatoryQualificationFeature(new(mq, provider, dqtEstablishment?.dfeta_name, dqtEstablishment?.dfeta_Value));
-
-        await TryAssignCurrentPersonInfo(qualification.dfeta_PersonId!.Id, context.HttpContext);
+        await TryAssignCurrentPersonInfo(currentMq.PersonId, context.HttpContext);
 
         await next();
     }

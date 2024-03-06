@@ -86,38 +86,22 @@ public partial class TestData
             return this;
         }
 
-        public CreateNameChangeIncidentBuilder WithCanceledStatus()
+        public CreateNameChangeIncidentBuilder WithStatus(IncidentStatusType status)
         {
-            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Canceled)
+            if (_incidentStatusType is not null && _incidentStatusType != status)
             {
                 throw new InvalidOperationException("Incident status cannot be changed after it's set.");
             }
 
-            _incidentStatusType = IncidentStatusType.Canceled;
+            _incidentStatusType = status;
             return this;
         }
 
-        public CreateNameChangeIncidentBuilder WithRejectedStatus()
-        {
-            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Rejected)
-            {
-                throw new InvalidOperationException("Incident status cannot be changed after it's set.");
-            }
+        public CreateNameChangeIncidentBuilder WithCanceledStatus() => WithStatus(IncidentStatusType.Canceled);
 
-            _incidentStatusType = IncidentStatusType.Rejected;
-            return this;
-        }
+        public CreateNameChangeIncidentBuilder WithRejectedStatus() => WithStatus(IncidentStatusType.Rejected);
 
-        public CreateNameChangeIncidentBuilder WithApprovedStatus()
-        {
-            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Approved)
-            {
-                throw new InvalidOperationException("Incident status cannot be changed after it's set.");
-            }
-
-            _incidentStatusType = IncidentStatusType.Approved;
-            return this;
-        }
+        public CreateNameChangeIncidentBuilder WithApprovedStatus() => WithStatus(IncidentStatusType.Approved);
 
         public async Task<CreateNameChangeIncidentResult> Execute(TestData testData)
         {
@@ -279,7 +263,7 @@ public partial class TestData
             }
         }
 
-        private enum IncidentStatusType
+        public enum IncidentStatusType
         {
             Active,
             Canceled,

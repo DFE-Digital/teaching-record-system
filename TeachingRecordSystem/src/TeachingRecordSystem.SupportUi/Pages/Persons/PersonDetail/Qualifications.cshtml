@@ -27,7 +27,7 @@ else
             <govuk-summary-list>                
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="mq-provider-@mq.QualificationId">@(!string.IsNullOrEmpty(mq.Provider) ? mq.Provider : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="mq-provider-@mq.QualificationId">@(mq.Provider?.Name ?? "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqEditProvider(mq.QualificationId, null)" class="govuk-link" visually-hidden-text="change training provider" data-testid="provider-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>

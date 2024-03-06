@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
 public class AddMqState
 {
-    public string? MqEstablishmentValue { get; set; }
+    public Guid? ProviderId { get; set; }
 
     public MandatoryQualificationSpecialism? Specialism { get; set; }
 
@@ -16,8 +16,9 @@ public class AddMqState
     public DateOnly? EndDate { get; set; }
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(MqEstablishmentValue), nameof(Specialism), nameof(StartDate), nameof(Status))]
-    public bool IsComplete => !string.IsNullOrWhiteSpace(MqEstablishmentValue) &&
+    [MemberNotNullWhen(true, nameof(ProviderId), nameof(Specialism), nameof(StartDate), nameof(Status))]
+    public bool IsComplete =>
+        ProviderId.HasValue &&
         Specialism.HasValue &&
         StartDate.HasValue &&
         Status.HasValue &&

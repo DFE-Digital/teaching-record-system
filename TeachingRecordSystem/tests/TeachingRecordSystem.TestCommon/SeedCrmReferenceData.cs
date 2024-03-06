@@ -244,6 +244,12 @@ public class SeedCrmReferenceData : IStartupTask
             dfeta_Value = "961",
             dfeta_name = "University of Manchester"
         });
+
+        _xrmFakedContext.CreateEntity(new dfeta_mqestablishment()
+        {
+            dfeta_Value = "150",
+            dfeta_name = "Postgraduate Diploma in Deaf Education, University of Manchester, School of Psychological Sciences"
+        });
     }
 
     private void AddSpecialisms()

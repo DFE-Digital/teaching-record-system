@@ -51,7 +51,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="provider">@(oldMandatoryQualification.Provider is not null ? oldMandatoryQualification.Provider.Name ?? oldMandatoryQualification.Provider.DqtMqEstablishmentName : "None")</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value data-testid="provider">@(oldMandatoryQualification.Provider?.Name ?? oldMandatoryQualification.Provider?.DqtMqEstablishmentName ?? "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
 
@@ -59,7 +59,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="specialism">@(oldMandatoryQualification.Specialism.HasValue ? oldMandatoryQualification.Specialism.Value.GetTitle() : "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="specialism">@(oldMandatoryQualification.Specialism?.GetTitle() ?? "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
 
@@ -67,7 +67,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="start-date">@(oldMandatoryQualification.StartDate.HasValue ? oldMandatoryQualification.StartDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="start-date">@(oldMandatoryQualification.StartDate?.ToString("d MMMM yyyy") ?? "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
 
@@ -75,7 +75,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="status">@(oldMandatoryQualification.Status.HasValue ? oldMandatoryQualification.Status.Value.GetTitle() : "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="status">@(oldMandatoryQualification.Status?.GetTitle() ?? "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
 
@@ -83,7 +83,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="end-date">@(oldMandatoryQualification.EndDate.HasValue ? oldMandatoryQualification.EndDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="end-date">@(oldMandatoryQualification.EndDate?.ToString("d MMMM yyyy") ?? "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
                 </govuk-summary-list>

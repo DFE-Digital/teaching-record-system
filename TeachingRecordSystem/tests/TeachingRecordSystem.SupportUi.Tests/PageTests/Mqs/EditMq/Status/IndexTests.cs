@@ -28,7 +28,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var databaseStatus = MandatoryQualificationStatus.Passed;
         var databaseEndDate = new DateOnly(2021, 11, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus, databaseEndDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -56,7 +56,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyStatus = MandatoryQualificationStatus.Passed;
         var journeyEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
             new EditMqStatusState()
@@ -107,7 +107,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -127,7 +127,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
         var status = MandatoryQualificationStatus.Passed;
 
@@ -156,7 +156,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStatus = dfeta_qualification_dfeta_MQ_Status.Passed;
         var newEndDate = startDate.AddDays(-daysBefore);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(startDate)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -185,7 +185,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStatus = dfeta_qualification_dfeta_MQ_Status.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -212,7 +212,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
-        var qualificationId = person.MandatoryQualifications!.First().QualificationId;
+        var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstance(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")

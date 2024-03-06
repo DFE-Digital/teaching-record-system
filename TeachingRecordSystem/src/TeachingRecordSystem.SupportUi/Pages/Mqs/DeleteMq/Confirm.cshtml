@@ -25,7 +25,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="provider">@(!string.IsNullOrEmpty(Model.TrainingProvider) ? Model.TrainingProvider : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="provider">@(Model.ProviderName ?? "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Specialism</govuk-summary-list-row-key>

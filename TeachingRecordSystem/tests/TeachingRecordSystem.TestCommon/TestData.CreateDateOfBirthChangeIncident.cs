@@ -39,38 +39,22 @@ public partial class TestData
             return this;
         }
 
-        public CreateDateOfBirthChangeIncidentBuilder WithCanceledStatus()
+        public CreateDateOfBirthChangeIncidentBuilder WithStatus(IncidentStatusType status)
         {
-            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Canceled)
+            if (_incidentStatusType is not null && _incidentStatusType != status)
             {
                 throw new InvalidOperationException("Incident status cannot be changed after it's set.");
             }
 
-            _incidentStatusType = IncidentStatusType.Canceled;
+            _incidentStatusType = status;
             return this;
         }
 
-        public CreateDateOfBirthChangeIncidentBuilder WithRejectedStatus()
-        {
-            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Rejected)
-            {
-                throw new InvalidOperationException("Incident status cannot be changed after it's set.");
-            }
+        public CreateDateOfBirthChangeIncidentBuilder WithCanceledStatus() => WithStatus(IncidentStatusType.Canceled);
 
-            _incidentStatusType = IncidentStatusType.Rejected;
-            return this;
-        }
+        public CreateDateOfBirthChangeIncidentBuilder WithRejectedStatus() => WithStatus(IncidentStatusType.Rejected);
 
-        public CreateDateOfBirthChangeIncidentBuilder WithApprovedStatus()
-        {
-            if (_incidentStatusType is not null && _incidentStatusType != IncidentStatusType.Approved)
-            {
-                throw new InvalidOperationException("Incident status cannot be changed after it's set.");
-            }
-
-            _incidentStatusType = IncidentStatusType.Approved;
-            return this;
-        }
+        public CreateDateOfBirthChangeIncidentBuilder WithApprovedStatus() => WithStatus(IncidentStatusType.Approved);
 
         public async Task<CreateDateOfBirthChangeIncidentResult> Execute(TestData testData)
         {
@@ -202,7 +186,7 @@ public partial class TestData
             };
         }
 
-        private enum IncidentStatusType
+        public enum IncidentStatusType
         {
             Active,
             Canceled,

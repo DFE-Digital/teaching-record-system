@@ -123,7 +123,7 @@ public class SetNpqQualificationTests : TestBase
            .ReturnsAsync(contact);
 
         DataverseAdapterMock
-           .Setup(mock => mock.GetQualificationsForTeacher(id, It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>()))
+           .Setup(mock => mock.GetQualificationsForTeacher(id, It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>()))
            .ReturnsAsync(qualifications);
 
         DataverseAdapterMock
