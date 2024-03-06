@@ -37,7 +37,8 @@ public class CreateTeacherTests : IAsyncLifetime
             Email = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
-            Trn = trn
+            Trn = trn,
+            ExistingTeacherResults = []
         };
 
         // Act
@@ -80,7 +81,8 @@ public class CreateTeacherTests : IAsyncLifetime
             Email = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
-            Trn = trn
+            Trn = trn,
+            ExistingTeacherResults = []
         };
 
         // Act
@@ -117,7 +119,8 @@ public class CreateTeacherTests : IAsyncLifetime
             Email = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
-            Trn = trn1
+            Trn = trn1,
+            ExistingTeacherResults = []
         };
 
         // Act
@@ -131,13 +134,15 @@ public class CreateTeacherTests : IAsyncLifetime
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn2,
-            ExistingTeacherResult = new FindExistingTrnResult()
-            {
-                TeacherId = createdTeacherId1,
-                MatchedAttributes = new[] { Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName },
-                HasActiveSanctions = false,
-                HasEytsDate = false,
-                HasQtsDate = false
+            ExistingTeacherResults = new[] {
+                new FindingExistingTeachersResult()
+                {
+                    TeacherId = createdTeacherId1,
+                    MatchedAttributes = new[] { Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName },
+                    HasActiveSanctions = false,
+                    HasEytsDate = false,
+                    HasQtsDate = false
+                }
             }
         };
         var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQuery(query2);

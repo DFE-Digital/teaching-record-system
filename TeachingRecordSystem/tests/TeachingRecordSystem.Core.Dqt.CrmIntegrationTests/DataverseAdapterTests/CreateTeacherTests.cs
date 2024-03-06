@@ -84,9 +84,9 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         // Arrange
         var command = new CreateTeacherCommand()
         {
-            FirstName = "Minnie",
-            LastName = "Ryder",
-            BirthDate = new(1990, 5, 23),
+            FirstName = Faker.Name.First(),
+            LastName = Faker.Name.Last(),
+            BirthDate = Faker.Identification.DateOfBirth(),
             GenderCode = Contact_GenderCode.Female,
             InitialTeacherTraining = new()
             {
@@ -155,7 +155,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     {
         // Arrange
         DataverseAdapter.FindExistingTeacher findExistingTeacher = () =>
-            Task.FromResult<DataverseAdapter.CreateTeacherDuplicateTeacherResult>(null);
+            Task.FromResult<DataverseAdapter.CreateTeacherDuplicateTeacherResult[]>(null);
 
         var command = CreateCommand();
 
@@ -196,13 +196,15 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var existingTeacherId = _createTeacherFixture.ExistingTeacherId;
 
         DataverseAdapter.FindExistingTeacher findExistingTeacher = () =>
-            Task.FromResult(new DataverseAdapter.CreateTeacherDuplicateTeacherResult()
-            {
-                TeacherId = existingTeacherId,
-                MatchedAttributes = new[] { Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName, Contact.Fields.BirthDate },
-                HasActiveSanctions = hasActiveSanctions,
-                HasQtsDate = hasQts,
-                HasEytsDate = hasEyts
+            Task.FromResult(new[] {
+                new DataverseAdapter.CreateTeacherDuplicateTeacherResult()
+                {
+                    TeacherId = existingTeacherId,
+                    MatchedAttributes = new[] { Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName, Contact.Fields.BirthDate },
+                    HasActiveSanctions = hasActiveSanctions,
+                    HasQtsDate = hasQts,
+                    HasEytsDate = hasEyts
+                }
             });
 
         var command = CreateCommand(teacherType, configureCommand: command =>
@@ -710,8 +712,8 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(existingTeacherId, result?.TeacherId);
-        Assert.Equal(expectedMatchedAttributes, result?.MatchedAttributes);
+        Assert.Contains(existingTeacherId, result?.Select(x => x.TeacherId));
+        Assert.Contains(expectedMatchedAttributes, result?.Select(x => x.MatchedAttributes));
     }
 
     [Theory]

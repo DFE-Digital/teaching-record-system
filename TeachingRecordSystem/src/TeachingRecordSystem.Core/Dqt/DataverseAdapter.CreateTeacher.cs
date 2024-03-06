@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public partial class DataverseAdapter
 {
-    internal delegate Task<CreateTeacherDuplicateTeacherResult> FindExistingTeacher();
+    internal delegate Task<CreateTeacherDuplicateTeacherResult[]> FindExistingTeacher();
 
     public async Task<CreateTeacherResult> CreateTeacher(CreateTeacherCommand command)
     {
@@ -63,10 +63,13 @@ public partial class DataverseAdapter
             // Create a Task to review the potential duplicate
             Debug.Assert(findExistingTeacherResult != null);
 
-            txnRequest.Requests.Add(new CreateRequest()
+            foreach (var duplicate in findExistingTeacherResult)
             {
-                Target = helper.CreateDuplicateReviewTaskEntity(findExistingTeacherResult)
-            });
+                txnRequest.Requests.Add(new CreateRequest()
+                {
+                    Target = helper.CreateDuplicateReviewTaskEntity(duplicate)
+                });
+            }
         }
 
         var qtsEntity = helper.CreateQtsRegistrationEntity(referenceData);
@@ -350,8 +353,9 @@ public partial class DataverseAdapter
             };
         }
 
-        public async Task<CreateTeacherDuplicateTeacherResult> FindExistingTeacher()
+        public async Task<CreateTeacherDuplicateTeacherResult[]> FindExistingTeacher()
         {
+            var duplicateResults = new List<CreateTeacherDuplicateTeacherResult>();
             var filter = new FilterExpression(LogicalOperator.And);
             filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
 
@@ -398,15 +402,16 @@ public partial class DataverseAdapter
                 matches.AddRange(teachersWithIttWithSlugs);
             }
 
-            var match = matches.FirstOrDefault();
 
-            if (match == null)
+            foreach (var match in matches)
             {
-                return null;
-            }
+                if (match == null)
+                {
+                    return null;
+                }
 
-            var attributeMatches = new[]
-            {
+                var attributeMatches = new[]
+                {
                 (
                     Attribute: Contact.Fields.FirstName,
                     Matches: NamesAreEqual(_command.FirstName, match.FirstName)
@@ -425,33 +430,36 @@ public partial class DataverseAdapter
                 )
             };
 
-            if (!string.IsNullOrEmpty(_command.HusId))
-            {
-                attributeMatches = attributeMatches.Concat(new[] { (Contact.Fields.dfeta_HUSID, _command.HusId.Equals(match.dfeta_HUSID)) }).ToArray();
+                if (!string.IsNullOrEmpty(_command.HusId))
+                {
+                    attributeMatches = attributeMatches.Concat(new[] { (Contact.Fields.dfeta_HUSID, _command.HusId.Equals(match.dfeta_HUSID)) }).ToArray();
+                }
+
+                if (!string.IsNullOrEmpty(_command.SlugId))
+                {
+                    attributeMatches = attributeMatches.Concat(new[] { (Contact.Fields.dfeta_SlugId, _command.SlugId.Equals(match.dfeta_SlugId, StringComparison.OrdinalIgnoreCase)) }).ToArray();
+                }
+
+                if (!string.IsNullOrEmpty(_command.SlugId) && teachersWithIttWithSlugs.Any())
+                {
+                    attributeMatches = attributeMatches.Concat(new[] { ($"{nameof(dfeta_initialteachertraining)}_{dfeta_initialteachertraining.Fields.dfeta_SlugId}", true) }).ToArray();
+                }
+
+                var matchedAttributeNames = attributeMatches.Where(m => m.Matches).Select(m => m.Attribute).ToArray();
+
+                duplicateResults.Add(new CreateTeacherDuplicateTeacherResult()
+                {
+                    TeacherId = match.Id,
+                    MatchedAttributes = matchedAttributeNames,
+                    HasActiveSanctions = match.dfeta_ActiveSanctions == true,
+                    HasQtsDate = match.dfeta_QTSDate.HasValue,
+                    HasEytsDate = match.dfeta_EYTSDate.HasValue,
+                    HusId = match.dfeta_HUSID,
+                    SlugId = match.dfeta_SlugId
+                });
             }
 
-            if (!string.IsNullOrEmpty(_command.SlugId))
-            {
-                attributeMatches = attributeMatches.Concat(new[] { (Contact.Fields.dfeta_SlugId, _command.SlugId.Equals(match.dfeta_SlugId, StringComparison.OrdinalIgnoreCase)) }).ToArray();
-            }
-
-            if (!string.IsNullOrEmpty(_command.SlugId) && teachersWithIttWithSlugs.Any())
-            {
-                attributeMatches = attributeMatches.Concat(new[] { ($"{nameof(dfeta_initialteachertraining)}_{dfeta_initialteachertraining.Fields.dfeta_SlugId}", true) }).ToArray();
-            }
-
-            var matchedAttributeNames = attributeMatches.Where(m => m.Matches).Select(m => m.Attribute).ToArray();
-
-            return new CreateTeacherDuplicateTeacherResult()
-            {
-                TeacherId = match.Id,
-                MatchedAttributes = matchedAttributeNames,
-                HasActiveSanctions = match.dfeta_ActiveSanctions == true,
-                HasQtsDate = match.dfeta_QTSDate.HasValue,
-                HasEytsDate = match.dfeta_EYTSDate.HasValue,
-                HusId = match.dfeta_HUSID,
-                SlugId = match.dfeta_SlugId
-            };
+            return duplicateResults.ToArray();
 
             bool TryGetMatchCombinationsFilter(out FilterExpression filter)
             {
