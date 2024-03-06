@@ -34,9 +34,16 @@ public class MatchToTeachingRecordAuthenticationHandler(SignInJourneyHelper help
     {
         EnsureInitialized();
 
+        if (properties is null ||
+            !properties.Items.TryGetValue("OneLoginAuthenticationScheme", out var oneLoginAuthenticationScheme) ||
+            string.IsNullOrEmpty(oneLoginAuthenticationScheme))
+        {
+            throw new InvalidOperationException($"'OneLoginAuthenticationScheme' must be passed in {nameof(properties)}.{nameof(properties.Items)}.");
+        }
+
         var journeyInstance = await helper.UserInstanceStateProvider.GetOrCreateSignInJourneyInstanceAsync(
             _context,
-            createState: () => new SignInJourneyState(properties?.RedirectUri ?? "/", properties),
+            createState: () => new SignInJourneyState(properties.RedirectUri ?? "/", oneLoginAuthenticationScheme, properties),
             updateState: state => state.Reset());
 
         var result = helper.SignInWithOneLogin(journeyInstance);

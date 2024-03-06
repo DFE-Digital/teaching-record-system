@@ -86,13 +86,9 @@
 
                         <govuk-textarea asp-for="OneLoginPrivateKeyPem" label-class="govuk-label--s" textarea-class="trs-monospace trs-nowrap" autocomplete="off" spellcheck="false" />
 
-                        <govuk-input asp-for="OneLoginRedirectUriPath" label-class="govuk-label--s" autocomplete="off" spellcheck="false">
-                            <govuk-input-prefix>@Model.OneLoginRedirectUriBase</govuk-input-prefix>
-                        </govuk-input>
+                        <govuk-input asp-for="OneLoginRedirectUriPath" label-class="govuk-label--s" autocomplete="off" spellcheck="false" />
 
-                        <govuk-input asp-for="OneLoginPostLogoutRedirectUriPath" label-class="govuk-label--s" autocomplete="off" spellcheck="false">
-                            <govuk-input-prefix>@Model.OneLoginRedirectUriBase</govuk-input-prefix>
-                        </govuk-input>
+                        <govuk-input asp-for="OneLoginPostLogoutRedirectUriPath" label-class="govuk-label--s" autocomplete="off" spellcheck="false"/>
                     </govuk-checkboxes-item-conditional>
                 </govuk-checkboxes-item>
             </govuk-checkboxes>

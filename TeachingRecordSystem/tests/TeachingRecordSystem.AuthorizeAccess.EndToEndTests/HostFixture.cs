@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -15,6 +14,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable, IStartupTask
 {
     public const string BaseUrl = "http://localhost:55649";
+    public const string FakeOneLoginAuthenticationScheme = "FakeOneLogin";
 
     private bool _initialized = false;
     private bool _disposed = false;
@@ -64,7 +64,7 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
 
                     services.Configure<AuthenticationOptions>(options =>
                     {
-                        options.AddScheme(OneLoginDefaults.AuthenticationScheme, b => b.HandlerType = typeof(FakeOneLoginHandler));
+                        options.AddScheme(FakeOneLoginAuthenticationScheme, b => b.HandlerType = typeof(FakeOneLoginHandler));
                     });
 
                     services.AddSingleton<OneLoginCurrentUserProvider>();

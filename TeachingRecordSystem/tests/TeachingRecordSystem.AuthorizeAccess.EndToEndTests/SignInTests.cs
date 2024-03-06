@@ -12,7 +12,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToStartPage();
+        await page.GoToTestStartPage();
 
         await page.WaitForUrlPathAsync("/not-verified");
     }
@@ -30,7 +30,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToStartPage();
+        await page.GoToTestStartPage();
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.FillAsync("text=What is your National Insurance number?", person.NationalInsuranceNumber!);
@@ -52,7 +52,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToStartPage();
+        await page.GoToTestStartPage();
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.FillAsync("text=What is your National Insurance number?", Faker.Identification.UkNationalInsuranceNumber());
@@ -78,7 +78,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToStartPage();
+        await page.GoToTestStartPage();
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.FillAsync("text=What is your National Insurance number?", Faker.Identification.UkNationalInsuranceNumber());
@@ -103,7 +103,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToStartPage();
+        await page.GoToTestStartPage();
 
         await page.AssertSignedIn(person.Trn!);
     }
@@ -119,7 +119,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToStartPage();
+        await page.GoToTestStartPage();
 
         await page.AssertSignedIn(person.Trn!);
     }

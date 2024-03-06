@@ -20,7 +20,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: person.PersonId);
             Clock.Advance();
 
-            var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: user.Subject);
@@ -51,7 +51,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: user.Subject);
@@ -80,7 +80,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
@@ -114,7 +114,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var ticket = CreateOneLoginAuthenticationTicket(
@@ -149,7 +149,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var ticket = CreateOneLoginAuthenticationTicket(
@@ -182,7 +182,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var personSearchServiceMock = new Mock<IPersonSearchService>();
             var helper = CreateHelper(dbContext, personSearchServiceMock.Object);
 
-            var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
@@ -226,7 +226,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var person1 = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
             var person2 = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
 
-            var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
@@ -291,7 +291,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             var person = await TestData.CreatePerson(b => b.WithTrn(false).WithNationalInsuranceNumber());
 
-            var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
@@ -346,7 +346,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
 
-            var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+            var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var subject = TestData.CreateOneLoginUserSubject();

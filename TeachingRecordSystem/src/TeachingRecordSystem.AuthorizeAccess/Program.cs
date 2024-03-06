@@ -1,10 +1,11 @@
-using System.Security.Cryptography;
 using GovUk.Frontend.AspNetCore;
 using GovUk.OneLogin.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.AuthorizeAccess;
@@ -30,53 +31,31 @@ builder.ConfigureLogging();
 builder.Services.AddGovUkFrontend();
 builder.Services.AddCsp(nonceByteAmount: 32);
 
-var authenticationBuilder = builder.Services
-    .AddAuthentication(options =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = AuthenticationSchemes.MatchToTeachingRecord;
+
+    options.AddScheme(AuthenticationSchemes.FormFlowJourney, scheme =>
     {
-        options.DefaultScheme = OneLoginDefaults.AuthenticationScheme;
-
-        options.AddScheme(AuthenticationSchemes.FormFlowJourney, scheme =>
-        {
-            scheme.HandlerType = typeof(FormFlowJourneySignInHandler);
-        });
-
-        options.AddScheme(AuthenticationSchemes.MatchToTeachingRecord, scheme =>
-        {
-            scheme.HandlerType = typeof(MatchToTeachingRecordAuthenticationHandler);
-        });
+        scheme.HandlerType = typeof(FormFlowJourneySignInHandler);
     });
+
+    options.AddScheme(AuthenticationSchemes.MatchToTeachingRecord, scheme =>
+    {
+        scheme.HandlerType = typeof(MatchToTeachingRecordAuthenticationHandler);
+    });
+});
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
 {
-    authenticationBuilder.AddOneLogin(options =>
-    {
-        options.SignInScheme = AuthenticationSchemes.FormFlowJourney;
+    builder.Services
+        .TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<OneLoginOptions>, OneLoginPostConfigureOptions>());
 
-        using (var rsa = RSA.Create())
-        {
-            var privateKeyPem = builder.Configuration.GetRequiredValue("OneLogin:PrivateKeyPem");
-            rsa.ImportPkcs8PrivateKey(Convert.FromBase64String(privateKeyPem), out _);
-            options.ClientAuthenticationCredentials = new SigningCredentials(
-                new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)), SecurityAlgorithms.RsaSha256);
-        }
-
-        var coreIdentityIssuer = ECDsa.Create();
-        var coreIdentityIssuerPem = builder.Configuration.GetRequiredValue("OneLogin:CoreIdentityIssuerPem");
-        coreIdentityIssuer.ImportSubjectPublicKeyInfo(Convert.FromBase64String(coreIdentityIssuerPem), out _);
-        options.CoreIdentityClaimIssuerSigningKey = new ECDsaSecurityKey(coreIdentityIssuer);
-        options.CoreIdentityClaimIssuer = "https://identity.integration.account.gov.uk/";
-
-        options.VectorOfTrust = @"[""Cl.Cm""]";
-
-        options.Claims.Add(OneLoginClaimTypes.CoreIdentity);
-
-        options.MetadataAddress = "https://oidc.integration.account.gov.uk/.well-known/openid-configuration";
-        options.ClientAssertionJwtAudience = "https://oidc.integration.account.gov.uk/token";
-
-        options.ClientId = builder.Configuration.GetRequiredValue("OneLogin:ClientId");
-        options.CallbackPath = "/_onelogin/aytq/callback";
-        options.SignedOutCallbackPath = "/_onelogin/aytq/logout-callback";
-    });
+    builder.Services
+        .Decorate<IAuthenticationSchemeProvider, OneLoginAuthenticationSchemeProvider>()
+        .AddSingleton<OneLoginAuthenticationSchemeProvider>(sp => (OneLoginAuthenticationSchemeProvider)sp.GetRequiredService<IAuthenticationSchemeProvider>())
+        .AddSingleton<IConfigureOptions<OneLoginOptions>>(sp => sp.GetRequiredService<OneLoginAuthenticationSchemeProvider>())
+        .AddSingleton<IHostedService>(sp => sp.GetRequiredService<OneLoginAuthenticationSchemeProvider>());
 }
 
 builder.Services

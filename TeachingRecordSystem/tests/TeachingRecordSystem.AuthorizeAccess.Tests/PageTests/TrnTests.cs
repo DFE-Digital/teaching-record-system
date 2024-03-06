@@ -6,7 +6,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NotAuthenticatedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/trn?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -22,7 +22,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NotVerifiedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: false);
@@ -42,7 +42,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri, oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn());
@@ -73,7 +73,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequest_RendersExpectedContent(bool haveExistingValueInState)
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
@@ -106,7 +106,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_NotAuthenticatedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         await journeyInstance.UpdateStateAsync(state => state.NationalInsuranceNumberSpecified = true);
@@ -132,7 +132,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_NotVerifiedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var trn = await TestData.GenerateTrn();
@@ -160,7 +160,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri, oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -196,7 +196,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_EmptyTrn_RendersError()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -233,7 +233,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_InvalidTrn_RendersError()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -270,7 +270,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ValidTrnButLookupFailed_UpdatesStateAndRedirectsToNotFoundPage()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -315,7 +315,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri, oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());

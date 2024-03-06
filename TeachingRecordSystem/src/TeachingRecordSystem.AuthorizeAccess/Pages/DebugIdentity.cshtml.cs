@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
+using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.FormFlow;
@@ -11,6 +13,7 @@ using TeachingRecordSystem.FormFlow;
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]
+[Authorize(AuthenticationSchemes = AuthenticationSchemes.FormFlowJourney)]
 public class DebugIdentityModel(
     TrsDbContext dbContext,
     SignInJourneyHelper helper,
@@ -109,7 +112,7 @@ public class DebugIdentityModel(
             state.VerifiedDatesOfBirth = verifiedDatesOfBirth;
         });
 
-        if ((DetachPerson || !IdentityVerified) && _oneLoginUser?.PersonId is not null)
+        if (DetachPerson && _oneLoginUser?.PersonId is not null)
         {
             _oneLoginUser.PersonId = null;
             await dbContext.SaveChangesAsync();

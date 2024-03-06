@@ -6,7 +6,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Get_NotAuthenticatedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -22,7 +22,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Get_NotVerifiedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: false);
@@ -42,7 +42,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri, oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn());
@@ -73,7 +73,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Get_ValidRequest_RendersExpectedContent(bool haveExistingValueInState)
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
@@ -103,7 +103,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Post_NotAuthenticatedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
@@ -127,7 +127,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Post_NotVerifiedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
@@ -155,7 +155,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri, oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -191,7 +191,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Post_EmptyNationalInsuranceNumber_RendersError()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -226,7 +226,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Post_InvalidNationalInsuranceNumber_RendersError()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -261,7 +261,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Post_ValidNationalInsuranceNumberButLookupFailed_UpdatesStateAndRedirectsToTrnPage()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri: "/", oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -304,7 +304,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri, oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -352,7 +352,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, authenticationProperties: null);
+        var state = new SignInJourneyState(redirectUri, oneLoginAuthenticationScheme: "dummy", authenticationProperties: null);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
