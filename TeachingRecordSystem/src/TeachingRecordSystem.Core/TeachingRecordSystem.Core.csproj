@@ -45,6 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AngleSharp" />
     <PackageReference Include="Azure.Storage.Blobs" />
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="dbup-sqlserver" />
