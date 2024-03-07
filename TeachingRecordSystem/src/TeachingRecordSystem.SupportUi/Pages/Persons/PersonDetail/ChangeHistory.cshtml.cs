@@ -34,7 +34,7 @@ public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, IDbConte
         var notesResult = await crmQueryDispatcher.ExecuteQuery(new GetNotesByContactIdQuery(PersonId));
 
         using var dbContext = await dbContextFactory.CreateDbContextAsync();
-        var personIdString = PersonId.ToString();
+
         var eventsWithUser = await dbContext.Database
             .SqlQuery<EventWithUser>($"""
                 SELECT
@@ -53,7 +53,7 @@ public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, IDbConte
                                     null
                             END = u.user_id
                 WHERE
-                    e.payload ->> 'PersonId' = {personIdString}
+                    e.person_id = {PersonId}
                     AND e.event_name in
                         ('MandatoryQualificationDeletedEvent',
                         'MandatoryQualificationDqtDeactivatedEvent',
