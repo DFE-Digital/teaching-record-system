@@ -161,8 +161,9 @@ public class GetAnIdentityEndpointsTests : TestBase
     {
         // Arrange
         var now = DateTime.UtcNow;
-        var masterContactId = Guid.NewGuid();
-        var mergedContactId = Guid.NewGuid();
+        var masterUserId = Guid.NewGuid();
+        var mergedUserId = Guid.NewGuid();
+
         var content = new
         {
             NotificationId = Guid.NewGuid(),
@@ -170,14 +171,8 @@ public class GetAnIdentityEndpointsTests : TestBase
             MessageType = UserMergedMessage.MessageTypeName,
             Message = new
             {
-                MasterUser = new
-                {
-                    UserId = masterContactId,
-                    EmailAddress = Faker.Internet.Email(),
-                    Trn = "7654321",
-                    MobileNumber = "07968987654"
-                },
-                MergedUserId = mergedContactId,
+                MasterUserId = masterUserId,
+                MergedUserId = mergedUserId,
                 Changes = new { }
             }
         };
@@ -197,7 +192,7 @@ public class GetAnIdentityEndpointsTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode);
-        DataverseAdapterMock.Verify(mock => mock.ClearTeacherIdentityInfo(mergedContactId, now));
+        DataverseAdapterMock.Verify(mock => mock.ClearTeacherIdentityInfo(mergedUserId, now));
     }
 
     [Fact]

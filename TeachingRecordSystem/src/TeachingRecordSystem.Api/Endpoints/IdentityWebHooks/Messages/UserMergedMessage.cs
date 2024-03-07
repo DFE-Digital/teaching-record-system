@@ -5,5 +5,5 @@ public class UserMergedMessage : INotificationMessage
     public const string MessageTypeName = "UserMerged";
 
     public required Guid MergedUserId { get; init; }
-    public required User MasterUser { get; init; }
+    public required Guid MasterUserId { get; init; }
 }
