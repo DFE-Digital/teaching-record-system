@@ -1,11 +1,11 @@
 using System.Net;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.V3.VNext.ApiModels;
-using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.V20240307.ApiModels;
+using TeachingRecordSystem.Api.V3.V20240307.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240307;
 
 [Collection(nameof(DisableParallelization))]
 public class CreateTrnRequestTests : TestBase
