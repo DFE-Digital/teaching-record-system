@@ -55,7 +55,7 @@
     <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Identity.Web" Version="2.17.0" />
     <PackageVersion Include="Microsoft.Identity.Web.GraphServiceClientBeta" Version="2.16.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageVersion Include="Microsoft.Playwright" Version="1.41.2" />
     <PackageVersion Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.1.16" />
     <PackageVersion Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" Version="1.1.16" />
