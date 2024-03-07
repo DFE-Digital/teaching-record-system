@@ -1135,7 +1135,8 @@ public class TrsDataSyncHelper(
             "created",
             "inserted",
             "payload",
-            "key"
+            "key",
+            "person_id"
         };
 
         var columnList = string.Join(", ", columnNames);
@@ -1147,7 +1148,8 @@ public class TrsDataSyncHelper(
                 created TIMESTAMP WITH TIME ZONE NOT NULL,
                 inserted TIMESTAMP WITH TIME ZONE NOT NULL,
                 payload JSONB NOT NULL,
-                key VARCHAR(200)
+                key VARCHAR(200),
+                person_id UUID
             )
             """;
 
@@ -1181,6 +1183,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(clock.UtcNow, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(payload, NpgsqlDbType.Jsonb);
             writer.WriteValueOrNull(key, NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull((e as IEventWithPersonId)?.PersonId, NpgsqlDbType.Uuid);
         }
 
         await writer.CompleteAsync(cancellationToken);
