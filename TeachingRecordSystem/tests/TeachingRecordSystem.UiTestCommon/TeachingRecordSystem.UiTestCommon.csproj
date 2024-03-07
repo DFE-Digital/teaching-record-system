@@ -5,10 +5,6 @@
     <IsTestProject>false</IsTestProject>
     <UserSecretsId>TeachingRecordSystemTests</UserSecretsId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AngleSharp" />
-  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeachingRecordSystem.FormFlow\TeachingRecordSystem.FormFlow.csproj" />
