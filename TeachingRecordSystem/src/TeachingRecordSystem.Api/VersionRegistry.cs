@@ -10,6 +10,7 @@ public static class VersionRegistry
     public static IReadOnlyCollection<string> AllV3MinorVersions { get; } =
     [
         V3MinorVersions.V20240101,
+        V3MinorVersions.V20240307,
         V3MinorVersions.VNext,
     ];
 
@@ -46,6 +47,7 @@ public static class VersionRegistry
     public static class V3MinorVersions
     {
         public const string V20240101 = "20240101";
+        public const string V20240307 = "20240307";
         public const string VNext = VNextVersion;
     }
 }
