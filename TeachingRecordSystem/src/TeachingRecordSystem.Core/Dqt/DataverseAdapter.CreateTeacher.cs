@@ -50,7 +50,7 @@ public partial class DataverseAdapter
         helper.FlagBadData(txnRequest);
 
         var findExistingTeacherResult = await (findExistingTeacher ?? helper.FindExistingTeacher)();
-        var allocateTrn = findExistingTeacherResult == null;
+        var allocateTrn = findExistingTeacherResult.Length > 0;
         string trn = null;
 
         if (allocateTrn)
@@ -366,7 +366,7 @@ public partial class DataverseAdapter
             else
             {
                 // Not enough data in the input to match on
-                return null;
+                return Array.Empty<CreateTeacherDuplicateTeacherResult>();
             }
 
             var query = new QueryExpression(Contact.EntityLogicalName)
