@@ -22,6 +22,7 @@
     <None Remove="Services\DqtReporting\Migrations\0015_dfeta_qualification_dfeta_mq_status.sql" />
     <None Remove="Services\DqtReporting\Migrations\0016_dfeta_qualification_dfeta_trsdeletedevent.sql" />
     <None Remove="Services\DqtReporting\Migrations\0017_dfeta_qualification_dfeta_trsevent.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0018_ContactQTLSDate.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,6 +43,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0015_dfeta_qualification_dfeta_mq_status.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0016_dfeta_qualification_dfeta_trsdeletedevent.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0017_dfeta_qualification_dfeta_trsevent.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0018_ContactQTLSDate.sql" />
   </ItemGroup>
 
   <ItemGroup>
