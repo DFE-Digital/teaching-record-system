@@ -50,7 +50,7 @@ public partial class DataverseAdapter
         helper.FlagBadData(txnRequest);
 
         var findExistingTeacherResult = await (findExistingTeacher ?? helper.FindExistingTeacher)();
-        var allocateTrn = findExistingTeacherResult.Length > 0;
+        var allocateTrn = findExistingTeacherResult.Length == 0;
         string trn = null;
 
         if (allocateTrn)
