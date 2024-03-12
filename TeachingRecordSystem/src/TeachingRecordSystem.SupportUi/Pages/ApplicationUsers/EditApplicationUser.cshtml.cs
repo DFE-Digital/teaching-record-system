@@ -4,14 +4,17 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.ApplicationUsers;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
+[BindProperties]
 public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     // From PathString
@@ -23,47 +26,59 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
     [FromRoute]
     public Guid UserId { get; set; }
 
-    [BindProperty]
     [Display(Name = "Name")]
     [Required(ErrorMessage = "Enter a name")]
     [MaxLength(UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
-    [BindProperty]
     [Display(Name = "API roles")]
     public string[]? ApiRoles { get; set; }
 
+    [BindNever]
     [Display(Name = "API keys")]
     public ApiKeyInfo[]? ApiKeys { get; set; }
 
-    [BindProperty]
     [Display(Name = "OIDC client")]
     public bool IsOidcClient { get; set; }
 
-    [BindProperty]
+    [Display(Name = "Client ID")]
+    [Required(ErrorMessage = "Enter a client ID")]
+    [MaxLength(ApplicationUser.ClientIdMaxLength, ErrorMessage = "Client ID must be 50 characters or less")]
+    public string? ClientId { get; set; }
+
+    [Display(Name = "Client secret")]
+    [Required(ErrorMessage = "Enter a client secret")]
+    [MinLength(ApplicationUser.ClientSecretMinLength, ErrorMessage = "Client secret must be at least 16 characters")]
+    [MaxLength(ApplicationUser.ClientSecretMaxLength, ErrorMessage = "Client secret must be 200 characters or less")]
+    public string? ClientSecret { get; set; }
+
+    [Display(Name = "Redirect URIs", Description = "Enter one per line")]
+    [ModelBinder(BinderType = typeof(MultiLineStringModelBinder))]
+    public string[]? RedirectUris { get; set; }
+
+    [Display(Name = "Post logout redirect URIs", Description = "Enter one per line")]
+    [ModelBinder(BinderType = typeof(MultiLineStringModelBinder))]
+    public string[]? PostLogoutRedirectUris { get; set; }
+
     [Display(Name = "Authentication scheme name")]
     [Required(ErrorMessage = "Enter an authentication scheme name")]
     [MaxLength(ApplicationUser.AuthenticationSchemeNameMaxLength, ErrorMessage = "Authentication scheme name must be 50 characters or less")]
     public string? OneLoginAuthenticationSchemeName { get; set; }
 
-    [BindProperty]
     [Display(Name = "One Login client ID")]
     [Required(ErrorMessage = "Enter the One Login client ID")]
     [MaxLength(ApplicationUser.OneLoginClientIdMaxLength, ErrorMessage = "One Login client ID must be 50 characters or less")]
     public string? OneLoginClientId { get; set; }
 
-    [BindProperty]
     [Display(Name = "One Login private key", Description = "Enter a key in the PEM format")]
     [Required(ErrorMessage = "Enter the One Login private key")]
     public string? OneLoginPrivateKeyPem { get; set; }
 
-    [BindProperty]
     [Display(Name = "One Login redirect URI path")]
     [Required(ErrorMessage = "Enter the One Login redirect URI")]
     [MaxLength(ApplicationUser.RedirectUriPathMaxLength, ErrorMessage = "One Login redirect URI must be 100 characters or less")]
     public string? OneLoginRedirectUriPath { get; set; }
 
-    [BindProperty]
     [Display(Name = "One Login post logout redirect URI path")]
     [Required(ErrorMessage = "Enter the One Login post logout redirect URI")]
     [MaxLength(ApplicationUser.RedirectUriPathMaxLength, ErrorMessage = "One Login post logout redirect URI must be 100 characters or less")]
@@ -74,6 +89,10 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
         Name = _user!.Name;
         ApiRoles = _user.ApiRoles;
         IsOidcClient = _user.IsOidcClient;
+        ClientId = _user.ClientId;
+        ClientSecret = _user.ClientSecret;
+        RedirectUris = _user.RedirectUris?.ToArray() ?? [];
+        PostLogoutRedirectUris = _user.PostLogoutRedirectUris?.ToArray() ?? [];
         OneLoginAuthenticationSchemeName = _user.OneLoginAuthenticationSchemeName;
         OneLoginClientId = _user.OneLoginClientId;
         OneLoginPrivateKeyPem = _user.OneLoginPrivateKeyPem;
@@ -88,6 +107,26 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
 
         if (IsOidcClient)
         {
+            foreach (var redirectUri in RedirectUris!)
+            {
+                if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out var uri) ||
+                    (uri.Scheme != "http" && uri.Scheme != "https"))
+                {
+                    ModelState.AddModelError(nameof(RedirectUris), "One or more redirect URIs are not valid");
+                    break;
+                }
+            }
+
+            foreach (var redirectUri in PostLogoutRedirectUris!)
+            {
+                if (!Uri.TryCreate(redirectUri, UriKind.Absolute, out var uri) ||
+                    (uri.Scheme != "http" && uri.Scheme != "https"))
+                {
+                    ModelState.AddModelError(nameof(PostLogoutRedirectUris), "One or more post logout redirect URIs are not valid");
+                    break;
+                }
+            }
+
             if (ModelState[nameof(OneLoginPrivateKeyPem)]!.Errors.Count == 0)
             {
                 try
@@ -114,10 +153,11 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
         }
         else
         {
-            // Clear any errors for any One Login-related fields (since we're not persisting them any way)
+            // Clear any errors for any OIDC-related fields (since we're not saving them if IsOidcClient is false)
             foreach (var key in ModelState.Keys)
             {
-                if (key.StartsWith("OneLogin"))
+                if (key.StartsWith("OneLogin") ||
+                    key is nameof(ClientId) or nameof(ClientSecret) or nameof(RedirectUris) or nameof(PostLogoutRedirectUris))
                 {
                     ModelState.Remove(key);
                 }
@@ -141,6 +181,10 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             var oldChanges = changes;
 
             changes |=
+                (ClientId != _user.ClientId ? ApplicationUserUpdatedEventChanges.ClientId : 0) |
+                (ClientSecret != _user.ClientSecret ? ApplicationUserUpdatedEventChanges.ClientSecret : 0) |
+                (!RedirectUris!.SequenceEqualIgnoringOrder(_user.RedirectUris ?? []) ? ApplicationUserUpdatedEventChanges.RedirectUris : 0) |
+                (!PostLogoutRedirectUris!.SequenceEqualIgnoringOrder(_user.PostLogoutRedirectUris ?? []) ? ApplicationUserUpdatedEventChanges.PostLogoutRedirectUris : 0) |
                 (OneLoginClientId != _user.OneLoginClientId ? ApplicationUserUpdatedEventChanges.OneLoginClientId : 0) |
                 (OneLoginPrivateKeyPem != _user.OneLoginPrivateKeyPem ? ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem : 0) |
                 (OneLoginAuthenticationSchemeName != _user.OneLoginAuthenticationSchemeName ? ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName : 0) |
@@ -164,6 +208,10 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             if (IsOidcClient)
             {
                 _user.IsOidcClient = IsOidcClient;
+                _user.ClientId = ClientId;
+                _user.ClientSecret = ClientSecret;
+                _user.RedirectUris = [.. RedirectUris!];
+                _user.PostLogoutRedirectUris = [.. PostLogoutRedirectUris!];
                 _user.OneLoginAuthenticationSchemeName = OneLoginAuthenticationSchemeName;
                 _user.OneLoginClientId = OneLoginClientId;
                 _user.OneLoginPrivateKeyPem = OneLoginPrivateKeyPem;
