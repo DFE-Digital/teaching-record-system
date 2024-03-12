@@ -12,9 +12,15 @@ public class HangfireBackgroundJobScheduler : IBackgroundJobScheduler
         _jobClient = jobClient;
     }
 
-    public Task Enqueue<T>(Expression<Func<T, Task>> expression) where T : notnull
+    public Task<string> Enqueue<T>(Expression<Func<T, Task>> expression) where T : notnull
     {
-        _jobClient.Enqueue(expression);
-        return Task.CompletedTask;
+        var jobId = _jobClient.Enqueue(expression);
+        return Task.FromResult(jobId);
+    }
+
+    public Task<string> ContinueJobWith<T>(string parentId, Expression<Func<T, Task>> expression) where T : notnull
+    {
+        var jobId = _jobClient.ContinueJobWith(parentId, expression);
+        return Task.FromResult(jobId);
     }
 }

@@ -1,22 +1,39 @@
+using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Establishments;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using Establishment = TeachingRecordSystem.Core.Models.Establishment;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-public class RefreshEstablishmentsJobTests : IAsyncLifetime
+public class RefreshEstablishmentsJobTests
 {
-    public RefreshEstablishmentsJobTests(DbFixture dbFixture)
+    public RefreshEstablishmentsJobTests(
+        DbFixture dbFixture,
+        IOrganizationServiceAsync2 organizationService,
+        ReferenceDataCache referenceDataCache,
+        FakeTrnGenerator trnGenerator)
     {
         DbFixture = dbFixture;
+        Clock = new();
+
+        var dbContextFactory = dbFixture.GetDbContextFactory();
+
+        Helper = new TrsDataSyncHelper(
+            dbContextFactory,
+            organizationService,
+            referenceDataCache,
+            Clock);
+
+        TestData = new TestData(
+            dbContextFactory,
+            organizationService,
+            referenceDataCache,
+            Clock,
+            trnGenerator,
+            TestDataSyncConfiguration.Sync(Helper));
     }
-
-    public DbFixture DbFixture { get; }
-
-    public Task DisposeAsync() => Task.CompletedTask;
-
-    public Task InitializeAsync() =>
-        DbFixture.WithDbContext(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from establishments"));
 
     [Fact]
     public Task ExecuteAsync_WhenCalledforNewUrn_AddsNewEstablishments() =>
@@ -26,7 +43,7 @@ public class RefreshEstablishmentsJobTests : IAsyncLifetime
             var establishmentMasterDataService = Mock.Of<IEstablishmentMasterDataService>();
             var establishment1 = new Establishment
             {
-                Urn = 123456,
+                Urn = TestData.GenerateEstablishmentUrn(),
                 LaCode = "123",
                 LaName = "Test LA",
                 EstablishmentNumber = "1234",
@@ -46,7 +63,7 @@ public class RefreshEstablishmentsJobTests : IAsyncLifetime
             };
             var establishment2 = new Establishment
             {
-                Urn = 123457,
+                Urn = TestData.GenerateEstablishmentUrn(),
                 LaCode = "123",
                 LaName = "Test LA",
                 EstablishmentNumber = "1235",
@@ -78,7 +95,7 @@ public class RefreshEstablishmentsJobTests : IAsyncLifetime
             await job.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            var establishmentsActual = await dbContext.Establishments.OrderBy(e => e.Urn).ToListAsync();
+            var establishmentsActual = await dbContext.Establishments.Where(e => e.Urn == establishment1.Urn || e.Urn == establishment2.Urn).OrderBy(e => e.Urn).ToListAsync();
             Assert.Collection(establishmentsActual,
                 e =>
                 {
@@ -129,10 +146,11 @@ public class RefreshEstablishmentsJobTests : IAsyncLifetime
             // Arrange
             var establishmentMasterDataService = Mock.Of<IEstablishmentMasterDataService>();
 
+            var urn = TestData.GenerateEstablishmentUrn();
             var dbEstablishment = new Core.DataStore.Postgres.Models.Establishment()
             {
                 EstablishmentId = Guid.NewGuid(),
-                Urn = 123456,
+                Urn = urn,
                 LaCode = "123",
                 LaName = "Test LA",
                 EstablishmentNumber = "1234",
@@ -154,7 +172,7 @@ public class RefreshEstablishmentsJobTests : IAsyncLifetime
 
             var updatedEstablishment = new Establishment
             {
-                Urn = 123456,
+                Urn = urn,
                 LaCode = "124",
                 LaName = "Test2 LA",
                 EstablishmentNumber = "1235",
@@ -186,7 +204,9 @@ public class RefreshEstablishmentsJobTests : IAsyncLifetime
             await job.ExecuteAsync(CancellationToken.None);
 
             // Assert
-            var establishmentActual = await dbContext.Establishments.SingleAsync();
+            var urnEstablishments = await dbContext.Establishments.Where(e => e.Urn == dbEstablishment.Urn).ToListAsync();
+            Assert.Single(urnEstablishments);
+            var establishmentActual = urnEstablishments.Single();
             Assert.Equal(updatedEstablishment.Urn, establishmentActual.Urn);
             Assert.Equal(updatedEstablishment.LaCode, establishmentActual.LaCode);
             Assert.Equal(updatedEstablishment.LaName, establishmentActual.LaName);
@@ -205,4 +225,12 @@ public class RefreshEstablishmentsJobTests : IAsyncLifetime
             Assert.Equal(updatedEstablishment.County, establishmentActual.County);
             Assert.Equal(updatedEstablishment.Postcode, establishmentActual.Postcode);
         });
+
+    private DbFixture DbFixture { get; }
+
+    private TestData TestData { get; }
+
+    private TestableClock Clock { get; }
+
+    public TrsDataSyncHelper Helper { get; }
 }

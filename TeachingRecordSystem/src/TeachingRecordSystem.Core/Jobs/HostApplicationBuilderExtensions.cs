@@ -108,6 +108,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     giasOptions!.Value.RefreshEstablishmentsJobSchedule);
 
+                recurringJobManager.AddOrUpdate<ImportTpsCsvExtractFileJob>(
+                    nameof(ImportTpsCsvExtractFileJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }

@@ -13,6 +13,7 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
+using TeachingRecordSystem.Core.Services.WorkforceData;
 using TeachingRecordSystem.Hosting;
 using TeachingRecordSystem.Worker.Infrastructure.Logging;
 
@@ -56,6 +57,7 @@ builder.Services.AddHangfireServer();
 
 builder.Services
     .AddTrsBaseServices()
+    .AddWorkforceData()
     .AddMemoryCache();
 
 // Filter telemetry emitted by DqtReportingService;

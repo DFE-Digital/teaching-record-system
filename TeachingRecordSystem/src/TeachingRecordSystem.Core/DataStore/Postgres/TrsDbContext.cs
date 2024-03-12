@@ -62,6 +62,14 @@ public class TrsDbContext : DbContext
 
     public DbSet<Establishment> Establishments => Set<Establishment>();
 
+    public DbSet<TpsCsvExtract> TpsCsvExtracts => Set<TpsCsvExtract>();
+
+    public DbSet<TpsCsvExtractLoadItem> TpsCsvExtractLoadItems => Set<TpsCsvExtractLoadItem>();
+
+    public DbSet<TpsCsvExtractItem> TpsCsvExtractItems => Set<TpsCsvExtractItem>();
+
+    public DbSet<PersonEmployment> PersonEmployments => Set<PersonEmployment>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);
