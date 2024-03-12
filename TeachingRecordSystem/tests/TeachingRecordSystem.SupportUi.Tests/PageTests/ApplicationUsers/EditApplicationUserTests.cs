@@ -128,7 +128,6 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
-        var originalName = applicationUser.Name;
         var newName = "";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
@@ -151,7 +150,6 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
-        var originalName = applicationUser.Name;
         var newName = new string('x', UserBase.NameMaxLength + 1);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
@@ -170,8 +168,12 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     }
 
     [Theory]
-    [MemberData(nameof(InvalidOneLoginDetailsData))]
+    [MemberData(nameof(InvalidOidcDetailsData))]
     public async Task Post_WithOidcClientButInvalidDetails_RendersExpectedError(
+        string clientId,
+        string clientSecret,
+        string redirectUris,
+        string postLogoutRedirectUris,
         string oneLoginClientId,
         string oneLoginClientKeyPem,
         string oneLoginAuthenticationSchemeName,
@@ -190,6 +192,10 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 { "Name", applicationUser.Name },
                 { "ApiRoles", applicationUser.ApiRoles },
                 { "IsOidcClient", bool.TrueString },
+                { "ClientId", clientId },
+                { "ClientSecret", clientSecret },
+                { "RedirectUris", redirectUris },
+                { "PostLogoutRedirectUris", postLogoutRedirectUris },
                 { "OneLoginClientId", oneLoginClientId },
                 { "OneLoginClientKeyPem", oneLoginClientKeyPem },
                 { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
@@ -213,6 +219,10 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         var originalName = applicationUser.Name;
         var newName = TestData.GenerateChangedApplicationUserName(originalName);
         var newRoles = new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson };
+        var clientId = "client-id";
+        var clientSecret = "Secret0123456789";
+        var redirectUris = "http://localhost/callback";
+        var postLogoutRedirectUris = "http://localhost/logout-callback";
         var oneLoginClientId = Guid.NewGuid().ToString();
         var oneLoginPrivateKeyPem = TestData.GeneratePrivateKeyPem();
         var oneLoginAuthenticationSchemeName = Guid.NewGuid().ToString();
@@ -226,6 +236,10 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 { "Name", newName },
                 { "ApiRoles", newRoles },
                 { "IsOidcClient", bool.TrueString },
+                { "ClientId", clientId },
+                { "ClientSecret", clientSecret },
+                { "RedirectUris", redirectUris },
+                { "PostLogoutRedirectUris", postLogoutRedirectUris },
                 { "OneLoginClientId", oneLoginClientId },
                 { "OneLoginPrivateKeyPem", oneLoginPrivateKeyPem },
                 { "OneLoginAuthenticationSchemeName", oneLoginAuthenticationSchemeName },
@@ -260,12 +274,20 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 Assert.True(applicationUserUpdatedEvent.ApplicationUser.ApiRoles.SequenceEqual(newRoles));
                 Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.ApiRoles);
                 Assert.False(applicationUserUpdatedEvent.OldApplicationUser.IsOidcClient);
+                Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.ClientId);
+                Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.ClientSecret);
+                Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.RedirectUris ?? []);
+                Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.PostLogoutRedirectUris ?? []);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginClientId);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginPrivateKeyPem);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginAuthenticationSchemeName);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginRedirectUriPath);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.OneLoginPostLogoutRedirectUriPath);
                 Assert.True(applicationUserUpdatedEvent.ApplicationUser.IsOidcClient);
+                Assert.Equal(clientId, applicationUserUpdatedEvent.ApplicationUser.ClientId);
+                Assert.Equal(clientSecret, applicationUserUpdatedEvent.ApplicationUser.ClientSecret);
+                Assert.Collection(applicationUserUpdatedEvent.ApplicationUser.RedirectUris ?? [], uri => Assert.Equal(redirectUris, uri));
+                Assert.Collection(applicationUserUpdatedEvent.ApplicationUser.PostLogoutRedirectUris ?? [], uri => Assert.Equal(postLogoutRedirectUris, uri));
                 Assert.Equal(oneLoginClientId, applicationUserUpdatedEvent.ApplicationUser.OneLoginClientId);
                 Assert.Equal(oneLoginPrivateKeyPem, applicationUserUpdatedEvent.ApplicationUser.OneLoginPrivateKeyPem);
                 Assert.Equal(oneLoginAuthenticationSchemeName, applicationUserUpdatedEvent.ApplicationUser.OneLoginAuthenticationSchemeName);
@@ -275,6 +297,10 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                     ApplicationUserUpdatedEventChanges.ApiRoles |
                         ApplicationUserUpdatedEventChanges.Name |
                         ApplicationUserUpdatedEventChanges.IsOidcClient |
+                        ApplicationUserUpdatedEventChanges.ClientId |
+                        ApplicationUserUpdatedEventChanges.ClientSecret |
+                        ApplicationUserUpdatedEventChanges.RedirectUris |
+                        ApplicationUserUpdatedEventChanges.PostLogoutRedirectUris |
                         ApplicationUserUpdatedEventChanges.OneLoginClientId |
                         ApplicationUserUpdatedEventChanges.OneLoginPrivateKeyPem |
                         ApplicationUserUpdatedEventChanges.OneLoginAuthenticationSchemeName |
@@ -288,9 +314,13 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Application user updated");
     }
 
-    public static TheoryData<string, string, string, string, string, string, string> InvalidOneLoginDetailsData => new()
-    {
-        {
+    public static object[][] InvalidOidcDetailsData =>
+    [
+        [
+            "client_id",
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
             "client_id",
             _privateKeyPem,
             "",  // OneLoginAuthenticationSchemeName
@@ -298,8 +328,12 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginAuthenticationSchemeName",
             "Enter an authentication scheme name"
-        },
-        {
+        ],
+        [
+            "client_id",
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
             "client_id",
             _privateKeyPem,
             new string('x', 51),  // OneLoginAuthenticationSchemeName
@@ -307,8 +341,12 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginAuthenticationSchemeName",
             "Authentication scheme name must be 50 characters or less"
-        },
-        {
+        ],
+        [
+            "client_id",
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
             "client_id",
             "",  // OneLoginPrivateKeyPem
             Guid.NewGuid().ToString(),
@@ -316,9 +354,12 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginPrivateKeyPem",
             "Enter the One Login private key"
-        },
-
-        {
+        ],
+        [
+            "client_id",
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
             "",  // OneLoginClientId
             _privateKeyPem,
             Guid.NewGuid().ToString(),
@@ -326,8 +367,12 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginClientId",
             "Enter the One Login client ID"
-        },
-        {
+        ],
+        [
+            "client_id",
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
             "client_id",
             _privateKeyPem,
             Guid.NewGuid().ToString(),
@@ -335,8 +380,12 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginRedirectUriPath",
             "Enter the One Login redirect URI"
-        },
-        {
+        ],
+        [
+            "client_id",
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
             "client_id",
             _privateKeyPem,
             Guid.NewGuid().ToString(),
@@ -344,8 +393,12 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             "",  // OneLoginPostLogoutRedirectUriPath
             "OneLoginPostLogoutRedirectUriPath",
             "Enter the One Login post logout redirect URI"
-        },
-        {
+        ],
+        [
+            "client_id",
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
             "client_id",
             _privateKeyPem,
             Guid.NewGuid().ToString(),
@@ -353,8 +406,12 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
             "OneLoginRedirectUriPath",
             "One Login redirect URI must be 100 characters or less"
-        },
-        {
+        ],
+        [
+            "client_id",
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
             "client_id",
             _privateKeyPem,
             Guid.NewGuid().ToString(),
@@ -362,8 +419,99 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             new string('x', 101),  // OneLoginPostLogoutRedirectUriPath
             "OneLoginPostLogoutRedirectUriPath",
             "One Login post logout redirect URI must be 100 characters or less"
-        }
-    };
+        ],
+        [
+            "",
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "ClientId",
+            "Enter a client ID"
+        ],
+        [
+            new string('x', 51),
+            "Secret0123456789",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "ClientId",
+            "Client ID must be 50 characters or less"
+        ],
+        [
+            "client_id",
+            "",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "ClientSecret",
+            "Enter a client secret"
+        ],
+        [
+            "client_id",
+            new string('x', 201),
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "ClientSecret",
+            "Client secret must be 200 characters or less"
+        ],
+        [
+            "client_id",
+            "S",
+            "https://localhost/callback",
+            "https://localhost/logout-callback",
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "ClientSecret",
+            "Client secret must be at least 16 characters"
+        ],
+        [
+            "client_id",
+            "Secret0123456789",
+            "foo",
+            "https://localhost/logout-callback",
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "RedirectUris",
+            "One or more redirect URIs are not valid"
+        ],
+        [
+            "client_id",
+            "Secret0123456789",
+            "https://localhost/callback",
+            "foo",
+            "client_id",
+            _privateKeyPem,
+            Guid.NewGuid().ToString(),
+            $"/_onelogin/{Guid.NewGuid:N}/callback",
+            $"/_onelogin/{Guid.NewGuid:N}/logout-callback",
+            "PostLogoutRedirectUris",
+            "One or more post logout redirect URIs are not valid"
+        ],
+    ];
 
     private static readonly string _privateKeyPem = RSA.Create().ExportPkcs8PrivateKeyPem();
 }

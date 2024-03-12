@@ -65,4 +65,12 @@ public static class EnumerableExtensions
             _ => string.Join(", ", valuesArray[0..^2].Append(string.Join($" {finalValuesConjunction} ", valuesArray[^2..])))
         };
     }
+
+    public static bool SequenceEqualIgnoringOrder<T>(this IEnumerable<T> first, IEnumerable<T> second)
+        where T : IComparable
+    {
+        var firstArray = first.ToArray().OrderBy(s => s);
+        var secondArray = second.ToArray().OrderBy(s => s);
+        return firstArray.SequenceEqual(secondArray);
+    }
 }

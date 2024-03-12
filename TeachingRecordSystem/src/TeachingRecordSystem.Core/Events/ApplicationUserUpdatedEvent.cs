@@ -20,4 +20,8 @@ public enum ApplicationUserUpdatedEventChanges
     OneLoginAuthenticationSchemeName = 1 << 5,
     OneLoginRedirectUriPath = 1 << 6,
     OneLoginPostLogoutRedirectUriPath = 1 << 7,
+    ClientId = 1 << 8,
+    ClientSecret = 1 << 9,
+    RedirectUris = 1 << 10,
+    PostLogoutRedirectUris = 1 << 11,
 }

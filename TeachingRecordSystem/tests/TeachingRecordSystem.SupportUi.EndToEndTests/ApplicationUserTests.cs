@@ -41,6 +41,10 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         var applicationUser = await TestData.CreateApplicationUser();
         var applicationUserId = applicationUser.UserId;
         var newApplicationUserName = TestData.GenerateChangedApplicationUserName(applicationUser.Name);
+        var newClientId = Guid.NewGuid().ToString();
+        var newClientSecret = Guid.NewGuid().ToString();
+        var newRedirectUris = "https://localhost/callback";
+        var newPostLogoutRedirectUris = "https://localhost/logout-callback";
         var newAuthenticationSchemeName = Guid.NewGuid().ToString();
         var newOneLoginClientId = Guid.NewGuid().ToString();
         var newOneLoginPrivateKeyPem = TestCommon.TestData.GeneratePrivateKeyPem();
@@ -62,6 +66,10 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         await page.SetCheckedAsync($"label:text-is('{ApiRoles.GetPerson}')", true);
         await page.SetCheckedAsync($"label:text-is('{ApiRoles.UpdatePerson}')", true);
         await page.SetCheckedAsync($"label:text-is('OIDC client')", true);
+        await page.FillAsync("text=Client ID", newClientId);
+        await page.FillAsync("text=Client secret", newClientSecret);
+        await page.FillAsync("text=Redirect URIs", newRedirectUris);
+        await page.FillAsync("text=Post logout redirect URIs", newPostLogoutRedirectUris);
         await page.FillAsync("text=Authentication scheme name", newAuthenticationSchemeName);
         await page.FillAsync("text=One Login client ID", newOneLoginClientId);
         await page.FillAsync("text=One Login private key", newOneLoginPrivateKeyPem);
