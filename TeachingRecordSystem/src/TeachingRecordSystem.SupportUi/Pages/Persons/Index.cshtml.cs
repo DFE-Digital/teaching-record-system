@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -69,6 +70,7 @@ public partial class IndexModel : PageModel
     private async Task<IActionResult> PerformSearch()
     {
         Contact[]? contacts = null;
+
         var columnSet = new ColumnSet(
             Contact.Fields.dfeta_TRN,
             Contact.Fields.BirthDate,
@@ -89,15 +91,13 @@ public partial class IndexModel : PageModel
         else if (TrnRegex().IsMatch(Search!))
         {
             var contact = await _crmQueryDispatcher.ExecuteQuery(new GetContactByTrnQuery(Search!, columnSet));
-            if (contact != null)
-            {
-                contacts = new[] { contact };
-            }
+            contacts = contact is not null ? [contact] : [];
         }
         else
         {
             contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByNameQuery(Search!, SortBy, MaxSearchResultCount, columnSet));
         }
+        Debug.Assert(contacts is not null);
 
         TotalKnownPages = Math.Max((int)Math.Ceiling((decimal)contacts!.Length / PageSize), 1);
 
