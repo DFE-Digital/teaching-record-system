@@ -135,6 +135,42 @@ public class TpsCsvExtractProcessorTests
     }
 
     [Fact]
+    public async Task ProcessNewEmploymentHistory_WithValidData_OnlyMatchesToLaCodeAndPostCodeForHigherEducationIfNoMatchOnLaCodeAndEstablishment()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var tpsCsvExtractId = Guid.NewGuid();
+        var laCode1 = "322";
+        var establishmentNumber1 = "4322";
+        var postcode1 = Faker.Address.UkPostCode();
+        var laCode2 = "323";
+        var establishmentNumber2 = "4323";
+        var postcode2 = Faker.Address.UkPostCode();
+        var nonHigherEducationEstablishment1 = await TestData.CreateEstablishment(laCode1, establishmentNumber: establishmentNumber1, postcode: postcode1);
+        var higherEductionEstablishment1 = await TestData.CreateEstablishment(laCode1, establishmentNumber: establishmentNumber1, postcode: postcode1, isHigherEducationInstitution: true);
+        var higherEductionEstablishment2 = await TestData.CreateEstablishment(laCode2, postcode: postcode2, isHigherEducationInstitution: true);
+        await TestData.CreateTpsCsvExtract(
+            b => b.WithTpsCsvExtractId(tpsCsvExtractId)
+                .WithItem(person!.Trn!, laCode1, establishmentNumber1, postcode1, new DateOnly(2023, 02, 03))
+                .WithItem(person!.Trn!, laCode2, establishmentNumber2, postcode2, new DateOnly(2023, 02, 03)));
+
+        // Act
+        var processor = new TpsCsvExtractProcessor(
+            TestData.DbContextFactory,
+            TestData.Clock);
+        await processor.ProcessNewEmploymentHistory(tpsCsvExtractId, CancellationToken.None);
+
+        // Assert
+        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
+        Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataAdded, i.Result));
+        var employmentHistory = await dbContext.PersonEmployments.Where(e => e.PersonId == person.PersonId).ToListAsync();
+        Assert.Equal(2, employmentHistory.Count);
+        Assert.Contains(nonHigherEducationEstablishment1.EstablishmentId, employmentHistory.Select(pe => pe.EstablishmentId));
+        Assert.Contains(higherEductionEstablishment2.EstablishmentId, employmentHistory.Select(pe => pe.EstablishmentId));
+    }
+
+    [Fact]
     public async Task ProcessUpdatedEmploymentHistory_WhenCalledWithUpdatedEmploymentHistory_UpdatesPersonEmploymentRecord()
     {
         // Arrange
