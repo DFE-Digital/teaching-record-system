@@ -57,6 +57,7 @@ builder.Services.AddHangfireServer();
 
 builder.Services
     .AddTrsBaseServices()
+    .AddAccessYourTeachingQualificationsOptions(builder.Configuration, builder.Environment)
     .AddWorkforceData()
     .AddMemoryCache();
 
