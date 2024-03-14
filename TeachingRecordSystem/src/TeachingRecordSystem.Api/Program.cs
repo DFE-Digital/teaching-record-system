@@ -138,6 +138,12 @@ public class Program
               policy => policy
                   .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
                   .RequireRole([ApiRoles.CreateTrn]));
+
+            options.AddPolicy(
+              AuthorizationPolicies.AssignQtls,
+              policy => policy
+                  .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                  .RequireRole([ApiRoles.AssignQtls]));
         });
 
         services
