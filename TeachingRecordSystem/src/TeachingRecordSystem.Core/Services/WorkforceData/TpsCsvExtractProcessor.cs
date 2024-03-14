@@ -30,22 +30,64 @@ public class TpsCsvExtractProcessor(
 
     public async Task ProcessNonMatchingEstablishments(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
-        int i = 0;
         using var dbContext = dbContextFactory.CreateDbContext();
-        foreach (var item in await dbContext.TpsCsvExtractItems.Where(x => x.TpsCsvExtractId == tpsCsvExtractId && dbContext.Persons.Any(p => p.Trn == x.Trn) && !dbContext.Establishments.Any(e => e.LaCode == x.LocalAuthorityCode && e.EstablishmentNumber == x.EstablishmentNumber)).ToListAsync())
-        {
-            item.Result = TpsCsvExtractItemResult.InvalidEstablishment;
-            i++;
-            if (i % 1000 == 0)
-            {
-                await dbContext.SaveChangesAsync(cancellationToken);
-            }
-        }
+        dbContext.Database.SetCommandTimeout(300);
 
-        if (dbContext.ChangeTracker.HasChanges())
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
+        FormattableString updateSql =
+            $"""
+            WITH unique_establishments AS (
+                SELECT
+                    establishment_id,
+                    la_code,
+                    establishment_number,
+                    establishment_name,
+                    establishment_type_code,
+                    postcode
+                FROM
+                    (SELECT
+                        establishment_id,
+                        la_code,
+                        establishment_number,
+                        establishment_name,
+                        establishment_type_code,
+                        postcode,
+                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number ORDER BY translate(establishment_status_code::text, '1234', '1324')) as row_number
+                    FROM
+                        establishments) e
+                    WHERE
+                        e.row_number = 1
+            )
+            UPDATE
+                tps_csv_extract_items x
+            SET
+                result = {TpsCsvExtractItemResult.InvalidEstablishment}
+            WHERE
+                x.tps_csv_extract_id = {tpsCsvExtractId}
+                AND EXISTS (SELECT
+                                1
+                            FROM
+                                persons p
+                            WHERE
+                                p.trn = x.trn)
+                AND NOT EXISTS (SELECT
+                                    1
+                                FROM
+                                    unique_establishments e
+                                WHERE
+                                    x.local_authority_code = e.la_code
+                                    AND (e.establishment_number = x.establishment_number
+                                         OR (e.establishment_type_code = '29' 
+                                             AND x.establishment_postcode = e.postcode
+                                             AND NOT EXISTS (SELECT
+                                                                1
+                                                             FROM
+                                                                unique_establishments e2
+                                                             WHERE
+                                                                e2.la_code = x.local_authority_code
+                                                                AND e2.establishment_number = x.establishment_number))))
+            """;
+
+        await dbContext.Database.ExecuteSqlAsync(updateSql, cancellationToken);
     }
 
     public async Task ProcessNewEmploymentHistory(Guid tpsCsvExtractId, CancellationToken cancellationToken)
@@ -91,16 +133,24 @@ public class TpsCsvExtractProcessor(
                     persons p ON x.trn = p.trn
                 JOIN
                     unique_establishments e ON x.local_authority_code = e.la_code
-                        AND (x.establishment_number = e.establishment_number OR
-                            (e.establishment_type_code = '29' AND x.establishment_postcode = e.postcode))
+                        AND (e.establishment_number = x.establishment_number
+                             OR (e.establishment_type_code = '29' 
+                                 AND x.establishment_postcode = e.postcode
+                                 AND NOT EXISTS (SELECT
+                                                     1
+                                                 FROM
+                                                     unique_establishments e2
+                                                 WHERE
+                                                     e2.la_code = x.local_authority_code
+                                                     AND e2.establishment_number = x.establishment_number)))
             WHERE
                 x.tps_csv_extract_id = {tpsCsvExtractId}
                 AND x.result IS NULL
                 AND NOT EXISTS (SELECT
                                     1
-                               FROM
+                                FROM
                                     person_employments pe
-                               WHERE
+                                WHERE
                                     pe.person_id = p.person_id
                                     AND pe.establishment_id = e.establishment_id
                                     AND pe.start_date = x.employment_start_date)
@@ -212,8 +262,16 @@ public class TpsCsvExtractProcessor(
                     persons p ON x.trn = p.trn
                 JOIN
                     unique_establishments e ON x.local_authority_code = e.la_code
-                        AND (x.establishment_number = e.establishment_number OR
-                            (e.establishment_type_code = '29' AND x.establishment_postcode = e.postcode))
+                        AND (e.establishment_number = x.establishment_number
+                             OR (e.establishment_type_code = '29' 
+                                 AND x.establishment_postcode = e.postcode
+                                 AND NOT EXISTS (SELECT
+                                                     1
+                                                 FROM
+                                                     unique_establishments e2
+                                                 WHERE
+                                                     e2.la_code = x.local_authority_code
+                                                     AND e2.establishment_number = x.establishment_number)))
                 JOIN
                     person_employments pe ON pe.person_id = p.person_id
                     AND pe.establishment_id = e.establishment_id
