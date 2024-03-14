@@ -9,11 +9,13 @@ public static class AuthorizationPolicies
     public const string UpdateNpq = nameof(UpdateNpq);
     public const string UnlockPerson = nameof(UnlockPerson);
     public const string CreateTrn = nameof(CreateTrn);
+    public const string AssignQtls = nameof(AssignQtls);
 
     public static bool IsApiKeyAuthentication(string policy)
     {
         switch (policy)
         {
+            case AssignQtls:
             case ApiKey:
             case GetPerson:
             case UpdatePerson:
