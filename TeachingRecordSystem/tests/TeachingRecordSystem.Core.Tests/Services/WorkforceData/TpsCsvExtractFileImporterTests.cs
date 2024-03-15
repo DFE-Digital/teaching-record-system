@@ -10,7 +10,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
     {
         var validFormatTrn = "1234567";
         var invalidFormatTrn = "12345678";
-        var validFormatNationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        var validFormatNationalInsuranceNumber = "QQ123456A";
         var invalidFormatNationalInsuranceNumber = "1234";
         var validFormatDateOfBirth = "01/01/1980";
         var invalidFormatDateOfBirth = "1234";
