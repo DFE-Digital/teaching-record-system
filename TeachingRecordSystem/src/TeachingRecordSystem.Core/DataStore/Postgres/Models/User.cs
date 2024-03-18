@@ -1,4 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using OpenIddict.EntityFrameworkCore.Models;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -77,6 +80,38 @@ public class ApplicationUser : UserBase
         {
             throw new InvalidOperationException($"{nameof(OneLoginPostLogoutRedirectUriPath)} is not set.");
         }
+    }
+
+    public OpenIddictEntityFrameworkCoreApplication<Guid>? ToOpenIddictApplication()
+    {
+        if (!IsOidcClient)
+        {
+            return null;
+        }
+
+        return new OpenIddictEntityFrameworkCoreApplication<Guid>()
+        {
+            ApplicationType = ApplicationTypes.Web,
+            ClientId = ClientId,
+            ClientSecret = ClientSecret,
+            ClientType = ClientTypes.Confidential,
+            ConsentType = ConsentTypes.Implicit,
+            DisplayName = Name,
+            Id = UserId,
+            Permissions = CreateJsonArray(
+                Permissions.Endpoints.Authorization,
+                Permissions.Endpoints.Token,
+                Permissions.Endpoints.Logout,
+                Permissions.GrantTypes.AuthorizationCode,
+                Permissions.ResponseTypes.Code,
+                Permissions.Scopes.Email,
+                Permissions.Scopes.Profile),
+            RedirectUris = CreateJsonArray(RedirectUris!.ToArray()),
+            PostLogoutRedirectUris = CreateJsonArray(PostLogoutRedirectUris!.ToArray()),
+            Requirements = CreateJsonArray(Requirements.Features.ProofKeyForCodeExchange)
+        };
+
+        static string CreateJsonArray(params string[] values) => JsonSerializer.Serialize(values);
     }
 }
 

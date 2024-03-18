@@ -89,8 +89,7 @@ public class SignInJourneyHelper(
                 oneLoginUser.LastSignIn = clock.UtcNow;
                 await dbContext.SaveChangesAsync();
 
-                await journeyInstance.UpdateStateAsync(state =>
-                    CreateAndAssignPrincipal(state, oneLoginUser.Person.PersonId, oneLoginUser.Person.Trn!));
+                await journeyInstance.UpdateStateAsync(state => CreateAndAssignPrincipal(state, oneLoginUser.Person.Trn!));
             }
         }
         else
@@ -170,8 +169,7 @@ public class SignInJourneyHelper(
             oneLoginUser.LastSignIn = clock.UtcNow;
             await dbContext.SaveChangesAsync();
 
-            await journeyInstance.UpdateStateAsync(state =>
-                CreateAndAssignPrincipal(state, matchedPersonId, matchedTrn));
+            await journeyInstance.UpdateStateAsync(state => CreateAndAssignPrincipal(state, matchedTrn));
 
             return true;
         }
@@ -185,22 +183,26 @@ public class SignInJourneyHelper(
             string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiDigit).ToArray());
     }
 
-    private static void CreateAndAssignPrincipal(SignInJourneyState state, Guid personId, string trn)
+    private static void CreateAndAssignPrincipal(SignInJourneyState state, string trn)
     {
         if (state.OneLoginAuthenticationTicket is null)
         {
             throw new InvalidOperationException("User is not authenticated with One Login.");
         }
 
-        var oneLoginIdentity = (ClaimsIdentity)state.OneLoginAuthenticationTicket.Principal.Identity!;
+        var oneLoginPrincipal = state.OneLoginAuthenticationTicket.Principal;
 
-        var teachingRecordIdentity = new ClaimsIdentity(new[]
-        {
-            new Claim(ClaimTypes.Trn, trn),
-            new Claim(ClaimTypes.PersonId, personId.ToString())
-        });
+        var teachingRecordIdentity = new ClaimsIdentity(
+            [
+                new Claim(ClaimTypes.Subject, oneLoginPrincipal.FindFirstValue("sub")!),
+                new Claim(ClaimTypes.Trn, trn),
+                new Claim(ClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!)
+            ],
+            authenticationType: "Authorize access to a teaching record",
+            nameType: "sub",
+            roleType: null);
 
-        var principal = new ClaimsPrincipal([oneLoginIdentity, teachingRecordIdentity]);
+        var principal = new ClaimsPrincipal(teachingRecordIdentity);
 
         state.AuthenticationTicket = new AuthenticationTicket(principal, state.AuthenticationProperties, AuthenticationSchemes.MatchToTeachingRecord);
     }

@@ -204,6 +204,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
 
             _user.Name = Name!;
             _user.ApiRoles = newApiRoles;
+            _user.IsOidcClient = IsOidcClient;
 
             if (IsOidcClient)
             {

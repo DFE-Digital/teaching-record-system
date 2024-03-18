@@ -15,6 +15,10 @@ public partial class TestData
             name ??= GenerateApplicationUserName();
             apiRoles ??= [];
             hasOneLoginSettings ??= false;
+            string? clientId = null;
+            string? clientSecret = null;
+            List<string>? redirectUris = null;
+            List<string>? postLogoutRedirectUris = null;
             string? oneLoginClientId = null;
             string? oneLoginPrivateKeyPem = null;
             string? oneLoginAuthenticationSchemeName = null;
@@ -23,6 +27,10 @@ public partial class TestData
 
             if (hasOneLoginSettings == true)
             {
+                clientId = Guid.NewGuid().ToString();
+                clientSecret = Guid.NewGuid().ToString();
+                redirectUris = ["https://localhost:3000/callback"];
+                postLogoutRedirectUris = ["https://localhost:3000/logout-callback"];
                 oneLoginClientId = Guid.NewGuid().ToString();
                 oneLoginPrivateKeyPem = GeneratePrivateKeyPem();
                 oneLoginAuthenticationSchemeName = Guid.NewGuid().ToString();
@@ -36,6 +44,10 @@ public partial class TestData
                 UserId = Guid.NewGuid(),
                 ApiRoles = apiRoles,
                 IsOidcClient = hasOneLoginSettings.Value,
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                RedirectUris = redirectUris,
+                PostLogoutRedirectUris = postLogoutRedirectUris,
                 OneLoginClientId = oneLoginClientId,
                 OneLoginPrivateKeyPem = oneLoginPrivateKeyPem,
                 OneLoginAuthenticationSchemeName = oneLoginAuthenticationSchemeName,
@@ -50,7 +62,7 @@ public partial class TestData
                 EventId = Guid.NewGuid(),
                 RaisedBy = SystemUser.SystemUserId,
                 CreatedUtc = Clock.UtcNow,
-                ApplicationUser = Core.Events.Models.ApplicationUser.FromModel(user)
+                ApplicationUser = EventModels.ApplicationUser.FromModel(user)
             };
             dbContext.AddEvent(@event);
 

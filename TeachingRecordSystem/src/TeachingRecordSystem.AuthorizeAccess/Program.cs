@@ -12,13 +12,16 @@ using TeachingRecordSystem.AuthorizeAccess;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Logging;
+using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Oidc;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.AuthorizeAccess.TagHelpers;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.PersonSearch;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +60,49 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
         .AddSingleton<IConfigureOptions<OneLoginOptions>>(sp => sp.GetRequiredService<OneLoginAuthenticationSchemeProvider>())
         .AddSingleton<IHostedService>(sp => sp.GetRequiredService<OneLoginAuthenticationSchemeProvider>());
 }
+
+builder.Services.AddOpenIddict()
+    .AddCore(options =>
+    {
+        options
+            .UseEntityFrameworkCore()
+                .UseDbContext<TrsDbContext>()
+                .ReplaceDefaultEntities<Guid>();
+
+        options.ReplaceApplicationManager<ApplicationManager>();
+    })
+    .AddServer(options =>
+    {
+        //options.SetIssuer();  // TODO
+
+        options
+            .SetAuthorizationEndpointUris("connect/authorize")
+            .SetLogoutEndpointUris("connect/logout")
+            .SetTokenEndpointUris("connect/token")
+            .SetUserinfoEndpointUris("connect/userinfo");
+
+        // TODO - add teaching record scopes
+        options.RegisterScopes(Scopes.Email, Scopes.Profile);
+
+        options.AllowAuthorizationCodeFlow();
+
+        options.DisableAccessTokenEncryption();
+        options.SetAccessTokenLifetime(TimeSpan.FromHours(1));
+
+        //if (!builder.Environment.IsProduction())
+        {
+            options
+                .AddDevelopmentEncryptionCertificate()
+                .AddDevelopmentSigningCertificate();
+        }
+
+        options.UseAspNetCore()
+            .EnableAuthorizationEndpointPassthrough()
+            .EnableLogoutEndpointPassthrough()
+            .EnableTokenEndpointPassthrough()
+            .EnableUserinfoEndpointPassthrough()
+            .EnableStatusCodePagesIntegration();
+    });
 
 builder.Services
     .AddRazorPages()
