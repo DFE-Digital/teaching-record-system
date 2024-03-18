@@ -51,7 +51,7 @@ public class TpsCsvExtractProcessor(
                         establishment_name,
                         establishment_type_code,
                         postcode,
-                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number ORDER BY translate(establishment_status_code::text, '1234', '1324')) as row_number
+                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number, CASE WHEN establishment_number IS NULL THEN postcode ELSE NULL END ORDER BY translate(establishment_status_code::text, '1234', '1324'), urn desc) as row_number
                     FROM
                         establishments) e
                     WHERE
@@ -114,7 +114,7 @@ public class TpsCsvExtractProcessor(
                         establishment_name,
                         establishment_type_code,
                         postcode,
-                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number ORDER BY translate(establishment_status_code::text, '1234', '1324')) as row_number
+                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number, CASE WHEN establishment_number IS NULL THEN postcode ELSE NULL END ORDER BY translate(establishment_status_code::text, '1234', '1324'), urn desc) as row_number
                     FROM
                         establishments) e
                     WHERE
@@ -240,7 +240,7 @@ public class TpsCsvExtractProcessor(
                         establishment_name,
                         establishment_type_code,
                         postcode,
-                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number ORDER BY translate(establishment_status_code::text, '1234', '1324')) as row_number
+                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number, CASE WHEN establishment_number IS NULL THEN postcode ELSE NULL END ORDER BY translate(establishment_status_code::text, '1234', '1324'), urn desc) as row_number
                     FROM
                         establishments) e
                 WHERE
@@ -385,6 +385,151 @@ public class TpsCsvExtractProcessor(
                     tps_csv_extract_item_id = ANY (ARRAY[{formattedExtractItemIds}]::uuid[])
                 """);
             batchCommands.Add(updateResultCommand);
+        }
+
+        async Task SaveChanges()
+        {
+            if (writeDbContext.ChangeTracker.HasChanges())
+            {
+                await writeDbContext.SaveChangesAsync(cancellationToken);
+            }
+
+            if (batchCommands.Count > 0)
+            {
+                using var batch = new NpgsqlBatch(connection);
+                foreach (var command in batchCommands)
+                {
+                    batch.BatchCommands.Add(command);
+                }
+
+                await batch.ExecuteNonQueryAsync(cancellationToken);
+                batchCommands.Clear();
+            }
+        }
+    }
+
+    public async Task UpdateLatestEstablishmentVersions(CancellationToken cancellationToken)
+    {
+        using var readDbContext = dbContextFactory.CreateDbContext();
+        readDbContext.Database.SetCommandTimeout(600);
+        using var writeDbContext = dbContextFactory.CreateDbContext();
+        var connection = (NpgsqlConnection)writeDbContext.Database.GetDbConnection();
+        await connection.OpenAsync(CancellationToken.None);
+
+        FormattableString querySql =
+            $"""
+            WITH unique_establishments AS (
+                SELECT
+                    establishment_id,
+                    la_code,
+                    establishment_number,
+                    establishment_name,
+                    establishment_type_code,
+                    postcode
+                FROM
+                    (SELECT
+                        establishment_id,
+                        la_code,
+                        establishment_number,
+                        establishment_name,
+                        establishment_type_code,
+                        postcode,
+                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number, CASE WHEN establishment_number IS NULL THEN postcode ELSE NULL END ORDER BY translate(establishment_status_code::text, '1234', '1324'), urn desc) as row_number
+                    FROM
+                        establishments) e
+                    WHERE
+                        e.row_number = 1
+            ),
+            establishment_changes AS (
+                SELECT
+                    *
+                FROM
+                    person_employments pe
+                WHERE
+                    NOT EXISTS (SELECT
+                                    1
+                                FROM
+                                    unique_establishments e
+                                WHERE
+                                    e.establishment_id = pe.establishment_id)
+            )
+            select
+                ec.person_employment_id,
+                ec.person_id,
+                ec.establishment_id as current_establishment_id,
+                ec.start_date,
+                ec.end_date,
+                ec.employment_type,
+                ue.establishment_id
+            from
+                    establishment_changes ec
+                JOIN
+                    establishments e ON e.establishment_id = ec.establishment_id
+                JOIN
+                    unique_establishments ue ON ue.la_code = e.la_code
+                        AND (ue.establishment_number = e.establishment_number
+                             OR (e.establishment_type_code = '29' 
+                                 AND ue.postcode = e.postcode
+                                 AND NOT EXISTS (SELECT
+                                                    1
+                                                 FROM
+                                                    unique_establishments e2
+                                                 WHERE
+                                                    e2.la_code = e.la_code
+                                                    AND e2.establishment_number = e.establishment_number)))
+            """;
+
+        var batchCommands = new List<NpgsqlBatchCommand>();
+
+        await foreach (var item in readDbContext.Database.SqlQuery<UpdatedPersonEmploymentEstablishment>(querySql).AsAsyncEnumerable())
+        {
+            var updatePersonEmploymentsCommand = new NpgsqlBatchCommand(
+                $"""
+                    UPDATE
+                        person_employments
+                    SET
+                        establishment_id = '{item.EstablishmentId}'
+                    WHERE
+                        person_employment_id = '{item.PersonEmploymentId}'
+                    """);
+
+            batchCommands.Add(updatePersonEmploymentsCommand);
+            writeDbContext.AddEvent(new PersonEmploymentUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = item.PersonEmploymentId,
+                PersonEmployment = new()
+                {
+                    PersonEmploymentId = item.PersonEmploymentId,
+                    PersonId = item.PersonId,
+                    EstablishmentId = item.EstablishmentId,
+                    StartDate = item.StartDate,
+                    EndDate = item.EndDate,
+                    EmploymentType = item.EmploymentType
+                },
+                OldPersonEmployment = new()
+                {
+                    PersonEmploymentId = item.PersonEmploymentId,
+                    PersonId = item.PersonId,
+                    EstablishmentId = item.CurrentEstablishmentId,
+                    StartDate = item.StartDate,
+                    EndDate = item.EndDate,
+                    EmploymentType = item.EmploymentType
+                },
+                Changes = PersonEmploymentUpdatedEventChanges.EstablishmentId,
+                CreatedUtc = clock.UtcNow,
+                RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+            });
+
+            if (batchCommands.Count == 50)
+            {
+                await SaveChanges();
+            }
+        }
+
+        if (batchCommands.Any())
+        {
+            await SaveChanges();
         }
 
         async Task SaveChanges()

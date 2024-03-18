@@ -1,15 +1,14 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Services.Establishments;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using Establishment = TeachingRecordSystem.Core.Models.Establishment;
 
-namespace TeachingRecordSystem.Core.Tests.Jobs;
+namespace TeachingRecordSystem.Core.Tests.Services.Establishments;
 
-public class RefreshEstablishmentsJobTests
+public class EstablishmentRefresherTests
 {
-    public RefreshEstablishmentsJobTests(
+    public EstablishmentRefresherTests(
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
@@ -36,7 +35,7 @@ public class RefreshEstablishmentsJobTests
     }
 
     [Fact]
-    public Task ExecuteAsync_WhenCalledforNewUrn_AddsNewEstablishments() =>
+    public Task RefreshEstablishments_WhenCalledforNewUrn_AddsNewEstablishments() =>
         DbFixture.WithDbContext(async dbContext =>
         {
             // Arrange
@@ -87,12 +86,12 @@ public class RefreshEstablishmentsJobTests
                 .Setup(s => s.GetEstablishments())
                 .Returns(establishments.ToAsyncEnumerable());
 
-            var job = new RefreshEstablishmentsJob(
+            var establishmentRefresher = new EstablishmentRefresher(
                 dbContext,
                 establishmentMasterDataService);
 
             // Act
-            await job.ExecuteAsync(CancellationToken.None);
+            await establishmentRefresher.RefreshEstablishments(CancellationToken.None);
 
             // Assert
             var establishmentsActual = await dbContext.Establishments.Where(e => e.Urn == establishment1.Urn || e.Urn == establishment2.Urn).OrderBy(e => e.Urn).ToListAsync();
@@ -140,7 +139,7 @@ public class RefreshEstablishmentsJobTests
         });
 
     [Fact]
-    public Task ExecuteAsync_WhenCalledForExistingUrn_UpdatesEstablishment() =>
+    public Task RefreshEstablishments_WhenCalledForExistingUrn_UpdatesEstablishment() =>
         DbFixture.WithDbContext(async dbContext =>
         {
             // Arrange
@@ -196,12 +195,12 @@ public class RefreshEstablishmentsJobTests
                 .Setup(s => s.GetEstablishments())
                 .Returns(establishments.ToAsyncEnumerable());
 
-            var job = new RefreshEstablishmentsJob(
+            var establishmentRefresher = new EstablishmentRefresher(
                 dbContext,
                 establishmentMasterDataService);
 
             // Act
-            await job.ExecuteAsync(CancellationToken.None);
+            await establishmentRefresher.RefreshEstablishments(CancellationToken.None);
 
             // Assert
             var urnEstablishments = await dbContext.Establishments.Where(e => e.Urn == dbEstablishment.Urn).ToListAsync();
