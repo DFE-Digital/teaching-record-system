@@ -106,9 +106,9 @@ builder.Services.AddOpenIddict()
 
             static SecurityKey LoadKey(string configurationValue)
             {
-                var rsa = RSA.Create();
+                using var rsa = RSA.Create();
                 rsa.FromXmlString(configurationValue);
-                return new RsaSecurityKey(rsa);
+                return new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true));
             }
         }
         else
