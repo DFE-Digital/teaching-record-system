@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
+using OpenIddict.EntityFrameworkCore.Models;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Infrastructure.EntityFramework;
 using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
@@ -84,7 +86,9 @@ public class TrsDbContext : DbContext
         }
 
         optionsBuilder
-            .UseSnakeCaseNamingConvention();
+            .UseSnakeCaseNamingConvention()
+            .UseOpenIddict<Guid>()
+            .AddInterceptors(new PopulateOidcApplicationInterceptor());
     }
 
     public void AddEvent(EventBase @event, DateTime? inserted = null)
@@ -100,6 +104,23 @@ public class TrsDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(TrsDbContext).Assembly);
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var clrType = entityType.ClrType;
+
+            if (clrType.Assembly == typeof(OpenIddictEntityFrameworkCoreApplication).Assembly)
+            {
+                entityType.SetTableName(clrType.Name.Split("`")[0] switch
+                {
+                    nameof(OpenIddictEntityFrameworkCoreApplication) => "oidc_applications",
+                    nameof(OpenIddictEntityFrameworkCoreAuthorization) => "oidc_authorizations",
+                    nameof(OpenIddictEntityFrameworkCoreScope) => "oidc_scopes",
+                    nameof(OpenIddictEntityFrameworkCoreToken) => "oidc_tokens",
+                    _ => throw new NotSupportedException($"Cannot configure table name for {clrType.Name}.")
+                });
+            }
+        }
     }
 
     private static DbContextOptions<TrsDbContext> CreateOptions(string connectionString, int? commandTimeout)

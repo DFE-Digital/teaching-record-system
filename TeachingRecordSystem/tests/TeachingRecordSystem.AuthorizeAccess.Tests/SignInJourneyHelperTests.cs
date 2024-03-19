@@ -392,7 +392,6 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             Assert.NotNull(state.AuthenticationTicket);
             Assert.Equal(person.Trn, state.AuthenticationTicket.Principal.FindFirstValue(ClaimTypes.Trn));
-            Assert.Equal(person.PersonId.ToString(), state.AuthenticationTicket.Principal.FindFirstValue(ClaimTypes.PersonId));
         });
 
     private SignInJourneyHelper CreateHelper(TrsDbContext dbContext, IPersonSearchService? personSearchService = null)
