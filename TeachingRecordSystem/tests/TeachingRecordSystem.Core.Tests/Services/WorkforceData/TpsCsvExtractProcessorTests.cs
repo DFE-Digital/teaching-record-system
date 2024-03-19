@@ -143,16 +143,14 @@ public class TpsCsvExtractProcessorTests
         var laCode1 = "322";
         var establishmentNumber1 = "4322";
         var postcode1 = Faker.Address.UkPostCode();
-        var laCode2 = "323";
         var establishmentNumber2 = "4323";
         var postcode2 = Faker.Address.UkPostCode();
-        var nonHigherEducationEstablishment1 = await TestData.CreateEstablishment(laCode1, establishmentNumber: establishmentNumber1, postcode: postcode1);
-        var higherEductionEstablishment1 = await TestData.CreateEstablishment(laCode1, establishmentNumber: establishmentNumber1, postcode: postcode1, isHigherEducationInstitution: true);
-        var higherEductionEstablishment2 = await TestData.CreateEstablishment(laCode2, postcode: postcode2, isHigherEducationInstitution: true);
+        var nonHigherEducationEstablishment = await TestData.CreateEstablishment(laCode1, establishmentNumber: establishmentNumber1, postcode: postcode1);
+        var higherEductionEstablishment = await TestData.CreateEstablishment(laCode1, postcode: postcode2, isHigherEducationInstitution: true);
         await TestData.CreateTpsCsvExtract(
             b => b.WithTpsCsvExtractId(tpsCsvExtractId)
                 .WithItem(person!.Trn!, laCode1, establishmentNumber1, postcode1, new DateOnly(2023, 02, 03))
-                .WithItem(person!.Trn!, laCode2, establishmentNumber2, postcode2, new DateOnly(2023, 02, 03)));
+                .WithItem(person!.Trn!, laCode1, establishmentNumber2, postcode2, new DateOnly(2023, 04, 05)));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -166,8 +164,8 @@ public class TpsCsvExtractProcessorTests
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataAdded, i.Result));
         var employmentHistory = await dbContext.PersonEmployments.Where(e => e.PersonId == person.PersonId).ToListAsync();
         Assert.Equal(2, employmentHistory.Count);
-        Assert.Contains(nonHigherEducationEstablishment1.EstablishmentId, employmentHistory.Select(pe => pe.EstablishmentId));
-        Assert.Contains(higherEductionEstablishment2.EstablishmentId, employmentHistory.Select(pe => pe.EstablishmentId));
+        Assert.Contains(nonHigherEducationEstablishment.EstablishmentId, employmentHistory.Select(pe => pe.EstablishmentId));
+        Assert.Contains(higherEductionEstablishment.EstablishmentId, employmentHistory.Select(pe => pe.EstablishmentId));
     }
 
     [Fact]
@@ -216,6 +214,27 @@ public class TpsCsvExtractProcessorTests
         using var dbContext = TestData.DbContextFactory.CreateDbContext();
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidNoChange, i.Result));
+    }
+
+    [Fact]
+    public async Task UpdateLatestEstablishmentVersions_WithEstablishmentChangingUrn_UpdatesPersonEmploymentRecord()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "127", establishmentNumber: "1238", establishmentStatusCode: 2); // Closed
+        var establishment2 = await TestData.CreateEstablishment(localAuthorityCode: "127", establishmentNumber: "1238", establishmentStatusCode: 1); // Open
+        var existingPersonEmployment = await TestData.CreatePersonEmployment(person.PersonId, establishment1.EstablishmentId, new DateOnly(2023, 02, 02), EmploymentType.FullTime);
+
+        // Act
+        var processor = new TpsCsvExtractProcessor(
+            TestData.DbContextFactory,
+            TestData.Clock);
+        await processor.UpdateLatestEstablishmentVersions(CancellationToken.None);
+
+        // Assert
+        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        var updatedPersonEmployment = await dbContext.PersonEmployments.SingleAsync(e => e.PersonEmploymentId == existingPersonEmployment.PersonEmploymentId);
+        Assert.Equal(establishment2.EstablishmentId, updatedPersonEmployment.EstablishmentId);
     }
 
     private DbFixture DbFixture { get; }

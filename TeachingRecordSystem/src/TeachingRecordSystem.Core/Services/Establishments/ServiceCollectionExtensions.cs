@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
                 .ValidateOnStart();
 
             builder.Services
+                .AddSingleton<EstablishmentRefresher>()
                 .AddSingleton<IEstablishmentMasterDataService, CsvDownloadEstablishmentMasterDataService>()
                 .AddHttpClient<IEstablishmentMasterDataService, CsvDownloadEstablishmentMasterDataService>((sp, httpClient) =>
                 {
