@@ -14,6 +14,7 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CreateGenerateReportingDbTableCommand(configuration),
     Commands.CreateCreateAdminCommand(configuration),
     Commands.CreateSyncPersonCommand(configuration),
+    Commands.CreateGenerateKeyCommand(configuration),
 };
 
 return await rootCommand.InvokeAsync(args);

@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using GovUk.Frontend.AspNetCore;
 using GovUk.OneLogin.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.AuthorizeAccess;
@@ -73,8 +75,6 @@ builder.Services.AddOpenIddict()
     })
     .AddServer(options =>
     {
-        //options.SetIssuer();  // TODO
-
         options
             .SetAuthorizationEndpointUris("connect/authorize")
             .SetLogoutEndpointUris("connect/logout")
@@ -89,7 +89,29 @@ builder.Services.AddOpenIddict()
         options.DisableAccessTokenEncryption();
         options.SetAccessTokenLifetime(TimeSpan.FromHours(1));
 
-        //if (!builder.Environment.IsProduction())
+        if (builder.Environment.IsProduction())
+        {
+            var encryptionKeysConfig = builder.Configuration.GetSection("EncryptionKeys").Get<string[]>() ?? [];
+            var signingKeysConfig = builder.Configuration.GetSection("SigningKeys").Get<string[]>() ?? [];
+
+            foreach (var value in encryptionKeysConfig)
+            {
+                options.AddEncryptionKey(LoadKey(value));
+            }
+
+            foreach (var value in signingKeysConfig)
+            {
+                options.AddSigningKey(LoadKey(value));
+            }
+
+            static SecurityKey LoadKey(string configurationValue)
+            {
+                var rsa = RSA.Create();
+                rsa.FromXmlString(configurationValue);
+                return new RsaSecurityKey(rsa);
+            }
+        }
+        else
         {
             options
                 .AddDevelopmentEncryptionCertificate()
