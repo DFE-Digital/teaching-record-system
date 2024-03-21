@@ -18,7 +18,7 @@
     <PackageVersion Include="Faker.Net" Version="2.0.154" />
     <PackageVersion Include="FakeXrmEasy.v9" Version="3.3.3" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <PackageVersion Include="GovUk.OneLogin.AspNetCore" Version="0.3.0" />
+    <PackageVersion Include="GovUk.OneLogin.AspNetCore" Version="0.3.1" />
     <PackageVersion Include="GovukNotify" Version="6.1.0" />
     <PackageVersion Include="GovUk.Frontend.AspNetCore" Version="1.5.0" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.7" />
