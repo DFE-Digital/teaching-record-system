@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -153,6 +154,22 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         user.EnsureConfiguredForOneLogin();
 
         options.SignInScheme = AuthenticationSchemes.FormFlowJourney;
+
+        options.Events.OnRedirectToIdentityProviderForSignOut = context =>
+        {
+            // The standard sign out process will call Authenticate() on SignInScheme then try to extract the id_token from the Principal.
+            // That won't work in our case most of the time since sign out journeys won't have the FormFlow instance around that has the AuthenticationTicket.
+            // Instead, we'll get it passed to us in explicitly in AuthenticationProperties.Items.
+
+            if (context.ProtocolMessage.IdTokenHint is null &&
+                context.Properties.Parameters.TryGetValue(OpenIdConnectParameterNames.IdToken, out var idToken) &&
+                idToken is string idTokenString)
+            {
+                context.ProtocolMessage.IdTokenHint = idTokenString;
+            }
+
+            return Task.CompletedTask;
+        };
 
         options.CoreIdentityClaimIssuerSigningKey = _coreIdentityIssuerSigningKey;
         options.CoreIdentityClaimIssuer = "https://identity.integration.account.gov.uk/";

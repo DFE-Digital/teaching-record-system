@@ -4,6 +4,7 @@ using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.PersonSearch;
@@ -191,12 +192,14 @@ public class SignInJourneyHelper(
         }
 
         var oneLoginPrincipal = state.OneLoginAuthenticationTicket.Principal;
+        var oneLoginIdToken = state.OneLoginAuthenticationTicket.Properties.GetTokenValue(OpenIdConnectParameterNames.IdToken)!;
 
         var teachingRecordIdentity = new ClaimsIdentity(
             [
                 new Claim(ClaimTypes.Subject, oneLoginPrincipal.FindFirstValue("sub")!),
                 new Claim(ClaimTypes.Trn, trn),
-                new Claim(ClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!)
+                new Claim(ClaimTypes.Email, oneLoginPrincipal.FindFirstValue("email")!),
+                new Claim(ClaimTypes.OneLoginIdToken, oneLoginIdToken)
             ],
             authenticationType: "Authorize access to a teaching record",
             nameType: "sub",

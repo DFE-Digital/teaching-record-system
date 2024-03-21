@@ -5,6 +5,7 @@ using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow;
@@ -140,6 +141,7 @@ public abstract class TestBase : IDisposable
 
         var properties = new AuthenticationProperties();
         properties.SetVectorOfTrust(vtr);
+        properties.StoreTokens([new AuthenticationToken() { Name = OpenIdConnectParameterNames.IdToken, Value = "dummy" }]);
 
         return new AuthenticationTicket(principal, properties, authenticationScheme: "OneLogin");
     }

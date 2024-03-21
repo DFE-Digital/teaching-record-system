@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
@@ -36,7 +37,10 @@ public class FakeOneLoginHandler(OneLoginCurrentUserProvider currentUserProvider
 
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType: "Fake One Login", nameType: "sub", roleType: null));
 
-        await _context.SignInAsync(AuthenticationSchemes.FormFlowJourney, principal, properties);
+        var authenticatedProperties = properties?.Clone() ?? new();
+        authenticatedProperties.StoreTokens([new AuthenticationToken() { Name = OpenIdConnectParameterNames.IdToken, Value = "dummy" }]);
+
+        await _context.SignInAsync(AuthenticationSchemes.FormFlowJourney, principal, authenticatedProperties);
     }
 
     public Task ForbidAsync(AuthenticationProperties? properties) =>
