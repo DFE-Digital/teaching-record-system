@@ -32,6 +32,7 @@ public partial class TestData
         private Contact_GenderCode? _gender;
         private bool? _hasNationalInsuranceNumber;
         private string? _nationalInsuranceNumber;
+        private readonly List<Qualification> _qualifications = new();
         private readonly List<MandatoryQualificationInfo> _mandatoryQualifications = new();
         private readonly List<QtsRegistration> _qtsRegistrations = new();
         private readonly List<Sanction> _sanctions = [];
@@ -122,6 +123,20 @@ public partial class TestData
             bool isActive = true)
         {
             _sanctions.Add(new(Guid.NewGuid(), sanctionCode, startDate, endDate, reviewDate, spent, details, detailsLink, isActive));
+            return this;
+        }
+
+        public CreatePersonBuilder WithQualification(
+            Guid? qualificationId,
+            dfeta_qualification_dfeta_Type type,
+            DateOnly? completionOrAwardDate = null,
+            bool? isActive = true,
+            string? heQualificationValue = null,
+            string? heSubject1Value = null,
+            string? heSubject2Value = null,
+            string? heSubject3Value = null)
+        {
+            _qualifications.Add(new(qualificationId ?? Guid.NewGuid(), type, completionOrAwardDate, isActive!.Value, heQualificationValue, heSubject1Value, heSubject2Value, heSubject3Value));
             return this;
         }
 
@@ -327,6 +342,61 @@ public partial class TestData
                     ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(new[] { dfeta_qtsregistration.Fields.dfeta_QTSDate, dfeta_qtsregistration.Fields.dfeta_EYTSDate }),
                     Target = eytsRegistrationId.ToEntityReference(dfeta_qtsregistration.EntityLogicalName)
                 });
+            }
+
+            foreach (var qualification in _qualifications)
+            {
+                var crmQualification = new dfeta_qualification()
+                {
+                    Id = qualification.QualificationId,
+                    dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
+                    dfeta_Type = qualification.Type,
+                    dfeta_CompletionorAwardDate = qualification.CompletionOrAwardDate?.ToDateTimeWithDqtBstFix(isLocalTime: true)
+                };
+
+                if (qualification.Type == dfeta_qualification_dfeta_Type.HigherEducation)
+                {
+                    if (qualification.HeQualificationValue is not null)
+                    {
+                        var heQualification = await testData.ReferenceDataCache.GetHeQualificationByValue(qualification.HeQualificationValue!);
+                        crmQualification.dfeta_HE_HEQualificationId = heQualification.Id.ToEntityReference(dfeta_hequalification.EntityLogicalName);
+                    }
+
+                    if (qualification.HeSubject1Value is not null)
+                    {
+                        var heSubject1 = await testData.ReferenceDataCache.GetHeSubjectByValue(qualification.HeSubject1Value!);
+                        crmQualification.dfeta_HE_HESubject1Id = heSubject1.Id.ToEntityReference(dfeta_hesubject.EntityLogicalName);
+                    }
+
+                    if (qualification.HeSubject2Value is not null)
+                    {
+                        var heSubject2 = await testData.ReferenceDataCache.GetHeSubjectByValue(qualification.HeSubject2Value!);
+                        crmQualification.dfeta_HE_HESubject2Id = heSubject2.Id.ToEntityReference(dfeta_hesubject.EntityLogicalName);
+                    }
+
+                    if (qualification.HeSubject3Value is not null)
+                    {
+                        var heSubject3 = await testData.ReferenceDataCache.GetHeSubjectByValue(qualification.HeSubject3Value!);
+                        crmQualification.dfeta_HE_HESubject3Id = heSubject3.Id.ToEntityReference(dfeta_hesubject.EntityLogicalName);
+                    }
+                }
+
+                txnRequestBuilder.AddRequest(new CreateRequest()
+                {
+                    Target = crmQualification
+                });
+
+                if (!qualification.IsActive)
+                {
+                    txnRequestBuilder.AddRequest(new UpdateRequest()
+                    {
+                        Target = new dfeta_qualification()
+                        {
+                            Id = qualification.QualificationId,
+                            StateCode = dfeta_qualificationState.Inactive
+                        }
+                    });
+                }
             }
 
             foreach (var sanction in _sanctions)
@@ -650,4 +720,14 @@ public partial class TestData
         DateOnly? EndDate);
 
     public record QtsRegistration(DateOnly? QtsDate, string? TeacherStatusValue, DateTime? CreatedOn, DateOnly? EytsDate, string? EytsStatusValue);
+
+    public record Qualification(
+        Guid QualificationId,
+        dfeta_qualification_dfeta_Type Type,
+        DateOnly? CompletionOrAwardDate = null,
+        bool IsActive = true,
+        string? HeQualificationValue = null,
+        string? HeSubject1Value = null,
+        string? HeSubject2Value = null,
+        string? HeSubject3Value = null);
 }

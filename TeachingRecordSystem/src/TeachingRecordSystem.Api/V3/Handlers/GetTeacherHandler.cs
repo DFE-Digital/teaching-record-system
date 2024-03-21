@@ -128,37 +128,15 @@ public class GetTeacherHandler(
 
         if ((request.Include & (GetTeacherRequestIncludes.NpqQualifications | GetTeacherRequestIncludes.HigherEducationQualifications)) != 0)
         {
-            string[]? columnNames = new[]
-            {
-                dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
-                dfeta_qualification.Fields.dfeta_Type,
-                dfeta_qualification.Fields.StateCode
-            };
-
-            string[]? heQualificationColumnNames = null;
-            string[]? heSubjectColumnNames = null;
-
-            if (request.Include.HasFlag(GetTeacherRequestIncludes.HigherEducationQualifications))
-            {
-                heQualificationColumnNames = new[]
-                {
-                    dfeta_hequalification.PrimaryIdAttribute,
-                    dfeta_hequalification.Fields.dfeta_name
-                };
-
-                heSubjectColumnNames = new[]
-                {
-                    dfeta_hesubject.PrimaryIdAttribute,
-                    dfeta_hesubject.Fields.dfeta_name,
-                    dfeta_hesubject.Fields.dfeta_Value
-                };
-            }
-
-            qualifications = await dataverseAdapter.GetQualificationsForTeacher(
-                teacher.Id,
-                columnNames,
-                heQualificationColumnNames,
-                heSubjectColumnNames);
+            qualifications = await crmQueryDispatcher.ExecuteQuery(
+                new GetQualificationsByContactIdQuery(
+                    teacher.Id,
+                    new ColumnSet(
+                        dfeta_qualification.PrimaryIdAttribute,
+                        dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
+                        dfeta_qualification.Fields.dfeta_Type,
+                        dfeta_qualification.Fields.StateCode),
+                    IncludeHigherEducationDetails: request.Include.HasFlag(GetTeacherRequestIncludes.HigherEducationQualifications)));
         }
 
         bool pendingNameChange = default, pendingDateOfBirthChange = default;
@@ -514,8 +492,7 @@ public class GetTeacherHandler(
             ?.Where(q =>
                 q.dfeta_Type.HasValue &&
                 q.dfeta_Type.Value == dfeta_qualification_dfeta_Type.HigherEducation &&
-                q.StateCode == dfeta_qualificationState.Active &&
-                q.Extract<dfeta_hequalification>() is not null)
+                q.StateCode == dfeta_qualificationState.Active)
             ?.Select(q =>
             {
                 var heQualification = q.Extract<dfeta_hequalification>();
@@ -555,7 +532,7 @@ public class GetTeacherHandler(
 
                 return new GetTeacherResponseHigherEducationQualification
                 {
-                    Name = heQualification.dfeta_name,
+                    Name = heQualification?.dfeta_name,
                     Awarded = q.dfeta_CompletionorAwardDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     Subjects = heSubjects.ToArray()
                 };

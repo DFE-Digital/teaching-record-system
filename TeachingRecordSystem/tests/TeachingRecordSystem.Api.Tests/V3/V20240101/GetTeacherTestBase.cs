@@ -275,21 +275,13 @@ public abstract class GetTeacherTestBase : TestBase
         HttpClient httpClient,
         string baseUrl,
         Contact contact,
+        Qualification[] qualifications,
         bool expectCertificateUrls)
     {
         // Arrange
-        var npqQualificationNoAwardDate = CreateQualification(dfeta_qualification_dfeta_Type.NPQLL, null, dfeta_qualificationState.Active, null);
-        var npqQualificationInactive = CreateQualification(dfeta_qualification_dfeta_Type.NPQSL, new DateTime(2022, 5, 6), dfeta_qualificationState.Inactive, null);
-        var npqQualificationValid = CreateQualification(dfeta_qualification_dfeta_Type.NPQEYL, new DateTime(2022, 3, 4), dfeta_qualificationState.Active, null);
+        var npqQualificationValid = qualifications[2];
 
-        var qualifications = new dfeta_qualification[]
-        {
-            npqQualificationNoAwardDate,
-            npqQualificationInactive,
-            npqQualificationValid
-        };
-
-        await ConfigureMocks(contact, qualifications: qualifications);
+        await ConfigureMocks(contact);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=NpqQualifications");
 
@@ -301,13 +293,13 @@ public abstract class GetTeacherTestBase : TestBase
         {
             new
             {
-                awarded = npqQualificationValid.dfeta_CompletionorAwardDate?.ToString("yyyy-MM-dd"),
+                awarded = npqQualificationValid.CompletionOrAwardDate?.ToString("yyyy-MM-dd"),
                 type = new
                 {
-                    code = npqQualificationValid.dfeta_Type.ToString(),
-                    name = npqQualificationValid.dfeta_Type?.GetName()
+                    code = npqQualificationValid.Type.ToString(),
+                    name = npqQualificationValid.Type.GetName()
                 },
-                certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.Id}",
+                certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.QualificationId}",
             }
         })!;
 
@@ -325,70 +317,11 @@ public abstract class GetTeacherTestBase : TestBase
     protected async Task ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(
         HttpClient httpClient,
         string baseUrl,
-        Contact contact)
+        Contact contact,
+        Qualification[] qualifications)
     {
         // Arrange
-        var qualification1AwardDate = new DateTime(2022, 4, 6);
-        var qualification1Name = "My HE Qual 1";
-        var qualification1Subject1 = (Code: "Qualification1Subject1", Name: "Qualification 1 Subject 1");
-        var qualification1Subject2 = (Code: "Qualification1Subject2", Name: "Qualification 1 Subject 2");
-        var qualification1Subject3 = (Code: "Qualification1Subject3", Name: "Qualification 1 Subject 3");
-
-        var qualification2AwardDate = new DateTime(2022, 4, 2);
-        var qualification2Name = "My HE Qual 2";
-        var qualification2Subject1 = (Code: "Qualification2Subject1", Name: "Qualification 2 Subject 1");
-
-        var qualification3Name = "My HE Qual 3";
-        var qualification3Subject1 = (Code: "Qualification3Subject1", Name: "Qualification 3 Subject 1");
-
-        var qualification4AwardDate = new DateTime(2022, 4, 8);
-        var qualification4Name = "My HE Qual 4";
-        var qualification4Subject1 = (Code: "Qualification4Subject1", Name: "Qualification 4 Subject 1");
-        var qualification4Subject2 = (Code: "Qualification4Subject2", Name: "Qualification 4 Subject 2");
-        var qualification4Subject3 = (Code: "Qualification4Subject3", Name: "Qualification 4 Subject 3");
-
-        var heQualificationWith3Subjects = CreateQualification(
-            dfeta_qualification_dfeta_Type.HigherEducation,
-            qualification1AwardDate,
-            dfeta_qualificationState.Active,
-            null,
-            qualification1Name,
-            qualification1Subject1,
-            qualification1Subject2,
-            qualification1Subject3);
-        var heQualificationWith1Subject = CreateQualification(
-            dfeta_qualification_dfeta_Type.HigherEducation,
-            qualification2AwardDate,
-            dfeta_qualificationState.Active,
-            null,
-            qualification2Name,
-            qualification2Subject1);
-        var heQualificationWithNoAwardDate = CreateQualification(
-            dfeta_qualification_dfeta_Type.HigherEducation,
-            null,
-            dfeta_qualificationState.Active,
-            null,
-            qualification3Name,
-            qualification3Subject1);
-        var heQualificationInactive = CreateQualification(
-            dfeta_qualification_dfeta_Type.HigherEducation,
-            qualification4AwardDate,
-            dfeta_qualificationState.Inactive,
-            null,
-            qualification4Name,
-            qualification4Subject1,
-            qualification4Subject2,
-            qualification4Subject3);
-
-        var qualifications = new dfeta_qualification[]
-        {
-            heQualificationWith3Subjects,
-            heQualificationWith1Subject,
-            heQualificationWithNoAwardDate,
-            heQualificationInactive
-        };
-
-        await ConfigureMocks(contact, qualifications: qualifications);
+        await ConfigureMocks(contact);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=HigherEducationQualifications");
 
@@ -399,36 +332,55 @@ public abstract class GetTeacherTestBase : TestBase
         var jsonResponse = await AssertEx.JsonResponse(response);
         var responseHigherEducationQualifications = jsonResponse.RootElement.GetProperty("higherEducationQualifications");
 
+        var heQualification1 = await TestData.ReferenceDataCache.GetHeQualificationByValue(qualifications[0].HeQualificationValue!);
+        var heQualification1Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[0].HeSubject1Value!);
+        var heQualification1Subject2 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[0].HeSubject2Value!);
+        var heQualification1Subject3 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[0].HeSubject3Value!);
+        var heQualification2 = await TestData.ReferenceDataCache.GetHeQualificationByValue(qualifications[1].HeQualificationValue!);
+        var heQualification2Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[1].HeSubject1Value!);
+        var heQualification3 = await TestData.ReferenceDataCache.GetHeQualificationByValue(qualifications[2].HeQualificationValue!);
+        var heQualification3Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[2].HeSubject1Value!);
+        var heQualification5Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[4].HeSubject1Value!);
+
         AssertEx.JsonObjectEquals(
             new[]
             {
                 new
                 {
-                    name = qualification1Name,
-                    awarded = (string?)qualification1AwardDate.ToString("yyyy-MM-dd"),
-                    subjects = new[]
+                    name = (string?)heQualification1.dfeta_name,
+                    awarded = (string?)qualifications[0].CompletionOrAwardDate?.ToString("yyyy-MM-dd"),
+                    subjects = (object[])new[]
                     {
-                        new { code = qualification1Subject1.Code, name = qualification1Subject1.Name },
-                        new { code = qualification1Subject2.Code, name = qualification1Subject2.Name },
-                        new { code = qualification1Subject3.Code, name = qualification1Subject3.Name }
+                        new { code = heQualification1Subject1.dfeta_Value, name = heQualification1Subject1.dfeta_name },
+                        new { code = heQualification1Subject2.dfeta_Value, name = heQualification1Subject2.dfeta_name },
+                        new { code = heQualification1Subject3.dfeta_Value, name = heQualification1Subject3.dfeta_name },
                     }
                 },
                 new
                 {
-                    name = qualification2Name,
-                    awarded = (string?)qualification2AwardDate.ToString("yyyy-MM-dd"),
-                    subjects = new[]
+                    name = (string?)heQualification2.dfeta_name,
+                    awarded = (string?)qualifications[1].CompletionOrAwardDate?.ToString("yyyy-MM-dd"),
+                    subjects = (object[])new[]
                     {
-                        new { code = qualification2Subject1.Code, name = qualification2Subject1.Name }
+                        new { code = heQualification2Subject1.dfeta_Value, name = heQualification2Subject1.dfeta_name },
                     }
                 },
                 new
                 {
-                    name = qualification3Name,
+                    name =  (string?)heQualification3.dfeta_name,
                     awarded = (string?)null,
-                    subjects = new[]
+                    subjects = (object[])new[]
                     {
-                        new { code = qualification3Subject1.Code, name = qualification3Subject1.Name }
+                        new { code = heQualification3Subject1.dfeta_Value, name = heQualification3Subject1.dfeta_name },
+                    }
+                },
+                new
+                {
+                    name = (string?)null,
+                    awarded = (string?)null,
+                    subjects = (object[])new[]
+                    {
+                        new { code = heQualification5Subject1.dfeta_Value, name = heQualification5Subject1.dfeta_name },
                     }
                 }
             },
@@ -624,6 +576,7 @@ public abstract class GetTeacherTestBase : TestBase
 
     protected async Task<Contact> CreateContact(
         QtsRegistration[]? qtsRegistrations = null,
+        Qualification[]? qualifications = null,
         bool hasMultiWordFirstName = false)
     {
         var firstName = hasMultiWordFirstName ? $"{Faker.Name.First()} {Faker.Name.First()}" : Faker.Name.First();
@@ -636,6 +589,11 @@ public abstract class GetTeacherTestBase : TestBase
                 foreach (var item in qtsRegistrations ?? Array.Empty<QtsRegistration>())
                 {
                     b.WithQtsRegistration(item!.QtsDate, item!.TeacherStatusValue, item.CreatedOn, item!.EytsDate, item!.EytsStatusValue);
+                }
+
+                foreach (var item in qualifications ?? Array.Empty<Qualification>())
+                {
+                    b.WithQualification(item.QualificationId, item.Type, item.CompletionOrAwardDate, item.IsActive, item.HeQualificationValue, item.HeSubject1Value, item.HeSubject2Value, item.HeSubject3Value);
                 }
             });
 
@@ -884,8 +842,11 @@ public abstract class GetTeacherTestBase : TestBase
 
         if (type == dfeta_qualification_dfeta_Type.HigherEducation)
         {
-            qualification.Attributes.Add($"{nameof(dfeta_hequalification)}.{dfeta_hequalification.PrimaryIdAttribute}", new AliasedValue(dfeta_hequalification.EntityLogicalName, dfeta_hequalification.PrimaryIdAttribute, Guid.NewGuid()));
-            qualification.Attributes.Add($"{nameof(dfeta_hequalification)}.{dfeta_hequalification.Fields.dfeta_name}", new AliasedValue(dfeta_hequalification.EntityLogicalName, dfeta_hequalification.Fields.dfeta_name, heName));
+            if (heName is not null)
+            {
+                qualification.Attributes.Add($"{nameof(dfeta_hequalification)}.{dfeta_hequalification.PrimaryIdAttribute}", new AliasedValue(dfeta_hequalification.EntityLogicalName, dfeta_hequalification.PrimaryIdAttribute, Guid.NewGuid()));
+                qualification.Attributes.Add($"{nameof(dfeta_hequalification)}.{dfeta_hequalification.Fields.dfeta_name}", new AliasedValue(dfeta_hequalification.EntityLogicalName, dfeta_hequalification.Fields.dfeta_name, heName));
+            }
 
             if (heSubject1 != null)
             {
