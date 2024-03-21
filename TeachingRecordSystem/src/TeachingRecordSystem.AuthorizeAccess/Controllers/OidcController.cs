@@ -143,6 +143,10 @@ public class OidcController(
 
                 yield break;
 
+            case ClaimTypes.OneLoginIdToken:
+                yield return Destinations.IdentityToken;
+                yield break;
+
             default:
                 yield break;
         }

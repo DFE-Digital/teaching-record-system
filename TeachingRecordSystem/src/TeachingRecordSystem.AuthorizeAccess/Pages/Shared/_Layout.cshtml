@@ -1,5 +1,7 @@
 @{
     Layout = "_GovUkPageTemplate";
+
+    var serviceName = ViewBag.ServiceName ?? "Authorise access to a teaching record";
 }
 
 @section Header {
@@ -31,8 +33,9 @@
             </div>
             <div class="govuk-header__content">
                 <a asp-page="#" class="govuk-header__link govuk-header__link--service-name">
-                    [XYZ]
+                    @serviceName
                 </a>
+                @RenderSection("Nav", required: false)
             </div>
         </div>
     </header>
