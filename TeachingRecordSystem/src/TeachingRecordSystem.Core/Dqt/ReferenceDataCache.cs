@@ -11,6 +11,8 @@ public class ReferenceDataCache : IStartupTask
     private Task<dfeta_teacherstatus[]>? _getTeacherStatusesTask;
     private Task<dfeta_earlyyearsstatus[]>? _getEarlyYearsStatusesTask;
     private Task<dfeta_specialism[]>? _getSpecialismsTask;
+    private Task<dfeta_hequalification[]>? _getHeQualificationsTask;
+    private Task<dfeta_hesubject[]>? _getHeSubjectsTask;
 
     public ReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher)
     {
@@ -104,6 +106,32 @@ public class ReferenceDataCache : IStartupTask
         return mqEstablishments.Single(s => s.dfeta_mqestablishmentId == mqEstablishmentId, $"Could not find MQ establishment with ID: '{mqEstablishmentId}'.");
     }
 
+    public async Task<dfeta_hequalification[]> GetHeQualifications()
+    {
+        var heQualifications = await EnsureHeQualifications();
+        return heQualifications.ToArray();
+    }
+
+    public async Task<dfeta_hequalification> GetHeQualificationByValue(string value)
+    {
+        var heQualifications = await EnsureHeQualifications();
+        // build environment has some duplicate HE Qualifications, which prevent us using Single() here
+        return heQualifications.First(s => s.dfeta_Value == value, $"Could not find HE qualification with value: '{value}'.");
+    }
+
+    public async Task<dfeta_hesubject[]> GetHeSubjects()
+    {
+        var heSubjects = await EnsureHeSubjects();
+        return heSubjects.ToArray();
+    }
+
+    public async Task<dfeta_hesubject> GetHeSubjectByValue(string value)
+    {
+        var heSubjects = await EnsureHeSubjects();
+        // build environment has some duplicate HE Subjects, which prevent us using Single() here
+        return heSubjects.First(s => s.dfeta_Value == value, $"Could not find HE subject with value: '{value}'.");
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
@@ -134,6 +162,16 @@ public class ReferenceDataCache : IStartupTask
             ref _mqEstablishmentsTask,
             () => _crmQueryDispatcher.ExecuteQuery(new GetAllMqEstablishmentsQuery()));
 
+    private Task<dfeta_hequalification[]> EnsureHeQualifications() =>
+        LazyInitializer.EnsureInitialized(
+            ref _getHeQualificationsTask,
+            () => _crmQueryDispatcher.ExecuteQuery(new GetAllHeQualificationsQuery()));
+
+    private Task<dfeta_hesubject[]> EnsureHeSubjects() =>
+        LazyInitializer.EnsureInitialized(
+            ref _getHeSubjectsTask,
+            () => _crmQueryDispatcher.ExecuteQuery(new GetAllHeSubjectsQuery()));
+
     async Task IStartupTask.Execute()
     {
         await EnsureSanctionCodes();
@@ -142,5 +180,7 @@ public class ReferenceDataCache : IStartupTask
         await EnsureEarlyYearsStatuses();
         await EnsureSpecialisms();
         await EnsureMqEstablishments();
+        await EnsureHeQualifications();
+        await EnsureHeSubjects();
     }
 }
