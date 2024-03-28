@@ -1,5 +1,6 @@
 #nullable disable
 using Microsoft.PowerPlatform.Dataverse.Client;
+using static TeachingRecordSystem.Core.Dqt.DataverseAdapter;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.DataverseAdapterTests;
 
@@ -155,7 +156,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     {
         // Arrange
         DataverseAdapter.FindExistingTeacher findExistingTeacher = () =>
-            Task.FromResult<DataverseAdapter.CreateTeacherDuplicateTeacherResult[]>(null);
+            Task.FromResult<DataverseAdapter.CreateTeacherDuplicateTeacherResult[]>(Array.Empty<CreateTeacherDuplicateTeacherResult>());
 
         var command = CreateCommand();
 
