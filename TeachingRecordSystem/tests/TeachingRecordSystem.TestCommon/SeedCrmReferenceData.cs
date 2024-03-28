@@ -20,6 +20,8 @@ public class SeedCrmReferenceData : IStartupTask
         AddEarlyYearsStatuses();
         AddMqEstablishments();
         AddSpecialisms();
+        AddHeQualifications();
+        AddHeSubjects();
 
         return Task.CompletedTask;
     }
@@ -263,5 +265,101 @@ public class SeedCrmReferenceData : IStartupTask
                 StateCode = !specialism.Legacy ? dfeta_specialismState.Active : dfeta_specialismState.Inactive
             });
         }
+    }
+
+    private void AddHeQualifications()
+    {
+        _xrmFakedContext.CreateEntity(new dfeta_hequalification()
+        {
+            dfeta_name = "BEd",
+            dfeta_Value = "001"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hequalification()
+        {
+            dfeta_name = "BEd (Hons)",
+            dfeta_Value = "002"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hequalification()
+        {
+            dfeta_name = "BSc/Education",
+            dfeta_Value = "003"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hequalification()
+        {
+            dfeta_name = "BSc Hons /Education",
+            dfeta_Value = "004"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hequalification()
+        {
+            dfeta_name = "BTech/Education",
+            dfeta_Value = "005"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hequalification()
+        {
+            dfeta_name = "BTech (Hons) /Education",
+            dfeta_Value = "006"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hequalification()
+        {
+            dfeta_name = "BA/Education",
+            dfeta_Value = "007"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hequalification()
+        {
+            dfeta_name = "BA (Hons) /Education",
+            dfeta_Value = "008"
+        });
+    }
+
+    private void AddHeSubjects()
+    {
+        _xrmFakedContext.CreateEntity(new dfeta_hesubject()
+        {
+            dfeta_name = "Mathematics",
+            dfeta_Value = "001"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hesubject()
+        {
+            dfeta_name = "English",
+            dfeta_Value = "002"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hesubject()
+        {
+            dfeta_name = "Science",
+            dfeta_Value = "003"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hesubject()
+        {
+            dfeta_name = "Art",
+            dfeta_Value = "004"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hesubject()
+        {
+            dfeta_name = "Physical Education",
+            dfeta_Value = "005"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hesubject()
+        {
+            dfeta_name = "Geography",
+            dfeta_Value = "006"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_hesubject()
+        {
+            dfeta_name = "History",
+            dfeta_Value = "007"
+        });
     }
 }
