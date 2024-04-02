@@ -155,7 +155,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     {
         // Arrange
         DataverseAdapter.FindExistingTeacher findExistingTeacher = () =>
-            Task.FromResult<DataverseAdapter.CreateTeacherDuplicateTeacherResult[]>(null);
+            Task.FromResult<DataverseAdapter.CreateTeacherDuplicateTeacherResult[]>(Array.Empty<DataverseAdapter.CreateTeacherDuplicateTeacherResult>());
 
         var command = CreateCommand();
 
