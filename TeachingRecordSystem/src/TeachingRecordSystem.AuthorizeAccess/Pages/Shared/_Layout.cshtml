@@ -1,7 +1,13 @@
+@inject GovUk.Frontend.AspNetCore.PageTemplateHelper PageTemplateHelper
 @{
     Layout = "_GovUkPageTemplate";
 
     var serviceName = ViewBag.ServiceName ?? "Authorise access to a teaching record";
+}
+
+@section Head {
+    @RenderSection("Head", required: false)
+    @PageTemplateHelper.GenerateStyleImports()
 }
 
 @section Header {

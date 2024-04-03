@@ -190,7 +190,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             Content = new FormUrlEncodedContentBuilder()
             {
                 { "Name", applicationUser.Name },
-                { "ApiRoles", applicationUser.ApiRoles },
+                { "ApiRoles", applicationUser.ApiRoles ?? [] },
                 { "IsOidcClient", bool.TrueString },
                 { "ClientId", clientId },
                 { "ClientSecret", clientSecret },
@@ -260,7 +260,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         await WithDbContext(async dbContext =>
         {
             applicationUser = await dbContext.ApplicationUsers.SingleAsync(u => u.UserId == applicationUser.UserId);
-            Assert.True(new HashSet<string>(applicationUser.ApiRoles).SetEquals(new HashSet<string>(newRoles)));
+            Assert.True(new HashSet<string>(applicationUser.ApiRoles ?? []).SetEquals(new HashSet<string>(newRoles)));
         });
 
         EventObserver.AssertEventsSaved(
@@ -271,8 +271,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 Assert.Equal(GetCurrentUserId(), applicationUserUpdatedEvent.RaisedBy.UserId);
                 Assert.Equal(originalName, applicationUserUpdatedEvent.OldApplicationUser.Name);
                 Assert.Equal(newName, applicationUserUpdatedEvent.ApplicationUser.Name);
-                Assert.True(applicationUserUpdatedEvent.ApplicationUser.ApiRoles.SequenceEqual(newRoles));
-                Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.ApiRoles);
+                Assert.True((applicationUserUpdatedEvent.ApplicationUser.ApiRoles ?? []).SequenceEqual(newRoles));
+                Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.ApiRoles ?? []);
                 Assert.False(applicationUserUpdatedEvent.OldApplicationUser.IsOidcClient);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.ClientId);
                 Assert.Null(applicationUserUpdatedEvent.OldApplicationUser.ClientSecret);

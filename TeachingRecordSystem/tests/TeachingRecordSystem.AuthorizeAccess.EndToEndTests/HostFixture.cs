@@ -1,10 +1,13 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
+using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow.State;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
@@ -67,6 +70,16 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
                         options.AddScheme(FakeOneLoginAuthenticationScheme, b => b.HandlerType = typeof(FakeOneLoginHandler));
                     });
 
+                    services.Configure<OpenIdConnectOptions>(
+                        TestAppConfiguration.AuthenticationSchemeName,
+                        options =>
+                        {
+                            options.Authority = BaseUrl;
+                            options.RequireHttpsMetadata = false;
+                        });
+
+                    services.Configure<OpenIddictServerAspNetCoreOptions>(options => options.DisableTransportSecurityRequirement = true);
+
                     services.AddSingleton<OneLoginCurrentUserProvider>();
                     services.AddSingleton<TestData>(
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
@@ -84,6 +97,25 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
         {
             throw new InvalidOperationException("Fixture has not been initialized");
         }
+    }
+
+    private async Task AddTestAppToApplicationUsers()
+    {
+        await using var dbContext = await Services.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
+
+        dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+        {
+            UserId = Guid.NewGuid(),
+            Name = "Test App",
+            IsOidcClient = true,
+            ClientId = TestAppConfiguration.ClientId,
+            ClientSecret = TestAppConfiguration.ClientSecret,
+            RedirectUris = [BaseUrl + TestAppConfiguration.RedirectUriPath],
+            PostLogoutRedirectUris = [BaseUrl + TestAppConfiguration.PostLogoutRedirectUriPath],
+            OneLoginAuthenticationSchemeName = FakeOneLoginAuthenticationScheme
+        });
+
+        await dbContext.SaveChangesAsync();
     }
 
     async Task IStartupTask.Execute()
@@ -108,6 +140,8 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
         _browser = await _playwright.Chromium.LaunchAsync(browserOptions);
 
         _initialized = true;
+
+        await AddTestAppToApplicationUsers();
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()

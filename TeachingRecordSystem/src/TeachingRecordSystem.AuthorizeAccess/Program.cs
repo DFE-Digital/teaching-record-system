@@ -164,6 +164,8 @@ builder.Services.AddOptions<AuthorizeAccessOptions>()
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
+builder.AddTestApp();
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
@@ -189,6 +191,10 @@ app.UseCsp(csp =>
     csp.AllowScripts
         .FromSelf()
         .From(pageTemplateHelper.GetCspScriptHashes())
+        .AddNonce();
+
+    csp.AllowStyles
+        .FromSelf()
         .AddNonce();
 
     // Ensure ASP.NET Core's auto refresh works

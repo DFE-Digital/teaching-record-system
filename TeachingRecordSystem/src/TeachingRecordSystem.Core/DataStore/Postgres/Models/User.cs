@@ -35,7 +35,7 @@ public class ApplicationUser : UserBase
     public const string ClientIdUniqueIndexName = "ix_users_client_id";
     public const string OneLoginAuthenticationSchemeNameUniqueIndexName = "ix_users_one_login_authentication_scheme_name";
 
-    public required string[] ApiRoles { get; set; }
+    public string[]? ApiRoles { get; set; }
     public ICollection<ApiKey> ApiKeys { get; } = null!;
     public bool IsOidcClient { get; set; }
     public string? ClientId { get; set; }

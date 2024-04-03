@@ -1,0 +1,27 @@
+@page "/oidc-test/signed-in"
+@using System.Text.Json
+@using TeachingRecordSystem.AuthorizeAccess.Pages.OidcTest
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@model SignedInModel
+@{
+    var claimsJson = JsonSerializer.Serialize(
+        User.Claims.ToDictionary(c => c.Type, c => c.Value),
+        new JsonSerializerOptions() { WriteIndented = true });
+}
+
+@section Head {
+    <style type="text/css" asp-add-nonce="true">
+        .claims-json {
+            font-family: monospace !important;
+            white-space: nowrap;
+            height: 260px;
+        }
+    </style>
+}
+
+<p class="govuk-body">
+    <govuk-textarea name="Claims" textarea-class="claims-json">
+        <govuk-textarea-label>Claims</govuk-textarea-label>
+        <govuk-textarea-value>@claimsJson</govuk-textarea-value>
+    </govuk-textarea>
+</p>
