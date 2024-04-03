@@ -92,7 +92,7 @@ public class OpenApiEndpointsStartupFilter(IConfiguration configuration) : IStar
 
         app.UseSwaggerUI(options =>
         {
-            foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions(configuration))
+            foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions(configuration).Reverse())
             {
                 var documentName = OpenApiDocumentHelper.GetDocumentName(version, minorVersion);
                 options.SwaggerEndpoint(OpenApiDocumentHelper.DocumentRouteTemplate.Replace("{documentName}", documentName), documentName);

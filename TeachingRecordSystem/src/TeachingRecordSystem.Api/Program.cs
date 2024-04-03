@@ -134,16 +134,16 @@ public class Program
                     .RequireRole([ApiRoles.UnlockPerson]));
 
             options.AddPolicy(
-              AuthorizationPolicies.CreateTrn,
-              policy => policy
-                  .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                  .RequireRole([ApiRoles.CreateTrn]));
+                AuthorizationPolicies.CreateTrn,
+                policy => policy
+                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                    .RequireRole([ApiRoles.CreateTrn]));
 
             options.AddPolicy(
-              AuthorizationPolicies.AssignQtls,
-              policy => policy
-                  .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                  .RequireRole([ApiRoles.AssignQtls]));
+                AuthorizationPolicies.AssignQtls,
+                policy => policy
+                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
+                    .RequireRole([ApiRoles.AssignQtls]));
         });
 
         services
