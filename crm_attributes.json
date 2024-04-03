@@ -109,6 +109,7 @@
     "statecode"
   ],
   "dfeta_hesubject": [
+    "dfeta_hesubjectid",
     "dfeta_name",
     "dfeta_value",
     "statecode"

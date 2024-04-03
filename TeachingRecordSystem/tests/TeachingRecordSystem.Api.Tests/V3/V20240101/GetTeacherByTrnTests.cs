@@ -110,10 +110,17 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     [Fact]
     public async Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent()
     {
-        var contact = await CreateContact();
+        var qualifications = new[]
+{
+            new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.NPQLL, null, IsActive:true),
+            new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.NPQSL, new DateOnly(2022, 5, 6), IsActive:false),
+            new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.NPQEYL, new DateOnly(2022, 3, 4), IsActive:true)
+        };
+
+        var contact = await CreateContact(qualifications: qualifications);
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(GetHttpClientWithApiKey(), baseUrl, contact, expectCertificateUrls: false);
+        await ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(GetHttpClientWithApiKey(), baseUrl, contact, qualifications, expectCertificateUrls: false);
     }
 
     [Fact]
@@ -158,10 +165,20 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     [Fact]
     public async Task Get_ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent()
     {
-        var contact = await CreateContact();
+        var qualifications = new[]
+        {
+            new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.HigherEducation, new DateOnly(2022, 4, 6), true,  "001", "001", "002", "003"),
+            new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.HigherEducation, new DateOnly(2022, 4, 2), true,  "002", "002"),
+            new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.HigherEducation, null, true,  "001", "003"),
+            new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.HigherEducation, new DateOnly(2022, 4, 8), false,  "001", "001", "002", "003"),
+            new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.HigherEducation, null, true,  null, "003"),
+            new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.HigherEducation, new DateOnly(2022, 4, 8), true),
+        };
+
+        var contact = await CreateContact(qualifications: qualifications);
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(GetHttpClientWithApiKey(), baseUrl, contact);
+        await ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(GetHttpClientWithApiKey(), baseUrl, contact, qualifications);
     }
 
     [Fact]
