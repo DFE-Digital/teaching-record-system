@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
@@ -16,7 +19,11 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 /// </para>
 /// <para>Assigns the <see cref="CurrentPersonFeature"/> on success.</para>
 /// </remarks>
-public class CheckPersonExistsFilter(ICrmQueryDispatcher crmQueryDispatcher, bool requireQts = false) : IAsyncResourceFilter
+public class CheckPersonExistsFilter(
+    TrsDbContext dbContext,
+    ICrmQueryDispatcher crmQueryDispatcher,
+    IBackgroundJobScheduler backgroundJobScheduler,
+    bool requireQts = false) : IAsyncResourceFilter
 {
     private readonly bool _requireQts = requireQts;
 
@@ -54,6 +61,12 @@ public class CheckPersonExistsFilter(ICrmQueryDispatcher crmQueryDispatcher, boo
         }
 
         context.HttpContext.SetCurrentPersonFeature(person);
+
+        // Ensure we've synced this person into the TRS DB at least once
+        if (!await dbContext.Persons.AnyAsync(p => p.PersonId == personId))
+        {
+            await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncPerson(personId, CancellationToken.None));
+        }
 
         await next();
     }
