@@ -173,7 +173,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
 
         var changes = ApplicationUserUpdatedEventChanges.None |
             (Name != _user!.Name ? ApplicationUserUpdatedEventChanges.Name : 0) |
-            (!new HashSet<string>(_user.ApiRoles).SetEquals(new HashSet<string>(newApiRoles)) ? ApplicationUserUpdatedEventChanges.ApiRoles : 0) |
+            (!new HashSet<string>(_user.ApiRoles ?? []).SetEquals(new HashSet<string>(newApiRoles)) ? ApplicationUserUpdatedEventChanges.ApiRoles : 0) |
             (IsOidcClient != _user.IsOidcClient ? ApplicationUserUpdatedEventChanges.IsOidcClient : 0);
 
         if (IsOidcClient)

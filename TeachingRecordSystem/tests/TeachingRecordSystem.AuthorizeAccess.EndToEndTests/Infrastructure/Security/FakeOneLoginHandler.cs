@@ -6,7 +6,7 @@ using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
 
-public class FakeOneLoginHandler(OneLoginCurrentUserProvider currentUserProvider) : IAuthenticationHandler
+public class FakeOneLoginHandler(OneLoginCurrentUserProvider currentUserProvider) : IAuthenticationHandler, IAuthenticationSignOutHandler
 {
     private HttpContext? _context;
 
@@ -49,6 +49,11 @@ public class FakeOneLoginHandler(OneLoginCurrentUserProvider currentUserProvider
     public Task InitializeAsync(AuthenticationScheme scheme, HttpContext context)
     {
         _context = context;
+        return Task.CompletedTask;
+    }
+
+    public Task SignOutAsync(AuthenticationProperties? properties)
+    {
         return Task.CompletedTask;
     }
 }

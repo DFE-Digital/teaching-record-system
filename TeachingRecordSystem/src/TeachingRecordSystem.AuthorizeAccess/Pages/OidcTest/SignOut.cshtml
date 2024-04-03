@@ -1,0 +1,11 @@
+@page "/oidc-test/sign-out"
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@model TeachingRecordSystem.AuthorizeAccess.Pages.OidcTest.SignOutModel
+@{
+}
+
+<form asp-page="SignOut" method="post">
+    <govuk-button type="submit">Sign out</govuk-button>
+</form>
+
+<script asp-add-nonce="true">document.forms[0].submit();</script>

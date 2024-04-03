@@ -35,7 +35,6 @@ public class OidcController(
         {
             var parameters = Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList();
 
-
             var authenticationProperties = new AuthenticationProperties()
             {
                 RedirectUri = Request.PathBase + Request.Path + QueryString.Create(parameters)

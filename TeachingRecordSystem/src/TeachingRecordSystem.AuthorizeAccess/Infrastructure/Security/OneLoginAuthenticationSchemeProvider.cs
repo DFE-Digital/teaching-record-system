@@ -155,6 +155,15 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
         options.SignInScheme = AuthenticationSchemes.FormFlowJourney;
 
+        options.Events.OnRedirectToIdentityProvider = context =>
+        {
+            // A large RedirectUri here can make the state parameter so large that One Login rejects the request.
+            // We have the RedirectUri stashed away on the FormFlow journey any way so we can clear it out.
+            context.Properties.RedirectUri = null;
+
+            return Task.CompletedTask;
+        };
+
         options.Events.OnRedirectToIdentityProviderForSignOut = context =>
         {
             // The standard sign out process will call Authenticate() on SignInScheme then try to extract the id_token from the Principal.

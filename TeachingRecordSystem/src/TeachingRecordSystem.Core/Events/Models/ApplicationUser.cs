@@ -4,7 +4,7 @@ public record ApplicationUser
 {
     public required Guid UserId { get; init; }
     public required string Name { get; init; }
-    public required string[] ApiRoles { get; init; }
+    public string[]? ApiRoles { get; init; }
     public bool IsOidcClient { get; init; }
     public string? ClientId { get; init; }
     public string? ClientSecret { get; init; }
