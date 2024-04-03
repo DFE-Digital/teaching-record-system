@@ -24,89 +24,6 @@ Webhooks are sent as JSON and follow the guidelines in [Standard Webhooks](https
 `data` is a type-specific object with the details of the event. Each `type` has its own message schema.
 
 
-## Message types
-
-### `ping`
-
-`ping` is used for verifying that a webhook endpoint is reachable and can successfully process messages.
-These messages are sent manually by a TRS developer.
-
-```json
-{
-  "pingId": "<a unique identifier for the ping>"
-}
-```
-
-### `alert.created`
-
-`alert.created` is generated whenever a new alert is added to a `person`:
-
-```json
-{
-  "trn": "",
-  "alert": {
-    "alertId": "",
-    "alertType": {
-      "alertTypeId": "",
-      "description": "",
-      "alertCategory": {
-        "alertCategoryId": "",
-        "description": ""
-      }
-    },
-    "startDate": "",
-    "endDate": ""
-  }
-}
-```
-
-### `alert.updated`
-
-`alert.updated` is generated whenever an existing alert updated for a `person`:
-
-```json
-{
-  "trn": "",
-  "alert": {
-    "alertId": "",
-    "alertType": {
-      "alertTypeId": "",
-      "description": "",
-      "alertCategory": {
-        "alertCategoryId": "",
-        "description": ""
-      }
-    },
-    "startDate": "",
-    "endDate": ""
-  }
-}
-```
-
-### `alert.deleted`
-
-`alert.deleted` is generated whenever an alert is deleted for a `person`:
-
-```json
-{
-  "trn": "",
-  "alert": {
-    "alertId": "",
-    "alertType": {
-      "alertTypeId": "",
-      "description": "",
-      "alertCategory": {
-        "alertCategoryId": "",
-        "description": ""
-      }
-    },
-    "startDate": "",
-    "endDate": ""
-  }
-}
-```
-
-
 ## Receiving webhooks
 
 You need a publicly-accessible HTTPS endpoint that accepts JSON using the POST method. Ask one of the TRS developers to configure your endpoint.
@@ -114,7 +31,7 @@ You will also need to specify the V3 API minor version you want to receive messa
 You will be given a public key with which you can [verify the webhook](#verifying-the-webhook).
 
 Your endpoint should return a success status code (200-299) when the webhook has been processed successfully.
-If an error code is returned, or the endpoint takes longer than 30 seconds to respond, the message will be retried later. The retry intervals are:
+If any other status code is returned, or the endpoint takes longer than 30 seconds to respond, the message will be retried later. The retry intervals are:
 - 5 seconds,
 - 5 minutes,
 - 30 minutes,
@@ -133,4 +50,17 @@ If after the final retry the message was still not delivered successfully no fur
 Follow [the spec](https://github.com/standard-webhooks/standard-webhooks/blob/main/spec/standard-webhooks.md#verifying-signatures) for verifying the webhook's signature.
 We use asymmetric signatures; you will be given the public key to use for verifying webhooks when your endpoint is configured.
 
-The [ping](#ping) message can be used to aid verification.
+The `ping` message can be used to aid verification.
+
+
+## Message types
+
+Reference the API Swagger document for the message schemas for the API version your webhook is registered to use
+e.g. https://preprod.teacher-qualifications-api.education.gov.uk/swagger/v3_20240307.json
+
+| Message `type` | Swagger schema name | Description |
+| - | - | - |
+| `ping` | `PingNotification` | Used for verifying that a webhook endpoint is reachable and can successfully process messages. These messages are sent manually by a TRS developer. |
+| `alert.created` | `AlertCreatedNotification` | Generated whenever a new alert is added to a `person`. |
+| `alert.updated` | `AlertUpdatedNotification` | Generated whenever an existing alert updated for a `person`. |
+| `alert.deleted` | `AlertDeletedNotification` | Generated whenever an alert is deleted for a `person`. |
