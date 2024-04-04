@@ -43,8 +43,7 @@ jobs:
       run: just install-tools
 
     - name: Restore
-      run: dotnet restore
-      working-directory: TeachingRecordSystem
+      run: just restore
 
     - name: Lint
       run: |
