@@ -61,6 +61,7 @@ public static class ServiceCollectionExtensions
             options.OperationFilter<ContentTypesOperationFilter>();
             options.OperationFilter<AddSecuritySchemeOperationFilter>();
             options.DocumentFilter<MinorVersionHeaderDocumentFilter>();
+            options.DocumentFilter<AddWebHookMessagesDocumentFilter>();
 
             foreach (var (version, minorVersion) in VersionRegistry.GetAllVersions(configuration))
             {
