@@ -131,6 +131,7 @@ builder.Services
     .AddMvcOptions(options =>
     {
         options.Filters.Add(new NoCachePageFilter());
+        options.Filters.Add(new AssignViewDataFromFormFlowJourneyResultFilterFactory());
     });
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())

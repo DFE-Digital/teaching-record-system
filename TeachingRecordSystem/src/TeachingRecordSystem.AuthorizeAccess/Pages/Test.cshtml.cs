@@ -22,7 +22,9 @@ public class TestModel : PageModel
                 {
                     Items =
                     {
-                        { "OneLoginAuthenticationScheme", AuthenticationScheme }
+                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, AuthenticationScheme },
+                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceName, "Test service" },
+                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceUrl, Request.GetEncodedUrl() }
                     },
                     RedirectUri = Request.GetEncodedUrl()
                 },

@@ -35,11 +35,15 @@ public class OidcController(
         {
             var parameters = Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList();
 
+            var serviceUrl = new Uri(request.RedirectUri!).GetLeftPart(UriPartial.Authority);
+
             var authenticationProperties = new AuthenticationProperties()
             {
                 RedirectUri = Request.PathBase + Request.Path + QueryString.Create(parameters)
             };
-            authenticationProperties.Items.Add("OneLoginAuthenticationScheme", client.OneLoginAuthenticationSchemeName);
+            authenticationProperties.Items.Add(MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, client.OneLoginAuthenticationSchemeName);
+            authenticationProperties.Items.Add(MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceName, client.Name);
+            authenticationProperties.Items.Add(MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceUrl, serviceUrl);
 
             return Challenge(authenticationProperties, childAuthenticationScheme);
         }
