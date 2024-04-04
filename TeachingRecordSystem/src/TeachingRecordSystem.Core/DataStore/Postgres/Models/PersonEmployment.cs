@@ -7,7 +7,7 @@ public class PersonEmployment
 
     public required Guid PersonEmploymentId { get; set; }
     public required Guid PersonId { get; set; }
-    public required Guid EstablishmentId { get; set; }
+    public required Guid? EstablishmentId { get; set; }
     public required DateOnly StartDate { get; set; }
     public required DateOnly? EndDate { get; set; }
     public required EmploymentType EmploymentType { get; set; }

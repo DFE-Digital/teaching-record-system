@@ -17,6 +17,7 @@ public class EstablishmentRefresher(
                 dbContext.Establishments.Add(new()
                 {
                     EstablishmentId = Guid.NewGuid(),
+                    EstablishmentSourceId = 1,
                     Urn = establishment.Urn,
                     LaCode = establishment.LaCode,
                     LaName = establishment.LaName,
@@ -38,6 +39,7 @@ public class EstablishmentRefresher(
             }
             else
             {
+                existingEstablishment.EstablishmentSourceId = 1;
                 existingEstablishment.LaCode = establishment.LaCode;
                 existingEstablishment.LaName = establishment.LaName;
                 existingEstablishment.EstablishmentName = establishment.EstablishmentName;

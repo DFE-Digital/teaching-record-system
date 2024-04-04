@@ -49,6 +49,7 @@ public partial class TestData
             var establishment = new Core.DataStore.Postgres.Models.Establishment
             {
                 EstablishmentId = Guid.NewGuid(),
+                EstablishmentSourceId = 1,
                 Urn = urn.Value,
                 LaCode = localAuthorityCode,
                 LaName = localAuthorityName,
