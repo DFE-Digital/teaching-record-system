@@ -4,8 +4,12 @@
     ViewBag.ServiceName = "OIDC Sample";
 }
 
-@section Head {
-    @RenderSection("Head", required: false)
+@section Styles {
+    @RenderSection("Styles", required: false)
+}
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
 }
 
 @if (User.Identity?.IsAuthenticated == true)

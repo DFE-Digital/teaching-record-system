@@ -4,11 +4,16 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
+  <Target Name="CompileSass" BeforeTargets="Build">
+    <Exec Command="sass -q wwwroot/Styles/site.scss wwwroot/Styles/site.css" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
     <PackageReference Include="GovUk.OneLogin.AspNetCore" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" />
     <PackageReference Include="OpenIddict.AspNetCore" />
     <PackageReference Include="Sentry.AspNetCore" />
     <PackageReference Include="Serilog.AspNetCore" />

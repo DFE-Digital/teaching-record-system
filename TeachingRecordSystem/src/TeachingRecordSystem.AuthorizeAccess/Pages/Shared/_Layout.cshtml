@@ -7,8 +7,9 @@
 
 @section Head {
     <meta name="robots" content="noindex">
-    @RenderSection("Head", required: false)
-    @PageTemplateHelper.GenerateStyleImports()
+    <link rel="stylesheet" asp-href-include="~/Styles/*.css">
+    @RenderSection("Styles", required: false)
+    @RenderSection("Scripts", required: false)
 }
 
 @section Header {
