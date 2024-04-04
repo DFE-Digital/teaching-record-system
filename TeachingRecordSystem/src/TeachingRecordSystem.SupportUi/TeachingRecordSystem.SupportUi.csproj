@@ -18,7 +18,6 @@
     <PackageReference Include="Microsoft.Identity.Web" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Microsoft.Identity.Web.GraphServiceClientBeta" />
-    <PackageReference Include="Microsoft.Web.LibraryManager.Build" />
     <PackageReference Include="Sentry.AspNetCore" />
     <PackageReference Include="Serilog.AspNetCore" />
   </ItemGroup>

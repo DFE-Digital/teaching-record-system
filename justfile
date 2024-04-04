@@ -12,6 +12,12 @@ install-tools:
   @cd {{solution-root}} && dotnet tool restore
   npm install -g sass
 
+# Restore dependencies
+restore:
+  @cd {{solution-root}} && dotnet restore
+  @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi" }} && dotnet libman restore
+  @cd {{solution-root / "src" / "TeachingRecordSystem.AuthorizeAccess" }} && dotnet libman restore
+
 # Run the trscli
 cli *ARGS:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Debug" / "net8.0" / "trscli.dll"}} {{ARGS}}
@@ -77,9 +83,8 @@ watch-worker:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Worker"}} && dotnet watch
 
 # Build the Docker image
-docker-build *ARGS:
-  npm install -g sass
-  @cd {{solution-root}} && dotnet publish -c Release
+docker-build *ARGS: install-tools restore
+  @cd {{solution-root}} && dotnet publish -c Release --no-restore
   @cd {{solution-root}} && docker build . {{ARGS}}
 
 # Set a configuration entry in user secrets for running the apps
