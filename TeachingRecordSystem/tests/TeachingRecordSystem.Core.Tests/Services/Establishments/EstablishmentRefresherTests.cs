@@ -149,6 +149,7 @@ public class EstablishmentRefresherTests
             var dbEstablishment = new Core.DataStore.Postgres.Models.Establishment()
             {
                 EstablishmentId = Guid.NewGuid(),
+                EstablishmentSourceId = 1,
                 Urn = urn,
                 LaCode = "123",
                 LaName = "Test LA",

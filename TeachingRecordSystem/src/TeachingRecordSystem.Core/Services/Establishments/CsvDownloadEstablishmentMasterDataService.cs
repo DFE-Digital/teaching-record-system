@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
 
@@ -24,7 +25,8 @@ public class CsvDownloadEstablishmentMasterDataService : IEstablishmentMasterDat
         response.EnsureSuccessStatusCode();
 
         using var stream = await response.Content.ReadAsStreamAsync();
-        using var reader = new StreamReader(stream);
+        // The CSV file is encoded in Windows 1252 encoding which is almost identical to Latin1 and allows Welsh and other special characters to be read correctly
+        using var reader = new StreamReader(stream, Encoding.Latin1);
         using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = true });
 
         await foreach (var item in csv.GetRecordsAsync<EstablishmentCsvRow>())

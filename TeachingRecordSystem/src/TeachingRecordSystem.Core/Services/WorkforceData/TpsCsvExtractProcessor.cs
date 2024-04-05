@@ -411,7 +411,7 @@ public class TpsCsvExtractProcessor(
     public async Task UpdateLatestEstablishmentVersions(CancellationToken cancellationToken)
     {
         using var readDbContext = dbContextFactory.CreateDbContext();
-        readDbContext.Database.SetCommandTimeout(600);
+        readDbContext.Database.SetCommandTimeout(5400);
         using var writeDbContext = dbContextFactory.CreateDbContext();
         var connection = (NpgsqlConnection)writeDbContext.Database.GetDbConnection();
         await connection.OpenAsync(CancellationToken.None);
@@ -434,7 +434,7 @@ public class TpsCsvExtractProcessor(
                         establishment_name,
                         establishment_type_code,
                         postcode,
-                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number, CASE WHEN establishment_number IS NULL THEN postcode ELSE NULL END ORDER BY translate(establishment_status_code::text, '1234', '1324'), urn desc) as row_number
+                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number, CASE WHEN establishment_number IS NULL THEN postcode ELSE NULL END ORDER BY translate(COALESCE(establishment_status_code, 1)::text, '1234', '1324'), urn desc) as row_number
                     FROM
                         establishments) e
                     WHERE
