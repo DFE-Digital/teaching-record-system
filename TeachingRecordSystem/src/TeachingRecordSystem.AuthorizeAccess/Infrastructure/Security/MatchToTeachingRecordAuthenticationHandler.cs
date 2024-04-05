@@ -35,15 +35,19 @@ public class MatchToTeachingRecordAuthenticationHandler(SignInJourneyHelper help
         EnsureInitialized();
 
         if (properties is null ||
-            !properties.Items.TryGetValue("OneLoginAuthenticationScheme", out var oneLoginAuthenticationScheme) ||
-            string.IsNullOrEmpty(oneLoginAuthenticationScheme))
+            !properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, out var oneLoginAuthenticationScheme) ||
+            oneLoginAuthenticationScheme is null ||
+            !properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.ServiceName, out var serviceName) ||
+            serviceName is null ||
+            !properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.ServiceUrl, out var serviceUrl) ||
+            serviceUrl is null)
         {
-            throw new InvalidOperationException($"'OneLoginAuthenticationScheme' must be passed in {nameof(properties)}.{nameof(properties.Items)}.");
+            throw new InvalidOperationException($"{nameof(AuthenticationProperties)} is missing one or more items.");
         }
 
         var journeyInstance = await helper.UserInstanceStateProvider.GetOrCreateSignInJourneyInstanceAsync(
             _context,
-            createState: () => new SignInJourneyState(properties.RedirectUri ?? "/", oneLoginAuthenticationScheme, properties),
+            createState: () => new SignInJourneyState(properties.RedirectUri ?? "/", serviceName, serviceUrl, oneLoginAuthenticationScheme),
             updateState: state => state.Reset());
 
         var result = helper.SignInWithOneLogin(journeyInstance);
@@ -69,5 +73,12 @@ public class MatchToTeachingRecordAuthenticationHandler(SignInJourneyHelper help
         {
             throw new InvalidOperationException("Not initialized.");
         }
+    }
+
+    public static class AuthenticationPropertiesItemKeys
+    {
+        public const string OneLoginAuthenticationScheme = "OneLoginAuthenticationScheme";
+        public const string ServiceName = "ServiceName";
+        public const string ServiceUrl = "ServiceUrl";
     }
 }

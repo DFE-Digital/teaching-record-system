@@ -6,7 +6,11 @@ using TeachingRecordSystem.FormFlow;
 namespace TeachingRecordSystem.AuthorizeAccess;
 
 [method: JsonConstructor]
-public class SignInJourneyState(string redirectUri, string oneLoginAuthenticationScheme, AuthenticationProperties? authenticationProperties)
+public class SignInJourneyState(
+    string redirectUri,
+    string serviceName,
+    string serviceUrl,
+    string oneLoginAuthenticationScheme)
 {
     public const string JourneyName = "SignInJourney";
 
@@ -14,6 +18,10 @@ public class SignInJourneyState(string redirectUri, string oneLoginAuthenticatio
         new JourneyDescriptor(JourneyName, typeof(SignInJourneyState), requestDataKeys: [], appendUniqueKey: true);
 
     public string RedirectUri { get; } = redirectUri;
+
+    public string ServiceName { get; } = serviceName;
+
+    public string ServiceUrl { get; } = serviceUrl;
 
     public string OneLoginAuthenticationScheme { get; } = oneLoginAuthenticationScheme;
 
@@ -38,8 +46,6 @@ public class SignInJourneyState(string redirectUri, string oneLoginAuthenticatio
     public string? Trn { get; set; }
 
     public bool TrnSpecified { get; set; }
-
-    public AuthenticationProperties? AuthenticationProperties { get; } = authenticationProperties;
 
     public void Reset()
     {

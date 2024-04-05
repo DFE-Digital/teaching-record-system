@@ -207,7 +207,7 @@ public class SignInJourneyHelper(
 
         var principal = new ClaimsPrincipal(teachingRecordIdentity);
 
-        state.AuthenticationTicket = new AuthenticationTicket(principal, state.AuthenticationProperties, AuthenticationSchemes.MatchToTeachingRecord);
+        state.AuthenticationTicket = new AuthenticationTicket(principal, properties: null, AuthenticationSchemes.MatchToTeachingRecord);
     }
 
     private static string EnsureUrlHasJourneyId(string url, JourneyInstanceId instanceId)

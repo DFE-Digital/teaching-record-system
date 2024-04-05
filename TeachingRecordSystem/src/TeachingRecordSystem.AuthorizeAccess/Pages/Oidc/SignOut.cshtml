@@ -1,0 +1,29 @@
+@page "/connect/logout"
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.Extensions.Primitives
+@using TeachingRecordSystem.AuthorizeAccess.Pages.Oidc
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@model SignOutModel
+@{
+    ViewBag.Title = $"Sign out of {Model.ServiceName}";
+    ViewBag.ServiceName = Model.ServiceName;
+    ViewBag.ServiceUrl = Model.ServiceUrl;
+    ViewBag.SignOutLink = Request.GetEncodedUrl();
+}
+
+<form asp-page="SignOut" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            @foreach (var parameter in HttpContext.Request.HasFormContentType ? (IEnumerable<KeyValuePair<string, StringValues>>)HttpContext.Request.Form : HttpContext.Request.Query)
+            {
+                <input type="hidden" name="@parameter.Key" value="@parameter.Value" />
+            }
+
+            <govuk-button type="submit">Sign out</govuk-button>
+        </div>
+    </div>
+</form>
+
+<script asp-add-nonce="true">document.forms[0].submit();</script>
