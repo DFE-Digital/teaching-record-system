@@ -64,6 +64,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<Establishment> Establishments => Set<Establishment>();
 
+    public DbSet<EstablishmentSource> EstablishmentSources => Set<EstablishmentSource>();
+
     public DbSet<TpsCsvExtract> TpsCsvExtracts => Set<TpsCsvExtract>();
 
     public DbSet<TpsCsvExtractLoadItem> TpsCsvExtractLoadItems => Set<TpsCsvExtractLoadItem>();
@@ -73,6 +75,10 @@ public class TrsDbContext : DbContext
     public DbSet<PersonEmployment> PersonEmployments => Set<PersonEmployment>();
 
     public DbSet<SupportTask> SupportTasks => Set<SupportTask>();
+    
+    public DbSet<TpsEstablishment> TpsEstablishments => Set<TpsEstablishment>();    
+
+    public DbSet<TpsEstablishmentType> TpsEstablishmentTypes => Set<TpsEstablishmentType>();
 
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString, int? commandTimeout = null)
     {

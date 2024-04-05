@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Establishment
 {
-    public const string UrnUniqueIndexName = "ix_establishment_urn";
+    public const string UrnIndexName = "ix_establishment_urn";
     public const string LaCodeEstablishmentNumberIndexName = "ix_establishment_la_code_establishment_number";
     public const string EstablishmentSourceIdIndexName = "ix_establishment_establishment_source_id";
 

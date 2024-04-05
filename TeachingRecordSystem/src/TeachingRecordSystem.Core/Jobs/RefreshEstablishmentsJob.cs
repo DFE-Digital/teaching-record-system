@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.Establishments;
+using TeachingRecordSystem.Core.Services.Establishments.Gias;
 
 namespace TeachingRecordSystem.Core.Jobs;
 

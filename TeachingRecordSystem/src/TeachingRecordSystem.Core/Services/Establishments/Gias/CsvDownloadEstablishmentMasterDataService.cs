@@ -3,7 +3,7 @@ using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
 
-namespace TeachingRecordSystem.Core.Services.Establishments;
+namespace TeachingRecordSystem.Core.Services.Establishments.Gias;
 
 public class CsvDownloadEstablishmentMasterDataService : IEstablishmentMasterDataService
 {

@@ -1,10 +1,10 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.Establishments;
+using TeachingRecordSystem.Core.Services.Establishments.Gias;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using Establishment = TeachingRecordSystem.Core.Models.Establishment;
 
-namespace TeachingRecordSystem.Core.Tests.Services.Establishments;
+namespace TeachingRecordSystem.Core.Tests.Services.Establishments.Gias;
 
 public class EstablishmentRefresherTests
 {

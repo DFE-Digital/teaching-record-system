@@ -1,6 +1,6 @@
 using CsvHelper.Configuration.Attributes;
 
-namespace TeachingRecordSystem.Core.Services.Establishments;
+namespace TeachingRecordSystem.Core.Services.Establishments.Gias;
 
 public class EstablishmentCsvRow
 {

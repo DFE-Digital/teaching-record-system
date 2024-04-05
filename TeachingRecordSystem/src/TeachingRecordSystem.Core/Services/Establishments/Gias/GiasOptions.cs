@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.Core.Services.Establishments;
+namespace TeachingRecordSystem.Core.Services.Establishments.Gias;
 
 public class GiasOptions
 {

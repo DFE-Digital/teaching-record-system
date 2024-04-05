@@ -7,6 +7,7 @@ namespace TeachingRecordSystem.Core.Services.WorkforceData;
 public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceClient) : ITpsExtractStorageService
 {
     private const string TpsExtractsContainerName = "tps-extracts";
+    private const string EstablishmentsFolderName = "establishments";
     private const string PendingFolderName = "pending";
     private const string ImportedFolderName = "imported";
 
@@ -16,6 +17,14 @@ public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceCl
         var fileNames = new List<string>();
         await GetFileNamesAsync(blobContainerClient, PendingFolderName, true, fileNames, cancellationToken);
         return fileNames.ToArray();
+    }
+
+    public async Task<string?> GetPendingEstablishmentImportFileName(CancellationToken cancellationToken)
+    {
+        var blobContainerClient = blobServiceClient.GetBlobContainerClient(TpsExtractsContainerName);
+        var fileNames = new List<string>();
+        await GetFileNamesAsync(blobContainerClient, EstablishmentsFolderName, true, fileNames, cancellationToken);
+        return fileNames?.FirstOrDefault();
     }
 
     public async Task<Stream> GetFile(string fileName, CancellationToken cancellationToken)
@@ -80,5 +89,5 @@ public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceCl
                 }
             }
         }
-    }
+    }    
 }
