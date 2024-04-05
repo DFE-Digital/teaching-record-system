@@ -76,10 +76,10 @@ builder.Services.AddOpenIddict()
     .AddServer(options =>
     {
         options
-            .SetAuthorizationEndpointUris("connect/authorize")
-            .SetLogoutEndpointUris("connect/logout")
-            .SetTokenEndpointUris("connect/token")
-            .SetUserinfoEndpointUris("connect/userinfo");
+            .SetAuthorizationEndpointUris("oauth2/authorize")
+            .SetLogoutEndpointUris("oauth2/logout")
+            .SetTokenEndpointUris("oauth2/token")
+            .SetUserinfoEndpointUris("oauth2/userinfo");
 
         // TODO - add teaching record scopes
         options.RegisterScopes(Scopes.Email, Scopes.Profile);
