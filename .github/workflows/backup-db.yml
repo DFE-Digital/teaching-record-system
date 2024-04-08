@@ -35,7 +35,7 @@ jobs:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@v3
+        uses: azure/setup-kubectl@v4
 
       - name: Get k8s credentials
         run: make ci production_aks get-cluster-credentials
