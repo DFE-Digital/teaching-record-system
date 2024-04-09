@@ -1,0 +1,48 @@
+@page "/check-answers"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.CheckAnswersModel
+@{
+    ViewBag.Title = "Check your answers";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Trn(Model.JourneyInstance!.InstanceId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form action="@LinkGenerator.CheckAnswers(Model.JourneyInstance!.InstanceId)" method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <p class="govuk-body">Your GOV.UK One Login could not be connected to your teaching record.</p>
+
+            <p class="govuk-body">Check your answers and try again.</p>
+
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>
+                        National Insurance number
+                    </govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @(Model.NationalInsuranceNumber ?? "None")
+                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.NationalInsuranceNumber(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="National Insurance number">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>
+                        Teacher reference number
+                    </govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @(Model.Trn ?? "None")
+                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.Trn(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="teacher reference number">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

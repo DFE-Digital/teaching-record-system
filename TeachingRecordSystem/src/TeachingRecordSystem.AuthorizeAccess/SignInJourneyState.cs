@@ -33,19 +33,26 @@ public class SignInJourneyState(
 
     public bool AttemptedIdentityVerification { get; set; }
 
-    public bool IdentityVerified { get; set; }
+    [JsonInclude]
+    public bool IdentityVerified { get; private set; }
 
-    public string[][]? VerifiedNames { get; set; }
+    [JsonInclude]
+    public string[][]? VerifiedNames { get; private set; }
 
-    public DateOnly[]? VerifiedDatesOfBirth { get; set; }
+    [JsonInclude]
+    public DateOnly[]? VerifiedDatesOfBirth { get; private set; }
 
-    public string? NationalInsuranceNumber { get; set; }
+    [JsonInclude]
+    public bool? HaveNationalInsuranceNumber { get; private set; }
 
-    public bool NationalInsuranceNumberSpecified { get; set; }
+    [JsonInclude]
+    public string? NationalInsuranceNumber { get; private set; }
 
-    public string? Trn { get; set; }
+    [JsonInclude]
+    public bool? HaveTrn { get; private set; }
 
-    public bool TrnSpecified { get; set; }
+    [JsonInclude]
+    public string? Trn { get; private set; }
 
     public void Reset()
     {
@@ -53,6 +60,43 @@ public class SignInJourneyState(
         OneLoginAuthenticationTicket = null;
         VerifiedNames = null;
         VerifiedDatesOfBirth = null;
+    }
+
+    public void SetVerified(string[][] verifiedNames, DateOnly[] verifiedDatesOfBirth)
+    {
+        IdentityVerified = true;
+        VerifiedNames = verifiedNames;
+        VerifiedDatesOfBirth = verifiedDatesOfBirth;
+    }
+
+    // Used by the Debug page
+    public void ClearVerified()
+    {
+        IdentityVerified = false;
+        VerifiedNames = null;
+        VerifiedDatesOfBirth = null;
+    }
+
+    public void SetNationalInsuranceNumber(bool haveNationalInsuranceNumber, string? nationalInsuranceNumber)
+    {
+        if (haveNationalInsuranceNumber && nationalInsuranceNumber is null)
+        {
+            throw new ArgumentException("National Insurance number must be specified.", nameof(nationalInsuranceNumber));
+        }
+
+        HaveNationalInsuranceNumber = haveNationalInsuranceNumber;
+        NationalInsuranceNumber = haveNationalInsuranceNumber ? nationalInsuranceNumber! : null;
+    }
+
+    public void SetTrn(bool haveTrn, string? trn)
+    {
+        if (haveTrn && trn is null)
+        {
+            throw new ArgumentException("TRN must be specified.", nameof(trn));
+        }
+
+        HaveTrn = haveTrn;
+        Trn = haveTrn ? trn! : null;
     }
 }
 

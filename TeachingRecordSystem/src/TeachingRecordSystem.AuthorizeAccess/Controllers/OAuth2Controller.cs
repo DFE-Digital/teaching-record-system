@@ -12,13 +12,13 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Controllers;
 
-public class OidcController(
+public class OAuth2Controller(
     TrsDbContext dbContext,
     IOpenIddictAuthorizationManager authorizationManager,
     IOpenIddictScopeManager scopeManager) : Controller
 {
-    [HttpGet("~/connect/authorize")]
-    [HttpPost("~/connect/authorize")]
+    [HttpGet("~/oauth2/authorize")]
+    [HttpPost("~/oauth2/authorize")]
     [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Authorize()
     {
@@ -82,7 +82,7 @@ public class OidcController(
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
-    [HttpPost("~/connect/token")]
+    [HttpPost("~/oauth2/token")]
     [IgnoreAntiforgeryToken]
     [Produces("application/json")]
     public async Task<IActionResult> Token()
@@ -109,8 +109,8 @@ public class OidcController(
     }
 
     [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
-    [HttpGet("~/connect/userinfo")]
-    [HttpPost("~/connect/userinfo")]
+    [HttpGet("~/oauth2/userinfo")]
+    [HttpPost("~/oauth2/userinfo")]
     [Produces("application/json")]
     public IActionResult UserInfo()
     {

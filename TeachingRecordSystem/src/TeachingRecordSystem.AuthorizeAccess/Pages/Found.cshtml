@@ -1,0 +1,24 @@
+@page "/found"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.FoundModel
+@{
+    ViewBag.Title = "We’ve found your teaching record";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form action="@LinkGenerator.Found(Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-panel class="trs-panel--left">
+                <govuk-panel-title>
+                    Your GOV.UK One Login is connected to your teaching record
+                </govuk-panel-title>
+                <govuk-panel-body>
+                    <p class="govuk-body-l">
+                        You won’t need to do this again.
+                    </p>
+
+                    <govuk-button type="submit" class="govuk-!-margin-bottom-0">Access your teaching record</govuk-button>
+                </govuk-panel-body>
+            </govuk-panel>
+        </form>
+    </div>
+</div>

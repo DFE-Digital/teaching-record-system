@@ -24,6 +24,8 @@ public class SignInJourneyHelper(
     public const string AuthenticationOnlyVtr = @"[""Cl.Cm""]";
     public const string AuthenticationAndIdentityVerificationVtr = @"[""Cl.Cm.P2""]";
 
+    public AuthorizeAccessLinkGenerator LinkGenerator { get; } = linkGenerator;
+
     public IUserInstanceStateProvider UserInstanceStateProvider { get; } = userInstanceStateProvider;
 
     public bool ShowDebugPages => optionsAccessor.Value.ShowDebugPages;
@@ -49,17 +51,18 @@ public class SignInJourneyHelper(
             state.AttemptedIdentityVerification = attemptedIdentityVerification;
 
             var vc = ticket.Principal.FindFirstValue("vc") is string vcStr ? JsonDocument.Parse(vcStr) : null;
-            state.IdentityVerified = vc is not null;
-            if (state.IdentityVerified)
+            var identityVerified = vc is not null;
+            if (identityVerified)
             {
-                state.VerifiedNames = ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray();
-                state.VerifiedDatesOfBirth = ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray();
+                state.SetVerified(
+                    verifiedNames: ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray(),
+                    verifiedDatesOfBirth: ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray());
             }
         });
 
         if (ShowDebugPages)
         {
-            return Results.Redirect(linkGenerator.DebugIdentity(journeyInstance.InstanceId));
+            return Results.Redirect(LinkGenerator.DebugIdentity(journeyInstance.InstanceId));
         }
 
         return await CreateOrUpdateOneLoginUser(journeyInstance);
@@ -122,10 +125,10 @@ public class SignInJourneyHelper(
 
         // Authenticated with OneLogin, identity verification succeeded, not yet matched to teaching record
         { OneLoginAuthenticationTicket: not null, IdentityVerified: true, AuthenticationTicket: null } =>
-            linkGenerator.NationalInsuranceNumber(journeyInstance.InstanceId),
+            LinkGenerator.Connect(journeyInstance.InstanceId),
 
         // Authenticated with OneLogin, identity verification failed
-        { OneLoginAuthenticationTicket: not null, IdentityVerified: false } => linkGenerator.NotVerified(journeyInstance.InstanceId),
+        { OneLoginAuthenticationTicket: not null, IdentityVerified: false } => LinkGenerator.NotVerified(journeyInstance.InstanceId),
 
         _ => throw new InvalidOperationException("Cannot determine next page.")
     };

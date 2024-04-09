@@ -171,7 +171,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.NotEqual(Clock.UtcNow, user.LastSignIn);
 
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
-            Assert.Equal($"/NationalInsuranceNumber?{journeyInstance.GetUniqueIdQueryParameter()}", redirectResult.Url);
+            Assert.Equal($"/Connect?{journeyInstance.GetUniqueIdQueryParameter()}", redirectResult.Url);
         });
 
     [Fact]
@@ -189,11 +189,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, sub: subject, createCoreIdentityVc: true);
             await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
 
-            await journeyInstance.UpdateStateAsync(state =>
-            {
-                state.NationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-                state.NationalInsuranceNumberSpecified = true;
-            });
+            await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, Faker.Identification.UkNationalInsuranceNumber()));
 
             personSearchServiceMock
                 .Setup(mock => mock.Search(
@@ -233,11 +229,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, sub: subject, createCoreIdentityVc: true);
             await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
 
-            await journeyInstance.UpdateStateAsync(state =>
-            {
-                state.NationalInsuranceNumber = person1.NationalInsuranceNumber;
-                state.NationalInsuranceNumberSpecified = true;
-            });
+            await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person1.NationalInsuranceNumber));
 
             personSearchServiceMock
                 .Setup(mock => mock.Search(
@@ -298,11 +290,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, sub: subject, createCoreIdentityVc: true);
             await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
 
-            await journeyInstance.UpdateStateAsync(state =>
-            {
-                state.NationalInsuranceNumber = person.NationalInsuranceNumber;
-                state.NationalInsuranceNumberSpecified = true;
-            });
+            await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
 
             personSearchServiceMock
                 .Setup(mock => mock.Search(
@@ -353,11 +341,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, sub: subject, createCoreIdentityVc: true);
             await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
 
-            await journeyInstance.UpdateStateAsync(state =>
-            {
-                state.NationalInsuranceNumber = person.NationalInsuranceNumber;
-                state.NationalInsuranceNumberSpecified = true;
-            });
+            await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
 
             personSearchServiceMock
                 .Setup(mock => mock.Search(

@@ -1,0 +1,36 @@
+// This is borrowed from https://github.com/DFE-Digital/claim-additional-payments-for-teaching/blob/master/app/assets/stylesheets/components/panel.scss
+// until it's rolled into the design system fully (https://github.com/alphagov/govuk-design-system-backlog/issues/27)
+
+.govuk-panel--interruption {
+  background-color: $govuk-brand-colour;
+  text-align: left;
+
+  * {
+    color: govuk-colour("white");
+  }
+
+  .govuk-radios__label::before,
+  & ::after {
+    color: govuk-colour("black");
+    border-color: govuk-colour("black");
+    background-color: govuk-colour("white");
+  }
+
+  .govuk-list--definition {
+    dt,
+    dd {
+      color: govuk-colour("blue");
+    }
+  }
+
+  .govuk-button,
+  .govuk-button:disabled:hover {
+    color: $govuk-brand-colour;
+    background-color: govuk-colour("white");
+    box-shadow: 0 2px 0 govuk-colour("dark-blue");
+  }
+
+  .govuk-button:hover {
+    background-color: govuk-colour("light-grey");
+  }
+}

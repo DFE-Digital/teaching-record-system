@@ -10,7 +10,7 @@ using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
-namespace TeachingRecordSystem.AuthorizeAccess.Pages.Oidc;
+namespace TeachingRecordSystem.AuthorizeAccess.Pages.OAuth2;
 
 public class SignOutModel(TrsDbContext dbContext) : PageModel
 {

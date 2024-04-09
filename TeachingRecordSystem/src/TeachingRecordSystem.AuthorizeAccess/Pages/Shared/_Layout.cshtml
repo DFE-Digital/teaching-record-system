@@ -1,3 +1,5 @@
+@inject GovUk.Frontend.AspNetCore.PageTemplateHelper PageTemplateHelper
+@inject Joonasw.AspNetCore.SecurityHeaders.Csp.ICspNonceService NonceService
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
     Layout = "_GovUkPageTemplate";
@@ -6,13 +8,17 @@
     {
         throw new InvalidOperationException("ViewBag.Title must be set.");
     }
+
+    if (ViewBag.ServiceName is not null)
+    {
+        ViewBag.Title += $" - {ViewBag.ServiceName}";
+    }
 }
 
 @section Head {
     <meta name="robots" content="noindex">
     <link rel="stylesheet" asp-href-include="~/Styles/*.css">
     @RenderSection("Styles", required: false)
-    @RenderSection("Scripts", required: false)
 }
 
 @section Header {
@@ -23,7 +29,6 @@
     else
     {
         var serviceName = ViewBag.ServiceName ?? throw new InvalidOperationException("ViewBag.ServiceName is not set.");
-        ViewBag.Title += $" - {serviceName}";
         var serviceUrl = ViewBag.ServiceUrl ?? throw new InvalidOperationException("ViewBag.ServiceUrl is not set.");
         var signOutLink = ViewBag.SignOutLink ?? throw new InvalidOperationException("ViewBag.SignOutLink is not set.");
 
@@ -154,6 +159,8 @@
 }
 
 @section BodyEnd {
+    @PageTemplateHelper.GenerateScriptImports(NonceService.GetNonce())
     <script src="~/Scripts/service-header.js" asp-add-nonce="true"></script>
     <script src="~/Scripts/init-service-header.js" asp-add-nonce="true"></script>
+    @RenderSection("Scripts", required: false)
 }

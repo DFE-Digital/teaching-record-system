@@ -6,7 +6,7 @@ public class NotVerifiedTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NotAuthenticatedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-verified?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -22,7 +22,7 @@ public class NotVerifiedTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_VerifiedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: true);
@@ -41,7 +41,7 @@ public class NotVerifiedTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequest_ReturnsExpectedContent()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: false);

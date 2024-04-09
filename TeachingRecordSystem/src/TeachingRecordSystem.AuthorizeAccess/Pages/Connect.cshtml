@@ -1,0 +1,31 @@
+@page "/connect"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.ConnectModel
+@{
+    ViewBag.Title = "Connect your GOV.UK One Login to your teaching record";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <div class="govuk-panel govuk-panel--interruption">
+            <form action="@LinkGenerator.Connect(Model.JourneyInstance!.InstanceId)" method="post">
+                <h1 class="govuk-panel__title">@ViewBag.Title</h1>
+
+                <div class="govuk-panel__body">
+                    <p class="govuk-body-l">
+                        You’ve verified your identity for your GOV.UK One Login.
+                    </p>
+
+                    <p class="govuk-body-l">
+                        You now need to connect it to your teaching record. You’ll be asked for your:
+                        <ul class="govuk-list govuk-list--bullet govuk-body-l">
+                            <li>National Insurance number</li>
+                            <li>teacher reference number</li>
+                        </ul>
+                    </p>
+
+                    <govuk-button class="govuk-!-margin-bottom-0">Connect to your teaching record</govuk-button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

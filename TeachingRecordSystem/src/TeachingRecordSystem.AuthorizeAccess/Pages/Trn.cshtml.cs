@@ -7,57 +7,66 @@ using TeachingRecordSystem.FormFlow;
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]
-public class TrnModel(SignInJourneyHelper helper, AuthorizeAccessLinkGenerator linkGenerator) : PageModel
+public class TrnModel(SignInJourneyHelper helper) : PageModel
 {
     public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
 
+    [FromQuery]
+    public bool? FromCheckAnswers { get; set; }
+
     [BindProperty]
-    [Display(Name = "Teacher reference number (TRN)")]
+    [Display(Name = "Do you have a teacher reference number (TRN)?")]
+    [Required(ErrorMessage = "Select yes if you have a TRN")]
+    public bool? HaveTrn { get; set; }
+
+    [BindProperty]
+    [Display(Name = "TRN")]
     [Required(ErrorMessage = "Enter your TRN")]
     [RegularExpression(@"\A\D*(\d{1}\D*){7}\D*\Z", ErrorMessage = "Your TRN should contain 7 digits")]
     public string? Trn { get; set; }
 
     public void OnGet()
     {
+        HaveTrn = JourneyInstance!.State.HaveTrn;
         Trn = JourneyInstance!.State.Trn;
     }
 
     public async Task<IActionResult> OnPost()
     {
+        if (HaveTrn != true)
+        {
+            ModelState.Remove(nameof(Trn));
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.TrnSpecified = true;
-            state.Trn = Trn;
-        });
+        await JourneyInstance!.UpdateStateAsync(state => state.SetTrn(HaveTrn!.Value, Trn));
 
-        if (await helper.TryMatchToTeachingRecord(JourneyInstance!))
-        {
-            return new RedirectResult(helper.GetNextPage(JourneyInstance));
-        }
-        else
-        {
-            return Redirect(linkGenerator.NotFound(JourneyInstance.InstanceId));
-        }
+        return await helper.TryMatchToTeachingRecord(JourneyInstance!) ? Redirect(helper.LinkGenerator.Found(JourneyInstance.InstanceId)) :
+            Redirect(helper.LinkGenerator.CheckAnswers(JourneyInstance.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         var state = JourneyInstance!.State;
 
-        if (state.OneLoginAuthenticationTicket is null || !state.IdentityVerified)
+        if (state.AuthenticationTicket is not null)
+        {
+            // Already matched to a Teaching Record
+            context.Result = Redirect(helper.GetSafeRedirectUri(JourneyInstance));
+        }
+        else if (state.OneLoginAuthenticationTicket is null || !state.IdentityVerified)
         {
             // Not authenticated/verified with One Login
             context.Result = BadRequest();
         }
-        else if (state.AuthenticationTicket is not null)
+        else if (!state.HaveNationalInsuranceNumber.HasValue)
         {
-            // Already matched to a Teaching Record
-            context.Result = Redirect(helper.GetSafeRedirectUri(JourneyInstance));
+            // Not answered the NINO question
+            context.Result = Redirect(helper.LinkGenerator.NationalInsuranceNumber(JourneyInstance.InstanceId));
         }
     }
 }

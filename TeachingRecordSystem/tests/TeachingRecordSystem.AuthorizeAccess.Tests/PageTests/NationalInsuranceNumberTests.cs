@@ -6,7 +6,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Get_NotAuthenticatedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -22,7 +22,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Get_NotVerifiedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: false);
@@ -41,8 +41,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Get_AlreadyAuthenticated_RedirectsToStateRedirectUri()
     {
         // Arrange
-        var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn());
@@ -64,7 +63,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"{redirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"{state.RedirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Theory]
@@ -73,7 +72,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Get_ValidRequest_RendersExpectedContent(bool haveExistingValueInState)
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
@@ -82,11 +81,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var existingNationalInsuranceNumber = haveExistingValueInState ? Faker.Identification.UkNationalInsuranceNumber() : null;
         if (existingNationalInsuranceNumber is not null)
         {
-            await journeyInstance.UpdateStateAsync(state =>
-            {
-                state.NationalInsuranceNumber = existingNationalInsuranceNumber;
-                state.NationalInsuranceNumberSpecified = true;
-            });
+            await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, existingNationalInsuranceNumber));
         }
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -103,7 +98,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Post_NotAuthenticatedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
@@ -127,7 +122,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Post_NotVerifiedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
@@ -154,8 +149,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Post_AlreadyAuthenticated_RedirectsToStateRedirectUri()
     {
         // Arrange
-        var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -184,14 +178,47 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"{redirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"{state.RedirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_HaveNationalInsuranceNumberNotAnswered_RendersError()
+    {
+        // Arrange
+        var state = CreateNewState();
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
+        var oneLoginUser = await TestData.CreateOneLoginUser(personId: null);
+
+        var ticket = CreateOneLoginAuthenticationTicket(
+            vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
+            sub: oneLoginUser.Subject,
+            email: oneLoginUser.Email,
+            firstName: person.FirstName,
+            lastName: person.LastName,
+            dateOfBirth: person.DateOfBirth);
+        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "HaveNationalInsuranceNumber", "Select yes if you have a National Insurance number");
     }
 
     [Fact]
     public async Task Post_EmptyNationalInsuranceNumber_RendersError()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -211,6 +238,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         {
             Content = new FormUrlEncodedContentBuilder
             {
+                { "HaveNationalInsuranceNumber", bool.TrueString },
                 { "NationalInsuranceNumber", nationalInsuranceNumber }
             }
         };
@@ -226,7 +254,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     public async Task Post_InvalidNationalInsuranceNumber_RendersError()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -246,6 +274,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         {
             Content = new FormUrlEncodedContentBuilder
             {
+                { "HaveNationalInsuranceNumber", bool.TrueString },
                 { "NationalInsuranceNumber", nationalInsuranceNumber }
             }
         };
@@ -258,10 +287,50 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     }
 
     [Fact]
+    public async Task Post_NoNationalInsuranceNumberSpecified_UpdatesStateAndRedirectsToTrnPage()
+    {
+        // Arrange
+        var state = CreateNewState();
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
+        var oneLoginUser = await TestData.CreateOneLoginUser(personId: null);
+
+        var ticket = CreateOneLoginAuthenticationTicket(
+            vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
+            sub: oneLoginUser.Subject,
+            email: oneLoginUser.Email,
+            firstName: person.FirstName,
+            lastName: person.LastName,
+            dateOfBirth: person.DateOfBirth);
+        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "HaveNationalInsuranceNumber", bool.FalseString }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/trn?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        state = journeyInstance.State;
+        Assert.False(state.HaveNationalInsuranceNumber);
+        Assert.Null(state.AuthenticationTicket);
+    }
+
+    [Fact]
     public async Task Post_ValidNationalInsuranceNumberButLookupFailed_UpdatesStateAndRedirectsToTrnPage()
     {
         // Arrange
-        var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -281,6 +350,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         {
             Content = new FormUrlEncodedContentBuilder
             {
+                { "HaveNationalInsuranceNumber", bool.TrueString },
                 { "NationalInsuranceNumber", nationalInsuranceNumber }
             }
         };
@@ -294,17 +364,16 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         state = journeyInstance.State;
+        Assert.True(state.HaveNationalInsuranceNumber);
         Assert.Equal(nationalInsuranceNumber, state.NationalInsuranceNumber);
-        Assert.True(state.NationalInsuranceNumberSpecified);
         Assert.Null(state.AuthenticationTicket);
     }
 
     [Fact]
-    public async Task Post_ValidNationalInsuranceNumberAndLookupSucceeded_UpdatesStateUpdatesOneLoginUserCompletesAuthenticationAndRedirectsToStateRedirectUri()
+    public async Task Post_ValidNationalInsuranceNumberAndLookupSucceeded_UpdatesStateUpdatesOneLoginUserCompletesAuthenticationAndRedirectsToFoundPage()
     {
         // Arrange
-        var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+        var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
@@ -324,6 +393,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         {
             Content = new FormUrlEncodedContentBuilder
             {
+                { "HaveNationalInsuranceNumber", bool.TrueString },
                 { "NationalInsuranceNumber", nationalInsuranceNumber }
             }
         };
@@ -333,53 +403,17 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"{redirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/found?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         state = journeyInstance.State;
+        Assert.True(state.HaveNationalInsuranceNumber);
         Assert.Equal(nationalInsuranceNumber, state.NationalInsuranceNumber);
-        Assert.True(state.NationalInsuranceNumberSpecified);
         Assert.NotNull(state.AuthenticationTicket);
 
         oneLoginUser = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
         Assert.Equal(Clock.UtcNow, oneLoginUser.FirstSignIn);
         Assert.Equal(Clock.UtcNow, oneLoginUser.LastSignIn);
         Assert.Equal(person.PersonId, oneLoginUser.PersonId);
-    }
-
-    [Fact]
-    public async Task Post_ContinueWithout_UpdatesStateAndRedirectsToTrnPage()
-    {
-        // Arrange
-        var redirectUri = "/";
-        var state = new SignInJourneyState(redirectUri, serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
-        var journeyInstance = await CreateJourneyInstance(state);
-
-        var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
-        var nationalInsuranceNumber = person.NationalInsuranceNumber!;
-        var oneLoginUser = await TestData.CreateOneLoginUser(personId: null);
-
-        var ticket = CreateOneLoginAuthenticationTicket(
-            vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
-            sub: oneLoginUser.Subject,
-            email: oneLoginUser.Email,
-            firstName: person.FirstName,
-            lastName: person.LastName,
-            dateOfBirth: person.DateOfBirth);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/national-insurance-number/ContinueWithout?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/trn?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        state = journeyInstance.State;
-        Assert.Null(state.NationalInsuranceNumber);
-        Assert.True(state.NationalInsuranceNumberSpecified);
     }
 }
