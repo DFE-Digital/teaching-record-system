@@ -25,7 +25,7 @@
 
   .govuk-button,
   .govuk-button:disabled:hover {
-    color: govuk-colour("black");
+    color: $govuk-brand-colour;
     background-color: govuk-colour("white");
     box-shadow: 0 2px 0 govuk-colour("dark-blue");
   }

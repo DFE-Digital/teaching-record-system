@@ -11,14 +11,20 @@ public abstract class AuthorizeAccessLinkGenerator
     public string NotVerified(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/NotVerified", journeyInstanceId: journeyInstanceId);
 
-    public string NationalInsuranceNumber(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/NationalInsuranceNumber", journeyInstanceId: journeyInstanceId);
+    public string Connect(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Connect", journeyInstanceId: journeyInstanceId);
 
-    public string NationalInsuranceNumberContinueWithout(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/NationalInsuranceNumber", handler: "ContinueWithout", journeyInstanceId: journeyInstanceId);
+    public string NationalInsuranceNumber(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/NationalInsuranceNumber", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string Trn(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Trn", journeyInstanceId: journeyInstanceId);
+    public string Trn(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Trn", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string CheckAnswers(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/CheckAnswers", journeyInstanceId: journeyInstanceId);
+
+    public string Found(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Found", journeyInstanceId: journeyInstanceId);
 
     public string NotFound(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/NotFound", journeyInstanceId: journeyInstanceId);

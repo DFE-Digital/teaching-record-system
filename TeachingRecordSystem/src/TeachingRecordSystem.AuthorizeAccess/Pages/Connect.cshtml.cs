@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.FormFlow;
@@ -5,13 +6,15 @@ using TeachingRecordSystem.FormFlow;
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
 [Journey(SignInJourneyState.JourneyName), RequireJourneyInstance]
-public class NotFoundModel(SignInJourneyHelper helper) : PageModel
+public class ConnectModel(SignInJourneyHelper helper) : PageModel
 {
     public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
 
     public void OnGet()
     {
     }
+
+    public IActionResult OnPost() => Redirect(helper.LinkGenerator.NationalInsuranceNumber(JourneyInstance!.InstanceId));
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
@@ -26,16 +29,6 @@ public class NotFoundModel(SignInJourneyHelper helper) : PageModel
         {
             // Not authenticated/verified with One Login
             context.Result = BadRequest();
-        }
-        else if (!state.HaveNationalInsuranceNumber.HasValue)
-        {
-            // Not answered the NINO question
-            context.Result = Redirect(helper.LinkGenerator.NationalInsuranceNumber(JourneyInstance.InstanceId));
-        }
-        else if (!state.HaveTrn.HasValue)
-        {
-            // Not answered the TRN question
-            context.Result = Redirect(helper.LinkGenerator.Trn(JourneyInstance.InstanceId));
         }
     }
 }

@@ -1,3 +1,22 @@
 @import '../lib/govuk-frontend/govuk/all.scss';
 @import './service-header-no-imports.scss';
 @import './Components/interruption-card.scss';
+
+.trs-panel--left {
+  text-align: left;
+
+  .govuk-body, .govuk-body-l {
+    color: govuk-colour("white");
+  }
+
+  .govuk-button,
+  .govuk-button:disabled:hover {
+    color: $govuk-text-colour;
+    background-color: govuk-colour("white");
+    box-shadow: 0 2px 0 govuk-colour("dark-grey");
+  }
+
+  .govuk-button:hover {
+    background-color: govuk-colour("light-grey");
+  }
+}

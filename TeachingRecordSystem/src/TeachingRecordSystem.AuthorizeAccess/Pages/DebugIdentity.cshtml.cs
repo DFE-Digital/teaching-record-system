@@ -107,9 +107,14 @@ public class DebugIdentityModel(
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            state.IdentityVerified = IdentityVerified;
-            state.VerifiedNames = verifiedNames;
-            state.VerifiedDatesOfBirth = verifiedDatesOfBirth;
+            if (IdentityVerified)
+            {
+                state.SetVerified(verifiedNames!, verifiedDatesOfBirth!);
+            }
+            else
+            {
+                state.ClearVerified();
+            }
         });
 
         if (DetachPerson && _oneLoginUser?.PersonId is not null)

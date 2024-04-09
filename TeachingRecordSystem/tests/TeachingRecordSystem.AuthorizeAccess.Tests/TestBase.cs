@@ -145,4 +145,7 @@ public abstract class TestBase : IDisposable
 
         return new AuthenticationTicket(principal, properties, authenticationScheme: "OneLogin");
     }
+
+    public SignInJourneyState CreateNewState(string redirectUri = "/") =>
+        new(redirectUri, serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
 }
