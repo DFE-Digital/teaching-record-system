@@ -27,7 +27,7 @@ public class EditNameState
         }
 
         var person = await crmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByIdQuery(
+            new GetActiveContactDetailByIdQuery(
                 personId,
                 new ColumnSet(
                     Contact.PrimaryIdAttribute,

@@ -4,15 +4,19 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetContactsByNameHandler : ICrmQueryHandler<GetContactsByNameQuery, Contact[]>
+public class GetActiveContactsByNameHandler : ICrmQueryHandler<GetActiveContactsByNameQuery, Contact[]>
 {
-    public async Task<Contact[]> Execute(GetContactsByNameQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Contact[]> Execute(GetActiveContactsByNameQuery query, IOrganizationServiceAsync organizationService)
     {
-        var filter = new FilterExpression(LogicalOperator.Or);
-        filter.AddCondition(Contact.Fields.FirstName, ConditionOperator.Like, $"{query.Name}%");
-        filter.AddCondition(Contact.Fields.MiddleName, ConditionOperator.Like, $"{query.Name}%");
-        filter.AddCondition(Contact.Fields.LastName, ConditionOperator.Like, $"{query.Name}%");
-        filter.AddCondition(Contact.Fields.FullName, ConditionOperator.Like, $"{query.Name}%");
+        var nameFilter = new FilterExpression(LogicalOperator.Or);
+        nameFilter.AddCondition(Contact.Fields.FirstName, ConditionOperator.Like, $"{query.Name}%");
+        nameFilter.AddCondition(Contact.Fields.MiddleName, ConditionOperator.Like, $"{query.Name}%");
+        nameFilter.AddCondition(Contact.Fields.LastName, ConditionOperator.Like, $"{query.Name}%");
+        nameFilter.AddCondition(Contact.Fields.FullName, ConditionOperator.Like, $"{query.Name}%");
+
+        var filter = new FilterExpression(LogicalOperator.And);
+        filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+        filter.AddFilter(nameFilter);
 
         var queryExpression = new QueryExpression(Contact.EntityLogicalName)
         {

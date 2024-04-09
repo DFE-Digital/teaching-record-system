@@ -23,7 +23,7 @@ public class EditDateOfBirthState
         }
 
         var person = await crmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByIdQuery(
+            new GetActiveContactDetailByIdQuery(
                 personId,
                 new ColumnSet(
                     Contact.PrimaryIdAttribute,

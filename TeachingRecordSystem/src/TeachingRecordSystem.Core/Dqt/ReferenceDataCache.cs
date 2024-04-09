@@ -135,7 +135,7 @@ public class ReferenceDataCache : IStartupTask
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllSanctionCodesQuery()));
+            () => _crmQueryDispatcher.ExecuteQuery(new GetAllActiveSanctionCodesQuery()));
 
     private Task<Subject[]> EnsureSubjects() =>
         LazyInitializer.EnsureInitialized(
@@ -150,7 +150,7 @@ public class ReferenceDataCache : IStartupTask
     private Task<dfeta_earlyyearsstatus[]> EnsureEarlyYearsStatuses() =>
         LazyInitializer.EnsureInitialized(
             ref _getEarlyYearsStatusesTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllEarlyYearsStatusesQuery()));
+            () => _crmQueryDispatcher.ExecuteQuery(new GetAllActiveEarlyYearsStatusesQuery()));
 
     private Task<dfeta_specialism[]> EnsureSpecialisms() =>
         LazyInitializer.EnsureInitialized(
@@ -165,12 +165,12 @@ public class ReferenceDataCache : IStartupTask
     private Task<dfeta_hequalification[]> EnsureHeQualifications() =>
         LazyInitializer.EnsureInitialized(
             ref _getHeQualificationsTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllHeQualificationsQuery()));
+            () => _crmQueryDispatcher.ExecuteQuery(new GetAllActiveHeQualificationsQuery()));
 
     private Task<dfeta_hesubject[]> EnsureHeSubjects() =>
         LazyInitializer.EnsureInitialized(
             ref _getHeSubjectsTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllHeSubjectsQuery()));
+            () => _crmQueryDispatcher.ExecuteQuery(new GetAllActiveHeSubjectsQuery()));
 
     async Task IStartupTask.Execute()
     {

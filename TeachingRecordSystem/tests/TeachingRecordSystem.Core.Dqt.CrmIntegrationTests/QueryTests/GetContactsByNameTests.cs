@@ -76,7 +76,7 @@ public class GetContactsByNameTests : IAsyncLifetime
             Contact.Fields.FullName);
 
         // Act
-        var results = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByNameQuery(name, testScenarioData.SortBy, maxRecordCount, columnSet));
+        var results = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByNameQuery(name, testScenarioData.SortBy, maxRecordCount, columnSet));
 
         // Assert
         Assert.NotNull(results);

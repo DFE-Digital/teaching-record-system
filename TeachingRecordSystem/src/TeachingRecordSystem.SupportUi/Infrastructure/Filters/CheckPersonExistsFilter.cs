@@ -37,7 +37,7 @@ public class CheckPersonExistsFilter(
         }
 
         var person = await crmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByIdQuery(
+            new GetActiveContactDetailByIdQuery(
                 personId,
                 new ColumnSet(
                     Contact.Fields.Id,

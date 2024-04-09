@@ -4,9 +4,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetContactsByLastNameAndDateOfBirthHandler : ICrmQueryHandler<GetContactsByLastNameAndDateOfBirthQuery, Contact[]>
+public class GetActiveContactsByLastNameAndDateOfBirthHandler : ICrmQueryHandler<GetActiveContactsByLastNameAndDateOfBirthQuery, Contact[]>
 {
-    public async Task<Contact[]> Execute(GetContactsByLastNameAndDateOfBirthQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Contact[]> Execute(GetActiveContactsByLastNameAndDateOfBirthQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression(Contact.EntityLogicalName)
         {

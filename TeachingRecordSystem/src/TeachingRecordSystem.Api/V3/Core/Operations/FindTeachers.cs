@@ -29,7 +29,7 @@ public class FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfig
     public async Task<FindTeachersResult> Handle(FindTeachersCommand command)
     {
         var contacts = await crmQueryDispatcher.ExecuteQuery(
-            new GetContactsByLastNameAndDateOfBirthQuery(
+            new GetActiveContactsByLastNameAndDateOfBirthQuery(
                 command.LastName!,
                 command.DateOfBirth!.Value,
                 new ColumnSet(

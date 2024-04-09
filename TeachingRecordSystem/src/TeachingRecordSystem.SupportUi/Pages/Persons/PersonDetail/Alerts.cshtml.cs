@@ -36,7 +36,7 @@ public partial class AlertsModel : PageModel
     public async Task<IActionResult> OnGet()
     {
         var contactDetail = await _crmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByIdQuery(
+            new GetActiveContactDetailByIdQuery(
                 PersonId,
                 new ColumnSet(
                     Contact.Fields.FirstName,

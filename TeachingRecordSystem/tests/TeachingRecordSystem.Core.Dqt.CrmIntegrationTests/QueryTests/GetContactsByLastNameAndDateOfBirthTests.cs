@@ -28,7 +28,7 @@ public class GetContactsByLastNameAndDateOfBirthTests : IAsyncLifetime
         var person2 = await _dataScope.TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
         // Act
-        var results = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByLastNameAndDateOfBirthQuery(lastName, dateOfBirth, new ColumnSet()));
+        var results = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByLastNameAndDateOfBirthQuery(lastName, dateOfBirth, new ColumnSet()));
 
         // Assert
         Assert.NotNull(results);

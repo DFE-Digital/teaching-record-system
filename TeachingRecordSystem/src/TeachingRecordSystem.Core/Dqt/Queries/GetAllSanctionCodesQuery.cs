@@ -1,3 +1,3 @@
 namespace TeachingRecordSystem.Core.Dqt.Queries;
 
-public record GetAllSanctionCodesQuery : ICrmQuery<dfeta_sanctioncode[]>;
+public record GetAllActiveSanctionCodesQuery : ICrmQuery<dfeta_sanctioncode[]>;

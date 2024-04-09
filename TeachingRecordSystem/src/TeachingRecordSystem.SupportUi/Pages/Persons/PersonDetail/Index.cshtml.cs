@@ -29,7 +29,7 @@ public class IndexModel(
     public async Task OnGet()
     {
         var contactDetail = await crmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByIdQuery(
+            new GetActiveContactDetailByIdQuery(
                 PersonId,
                 new ColumnSet(
                     Contact.Fields.dfeta_TRN,

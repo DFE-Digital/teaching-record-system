@@ -55,7 +55,7 @@ public class ConfirmModel : PageModel
         }
 
         var person = await _crmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByIdQuery(
+            new GetActiveContactDetailByIdQuery(
                 PersonId,
                 new ColumnSet(
                     Contact.PrimaryIdAttribute,

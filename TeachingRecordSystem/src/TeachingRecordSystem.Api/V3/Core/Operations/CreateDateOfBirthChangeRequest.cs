@@ -20,7 +20,7 @@ public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryD
     public async Task Handle(CreateDateOfBirthChangeRequestCommand command)
     {
         var contact = await crmQueryDispatcher.ExecuteQuery(
-            new GetContactByTrnQuery(command.Trn, new Microsoft.Xrm.Sdk.Query.ColumnSet()));
+            new GetActiveContactByTrnQuery(command.Trn, new Microsoft.Xrm.Sdk.Query.ColumnSet()));
 
         if (contact is null)
         {

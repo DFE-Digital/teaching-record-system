@@ -26,16 +26,15 @@ public class GetContactWithParentByIdHandler : ICrmQueryHandler<GetContactWithPa
             var queryExpression = new QueryExpression(Contact.EntityLogicalName)
             {
                 ColumnSet = new ColumnSet(
-                            Contact.Fields.dfeta_TRN,
-                            Contact.Fields.FirstName,
-                            Contact.Fields.MiddleName,
-                            Contact.Fields.LastName,
-                            Contact.Fields.EMailAddress1,
-                            Contact.Fields.dfeta_NINumber,
-                            Contact.Fields.BirthDate,
-                            Contact.Fields.Merged,
-                            Contact.Fields.MasterId
-                    ),
+                    Contact.Fields.dfeta_TRN,
+                    Contact.Fields.FirstName,
+                    Contact.Fields.MiddleName,
+                    Contact.Fields.LastName,
+                    Contact.Fields.EMailAddress1,
+                    Contact.Fields.dfeta_NINumber,
+                    Contact.Fields.BirthDate,
+                    Contact.Fields.Merged,
+                    Contact.Fields.MasterId),
                 Criteria = filter
             };
 

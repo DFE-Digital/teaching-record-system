@@ -27,7 +27,7 @@ public class GetTeacherHandler(
     public async Task<GetTeacherResponse?> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
         var contactDetail = await crmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByTrnQuery(
+            new GetActiveContactDetailByTrnQuery(
                 request.Trn,
                 new ColumnSet(
                     Contact.Fields.FirstName,

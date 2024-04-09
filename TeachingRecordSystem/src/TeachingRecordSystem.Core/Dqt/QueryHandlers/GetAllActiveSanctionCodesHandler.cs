@@ -5,9 +5,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetAllSanctionCodesHandler : ICrmQueryHandler<GetAllSanctionCodesQuery, dfeta_sanctioncode[]>
+public class GetAllActiveSanctionCodesHandler : ICrmQueryHandler<GetAllActiveSanctionCodesQuery, dfeta_sanctioncode[]>
 {
-    public async Task<dfeta_sanctioncode[]> Execute(GetAllSanctionCodesQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_sanctioncode[]> Execute(GetAllActiveSanctionCodesQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {

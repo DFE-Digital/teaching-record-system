@@ -13,7 +13,7 @@ public class GetAllEarlyYearsStatusesTests
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var query = new GetAllEarlyYearsStatusesQuery();
+        var query = new GetAllActiveEarlyYearsStatusesQuery();
 
         // Act
         var result = await _crmQueryDispatcher.ExecuteQuery(query);
