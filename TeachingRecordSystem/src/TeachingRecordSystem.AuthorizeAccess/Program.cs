@@ -151,11 +151,13 @@ builder.Services
     .AddTransient<AuthorizeAccessLinkGenerator, RoutingAuthorizeAccessLinkGenerator>()
     .AddTransient<FormFlowJourneySignInHandler>()
     .AddTransient<MatchToTeachingRecordAuthenticationHandler>()
+    .AddHttpContextAccessor()
+    .AddSingleton<IStartupFilter, FormFlowSessionMiddlewareStartupFilter>()
     .AddFormFlow(options =>
     {
         options.JourneyRegistry.RegisterJourney(SignInJourneyState.JourneyDescriptor);
     })
-    .AddSingleton<ICurrentUserIdProvider, DummyCurrentUserIdProvider>()
+    .AddSingleton<ICurrentUserIdProvider, FormFlowSessionCurrentUserIdProvider>()
     .AddTransient<SignInJourneyHelper>()
     .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
     .AddPersonSearch();
