@@ -72,7 +72,7 @@ public class CreateTrnRequestHandler(
 
         // re-fetch teacher that was just created.
         var teacher = (await _crmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByIdQuery(
+            new GetActiveContactDetailByIdQuery(
                 contactId,
                 new ColumnSet(
                     Contact.Fields.dfeta_TRN,

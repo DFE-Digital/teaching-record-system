@@ -4,9 +4,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetContactsByDateOfBirthHandler : ICrmQueryHandler<GetContactsByDateOfBirthQuery, Contact[]>
+public class GetActiveContactsByDateOfBirthHandler : ICrmQueryHandler<GetActiveContactsByDateOfBirthQuery, Contact[]>
 {
-    public async Task<Contact[]> Execute(GetContactsByDateOfBirthQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Contact[]> Execute(GetActiveContactsByDateOfBirthQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryByAttribute = new QueryByAttribute()
         {
@@ -14,8 +14,10 @@ public class GetContactsByDateOfBirthHandler : ICrmQueryHandler<GetContactsByDat
             ColumnSet = query.ColumnSet,
             TopCount = query.MaxRecordCount
         };
+
         queryByAttribute.AddAttributeValue(Contact.Fields.StateCode, (int)ContactState.Active);
         queryByAttribute.AddAttributeValue(Contact.Fields.BirthDate, query.DateOfBirth.ToDateTime());
+
         switch (query.SortBy)
         {
             case ContactSearchSortByOption.LastNameAscending:

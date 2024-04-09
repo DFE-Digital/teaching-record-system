@@ -13,7 +13,7 @@ public class GetAllHeSubjectsTests
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var query = new GetAllHeSubjectsQuery();
+        var query = new GetAllActiveHeSubjectsQuery();
 
         // Act
         var result = await _crmQueryDispatcher.ExecuteQuery(query);

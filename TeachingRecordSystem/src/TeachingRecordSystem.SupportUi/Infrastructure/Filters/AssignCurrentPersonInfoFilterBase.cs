@@ -10,7 +10,7 @@ public abstract class AssignCurrentPersonInfoFilterBase(ICrmQueryDispatcher crmQ
     protected async Task<bool> TryAssignCurrentPersonInfo(Guid personId, HttpContext httpContext)
     {
         var contactDetail = await CrmQueryDispatcher.ExecuteQuery(
-            new GetContactDetailByIdQuery(
+            new GetActiveContactDetailByIdQuery(
                 personId,
                 new ColumnSet(
                     Contact.Fields.Id,

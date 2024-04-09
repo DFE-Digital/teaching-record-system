@@ -5,9 +5,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetAllEarlyYearsStatusesHandler : ICrmQueryHandler<GetAllEarlyYearsStatusesQuery, dfeta_earlyyearsstatus[]>
+public class GetAllActiveEarlyYearsStatusesHandler : ICrmQueryHandler<GetAllActiveEarlyYearsStatusesQuery, dfeta_earlyyearsstatus[]>
 {
-    public async Task<dfeta_earlyyearsstatus[]> Execute(GetAllEarlyYearsStatusesQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_earlyyearsstatus[]> Execute(GetAllActiveEarlyYearsStatusesQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {

@@ -24,7 +24,7 @@ public class GetContactDetailByIdTests : IAsyncLifetime
         var contactId = Guid.NewGuid();
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetContactDetailByIdQuery(contactId, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(contactId, new ColumnSet()));
 
         // Assert
         Assert.Null(result);
@@ -37,7 +37,7 @@ public class GetContactDetailByIdTests : IAsyncLifetime
         var person = await _dataScope.TestData.CreatePerson();
 
         // Act
-        var results = await _crmQueryDispatcher.ExecuteQuery(new GetContactDetailByIdQuery(person.ContactId, new ColumnSet()));
+        var results = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(person.ContactId, new ColumnSet()));
 
         // Assert
         Assert.NotNull(results);
@@ -56,7 +56,7 @@ public class GetContactDetailByIdTests : IAsyncLifetime
         await _dataScope.TestData.UpdatePerson(b => b.WithPersonId(person.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
 
         // Act
-        var results = await _crmQueryDispatcher.ExecuteQuery(new GetContactDetailByIdQuery(person.ContactId, new ColumnSet()));
+        var results = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(person.ContactId, new ColumnSet()));
 
         // Assert
         Assert.NotNull(results);

@@ -5,9 +5,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetAllHeQualificationsHandler : ICrmQueryHandler<GetAllHeQualificationsQuery, dfeta_hequalification[]>
+public class GetAllActiveHeQualificationsHandler : ICrmQueryHandler<GetAllActiveHeQualificationsQuery, dfeta_hequalification[]>
 {
-    public async Task<dfeta_hequalification[]> Execute(GetAllHeQualificationsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_hequalification[]> Execute(GetAllActiveHeQualificationsQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {

@@ -86,16 +86,16 @@ public partial class IndexModel : PageModel
         // Check if the search string is a date of birth, TRN or one or more names
         if (DateOnly.TryParse(Search, out var dateOfBirth))
         {
-            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByDateOfBirthQuery(dateOfBirth, SortBy, MaxSearchResultCount, columnSet));
+            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByDateOfBirthQuery(dateOfBirth, SortBy, MaxSearchResultCount, columnSet));
         }
         else if (TrnRegex().IsMatch(Search!))
         {
-            var contact = await _crmQueryDispatcher.ExecuteQuery(new GetContactByTrnQuery(Search!, columnSet));
+            var contact = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactByTrnQuery(Search!, columnSet));
             contacts = contact is not null ? [contact] : [];
         }
         else
         {
-            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetContactsByNameQuery(Search!, SortBy, MaxSearchResultCount, columnSet));
+            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByNameQuery(Search!, SortBy, MaxSearchResultCount, columnSet));
         }
         Debug.Assert(contacts is not null);
 

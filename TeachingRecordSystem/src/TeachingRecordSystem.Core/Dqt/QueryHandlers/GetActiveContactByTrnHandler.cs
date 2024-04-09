@@ -4,9 +4,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetContactByTrnHandler : ICrmQueryHandler<GetContactByTrnQuery, Contact?>
+public class GetActiveContactByTrnHandler : ICrmQueryHandler<GetActiveContactByTrnQuery, Contact?>
 {
-    public async Task<Contact?> Execute(GetContactByTrnQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Contact?> Execute(GetActiveContactByTrnQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryByAttribute = new QueryByAttribute()
         {

@@ -59,7 +59,7 @@ public class ConfirmModel : PageModel
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetContactDetailByIdQuery(PersonId, new ColumnSet(Contact.Fields.Id)));
+        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(PersonId, new ColumnSet(Contact.Fields.Id)));
         if (person is null)
         {
             context.Result = NotFound();
