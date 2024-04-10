@@ -87,7 +87,7 @@ public class HostFixture : WebApplicationFactory<Program>
                 .AddHttpMessageHandler(_ => EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())
                 .ConfigurePrimaryHttpMessageHandler(_ => new NotFoundHandler());
 
-            services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            services.PostConfigure<JwtBearerOptions>("IdAccessToken", options =>
             {
                 options.TokenValidationParameters.ValidateIssuer = false;
                 options.TokenValidationParameters.IssuerSigningKey = JwtSigningCredentials.Key;

@@ -3,25 +3,23 @@
 @using TeachingRecordSystem.AuthorizeAccess.Pages.OidcTest
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @model SignedInModel
-@{
-    var claimsJson = JsonSerializer.Serialize(
-        User.Claims.ToDictionary(c => c.Type, c => c.Value),
-        new JsonSerializerOptions() { WriteIndented = true });
-}
 
 @section Styles {
     <style type="text/css" asp-add-nonce="true">
         .claims-json {
             font-family: monospace !important;
-            white-space: nowrap;
             height: 260px;
+            white-space: pre-wrap;
+        }
+
+        .access-token {
+            font-family: monospace !important;
         }
     </style>
 }
 
 <p class="govuk-body">
-    <govuk-textarea name="Claims" textarea-class="claims-json">
-        <govuk-textarea-label>Claims</govuk-textarea-label>
-        <govuk-textarea-value>@claimsJson</govuk-textarea-value>
-    </govuk-textarea>
+    <govuk-input asp-for="AccessToken" input-class="access-token" disabled="true" />
+
+    <govuk-textarea asp-for="ClaimsJson" textarea-class="claims-json" disabled="true" />
 </p>
