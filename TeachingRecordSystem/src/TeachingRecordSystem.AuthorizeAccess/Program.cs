@@ -81,6 +81,8 @@ builder.Services.AddOpenIddict()
             .SetTokenEndpointUris("oauth2/token")
             .SetUserinfoEndpointUris("oauth2/userinfo");
 
+        options.SetIssuer(builder.Configuration.GetRequiredValue("AuthorizeAccessIssuer"));
+
         options.RegisterScopes(Scopes.Email, Scopes.Profile, CustomScopes.TeachingRecord);
 
         options.AllowAuthorizationCodeFlow();
