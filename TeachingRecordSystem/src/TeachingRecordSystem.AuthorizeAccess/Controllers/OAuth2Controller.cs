@@ -25,6 +25,18 @@ public class OAuth2Controller(
         var request = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
+        if (!request.HasScope(CustomScopes.TeachingRecord))
+        {
+            return Forbid(
+                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+                properties: new AuthenticationProperties(new Dictionary<string, string?>()
+                {
+                    [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidRequest,
+                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                        $"Requests must include the {CustomScopes.TeachingRecord} scope."
+                }));
+        }
+
         var clientId = request.ClientId!;
         var client = await dbContext.ApplicationUsers.SingleAsync(u => u.ClientId == clientId);
 

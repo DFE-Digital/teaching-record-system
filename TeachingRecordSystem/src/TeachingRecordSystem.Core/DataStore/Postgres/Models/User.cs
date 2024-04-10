@@ -105,7 +105,8 @@ public class ApplicationUser : UserBase
                 Permissions.GrantTypes.AuthorizationCode,
                 Permissions.ResponseTypes.Code,
                 Permissions.Scopes.Email,
-                Permissions.Scopes.Profile),
+                Permissions.Scopes.Profile,
+                $"{Permissions.Prefixes.Scope}teaching_record"),
             RedirectUris = CreateJsonArray(RedirectUris!.ToArray()),
             PostLogoutRedirectUris = CreateJsonArray(PostLogoutRedirectUris!.ToArray()),
             Requirements = CreateJsonArray(Requirements.Features.ProofKeyForCodeExchange)
