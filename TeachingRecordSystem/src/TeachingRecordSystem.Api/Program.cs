@@ -2,7 +2,6 @@ using System.Security.Claims;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using idunno.Authentication.Basic;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -48,9 +47,15 @@ public class Program
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })
-            .AddJwtBearer(options =>
+            .AddJwtBearer(AuthenticationSchemeNames.IdAccessToken, options =>
             {
                 options.Authority = configuration["GetAnIdentity:BaseAddress"];
+                options.MapInboundClaims = false;
+                options.TokenValidationParameters.ValidateAudience = false;
+            })
+            .AddJwtBearer(AuthenticationSchemeNames.AuthorizeAccessAccessToken, options =>
+            {
+                options.Authority = configuration.GetRequiredValue("AuthorizeAccessIssuer");
                 options.MapInboundClaims = false;
                 options.TokenValidationParameters.ValidateAudience = false;
             })
@@ -101,11 +106,11 @@ public class Program
             options.AddPolicy(
                 AuthorizationPolicies.IdentityUserWithTrn,
                 policy => policy
-                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                    .AddAuthenticationSchemes(AuthenticationSchemeNames.IdAccessToken, AuthenticationSchemeNames.AuthorizeAccessAccessToken)
                     .RequireAssertion(ctx =>
                     {
                         var scopes = (ctx.User.FindFirstValue("scope") ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                        return scopes.Contains("dqt:read");
+                        return scopes.Contains("dqt:read") || scopes.Contains("teaching_record");
                     })
                     .RequireClaim("trn"));
 
@@ -297,4 +302,10 @@ public class Program
             };
         }
     }
+}
+
+file static class AuthenticationSchemeNames
+{
+    public const string IdAccessToken = nameof(IdAccessToken);
+    public const string AuthorizeAccessAccessToken = nameof(AuthorizeAccessAccessToken);
 }
