@@ -35,6 +35,7 @@ public static class TestAppConfiguration
                     options.Scope.Add("openid");
                     options.Scope.Add("email");
                     options.Scope.Add("profile");
+                    options.Scope.Add(CustomScopes.TeachingRecord);
                 });
         }
         else

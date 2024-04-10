@@ -81,8 +81,7 @@ builder.Services.AddOpenIddict()
             .SetTokenEndpointUris("oauth2/token")
             .SetUserinfoEndpointUris("oauth2/userinfo");
 
-        // TODO - add teaching record scopes
-        options.RegisterScopes(Scopes.Email, Scopes.Profile);
+        options.RegisterScopes(Scopes.Email, Scopes.Profile, CustomScopes.TeachingRecord);
 
         options.AllowAuthorizationCodeFlow();
 
