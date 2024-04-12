@@ -61,7 +61,7 @@ public class BackFillVersionedEndpointsConvention : IApplicationModelConvention
                 {
                     acceptedVersions.Add(version);
                 }
-                else if (epForThisVersion.Action.Attributes.OfType<RemovesFromApiAttribute>().Any())
+                else
                 {
                     break;
                 }
