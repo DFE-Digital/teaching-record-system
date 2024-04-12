@@ -27,7 +27,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: false);
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -46,7 +46,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
+        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         Debug.Assert(state.NationalInsuranceNumber is null);
@@ -68,7 +70,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
+        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         Debug.Assert(state.NationalInsuranceNumber is null);
@@ -92,15 +96,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person.PersonId);
+        var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
-        var ticket = CreateOneLoginAuthenticationTicket(
-            vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
-            sub: oneLoginUser.Subject,
-            email: oneLoginUser.Email,
-            firstName: person.FirstName,
-            lastName: person.LastName,
-            dateOfBirth: person.DateOfBirth);
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -120,7 +118,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
+        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
@@ -166,7 +166,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr, createCoreIdentityVc: false);
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -185,7 +185,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
+        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         Debug.Assert(state.NationalInsuranceNumber is null);
@@ -207,7 +209,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
+        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         Debug.Assert(state.NationalInsuranceNumber is null);
@@ -231,15 +235,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person.PersonId);
+        var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
-        var ticket = CreateOneLoginAuthenticationTicket(
-            vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
-            sub: oneLoginUser.Subject,
-            email: oneLoginUser.Email,
-            firstName: person.FirstName,
-            lastName: person.LastName,
-            dateOfBirth: person.DateOfBirth);
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -253,13 +251,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_ValidRequests_RedirectsToNotFoundPage()
+    public async Task Post_ValidRequest_RedirectsToNotFoundPage()
     {
         // Arrange
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
+        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();

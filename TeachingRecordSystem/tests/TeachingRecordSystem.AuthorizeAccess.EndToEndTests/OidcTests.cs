@@ -8,7 +8,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task SignInAndOut()
     {
         var person = await TestData.CreatePerson(x => x.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person.PersonId);
+        var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email, coreIdentityVc));

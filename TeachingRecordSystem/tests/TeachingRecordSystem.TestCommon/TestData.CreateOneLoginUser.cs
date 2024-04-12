@@ -6,11 +6,31 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
+    public Task<OneLoginUser> CreateOneLoginUser(CreatePersonResult createPersonResult, string? subject = null, string? email = null) =>
+        CreateOneLoginUser(
+            createPersonResult.PersonId,
+            subject,
+            email,
+            verifiedInfo: ([createPersonResult.FirstName, createPersonResult.LastName], createPersonResult.DateOfBirth));
+
+    public Task<OneLoginUser> CreateOneLoginUser(string? subject = null, string? email = null, bool verified = false) =>
+        CreateOneLoginUser(
+            personId: null,
+            subject,
+            email,
+            verifiedInfo: verified ? ([Faker.Name.First(), Faker.Name.Last()], DateOnly.FromDateTime(Faker.Identification.DateOfBirth())) : null);
+
     public Task<OneLoginUser> CreateOneLoginUser(
         Guid? personId,
         string? subject = null,
-        string? email = null)
+        string? email = null,
+        (string[] Name, DateOnly DateOfBirth)? verifiedInfo = null)
     {
+        if (personId is not null && verifiedInfo is null)
+        {
+            throw new ArgumentException("OneLoginUser with a Person must be verified.", nameof(verifiedInfo));
+        }
+
         return WithDbContext(async dbContext =>
         {
             subject ??= CreateOneLoginUserSubject();
@@ -24,6 +44,14 @@ public partial class TestData
                 LastOneLoginSignIn = Clock.UtcNow,
                 PersonId = personId
             };
+
+            if (verifiedInfo is not null)
+            {
+                user.VerifiedOn = Clock.UtcNow;
+                user.VerificationRoute = OneLoginUserVerificationRoute.OneLogin;
+                user.VerifiedNames = [verifiedInfo!.Value.Name];
+                user.VerifiedDatesOfBirth = [verifiedInfo!.Value.DateOfBirth];
+            }
 
             dbContext.OneLoginUsers.Add(user);
 

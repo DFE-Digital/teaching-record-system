@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.FormFlow;
+using static TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security.FormFlowJourneySignInHandler;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 
@@ -169,6 +172,25 @@ public sealed class OneLoginAuthenticationSchemeProvider(
             }
 
             return Task.CompletedTask;
+        };
+
+        options.Events.OnAccessDenied = async context =>
+        {
+            // This handles the scenario where we've requested ID verification but One Login couldn't do it.
+
+            if (context.Properties!.TryGetVectorOfTrust(out var vtr) && vtr == SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr &&
+                context.Properties?.Items.TryGetValue(PropertyKeys.JourneyInstanceId, out var serializedInstanceId) == true && serializedInstanceId is not null)
+            {
+                context.HandleResponse();
+
+                var journeyInstanceId = JourneyInstanceId.Deserialize(serializedInstanceId);
+
+                var signInJourneyHelper = context.HttpContext.RequestServices.GetRequiredService<SignInJourneyHelper>();
+                var journeyInstance = (await signInJourneyHelper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(context.HttpContext, journeyInstanceId))!;
+
+                var result = await signInJourneyHelper.OnUserVerificationWithOneLoginFailed(journeyInstance);
+                await result.ExecuteAsync(context.HttpContext);
+            }
         };
 
         options.CoreIdentityClaimIssuerSigningKey = _coreIdentityIssuerSigningKey;
