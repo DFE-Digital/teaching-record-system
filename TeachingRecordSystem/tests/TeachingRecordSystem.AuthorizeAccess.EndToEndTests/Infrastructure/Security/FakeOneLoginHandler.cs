@@ -1,12 +1,15 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
+using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
+using TeachingRecordSystem.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
 
-public class FakeOneLoginHandler(OneLoginCurrentUserProvider currentUserProvider) : IAuthenticationHandler, IAuthenticationSignOutHandler
+public class FakeOneLoginHandler(OneLoginCurrentUserProvider currentUserProvider, SignInJourneyHelper signInJourneyHelper) : IAuthenticationHandler, IAuthenticationSignOutHandler
 {
     private HttpContext? _context;
 
@@ -21,6 +24,30 @@ public class FakeOneLoginHandler(OneLoginCurrentUserProvider currentUserProvider
     {
         _ = _context ?? throw new InvalidOperationException("Not initialized.");
         var user = currentUserProvider.CurrentUser ?? throw new InvalidOperationException("No current user set.");
+
+        if (properties is null || !properties.TryGetVectorOfTrust(out var vtr))
+        {
+            throw new InvalidOperationException("No vtr set.");
+        }
+
+        if (vtr == SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr && user.CoreIdentityVc is null)
+        {
+            // Simulate an 'access_denied' error for failing ID verification
+
+            if (!properties.Items.TryGetValue(FormFlowJourneySignInHandler.PropertyKeys.JourneyInstanceId, out var serializedInstanceId) || serializedInstanceId is null)
+            {
+                throw new InvalidOperationException("No JourneyInstanceId set.");
+            }
+
+            var journeyInstanceId = JourneyInstanceId.Deserialize(serializedInstanceId);
+
+            var journeyInstance = (await signInJourneyHelper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(_context, journeyInstanceId))!;
+
+            var result = await signInJourneyHelper.OnUserVerificationWithOneLoginFailed(journeyInstance);
+            await result.ExecuteAsync(_context);
+
+            return;
+        }
 
         var claims = new List<Claim>()
         {

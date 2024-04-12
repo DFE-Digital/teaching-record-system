@@ -10,4 +10,8 @@ public class OneLoginUser
     public DateTime? LastSignIn { get; set; }
     public Guid? PersonId { get; set; }
     public Person? Person { get; }
+    public DateTime? VerifiedOn { get; set; }
+    public OneLoginUserVerificationRoute? VerificationRoute { get; set; }
+    public string[][]? VerifiedNames { get; set; }
+    public DateOnly[]? VerifiedDatesOfBirth { get; set; }
 }

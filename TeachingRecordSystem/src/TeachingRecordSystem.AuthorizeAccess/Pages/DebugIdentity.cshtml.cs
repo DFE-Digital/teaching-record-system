@@ -17,6 +17,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 public class DebugIdentityModel(
     TrsDbContext dbContext,
     SignInJourneyHelper helper,
+    IClock clock,
     IOptions<AuthorizeAccessOptions> optionsAccessor) : PageModel
 {
     private OneLoginUser? _oneLoginUser;
@@ -105,9 +106,38 @@ public class DebugIdentityModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state =>
+        if (DetachPerson && _oneLoginUser!.PersonId is not null)
+        {
+            _oneLoginUser.PersonId = null;
+        }
+
+        if (_oneLoginUser!.PersonId is null)
         {
             if (IdentityVerified)
+            {
+                _oneLoginUser!.VerifiedOn = clock.UtcNow;
+                _oneLoginUser.VerificationRoute = OneLoginUserVerificationRoute.OneLogin;
+                _oneLoginUser.VerifiedNames = verifiedNames;
+                _oneLoginUser.VerifiedDatesOfBirth = verifiedDatesOfBirth;
+            }
+            else
+            {
+                _oneLoginUser!.VerifiedOn = null;
+                _oneLoginUser.VerificationRoute = null;
+                _oneLoginUser.VerifiedNames = null;
+                _oneLoginUser.VerifiedDatesOfBirth = null;
+            }
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            if (_oneLoginUser!.PersonId is not null)
+            {
+                helper.Complete(state, _oneLoginUser.Person!.Trn!);
+            }
+            else if (IdentityVerified)
             {
                 state.SetVerified(verifiedNames!, verifiedDatesOfBirth!);
             }
@@ -117,14 +147,8 @@ public class DebugIdentityModel(
             }
         });
 
-        if (DetachPerson && _oneLoginUser?.PersonId is not null)
-        {
-            _oneLoginUser.PersonId = null;
-            await dbContext.SaveChangesAsync();
-        }
-
-        var nextPage = await helper.CreateOrUpdateOneLoginUser(JourneyInstance);
-        return new HttpResultActionResult(nextPage);
+        var nextPage = helper.GetNextPage(JourneyInstance);
+        return nextPage.ToActionResult();
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

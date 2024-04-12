@@ -5,13 +5,15 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests;
 public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_NotAuthenticated_RedirectsToStartOfMatchingJourney()
+    public async Task Get_NotFullyAuthenticated_RedirectsToStartOfMatchingJourney()
     {
         // Arrange
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
+        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
         Debug.Assert(state.AuthenticationTicket is null);
 
@@ -33,15 +35,9 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person.PersonId);
+        var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
-        var ticket = CreateOneLoginAuthenticationTicket(
-            vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
-            sub: oneLoginUser.Subject,
-            email: oneLoginUser.Email,
-            firstName: person.FirstName,
-            lastName: person.LastName,
-            dateOfBirth: person.DateOfBirth);
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/found?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -60,7 +56,9 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr);
+        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
         Debug.Assert(state.AuthenticationTicket is null);
 
@@ -82,15 +80,9 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(state);
 
         var person = await TestData.CreatePerson(b => b.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person.PersonId);
+        var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
-        var ticket = CreateOneLoginAuthenticationTicket(
-            vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
-            sub: oneLoginUser.Subject,
-            email: oneLoginUser.Email,
-            firstName: person.FirstName,
-            lastName: person.LastName,
-            dateOfBirth: person.DateOfBirth);
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
         await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/found?{journeyInstance.GetUniqueIdQueryParameter()}");

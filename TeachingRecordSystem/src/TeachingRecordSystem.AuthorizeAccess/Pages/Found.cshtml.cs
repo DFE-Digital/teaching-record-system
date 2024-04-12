@@ -14,7 +14,7 @@ public class FoundModel(SignInJourneyHelper helper) : PageModel
     {
     }
 
-    public IActionResult OnPost() => Redirect(helper.GetNextPage(JourneyInstance!));
+    public IActionResult OnPost() => helper.GetNextPage(JourneyInstance!).ToActionResult();
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
@@ -23,7 +23,7 @@ public class FoundModel(SignInJourneyHelper helper) : PageModel
         if (state.AuthenticationTicket is null)
         {
             // Not matched
-            context.Result = Redirect(helper.GetNextPage(JourneyInstance));
+            context.Result = helper.GetNextPage(JourneyInstance).ToActionResult();
         }
     }
 }

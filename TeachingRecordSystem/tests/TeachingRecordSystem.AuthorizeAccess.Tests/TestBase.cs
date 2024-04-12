@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
@@ -145,6 +146,15 @@ public abstract class TestBase : IDisposable
 
         return new AuthenticationTicket(principal, properties, authenticationScheme: "OneLogin");
     }
+
+    public AuthenticationTicket CreateOneLoginAuthenticationTicket(string vtr, OneLoginUser user) =>
+        CreateOneLoginAuthenticationTicket(
+            vtr,
+            user.Subject,
+            user.Email,
+            user.VerifiedNames?.First().First(),
+            user.VerifiedNames?.First().Last(),
+            user.VerifiedDatesOfBirth?.First());
 
     public SignInJourneyState CreateNewState(string redirectUri = "/") =>
         new(redirectUri, serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
