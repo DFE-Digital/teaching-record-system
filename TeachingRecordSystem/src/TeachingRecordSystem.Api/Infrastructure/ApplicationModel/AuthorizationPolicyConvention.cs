@@ -22,7 +22,8 @@ public class AuthorizationPolicyConvention : IActionModelConvention
         }
 
         if (!action.Attributes.Any(att => att is AuthorizeAttribute) &&
-            !action.Controller.Attributes.Any(att => att is AuthorizeAttribute))
+            !action.Controller.Attributes.Any(att => att is AuthorizeAttribute) &&
+            !action.Attributes.Any(att => att is RemovesFromApiAttribute))
         {
             throw new InvalidOperationException(
                 $"The {action.ActionName} action on the {action.Controller.ControllerName} controller does not have an authorize attribute assigned.");
