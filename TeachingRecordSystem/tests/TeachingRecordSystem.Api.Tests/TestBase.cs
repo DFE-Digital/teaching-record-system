@@ -56,7 +56,7 @@ public abstract class TestBase
         return client;
     }
 
-    public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read")
+    public HttpClient GetHttpClientWithIdentityAccessToken(string trn, string scope = "dqt:read", string? version = null)
     {
         // The actual access tokens contain many more claims than this but these are the two we care about
         var subject = new ClaimsIdentity(new[]
@@ -80,6 +80,11 @@ public abstract class TestBase
 
         var httpClient = HostFixture.CreateClient();
         httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+
+        if (version is not null)
+        {
+            httpClient.DefaultRequestHeaders.Add(VersionRegistry.MinorVersionHeaderName, version);
+        }
 
         return httpClient;
     }

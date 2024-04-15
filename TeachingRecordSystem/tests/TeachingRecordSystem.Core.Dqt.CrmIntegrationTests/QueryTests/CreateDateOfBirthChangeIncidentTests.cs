@@ -39,13 +39,14 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
         };
 
         // Act
-        var incidentId = await _crmQueryDispatcher.ExecuteQuery(query);
+        var (incidentId, ticketNumber) = await _crmQueryDispatcher.ExecuteQuery(query);
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
 
         var createdIncident = ctx.IncidentSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(Incident.PrimaryIdAttribute) == incidentId);
         Assert.NotNull(createdIncident);
+        Assert.NotNull(ticketNumber);
         Assert.Equal(createPersonResult.ContactId, createdIncident.CustomerId.Id);
         Assert.Equal("Request to change date of birth", createdIncident.Title);
         Assert.Equal(newDateOfBirth, DateOnly.FromDateTime(createdIncident.dfeta_NewDateofBirth!.Value));

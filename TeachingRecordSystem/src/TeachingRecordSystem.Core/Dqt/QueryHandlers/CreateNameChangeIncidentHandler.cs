@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class CreateNameChangeIncidentHandler : ICrmQueryHandler<CreateNameChangeIncidentQuery, Guid>
+public class CreateNameChangeIncidentHandler : ICrmQueryHandler<CreateNameChangeIncidentQuery, (Guid IncidentId, string TicketNumber)>
 {
     private readonly ReferenceDataCache _referenceDataCache;
 
@@ -13,7 +13,7 @@ public class CreateNameChangeIncidentHandler : ICrmQueryHandler<CreateNameChange
         _referenceDataCache = referenceDataCache;
     }
 
-    public async Task<Guid> Execute(CreateNameChangeIncidentQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<(Guid IncidentId, string TicketNumber)> Execute(CreateNameChangeIncidentQuery query, IOrganizationServiceAsync organizationService)
     {
         var subject = await _referenceDataCache.GetSubjectByTitle("Change of Name");
 
@@ -56,11 +56,18 @@ public class CreateNameChangeIncidentHandler : ICrmQueryHandler<CreateNameChange
         };
 
         var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
-        var createIncidentResponse = requestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = incident });
+        requestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = incident });
         requestBuilder.AddRequest(new CreateRequest() { Target = document });
         requestBuilder.AddRequest(new CreateRequest() { Target = annotation });
+        var getIncidentResponse = requestBuilder.AddRequest<RetrieveResponse>(
+            new RetrieveRequest()
+            {
+                Target = incident.Id.ToEntityReference(Incident.EntityLogicalName),
+                ColumnSet = new(Incident.Fields.TicketNumber)
+            });
         await requestBuilder.Execute();
 
-        return createIncidentResponse.GetResponse().id;
+        var ticketNumber = getIncidentResponse.GetResponse().Entity.ToEntity<Incident>().TicketNumber;
+        return (incident.Id, ticketNumber);
     }
 }

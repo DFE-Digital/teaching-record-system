@@ -17,7 +17,7 @@ public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryD
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
 
-    public async Task Handle(CreateDateOfBirthChangeRequestCommand command)
+    public async Task<string> Handle(CreateDateOfBirthChangeRequestCommand command)
     {
         var contact = await crmQueryDispatcher.ExecuteQuery(
             new GetActiveContactByTrnQuery(command.Trn, new Microsoft.Xrm.Sdk.Query.ColumnSet()));
@@ -43,7 +43,7 @@ public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryD
             evidenceFileMimeType = "application/octet-stream";
         }
 
-        await crmQueryDispatcher.ExecuteQuery(new CreateDateOfBirthChangeIncidentQuery()
+        var (_, ticketNumber) = await crmQueryDispatcher.ExecuteQuery(new CreateDateOfBirthChangeIncidentQuery()
         {
             ContactId = contact.Id,
             DateOfBirth = command.DateOfBirth,
@@ -52,5 +52,7 @@ public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryD
             EvidenceFileMimeType = evidenceFileMimeType,
             FromIdentity = true
         });
+
+        return ticketNumber;
     }
 }

@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Dqt.Queries;
 
-public record CreateNameChangeIncidentQuery : ICrmQuery<Guid>
+public record CreateNameChangeIncidentQuery : ICrmQuery<(Guid IncidentId, string TicketNumber)>
 {
     public required Guid ContactId { get; init; }
     public required string FirstName { get; init; }
