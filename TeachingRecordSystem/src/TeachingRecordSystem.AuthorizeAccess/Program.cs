@@ -174,16 +174,21 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-    app.UseMigrationsEndPoint();
-}
-else if (!app.Environment.IsUnitTests())
-{
-    app.UseExceptionHandler("/error");
-    app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
-}
+app.UseWhen(
+    context => !context.Request.Path.StartsWithSegments("/oauth2"),
+    a =>
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            a.UseDeveloperExceptionPage();
+            a.UseMigrationsEndPoint();
+        }
+        else if (!app.Environment.IsUnitTests())
+        {
+            a.UseExceptionHandler("/error");
+            a.UseStatusCodePagesWithReExecute("/error", "?code={0}");
+        }
+    });
 
 app.UseCsp(csp =>
 {
