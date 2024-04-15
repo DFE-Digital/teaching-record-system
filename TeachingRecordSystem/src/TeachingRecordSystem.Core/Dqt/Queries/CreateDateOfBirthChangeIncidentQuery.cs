@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Dqt.Queries;
 
-public record CreateDateOfBirthChangeIncidentQuery : ICrmQuery<Guid>
+public record CreateDateOfBirthChangeIncidentQuery : ICrmQuery<(Guid IncidentId, string TicketNumber)>
 {
     public required Guid ContactId { get; init; }
     public required DateOnly DateOfBirth { get; init; }

@@ -52,11 +52,11 @@ public class WorkaroundCloseIncidentRequestExecutor : IFakeMessageExecutor
         {
             LogicalName = IncidentResolutionLogicalName,
             Attributes = new AttributeCollection
-                {
-                    { "description", incidentResolution[AttributeSubject] },
-                    { AttributeSubject, incidentResolution[AttributeSubject] },
-                    { AttributeIncidentId, incidentId }
-                }
+            {
+                { "description", incidentResolution[AttributeSubject] },
+                { AttributeSubject, incidentResolution[AttributeSubject] },
+                { AttributeIncidentId, incidentId }
+            }
         };
         service.Create(newIncidentResolution);
 

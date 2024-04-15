@@ -19,7 +19,7 @@ public class CreateNameChangeRequestHandler(ICrmQueryDispatcher crmQueryDispatch
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
 
-    public async Task Handle(CreateNameChangeRequestCommand command)
+    public async Task<string> Handle(CreateNameChangeRequestCommand command)
     {
         var contact = await crmQueryDispatcher.ExecuteQuery(
             new GetActiveContactByTrnQuery(command.Trn, new Microsoft.Xrm.Sdk.Query.ColumnSet()));
@@ -50,7 +50,7 @@ public class CreateNameChangeRequestHandler(ICrmQueryDispatcher crmQueryDispatch
         var firstName = firstAndMiddleNames[0];
         var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
 
-        await crmQueryDispatcher.ExecuteQuery(new CreateNameChangeIncidentQuery()
+        var (_, ticketNumber) = await crmQueryDispatcher.ExecuteQuery(new CreateNameChangeIncidentQuery()
         {
             ContactId = contact.Id,
             FirstName = firstName,
@@ -64,5 +64,7 @@ public class CreateNameChangeRequestHandler(ICrmQueryDispatcher crmQueryDispatch
             EvidenceFileMimeType = evidenceFileMimeType,
             FromIdentity = true
         });
+
+        return ticketNumber;
     }
 }
