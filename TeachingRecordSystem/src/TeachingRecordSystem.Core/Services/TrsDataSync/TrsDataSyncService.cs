@@ -23,7 +23,7 @@ public class TrsDataSyncService(
         {
             BackoffType = DelayBackoffType.Exponential,
             Delay = TimeSpan.FromSeconds(30),
-            MaxRetryAttempts = 3
+            MaxRetryAttempts = 10
         })
         .Build();
 
