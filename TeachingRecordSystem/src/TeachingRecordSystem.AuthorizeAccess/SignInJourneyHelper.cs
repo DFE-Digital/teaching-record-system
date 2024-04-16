@@ -120,12 +120,14 @@ public class SignInJourneyHelper(
         {
             var verifiedNames = ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray();
             var verifiedDatesOfBirth = ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray();
+            var coreIdentityClaimVc = ticket.Principal.FindFirstValue("vc") ?? throw new InvalidOperationException("No vc claim present.");
 
             var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == sub);
             oneLoginUser.VerifiedOn = clock.UtcNow;
             oneLoginUser.VerificationRoute = OneLoginUserVerificationRoute.OneLogin;
             oneLoginUser.VerifiedNames = verifiedNames;
             oneLoginUser.VerifiedDatesOfBirth = verifiedDatesOfBirth;
+            oneLoginUser.LastCoreIdentityVc = coreIdentityClaimVc;
             await dbContext.SaveChangesAsync();
 
             await journeyInstance.UpdateStateAsync(state =>
