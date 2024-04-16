@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -179,11 +180,9 @@ public sealed class OneLoginAuthenticationSchemeProvider(
             // This handles the scenario where we've requested ID verification but One Login couldn't do it.
 
             if (context.Properties!.TryGetVectorOfTrust(out var vtr) && vtr == SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr &&
-                context.Properties?.Items.TryGetValue(PropertyKeys.JourneyInstanceId, out var serializedInstanceId) == true && serializedInstanceId is not null)
+                TryGetJourneyInstanceId(context.Properties, out var journeyInstanceId))
             {
                 context.HandleResponse();
-
-                var journeyInstanceId = JourneyInstanceId.Deserialize(serializedInstanceId);
 
                 var signInJourneyHelper = context.HttpContext.RequestServices.GetRequiredService<SignInJourneyHelper>();
                 var journeyInstance = (await signInJourneyHelper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(context.HttpContext, journeyInstanceId))!;
@@ -221,6 +220,21 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         options.NonceCookie.Name = "onelogin-nonce.";
 
         static string EnsurePrefixedWithSlash(string value) => !value.StartsWith('/') ? "/" + value : value;
+
+        static bool TryGetJourneyInstanceId(
+            AuthenticationProperties? properties,
+            [NotNullWhen(true)] out JourneyInstanceId? journeyInstanceId)
+        {
+            if (properties?.Items.TryGetValue(PropertyKeys.JourneyInstanceId, out var serializedInstanceId) == true
+                && serializedInstanceId is not null)
+            {
+                journeyInstanceId = JourneyInstanceId.Deserialize(serializedInstanceId);
+                return true;
+            }
+
+            journeyInstanceId = default;
+            return false;
+        }
     }
 
     void IConfigureOptions<OneLoginOptions>.Configure(OneLoginOptions options)

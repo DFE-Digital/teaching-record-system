@@ -11,7 +11,7 @@ public class OneLoginUserMapping : IEntityTypeConfiguration<OneLoginUser>
     public void Configure(EntityTypeBuilder<OneLoginUser> builder)
     {
         builder.HasKey(o => o.Subject);
-        builder.Property(o => o.Subject).HasMaxLength(200);
+        builder.Property(o => o.Subject).HasMaxLength(255);
         builder.Property(o => o.Email).HasMaxLength(200);
         builder.HasOne<Person>(o => o.Person).WithOne().HasForeignKey<OneLoginUser>(o => o.PersonId);
         builder.Property(o => o.VerifiedNames).HasColumnType("jsonb").HasConversion<string>(
@@ -26,6 +26,7 @@ public class OneLoginUserMapping : IEntityTypeConfiguration<OneLoginUser>
             new ValueComparer<DateOnly[]>(
                 (a, b) => (a == null && b == null) || (a != null && b != null && a.SequenceEqual(b)),
                 v => HashCode.Combine(v)));
+        builder.Property(o => o.LastCoreIdentityVc).HasColumnType("jsonb");
     }
 }
 

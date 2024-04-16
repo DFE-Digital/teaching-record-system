@@ -14,4 +14,5 @@ public class OneLoginUser
     public OneLoginUserVerificationRoute? VerificationRoute { get; set; }
     public string[][]? VerifiedNames { get; set; }
     public DateOnly[]? VerifiedDatesOfBirth { get; set; }
+    public string? LastCoreIdentityVc { get; set; }
 }

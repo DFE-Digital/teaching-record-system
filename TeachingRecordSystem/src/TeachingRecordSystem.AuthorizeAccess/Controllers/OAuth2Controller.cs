@@ -124,17 +124,33 @@ public class OAuth2Controller(
     [HttpGet("~/oauth2/userinfo")]
     [HttpPost("~/oauth2/userinfo")]
     [Produces("application/json")]
-    public IActionResult UserInfo()
+    public async Task<IActionResult> UserInfo()
     {
+        var subject = User.GetClaim(ClaimTypes.Subject)!;
+
         var claims = new Dictionary<string, object>(StringComparer.Ordinal)
         {
-            [ClaimTypes.Subject] = User.GetClaim(ClaimTypes.Subject)!,
-            [ClaimTypes.Trn] = User.GetClaim(ClaimTypes.Trn)!
+            [ClaimTypes.Subject] = subject
         };
+
+        var oneLoginUser = await dbContext.OneLoginUsers
+            .Include(o => o.Person)
+            .SingleAsync(u => u.Subject == subject);
+
+        if (oneLoginUser.Person?.Trn is string trn)
+        {
+            claims.Add(ClaimTypes.Trn, trn);
+        }
 
         if (User.HasScope(Scopes.Email))
         {
-            claims[ClaimTypes.Email] = User.GetClaim(ClaimTypes.Email)!;
+            claims.Add(ClaimTypes.Email, oneLoginUser.Email);
+        }
+
+        if (oneLoginUser.VerificationRoute == OneLoginUserVerificationRoute.OneLogin)
+        {
+            claims.Add(ClaimTypes.OneLoginVerifiedNames, oneLoginUser.VerifiedNames!);
+            claims.Add(ClaimTypes.OneLoginIdVerifiedBirthDates, oneLoginUser.VerifiedDatesOfBirth!);
         }
 
         return Ok(claims);
@@ -151,7 +167,7 @@ public class OAuth2Controller(
                 yield break;
 
             case ClaimTypes.Email:
-                if (claim.Subject!.HasScope(Scopes.Profile))
+                if (claim.Subject!.HasScope(Scopes.Email))
                 {
                     yield return Destinations.IdentityToken;
                 }

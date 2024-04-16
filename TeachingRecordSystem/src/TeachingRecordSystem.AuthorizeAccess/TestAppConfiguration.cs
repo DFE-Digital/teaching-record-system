@@ -1,4 +1,8 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
 using static IdentityModel.OidcConstants;
@@ -30,12 +34,15 @@ public static class TestAppConfiguration
                     options.ResponseMode = ResponseModes.Query;
                     options.ResponseType = ResponseTypes.Code;
                     options.MapInboundClaims = false;
+                    options.GetClaimsFromUserInfoEndpoint = true;
                     options.SaveTokens = true;
                     options.Scope.Clear();
                     options.Scope.Add("openid");
                     options.Scope.Add("email");
                     options.Scope.Add("profile");
                     options.Scope.Add(CustomScopes.TeachingRecord);
+                    options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.OneLoginVerifiedNames));
+                    options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.OneLoginIdVerifiedBirthDates));
                 });
         }
         else
@@ -46,5 +53,16 @@ public static class TestAppConfiguration
         }
 
         return builder;
+    }
+}
+
+file class MapJsonClaimAction(string claimType) : ClaimAction(claimType, JsonClaimValueTypes.Json)
+{
+    public override void Run(JsonElement userData, ClaimsIdentity identity, string issuer)
+    {
+        if (userData.TryGetProperty(ClaimType, out var element))
+        {
+            identity.AddClaim(new Claim(ClaimType, element.ToString(), valueType: ""));
+        }
     }
 }
