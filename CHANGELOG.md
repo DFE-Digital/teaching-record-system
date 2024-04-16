@@ -1,5 +1,14 @@
 # API Changelog
 
+## 20240416
+
+### `GET /v3/teachers/<trn>`
+
+An additional query parameter can be specified for the `GET /v3/teachers/<trn>` operation - `dateOfBirth`.
+When provided, it will be checked against the date of birth on the teaching record with `<trn>`; if it does not match a `404` will be returned.
+The query parameter should be formatted `YYYY-MM-DD` e.g. `2024-04-16`.
+
+
 ## 20240412
 
 ### Change of name & Change of date of birth requests
