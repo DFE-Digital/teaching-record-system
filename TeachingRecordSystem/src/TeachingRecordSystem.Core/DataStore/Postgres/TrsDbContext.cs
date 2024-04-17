@@ -72,6 +72,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<PersonEmployment> PersonEmployments => Set<PersonEmployment>();
 
+    public DbSet<SupportTask> SupportTasks => Set<SupportTask>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string connectionString, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);
