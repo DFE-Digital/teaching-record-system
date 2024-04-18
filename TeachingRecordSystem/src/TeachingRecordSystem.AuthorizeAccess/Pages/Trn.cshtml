@@ -1,7 +1,7 @@
 @page "/trn"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.TrnModel
 @{
-    ViewBag.Title = "What is your teacher reference number (TRN)?";
+    ViewBag.Title = "Teacher reference number (TRN)";
 }
 
 @section BeforeContent {
@@ -11,9 +11,33 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.Trn(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-details>
+                <govuk-details-summary>About teacher reference numbers</govuk-details-summary>
+                <govuk-details-text>
+                    <p class="govuk-body">
+                        You’ll have a TRN if you:
+                        <ul class="govuk-list govuk-list--bullet">
+                            <li>hold qualified teacher status (QTS) in England or Wales</li>
+                            <li>hold early years teacher status (EYTS) in England</li>
+                            <li>already hold a national professional qualification (NPQ)</li>
+                            <li>are working towards QTS or a EYTS</li>
+                        </ul>
+                    </p>
+                    <p class="govuk-body">
+                        <a href="https://www.gov.uk/guidance/teacher-reference-number-trn" rel="noreferrer" target="_blank">Learn about TRNs</a> including how to request one, or
+                        <a href="https://find-a-lost-trn.education.gov.uk/" rel="noreferrer" target="_blank">find a lost TRN</a>.
+                    </p>
+                    <p class="govuk-body">
+                        You may not have one yet in you work in early years, further education or qualified as a teacher outside of England.
+                    </p>
+                </govuk-details-text>
+            </govuk-details>
+
             <govuk-radios asp-for="HaveTrn">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--l" />
+                    <govuk-radios-fieldset-legend />
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
@@ -23,26 +47,6 @@
                     <govuk-radios-item value="@false">No</govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
-
-            <govuk-details>
-                <govuk-details-summary>About TRNs</govuk-details-summary>
-                <govuk-details-text>
-                    <p class="govuk-body">You’ll have a TRN if you:</p>
-                    <ul class="govuk-list govuk-list--bullet">
-                        <li>hold qualified teacher status (QTS) in England or Wales</li>
-                        <li>hold early years teacher status (EYTS) in England</li>
-                        <li>already hold a national professional qualification (NPQ)</li>
-                        <li>are working towards QTS or a EYTS</li>
-                    </ul>
-                    <p class="govuk-body">
-                        <a href="https://www.gov.uk/guidance/teacher-reference-number-trn#request-a-trn-if-youre-an-early-years-professional-or-mentor-for-an-early-career-teacher" class="govuk-link">Learn about TRNs</a> including how to request one, or <a href="https://find-a-lost-trn.education.gov.uk/start" class="govuk-link">find a lost TRN</a>.
-                    </p>
-                    <p class="govuk-body">
-                        You may not have one yet if you work in early years, further education or qualified as a teacher outside of
-                        England.
-                    </p>
-                </govuk-details-text>
-            </govuk-details>
 
             <govuk-button type="submit">Continue</govuk-button>
         </form>

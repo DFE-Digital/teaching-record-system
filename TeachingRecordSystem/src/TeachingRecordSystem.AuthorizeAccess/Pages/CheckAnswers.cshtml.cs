@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,6 +11,12 @@ public class CheckAnswersModel(SignInJourneyHelper helper) : PageModel
 {
     public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
 
+    public string? Email { get; set; }
+
+    public string? Name { get; set; }
+
+    public DateOnly DateOfBirth { get; set; }
+
     public string? NationalInsuranceNumber => JourneyInstance!.State.NationalInsuranceNumber;
 
     public string? Trn => JourneyInstance!.State.Trn;
@@ -18,7 +25,7 @@ public class CheckAnswersModel(SignInJourneyHelper helper) : PageModel
     {
     }
 
-    public IActionResult OnPost() => Redirect(helper.LinkGenerator.NotFound(JourneyInstance!.InstanceId));
+    public IActionResult OnPost() => throw new NotImplementedException();
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
@@ -43,6 +50,13 @@ public class CheckAnswersModel(SignInJourneyHelper helper) : PageModel
         {
             // Not answered the TRN question
             context.Result = Redirect(helper.LinkGenerator.Trn(JourneyInstance.InstanceId));
+        }
+
+        if (context.Result is null)
+        {
+            Email = state.OneLoginAuthenticationTicket!.Principal.FindFirstValue("email")!;
+            Name = string.Join(" ", state.VerifiedNames!.First());
+            DateOfBirth = state.VerifiedDatesOfBirth!.First();
         }
     }
 }

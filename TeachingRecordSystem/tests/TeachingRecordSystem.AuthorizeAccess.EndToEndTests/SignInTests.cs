@@ -33,7 +33,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPage();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButton("Connect to your teaching record");
+        await page.ClickButton("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=Yes");
@@ -62,7 +62,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPage();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButton("Connect to your teaching record");
+        await page.ClickButton("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=Yes");
@@ -71,7 +71,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('TRN')", person.Trn!);
+        await page.FillAsync("label:text-is('Teacher reference number')", person.Trn!);
         await page.ClickButton("Continue");
 
         await page.WaitForUrlPathAsync("/found");
@@ -96,7 +96,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPage();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButton("Connect to your teaching record");
+        await page.ClickButton("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=No");
@@ -104,7 +104,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('TRN')", person.Trn!);
+        await page.FillAsync("label:text-is('Teacher reference number')", person.Trn!);
         await page.ClickButton("Continue");
 
         await page.WaitForUrlPathAsync("/found");
@@ -129,7 +129,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPage();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButton("Connect to your teaching record");
+        await page.ClickButton("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=Yes");
@@ -138,13 +138,13 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('TRN')", await TestData.GenerateTrn());
-        await page.ClickButton("Continue");
-
-        await page.WaitForUrlPathAsync("/check-answers");
+        await page.FillAsync("label:text-is('Teacher reference number')", await TestData.GenerateTrn());
         await page.ClickButton("Continue");
 
         await page.WaitForUrlPathAsync("/not-found");
+        await page.ClickButton("Check your answers");
+
+        await page.WaitForUrlPathAsync("/check-answers");
     }
 
     [Fact]
@@ -163,20 +163,20 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToTestStartPage();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButton("Connect to your teaching record");
+        await page.ClickButton("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=No");
         await page.ClickButton("Continue");
 
         await page.WaitForUrlPathAsync("/trn");
-        await page.CheckAsync("text=No");
-        await page.ClickButton("Continue");
-
-        await page.WaitForUrlPathAsync("/check-answers");
+        await page.CheckAsync("label:text-is('No')");
         await page.ClickButton("Continue");
 
         await page.WaitForUrlPathAsync("/not-found");
+        await page.ClickButton("Check your answers");
+
+        await page.WaitForUrlPathAsync("/check-answers");
     }
 
     [Fact]

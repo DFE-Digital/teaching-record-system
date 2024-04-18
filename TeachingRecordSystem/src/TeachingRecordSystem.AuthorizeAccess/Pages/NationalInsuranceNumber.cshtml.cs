@@ -15,7 +15,7 @@ public class NationalInsuranceNumberModel(SignInJourneyHelper helper) : PageMode
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you have a National Insurance number?", Description = "It’s on your National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’.")]
+    [Display(Name = "Do you have a National Insurance number?")]
     [Required(ErrorMessage = "Select yes if you have a National Insurance number")]
     public bool? HaveNationalInsuranceNumber { get; set; }
 

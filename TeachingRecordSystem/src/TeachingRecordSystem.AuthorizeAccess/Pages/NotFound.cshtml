@@ -5,25 +5,31 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.CheckAnswers(Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.Trn(Model.JourneyInstance!.InstanceId)" />
 }
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        <div class="govuk-panel govuk-panel--interruption">
-            <h1 class="govuk-panel__title">Your GOV.UK One Login could not be connected to your teaching record</h1>
+<form action="@LinkGenerator.NotFound(Model.JourneyInstance!.InstanceId)" method="post">
+    <div class="govuk-panel govuk-panel--interruption">
+        <h1 class="govuk-panel__title">@ViewBag.Title</h1>
 
-            <div class="govuk-panel__body">
-                <p class="govuk-body-l">
-                    You need to get support to access your teaching qualifications.
+        <div class="govuk-panel__body">
+            <div class="trs-two-thirds">
+                <p class="govuk-body govuk-!-margin-bottom-0">
+                    We’ve been unable to match your answers to a teaching record.
                 </p>
 
-                <p class="govuk-body-l">
-                    Your details will be sent to the Teaching Regulation Agency support team.
+                <h2 class="govuk-heading-l">Get support</h2>
+
+                <p class="govuk-body">
+                    Check your answers. If they’re correct, you can get support with accessing your teaching qualifications.
                 </p>
 
-                <govuk-button class="govuk-!-margin-bottom-0">Get support</govuk-button>
+                <p class="govuk-body">
+                    We’ll check your details and contact you if we need any more information.
+                </p>
+
+                <govuk-button class="govuk-!-margin-bottom-0">Check your answers</govuk-button>
             </div>
         </div>
     </div>
-</div>
+</form>
