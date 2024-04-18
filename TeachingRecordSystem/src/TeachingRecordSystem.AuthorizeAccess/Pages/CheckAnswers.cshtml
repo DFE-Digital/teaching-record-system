@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Trn(Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.NotFound(Model.JourneyInstance!.InstanceId)" />
 }
 
 <div class="govuk-grid-row">
@@ -13,9 +13,24 @@
         <form action="@LinkGenerator.CheckAnswers(Model.JourneyInstance!.InstanceId)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <p class="govuk-body">Your GOV.UK One Login could not be connected to your teaching record.</p>
+            <h2 class="govuk-heading-m">GOV.UK One Login</h2>
 
-            <p class="govuk-body">Check your answers and try again.</p>
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.Email</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.DateOfBirth.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <h2 class="govuk-heading-m">Additional details</h2>
 
             <govuk-summary-list>
                 <govuk-summary-list-row>
@@ -42,7 +57,7 @@
                 </govuk-summary-list-row>
             </govuk-summary-list>
 
-            <govuk-button type="submit">Continue</govuk-button>
+            <govuk-button type="submit">Submit support request</govuk-button>
         </form>
     </div>
 </div>

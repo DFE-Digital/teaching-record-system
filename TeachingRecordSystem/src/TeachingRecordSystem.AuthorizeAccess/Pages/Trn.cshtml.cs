@@ -15,14 +15,14 @@ public class TrnModel(SignInJourneyHelper helper) : PageModel
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you have a teacher reference number (TRN)?")]
-    [Required(ErrorMessage = "Select yes if you have a TRN")]
+    [Display(Name = "Do you have a teacher reference number?")]
+    [Required(ErrorMessage = "Select yes if you have a teacher reference number")]
     public bool? HaveTrn { get; set; }
 
     [BindProperty]
-    [Display(Name = "TRN")]
-    [Required(ErrorMessage = "Enter your TRN")]
-    [RegularExpression(@"\A\D*(\d{1}\D*){7}\D*\Z", ErrorMessage = "Your TRN should contain 7 digits")]
+    [Display(Name = "Teacher reference number")]
+    [Required(ErrorMessage = "Enter your teacher reference number")]
+    [RegularExpression(@"\A\D*(\d{1}\D*){7}\D*\Z", ErrorMessage = "Your teacher reference number should contain 7 digits")]
     public string? Trn { get; set; }
 
     public void OnGet()
@@ -46,7 +46,7 @@ public class TrnModel(SignInJourneyHelper helper) : PageModel
         await JourneyInstance!.UpdateStateAsync(state => state.SetTrn(HaveTrn!.Value, Trn));
 
         return await helper.TryMatchToTeachingRecord(JourneyInstance!) ? Redirect(helper.LinkGenerator.Found(JourneyInstance.InstanceId)) :
-            Redirect(helper.LinkGenerator.CheckAnswers(JourneyInstance.InstanceId));
+            Redirect(helper.LinkGenerator.NotFound(JourneyInstance.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

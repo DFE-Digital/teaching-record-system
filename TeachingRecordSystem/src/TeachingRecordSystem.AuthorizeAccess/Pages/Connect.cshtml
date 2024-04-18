@@ -1,31 +1,29 @@
 @page "/connect"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.ConnectModel
 @{
-    ViewBag.Title = "Connect your GOV.UK One Login to your teaching record";
+    ViewBag.Title = "Find your teaching record";
 }
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        <div class="govuk-panel govuk-panel--interruption">
-            <form action="@LinkGenerator.Connect(Model.JourneyInstance!.InstanceId)" method="post">
-                <h1 class="govuk-panel__title">@ViewBag.Title</h1>
+<form action="@LinkGenerator.Connect(Model.JourneyInstance!.InstanceId)" method="post">
+    <div class="govuk-panel govuk-panel--interruption">
+        <h1 class="govuk-panel__title">@ViewBag.Title</h1>
 
-                <div class="govuk-panel__body">
-                    <p class="govuk-body-l">
-                        You’ve verified your identity for your GOV.UK One Login.
-                    </p>
+        <div class="govuk-panel__body">
+            <div class="trs-two-thirds">
+                <p class="govuk-body">
+                    You’ve signed in to GOV.UK One Login and verified your identity.
+                </p>
 
-                    <p class="govuk-body-l">
-                        You now need to connect it to your teaching record. You’ll be asked for your:
-                        <ul class="govuk-list govuk-list--bullet govuk-body-l">
-                            <li>National Insurance number</li>
-                            <li>teacher reference number</li>
-                        </ul>
-                    </p>
+                <p class="govuk-body">
+                    We’ll ask for your National Insurance number or teacher reference number (TRN) so we can find your teaching record.
+                </p>
 
-                    <govuk-button class="govuk-!-margin-bottom-0">Connect to your teaching record</govuk-button>
-                </div>
-            </form>
+                <p class="govuk-body">
+                    You won’t need to do this again.
+                </p>
+
+                <govuk-button class="govuk-!-margin-bottom-0">Find your teaching record</govuk-button>
+            </div>
         </div>
     </div>
-</div>
+</form>

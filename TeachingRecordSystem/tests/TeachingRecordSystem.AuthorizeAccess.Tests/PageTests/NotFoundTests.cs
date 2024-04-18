@@ -139,4 +139,32 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
     }
+
+    [Fact]
+    public async Task Post_ValidRequest_RedirectsToCheckAnswersPage()
+    {
+        // Arrange
+        var state = CreateNewState();
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
+        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+
+        await journeyInstance.UpdateStateAsync(async state =>
+        {
+            state.SetNationalInsuranceNumber(true, TestData.GenerateNationalInsuranceNumber());
+            state.SetTrn(true, await TestData.GenerateTrn());
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
 }

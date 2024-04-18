@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.FormFlow;
@@ -12,6 +13,8 @@ public class NotFoundModel(SignInJourneyHelper helper) : PageModel
     public void OnGet()
     {
     }
+
+    public IActionResult OnPost() => Redirect(helper.LinkGenerator.CheckAnswers(JourneyInstance!.InstanceId));
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {

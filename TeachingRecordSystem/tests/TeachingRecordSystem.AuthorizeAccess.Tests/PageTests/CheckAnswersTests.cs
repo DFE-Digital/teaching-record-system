@@ -249,35 +249,4 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"{state.RedirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
-
-    [Fact]
-    public async Task Post_ValidRequest_RedirectsToNotFoundPage()
-    {
-        // Arrange
-        var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
-
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
-
-        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
-
-        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-        var trn = await TestData.GenerateTrn();
-
-        await journeyInstance.UpdateStateAsync(state =>
-        {
-            state.SetNationalInsuranceNumber(true, nationalInsuranceNumber);
-            state.SetTrn(true, trn);
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
 }

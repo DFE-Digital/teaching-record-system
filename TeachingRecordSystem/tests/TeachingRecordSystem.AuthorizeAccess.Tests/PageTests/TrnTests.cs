@@ -267,7 +267,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "HaveTrn", "Select yes if you have a TRN");
+        await AssertEx.HtmlResponseHasError(response, "HaveTrn", "Select yes if you have a teacher reference number");
     }
 
     [Fact]
@@ -299,7 +299,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Trn", "Enter your TRN");
+        await AssertEx.HtmlResponseHasError(response, "Trn", "Enter your teacher reference number");
     }
 
     [Fact]
@@ -331,11 +331,11 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Trn", "Your TRN should contain 7 digits");
+        await AssertEx.HtmlResponseHasError(response, "Trn", "Your teacher reference number should contain 7 digits");
     }
 
     [Fact]
-    public async Task Post_NoTrnSpecified_UpdatesStateAndRedirectsToCheckAnswersPage()
+    public async Task Post_NoTrnSpecified_UpdatesStateAndRedirectsToNotFoundPage()
     {
         // Arrange
         var state = CreateNewState();
@@ -363,7 +363,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         state = journeyInstance.State;
@@ -373,7 +373,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_ValidTrnButLookupFailed_UpdatesStateAndRedirectsToCheckAnswersPage()
+    public async Task Post_ValidTrnButLookupFailed_UpdatesStateAndRedirectsToNotFoundPage()
     {
         // Arrange
         var state = CreateNewState();
@@ -402,7 +402,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         state = journeyInstance.State;
