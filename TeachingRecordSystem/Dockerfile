@@ -8,7 +8,10 @@ COPY src/TeachingRecordSystem.Cli/bin/Release/net8.0/publish/ Apps/TrsCli/
 COPY src/TeachingRecordSystem.SupportUi/bin/Release/net8.0/publish/ Apps/SupportUi/
 COPY src/TeachingRecordSystem.Worker/bin/Release/net8.0/publish/ Apps/Worker/
 COPY src/TeachingRecordSystem.AuthorizeAccess/bin/Release/net8.0/publish/ Apps/AuthorizeAccess/
+COPY db.sh Apps/db.sh
 WORKDIR /Apps
+
+RUN chmod +x /Apps/db.sh
 
 # Install Culture prerequisities
 RUN apk add --no-cache \
