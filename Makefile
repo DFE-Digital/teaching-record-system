@@ -246,6 +246,9 @@ domains-infra-init: bin/terrafile set-azure-pd-subscription ## make [domain|aks_
 domains-infra-plan: domains-infra-init ## terraform plan for dns core resources
 	terraform -chdir=terraform/domains/infrastructure plan -var-file config/trs.tfvars.json
 
+domains-infra-apply: domains-infra-init ## terraform apply for dns core resources
+	terraform -chdir=terraform/domains/infrastructure apply -var-file config/trs.tfvars.json
+
 domain-azure-resources: set-azure-account # make [domain|aks_domain] domain-azure-resources CONFIRM_DEPLOY=1, creates core DNA/AKS
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
 	az deployment sub create -l "UK South" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-trsdomains-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}trsdomainstf" "tfStorageContainerName=trsdomains-tf"  "keyVaultName=${RESOURCE_NAME_PREFIX}-trsdomain-kv"
