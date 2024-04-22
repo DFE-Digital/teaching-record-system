@@ -26,7 +26,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -48,7 +48,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -70,7 +70,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -104,7 +104,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -126,7 +126,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -148,7 +148,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 

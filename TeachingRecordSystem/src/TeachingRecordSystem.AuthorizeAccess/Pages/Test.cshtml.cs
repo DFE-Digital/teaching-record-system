@@ -13,6 +13,9 @@ public class TestModel : PageModel
     [FromQuery(Name = "scheme")]
     public string? AuthenticationScheme { get; set; }
 
+    [FromQuery(Name = "trn_token")]
+    public string? TrnToken { get; set; }
+
     public IActionResult OnGet()
     {
         if (User.Identity?.IsAuthenticated != true)
@@ -24,7 +27,8 @@ public class TestModel : PageModel
                     {
                         { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, AuthenticationScheme },
                         { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceName, "Test service" },
-                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceUrl, Request.GetEncodedUrl() }
+                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceUrl, Request.GetEncodedUrl() },
+                        { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.TrnToken, TrnToken },
                     },
                     RedirectUri = Request.GetEncodedUrl()
                 },

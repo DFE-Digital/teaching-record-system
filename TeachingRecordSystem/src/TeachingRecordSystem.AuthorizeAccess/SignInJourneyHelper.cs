@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.PersonSearch;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
@@ -16,6 +17,7 @@ namespace TeachingRecordSystem.AuthorizeAccess;
 public class SignInJourneyHelper(
     TrsDbContext dbContext,
     IPersonSearchService personSearchService,
+    IdDbContext idDbContext,
     AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
     IUserInstanceStateProvider userInstanceStateProvider,
@@ -23,6 +25,10 @@ public class SignInJourneyHelper(
 {
     public const string AuthenticationOnlyVtr = @"[""Cl.Cm""]";
     public const string AuthenticationAndIdentityVerificationVtr = @"[""Cl.Cm.P2""]";
+
+    // ID's database has a user_id column to indicate that a TRN token has been used already.
+    // This sentinel value indicates the token has been used by us, rather than a teacher ID user.
+    private static readonly Guid _teacherAuthIdUserIdSentinel = Guid.Empty;
 
     public AuthorizeAccessLinkGenerator LinkGenerator { get; } = linkGenerator;
 
@@ -36,25 +42,22 @@ public class SignInJourneyHelper(
     public IResult VerifyIdentityWithOneLogin(JourneyInstance<SignInJourneyState> journeyInstance) =>
         OneLoginChallenge(journeyInstance, AuthenticationAndIdentityVerificationVtr);
 
-    public async Task<IResult> OnSignedInWithOneLogin(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
+    public async Task<IResult> OnOneLoginCallback(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
     {
         if (!ticket.Properties.TryGetVectorOfTrust(out var vtr))
         {
             throw new InvalidOperationException("No vtr.");
         }
 
-        var sub = ticket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
-        var email = ticket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
-
         if (vtr == AuthenticationOnlyVtr)
         {
-            await OnUserAuthenticated();
+            await OnUserAuthenticated(journeyInstance, ticket);
         }
         else
         {
             Debug.Assert(vtr == AuthenticationAndIdentityVerificationVtr);
             Debug.Assert(journeyInstance.State.OneLoginAuthenticationTicket is not null);
-            await OnUserVerified();
+            await OnUserVerified(journeyInstance, ticket);
         }
 
         if (ShowDebugPages)
@@ -63,84 +66,157 @@ public class SignInJourneyHelper(
         }
 
         return GetNextPage(journeyInstance);
+    }
 
-        async Task OnUserAuthenticated()
+    public async Task OnUserAuthenticated(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
+    {
+        var sub = ticket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
+        var email = ticket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
+
+        var oneLoginUser = await dbContext.OneLoginUsers
+            .Include(u => u.Person)
+            .SingleOrDefaultAsync(u => u.Subject == sub);
+
+        if (oneLoginUser is null)
         {
-            var oneLoginUser = await dbContext.OneLoginUsers
-                .Include(u => u.Person)
-                .SingleOrDefaultAsync(u => u.Subject == sub);
-
-            if (oneLoginUser is null)
+            oneLoginUser = new()
             {
-                oneLoginUser = new()
-                {
-                    Subject = sub,
-                    Email = email,
-                    FirstOneLoginSignIn = clock.UtcNow,
-                    LastOneLoginSignIn = clock.UtcNow
-                };
-                dbContext.OneLoginUsers.Add(oneLoginUser);
+                Subject = sub,
+                Email = email,
+                FirstOneLoginSignIn = clock.UtcNow,
+                LastOneLoginSignIn = clock.UtcNow
+            };
+            dbContext.OneLoginUsers.Add(oneLoginUser);
+        }
+        else
+        {
+            oneLoginUser.LastOneLoginSignIn = clock.UtcNow;
+
+            // Email may have changed since the last sign in - ensure we update it.
+            // TODO Should we emit an event if it has changed?
+            oneLoginUser.Email = email;
+
+            if (oneLoginUser.PersonId is not null)
+            {
+                oneLoginUser.LastSignIn = clock.UtcNow;
             }
-            else
-            {
-                oneLoginUser.LastOneLoginSignIn = clock.UtcNow;
-
-                // Email may have changed since the last sign in - ensure we update it.
-                // TODO Should we emit an event if it has changed?
-                oneLoginUser.Email = email;
-
-                if (oneLoginUser.PersonId is not null)
-                {
-                    oneLoginUser.LastSignIn = clock.UtcNow;
-                }
-            }
-
-            await dbContext.SaveChangesAsync();
-
-            await journeyInstance.UpdateStateAsync(state =>
-            {
-                state.Reset();
-                state.OneLoginAuthenticationTicket = ticket;
-
-                if (oneLoginUser.VerificationRoute is not null)
-                {
-                    Debug.Assert(oneLoginUser.VerifiedNames is not null);
-                    Debug.Assert(oneLoginUser.VerifiedDatesOfBirth is not null);
-                    state.SetVerified(oneLoginUser.VerifiedNames!, oneLoginUser.VerifiedDatesOfBirth!);
-                }
-
-                if (oneLoginUser.Person?.Trn is string trn && !ShowDebugPages)
-                {
-                    Complete(state, trn);
-                }
-            });
         }
 
-        async Task OnUserVerified()
+        await dbContext.SaveChangesAsync();
+
+        await journeyInstance.UpdateStateAsync(state =>
         {
-            var verifiedNames = ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray();
-            var verifiedDatesOfBirth = ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray();
-            var coreIdentityClaimVc = ticket.Principal.FindFirstValue("vc") ?? throw new InvalidOperationException("No vc claim present.");
+            state.Reset();
+            state.OneLoginAuthenticationTicket = ticket;
 
-            var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == sub);
-            oneLoginUser.VerifiedOn = clock.UtcNow;
-            oneLoginUser.VerificationRoute = OneLoginUserVerificationRoute.OneLogin;
-            oneLoginUser.VerifiedNames = verifiedNames;
-            oneLoginUser.VerifiedDatesOfBirth = verifiedDatesOfBirth;
-            oneLoginUser.LastCoreIdentityVc = coreIdentityClaimVc;
-            await dbContext.SaveChangesAsync();
-
-            await journeyInstance.UpdateStateAsync(state =>
+            if (oneLoginUser.VerificationRoute is not null)
             {
-                state.OneLoginAuthenticationTicket = ticket;
-                state.AttemptedIdentityVerification = true;
+                Debug.Assert(oneLoginUser.VerifiedNames is not null);
+                Debug.Assert(oneLoginUser.VerifiedDatesOfBirth is not null);
+                state.SetVerified(oneLoginUser.VerifiedNames!, oneLoginUser.VerifiedDatesOfBirth!);
+            }
 
-                state.SetVerified(verifiedNames, verifiedDatesOfBirth);
-            });
+            if (oneLoginUser.Person?.Trn is string trn && !ShowDebugPages)
+            {
+                Complete(state, trn);
+            }
+        });
+    }
+
+    public Task OnUserVerified(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
+    {
+        var verifiedNames = ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray();
+        var verifiedDatesOfBirth = ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray();
+        var coreIdentityClaimVc = ticket.Principal.FindFirstValue("vc") ?? throw new InvalidOperationException("No vc claim present.");
+
+        return OnUserVerifiedCore(
+            journeyInstance,
+            verifiedNames,
+            verifiedDatesOfBirth,
+            coreIdentityClaimVc,
+            state => state.OneLoginAuthenticationTicket = ticket);
+    }
+
+    public async Task OnUserVerifiedCore(
+        JourneyInstance<SignInJourneyState> journeyInstance,
+        string[][] verifiedNames,
+        DateOnly[] verifiedDatesOfBirth,
+        string? coreIdentityClaimVc,
+        Action<SignInJourneyState>? updateState = null)
+    {
+        var sub = journeyInstance.State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
+
+        var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == sub);
+        oneLoginUser.VerifiedOn = clock.UtcNow;
+        oneLoginUser.VerificationRoute = OneLoginUserVerificationRoute.OneLogin;
+        oneLoginUser.VerifiedNames = verifiedNames;
+        oneLoginUser.VerifiedDatesOfBirth = verifiedDatesOfBirth;
+        oneLoginUser.LastCoreIdentityVc = coreIdentityClaimVc;
+
+        string? trn = null;
+
+        if (await TryApplyTrnToken() is (Guid PersonId, string Trn) trnTokenPerson)
+        {
+            oneLoginUser.PersonId = trnTokenPerson.PersonId;
+            oneLoginUser.FirstSignIn = clock.UtcNow;
+            oneLoginUser.LastSignIn = clock.UtcNow;
+            trn = trnTokenPerson.Trn;
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        await journeyInstance.UpdateStateAsync(state =>
+        {
+            updateState?.Invoke(state);
+            state.AttemptedIdentityVerification = true;
+
+            state.SetVerified(verifiedNames, verifiedDatesOfBirth);
+
+            if (trn is not null)
+            {
+                Complete(state, trn);
+            }
+        });
+
+        async Task<(Guid PersonId, string Trn)?> TryApplyTrnToken()
+        {
+            if (journeyInstance.State.TrnToken is not string trnToken)
+            {
+                return null;
+            }
+
+            var trnTokenModel = await idDbContext.TrnTokens.SingleOrDefaultAsync(
+                t => t.TrnToken == trnToken && t.ExpiresUtc > clock.UtcNow && t.UserId == null);
+
+            if (trnTokenModel is null)
+            {
+                return null;
+            }
+
+            var trnTokenPerson = await dbContext.Persons.SingleOrDefaultAsync(
+                p => p.Trn == trnTokenModel.Trn && p.DqtState == (int)ContactState.Active);
+
+            if (trnTokenPerson is null)
+            {
+                return null;
+            }
+
+            // If the record's last name and DOB do not match the verified details then don't automatically link
+            if (!trnTokenPerson.LastName.Equals(verifiedNames.First().Last(), StringComparison.OrdinalIgnoreCase) ||
+                trnTokenPerson.DateOfBirth != verifiedDatesOfBirth.First())
+            {
+                return null;
+            }
+
+            // Invalidate the token
+            trnTokenModel.UserId = _teacherAuthIdUserIdSentinel;
+            await idDbContext.SaveChangesAsync();
+
+            return (trnTokenPerson.PersonId, trnTokenModel.Trn);
         }
     }
 
-    public async Task<IResult> OnUserVerificationWithOneLoginFailed(JourneyInstance<SignInJourneyState> journeyInstance)
+    public async Task<IResult> OnVerificationFailed(JourneyInstance<SignInJourneyState> journeyInstance)
     {
         await journeyInstance.UpdateStateAsync(state =>
         {

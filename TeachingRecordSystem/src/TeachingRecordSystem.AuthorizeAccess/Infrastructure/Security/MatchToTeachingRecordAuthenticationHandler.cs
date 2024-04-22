@@ -35,23 +35,28 @@ public class MatchToTeachingRecordAuthenticationHandler(SignInJourneyHelper help
         EnsureInitialized();
 
         if (properties is null ||
-            !properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, out var oneLoginAuthenticationScheme) ||
-            oneLoginAuthenticationScheme is null ||
-            !properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.ServiceName, out var serviceName) ||
-            serviceName is null ||
-            !properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.ServiceUrl, out var serviceUrl) ||
-            serviceUrl is null)
+            !TryGetNonNullItem(AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, out var oneLoginAuthenticationScheme) ||
+            !TryGetNonNullItem(AuthenticationPropertiesItemKeys.ServiceName, out var serviceName) ||
+            !TryGetNonNullItem(AuthenticationPropertiesItemKeys.ServiceUrl, out var serviceUrl))
         {
             throw new InvalidOperationException($"{nameof(AuthenticationProperties)} is missing one or more items.");
         }
 
+        properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.TrnToken, out var trnToken);
+
         var journeyInstance = await helper.UserInstanceStateProvider.GetOrCreateSignInJourneyInstanceAsync(
             _context,
-            createState: () => new SignInJourneyState(properties.RedirectUri ?? "/", serviceName, serviceUrl, oneLoginAuthenticationScheme),
+            createState: () => new SignInJourneyState(properties.RedirectUri ?? "/", serviceName, serviceUrl, oneLoginAuthenticationScheme, trnToken),
             updateState: state => state.Reset());
 
         var result = helper.SignInWithOneLogin(journeyInstance);
         await result.ExecuteAsync(_context);
+
+        bool TryGetNonNullItem(string key, [NotNullWhen(true)] out string? value)
+        {
+            value = default;
+            return properties?.Items.TryGetValue(key, out value) == true && value is not null;
+        }
     }
 
     public Task ForbidAsync(AuthenticationProperties? properties)
@@ -80,5 +85,6 @@ public class MatchToTeachingRecordAuthenticationHandler(SignInJourneyHelper help
         public const string OneLoginAuthenticationScheme = "OneLoginAuthenticationScheme";
         public const string ServiceName = "ServiceName";
         public const string ServiceUrl = "ServiceUrl";
+        public const string TrnToken = "TrnToken";
     }
 }

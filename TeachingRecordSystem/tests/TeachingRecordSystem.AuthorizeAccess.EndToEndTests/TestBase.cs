@@ -7,6 +7,8 @@ public abstract class TestBase(HostFixture hostFixture)
 {
     public HostFixture HostFixture { get; } = hostFixture;
 
+    public IClock Clock => HostFixture.Services.GetRequiredService<IClock>();
+
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
     public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)

@@ -43,7 +43,7 @@ public class FakeOneLoginHandler(OneLoginCurrentUserProvider currentUserProvider
 
             var journeyInstance = (await signInJourneyHelper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(_context, journeyInstanceId))!;
 
-            var result = await signInJourneyHelper.OnUserVerificationWithOneLoginFailed(journeyInstance);
+            var result = await signInJourneyHelper.OnVerificationFailed(journeyInstance);
             await result.ExecuteAsync(_context);
 
             return;
