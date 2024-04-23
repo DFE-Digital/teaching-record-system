@@ -6,20 +6,12 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 
 namespace TeachingRecordSystem.Api.Tests.Infrastructure.Security;
 
-public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticationOptions>
+public class TestApiKeyAuthenticationHandler(
+    CurrentApiClientProvider currentApiClientProvider,
+    IOptionsMonitor<TestApiKeyAuthenticationOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder) : AuthenticationHandler<TestApiKeyAuthenticationOptions>(options, logger, encoder)
 {
-    private readonly CurrentApiClientProvider _currentApiClientProvider;
-
-    public TestAuthenticationHandler(
-        CurrentApiClientProvider currentApiClientProvider,
-        IOptionsMonitor<TestAuthenticationOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder) :
-        base(options, logger, encoder)
-    {
-        _currentApiClientProvider = currentApiClientProvider;
-    }
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (!Request.Headers.TryGetValue("X-Use-CurrentClientIdProvider", out var useCurrentClientIdProvider) ||
@@ -28,8 +20,8 @@ public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticatio
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        var currentApiClientId = _currentApiClientProvider.CurrentApiClientId;
-        var currentRoles = _currentApiClientProvider.Roles!;
+        var currentApiClientId = currentApiClientProvider.CurrentApiClientId;
+        var currentRoles = currentApiClientProvider.Roles!;
 
         if (currentApiClientId is not null)
         {
@@ -46,7 +38,7 @@ public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticatio
     }
 }
 
-public class TestAuthenticationOptions : AuthenticationSchemeOptions { }
+public class TestApiKeyAuthenticationOptions : AuthenticationSchemeOptions { }
 
 public class CurrentApiClientProvider
 {
