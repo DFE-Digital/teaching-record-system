@@ -35,6 +35,8 @@ public class HostFixture : WebApplicationFactory<Program>
         {
             DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
 
+            services.AddDbContext<IdDbContext>(options => options.UseInMemoryDatabase("TeacherAuthId"), contextLifetime: ServiceLifetime.Transient);
+
             services
                 .Configure<AuthenticationOptions>(options =>
                 {

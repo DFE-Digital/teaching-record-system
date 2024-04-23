@@ -48,14 +48,19 @@ public class OAuth2Controller(
             var parameters = Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList();
 
             var serviceUrl = new Uri(request.RedirectUri!).GetLeftPart(UriPartial.Authority);
+            var trnToken = parameters.GroupBy(kvp => kvp.Key).FirstOrDefault(kvp => kvp.Key == "trn_token")?.Select(kvp => kvp.Value).FirstOrDefault();
 
             var authenticationProperties = new AuthenticationProperties()
             {
-                RedirectUri = Request.PathBase + Request.Path + QueryString.Create(parameters)
+                RedirectUri = Request.PathBase + Request.Path + QueryString.Create(parameters),
+                Items =
+                {
+                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, client.OneLoginAuthenticationSchemeName },
+                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceName, client.Name },
+                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceUrl, serviceUrl },
+                    { MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.TrnToken, trnToken },
+                }
             };
-            authenticationProperties.Items.Add(MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.OneLoginAuthenticationScheme, client.OneLoginAuthenticationSchemeName);
-            authenticationProperties.Items.Add(MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceName, client.Name);
-            authenticationProperties.Items.Add(MatchToTeachingRecordAuthenticationHandler.AuthenticationPropertiesItemKeys.ServiceUrl, serviceUrl);
 
             return Challenge(authenticationProperties, childAuthenticationScheme);
         }

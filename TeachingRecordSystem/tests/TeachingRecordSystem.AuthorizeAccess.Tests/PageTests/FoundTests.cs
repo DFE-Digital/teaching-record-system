@@ -14,7 +14,7 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
         Debug.Assert(state.AuthenticationTicket is null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/found?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -38,7 +38,7 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/found?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -59,7 +59,7 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
         Debug.Assert(state.AuthenticationTicket is null);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/found?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -83,7 +83,7 @@ public class FoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/found?{journeyInstance.GetUniqueIdQueryParameter()}");
 

@@ -180,6 +180,41 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task SignIn_UnknownVerifiedUserWithTrnTokenAndMatchingDetails_MatchesWithTrn()
+    {
+        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber(false));
+
+        var subject = TestData.CreateOneLoginUserSubject();
+        var email = Faker.Internet.Email();
+        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
+
+        var trnToken = Guid.NewGuid().ToString();
+
+        using (var idDbContext = HostFixture.Services.GetRequiredService<IdDbContext>())
+        {
+            idDbContext.TrnTokens.Add(new IdTrnToken()
+            {
+                TrnToken = trnToken,
+                Trn = person.Trn!,
+                CreatedUtc = Clock.UtcNow,
+                ExpiresUtc = Clock.UtcNow.AddDays(1),
+                Email = email,
+                UserId = null
+            });
+
+            await idDbContext.SaveChangesAsync();
+        }
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPage(trnToken: trnToken);
+
+        await page.AssertSignedIn(person.Trn!);
+    }
+
+    [Fact]
     public async Task SignIn_KnownUser()
     {
         var person = await TestData.CreatePerson(x => x.WithTrn());

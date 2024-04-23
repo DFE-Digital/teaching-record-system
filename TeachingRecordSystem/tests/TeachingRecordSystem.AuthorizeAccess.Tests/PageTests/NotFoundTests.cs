@@ -30,7 +30,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(verified: false);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -52,7 +52,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/not-found?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -74,7 +74,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         Debug.Assert(state.NationalInsuranceNumber is null);
 
@@ -98,7 +98,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         Debug.Assert(state.NationalInsuranceNumber is null);
         await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, TestData.GenerateNationalInsuranceNumber()));
@@ -123,7 +123,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         await journeyInstance.UpdateStateAsync(async state =>
         {
@@ -150,7 +150,7 @@ public class NotFoundTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnSignedInWithOneLogin(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
 
         await journeyInstance.UpdateStateAsync(async state =>
         {

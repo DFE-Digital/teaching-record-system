@@ -145,6 +145,8 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
         RetryPauseTime = TimeSpan.FromSeconds(1)
     };
     builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
+
+    builder.Services.AddDbContext<IdDbContext>(options => options.UseNpgsql(builder.Configuration.GetRequiredConnectionString("Id")));
 }
 
 builder.Services
