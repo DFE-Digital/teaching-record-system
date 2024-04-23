@@ -66,21 +66,6 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     }
 
     [Fact]
-    public async Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse()
-    {
-        var qtsDate = new DateOnly(2021, 01, 01);
-        var qtsCreatedDate = new DateTime(2021, 01, 01);
-        var qts = new QtsRegistration[]
-        {
-            new QtsRegistration(qtsDate, QtsAwardedInWalesTeacherStatusValue, qtsCreatedDate, null, null)
-        };
-        var contact = await CreateContact(qts);
-        var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
-
-        await ValidRequestForTeacher_ReturnsExpectedContent(GetHttpClientWithApiKey(), baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), "Qualified"), expectedEyts: null);
-    }
-
-    [Fact]
     public async Task Get_ValidRequestForContactWithMultiWordFirstName_ReturnsExpectedResponse()
     {
         var contact = await CreateContact();
