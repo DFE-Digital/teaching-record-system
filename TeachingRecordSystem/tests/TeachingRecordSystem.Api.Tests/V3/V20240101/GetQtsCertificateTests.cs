@@ -4,9 +4,6 @@ namespace TeachingRecordSystem.Api.Tests.V3.V20240101;
 
 public class GetQtsCertificateTests : TestBase
 {
-    private const string QtsAwardedInWalesTeacherStatusValue = "213";
-    private readonly Guid _qtsAwardedInWalesTeacherStatusId = Guid.NewGuid();
-
     public GetQtsCertificateTests(HostFixture hostFixture)
         : base(hostFixture)
     {
@@ -59,74 +56,6 @@ public class GetQtsCertificateTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Get_QtsCertificateForTeacherQualifiedInWales_ReturnsNotFound()
-    {
-        // Arrange
-        var trn = "1234567";
-
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var qtsDate = new DateOnly(1997, 4, 23);
-
-        var teacher = new Contact()
-        {
-            Id = Guid.NewGuid(),
-            dfeta_TRN = trn,
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            dfeta_QTSDate = qtsDate.ToDateTime()
-        };
-
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
-            .ReturnsAsync(teacher);
-
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherStatus(
-                It.Is<string>(s => s == QtsAwardedInWalesTeacherStatusValue),
-                It.IsAny<RequestBuilder>()))
-            .ReturnsAsync(new dfeta_teacherstatus()
-            {
-                Id = _qtsAwardedInWalesTeacherStatusId
-            });
-
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherStatus(
-                It.Is<string>(s => s != QtsAwardedInWalesTeacherStatusValue),
-                It.IsAny<RequestBuilder>()))
-            .ReturnsAsync(new dfeta_teacherstatus()
-            {
-                Id = Guid.NewGuid()
-            });
-
-        var qtsRegistrations = new[]
-        {
-            new dfeta_qtsregistration()
-            {
-                dfeta_QTSDate = qtsDate.ToDateTime(),
-                dfeta_TeacherStatusId = _qtsAwardedInWalesTeacherStatusId.ToEntityReference(dfeta_teacherstatus.EntityLogicalName)
-            }
-        };
-
-        DataverseAdapterMock
-            .Setup(mock => mock.GetQtsRegistrationsByTeacher(
-                teacher.Id,
-                It.IsAny<string[]>()))
-            .ReturnsAsync(qtsRegistrations);
-
-        var httpClient = GetHttpClientWithIdentityAccessToken(trn);
-        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/certificates/qts");
-
-        // Act
-        var response = await httpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
-    }
-
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -158,24 +87,6 @@ public class GetQtsCertificateTests : TestBase
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(teacher);
-
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherStatus(
-                It.Is<string>(s => s == QtsAwardedInWalesTeacherStatusValue),
-                It.IsAny<RequestBuilder>()))
-            .ReturnsAsync(new dfeta_teacherstatus()
-            {
-                Id = _qtsAwardedInWalesTeacherStatusId
-            });
-
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherStatus(
-                It.Is<string>(s => s != QtsAwardedInWalesTeacherStatusValue),
-                It.IsAny<RequestBuilder>()))
-            .ReturnsAsync(new dfeta_teacherstatus()
-            {
-                Id = Guid.NewGuid()
-            });
 
         var qtsRegistrations = new[]
         {

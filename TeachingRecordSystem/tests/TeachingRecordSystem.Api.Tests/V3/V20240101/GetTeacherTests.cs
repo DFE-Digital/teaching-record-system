@@ -56,22 +56,6 @@ public class GetTeacherTests : GetTeacherTestBase
     }
 
     [Theory]
-    [InlineData("213", "Qualified")]
-    public async Task Get_ValidRequestForTeacherQualifiedInWales_ReturnsExpectedResponse(string qtsStatusValue, string qtsStatusDescription)
-    {
-        var qtsDate = new DateOnly(2021, 01, 01);
-        var qtsCreatedDate = new DateTime(2021, 01, 01);
-        var qts = new QtsRegistration[]
-        {
-            new QtsRegistration(qtsDate, qtsStatusValue, qtsCreatedDate, null, null)
-        };
-        var contact = await CreateContact(qts);
-        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
-        var baseUrl = "/v3/teacher";
-        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), qtsStatusDescription), expectedEyts: null);
-    }
-
-    [Theory]
     [InlineData("220", "Early years trainee")]
     [InlineData("221", "Qualified")]
     [InlineData("222", "Early years professional status")]
