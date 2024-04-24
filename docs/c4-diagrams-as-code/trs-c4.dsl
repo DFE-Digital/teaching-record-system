@@ -8,7 +8,7 @@ workspace {
     citizen = person "User (Citizen)"
     emp-prov-la = person "Employer, Provider, LA"
 
-    softwareSystem = softwareSystem "Teaching Record System Core Containers"{
+    softwareSystem = softwareSystem "Teaching Record System Core Containers and AYTQ"{
 
       teaching-record-system = group "Teaching Record System" {
         trsApi = container "TRS API (formerly known as Qualified Teachers API)" {
