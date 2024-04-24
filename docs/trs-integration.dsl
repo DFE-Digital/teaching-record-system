@@ -110,7 +110,7 @@ workspace {
       trsApi -> tps-bancs-api  "http: Return a TRN"
       trsApi -> tps-bancs-api "http: Prohibition outcomes"
       
-      tps-bancs-api -> trsApi "http: Return a TRN"
+      tps-bancs-api -> trsApi "http: Request a TRN"
       tps-bancs-api -> trsApi "http: Deceased active and inactive service"
       tps-bancs-api -> trsApi "sftp: Workforce data"
     
