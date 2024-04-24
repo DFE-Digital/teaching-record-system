@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using JustEat.HttpClientInterception;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Options;
@@ -23,7 +22,12 @@ public class HostFixture : WebApplicationFactory<Program>
     public HostFixture(IConfiguration configuration)
     {
         _configuration = configuration;
-        JwtSigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()), SecurityAlgorithms.RsaSha256);
+
+        using (var rsa = RSA.Create())
+        {
+            JwtSigningCredentials = new SigningCredentials(new RsaSecurityKey(rsa.ExportParameters(includePrivateParameters: true)), SecurityAlgorithms.RsaSha256);
+        }
+
         _ = Services;  // Start the host
     }
 
@@ -46,11 +50,16 @@ public class HostFixture : WebApplicationFactory<Program>
         {
             DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
 
-            // Replace ApiKeyAuthenticationHandler with a mechanism we can control from tests
+            // Replace authentication handlers with mechanisms we can control from tests
             services.Configure<AuthenticationOptions>(options =>
             {
-                options.SchemeMap[ApiKeyAuthenticationHandler.AuthenticationScheme].HandlerType = typeof(TestAuthenticationHandler);
+                options.SchemeMap[ApiKeyAuthenticationHandler.AuthenticationScheme].HandlerType = typeof(TestApiKeyAuthenticationHandler);
+                options.SchemeMap["IdAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
+                options.SchemeMap["AuthorizeAccessAccessToken"].HandlerType = typeof(SimpleJwtBearerAuthentication);
             });
+
+            services.Configure<SimpleJwtBearerAuthenticationOptions>("IdAccessToken", o => o.IssuerSigningKey = JwtSigningCredentials.Key);
+            services.Configure<SimpleJwtBearerAuthenticationOptions>("AuthorizeAccessAccessToken", o => o.IssuerSigningKey = JwtSigningCredentials.Key);
 
             // Add controllers defined in this test assembly
             services.AddMvc().AddApplicationPart(typeof(HostFixture).Assembly);
@@ -86,12 +95,6 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddHttpClient("EvidenceFiles")
                 .AddHttpMessageHandler(_ => EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())
                 .ConfigurePrimaryHttpMessageHandler(_ => new NotFoundHandler());
-
-            services.PostConfigure<JwtBearerOptions>("IdAccessToken", options =>
-            {
-                options.TokenValidationParameters.ValidateIssuer = false;
-                options.TokenValidationParameters.IssuerSigningKey = JwtSigningCredentials.Key;
-            });
         });
     }
 

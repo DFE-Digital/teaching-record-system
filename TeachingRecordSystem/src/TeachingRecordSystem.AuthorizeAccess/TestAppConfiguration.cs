@@ -36,13 +36,25 @@ public static class TestAppConfiguration
                     options.MapInboundClaims = false;
                     options.GetClaimsFromUserInfoEndpoint = true;
                     options.SaveTokens = true;
+
                     options.Scope.Clear();
                     options.Scope.Add("openid");
                     options.Scope.Add("email");
                     options.Scope.Add("profile");
                     options.Scope.Add(CustomScopes.TeachingRecord);
+
                     options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.OneLoginVerifiedNames));
                     options.ClaimActions.Add(new MapJsonClaimAction(ClaimTypes.OneLoginIdVerifiedBirthDates));
+
+                    options.Events.OnRedirectToIdentityProvider = ctx =>
+                    {
+                        if (ctx.Properties.Parameters.TryGetValue("TrnToken", out var trnTokenObj) && trnTokenObj is string trnToken)
+                        {
+                            ctx.ProtocolMessage.SetParameter("trn_token", trnToken);
+                        }
+
+                        return Task.CompletedTask;
+                    };
                 });
         }
         else

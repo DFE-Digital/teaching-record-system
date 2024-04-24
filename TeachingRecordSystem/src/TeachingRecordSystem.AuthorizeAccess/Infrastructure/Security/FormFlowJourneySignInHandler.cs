@@ -64,7 +64,7 @@ public class FormFlowJourneySignInHandler(SignInJourneyHelper helper) : IAuthent
 
         var ticket = new AuthenticationTicket(user, properties, _scheme.Name);
 
-        var result = await helper.OnSignedInWithOneLogin(journeyInstance, ticket);
+        var result = await helper.OnOneLoginCallback(journeyInstance, ticket);
 
         // Override the redirect done by RemoteAuthenticationHandler
         _context.Response.OnStarting(() => result.ExecuteAsync(_context));

@@ -65,6 +65,8 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
                 {
                     DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
 
+                    services.AddDbContext<IdDbContext>(options => options.UseInMemoryDatabase("TeacherAuthId"), contextLifetime: ServiceLifetime.Transient);
+
                     services.Configure<AuthenticationOptions>(options =>
                     {
                         options.AddScheme(FakeOneLoginAuthenticationScheme, b => b.HandlerType = typeof(FakeOneLoginHandler));

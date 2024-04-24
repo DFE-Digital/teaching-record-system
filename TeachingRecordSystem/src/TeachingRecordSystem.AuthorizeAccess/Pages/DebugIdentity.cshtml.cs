@@ -17,12 +17,14 @@ namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 public class DebugIdentityModel(
     TrsDbContext dbContext,
     SignInJourneyHelper helper,
-    IClock clock,
     IOptions<AuthorizeAccessOptions> optionsAccessor) : PageModel
 {
     private OneLoginUser? _oneLoginUser;
 
     public JourneyInstance<SignInJourneyState>? JourneyInstance { get; set; }
+
+    [Display(Name = "TRN token")]
+    public string? TrnToken { get; set; }
 
     [Display(Name = "Subject")]
     public string? Subject { get; set; }
@@ -106,49 +108,36 @@ public class DebugIdentityModel(
             return this.PageWithErrors();
         }
 
-        if (DetachPerson && _oneLoginUser!.PersonId is not null)
+        if (_oneLoginUser!.PersonId is not null && !DetachPerson)
+        {
+            await JourneyInstance!.UpdateStateAsync(state => helper.Complete(state, _oneLoginUser.Person!.Trn!));
+            return GetNextPage();
+        }
+
+        if (_oneLoginUser!.PersonId is not null && DetachPerson)
         {
             _oneLoginUser.PersonId = null;
         }
 
-        if (_oneLoginUser!.PersonId is null)
+        if (IdentityVerified)
         {
-            if (IdentityVerified)
-            {
-                _oneLoginUser!.VerifiedOn = clock.UtcNow;
-                _oneLoginUser.VerificationRoute = OneLoginUserVerificationRoute.OneLogin;
-                _oneLoginUser.VerifiedNames = verifiedNames;
-                _oneLoginUser.VerifiedDatesOfBirth = verifiedDatesOfBirth;
-            }
-            else
-            {
-                _oneLoginUser!.VerifiedOn = null;
-                _oneLoginUser.VerificationRoute = null;
-                _oneLoginUser.VerifiedNames = null;
-                _oneLoginUser.VerifiedDatesOfBirth = null;
-            }
+            await helper.OnUserVerifiedCore(JourneyInstance!, verifiedNames!, verifiedDatesOfBirth!, coreIdentityClaimVc: null);
+        }
+        else
+        {
+            _oneLoginUser!.VerifiedOn = null;
+            _oneLoginUser.VerificationRoute = null;
+            _oneLoginUser.VerifiedNames = null;
+            _oneLoginUser.VerifiedDatesOfBirth = null;
+
+            await JourneyInstance!.UpdateStateAsync(state => state.ClearVerified());
         }
 
         await dbContext.SaveChangesAsync();
 
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            if (_oneLoginUser!.PersonId is not null)
-            {
-                helper.Complete(state, _oneLoginUser.Person!.Trn!);
-            }
-            else if (IdentityVerified)
-            {
-                state.SetVerified(verifiedNames!, verifiedDatesOfBirth!);
-            }
-            else
-            {
-                state.ClearVerified();
-            }
-        });
+        return GetNextPage();
 
-        var nextPage = helper.GetNextPage(JourneyInstance);
-        return nextPage.ToActionResult();
+        IActionResult GetNextPage() => helper.GetNextPage(JourneyInstance!).ToActionResult();
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -165,6 +154,7 @@ public class DebugIdentityModel(
             return;
         }
 
+        TrnToken = JourneyInstance.State.TrnToken;
         Subject = User.FindFirstValue("sub");
         Email = User.FindFirstValue("email");
 

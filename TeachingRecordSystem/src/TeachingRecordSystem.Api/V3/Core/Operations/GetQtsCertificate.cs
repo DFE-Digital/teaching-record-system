@@ -14,8 +14,6 @@ public class GetQtsCertificateHandler(IDataverseAdapter dataverseAdapter, ICerti
     private const string QtsFormTrnField = "TRN";
     private const string QtsFormDateField = "QTSDate";
 
-    private const string QtsAwardedInWalesTeacherStatusValue = "213";
-
     public async Task<FileDownloadInfo?> Handle(GetQtsCertificateCommand command)
     {
         var teacher = await dataverseAdapter.GetTeacherByTrn(
@@ -31,21 +29,6 @@ public class GetQtsCertificateHandler(IDataverseAdapter dataverseAdapter, ICerti
             });
 
         if (teacher?.dfeta_QTSDate is null)
-        {
-            return null;
-        }
-
-        var qtsAwardedInWalesStatus = await dataverseAdapter.GetTeacherStatus(QtsAwardedInWalesTeacherStatusValue, null);
-        var qtsRegistrations = await dataverseAdapter.GetQtsRegistrationsByTeacher(
-            teacher.Id,
-            columnNames: new[]
-            {
-                dfeta_qtsregistration.Fields.dfeta_QTSDate,
-                dfeta_qtsregistration.Fields.dfeta_TeacherStatusId
-            });
-
-        var qtsRegistration = qtsRegistrations.SingleOrDefault(qts => qts.dfeta_QTSDate is not null);
-        if (qtsRegistration is null || qtsRegistration.dfeta_TeacherStatusId.Id == qtsAwardedInWalesStatus.Id)
         {
             return null;
         }

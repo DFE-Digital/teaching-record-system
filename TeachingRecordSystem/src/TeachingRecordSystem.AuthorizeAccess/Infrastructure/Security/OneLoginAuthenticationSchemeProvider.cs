@@ -187,7 +187,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
                 var signInJourneyHelper = context.HttpContext.RequestServices.GetRequiredService<SignInJourneyHelper>();
                 var journeyInstance = (await signInJourneyHelper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(context.HttpContext, journeyInstanceId))!;
 
-                var result = await signInJourneyHelper.OnUserVerificationWithOneLoginFailed(journeyInstance);
+                var result = await signInJourneyHelper.OnVerificationFailed(journeyInstance);
                 await result.ExecuteAsync(context.HttpContext);
             }
         };
