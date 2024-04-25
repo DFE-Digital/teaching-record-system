@@ -43,6 +43,8 @@ public abstract class TestBase : IDisposable
 
     public HostFixture HostFixture { get; }
 
+    public CaptureEventObserver EventObserver => _testServices.EventObserver;
+
     public TestableClock Clock => _testServices.Clock;
 
     public HttpClient HttpClient { get; }

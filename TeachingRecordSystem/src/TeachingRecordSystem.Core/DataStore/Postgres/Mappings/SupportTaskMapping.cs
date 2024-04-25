@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -14,5 +15,7 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
         builder.HasOne<Person>().WithMany().HasForeignKey(p => p.PersonId).HasConstraintName("fk_support_tasks_person");
         builder.HasIndex(t => t.OneLoginUserSubject);
         builder.HasIndex(t => t.PersonId);
+        builder.Property<JsonDocument>("_data").HasColumnName("data").IsRequired();
+        builder.Ignore(t => t.Data);
     }
 }

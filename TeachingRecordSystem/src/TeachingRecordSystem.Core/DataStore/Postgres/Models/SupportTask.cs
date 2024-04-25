@@ -1,19 +1,30 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class SupportTask
 {
+    internal static readonly JsonSerializerOptions SerializerOptions = new();
     private static readonly char[] _validReferenceChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray();
 
-    public required string SupportTaskReference { get; init; }
+    private JsonDocument _data = null!;
+
+    public required string SupportTaskReference { get; set; }
+    public required DateTime CreatedOn { get; init; }
+    public required DateTime UpdatedOn { get; set; }
     public required SupportTaskType SupportTaskType { get; init; }
     public required SupportTaskStatus Status { get; set; }
-    public required JsonDocument Data { get; set; }
     public string? OneLoginUserSubject { get; init; }
     public Guid? PersonId { get; init; }
+
+    public required object Data
+    {
+        get => JsonSerializer.Deserialize(_data, GetDataType(), SerializerOptions)!;
+        set => _data = JsonSerializer.SerializeToDocument(value, GetDataType(), SerializerOptions);
+    }
 
     public static string GenerateSupportTaskReference()
     {
@@ -63,4 +74,12 @@ public class SupportTask
             return _validReferenceChars[checkCodePoint];
         }
     }
+
+    internal static Type GetDataType(SupportTaskType supportTaskType) => supportTaskType switch
+    {
+        SupportTaskType.ConnectOneLoginUser => typeof(ConnectOneLoginUserData),
+        _ => throw new ArgumentNullException($"Unknown {nameof(SupportTaskType)}: {supportTaskType}'.")
+    };
+
+    private Type GetDataType() => GetDataType(SupportTaskType);
 }
