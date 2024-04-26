@@ -14,7 +14,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
     private const string KnownGiasLaCodeHackney = "204";
     private const string KnownGiasLaNameHackney = "Hackney";
     private const string KnownGiasEstablishmentNumberHackney = "2654";
-    private const string KnownGiasEstablishmentNameHackney = "Woodberry Down Community Primary School";    
+    private const string KnownGiasEstablishmentNameHackney = "Woodberry Down Community Primary School";
     private const string KnownGiasLaCodeCityOfLondon = "201";
     private const string KnownGiasLaNameCityOfLondon = "City of London";
     private const string KnownGiasEstablishmentNumberCityOfLondon = "6007";
@@ -326,7 +326,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         {
             Assert.Empty(nonGiasEstablishments);
         }
-    }    
+    }
 
     public Task InitializeAsync() => Task.CompletedTask;
 

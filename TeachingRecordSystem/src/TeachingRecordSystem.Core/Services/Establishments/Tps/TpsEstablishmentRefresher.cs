@@ -1,11 +1,11 @@
-using CsvHelper.Configuration;
-using CsvHelper;
 using System.Globalization;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.WorkforceData;
+using System.Text.RegularExpressions;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Npgsql;
 using NpgsqlTypes;
-using System.Text.RegularExpressions;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.WorkforceData;
 
 namespace TeachingRecordSystem.Core.Services.Establishments.Tps;
 
@@ -16,11 +16,13 @@ public class TpsEstablishmentRefresher(
     public async Task ImportFile(string fileName, CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
-        var truncateSql = "TRUNCATE TABLE tps_establishments";
-        await dbContext.Database.ExecuteSqlRawAsync(truncateSql, cancellationToken);
-
         var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
         await connection.OpenAsync(cancellationToken);
+        using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+
+        var truncateSql = "TRUNCATE TABLE tps_establishments";
+        await using var command = new NpgsqlCommand(truncateSql, connection, transaction);
+        await command.ExecuteNonQueryAsync(cancellationToken);
 
         using var writer = await connection.BeginBinaryImportAsync(
             $"""
@@ -62,6 +64,8 @@ public class TpsEstablishmentRefresher(
 
         await writer.CompleteAsync(cancellationToken);
         await writer.CloseAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
     }
 
     public async Task RefreshEstablishments(CancellationToken cancellationToken)
@@ -222,7 +226,7 @@ public class TpsEstablishmentRefresher(
             }
             else
             {
-                existingEstablishment.EstablishmentSourceId = 2;                
+                existingEstablishment.EstablishmentSourceId = 2;
                 existingEstablishment.LaName = item.LaName;
                 existingEstablishment.EstablishmentName = item.EstablishmentName;
             }

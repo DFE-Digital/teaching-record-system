@@ -9,7 +9,7 @@ public class TpsRefreshEstablishmentsJob(
     IBackgroundJobScheduler backgroundJobScheduler)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
-    { 
+    {
         var tpsEstablishmentFileName = await tpsExtractStorageService.GetPendingEstablishmentImportFileName(cancellationToken);
         if (tpsEstablishmentFileName == null)
         {

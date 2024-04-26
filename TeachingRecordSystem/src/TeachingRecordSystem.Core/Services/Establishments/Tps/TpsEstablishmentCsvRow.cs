@@ -5,14 +5,11 @@ namespace TeachingRecordSystem.Core.Services.Establishments.Tps;
 public class TpsEstablishmentCsvRow
 {
     [Name("LA Code")]
-    [NullValues("")]
-    public required string? LaCode { get; set; }
+    public required string LaCode { get; set; }
     [Name("Establishment Code")]
-    [NullValues("")]
-    public required string? EstablishmentCode { get; set; }
+    public required string EstablishmentCode { get; set; }
     [Name("EMPS Name")]
-    [NullValues("")]
-    public required string? EmployersName { get; set; }
+    public required string EmployersName { get; set; }
     [Name("SCHL (GIAS) Name")]
     [NullValues("")]
     public required string? SchoolGiasName { get; set; }

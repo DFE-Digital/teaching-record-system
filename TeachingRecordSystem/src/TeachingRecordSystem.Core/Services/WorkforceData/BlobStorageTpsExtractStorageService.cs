@@ -14,16 +14,14 @@ public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceCl
     public async Task<string[]> GetPendingImportFileNames(CancellationToken cancellationToken)
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(TpsExtractsContainerName);
-        var fileNames = new List<string>();
-        await GetFileNamesAsync(blobContainerClient, PendingFolderName, true, fileNames, cancellationToken);
-        return fileNames.ToArray();
+        var fileNames = await GetFileNames(blobContainerClient, PendingFolderName, true, cancellationToken);
+        return fileNames;
     }
 
     public async Task<string?> GetPendingEstablishmentImportFileName(CancellationToken cancellationToken)
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(TpsExtractsContainerName);
-        var fileNames = new List<string>();
-        await GetFileNamesAsync(blobContainerClient, EstablishmentsFolderName, true, fileNames, cancellationToken);
+        var fileNames = await GetFileNames(blobContainerClient, EstablishmentsFolderName, true, cancellationToken);
         return fileNames?.FirstOrDefault();
     }
 
@@ -65,8 +63,9 @@ public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceCl
         }
     }
 
-    private async Task GetFileNamesAsync(BlobContainerClient containerClient, string prefix, bool includeSubfolders, List<string> fileNames, CancellationToken cancellationToken)
+    private async Task<string[]> GetFileNames(BlobContainerClient containerClient, string prefix, bool includeSubfolders, CancellationToken cancellationToken)
     {
+        var fileNames = new List<string>();
         var resultSegment = containerClient.GetBlobsByHierarchyAsync(prefix: prefix, delimiter: "/", cancellationToken: cancellationToken).AsPages();
 
         // Enumerate the blobs returned for each page.
@@ -80,7 +79,11 @@ public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceCl
                     if (includeSubfolders)
                     {
                         // Call recursively with the prefix to traverse the virtual directory.
-                        await GetFileNamesAsync(containerClient, blobhierarchyItem.Prefix, true, fileNames, cancellationToken);
+                        var subfolderFileNames = await GetFileNames(containerClient, blobhierarchyItem.Prefix, true, cancellationToken);
+                        if (subfolderFileNames != null)
+                        {
+                            fileNames.AddRange(subfolderFileNames);
+                        }
                     }
                 }
                 else
@@ -89,5 +92,7 @@ public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceCl
                 }
             }
         }
-    }    
+
+        return fileNames.ToArray();
+    }
 }

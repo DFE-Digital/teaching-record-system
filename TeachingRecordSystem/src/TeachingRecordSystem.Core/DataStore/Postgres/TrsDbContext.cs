@@ -75,8 +75,8 @@ public class TrsDbContext : DbContext
     public DbSet<PersonEmployment> PersonEmployments => Set<PersonEmployment>();
 
     public DbSet<SupportTask> SupportTasks => Set<SupportTask>();
-    
-    public DbSet<TpsEstablishment> TpsEstablishments => Set<TpsEstablishment>();    
+
+    public DbSet<TpsEstablishment> TpsEstablishments => Set<TpsEstablishment>();
 
     public DbSet<TpsEstablishmentType> TpsEstablishmentTypes => Set<TpsEstablishmentType>();
 
