@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests;
 
@@ -248,5 +250,71 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"{state.RedirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_ValidRequest_CreatesSupportTicketAndRedirectsToSupportRequestedSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+
+        var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
+        await GetSignInJourneyHelper().OnUserAuthenticated(journeyInstance, ticket);
+
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var trn = await TestData.GenerateTrn();
+
+        await journeyInstance.UpdateStateAsync(state =>
+        {
+            state.SetNationalInsuranceNumber(true, nationalInsuranceNumber);
+            state.SetTrn(true, trn);
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        var supportTask = await WithDbContext(dbContext => dbContext.SupportTasks.SingleAsync(t => t.OneLoginUserSubject == oneLoginUser.Subject));
+        Assert.NotNull(supportTask);
+        Assert.Equal(Clock.UtcNow, supportTask.CreatedOn);
+        Assert.Equal(Clock.UtcNow, supportTask.UpdatedOn);
+        Assert.Equal(SupportTaskType.ConnectOneLoginUser, supportTask.SupportTaskType);
+        Assert.Equal(SupportTaskStatus.Open, supportTask.Status);
+        Assert.Equal(oneLoginUser.Subject, supportTask.OneLoginUserSubject);
+        var data = Assert.IsType<ConnectOneLoginUserData>(supportTask.Data);
+        Assert.True(data.Verified);
+        Assert.Equal(oneLoginUser.Subject, data.OneLoginUserSubject);
+        Assert.Equal(oneLoginUser.Email, data.OneLoginUserEmail);
+        Assert.Equal(oneLoginUser.VerifiedNames, data.VerifiedNames);
+        Assert.Equal(oneLoginUser.VerifiedDatesOfBirth, data.VerifiedDatesOfBirth);
+        Assert.Equal(nationalInsuranceNumber, data.StatedNationalInsuranceNumber);
+        Assert.Equal(trn, data.StatedTrn);
+
+        EventObserver.AssertEventsSaved(e =>
+        {
+            var supportTaskCreatedEvent = Assert.IsType<SupportTaskCreatedEvent>(e);
+            Assert.Equal(Clock.UtcNow, supportTaskCreatedEvent.CreatedUtc);
+            Assert.Equal(supportTaskCreatedEvent.RaisedBy.UserId, SystemUser.SystemUserId);
+            Assert.Equal(supportTask.SupportTaskReference, supportTaskCreatedEvent.SupportTask.SupportTaskReference);
+            Assert.Equal(SupportTaskType.ConnectOneLoginUser, supportTaskCreatedEvent.SupportTask.SupportTaskType);
+            Assert.Equal(SupportTaskStatus.Open, supportTaskCreatedEvent.SupportTask.Status);
+            Assert.Equal(oneLoginUser.Subject, supportTaskCreatedEvent.SupportTask.OneLoginUserSubject);
+            var eventData = Assert.IsType<ConnectOneLoginUserData>(supportTask.Data);
+            Assert.True(eventData.Verified);
+            Assert.Equal(oneLoginUser.Subject, eventData.OneLoginUserSubject);
+            Assert.Equal(oneLoginUser.Email, eventData.OneLoginUserEmail);
+            Assert.Equal(oneLoginUser.VerifiedNames, eventData.VerifiedNames);
+            Assert.Equal(oneLoginUser.VerifiedDatesOfBirth, eventData.VerifiedDatesOfBirth);
+            Assert.Equal(nationalInsuranceNumber, eventData.StatedNationalInsuranceNumber);
+            Assert.Equal(trn, eventData.StatedTrn);
+        });
     }
 }

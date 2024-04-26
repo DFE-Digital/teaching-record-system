@@ -9,10 +9,10 @@
 }
 
 <form action="@LinkGenerator.NotFound(Model.JourneyInstance!.InstanceId)" method="post">
-    <div class="govuk-panel govuk-panel--interruption">
-        <h1 class="govuk-panel__title">@ViewBag.Title</h1>
+    <govuk-panel class="govuk-panel--interruption">
+        <govuk-panel-title>@ViewBag.Title</govuk-panel-title>
 
-        <div class="govuk-panel__body">
+        <govuk-panel-body class="govuk-panel__body">
             <div class="trs-two-thirds">
                 <p class="govuk-body govuk-!-margin-bottom-0">
                     We’ve been unable to match your answers to a teaching record.
@@ -30,6 +30,6 @@
 
                 <govuk-button class="govuk-!-margin-bottom-0">Check your answers</govuk-button>
             </div>
-        </div>
-    </div>
+        </govuk-panel-body>
+    </govuk-panel>
 </form>

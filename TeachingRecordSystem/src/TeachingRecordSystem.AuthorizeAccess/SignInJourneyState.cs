@@ -36,6 +36,8 @@ public class SignInJourneyState(
 
     public bool AttemptedIdentityVerification { get; set; }
 
+    public bool HasPendingSupportRequest { get; set; }
+
     [JsonInclude]
     public bool IdentityVerified { get; private set; }
 

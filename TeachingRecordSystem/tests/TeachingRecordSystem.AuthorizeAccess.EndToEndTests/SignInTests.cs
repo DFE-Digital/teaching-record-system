@@ -145,6 +145,9 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButton("Check your answers");
 
         await page.WaitForUrlPathAsync("/check-answers");
+        await page.ClickButton("Submit support request");
+
+        await page.WaitForUrlPathAsync("/request-submitted");
     }
 
     [Fact]
@@ -177,6 +180,9 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButton("Check your answers");
 
         await page.WaitForUrlPathAsync("/check-answers");
+        await page.ClickButton("Submit support request");
+
+        await page.WaitForUrlPathAsync("/request-submitted");
     }
 
     [Fact]
