@@ -3,8 +3,8 @@ using System.Security.Claims;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
+using TeachingRecordSystem.AuthorizeAccess.Services.PersonMatching;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.PersonSearch;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -472,8 +472,8 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         WithDbContext(async dbContext =>
         {
             // Arrange
-            var personSearchServiceMock = new Mock<IPersonSearchService>();
-            var helper = CreateHelper(dbContext, personSearchServiceMock.Object);
+            var personMatchingServiceMock = new Mock<IPersonMatchingService>();
+            var helper = CreateHelper(dbContext, personMatchingServiceMock.Object);
 
             var verifiedFirstName = Faker.Name.Last();
             var verifiedLastName = Faker.Name.Last();
@@ -492,13 +492,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, Faker.Identification.UkNationalInsuranceNumber()));
 
-            personSearchServiceMock
-                .Setup(mock => mock.Search(
+            personMatchingServiceMock
+                .Setup(mock => mock.Match(
                     It.Is<IEnumerable<string[]>>(names => names.SequenceEqual(state.VerifiedNames!)),
                     It.Is<IEnumerable<DateOnly>>(dobs => dobs.SequenceEqual(state.VerifiedDatesOfBirth!)),
                     state.NationalInsuranceNumber,
                     state.Trn))
-                .ReturnsAsync(Array.Empty<PersonSearchResult>());
+                .ReturnsAsync(value: null);
 
             // Act
             var result = await helper.TryMatchToTeachingRecord(journeyInstance);
@@ -513,82 +513,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         });
 
     [Fact]
-    public Task TryMatchToTeachingRecord_MatchesMultipleResults_ReturnsFalseAndDoesNotSetAuthenticationTicket() =>
+    public Task TryMatchToTeachingRecord_MatchesWithoutTrn_ReturnsFalseAndDoesNotSetAuthenticationTicket() =>
         WithDbContext(async dbContext =>
         {
             // Arrange
-            var personSearchServiceMock = new Mock<IPersonSearchService>();
-            var helper = CreateHelper(dbContext, personSearchServiceMock.Object);
-
-            var firstName = Faker.Name.Last();
-            var lastName = Faker.Name.Last();
-            var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
-            var person1 = await TestData.CreatePerson(b => b.WithTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
-            var person2 = await TestData.CreatePerson(b => b.WithTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
-
-            var user = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
-            Clock.Advance();
-
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
-            var journeyInstance = await CreateJourneyInstance(state);
-
-            var authenticationTicket = CreateOneLoginAuthenticationTicket(
-                vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
-                sub: user.Subject,
-                createCoreIdentityVc: false);
-            await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
-
-            await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person1.NationalInsuranceNumber));
-
-            personSearchServiceMock
-                .Setup(mock => mock.Search(
-                    It.Is<IEnumerable<string[]>>(names => names.SequenceEqual(state.VerifiedNames!)),
-                    It.Is<IEnumerable<DateOnly>>(dobs => dobs.SequenceEqual(state.VerifiedDatesOfBirth!)),
-                    state.NationalInsuranceNumber,
-                    state.Trn))
-                .ReturnsAsync(new[]
-                {
-                    new PersonSearchResult()
-                    {
-                        PersonId = person1.PersonId,
-                        FirstName = person1.FirstName,
-                        MiddleName = person1.MiddleName,
-                        LastName = person1.LastName,
-                        DateOfBirth = person1.DateOfBirth,
-                        Trn = person1.Trn,
-                        NationalInsuranceNumber = person1.NationalInsuranceNumber
-                    },
-                    new PersonSearchResult()
-                    {
-                        PersonId = person2.PersonId,
-                        FirstName = person2.FirstName,
-                        MiddleName = person2.MiddleName,
-                        LastName = person2.LastName,
-                        DateOfBirth = person2.DateOfBirth,
-                        Trn = person2.Trn,
-                        NationalInsuranceNumber = person2.NationalInsuranceNumber
-                    }
-                });
-
-            // Act
-            var result = await helper.TryMatchToTeachingRecord(journeyInstance);
-
-            // Assert
-            Assert.False(result);
-
-            user = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject);
-            Assert.Null(user.PersonId);
-
-            Assert.Null(state.AuthenticationTicket);
-        });
-
-    [Fact]
-    public Task TryMatchToTeachingRecord_MatchesSingleResultWithoutTrn_ReturnsFalseAndDoesNotSetAuthenticationTicket() =>
-        WithDbContext(async dbContext =>
-        {
-            // Arrange
-            var personSearchServiceMock = new Mock<IPersonSearchService>();
-            var helper = CreateHelper(dbContext, personSearchServiceMock.Object);
+            var personMatchingServiceMock = new Mock<IPersonMatchingService>();
+            var helper = CreateHelper(dbContext, personMatchingServiceMock.Object);
 
             var firstName = Faker.Name.Last();
             var lastName = Faker.Name.Last();
@@ -609,25 +539,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
 
-            personSearchServiceMock
-                .Setup(mock => mock.Search(
+            personMatchingServiceMock
+                .Setup(mock => mock.Match(
                     It.Is<IEnumerable<string[]>>(names => names.SequenceEqual(state.VerifiedNames!)),
                     It.Is<IEnumerable<DateOnly>>(dobs => dobs.SequenceEqual(state.VerifiedDatesOfBirth!)),
                     state.NationalInsuranceNumber,
                     state.Trn))
-                .ReturnsAsync(new[]
-                {
-                    new PersonSearchResult()
-                    {
-                        PersonId = person.PersonId,
-                        FirstName = person.FirstName,
-                        MiddleName = person.MiddleName,
-                        LastName = person.LastName,
-                        DateOfBirth = person.DateOfBirth,
-                        Trn = person.Trn,
-                        NationalInsuranceNumber = person.NationalInsuranceNumber
-                    }
-                });
+                .ReturnsAsync((person.PersonId, person.Trn!));
 
             // Act
             var result = await helper.TryMatchToTeachingRecord(journeyInstance);
@@ -642,12 +560,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         });
 
     [Fact]
-    public Task TryMatchToTeachingRecord_MatchesSingleResult_ReturnsTrueAndUpdatesOneLoginUserAssignsAuthenticationTicket() =>
+    public Task TryMatchToTeachingRecord_Matches_ReturnsTrueAndUpdatesOneLoginUserAssignsAuthenticationTicket() =>
         WithDbContext(async dbContext =>
         {
             // Arrange
-            var personSearchServiceMock = new Mock<IPersonSearchService>();
-            var helper = CreateHelper(dbContext, personSearchServiceMock.Object);
+            var personMatchingServiceMock = new Mock<IPersonMatchingService>();
+            var helper = CreateHelper(dbContext, personMatchingServiceMock.Object);
 
             var firstName = Faker.Name.Last();
             var lastName = Faker.Name.Last();
@@ -668,25 +586,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
 
-            personSearchServiceMock
-                .Setup(mock => mock.Search(
+            personMatchingServiceMock
+                .Setup(mock => mock.Match(
                     It.Is<IEnumerable<string[]>>(names => names.SequenceEqual(state.VerifiedNames!)),
                     It.Is<IEnumerable<DateOnly>>(dobs => dobs.SequenceEqual(state.VerifiedDatesOfBirth!)),
                     state.NationalInsuranceNumber,
                     state.Trn))
-                .ReturnsAsync(new[]
-                {
-                    new PersonSearchResult()
-                    {
-                        PersonId = person.PersonId,
-                        FirstName = person.FirstName,
-                        MiddleName = person.MiddleName,
-                        LastName = person.LastName,
-                        DateOfBirth = person.DateOfBirth,
-                        Trn = person.Trn,
-                        NationalInsuranceNumber = person.NationalInsuranceNumber
-                    }
-                });
+                .ReturnsAsync((person.PersonId, person.Trn!));
 
             // Act
             var result = await helper.TryMatchToTeachingRecord(journeyInstance);
@@ -703,13 +609,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.Equal(person.Trn, state.AuthenticationTicket.Principal.FindFirstValue(ClaimTypes.Trn));
         });
 
-    private SignInJourneyHelper CreateHelper(TrsDbContext dbContext, IPersonSearchService? personSearchService = null)
+    private SignInJourneyHelper CreateHelper(TrsDbContext dbContext, IPersonMatchingService? personMatchingService = null)
     {
         var linkGenerator = new FakeLinkGenerator();
         var options = Options.Create(new AuthorizeAccessOptions() { ShowDebugPages = false });
-        personSearchService ??= Mock.Of<IPersonSearchService>();
+        personMatchingService ??= Mock.Of<IPersonMatchingService>();
 
-        return ActivatorUtilities.CreateInstance<SignInJourneyHelper>(HostFixture.Services, dbContext, personSearchService, linkGenerator, options, Clock);
+        return ActivatorUtilities.CreateInstance<SignInJourneyHelper>(HostFixture.Services, dbContext, personMatchingService, linkGenerator, options, Clock);
     }
 
     private async Task<string> CreateTrnToken(string trn, string email, TimeSpan? expires = null, Guid? userId = null)

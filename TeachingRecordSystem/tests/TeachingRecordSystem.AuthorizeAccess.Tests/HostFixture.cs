@@ -16,10 +16,12 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 public class HostFixture : WebApplicationFactory<Program>
 {
     private readonly IConfiguration _configuration;
+    private readonly FakeTrnGenerator _fakeTrnGenerator;
 
-    public HostFixture(IConfiguration configuration)
+    public HostFixture(IConfiguration configuration, FakeTrnGenerator fakeTrnGenerator)
     {
         _configuration = configuration;
+        _fakeTrnGenerator = fakeTrnGenerator;
         _ = base.Services;  // Start the host
     }
 
@@ -33,8 +35,6 @@ public class HostFixture : WebApplicationFactory<Program>
 
         builder.ConfigureServices((context, services) =>
         {
-            DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
-
             services.AddDbContext<IdDbContext>(options => options.UseInMemoryDatabase("TeacherAuthId"), contextLifetime: ServiceLifetime.Transient);
 
             services
@@ -60,7 +60,7 @@ public class HostFixture : WebApplicationFactory<Program>
                     TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
             services.AddFakeXrm();
             services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
-            services.AddSingleton<FakeTrnGenerator>();
+            services.AddSingleton(_fakeTrnGenerator);
             services.AddSingleton<TrsDataSyncHelper>();
         });
     }
