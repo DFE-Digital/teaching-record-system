@@ -1,0 +1,140 @@
+using Npgsql;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+
+namespace TeachingRecordSystem.Core.Services.PersonMatching;
+
+public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingService
+{
+    public async Task<(Guid PersonId, string Trn)?> Match(MatchRequest request)
+    {
+        var fullNames = request.Names.Where(parts => parts.Length > 1).Select(parts => $"{parts.First()} {parts.Last()}").ToArray();
+        if (fullNames.Length == 0 || !request.DatesOfBirth.Any() || (request.NationalInsuranceNumber is null && request.Trn is null))
+        {
+            return null;
+        }
+
+        var results = await dbContext.Database.SqlQueryRaw<MatchQueryResult>(
+                """
+                WITH matches AS (
+                	SELECT a.person_id, ARRAY_AGG(a.attribute_type) matched_attrs FROM person_search_attributes a
+                	WHERE (a.attribute_type = 'FullName' AND a.attribute_value = ANY(:full_names))
+                	OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY(:dobs))
+                	OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = :ni_number)
+                	OR (a.attribute_type = 'Trn' AND a.attribute_value = :trn)
+                	GROUP BY a.person_id
+                )
+                SELECT p.person_id, p.trn
+                FROM matches m
+                JOIN persons p ON m.person_id = p.person_id
+                WHERE ARRAY['FullName', 'DateOfBirth']::varchar[] <@ m.matched_attrs
+                AND ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attrs
+                AND p.dqt_state = 0
+                """,
+                parameters:
+                [
+                    new NpgsqlParameter("full_names", fullNames),
+                    new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
+                    new NpgsqlParameter("ni_number", NpgsqlTypes.NpgsqlDbType.Varchar)
+                    {
+                        Value = request.NationalInsuranceNumber is not null ? request.NationalInsuranceNumber : DBNull.Value
+                    },
+                    new NpgsqlParameter("trn", NpgsqlTypes.NpgsqlDbType.Varchar)
+                    {
+                        Value = request.Trn is not null ? request.Trn : DBNull.Value
+                    }
+                ]
+            ).ToArrayAsync();
+
+        return results.Length == 1 ? (results[0].person_id, results[0].trn) : null;
+    }
+
+    public async Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedMatches(GetSuggestedMatchesRequest request)
+    {
+        // Return any record that matches on last name and DOB OR NINO OR TRN.
+        // Results should be ordered such that matches on TRN are returned before matches on NINO with matches on last name + DOB last.
+
+        var lastNames = request.Names.Select(parts => parts.Last()).ToArray();
+        var trns = new[] { request.Trn, request.TrnTokenTrnHint }.Where(trn => trn is not null).Distinct().ToArray();
+
+        var results = await dbContext.Database.SqlQueryRaw<SuggestionsQueryResult>(
+                """
+                WITH matches AS (
+                	SELECT a.person_id, ARRAY_AGG(DISTINCT a.attribute_type) matched_attrs FROM person_search_attributes a
+                	WHERE (a.attribute_type = 'LastName' AND a.attribute_value = ANY(:last_names))
+                	OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY(:dobs))
+                	OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = :ni_number)
+                	OR (a.attribute_type = 'Trn' AND a.attribute_value = ANY(:trns))
+                	GROUP BY a.person_id
+                )
+                SELECT
+                    m.matched_attrs,
+                    p.person_id,
+                    p.trn,
+                    p.email_address,
+                    p.first_name,
+                    p.middle_name,
+                    p.last_name,
+                    p.date_of_birth,
+                    p.national_insurance_number
+                FROM matches m
+                JOIN persons p ON m.person_id = p.person_id
+                WHERE (ARRAY['LastName', 'DateOfBirth']::varchar[] <@ m.matched_attrs
+                OR ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attrs)
+                AND p.dqt_state = 0
+                """,
+                parameters:
+                [
+                    new NpgsqlParameter("last_names", lastNames),
+                    new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
+                    new NpgsqlParameter("ni_number", NpgsqlTypes.NpgsqlDbType.Varchar)
+                    {
+                        Value = request.NationalInsuranceNumber is not null ? request.NationalInsuranceNumber : DBNull.Value
+                    },
+                    new NpgsqlParameter("trns", trns)
+                ]
+            ).ToArrayAsync();
+
+        return results
+            .Select(r =>
+            {
+                var score = r.matched_attrs.Sum(
+                    m => m switch
+                    {
+                        "Trn" => 3,
+                        "NationalInsuranceNumber" => 2,
+                        "LastName" => 1,
+                        _ => 0
+                    });
+
+                return (Result: r, Score: score);
+            })
+            .OrderByDescending(t => t.Score)
+            .ThenBy(t => t.Result.trn)
+            .Select(t => t.Result)
+            .Select(r => new SuggestedMatch(
+                r.person_id,
+                r.trn,
+                r.email_address,
+                r.first_name,
+                r.middle_name,
+                r.last_name,
+                r.date_of_birth,
+                r.national_insurance_number))
+            .AsReadOnly();
+    }
+
+#pragma warning disable IDE1006 // Naming Styles
+    private record MatchQueryResult(Guid person_id, string trn);
+
+    private record SuggestionsQueryResult(
+        string[] matched_attrs,
+        Guid person_id,
+        string trn,
+        string? email_address,
+        string first_name,
+        string? middle_name,
+        string last_name,
+        DateOnly? date_of_birth,
+        string? national_insurance_number);
+#pragma warning restore IDE1006 // Naming Styles
+}

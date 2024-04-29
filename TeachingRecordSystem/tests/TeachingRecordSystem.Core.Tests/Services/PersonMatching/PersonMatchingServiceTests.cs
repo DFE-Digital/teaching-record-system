@@ -1,12 +1,13 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
-using TeachingRecordSystem.AuthorizeAccess.Services.PersonMatching;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
-namespace TeachingRecordSystem.AuthorizeAccess.Tests.Services.PersonMatching;
+namespace TeachingRecordSystem.Core.Tests.Services.PersonMatching;
 
-public class PersonMatchingServiceTests
+[Collection(nameof(DisableParallelization))]
+public class PersonMatchingServiceTests : IAsyncLifetime
 {
     public PersonMatchingServiceTests(
         DbFixture dbFixture,
@@ -39,6 +40,10 @@ public class PersonMatchingServiceTests
     private TestData TestData { get; }
 
     private TestableClock Clock { get; }
+
+    public Task InitializeAsync() => DbFixture.DbHelper.ClearData();
+
+    public Task DisposeAsync() => Task.CompletedTask;
 
     [Theory]
     [MemberData(nameof(MatchData))]
@@ -102,7 +107,7 @@ public class PersonMatchingServiceTests
             var service = new PersonMatchingService(dbContext);
 
             // Act
-            var result = await service.Match(names, datesOfBirth, nationalInsuranceNumber, trn);
+            var result = await service.Match(new(names, datesOfBirth, nationalInsuranceNumber, trn));
 
             // Assert
             if (expectMatch)
@@ -137,7 +142,7 @@ public class PersonMatchingServiceTests
             var service = new PersonMatchingService(dbContext);
 
             // Act
-            var result = await service.Match(names, datesOfBirth, nationalInsuranceNumber, trn);
+            var result = await service.Match(new(names, datesOfBirth, nationalInsuranceNumber, trn));
 
             // Assert
             Assert.Null(result);
@@ -168,10 +173,51 @@ public class PersonMatchingServiceTests
             var service = new PersonMatchingService(dbContext);
 
             // Act
-            var result = await service.Match(names, datesOfBirth, nationalInsuranceNumber, trn);
+            var result = await service.Match(new(names, datesOfBirth, nationalInsuranceNumber, trn));
 
             // Assert
             Assert.NotNull(result);
+        });
+
+    [Fact]
+    public Task GetSuggestedMatches_ReturnsExpectedResults() =>
+        DbFixture.WithDbContext(async dbContext =>
+        {
+            // Arrange
+            var firstName = TestData.GenerateFirstName();
+            var lastName = TestData.GenerateLastName();
+            var dateOfBirth = TestData.GenerateDateOfBirth();
+            var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+
+            // Person who matches on last name & DOB
+            var person1 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+
+            // Person who matches on NINO
+            var person2 = await TestData.CreatePerson(b => b.WithNationalInsuranceNumber(hasNationalInsuranceNumber: true, nationalInsuranceNumber));
+
+            // Person who matches on TRN
+            var person3 = await TestData.CreatePerson(b => b.WithTrn());
+            var trn = person3.Trn!;
+
+            // Person who matches on last name, DOB & TRN
+            var person4 = await TestData.CreatePerson(b => b.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+            var trnTokenHintTrn = person4.Trn!;
+
+            string[][] names = [[firstName, lastName]];
+            DateOnly[] datesOfBirth = [dateOfBirth];
+
+            var service = new PersonMatchingService(dbContext);
+
+            // Act
+            var result = await service.GetSuggestedMatches(new(names, datesOfBirth, nationalInsuranceNumber, trn, trnTokenHintTrn));
+
+            // Assert
+            Assert.Collection(
+                result,
+                r => Assert.Equal(person4.PersonId, r.PersonId),
+                r => Assert.Equal(person3.PersonId, r.PersonId),
+                r => Assert.Equal(person2.PersonId, r.PersonId),
+                r => Assert.Equal(person1.PersonId, r.PersonId));
         });
 
     public static TheoryData<NameArgumentOption, DateOfBirthArgumentOption, NationalInsuranceNumberArgumentOption, TrnArgumentOption, bool> MatchData { get; } = new()
