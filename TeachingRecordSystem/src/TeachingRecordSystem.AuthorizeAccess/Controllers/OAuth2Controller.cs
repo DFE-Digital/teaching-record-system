@@ -155,7 +155,7 @@ public class OAuth2Controller(
         if (oneLoginUser.VerificationRoute == OneLoginUserVerificationRoute.OneLogin)
         {
             claims.Add(ClaimTypes.OneLoginVerifiedNames, oneLoginUser.VerifiedNames!);
-            claims.Add(ClaimTypes.OneLoginIdVerifiedBirthDates, oneLoginUser.VerifiedDatesOfBirth!);
+            claims.Add(ClaimTypes.OneLoginVerifiedBirthDates, oneLoginUser.VerifiedDatesOfBirth!);
         }
 
         return Ok(claims);
