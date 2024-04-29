@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
+using TeachingRecordSystem.AuthorizeAccess.Services.PersonMatching;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Services.PersonSearch;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
 
@@ -16,7 +16,7 @@ namespace TeachingRecordSystem.AuthorizeAccess;
 
 public class SignInJourneyHelper(
     TrsDbContext dbContext,
-    IPersonSearchService personSearchService,
+    IPersonMatchingService personMatchingService,
     IdDbContext idDbContext,
     AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
@@ -262,14 +262,10 @@ public class SignInJourneyHelper(
         var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(state.NationalInsuranceNumber);
         var trn = NormalizeTrn(state.Trn);
 
-        var personSearchResults = await personSearchService.Search(names!, datesOfBirth!, nationalInsuranceNumber, trn);
+        var matchResult = await personMatchingService.Match(names!, datesOfBirth!, nationalInsuranceNumber, trn);
 
-        if (personSearchResults.Count == 1)
+        if (matchResult is var (matchedPersonId, matchedTrn))
         {
-            var result = personSearchResults.Single();
-            var matchedPersonId = result.PersonId;
-            var matchedTrn = result.Trn;
-
             // It's possible we match on a record that doesn't have a TRN; we don't want to proceed in that case;
             // downstream consumers can't do anything without a TRN
             if (matchedTrn is null)

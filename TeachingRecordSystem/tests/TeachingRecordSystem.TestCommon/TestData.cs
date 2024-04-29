@@ -180,6 +180,19 @@ public partial class TestData
         return newName;
     }
 
+    public string GenerateChangedNationalInsuranceNumber(string currentNationalInsuranceNumber)
+    {
+        string newNationalInsuranceNumber;
+
+        do
+        {
+            newNationalInsuranceNumber = GenerateNationalInsuranceNumber();
+        }
+        while (newNationalInsuranceNumber == currentNationalInsuranceNumber);
+
+        return newNationalInsuranceNumber;
+    }
+
     public string GenerateUniqueEmail()
     {
         string email;

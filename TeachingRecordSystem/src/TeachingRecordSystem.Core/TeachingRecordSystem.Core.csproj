@@ -57,7 +57,6 @@
     <PackageReference Include="GovukNotify" />
     <PackageReference Include="Hangfire.Core" />
     <PackageReference Include="IdentityModel" />
-    <PackageReference Include="LinqKit" />
     <PackageReference Include="Microsoft.ApplicationInsights" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
