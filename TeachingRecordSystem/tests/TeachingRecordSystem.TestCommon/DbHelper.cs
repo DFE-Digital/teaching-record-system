@@ -106,6 +106,6 @@ public class DbHelper(string connectionString)
             new RespawnerOptions()
             {
                 DbAdapter = DbAdapter.Postgres,
-                TablesToIgnore = ["mandatory_qualification_providers"]
+                TablesToIgnore = ["mandatory_qualification_providers", "establishment_sources", "tps_establishment_types"]
             });
 }

@@ -11,7 +11,7 @@ public class EstablishmentMapping : IEntityTypeConfiguration<Establishment>
         builder.ToTable("establishments");
         builder.HasKey(e => e.EstablishmentId);
         builder.Property(e => e.EstablishmentSourceId).IsRequired().HasDefaultValue(1);
-        builder.HasIndex(e => e.Urn).HasDatabaseName(Establishment.UrnUniqueIndexName).IsUnique();
+        builder.HasIndex(e => e.Urn).HasDatabaseName(Establishment.UrnIndexName);
         builder.HasIndex(e => new { e.LaCode, e.EstablishmentNumber }).HasDatabaseName(Establishment.LaCodeEstablishmentNumberIndexName);
         builder.Property(e => e.Urn).HasMaxLength(6).IsFixedLength();
         builder.Property(e => e.LaCode).HasMaxLength(3).IsFixedLength();

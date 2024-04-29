@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.Establishments;
+using TeachingRecordSystem.Core.Services.Establishments.Gias;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
@@ -110,6 +110,11 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.AddOrUpdate<ImportTpsCsvExtractFileJob>(
                     nameof(ImportTpsCsvExtractFileJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<TpsRefreshEstablishmentsJob>(
+                    nameof(TpsRefreshEstablishmentsJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 

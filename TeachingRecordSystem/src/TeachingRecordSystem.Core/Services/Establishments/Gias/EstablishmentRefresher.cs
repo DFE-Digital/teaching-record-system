@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
-namespace TeachingRecordSystem.Core.Services.Establishments;
+namespace TeachingRecordSystem.Core.Services.Establishments.Gias;
 
 public class EstablishmentRefresher(
     TrsDbContext dbContext,
