@@ -1,4 +1,6 @@
-namespace TeachingRecordSystem.AuthorizeAccess.Services.PersonMatching;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace TeachingRecordSystem.Core.Services.PersonMatching;
 
 public static class ServiceCollectionExtensions
 {

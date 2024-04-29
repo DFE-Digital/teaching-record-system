@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
-using TeachingRecordSystem.AuthorizeAccess.Services.PersonMatching;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.FormFlow;
 using TeachingRecordSystem.FormFlow.State;
 
@@ -262,7 +262,7 @@ public class SignInJourneyHelper(
         var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(state.NationalInsuranceNumber);
         var trn = NormalizeTrn(state.Trn);
 
-        var matchResult = await personMatchingService.Match(names!, datesOfBirth!, nationalInsuranceNumber, trn);
+        var matchResult = await personMatchingService.Match(new(names!, datesOfBirth!, nationalInsuranceNumber, trn));
 
         if (matchResult is var (matchedPersonId, matchedTrn))
         {

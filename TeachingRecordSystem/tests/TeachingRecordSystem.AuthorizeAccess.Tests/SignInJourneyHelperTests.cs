@@ -3,8 +3,8 @@ using System.Security.Claims;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
-using TeachingRecordSystem.AuthorizeAccess.Services.PersonMatching;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -493,11 +493,11 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, Faker.Identification.UkNationalInsuranceNumber()));
 
             personMatchingServiceMock
-                .Setup(mock => mock.Match(
-                    It.Is<IEnumerable<string[]>>(names => names.SequenceEqual(state.VerifiedNames!)),
-                    It.Is<IEnumerable<DateOnly>>(dobs => dobs.SequenceEqual(state.VerifiedDatesOfBirth!)),
-                    state.NationalInsuranceNumber,
-                    state.Trn))
+                .Setup(mock => mock.Match(It.Is<MatchRequest>(r =>
+                        r.Names.SequenceEqual(state.VerifiedNames!) &&
+                        r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
+                        r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
+                        r.Trn == state.Trn)))
                 .ReturnsAsync(value: null);
 
             // Act
@@ -540,11 +540,11 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
 
             personMatchingServiceMock
-                .Setup(mock => mock.Match(
-                    It.Is<IEnumerable<string[]>>(names => names.SequenceEqual(state.VerifiedNames!)),
-                    It.Is<IEnumerable<DateOnly>>(dobs => dobs.SequenceEqual(state.VerifiedDatesOfBirth!)),
-                    state.NationalInsuranceNumber,
-                    state.Trn))
+                .Setup(mock => mock.Match(It.Is<MatchRequest>(r =>
+                        r.Names.SequenceEqual(state.VerifiedNames!) &&
+                        r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
+                        r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
+                        r.Trn == state.Trn)))
                 .ReturnsAsync((person.PersonId, person.Trn!));
 
             // Act
@@ -587,11 +587,11 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
 
             personMatchingServiceMock
-                .Setup(mock => mock.Match(
-                    It.Is<IEnumerable<string[]>>(names => names.SequenceEqual(state.VerifiedNames!)),
-                    It.Is<IEnumerable<DateOnly>>(dobs => dobs.SequenceEqual(state.VerifiedDatesOfBirth!)),
-                    state.NationalInsuranceNumber,
-                    state.Trn))
+                .Setup(mock => mock.Match(It.Is<MatchRequest>(r =>
+                        r.Names.SequenceEqual(state.VerifiedNames!) &&
+                        r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
+                        r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
+                        r.Trn == state.Trn)))
                 .ReturnsAsync((person.PersonId, person.Trn!));
 
             // Act
