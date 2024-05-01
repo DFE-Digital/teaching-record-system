@@ -75,7 +75,8 @@
     "dfeta_allowpiiupdatesfromregister",
     "dfeta_previouslastname",
     "dfeta_AllowIDSignInWithProhibitions",
-    "dfeta_qtlsdate"
+    "dfeta_qtlsdate",
+    "dfeta_qtlsdatehasbeenset"
   ],
   "dfeta_businesseventaudit":[
     "createdon",
