@@ -52,7 +52,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption dateOfBirthOption,
             NationalInsuranceNumberArgumentOption nationalInsuranceNumberOption,
             TrnArgumentOption trnOption,
-            bool expectMatch) =>
+            bool expectMatch,
+            IEnumerable<OneLoginUserMatchedAttribute>? expectedMatchedAttributes) =>
         DbFixture.WithDbContext(async dbContext =>
         {
             // Arrange
@@ -113,8 +114,9 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             if (expectMatch)
             {
                 Assert.NotNull(result);
-                Assert.Equal(person.PersonId, result.Value!.PersonId);
-                Assert.Equal(person.Trn, result.Value!.Trn);
+                Assert.Equal(person.PersonId, result.PersonId);
+                Assert.Equal(person.Trn, result.Trn);
+                Assert.Equal(expectedMatchedAttributes?.Order(), result.MatchedAttributes.Select(kvp => kvp.Key).Distinct().Order());
             }
             else
             {
@@ -220,7 +222,29 @@ public class PersonMatchingServiceTests : IAsyncLifetime
                 r => Assert.Equal(person1.PersonId, r.PersonId));
         });
 
-    public static TheoryData<NameArgumentOption, DateOfBirthArgumentOption, NationalInsuranceNumberArgumentOption, TrnArgumentOption, bool> MatchData { get; } = new()
+    private static readonly OneLoginUserMatchedAttribute[] _matchNameDobNinoAndTrnAttributes =
+    [
+        OneLoginUserMatchedAttribute.FullName,
+        OneLoginUserMatchedAttribute.DateOfBirth,
+        OneLoginUserMatchedAttribute.NationalInsuranceNumber,
+        OneLoginUserMatchedAttribute.Trn
+    ];
+
+    private static readonly OneLoginUserMatchedAttribute[] _matchNameDobAndNinoAttributes =
+    [
+        OneLoginUserMatchedAttribute.FullName,
+        OneLoginUserMatchedAttribute.DateOfBirth,
+        OneLoginUserMatchedAttribute.NationalInsuranceNumber
+    ];
+
+    private static readonly OneLoginUserMatchedAttribute[] _matchNameDobAndTrnAttributes =
+    [
+        OneLoginUserMatchedAttribute.FullName,
+        OneLoginUserMatchedAttribute.DateOfBirth,
+        OneLoginUserMatchedAttribute.Trn
+    ];
+
+    public static TheoryData<NameArgumentOption, DateOfBirthArgumentOption, NationalInsuranceNumberArgumentOption, TrnArgumentOption, bool, IEnumerable<OneLoginUserMatchedAttribute>?> MatchData { get; } = new()
     {
         // *** Match cases ***
 
@@ -230,7 +254,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobNinoAndTrnAttributes
         },
 
         // Single name, single DOB, NINO match but no TRN
@@ -239,7 +264,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndNinoAttributes
         },
 
         // Single name, single DOB, NINO match but TRN doesn't match
@@ -248,7 +274,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.SpecifiedButDifferent,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndNinoAttributes
         },
 
         // Single name, single DOB, TRN match but no NINO
@@ -257,7 +284,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.NotSpecified,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndTrnAttributes
         },
 
         // Single name, single DOB, TRN match but NINO doesn't match
@@ -266,7 +294,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedButDifferent,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndTrnAttributes
         },
 
         // Single name with alias, single DOB, NINO and TRN all match
@@ -275,7 +304,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobNinoAndTrnAttributes
         },
 
         // Single name with alias, single DOB, NINO match but no TRN
@@ -284,7 +314,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndNinoAttributes
         },
 
         // Single name with alias, single DOB, NINO match but TRN doesn't match
@@ -293,7 +324,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.SpecifiedButDifferent,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndNinoAttributes
         },
 
         // Single name with alias, single DOB, TRN match but no NINO
@@ -302,7 +334,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.NotSpecified,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndTrnAttributes
         },
 
         // Single name with alias, single DOB, TRN match but NINO doesn't match
@@ -311,7 +344,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedButDifferent,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndTrnAttributes
         },
 
         // Multiple names with one match, single DOB, NINO and TRN all match
@@ -320,7 +354,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobNinoAndTrnAttributes
         },
 
         // Multiple names with one match, single DOB, NINO match but no TRN
@@ -329,7 +364,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndNinoAttributes
         },
 
         // Multiple names with one match, single DOB, NINO match but TRN doesn't match
@@ -338,7 +374,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.SpecifiedButDifferent,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndNinoAttributes
         },
 
         // Multiple names with one match, single DOB, TRN match but no NINO
@@ -347,7 +384,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.NotSpecified,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndTrnAttributes
         },
 
         // Multiple names with one match, single DOB, TRN match but NINO doesn't match
@@ -356,7 +394,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedButDifferent,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ true
+            /*expectMatch: */ true,
+            _matchNameDobAndTrnAttributes
         },
 
 
@@ -368,7 +407,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ false
+            /*expectMatch: */ false,
+            null
         },
 
         // Missing full name
@@ -377,7 +417,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ false
+            /*expectMatch: */ false,
+            null
         },
 
         // Missing dates of birth
@@ -386,7 +427,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.NotSpecifed,
             NationalInsuranceNumberArgumentOption.SpecifiedAndMatches,
             TrnArgumentOption.SpecifiedAndMatches,
-            /*expectMatch: */ false
+            /*expectMatch: */ false,
+            null
         },
 
         // Missing TRN and NINO
@@ -395,7 +437,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.NotSpecified,
             TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ false
+            /*expectMatch: */ false,
+            null
         },
 
         // First name doesn't match
@@ -404,7 +447,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.NotSpecified,
             TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ false
+            /*expectMatch: */ false,
+            null
         },
 
         // Last name doesn't match
@@ -413,7 +457,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.NotSpecified,
             TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ false
+            /*expectMatch: */ false,
+            null
         },
 
         // DOB doesn't match
@@ -422,7 +467,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.SpecifiedButDifferent,
             NationalInsuranceNumberArgumentOption.NotSpecified,
             TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ false
+            /*expectMatch: */ false,
+            null
         },
 
         // Neither NINO nor TRN match
@@ -431,7 +477,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedButDifferent,
             TrnArgumentOption.SpecifiedButDifferent,
-            /*expectMatch: */ false
+            /*expectMatch: */ false,
+            null
         },
 
         // NINO doesn't match, TRN not specified
@@ -440,7 +487,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.SpecifiedButDifferent,
             TrnArgumentOption.NotSpecified,
-            /*expectMatch: */ false
+            /*expectMatch: */ false,
+            null
         },
 
         // TRN doesn't match, NINO not specified
@@ -449,7 +497,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             DateOfBirthArgumentOption.MatchesPersonDateOfBirth,
             NationalInsuranceNumberArgumentOption.NotSpecified,
             TrnArgumentOption.SpecifiedButDifferent,
-            /*expectMatch: */ false
+            /*expectMatch: */ false,
+            null
         },
     };
 

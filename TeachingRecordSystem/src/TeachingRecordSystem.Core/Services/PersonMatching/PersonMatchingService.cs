@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
@@ -5,7 +6,7 @@ namespace TeachingRecordSystem.Core.Services.PersonMatching;
 
 public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingService
 {
-    public async Task<(Guid PersonId, string Trn)?> Match(MatchRequest request)
+    public async Task<MatchResult?> Match(MatchRequest request)
     {
         var fullNames = request.Names.Where(parts => parts.Length > 1).Select(parts => $"{parts.First()} {parts.Last()}").ToArray();
         if (fullNames.Length == 0 || !request.DatesOfBirth.Any() || (request.NationalInsuranceNumber is null && request.Trn is null))
@@ -16,18 +17,22 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         var results = await dbContext.Database.SqlQueryRaw<MatchQueryResult>(
                 """
                 WITH matches AS (
-                	SELECT a.person_id, ARRAY_AGG(a.attribute_type) matched_attrs FROM person_search_attributes a
+                	SELECT
+                        a.person_id,
+                        array_agg(a.attribute_type) matched_attr_keys,
+                        json_agg(json_build_object('attribute_type', a.attribute_type, 'attribute_value', a.attribute_value)) matched_attrs
+                    FROM person_search_attributes a
                 	WHERE (a.attribute_type = 'FullName' AND a.attribute_value = ANY(:full_names))
                 	OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY(:dobs))
                 	OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = :ni_number)
                 	OR (a.attribute_type = 'Trn' AND a.attribute_value = :trn)
                 	GROUP BY a.person_id
                 )
-                SELECT p.person_id, p.trn
+                SELECT p.person_id, p.trn, m.matched_attrs
                 FROM matches m
                 JOIN persons p ON m.person_id = p.person_id
-                WHERE ARRAY['FullName', 'DateOfBirth']::varchar[] <@ m.matched_attrs
-                AND ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attrs
+                WHERE ARRAY['FullName', 'DateOfBirth']::varchar[] <@ m.matched_attr_keys
+                AND ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attr_keys
                 AND p.dqt_state = 0
                 """,
                 parameters:
@@ -45,7 +50,18 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 ]
             ).ToArrayAsync();
 
-        return results.Length == 1 ? (results[0].person_id, results[0].trn) : null;
+        return results switch
+        {
+            [MatchQueryResult r] => new MatchResult(r.person_id, r.trn, MapMatchedAttrs(r.matched_attrs)),
+            _ => null
+        };
+
+        static IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>> MapMatchedAttrs(JsonDocument doc) =>
+            doc.Deserialize<MatchedAttribute[]>()!
+                .Select(a => new KeyValuePair<OneLoginUserMatchedAttribute, string>(
+                    Enum.Parse<OneLoginUserMatchedAttribute>(a.attribute_type),
+                    a.attribute_value))
+                .AsReadOnly();
     }
 
     public async Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedMatches(GetSuggestedMatchesRequest request)
@@ -59,7 +75,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         var results = await dbContext.Database.SqlQueryRaw<SuggestionsQueryResult>(
                 """
                 WITH matches AS (
-                	SELECT a.person_id, ARRAY_AGG(DISTINCT a.attribute_type) matched_attrs FROM person_search_attributes a
+                	SELECT a.person_id, array_agg(DISTINCT a.attribute_type) matched_attr_keys FROM person_search_attributes a
                 	WHERE (a.attribute_type = 'LastName' AND a.attribute_value = ANY(:last_names))
                 	OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY(:dobs))
                 	OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = :ni_number)
@@ -67,7 +83,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 	GROUP BY a.person_id
                 )
                 SELECT
-                    m.matched_attrs,
+                    m.matched_attr_keys,
                     p.person_id,
                     p.trn,
                     p.email_address,
@@ -78,8 +94,8 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     p.national_insurance_number
                 FROM matches m
                 JOIN persons p ON m.person_id = p.person_id
-                WHERE (ARRAY['LastName', 'DateOfBirth']::varchar[] <@ m.matched_attrs
-                OR ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attrs)
+                WHERE (ARRAY['LastName', 'DateOfBirth']::varchar[] <@ m.matched_attr_keys
+                OR ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attr_keys)
                 AND p.dqt_state = 0
                 """,
                 parameters:
@@ -97,7 +113,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         return results
             .Select(r =>
             {
-                var score = r.matched_attrs.Sum(
+                var score = r.matched_attr_keys.Sum(
                     m => m switch
                     {
                         "Trn" => 3,
@@ -124,10 +140,12 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
     }
 
 #pragma warning disable IDE1006 // Naming Styles
-    private record MatchQueryResult(Guid person_id, string trn);
+    private record MatchQueryResult(Guid person_id, string trn, JsonDocument matched_attrs);
+
+    private record MatchedAttribute(string attribute_type, string attribute_value);
 
     private record SuggestionsQueryResult(
-        string[] matched_attrs,
+        string[] matched_attr_keys,
         Guid person_id,
         string trn,
         string? email_address,
