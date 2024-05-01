@@ -26,10 +26,29 @@ public class SetQtlsDateTests : IAsyncLifetime
         // Act
         await _crmQueryDispatcher.ExecuteQuery(new SetQtlsDateQuery(contactId: createPersonResult.ContactId, qtlsDate: qtlsDate));
         var contact = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(ContactId: createPersonResult.ContactId, ColumnSet: new ColumnSet(
-            Contact.Fields.dfeta_qtlsdate)));
+            Contact.Fields.dfeta_qtlsdate, Contact.Fields.dfeta_QtlsDateHasBeenSet)));
 
         // Assert
         Assert.Equal(qtlsDate, contact!.Contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
+        Assert.True(contact!.Contact.dfeta_QtlsDateHasBeenSet);
+    }
 
+    [Fact]
+    public async Task WhenClearingExistingQtlsDate_DoesNotSetQtlsDateHasBeenSet()
+    {
+        // Arrange
+        var qtlsDate = new DateOnly(2021, 01, 01);
+        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        {
+            x.WithQtlsDate(qtlsDate);
+        });
+
+        // Act
+        await _crmQueryDispatcher.ExecuteQuery(new SetQtlsDateQuery(contactId: createPersonResult.ContactId, qtlsDate: null));
+        var contact = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(ContactId: createPersonResult.ContactId, ColumnSet: new ColumnSet(
+            Contact.Fields.dfeta_qtlsdate, Contact.Fields.dfeta_QtlsDateHasBeenSet)));
+
+        // Assert
+        Assert.True(contact!.Contact.dfeta_QtlsDateHasBeenSet);
     }
 }

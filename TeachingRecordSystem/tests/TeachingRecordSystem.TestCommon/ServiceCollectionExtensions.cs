@@ -49,6 +49,7 @@ public static class ServiceCollectionExtensions
         CalculateActiveSanctionsPlugin.Register(fakedXrmContext);
         QtsRegistrationUpdatedPlugin.Register(fakedXrmContext);
         UpdateInductionStatusPlugin.Register(fakedXrmContext);
+        UpdateQtlsDateSetPlugin.Register(fakedXrmContext);
 
 
         // SeedCrmReferenceData must be registered before AddDefaultServiceClient is called

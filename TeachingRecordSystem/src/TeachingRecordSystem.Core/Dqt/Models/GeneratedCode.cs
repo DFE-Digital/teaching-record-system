@@ -2277,6 +2277,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_NINumber = "dfeta_ninumber";
 			public const string dfeta_PreviousLastName = "dfeta_previouslastname";
 			public const string dfeta_qtlsdate = "dfeta_qtlsdate";
+			public const string dfeta_QtlsDateHasBeenSet = "dfeta_qtlsdatehasbeenset";
 			public const string dfeta_QTSDate = "dfeta_qtsdate";
 			public const string dfeta_SlugId = "dfeta_slugid";
 			public const string dfeta_StatedFirstName = "dfeta_statedfirstname";
@@ -2800,6 +2801,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_qtlsdate");
 				this.SetAttributeValue("dfeta_qtlsdate", value);
 				this.OnPropertyChanged("dfeta_qtlsdate");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtlsdatehasbeenset")]
+		public System.Nullable<bool> dfeta_QtlsDateHasBeenSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_qtlsdatehasbeenset");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_QtlsDateHasBeenSet");
+				this.SetAttributeValue("dfeta_qtlsdatehasbeenset", value);
+				this.OnPropertyChanged("dfeta_QtlsDateHasBeenSet");
 			}
 		}
 		
