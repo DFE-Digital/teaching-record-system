@@ -1,0 +1,61 @@
+@model PersonDetailModel
+
+<govuk-summary-card>
+    <govuk-summary-card-title>Personal Details</govuk-summary-card-title>
+    <govuk-summary-list>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
+            @if (Model.ShowChangeLinks)
+            {
+                <govuk-summary-list-row-actions>
+                    <govuk-summary-list-row-action href="@LinkGenerator.PersonEditName(Model.PersonId, journeyInstanceId: null)" visually-hidden-text="name">Change</govuk-summary-list-row-action>
+                </govuk-summary-list-row-actions>
+            }
+        </govuk-summary-list-row>
+        @if (Model.PreviousNames.Length > 0)
+        {
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Previous name(s)</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>
+                    <ul class="govuk-list">
+                        @foreach (var previousName in Model.PreviousNames)
+                        {
+                            <li>@previousName</li>
+                        }
+                    </ul>
+                </govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        }
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value  use-empty-fallback>@Model.DateOfBirth?.ToString("dd/MM/yyyy")</govuk-summary-list-row-value>
+            @if (Model.ShowChangeLinks)
+            {
+                <govuk-summary-list-row-actions>
+                    <govuk-summary-list-row-action href="@LinkGenerator.PersonEditDateOfBirth(Model.PersonId, journeyInstanceId: null)" visually-hidden-text="date of birth">Change</govuk-summary-list-row-action>
+                </govuk-summary-list-row-actions>
+            }
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.Gender</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.NationalInsuranceNumber</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.Email</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.MobileNumber</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+    </govuk-summary-list>
+</govuk-summary-card>

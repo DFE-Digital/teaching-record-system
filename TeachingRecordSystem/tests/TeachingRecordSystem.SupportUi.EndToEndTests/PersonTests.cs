@@ -23,7 +23,7 @@ public class PersonTests : TestBase
 
         await page.AssertOnPersonDetailPage(personId);
 
-        await page.ClickLinkForElementWithTestId("name-change-link");
+        await page.ClickChangeLinkForSummaryListRowWithKey("Name");
 
         await page.AssertOnPersonEditNamePage(personId);
 
@@ -54,7 +54,7 @@ public class PersonTests : TestBase
 
         await page.AssertOnPersonDetailPage(personId);
 
-        await page.ClickLinkForElementWithTestId("date-of-birth-change-link");
+        await page.ClickChangeLinkForSummaryListRowWithKey("Date of birth");
 
         await page.AssertOnPersonEditDateOfBirthPage(personId);
 

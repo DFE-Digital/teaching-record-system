@@ -1,5 +1,6 @@
 @page "/persons/{personId}"
 @using TeachingRecordSystem.SupportUi.Pages.Common;
+@using TeachingRecordSystem.SupportUi.Pages.Shared
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.IndexModel
 @{
     Layout = "Layout";
@@ -21,56 +22,19 @@
     </govuk-notification-banner>
 }
 
-<govuk-summary-card>
-    <govuk-summary-card-title>Personal Details</govuk-summary-card-title>
-    <govuk-summary-list data-testid="personal-details">
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-name">@Model.Person.Name</govuk-summary-list-row-value>
-            <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action href="@LinkGenerator.PersonEditName(Model.PersonId, null)" visually-hidden-text="change name" data-testid="name-change-link">Change</govuk-summary-list-row-action>
-            </govuk-summary-list-row-actions>
-        </govuk-summary-list-row>
-        @if (Model.Person.PreviousNames.Length > 0)
-        {
-            <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Previous name(s)</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>
-                    <ul class="govuk-list">
-                        @for (int i = 0; i < Model.Person.PreviousNames.Length; i++)
-                        {
-                            <li data-testid="personal-details-previous-names-@i">@Model.Person.PreviousNames[i]</li>                
-                        }
-                    </ul>
-                </govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-        }
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-date-of-birth" use-empty-fallback>@(Model.Person.DateOfBirth.HasValue ? Model.Person.DateOfBirth.Value.ToString("dd/MM/yyyy") : string.Empty)</govuk-summary-list-row-value>
-            <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action href="@LinkGenerator.PersonEditDateOfBirth(Model.PersonId, null)" visually-hidden-text="change date of birth" data-testid="date-of-birth-change-link">Change</govuk-summary-list-row-action>
-            </govuk-summary-list-row-actions>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-gender" use-empty-fallback>@Model.Person.Gender</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-trn" use-empty-fallback>@Model.Person.Trn</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-nino" use-empty-fallback>@Model.Person.NationalInsuranceNumber</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-email" use-empty-fallback>@Model.Person.Email</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value data-testid="personal-details-mobile-number" use-empty-fallback>@Model.Person.MobileNumber</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-    </govuk-summary-list>
-</govuk-summary-card>
+@{
+    var personDetailModel = new PersonDetailModel()
+    {
+        PersonId = Model.PersonId,
+        ShowChangeLinks = true,
+        Trn = Model.Person.Trn,
+        Name = Model.Person.Name,
+        PreviousNames = Model.Person.PreviousNames,
+        DateOfBirth = Model.Person.DateOfBirth,
+        NationalInsuranceNumber = Model.Person.NationalInsuranceNumber,
+        Gender = Model.Person.Gender,
+        Email = Model.Person.Email,
+        MobileNumber = Model.Person.MobileNumber
+    };
+}
+@await Html.PartialAsync("_PersonDetail", personDetailModel)
