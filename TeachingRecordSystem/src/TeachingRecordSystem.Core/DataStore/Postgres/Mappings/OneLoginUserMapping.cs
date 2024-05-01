@@ -27,6 +27,12 @@ public class OneLoginUserMapping : IEntityTypeConfiguration<OneLoginUser>
                 (a, b) => (a == null && b == null) || (a != null && b != null && a.SequenceEqual(b)),
                 v => HashCode.Combine(v)));
         builder.Property(o => o.LastCoreIdentityVc).HasColumnType("jsonb");
+        builder.Property(o => o.MatchedAttributes).HasColumnType("jsonb").HasConversion<string>(
+            v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+            v => JsonSerializer.Deserialize<KeyValuePair<OneLoginUserMatchedAttribute, string>[]>(v, (JsonSerializerOptions?)null),
+            new ValueComparer<KeyValuePair<OneLoginUserMatchedAttribute, string>[]>(
+                (a, b) => a == b,  // Reference equality is fine here; we'll always replace the entire collection
+                v => v.GetHashCode()));
     }
 }
 

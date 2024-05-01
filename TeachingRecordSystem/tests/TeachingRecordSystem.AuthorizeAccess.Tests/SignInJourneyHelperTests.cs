@@ -246,6 +246,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.FirstSignIn);
             Assert.Equal(Clock.UtcNow, user.LastSignIn);
+            Assert.Equal(OneLoginUserMatchRoute.TrnToken, user.MatchRoute);
 
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
             Assert.Equal($"{state.RedirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", redirectResult.Url);
@@ -494,10 +495,10 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             personMatchingServiceMock
                 .Setup(mock => mock.Match(It.Is<MatchRequest>(r =>
-                        r.Names.SequenceEqual(state.VerifiedNames!) &&
-                        r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
-                        r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
-                        r.Trn == state.Trn)))
+                    r.Names.SequenceEqual(state.VerifiedNames!) &&
+                    r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
+                    r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
+                    r.Trn == state.Trn)))
                 .ReturnsAsync(value: null);
 
             // Act
@@ -541,11 +542,18 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             personMatchingServiceMock
                 .Setup(mock => mock.Match(It.Is<MatchRequest>(r =>
-                        r.Names.SequenceEqual(state.VerifiedNames!) &&
-                        r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
-                        r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
-                        r.Trn == state.Trn)))
-                .ReturnsAsync((person.PersonId, person.Trn!));
+                    r.Names.SequenceEqual(state.VerifiedNames!) &&
+                    r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
+                    r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
+                    r.Trn == state.Trn)))
+                .ReturnsAsync(new MatchResult(
+                    person.PersonId,
+                    person.Trn!,
+                    new Dictionary<OneLoginUserMatchedAttribute, string>()
+                    {
+                        { OneLoginUserMatchedAttribute.FullName, $"{person.FirstName} {person.LastName}" },
+                        { OneLoginUserMatchedAttribute.NationalInsuranceNumber, person.NationalInsuranceNumber! },
+                    }));
 
             // Act
             var result = await helper.TryMatchToTeachingRecord(journeyInstance);
@@ -588,11 +596,18 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             personMatchingServiceMock
                 .Setup(mock => mock.Match(It.Is<MatchRequest>(r =>
-                        r.Names.SequenceEqual(state.VerifiedNames!) &&
-                        r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
-                        r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
-                        r.Trn == state.Trn)))
-                .ReturnsAsync((person.PersonId, person.Trn!));
+                    r.Names.SequenceEqual(state.VerifiedNames!) &&
+                    r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
+                    r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
+                    r.Trn == state.Trn)))
+                .ReturnsAsync(new MatchResult(
+                    person.PersonId,
+                    person.Trn!,
+                    new Dictionary<OneLoginUserMatchedAttribute, string>()
+                    {
+                        { OneLoginUserMatchedAttribute.FullName, $"{person.FirstName} {person.LastName}" },
+                        { OneLoginUserMatchedAttribute.NationalInsuranceNumber, person.NationalInsuranceNumber! },
+                    }));
 
             // Act
             var result = await helper.TryMatchToTeachingRecord(journeyInstance);
@@ -604,6 +619,9 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.Equal(Clock.UtcNow, user.FirstSignIn);
             Assert.Equal(Clock.UtcNow, user.LastSignIn);
             Assert.Equal(person.PersonId, user.PersonId);
+            Assert.Equal(OneLoginUserMatchRoute.Interactive, user.MatchRoute);
+            Assert.NotNull(user.MatchedAttributes);
+            Assert.NotEmpty(user.MatchedAttributes);
 
             Assert.NotNull(state.AuthenticationTicket);
             Assert.Equal(person.Trn, state.AuthenticationTicket.Principal.FindFirstValue(ClaimTypes.Trn));

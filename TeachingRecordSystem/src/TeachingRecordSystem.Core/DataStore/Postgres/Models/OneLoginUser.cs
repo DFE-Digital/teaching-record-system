@@ -15,4 +15,6 @@ public class OneLoginUser
     public string[][]? VerifiedNames { get; set; }
     public DateOnly[]? VerifiedDatesOfBirth { get; set; }
     public string? LastCoreIdentityVc { get; set; }
+    public OneLoginUserMatchRoute MatchRoute { get; set; }
+    public KeyValuePair<OneLoginUserMatchedAttribute, string>[]? MatchedAttributes { get; set; }
 }

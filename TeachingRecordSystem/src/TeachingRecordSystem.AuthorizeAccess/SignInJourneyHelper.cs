@@ -155,12 +155,14 @@ public class SignInJourneyHelper(
 
         string? trn = null;
 
-        if (await TryApplyTrnToken() is (Guid PersonId, string Trn) trnTokenPerson)
+        if (await TryApplyTrnToken() is TryApplyTrnTokenResult result)
         {
-            oneLoginUser.PersonId = trnTokenPerson.PersonId;
+            oneLoginUser.PersonId = result.PersonId;
             oneLoginUser.FirstSignIn = clock.UtcNow;
             oneLoginUser.LastSignIn = clock.UtcNow;
-            trn = trnTokenPerson.Trn;
+            oneLoginUser.MatchRoute = OneLoginUserMatchRoute.TrnToken;
+            oneLoginUser.MatchedAttributes = result.MatchedAttributes.ToArray();
+            trn = result.Trn;
         }
 
         await dbContext.SaveChangesAsync();
@@ -178,7 +180,7 @@ public class SignInJourneyHelper(
             }
         });
 
-        async Task<(Guid PersonId, string Trn)?> TryApplyTrnToken()
+        async Task<TryApplyTrnTokenResult?> TryApplyTrnToken()
         {
             if (journeyInstance.State.TrnToken is not string trnToken)
             {
@@ -202,17 +204,23 @@ public class SignInJourneyHelper(
             }
 
             // If the record's last name and DOB do not match the verified details then don't automatically link
-            if (!trnTokenPerson.LastName.Equals(verifiedNames.First().Last(), StringComparison.OrdinalIgnoreCase) ||
-                trnTokenPerson.DateOfBirth != verifiedDatesOfBirth.First())
+            var matchedLastName = verifiedNames.Select(parts => parts.Last()).FirstOrDefault(name => name.Equals(trnTokenPerson.LastName, StringComparison.OrdinalIgnoreCase));
+            var matchedDateOfBirth = verifiedDatesOfBirth.FirstOrDefault(dob => dob == trnTokenPerson.DateOfBirth);
+            if (matchedLastName == default || matchedDateOfBirth == default)
             {
                 return null;
             }
+            var matchedAttributes = new Dictionary<OneLoginUserMatchedAttribute, string>()
+            {
+                { OneLoginUserMatchedAttribute.LastName, matchedLastName },
+                { OneLoginUserMatchedAttribute.DateOfBirth, matchedDateOfBirth.ToString("yyyy-MM-dd") }
+            };
 
             // Invalidate the token
             trnTokenModel.UserId = _teacherAuthIdUserIdSentinel;
             await idDbContext.SaveChangesAsync();
 
-            return (trnTokenPerson.PersonId, trnTokenModel.Trn);
+            return new(trnTokenPerson.PersonId, trnTokenModel.Trn, matchedAttributes);
         }
     }
 
@@ -264,7 +272,7 @@ public class SignInJourneyHelper(
 
         var matchResult = await personMatchingService.Match(new(names!, datesOfBirth!, nationalInsuranceNumber, trn));
 
-        if (matchResult is var (matchedPersonId, matchedTrn))
+        if (matchResult is var (matchedPersonId, matchedTrn, matchedAttributes))
         {
             // It's possible we match on a record that doesn't have a TRN; we don't want to proceed in that case;
             // downstream consumers can't do anything without a TRN
@@ -279,6 +287,8 @@ public class SignInJourneyHelper(
             oneLoginUser.PersonId = matchedPersonId;
             oneLoginUser.FirstSignIn = clock.UtcNow;
             oneLoginUser.LastSignIn = clock.UtcNow;
+            oneLoginUser.MatchRoute = OneLoginUserMatchRoute.Interactive;
+            oneLoginUser.MatchedAttributes = matchedAttributes.ToArray();
             await dbContext.SaveChangesAsync();
 
             await journeyInstance.UpdateStateAsync(state => Complete(state, matchedTrn));
@@ -342,4 +352,6 @@ public class SignInJourneyHelper(
         delegatedProperties.Items.Add(FormFlowJourneySignInHandler.PropertyKeys.JourneyInstanceId, journeyInstance.InstanceId.Serialize());
         return Results.Challenge(delegatedProperties, authenticationSchemes: [journeyInstance.State.OneLoginAuthenticationScheme]);
     }
+
+    private record TryApplyTrnTokenResult(Guid PersonId, string Trn, IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>> MatchedAttributes);
 }
