@@ -49,6 +49,9 @@ public static class PageExtensions
     public static Task ClickLinkForElementWithTestId(this IPage page, string testId) =>
         page.GetByTestId(testId).ClickAsync();
 
+    public static Task ClickChangeLinkForSummaryListRowWithKey(this IPage page, string key) =>
+        page.Locator($".govuk-summary-list__row:has(> dt:text('{key}'))").GetByText("Change").ClickAsync();
+
     public static async Task ClickAddAlertPersonAlertsPage(this IPage page)
     {
         await page.GetByTestId($"add-alert").ClickAsync();

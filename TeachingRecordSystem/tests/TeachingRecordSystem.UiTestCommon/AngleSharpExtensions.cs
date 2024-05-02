@@ -86,11 +86,17 @@ public static class AngleSharpExtensions
     public static string? GetSummaryListValueForKey(this IDocument doc, string key) =>
         doc.Body?.GetSummaryListValueForKey(key);
 
-    public static string? GetSummaryListValueForKey(this IElement element, string key)
+    public static string? GetSummaryListValueForKey(this IElement element, string key) =>
+        GetSummaryListValueElementForKey(element, key)?.GetCleansedTextContent();
+
+    public static IElement? GetSummaryListValueElementForKey(this IDocument doc, string key) =>
+        doc.Body?.GetSummaryListValueElementForKey(key);
+
+    public static IElement? GetSummaryListValueElementForKey(this IElement element, string key)
     {
         var row = element.GetSummaryListRowForKey(key);
         var rowValue = row?.QuerySelector(".govuk-summary-list__value");
-        return rowValue.GetCleansedTextContent();
+        return rowValue;
     }
 
     /// <summary>

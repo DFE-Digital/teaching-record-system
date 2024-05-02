@@ -32,10 +32,10 @@ public class IndexTests : TestBase
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
         var previousMiddleNameChangedOn = new DateOnly(2022, 02, 02);
-        var createPersonResult = await TestData.CreatePerson(
-            b => b.WithEmail(email)
-             .WithMobileNumber(mobileNumber)
-             .WithNationalInsuranceNumber());
+        var createPersonResult = await TestData.CreatePerson(b => b
+            .WithEmail(email)
+            .WithMobileNumber(mobileNumber)
+            .WithNationalInsuranceNumber());
 
         await TestData.UpdatePerson(b => b.WithPersonId(createPersonResult.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
         await Task.Delay(2000);
@@ -50,25 +50,22 @@ public class IndexTests : TestBase
         var doc = await AssertEx.HtmlResponse(response);
 
         Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetElementByTestId("page-title")!.TextContent);
-        var summaryList = doc.GetElementByTestId("personal-details");
-        Assert.NotNull(summaryList);
-        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", summaryList.GetElementByTestId("personal-details-name")!.TextContent);
-        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {createPersonResult.LastName}", summaryList.GetElementByTestId("personal-details-previous-names-0")!.TextContent);
-        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", summaryList.GetElementByTestId("personal-details-previous-names-1")!.TextContent);
-        Assert.Equal(createPersonResult.DateOfBirth.ToString("dd/MM/yyyy"), summaryList.GetElementByTestId("personal-details-date-of-birth")!.TextContent);
-        Assert.Equal(createPersonResult.Gender, summaryList.GetElementByTestId("personal-details-gender")!.TextContent);
-        Assert.Equal(createPersonResult.Trn, summaryList.GetElementByTestId("personal-details-trn")!.TextContent);
-        Assert.Equal(createPersonResult.NationalInsuranceNumber, summaryList.GetElementByTestId("personal-details-nino")!.TextContent);
-        Assert.Equal(createPersonResult.Email, summaryList.GetElementByTestId("personal-details-email")!.TextContent);
-        Assert.Equal(createPersonResult.MobileNumber, summaryList.GetElementByTestId("personal-details-mobile-number")!.TextContent);
+        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetSummaryListValueForKey("Name"));
+        var previousNames = doc.GetSummaryListValueElementForKey("Previous name(s)")?.QuerySelectorAll("li");
+        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {createPersonResult.LastName}", previousNames?.First().TextContent);
+        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", previousNames?.Last().TextContent);
+        Assert.Equal(createPersonResult.DateOfBirth.ToString("dd/MM/yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
+        Assert.Equal(createPersonResult.Gender, doc.GetSummaryListValueForKey("Gender"));
+        Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueForKey("TRN"));
+        Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(createPersonResult.Email, doc.GetSummaryListValueForKey("Email"));
+        Assert.Equal(createPersonResult.MobileNumber, doc.GetSummaryListValueForKey("Mobile number"));
     }
 
     [Fact]
     public async Task Get_WithPersonIdForExistingPersonWithMissingProperties_ReturnsExpectedContent()
     {
         // Arrange
-        var email = TestData.GenerateUniqueEmail();
-        var mobileNumber = TestData.GenerateUniqueMobileNumber();
         var createPersonResult = await TestData.CreatePerson(b => b.WithTrn(hasTrn: false));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
@@ -80,13 +77,11 @@ public class IndexTests : TestBase
         var doc = await AssertEx.HtmlResponse(response);
 
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("page-title")!.TextContent);
-        var summaryList = doc.GetElementByTestId("personal-details");
-        Assert.NotNull(summaryList);
-        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", summaryList.GetElementByTestId("personal-details-name")!.TextContent);
-        Assert.Equal(createPersonResult.DateOfBirth.ToString("dd/MM/yyyy"), summaryList.GetElementByTestId("personal-details-date-of-birth")!.TextContent);
-        Assert.Equal("-", summaryList.GetElementByTestId("personal-details-trn")!.TextContent);
-        Assert.Equal("-", summaryList.GetElementByTestId("personal-details-email")!.TextContent);
-        Assert.Equal("-", summaryList.GetElementByTestId("personal-details-nino")!.TextContent);
-        Assert.Equal("-", summaryList.GetElementByTestId("personal-details-mobile-number")!.TextContent);
+        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetSummaryListValueForKey("Name"));
+        Assert.Equal(createPersonResult.DateOfBirth.ToString("dd/MM/yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
+        Assert.Equal("-", doc.GetSummaryListValueForKey("TRN"));
+        Assert.Equal("-", doc.GetSummaryListValueForKey("Email"));
+        Assert.Equal("-", doc.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal("-", doc.GetSummaryListValueForKey("Mobile number"));
     }
 }
