@@ -9,9 +9,29 @@ namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
 public record SetQtlsCommand(string Trn, DateOnly? QtsDate);
 
+public sealed class SetQtlsResult
+{
+    private SetQtlsResult() { }
+
+    public bool Succeeded { get; private set; }
+
+    public QtlsInfo? QtlsInfo { get; private set; }
+
+    public static SetQtlsResult Success(QtlsInfo qtlsInfo) => new()
+    {
+        Succeeded = true,
+        QtlsInfo = qtlsInfo
+    };
+
+    public static SetQtlsResult Failed() => new()
+    {
+        Succeeded = false
+    };
+}
+
 public class SetQtlsHandler(ICrmQueryDispatcher _crmQueryDispatcher)
 {
-    public async Task<QtlsInfo> Handle(SetQtlsCommand command)
+    public async Task<SetQtlsResult> Handle(SetQtlsCommand command)
     {
         var contact = (await _crmQueryDispatcher.ExecuteQuery(
             new GetActiveContactByTrnQuery(
@@ -43,17 +63,18 @@ public class SetQtlsHandler(ICrmQueryDispatcher _crmQueryDispatcher)
                 }
             );
 
-            throw new ErrorException(ErrorRegistry.UnableToUpdateQtlsDate());
+            return SetQtlsResult.Failed();
         }
 
         await _crmQueryDispatcher.ExecuteQuery(
              new SetQtlsDateQuery(contact.Id, command.QtsDate))!;
 
-        return new QtlsInfo()
+
+        return SetQtlsResult.Success(new QtlsInfo()
         {
             Trn = command.Trn,
             QtsDate = command.QtsDate
-        };
+        });
     }
 
     private async Task<(dfeta_induction Induction, bool HasAppropriateBody)?> GetInductionWithAppropriateBody(Guid contactId)

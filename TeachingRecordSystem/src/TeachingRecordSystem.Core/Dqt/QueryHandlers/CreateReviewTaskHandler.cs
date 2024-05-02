@@ -8,7 +8,6 @@ public class CreateReviewTaskHandler : ICrmQueryHandler<CreateReviewTaskQuery, G
     {
         var crmTaskId = await organizationService.CreateAsync(new CrmTask()
         {
-            Id = Guid.NewGuid(),
             RegardingObjectId = query.ContactId.ToEntityReference(Contact.EntityLogicalName),
             Category = query.Category,
             Subject = query.Subject,
