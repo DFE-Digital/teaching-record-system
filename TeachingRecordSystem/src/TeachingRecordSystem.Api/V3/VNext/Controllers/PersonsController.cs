@@ -20,7 +20,7 @@ public class PersonsController : ControllerBase
         Description = "Sets QTLS status for a teacher.")]
     [ProducesResponseType(typeof(QtlsInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
-    [MapError(10030, statusCode: StatusCodes.Status202Accepted)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
     [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.AssignQtls)]
     public async Task<IActionResult> Put(
@@ -29,8 +29,7 @@ public class PersonsController : ControllerBase
     {
         var command = new SetQtlsCommand(request.Trn!, request.QTSDate);
         var result = await handler.Handle(command);
-        var response = result.Adapt<QtlsInfo>();
-        return Ok(response);
+        return result is { Succeeded: true } ? Ok(result.QtlsInfo!) : Accepted();
     }
 
     [HttpGet("{trn}/qtls")]
