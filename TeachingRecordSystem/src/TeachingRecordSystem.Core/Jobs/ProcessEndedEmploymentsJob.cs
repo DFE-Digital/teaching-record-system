@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 
 namespace TeachingRecordSystem.Core.Jobs;

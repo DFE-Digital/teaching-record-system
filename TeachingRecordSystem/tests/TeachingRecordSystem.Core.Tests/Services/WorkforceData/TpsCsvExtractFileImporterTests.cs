@@ -393,7 +393,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     ExtractDate = validFormatExtractDate,
                     Gender = validFormatGender
                 },
-                ExpectedResult = TpsCsvExtractItemLoadErrors.None,
+                ExpectedResult = TpsCsvExtractItemLoadErrors.EmploymentEndDateIncorrectFormat,
             },
             // Invalid Employment End Date
             new ()

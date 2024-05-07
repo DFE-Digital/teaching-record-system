@@ -8,7 +8,7 @@ public partial class TestData
     public async Task<PersonEmployment> CreatePersonEmployment(
         CreatePersonResult person,
         Establishment establishment,
-        DateOnly startDate,        
+        DateOnly startDate,
         DateOnly lastKnownEmployedDate,
         EmploymentType employmentType,
         DateOnly lastExtractDate,

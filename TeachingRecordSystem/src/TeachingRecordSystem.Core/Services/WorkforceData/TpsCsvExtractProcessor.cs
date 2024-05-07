@@ -283,7 +283,7 @@ public class TpsCsvExtractProcessor(
 
         await foreach (var item in readDbContext.Database.SqlQuery<UpdatedPersonEmployment>(querySql).AsAsyncEnumerable())
         {
-            var changes = PersonEmploymentUpdatedEventChanges.None |                
+            var changes = PersonEmploymentUpdatedEventChanges.None |
                 (item.CurrentEmploymentType != item.EmploymentType ? PersonEmploymentUpdatedEventChanges.EmploymentType : PersonEmploymentUpdatedEventChanges.None) |
                 (item.CurrentLastKnownEmployedDate != item.LastKnownEmployedDate ? PersonEmploymentUpdatedEventChanges.LastKnownEmployedDate : PersonEmploymentUpdatedEventChanges.None) |
                 (item.CurrentLastExtractDate != item.LastExtractDate ? PersonEmploymentUpdatedEventChanges.LastExtractDate : PersonEmploymentUpdatedEventChanges.None);
@@ -594,7 +594,7 @@ public class TpsCsvExtractProcessor(
                 person_employments
             WHERE
                 end_date IS NULL
-                AND AGE(last_extract_date, last_known_employed_date) > INTERVAL '3 months'
+                AND AGE(last_extract_date, last_known_employed_date) > INTERVAL '5 months'
             """;
 
         var batchCommands = new List<NpgsqlBatchCommand>();

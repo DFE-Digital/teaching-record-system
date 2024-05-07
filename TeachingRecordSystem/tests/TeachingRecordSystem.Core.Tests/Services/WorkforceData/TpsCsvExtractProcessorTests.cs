@@ -259,7 +259,7 @@ public class TpsCsvExtractProcessorTests
         var establishment2 = await TestData.CreateEstablishment(localAuthorityCode: "128", establishmentNumber: "1240");
         var extractDate = new DateOnly(2024, 04, 25);
         var lastKnownEmployedDateWithinThreeMonthsOfExtractDate = new DateOnly(2024, 02, 29);
-        var lastKnownEmployedDateOutsideThreeMonthsOfExtractDate = new DateOnly(2023, 11, 30);        
+        var lastKnownEmployedDateOutsideThreeMonthsOfExtractDate = new DateOnly(2023, 11, 30);
         var personEmploymentWhichHasEnded = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), lastKnownEmployedDateOutsideThreeMonthsOfExtractDate, EmploymentType.FullTime, extractDate);
         var personEmploymentWhichHasNotEnded = await TestData.CreatePersonEmployment(person, establishment2, new DateOnly(2023, 02, 02), lastKnownEmployedDateWithinThreeMonthsOfExtractDate, EmploymentType.FullTime, extractDate);
 
