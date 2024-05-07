@@ -15,14 +15,14 @@ public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceCl
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(TpsExtractsContainerName);
         var fileNames = await GetFileNames(blobContainerClient, PendingFolderName, true, cancellationToken);
-        return fileNames;
+        return fileNames.OrderBy(f => f).ToArray();
     }
 
     public async Task<string?> GetPendingEstablishmentImportFileName(CancellationToken cancellationToken)
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(TpsExtractsContainerName);
         var fileNames = await GetFileNames(blobContainerClient, EstablishmentsFolderName, true, cancellationToken);
-        return fileNames?.FirstOrDefault();
+        return fileNames.FirstOrDefault();
     }
 
     public async Task<Stream> GetFile(string fileName, CancellationToken cancellationToken)

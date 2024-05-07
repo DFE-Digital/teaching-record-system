@@ -76,7 +76,7 @@ public class TpsCsvExtractFileImporter(
         using var csvReader = new CsvReader(streamReader, new CsvConfiguration(CultureInfo.CurrentCulture) { HasHeaderRecord = true });
 
         var validGenderValues = new List<string>() { "Male", "Female" };
-        var validFullOrPartTimeIndicatorValues = new List<string>() { "FT", "PTI", "PTR" };
+        var validFullOrPartTimeIndicatorValues = new List<string>() { "FT", "PTI", "PTR", "PT" };
 
         await foreach (var row in csvReader.GetRecordsAsync<TpsCsvExtractRowRaw>())
         {
@@ -116,7 +116,7 @@ public class TpsCsvExtractFileImporter(
                 loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.EmploymentStartDateIncorrectFormat;
             }
 
-            if (row.EmploymentEndDate is not null && !DateOnly.TryParseExact(row.EmploymentEndDate, "dd/MM/yyyy", out _))
+            if (row.EmploymentEndDate is null || !DateOnly.TryParseExact(row.EmploymentEndDate, "dd/MM/yyyy", out _))
             {
                 loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.EmploymentEndDateIncorrectFormat;
             }
@@ -200,7 +200,8 @@ public class TpsCsvExtractFileImporter(
                     withdrawl_indicator,
                     extract_date,
                     gender,                    
-                    created
+                    created,
+                    key
                 )
             FROM
                 STDIN (FORMAT BINARY)
@@ -210,6 +211,8 @@ public class TpsCsvExtractFileImporter(
 
         await foreach (var item in readDbContext.TpsCsvExtractLoadItems.Where(x => x.TpsCsvExtractId == tpsCsvExtractId && x.Errors == TpsCsvExtractItemLoadErrors.None).AsNoTracking().AsAsyncEnumerable())
         {
+            var employmentStartDate = DateOnly.ParseExact(item.EmploymentStartDate!, "dd/MM/yyyy");
+
             writer.StartRow();
             writer.Write(Guid.NewGuid(), NpgsqlDbType.Uuid);
             writer.Write(tpsCsvExtractId, NpgsqlDbType.Uuid);
@@ -224,13 +227,14 @@ public class TpsCsvExtractFileImporter(
             writer.Write(item.EstablishmentNumber, NpgsqlDbType.Char);
             writer.Write(item.EstablishmentPostcode, NpgsqlDbType.Varchar);
             writer.Write(item.EstablishmentEmailAddress, NpgsqlDbType.Varchar);
-            writer.Write(DateOnly.ParseExact(item.EmploymentStartDate!, "dd/MM/yyyy"), NpgsqlDbType.Date);
+            writer.Write(employmentStartDate, NpgsqlDbType.Date);
             writer.Write(!string.IsNullOrEmpty(item.EmploymentEndDate) ? DateOnly.ParseExact(item.EmploymentEndDate!, "dd/MM/yyyy") : (DateOnly?)null, NpgsqlDbType.Date);
             writer.Write((int)EmploymentTypeHelper.FromFullOrPartTimeIndicator(item.FullOrPartTimeIndicator!), NpgsqlDbType.Integer);
             writer.Write(item.WithdrawlIndicator, NpgsqlDbType.Char);
             writer.Write(DateOnly.ParseExact(item.ExtractDate!, "dd/MM/yyyy"), NpgsqlDbType.Date);
             writer.Write(item.Gender, NpgsqlDbType.Varchar);
             writer.Write(clock.UtcNow, NpgsqlDbType.TimestampTz);
+            writer.Write($"{item.Trn}.{item.LocalAuthorityCode}.{item.EstablishmentNumber ?? "NULL"}.{employmentStartDate:yyyyMMdd}", NpgsqlDbType.Varchar);
         }
 
         await writer.CompleteAsync(cancellationToken);

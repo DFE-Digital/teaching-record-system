@@ -8,5 +8,8 @@ public record UpdatedPersonEmploymentEstablishment
     public required DateOnly StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
     public required EmploymentType EmploymentType { get; init; }
+    public required DateOnly LastKnownEmployedDate { get; init; }
+    public required DateOnly LastExtractDate { get; init; }
+    public required string Key { get; init; }
     public required Guid EstablishmentId { get; init; }
 }

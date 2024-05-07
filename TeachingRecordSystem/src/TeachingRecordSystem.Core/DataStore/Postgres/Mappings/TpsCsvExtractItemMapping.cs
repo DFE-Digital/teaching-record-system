@@ -23,6 +23,8 @@ public class TpsCsvExtractItemMapping : IEntityTypeConfiguration<TpsCsvExtractIt
         builder.Property(x => x.WithdrawlIndicator).HasMaxLength(1).IsFixedLength();
         builder.Property(x => x.Gender).HasMaxLength(10).IsRequired();
         builder.Property(x => x.Created).IsRequired();
+        builder.Property(x => x.Key).HasMaxLength(50).IsRequired();
+        builder.HasIndex(x => x.Key).HasDatabaseName(TpsCsvExtractItem.KeyIndexName);
         builder.HasIndex(x => x.Trn).HasDatabaseName(TpsCsvExtractItem.TrnIndexName);
         builder.HasIndex(x => new { x.LocalAuthorityCode, x.EstablishmentNumber }).HasDatabaseName(TpsCsvExtractItem.LaCodeEstablishmentNumberIndexName);
         builder.HasIndex(x => x.TpsCsvExtractId).HasDatabaseName(TpsCsvExtractItem.TpsCsvExtractIdIndexName);
