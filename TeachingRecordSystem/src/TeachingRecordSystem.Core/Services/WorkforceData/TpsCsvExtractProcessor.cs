@@ -122,18 +122,23 @@ public class TpsCsvExtractProcessor(
             )
             SELECT
                 x.tps_csv_extract_item_id,
+                x.trn,
+                x.local_authority_code,
+                x.establishment_number,
                 p.person_id,
                 e.establishment_id,
                 x.employment_start_date as start_date,
-                x.employment_end_date as end_date,
-                x.employment_type
+                x.employment_end_date as last_known_employed_date,
+                x.employment_type,
+                x.extract_date as last_extract_date,
+                x.key
             FROM
                     tps_csv_extract_items x
                 JOIN
                     persons p ON x.trn = p.trn
                 JOIN
                     unique_establishments e ON x.local_authority_code = e.la_code
-                        AND (e.establishment_number = x.establishment_number
+                        AND (x.establishment_number = e.establishment_number
                              OR (e.establishment_type_code = '29' 
                                  AND x.establishment_postcode = e.postcode
                                  AND NOT EXISTS (SELECT
@@ -151,9 +156,7 @@ public class TpsCsvExtractProcessor(
                                 FROM
                                     person_employments pe
                                 WHERE
-                                    pe.person_id = p.person_id
-                                    AND pe.establishment_id = e.establishment_id
-                                    AND pe.start_date = x.employment_start_date)
+                                    pe.key = x.key)
             """;
 
         int i = 0;
@@ -166,10 +169,13 @@ public class TpsCsvExtractProcessor(
                 PersonId = item.PersonId,
                 EstablishmentId = item.EstablishmentId,
                 StartDate = item.StartDate,
-                EndDate = item.EndDate,
+                EndDate = null,
+                LastKnownEmployedDate = item.LastKnownEmployedDate,
+                LastExtractDate = item.LastExtractDate,
                 EmploymentType = item.EmploymentType,
                 CreatedOn = clock.UtcNow,
-                UpdatedOn = clock.UtcNow
+                UpdatedOn = clock.UtcNow,
+                Key = item.Key
             };
 
             writeDbContext.PersonEmployments.Add(personEmployment);
@@ -252,30 +258,20 @@ public class TpsCsvExtractProcessor(
                 pe.person_id,
                 pe.establishment_id,
                 pe.start_date,
-                pe.end_date as current_end_date,
+                pe.end_date,
                 pe.employment_type as current_employment_type,
-                x.employment_end_date as end_date,
-                x.employment_type
+                pe.last_known_employed_date as current_last_known_employed_date,
+                pe.last_extract_date as current_last_extract_date,                
+                x.employment_type,
+                x.employment_end_date as last_known_employed_date,
+                x.extract_date as last_extract_date,
+                x.key
             FROM
                     tps_csv_extract_items x
                 JOIN
                     persons p ON x.trn = p.trn
                 JOIN
-                    unique_establishments e ON x.local_authority_code = e.la_code
-                        AND (e.establishment_number = x.establishment_number
-                             OR (e.establishment_type_code = '29' 
-                                 AND x.establishment_postcode = e.postcode
-                                 AND NOT EXISTS (SELECT
-                                                     1
-                                                 FROM
-                                                     unique_establishments e2
-                                                 WHERE
-                                                     e2.la_code = x.local_authority_code
-                                                     AND e2.establishment_number = x.establishment_number)))
-                JOIN
-                    person_employments pe ON pe.person_id = p.person_id
-                    AND pe.establishment_id = e.establishment_id
-                    AND pe.start_date = x.employment_start_date
+                    person_employments pe ON pe.key = x.key
             WHERE
                 x.tps_csv_extract_id = {tpsCsvExtractId}
                 AND x.result IS NULL
@@ -288,19 +284,23 @@ public class TpsCsvExtractProcessor(
         await foreach (var item in readDbContext.Database.SqlQuery<UpdatedPersonEmployment>(querySql).AsAsyncEnumerable())
         {
             var changes = PersonEmploymentUpdatedEventChanges.None |
-                (item.CurrentEndDate != item.EndDate ? PersonEmploymentUpdatedEventChanges.EndDate : PersonEmploymentUpdatedEventChanges.None) |
-                (item.CurrentEmploymentType != item.EmploymentType ? PersonEmploymentUpdatedEventChanges.EmploymentType : PersonEmploymentUpdatedEventChanges.None);
+                (item.CurrentEmploymentType != item.EmploymentType ? PersonEmploymentUpdatedEventChanges.EmploymentType : PersonEmploymentUpdatedEventChanges.None) |
+                (item.CurrentLastKnownEmployedDate != item.LastKnownEmployedDate ? PersonEmploymentUpdatedEventChanges.LastKnownEmployedDate : PersonEmploymentUpdatedEventChanges.None) |
+                (item.CurrentLastExtractDate != item.LastExtractDate ? PersonEmploymentUpdatedEventChanges.LastExtractDate : PersonEmploymentUpdatedEventChanges.None);
 
             if (changes != PersonEmploymentUpdatedEventChanges.None)
             {
-                var formattedEndDate = item.EndDate.HasValue ? $"to_date('{item.EndDate:yyyyMMdd}','YYYYMMDD')" : "NULL";
+                var formattedLastKnownEmployedDate = $"to_date('{item.LastKnownEmployedDate:yyyyMMdd}','YYYYMMDD')";
+                var formattedLastExtractDate = $"to_date('{item.LastExtractDate:yyyyMMdd}','YYYYMMDD')";
                 var updatePersonEmploymentsCommand = new NpgsqlBatchCommand(
                     $"""
                     UPDATE
                         person_employments
                     SET
-                        end_date = {formattedEndDate},
-                        employment_type = {(int)item.EmploymentType}
+                        employment_type = {(int)item.EmploymentType},
+                        last_known_employed_date = {formattedLastKnownEmployedDate},
+                        last_extract_date = {formattedLastExtractDate},
+                        updated_on = now()
                     WHERE
                         person_employment_id = '{item.PersonEmploymentId}'
                     """);
@@ -317,7 +317,10 @@ public class TpsCsvExtractProcessor(
                         EstablishmentId = item.EstablishmentId,
                         StartDate = item.StartDate,
                         EndDate = item.EndDate,
-                        EmploymentType = item.EmploymentType
+                        EmploymentType = item.EmploymentType,
+                        LastKnownEmployedDate = item.LastKnownEmployedDate,
+                        LastExtractDate = item.LastExtractDate,
+                        Key = item.Key
                     },
                     OldPersonEmployment = new()
                     {
@@ -325,8 +328,11 @@ public class TpsCsvExtractProcessor(
                         PersonId = item.PersonId,
                         EstablishmentId = item.EstablishmentId,
                         StartDate = item.StartDate,
-                        EndDate = item.CurrentEndDate,
-                        EmploymentType = item.CurrentEmploymentType
+                        EndDate = item.EndDate,
+                        EmploymentType = item.CurrentEmploymentType,
+                        LastKnownEmployedDate = item.CurrentLastKnownEmployedDate,
+                        LastExtractDate = item.CurrentLastExtractDate,
+                        Key = item.Key
                     },
                     Changes = changes,
                     CreatedUtc = clock.UtcNow,
@@ -460,6 +466,9 @@ public class TpsCsvExtractProcessor(
                 ec.start_date,
                 ec.end_date,
                 ec.employment_type,
+                ec.last_known_employed_date,
+                ec.last_extract_date,
+                ec.key,
                 ue.establishment_id
             from
                     establishment_changes ec
@@ -488,7 +497,8 @@ public class TpsCsvExtractProcessor(
                     UPDATE
                         person_employments
                     SET
-                        establishment_id = '{item.EstablishmentId}'
+                        establishment_id = '{item.EstablishmentId}',
+                        updated_on = now()
                     WHERE
                         person_employment_id = '{item.PersonEmploymentId}'
                     """);
@@ -505,7 +515,10 @@ public class TpsCsvExtractProcessor(
                     EstablishmentId = item.EstablishmentId,
                     StartDate = item.StartDate,
                     EndDate = item.EndDate,
-                    EmploymentType = item.EmploymentType
+                    EmploymentType = item.EmploymentType,
+                    LastKnownEmployedDate = item.LastKnownEmployedDate,
+                    LastExtractDate = item.LastExtractDate,
+                    Key = item.Key
                 },
                 OldPersonEmployment = new()
                 {
@@ -514,9 +527,121 @@ public class TpsCsvExtractProcessor(
                     EstablishmentId = item.CurrentEstablishmentId,
                     StartDate = item.StartDate,
                     EndDate = item.EndDate,
-                    EmploymentType = item.EmploymentType
+                    EmploymentType = item.EmploymentType,
+                    LastKnownEmployedDate = item.LastKnownEmployedDate,
+                    LastExtractDate = item.LastExtractDate,
+                    Key = item.Key
                 },
                 Changes = PersonEmploymentUpdatedEventChanges.EstablishmentId,
+                CreatedUtc = clock.UtcNow,
+                RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+            });
+
+            if (batchCommands.Count == 50)
+            {
+                await SaveChanges();
+            }
+        }
+
+        if (batchCommands.Any())
+        {
+            await SaveChanges();
+        }
+
+        async Task SaveChanges()
+        {
+            if (writeDbContext.ChangeTracker.HasChanges())
+            {
+                await writeDbContext.SaveChangesAsync(cancellationToken);
+            }
+
+            if (batchCommands.Count > 0)
+            {
+                using var batch = new NpgsqlBatch(connection);
+                foreach (var command in batchCommands)
+                {
+                    batch.BatchCommands.Add(command);
+                }
+
+                await batch.ExecuteNonQueryAsync(cancellationToken);
+                batchCommands.Clear();
+            }
+        }
+    }
+
+    public async Task ProcessEndedEmployments(CancellationToken cancellationToken)
+    {
+        using var readDbContext = dbContextFactory.CreateDbContext();
+        readDbContext.Database.SetCommandTimeout(300);
+        using var writeDbContext = dbContextFactory.CreateDbContext();
+        var connection = (NpgsqlConnection)writeDbContext.Database.GetDbConnection();
+        await connection.OpenAsync(CancellationToken.None);
+
+        FormattableString querySql =
+            $"""
+            SELECT
+                person_employment_id,
+                person_id,
+                establishment_id,
+                start_date,
+                end_date as current_end_date,
+                employment_type,
+                last_known_employed_date,
+                last_extract_date,
+                key,
+                last_known_employed_date as end_date
+            FROM
+                person_employments
+            WHERE
+                end_date IS NULL
+                AND AGE(last_extract_date, last_known_employed_date) > INTERVAL '5 months'
+            """;
+
+        var batchCommands = new List<NpgsqlBatchCommand>();
+
+        await foreach (var item in readDbContext.Database.SqlQuery<UpdatedPersonEmploymentEndDate>(querySql).AsAsyncEnumerable())
+        {
+            var updatePersonEmploymentsCommand = new NpgsqlBatchCommand(
+                $"""
+                    UPDATE
+                        person_employments
+                    SET
+                        end_date = last_known_employed_date,
+                        updated_on = now()
+                    WHERE
+                        person_employment_id = '{item.PersonEmploymentId}'
+                    """);
+
+            batchCommands.Add(updatePersonEmploymentsCommand);
+            writeDbContext.AddEvent(new PersonEmploymentUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                PersonId = item.PersonEmploymentId,
+                PersonEmployment = new()
+                {
+                    PersonEmploymentId = item.PersonEmploymentId,
+                    PersonId = item.PersonId,
+                    EstablishmentId = item.EstablishmentId,
+                    StartDate = item.StartDate,
+                    EndDate = item.CurrentEndDate,
+                    EmploymentType = item.EmploymentType,
+                    LastKnownEmployedDate = item.LastKnownEmployedDate,
+                    LastExtractDate = item.LastExtractDate,
+                    Key = item.Key
+                },
+                OldPersonEmployment = new()
+                {
+                    PersonEmploymentId = item.PersonEmploymentId,
+                    PersonId = item.PersonId,
+                    EstablishmentId = item.EstablishmentId,
+                    StartDate = item.StartDate,
+                    EndDate = item.EndDate,
+                    EmploymentType = item.EmploymentType,
+                    LastKnownEmployedDate = item.LastKnownEmployedDate,
+                    LastExtractDate = item.LastExtractDate,
+                    Key = item.Key
+                },
+                Changes = PersonEmploymentUpdatedEventChanges.EndDate,
                 CreatedUtc = clock.UtcNow,
                 RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
             });

@@ -47,7 +47,8 @@ public partial class TestData
             string? establishmentNumber,
             string establishmentPostcode,
             DateOnly startDate,
-            DateOnly? endDate = null,
+            DateOnly endDate,
+            DateOnly extractDate,
             string? fullOrPartTimeIndicator = null,
             string? nationalInsuranceNumber = null,
             DateOnly? dateOfBirth = null)
@@ -56,7 +57,7 @@ public partial class TestData
             dateOfBirth ??= DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
             fullOrPartTimeIndicator ??= validFullOrPartTimeIndicatorValues[Faker.RandomNumber.Next(0, 2)];
 
-            _items.Add(new TpsCsvExtractItem(trn, nationalInsuranceNumber, dateOfBirth.Value, localAuthorityCode, establishmentPostcode, establishmentNumber, startDate, endDate, fullOrPartTimeIndicator));
+            _items.Add(new TpsCsvExtractItem(trn, nationalInsuranceNumber, dateOfBirth.Value, localAuthorityCode, establishmentPostcode, establishmentNumber, startDate, endDate, fullOrPartTimeIndicator, extractDate));
             return this;
         }
 
@@ -69,7 +70,6 @@ public partial class TestData
 
             _tpsCsvExtractId ??= Guid.NewGuid();
             _filename ??= "test.csv";
-            var extractDate = testData.Clock.Today;
             var createdOn = testData.Clock.UtcNow;
 
             var tpsCsvExtract = new TpsCsvExtract
@@ -101,10 +101,10 @@ public partial class TestData
                         EstablishmentEmailAddress = null,
                         MemberId = memberId++.ToString(),
                         EmploymentStartDate = item.StartDate.ToString("dd/MM/yyyy"),
-                        EmploymentEndDate = item.EndDate?.ToString("dd/MM/yyyy"),
+                        EmploymentEndDate = item.EndDate.ToString("dd/MM/yyyy"),
                         FullOrPartTimeIndicator = item.FullOrPartTimeIndicator,
                         WithdrawlIndicator = null,
-                        ExtractDate = extractDate.ToString("dd/MM/yyyy"),
+                        ExtractDate = item.ExtractDate.ToString("dd/MM/yyyy"),
                         Gender = validGenderValues[Faker.RandomNumber.Next(0, 1)],
                         Errors = TpsCsvExtractItemLoadErrors.None,
                         Created = DateTime.UtcNow
@@ -133,9 +133,10 @@ public partial class TestData
                         EmploymentEndDate = item.EndDate,
                         EmploymentType = EmploymentTypeHelper.FromFullOrPartTimeIndicator(loadItem.FullOrPartTimeIndicator),
                         WithdrawlIndicator = loadItem.WithdrawlIndicator,
-                        ExtractDate = extractDate,
+                        ExtractDate = item.ExtractDate,
                         Created = createdOn,
-                        Result = null
+                        Result = null,
+                        Key = $"{item.Trn}.{item.LocalAuthorityCode}.{item.EstablishmentNumber}.{item.StartDate:yyyyMMdd}"
                     };
 
                     dbContext.TpsCsvExtractItems.Add(validItem);
@@ -146,5 +147,5 @@ public partial class TestData
         }
     }
 
-    public record TpsCsvExtractItem(string Trn, string NationalInsuranceNumber, DateOnly DateOfBirth, string LocalAuthorityCode, string EstablishmentPostcode, string? EstablishmentNumber, DateOnly StartDate, DateOnly? EndDate, string FullOrPartTimeIndicator);
+    public record TpsCsvExtractItem(string Trn, string NationalInsuranceNumber, DateOnly DateOfBirth, string LocalAuthorityCode, string EstablishmentPostcode, string? EstablishmentNumber, DateOnly StartDate, DateOnly EndDate, string FullOrPartTimeIndicator, DateOnly ExtractDate);
 }

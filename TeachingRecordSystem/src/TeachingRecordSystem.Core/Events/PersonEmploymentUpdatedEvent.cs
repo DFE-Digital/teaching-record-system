@@ -17,5 +17,7 @@ public enum PersonEmploymentUpdatedEventChanges
     StartDate = 1 << 0,
     EndDate = 1 << 1,
     EmploymentType = 1 << 2,
-    EstablishmentId = 1 << 3
+    EstablishmentId = 1 << 3,
+    LastKnownEmployedDate = 1 << 4,
+    LastExtractDate = 1 << 5
 }

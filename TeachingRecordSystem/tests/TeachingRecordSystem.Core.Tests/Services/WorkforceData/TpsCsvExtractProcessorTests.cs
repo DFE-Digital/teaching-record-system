@@ -42,7 +42,10 @@ public class TpsCsvExtractProcessorTests
 
         var trn = await TestData.GenerateTrn();
         var tpsCsvExtractId = Guid.NewGuid();
-        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(trn, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 03)));
+        var startDate = new DateOnly(2023, 02, 03);
+        var endDate = new DateOnly(2024, 03, 30);
+        var extractDate = new DateOnly(2024, 04, 25);
+        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(trn, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, startDate, endDate, extractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -64,7 +67,10 @@ public class TpsCsvExtractProcessorTests
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "124", establishmentNumber: "1235");
         var nonExistentEstablishmentNumber = "4321";
-        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person.Trn!, establishment1.LaCode, nonExistentEstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 03)));
+        var startDate = new DateOnly(2023, 02, 03);
+        var endDate = new DateOnly(2024, 03, 30);
+        var extractDate = new DateOnly(2024, 04, 25);
+        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person.Trn!, establishment1.LaCode, nonExistentEstablishmentNumber, establishment1.Postcode!, startDate, endDate, extractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -85,7 +91,10 @@ public class TpsCsvExtractProcessorTests
         var person = await TestData.CreatePerson();
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment = await TestData.CreateEstablishment(localAuthorityCode: "125", establishmentNumber: "1236");
-        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, new DateOnly(2023, 02, 03)));
+        var startDate = new DateOnly(2023, 02, 03);
+        var endDate = new DateOnly(2024, 03, 30);
+        var extractDate = new DateOnly(2024, 04, 25);
+        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, startDate, endDate, extractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -116,7 +125,10 @@ public class TpsCsvExtractProcessorTests
         var openEstablishment = await TestData.CreateEstablishment(laCode, establishmentNumber: establishmentNumber, establishmentStatusCode: 1, postcode: postcode);
         var proposedToOpenEstablishment = await TestData.CreateEstablishment(laCode, establishmentNumber: establishmentNumber, establishmentStatusCode: 4, postcode: postcode);
         var openButProposedToCloseEstablishment = await TestData.CreateEstablishment(laCode, establishmentNumber: establishmentNumber, establishmentStatusCode: 3, postcode: postcode);
-        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, laCode, establishmentNumber, postcode, new DateOnly(2023, 02, 03)));
+        var startDate = new DateOnly(2023, 02, 03);
+        var endDate = new DateOnly(2024, 03, 30);
+        var extractDate = new DateOnly(2024, 04, 25);
+        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, laCode, establishmentNumber, postcode, startDate, endDate, extractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -149,8 +161,8 @@ public class TpsCsvExtractProcessorTests
         var higherEductionEstablishment = await TestData.CreateEstablishment(laCode1, postcode: postcode2, isHigherEducationInstitution: true);
         await TestData.CreateTpsCsvExtract(
             b => b.WithTpsCsvExtractId(tpsCsvExtractId)
-                .WithItem(person!.Trn!, laCode1, establishmentNumber1, postcode1, new DateOnly(2023, 02, 03))
-                .WithItem(person!.Trn!, laCode1, establishmentNumber2, postcode2, new DateOnly(2023, 04, 05)));
+                .WithItem(person!.Trn!, laCode1, establishmentNumber1, postcode1, new DateOnly(2023, 02, 03), new DateOnly(2024, 03, 30), new DateOnly(2024, 04, 25))
+                .WithItem(person!.Trn!, laCode1, establishmentNumber2, postcode2, new DateOnly(2023, 04, 05), new DateOnly(2024, 03, 30), new DateOnly(2024, 04, 25)));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -175,9 +187,10 @@ public class TpsCsvExtractProcessorTests
         var person = await TestData.CreatePerson();
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
-        var existingPersonEmployment = await TestData.CreatePersonEmployment(person.PersonId, establishment1.EstablishmentId, new DateOnly(2023, 02, 02), EmploymentType.FullTime);
-        var updatedEndDate = new DateOnly(2024, 03, 06);
-        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate));
+        var existingPersonEmployment = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25));
+        var updatedEndDate = new DateOnly(2024, 03, 30);
+        var updatedLastExtractDate = new DateOnly(2024, 04, 25);
+        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate, updatedLastExtractDate));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -190,7 +203,8 @@ public class TpsCsvExtractProcessorTests
         var items = await dbContext.TpsCsvExtractItems.Where(i => i.TpsCsvExtractId == tpsCsvExtractId).ToListAsync();
         Assert.All(items, i => Assert.Equal(TpsCsvExtractItemResult.ValidDataUpdated, i.Result));
         var updatedPersonEmployment = await dbContext.PersonEmployments.SingleAsync(e => e.PersonEmploymentId == existingPersonEmployment.PersonEmploymentId);
-        Assert.Equal(updatedEndDate, updatedPersonEmployment.EndDate);
+        Assert.Equal(updatedEndDate, updatedPersonEmployment.LastKnownEmployedDate);
+        Assert.Equal(updatedLastExtractDate, updatedPersonEmployment.LastExtractDate);
     }
 
     [Fact]
@@ -200,9 +214,8 @@ public class TpsCsvExtractProcessorTests
         var person = await TestData.CreatePerson();
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
-        var existingPersonEmployment = await TestData.CreatePersonEmployment(person.PersonId, establishment1.EstablishmentId, new DateOnly(2023, 02, 02), EmploymentType.FullTime);
-        var updatedEndDate = new DateOnly(2024, 03, 06);
-        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, existingPersonEmployment.StartDate, existingPersonEmployment.EndDate, "FT"));
+        var existingPersonEmployment = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25));
+        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, existingPersonEmployment.StartDate, existingPersonEmployment.LastKnownEmployedDate, existingPersonEmployment.LastExtractDate, "FT"));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -223,7 +236,7 @@ public class TpsCsvExtractProcessorTests
         var person = await TestData.CreatePerson();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "127", establishmentNumber: "1238", establishmentStatusCode: 2); // Closed
         var establishment2 = await TestData.CreateEstablishment(localAuthorityCode: "127", establishmentNumber: "1238", establishmentStatusCode: 1); // Open
-        var existingPersonEmployment = await TestData.CreatePersonEmployment(person.PersonId, establishment1.EstablishmentId, new DateOnly(2023, 02, 02), EmploymentType.FullTime);
+        var existingPersonEmployment = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -235,6 +248,33 @@ public class TpsCsvExtractProcessorTests
         using var dbContext = TestData.DbContextFactory.CreateDbContext();
         var updatedPersonEmployment = await dbContext.PersonEmployments.SingleAsync(e => e.PersonEmploymentId == existingPersonEmployment.PersonEmploymentId);
         Assert.Equal(establishment2.EstablishmentId, updatedPersonEmployment.EstablishmentId);
+    }
+
+    [Fact]
+    public async Task ProcessEndedEmployments_WithLastKnownEmployedDateGreaterThanThreeMonthsBeforeLastExtractDate_SetsEndDateOnPersonEmploymentRecord()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "128", establishmentNumber: "1239");
+        var establishment2 = await TestData.CreateEstablishment(localAuthorityCode: "128", establishmentNumber: "1240");
+        var extractDate = new DateOnly(2024, 04, 25);
+        var lastKnownEmployedDateWithinThreeMonthsOfExtractDate = new DateOnly(2024, 02, 29);
+        var lastKnownEmployedDateOutsideThreeMonthsOfExtractDate = new DateOnly(2023, 09, 30);
+        var personEmploymentWhichHasEnded = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), lastKnownEmployedDateOutsideThreeMonthsOfExtractDate, EmploymentType.FullTime, extractDate);
+        var personEmploymentWhichHasNotEnded = await TestData.CreatePersonEmployment(person, establishment2, new DateOnly(2023, 02, 02), lastKnownEmployedDateWithinThreeMonthsOfExtractDate, EmploymentType.FullTime, extractDate);
+
+        // Act
+        var processor = new TpsCsvExtractProcessor(
+            TestData.DbContextFactory,
+            TestData.Clock);
+        await processor.ProcessEndedEmployments(CancellationToken.None);
+
+        // Assert
+        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        var updatedPersonEmploymentWhichShouldHaveEndDateSet = await dbContext.PersonEmployments.SingleAsync(e => e.PersonEmploymentId == personEmploymentWhichHasEnded.PersonEmploymentId);
+        var updatedPersonEmploymentWhichShouldNotHaveEndDateSet = await dbContext.PersonEmployments.SingleAsync(e => e.PersonEmploymentId == personEmploymentWhichHasNotEnded.PersonEmploymentId);
+        Assert.Equal(lastKnownEmployedDateOutsideThreeMonthsOfExtractDate, updatedPersonEmploymentWhichShouldHaveEndDateSet.EndDate);
+        Assert.Null(updatedPersonEmploymentWhichShouldNotHaveEndDateSet.EndDate);
     }
 
     private DbFixture DbFixture { get; }

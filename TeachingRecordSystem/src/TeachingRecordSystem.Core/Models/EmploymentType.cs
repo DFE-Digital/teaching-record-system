@@ -4,7 +4,8 @@ public enum EmploymentType
 {
     FullTime = 0,
     PartTimeRegular = 1,
-    PartTimeIrregular = 2
+    PartTimeIrregular = 2,
+    PartTime = 3
 }
 
 public static class EmploymentTypeHelper
@@ -16,6 +17,7 @@ public static class EmploymentTypeHelper
             "FT" => EmploymentType.FullTime,
             "PTR" => EmploymentType.PartTimeRegular,
             "PTI" => EmploymentType.PartTimeIrregular,
+            "PT" => EmploymentType.PartTime,
             _ => throw new ArgumentOutOfRangeException(nameof(fullOrPartTimeIndicator))
         };
     }

@@ -14,6 +14,8 @@ public class PersonEmploymentMapping : IEntityTypeConfiguration<PersonEmployment
         builder.Property(e => e.EmploymentType).IsRequired();
         builder.Property(e => e.CreatedOn).IsRequired();
         builder.Property(e => e.UpdatedOn).IsRequired();
+        builder.Property(x => x.Key).HasMaxLength(50).IsRequired();
+        builder.HasIndex(x => x.Key).HasDatabaseName(PersonEmployment.KeyIndexName);
         builder.HasIndex(e => e.PersonId).HasDatabaseName(PersonEmployment.PersonIdIndexName);
         builder.HasIndex(e => e.EstablishmentId).HasDatabaseName(PersonEmployment.EstablishmentIdIndexName);
         builder.HasOne<Person>().WithMany().HasForeignKey(e => e.PersonId).HasConstraintName("fk_person_employments_person_id");

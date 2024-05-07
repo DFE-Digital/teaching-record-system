@@ -1,28 +1,36 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;
 
 namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
     public async Task<PersonEmployment> CreatePersonEmployment(
-        Guid personId,
-        Guid establishmentId,
+        CreatePersonResult person,
+        Establishment establishment,
         DateOnly startDate,
+        DateOnly lastKnownEmployedDate,
         EmploymentType employmentType,
+        DateOnly lastExtractDate,
         DateOnly? endDate = null)
     {
+        var key = $"{person.Trn}.{establishment.LaCode}.{establishment.EstablishmentNumber}.{startDate:yyyyMMdd}";
+
         var personEmployment = await WithDbContext(async dbContext =>
         {
             var personEmployment = new PersonEmployment
             {
                 PersonEmploymentId = Guid.NewGuid(),
-                PersonId = personId,
-                EstablishmentId = establishmentId,
+                PersonId = person.PersonId,
+                EstablishmentId = establishment.EstablishmentId,
                 StartDate = startDate,
                 EndDate = endDate,
                 EmploymentType = employmentType,
+                LastKnownEmployedDate = lastKnownEmployedDate,
+                LastExtractDate = lastExtractDate,
                 CreatedOn = Clock.UtcNow,
-                UpdatedOn = Clock.UtcNow
+                UpdatedOn = Clock.UtcNow,
+                Key = key
             };
 
             dbContext.PersonEmployments.Add(personEmployment);

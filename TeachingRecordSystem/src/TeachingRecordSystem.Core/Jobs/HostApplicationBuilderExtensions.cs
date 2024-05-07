@@ -118,6 +118,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<ProcessEndedEmploymentsJob>(
+                    nameof(ProcessEndedEmploymentsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }

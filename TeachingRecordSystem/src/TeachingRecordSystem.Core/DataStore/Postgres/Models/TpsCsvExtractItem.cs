@@ -8,6 +8,7 @@ public class TpsCsvExtractItem
     public const string TpsCsvExtractForeignKeyName = "fk_tps_csv_extract_items_tps_csv_extract_id";
     public const string TpsCsvExtractLoadItemIdIndexName = "ix_tps_csv_extract_items_tps_csv_extract_load_item_id";
     public const string TpsCsvExtractLoadItemIdForeignKeyName = "fk_tps_csv_extract_items_tps_csv_extract_load_item_id";
+    public const string KeyIndexName = "ix_tps_csv_extract_items_key";
 
     public required Guid TpsCsvExtractItemId { get; set; }
     public required Guid TpsCsvExtractId { get; set; }
@@ -31,4 +32,5 @@ public class TpsCsvExtractItem
     public required DateOnly ExtractDate { get; set; }
     public required DateTime Created { get; set; }
     public required TpsCsvExtractItemResult? Result { get; set; }
+    public required string Key { get; set; }
 }
