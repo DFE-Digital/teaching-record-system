@@ -96,13 +96,23 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 {
                     StartDate = induction.dfeta_StartDate,
                     CompletionDate = induction.dfeta_CompletionDate,
-                    InductionStatusName = induction.FormattedValues.ContainsKey(dfeta_induction.Fields.dfeta_InductionStatus) ?
-                        induction.FormattedValues[dfeta_induction.Fields.dfeta_InductionStatus] :
+                    InductionStatusName = teacher.FormattedValues.ContainsKey(Contact.Fields.dfeta_InductionStatus) ?
+                        teacher.FormattedValues[Contact.Fields.dfeta_InductionStatus] :
                         null,
                     State = induction.StateCode.Value,
                     StateName = induction.FormattedValues[dfeta_induction.Fields.StateCode]
                 } :
-                null;
+                teacher.dfeta_qtlsdate.HasValue ?
+                    new Induction()
+                    {
+                        StartDate = induction.dfeta_StartDate,
+                        CompletionDate = induction.dfeta_CompletionDate,
+                        InductionStatusName = teacher.FormattedValues.ContainsKey(Contact.Fields.dfeta_InductionStatus) ?
+                            teacher.FormattedValues[Contact.Fields.dfeta_InductionStatus] :
+                            null,
+                        State = induction.StateCode.Value,
+                        StateName = induction.FormattedValues[dfeta_induction.Fields.StateCode]
+                    } : null;
         }
 
         QualifiedTeacherStatus MapQualifiedTeacherStatus()
