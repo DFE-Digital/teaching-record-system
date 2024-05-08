@@ -40,7 +40,7 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
         {
             x.WithQts(new DateOnly(2021, 01, 1));
-            x.WithInduction(inductionStatus: dfeta_InductionStatus.Pass, inductionExemptionReason: null, null, null, null);
+            x.WithInduction(inductionStatus: dfeta_InductionStatus.Pass, inductionExemptionReason: null, null, null, null, null, null);
         });
 
         // Act
@@ -65,7 +65,7 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
         {
             x.WithQts(new DateOnly(2021, 01, 1));
-            x.WithInduction(inductionStatus: dfeta_InductionStatus.Pass, inductionExemptionReason: null, startDate: new DateOnly(2021, 01, 01), endDate: new DateOnly(2022, 01, 01), appropriateBodyOrgId: establishment1.AccountId);
+            x.WithInduction(inductionStatus: dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionPeriodStartDate: new DateOnly(2021, 01, 01), completedDate: new DateOnly(2022, 01, 01), inductionStartDate: new DateOnly(2021, 01, 01), inductionPeriodEndDate: new DateOnly(2022, 01, 01), appropriateBodyOrgId: establishment1.AccountId);
         });
 
         // Act
@@ -108,7 +108,7 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         {
             x.WithQts(new DateOnly(2021, 01, 1));
             x.WithQtlsDate(qtlsDate);
-            x.WithInduction(inductionStatus: inductionStatus, inductionExemptionReason: exemptionReason, startDate: new DateOnly(2021, 01, 01), endDate: new DateOnly(2022, 01, 01), appropriateBodyOrgId: establishment1.AccountId);
+            x.WithInduction(inductionStatus: inductionStatus, inductionExemptionReason: exemptionReason, inductionStartDate: new DateOnly(2021, 01, 01), completedDate: new DateOnly(2022, 01, 01), inductionPeriodStartDate: new DateOnly(2021, 01, 01), inductionPeriodEndDate: new DateOnly(2022, 01, 01), appropriateBodyOrgId: establishment1.AccountId);
         });
 
         // Act
@@ -175,7 +175,7 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
         {
             x.WithQts(qtlsDate);
-            x.WithInduction(inductionStatus, exemptionReason, null, null, null);
+            x.WithInduction(inductionStatus, exemptionReason, null, null, null, null, null);
         });
 
         // Act

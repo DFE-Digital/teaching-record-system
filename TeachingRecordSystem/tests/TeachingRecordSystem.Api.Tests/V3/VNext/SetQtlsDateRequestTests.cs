@@ -227,7 +227,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null)
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
 
@@ -260,7 +260,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -289,7 +289,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null)); ;
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)); ;
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -325,7 +325,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -356,7 +356,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null)
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
@@ -389,7 +389,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -422,7 +422,7 @@ public class SetQtlsDateRequestTests : TestBase
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
             .WithQtlsDate(existingQtlsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, account.AccountId));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, account.AccountId));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -453,7 +453,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, account.AccountId));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, account.AccountId));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -483,7 +483,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -516,7 +516,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null)
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
@@ -549,7 +549,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -582,7 +582,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null)
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
@@ -615,7 +615,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -652,7 +652,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null)
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
@@ -689,7 +689,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -722,7 +722,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null)
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
@@ -755,7 +755,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
@@ -792,7 +792,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null)
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
@@ -982,7 +982,7 @@ public class SetQtlsDateRequestTests : TestBase
         var qtlsDate = !string.IsNullOrEmpty(incomingQtls) ? DateOnly.Parse(incomingQtls) : default(DateOnly?);
         var existingContact = await TestData.CreatePerson(p => p
             .WithTrn(hasTrn: true)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: existingInductionExemptionReason, null, null, null));
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: existingInductionExemptionReason, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { QTSDate = qtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")

@@ -76,6 +76,20 @@ public class UpdateInductionStatusPlugin : IPlugin
                 }
             });
 
+
+        context.RegisterPluginStep<UpdateInductionStatusPlugin>(
+            new PluginStepDefinition()
+            {
+                EntityLogicalName = Contact.EntityLogicalName,
+                MessageName = "Create",
+                Stage = ProcessingStepStage.Postoperation,
+                ImagesDefinitions = new List<IPluginImageDefinition>() { contactPostImage },
+                FilteringAttributes = new string[]
+                {
+                            Contact.Fields.dfeta_qtlsdate
+                }
+            });
+
         context.RegisterPluginStep<UpdateInductionStatusPlugin>(
             new PluginStepDefinition()
             {
@@ -181,80 +195,7 @@ public class UpdateInductionStatusPlugin : IPlugin
             return;
         }
 
-        //    Entity preImageEnt = context.PreEntityImages[preImageAlias];
-        //    if (preImageEnt.Contains(Induction.Attributes.PersonId))
-        //    {
-        //        if (preImageEnt[Induction.Attributes.PersonId] != null)
-        //        {
-        //            Guid personId = ((EntityReference)preImageEnt[Induction.Attributes.PersonId]).Id;
-        //            if (context.MessageName == "Delete")
-        //            {
-        //                //triggered from inductionstatus deleted - needs to recompute induction status
-        //                var qtlsDate = this.GetContactQTLSDate(orgService, personId);
-        //                OptionSetValue derivedInductionStatus = this.CalculateInductionStation(qtlsDate, null);
-        //                if (derivedInductionStatus != null)
-        //                    Person.SetIndutionStatus(orgService, personId, derivedInductionStatus?.Value);
-        //                else
-        //                    Person.SetIndutionStatus(orgService, personId, null);
-        //                return;
-        //            }
 
-        //            if (context.InputParameters.Contains("Target") && context.InputParameters["Target"] is Entity)
-        //            {
-        //                Entity entity = (Entity)context.InputParameters["Target"];
-        //                if (entity.Attributes.Contains("statecode"))
-        //                {
-        //                    OptionSetValue state = entity.GetAttributeValue<OptionSetValue>("statecode");
-        //                    if (state.Value == 1)
-        //                        Person.SetIndutionStatus(orgService, personId, null);
-        //                }
-        //                else
-        //                {
-        //                    //triggered from update to InductionStatus.InductionStatus
-        //                    var qtlsDate = this.GetContactQTLSDate(orgService, personId);
-        //                    var existingInductionStatus = entity.GetAttributeValue<OptionSetValue>(Induction.Attributes.InductionStatus);
-        //                    if (existingInductionStatus != null)
-        //                    {
-        //                        OptionSetValue derivedInductionStatus = this.CalculateInductionStation(qtlsDate, existingInductionStatus);
-        //                        Person.SetIndutionStatus(orgService, personId, derivedInductionStatus.Value);
-        //                    }
-        //                }
-        //                return;
-        //            }
-        //        }
-        //    }
-        //}
-        //else if (context.PostEntityImages != null && context.PostEntityImages.Contains(postImageInductionAlias))
-        //{
-        //    //triggered on newly created inductionstatus
-        //    Entity postImageEnt = context.PostEntityImages[postImageInductionAlias];
-        //    Guid personId = ((EntityReference)postImageEnt[Induction.Attributes.PersonId]).Id;
-        //    var qtlsDate = this.GetContactQTLSDate(orgService, personId);
-        //    var existingInductionStatus = postImageEnt.GetAttributeValue<OptionSetValue>(Induction.Attributes.InductionStatus);
-        //    if (existingInductionStatus != null)
-        //    {
-        //        OptionSetValue derivedInductionStatus = this.CalculateInductionStation(qtlsDate, existingInductionStatus);
-        //        Person.SetIndutionStatus(orgService, personId, derivedInductionStatus.Value);
-        //    }
-        //    return;
-        //}
-        //else if (context.PostEntityImages != null && context.PostEntityImages.Contains(postImageContactAlias))
-        //{
-        //    //Triggered on updates to contact.dfeta_qtlsdate
-        //    Entity postImageEnt = context.PostEntityImages[postImageContactAlias];
-        //    if (postImageEnt.Contains(Person.Attributes.ID))
-        //    {
-        //        var personId = postImageEnt.GetAttributeValue<Guid>(Person.Attributes.ID);
-        //        var qtlsDate = postImageEnt.GetAttributeValue<DateTime?>(Person.Attributes.QTLSDate);
-        //        var inductionStatus = this.GetContactInductionStatus(orgService, personId);
-        //        OptionSetValue derivedInductionStatus = this.CalculateInductionStation(qtlsDate, inductionStatus);
-        //        if (derivedInductionStatus != null)
-        //            Person.SetIndutionStatus(orgService, personId, derivedInductionStatus?.Value);
-        //        else
-        //            Person.SetIndutionStatus(orgService, personId, null);
-        //    }
-        //    return;
-        //}
     }
 
     private OptionSetValue? GetContactInductionStatus(IOrganizationService orgService, Guid personId)
