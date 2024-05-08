@@ -104,23 +104,23 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithInduction(dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? startDate, DateOnly? endDate, Guid? appropriateBodyOrgId)
+        public CreatePersonBuilder WithInduction(dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? inductionStartDate, DateOnly? completedDate, DateOnly? inductionPeriodStartDate, DateOnly? inductionPeriodEndDate, Guid? appropriateBodyOrgId)
         {
             var inductionId = Guid.NewGuid();
             if (inductionStatus == dfeta_InductionStatus.Exempt && inductionExemptionReason == null)
             {
                 throw new InvalidOperationException("WithInduction must provide InductionExemptionReason if InductionStatus is Exempt");
             }
-            _inductions.Add(new Induction(inductionId, inductionStatus, inductionExemptionReason));
+            _inductions.Add(new Induction(inductionId, inductionStatus, inductionExemptionReason, inductionStartDate, completedDate));
 
             //inductionPeriod is optional
-            if (!appropriateBodyOrgId.HasValue && startDate.HasValue || !appropriateBodyOrgId.HasValue && endDate.HasValue)
+            if (!appropriateBodyOrgId.HasValue && inductionPeriodStartDate.HasValue || !appropriateBodyOrgId.HasValue && inductionPeriodEndDate.HasValue)
             {
                 throw new InvalidOperationException("WithInductionPeriod must be associated with an appropriate body");
             }
             if (appropriateBodyOrgId.HasValue)
             {
-                _inductionPeriods.Add(new InductionPeriod(inductionId, startDate, endDate, appropriateBodyOrgId!.Value));
+                _inductionPeriods.Add(new InductionPeriod(inductionId, inductionPeriodStartDate, inductionPeriodEndDate, appropriateBodyOrgId!.Value));
             }
             return this;
         }
@@ -445,6 +445,8 @@ public partial class TestData
                         dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
                         dfeta_InductionStatus = induction.inductionStatus,
                         dfeta_InductionExemptionReason = induction.inductionExemptionReason,
+                        dfeta_StartDate = induction.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+                        dfeta_CompletionDate = induction.CompletetionDate.ToDateTimeWithDqtBstFix(isLocalTime: false)
                     }
                 });
             }
@@ -540,7 +542,8 @@ public partial class TestData
                 EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 Sanctions = [.. _sanctions],
                 MandatoryQualifications = [.. mqs.Select(t => t)],
-                Inductions = [.. _inductions]
+                Inductions = [.. _inductions],
+                InductionPeriods = [.. _inductionPeriods]
             };
         }
     }
@@ -775,9 +778,10 @@ public partial class TestData
         public required IReadOnlyCollection<Sanction> Sanctions { get; init; }
         public required IReadOnlyCollection<MandatoryQualificationInfo> MandatoryQualifications { get; init; }
         public required IReadOnlyCollection<Induction> Inductions { get; init; }
+        public required IReadOnlyCollection<InductionPeriod> InductionPeriods { get; init; }
     }
 
-    public record Induction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason);
+    public record Induction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? StartDate, DateOnly? CompletetionDate);
     public record InductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId);
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);
