@@ -208,11 +208,18 @@ public class Program
         services.AddMemoryCache();
         services.AddSingleton<AddTrnToSentryScopeResourceFilter>();
 
-        services.AddHttpClient("EvidenceFiles", client =>
-        {
-            client.MaxResponseContentBufferSize = 5 * 1024 * 1024;  // 5MB
-            client.Timeout = TimeSpan.FromSeconds(30);
-        });
+        builder.Services.AddOptions<EvidenceFilesOptions>()
+            .Bind(builder.Configuration.GetSection("EvidenceFiles"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        services
+            .AddTransient<DownloadEvidenceFilesFromBlobStorageHttpHandler>()
+            .AddHttpClient("EvidenceFiles", client =>
+            {
+                client.MaxResponseContentBufferSize = 5 * 1024 * 1024;  // 5MB
+                client.Timeout = TimeSpan.FromSeconds(30);
+            })
+            .AddHttpMessageHandler<DownloadEvidenceFilesFromBlobStorageHttpHandler>();
 
         builder
             .AddBlobStorage()
