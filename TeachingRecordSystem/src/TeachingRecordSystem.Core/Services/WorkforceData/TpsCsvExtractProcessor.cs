@@ -8,6 +8,8 @@ public class TpsCsvExtractProcessor(
     IDbContextFactory<TrsDbContext> dbContextFactory,
     IClock clock)
 {
+    private const string TempEventsTableSuffix = "tps_extract_events";
+
     public async Task ProcessNonMatchingTrns(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
         int i = 0;
@@ -92,9 +94,9 @@ public class TpsCsvExtractProcessor(
 
     public async Task ProcessNewEmploymentHistory(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
-        using var readDbContext = dbContextFactory.CreateDbContext();
-        readDbContext.Database.SetCommandTimeout(600);
-        using var writeDbContext = dbContextFactory.CreateDbContext();
+        using var dbContext = dbContextFactory.CreateDbContext();
+        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
+        await connection.OpenAsync(cancellationToken);
 
         FormattableString querySql =
             $"""
@@ -119,300 +121,275 @@ public class TpsCsvExtractProcessor(
                         establishments) e
                     WHERE
                         e.row_number = 1
-            )
-            SELECT
-                x.tps_csv_extract_item_id,
-                x.trn,
-                x.local_authority_code,
-                x.establishment_number,
-                p.person_id,
-                e.establishment_id,
-                x.employment_start_date as start_date,
-                x.employment_end_date as last_known_employed_date,
-                x.employment_type,
-                x.extract_date as last_extract_date,
-                x.key
-            FROM
+            ),
+            update_extract_items AS (
+                SELECT
+                    x.tps_csv_extract_item_id,
+                    gen_random_uuid() as person_employment_id,
+                    p.person_id,
+                    e.establishment_id,
+                    x.employment_start_date as start_date,
+                    x.employment_end_date as last_known_employed_date,
+                    x.employment_type,
+                    x.extract_date as last_extract_date,
+                    x.key
+                FROM
+                        tps_csv_extract_items x
+                    JOIN
+                        persons p ON x.trn = p.trn
+                    JOIN
+                        unique_establishments e ON x.local_authority_code = e.la_code
+                            AND (x.establishment_number = e.establishment_number
+                                 OR (e.establishment_type_code = '29' 
+                                     AND x.establishment_postcode = e.postcode
+                                     AND NOT EXISTS (SELECT
+                                                         1
+                                                     FROM
+                                                         unique_establishments e2
+                                                     WHERE
+                                                         e2.la_code = x.local_authority_code
+                                                         AND e2.establishment_number = x.establishment_number)))
+                WHERE
+                    x.tps_csv_extract_id = {tpsCsvExtractId}
+                    AND x.result IS NULL
+                    AND NOT EXISTS (SELECT
+                                        1
+                                    FROM
+                                        person_employments pe
+                                    WHERE
+                                        pe.key = x.key)
+                LIMIT 1000
+            ),
+            new_person_employments AS (
+                UPDATE
                     tps_csv_extract_items x
-                JOIN
-                    persons p ON x.trn = p.trn
-                JOIN
-                    unique_establishments e ON x.local_authority_code = e.la_code
-                        AND (x.establishment_number = e.establishment_number
-                             OR (e.establishment_type_code = '29' 
-                                 AND x.establishment_postcode = e.postcode
-                                 AND NOT EXISTS (SELECT
-                                                     1
-                                                 FROM
-                                                     unique_establishments e2
-                                                 WHERE
-                                                     e2.la_code = x.local_authority_code
-                                                     AND e2.establishment_number = x.establishment_number)))
-            WHERE
-                x.tps_csv_extract_id = {tpsCsvExtractId}
-                AND x.result IS NULL
-                AND NOT EXISTS (SELECT
-                                    1
-                                FROM
-                                    person_employments pe
-                                WHERE
-                                    pe.key = x.key)
+                SET
+                    result = 1
+                FROM
+                    update_extract_items u
+                WHERE
+                    x.tps_csv_extract_item_id = u.tps_csv_extract_item_id
+                RETURNING
+                    u.person_employment_id,
+                    u.person_id,
+                    u.establishment_id,
+                    u.start_date,
+                    u.employment_type,
+                    u.last_extract_date,
+                    u.last_known_employed_date,
+                    u.key
+            )
+            INSERT INTO person_employments
+                (
+                    person_employment_id,
+                    person_id,
+                    establishment_id,
+                    start_date,
+                    employment_type,
+                    last_extract_date,
+                    last_known_employed_date,
+                    key,
+                    created_on,
+                    updated_on
+                )
+            SELECT
+                *,
+                {clock.UtcNow} as created_on,
+                {clock.UtcNow} as updated_on
+            FROM
+                new_person_employments
+            RETURNING
+                person_employment_id,
+                person_id,
+                establishment_id,
+                start_date,
+                employment_type,
+                last_extract_date,
+                last_known_employed_date,
+                key,
+                created_on,
+                updated_on
             """;
 
-        int i = 0;
-        var processedExtractItemIds = new List<Guid>();
-        await foreach (var item in readDbContext.Database.SqlQuery<NewPersonEmployment>(querySql).AsAsyncEnumerable())
+        bool hasRecordsToUpdate = false;
+        var events = new List<EventBase>();
+
+        do
         {
-            var personEmployment = new PersonEmployment
+            hasRecordsToUpdate = false;
+            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            dbContext.Database.UseTransaction(transaction);
+            await foreach (var item in dbContext.Database.SqlQuery<NewPersonEmployment>(querySql).AsAsyncEnumerable())
             {
-                PersonEmploymentId = Guid.NewGuid(),
-                PersonId = item.PersonId,
-                EstablishmentId = item.EstablishmentId,
-                StartDate = item.StartDate,
-                EndDate = null,
-                LastKnownEmployedDate = item.LastKnownEmployedDate,
-                LastExtractDate = item.LastExtractDate,
-                EmploymentType = item.EmploymentType,
-                CreatedOn = clock.UtcNow,
-                UpdatedOn = clock.UtcNow,
-                Key = item.Key
-            };
+                hasRecordsToUpdate = true;
+                var personEmployment = new PersonEmployment
+                {
+                    PersonEmploymentId = item.PersonEmploymentId,
+                    PersonId = item.PersonId,
+                    EstablishmentId = item.EstablishmentId,
+                    StartDate = item.StartDate,
+                    EndDate = null,
+                    LastKnownEmployedDate = item.LastKnownEmployedDate,
+                    LastExtractDate = item.LastExtractDate,
+                    EmploymentType = item.EmploymentType,
+                    CreatedOn = item.CreatedOn,
+                    UpdatedOn = item.UpdatedOn,
+                    Key = item.Key
+                };
 
-            writeDbContext.PersonEmployments.Add(personEmployment);
-            writeDbContext.AddEvent(new PersonEmploymentCreatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                PersonId = item.PersonId,
-                PersonEmployment = Core.Events.Models.PersonEmployment.FromModel(personEmployment),
-                CreatedUtc = clock.UtcNow,
-                RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
-            });
+                var createdEvent = new PersonEmploymentCreatedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    PersonId = item.PersonId,
+                    PersonEmployment = Core.Events.Models.PersonEmployment.FromModel(personEmployment),
+                    CreatedUtc = clock.UtcNow,
+                    RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                };
 
-            processedExtractItemIds.Add(item.TpsCsvExtractItemId);
-
-            i++;
-            if (i % 1000 == 0)
-            {
-                await SaveChanges();
+                events.Add(createdEvent);
             }
-        }
 
-        if (writeDbContext.ChangeTracker.HasChanges())
-        {
-            await SaveChanges();
+            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            events.Clear();
         }
-
-        async Task SaveChanges()
-        {
-            await writeDbContext.SaveChangesAsync(cancellationToken);
-
-            FormattableString updateSql =
-                $"""
-                UPDATE
-                    tps_csv_extract_items
-                SET
-                    result = {TpsCsvExtractItemResult.ValidDataAdded}
-                WHERE
-                    tps_csv_extract_item_id = ANY ({processedExtractItemIds})
-                """;
-            await writeDbContext.Database.ExecuteSqlAsync(updateSql, cancellationToken);
-            processedExtractItemIds!.Clear();
-        }
+        while (hasRecordsToUpdate);
     }
 
     public async Task ProcessUpdatedEmploymentHistory(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
-        using var readDbContext = dbContextFactory.CreateDbContext();
-        readDbContext.Database.SetCommandTimeout(600);
-        using var writeDbContext = dbContextFactory.CreateDbContext();
-        var connection = (NpgsqlConnection)writeDbContext.Database.GetDbConnection();
-        await connection.OpenAsync(CancellationToken.None);
+        using var dbContext = dbContextFactory.CreateDbContext();
+        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
+        await connection.OpenAsync(cancellationToken);
 
         FormattableString querySql =
             $"""
-            WITH unique_establishments AS (
+            WITH extract_items AS (
                 SELECT
-                    establishment_id,
-                    la_code,
-                    establishment_number,
-                    establishment_name,
-                    establishment_type_code,
-                    postcode
+                    x.tps_csv_extract_item_id,
+                    pe.person_employment_id,
+                    pe.employment_type as current_employment_type,
+                    pe.last_known_employed_date as current_last_known_employed_date,
+                    pe.last_extract_date as current_last_extract_date,                
+                    x.employment_type as new_employment_type,
+                    x.employment_end_date as new_last_known_employed_date,
+                    x.extract_date as new_last_extract_date,
+                    x.key,
+                    CASE WHEN pe.employment_type != x.employment_type OR pe.last_known_employed_date != x.employment_end_date OR pe.last_extract_date != x.extract_date THEN 2 ELSE 0 END as result
                 FROM
-                    (SELECT
-                        establishment_id,
-                        la_code,
-                        establishment_number,
-                        establishment_name,
-                        establishment_type_code,
-                        postcode,
-                        ROW_NUMBER() OVER (PARTITION BY la_code, establishment_number, CASE WHEN establishment_number IS NULL THEN postcode ELSE NULL END ORDER BY translate(establishment_status_code::text, '1234', '1324'), urn desc) as row_number
-                    FROM
-                        establishments) e
+                        tps_csv_extract_items x
+                    JOIN
+                        person_employments pe ON pe.key = x.key
                 WHERE
-                    e.row_number = 1
+                    x.tps_csv_extract_id = {tpsCsvExtractId}
+                    AND x.result IS NULL
+                LIMIT 1000),
+            changes AS (
+                UPDATE
+                    tps_csv_extract_items x
+                SET
+                    result = u.result
+                FROM
+                    extract_items u
+                WHERE
+                    x.tps_csv_extract_item_id = u.tps_csv_extract_item_id
+                RETURNING
+                    u.person_employment_id,
+                    u.current_employment_type,
+                    u.current_last_known_employed_date,
+                    u.current_last_extract_date,
+                    u.new_employment_type,
+                    u.new_last_known_employed_date,
+                    u.new_last_extract_date
             )
-            SELECT
-                x.tps_csv_extract_item_id,
+            UPDATE
+                person_employments pe
+            SET
+                employment_type = changes.new_employment_type,
+                last_known_employed_date = changes.new_last_known_employed_date,
+                last_extract_date = changes.new_last_extract_date,
+                updated_on = {clock.UtcNow}
+            FROM
+                changes
+            WHERE
+                changes.person_employment_id = pe.person_employment_id
+            RETURNING
                 pe.person_employment_id,
                 pe.person_id,
                 pe.establishment_id,
                 pe.start_date,
                 pe.end_date,
-                pe.employment_type as current_employment_type,
-                pe.last_known_employed_date as current_last_known_employed_date,
-                pe.last_extract_date as current_last_extract_date,                
-                x.employment_type,
-                x.employment_end_date as last_known_employed_date,
-                x.extract_date as last_extract_date,
-                x.key
-            FROM
-                    tps_csv_extract_items x
-                JOIN
-                    persons p ON x.trn = p.trn
-                JOIN
-                    person_employments pe ON pe.key = x.key
-            WHERE
-                x.tps_csv_extract_id = {tpsCsvExtractId}
-                AND x.result IS NULL
+                changes.current_employment_type,
+                changes.current_last_known_employed_date,
+                changes.current_last_extract_date,
+                changes.new_employment_type,
+                changes.new_last_known_employed_date,
+                changes.new_last_extract_date,
+                pe.key
             """;
 
-        var updatedExtractItemIds = new List<Guid>();
-        var noChangeExtractItemIds = new List<Guid>();
-        var batchCommands = new List<NpgsqlBatchCommand>();
+        bool hasRecordsToUpdate = false;
+        var events = new List<EventBase>();
 
-        await foreach (var item in readDbContext.Database.SqlQuery<UpdatedPersonEmployment>(querySql).AsAsyncEnumerable())
+        do
         {
-            var changes = PersonEmploymentUpdatedEventChanges.None |
-                (item.CurrentEmploymentType != item.EmploymentType ? PersonEmploymentUpdatedEventChanges.EmploymentType : PersonEmploymentUpdatedEventChanges.None) |
-                (item.CurrentLastKnownEmployedDate != item.LastKnownEmployedDate ? PersonEmploymentUpdatedEventChanges.LastKnownEmployedDate : PersonEmploymentUpdatedEventChanges.None) |
-                (item.CurrentLastExtractDate != item.LastExtractDate ? PersonEmploymentUpdatedEventChanges.LastExtractDate : PersonEmploymentUpdatedEventChanges.None);
-
-            if (changes != PersonEmploymentUpdatedEventChanges.None)
+            hasRecordsToUpdate = false;
+            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            dbContext.Database.UseTransaction(transaction);
+            await foreach (var item in dbContext.Database.SqlQuery<UpdatedPersonEmployment>(querySql).AsAsyncEnumerable())
             {
-                var formattedLastKnownEmployedDate = $"to_date('{item.LastKnownEmployedDate:yyyyMMdd}','YYYYMMDD')";
-                var formattedLastExtractDate = $"to_date('{item.LastExtractDate:yyyyMMdd}','YYYYMMDD')";
-                var updatePersonEmploymentsCommand = new NpgsqlBatchCommand(
-                    $"""
-                    UPDATE
-                        person_employments
-                    SET
-                        employment_type = {(int)item.EmploymentType},
-                        last_known_employed_date = {formattedLastKnownEmployedDate},
-                        last_extract_date = {formattedLastExtractDate},
-                        updated_on = now()
-                    WHERE
-                        person_employment_id = '{item.PersonEmploymentId}'
-                    """);
+                hasRecordsToUpdate = true;
+                var changes = PersonEmploymentUpdatedEventChanges.None |
+                    (item.CurrentEmploymentType != item.NewEmploymentType ? PersonEmploymentUpdatedEventChanges.EmploymentType : PersonEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentLastKnownEmployedDate != item.NewLastKnownEmployedDate ? PersonEmploymentUpdatedEventChanges.LastKnownEmployedDate : PersonEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentLastExtractDate != item.NewLastExtractDate ? PersonEmploymentUpdatedEventChanges.LastExtractDate : PersonEmploymentUpdatedEventChanges.None);
 
-                batchCommands.Add(updatePersonEmploymentsCommand);
-                writeDbContext.AddEvent(new PersonEmploymentUpdatedEvent
+                if (changes != PersonEmploymentUpdatedEventChanges.None)
                 {
-                    EventId = Guid.NewGuid(),
-                    PersonId = item.PersonEmploymentId,
-                    PersonEmployment = new()
+                    var updatedEvent = new PersonEmploymentUpdatedEvent
                     {
-                        PersonEmploymentId = item.PersonEmploymentId,
-                        PersonId = item.PersonId,
-                        EstablishmentId = item.EstablishmentId,
-                        StartDate = item.StartDate,
-                        EndDate = item.EndDate,
-                        EmploymentType = item.EmploymentType,
-                        LastKnownEmployedDate = item.LastKnownEmployedDate,
-                        LastExtractDate = item.LastExtractDate,
-                        Key = item.Key
-                    },
-                    OldPersonEmployment = new()
-                    {
-                        PersonEmploymentId = item.PersonEmploymentId,
-                        PersonId = item.PersonId,
-                        EstablishmentId = item.EstablishmentId,
-                        StartDate = item.StartDate,
-                        EndDate = item.EndDate,
-                        EmploymentType = item.CurrentEmploymentType,
-                        LastKnownEmployedDate = item.CurrentLastKnownEmployedDate,
-                        LastExtractDate = item.CurrentLastExtractDate,
-                        Key = item.Key
-                    },
-                    Changes = changes,
-                    CreatedUtc = clock.UtcNow,
-                    RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
-                });
+                        EventId = Guid.NewGuid(),
+                        PersonId = item.PersonEmploymentId,
+                        PersonEmployment = new()
+                        {
+                            PersonEmploymentId = item.PersonEmploymentId,
+                            PersonId = item.PersonId,
+                            EstablishmentId = item.EstablishmentId,
+                            StartDate = item.StartDate,
+                            EndDate = item.EndDate,
+                            EmploymentType = item.NewEmploymentType,
+                            LastKnownEmployedDate = item.NewLastKnownEmployedDate,
+                            LastExtractDate = item.NewLastExtractDate,
+                            Key = item.Key
+                        },
+                        OldPersonEmployment = new()
+                        {
+                            PersonEmploymentId = item.PersonEmploymentId,
+                            PersonId = item.PersonId,
+                            EstablishmentId = item.EstablishmentId,
+                            StartDate = item.StartDate,
+                            EndDate = item.EndDate,
+                            EmploymentType = item.CurrentEmploymentType,
+                            LastKnownEmployedDate = item.CurrentLastKnownEmployedDate,
+                            LastExtractDate = item.CurrentLastExtractDate,
+                            Key = item.Key
+                        },
+                        Changes = changes,
+                        CreatedUtc = clock.UtcNow,
+                        RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                    };
 
-                updatedExtractItemIds.Add(item.TpsCsvExtractItemId);
-                if (updatedExtractItemIds.Count == 1000)
-                {
-                    UpdateResult(updatedExtractItemIds, TpsCsvExtractItemResult.ValidDataUpdated);
-                    updatedExtractItemIds.Clear();
-                }
-            }
-            else
-            {
-                noChangeExtractItemIds.Add(item.TpsCsvExtractItemId);
-
-                if (noChangeExtractItemIds.Count == 1000)
-                {
-                    UpdateResult(noChangeExtractItemIds, TpsCsvExtractItemResult.ValidNoChange);
-                    noChangeExtractItemIds.Clear();
+                    events.Add(updatedEvent);
                 }
             }
 
-            if (batchCommands.Count == 50)
-            {
-                await SaveChanges();
-            }
+            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            events.Clear();
         }
-
-        if (updatedExtractItemIds.Any())
-        {
-            UpdateResult(updatedExtractItemIds, TpsCsvExtractItemResult.ValidDataUpdated);
-        }
-
-        if (noChangeExtractItemIds.Any())
-        {
-            UpdateResult(noChangeExtractItemIds, TpsCsvExtractItemResult.ValidNoChange);
-        }
-
-        if (batchCommands.Any())
-        {
-            await SaveChanges();
-        }
-
-        void UpdateResult(IEnumerable<Guid> extractItemIds, TpsCsvExtractItemResult result)
-        {
-            var formattedExtractItemIds = string.Join(", ", extractItemIds.Select(id => $"'{id}'"));
-            var updateResultCommand = new NpgsqlBatchCommand(
-                $"""
-                UPDATE
-                    tps_csv_extract_items
-                SET
-                    result = {(int)result}
-                WHERE
-                    tps_csv_extract_item_id = ANY (ARRAY[{formattedExtractItemIds}]::uuid[])
-                """);
-            batchCommands.Add(updateResultCommand);
-        }
-
-        async Task SaveChanges()
-        {
-            if (writeDbContext.ChangeTracker.HasChanges())
-            {
-                await writeDbContext.SaveChangesAsync(cancellationToken);
-            }
-
-            if (batchCommands.Count > 0)
-            {
-                using var batch = new NpgsqlBatch(connection);
-                foreach (var command in batchCommands)
-                {
-                    batch.BatchCommands.Add(command);
-                }
-
-                await batch.ExecuteNonQueryAsync(cancellationToken);
-                batchCommands.Clear();
-            }
-        }
+        while (hasRecordsToUpdate);
     }
+
 
     public async Task UpdateLatestEstablishmentVersions(CancellationToken cancellationToken)
     {
@@ -553,6 +530,7 @@ public class TpsCsvExtractProcessor(
             if (writeDbContext.ChangeTracker.HasChanges())
             {
                 await writeDbContext.SaveChangesAsync(cancellationToken);
+                writeDbContext.ChangeTracker.Clear();
             }
 
             if (batchCommands.Count > 0)
@@ -571,110 +549,97 @@ public class TpsCsvExtractProcessor(
 
     public async Task ProcessEndedEmployments(CancellationToken cancellationToken)
     {
-        using var readDbContext = dbContextFactory.CreateDbContext();
-        readDbContext.Database.SetCommandTimeout(300);
-        using var writeDbContext = dbContextFactory.CreateDbContext();
-        var connection = (NpgsqlConnection)writeDbContext.Database.GetDbConnection();
-        await connection.OpenAsync(CancellationToken.None);
+        using var dbContext = dbContextFactory.CreateDbContext();
+        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
+        await connection.OpenAsync(cancellationToken);
 
         FormattableString querySql =
             $"""
-            SELECT
-                person_employment_id,
-                person_id,
-                establishment_id,
-                start_date,
-                end_date as current_end_date,
-                employment_type,
-                last_known_employed_date,
-                last_extract_date,
-                key,
-                last_known_employed_date as end_date
+            WITH changes AS (
+               SELECT
+                    person_employment_id,
+                    end_date as current_end_date,
+                    last_known_employed_date as new_end_date
+                FROM
+                    person_employments
+                WHERE
+                    end_date IS NULL
+                    AND AGE(last_extract_date, last_known_employed_date) > INTERVAL '5 months'
+                LIMIT 1000
+            )
+            UPDATE
+                person_employments pe
+            SET
+                end_date = new_end_date,
+                updated_on = {clock.UtcNow}
             FROM
-                person_employments
+                changes 
             WHERE
-                end_date IS NULL
-                AND AGE(last_extract_date, last_known_employed_date) > INTERVAL '5 months'
+                pe.person_employment_id = changes.person_employment_id
+            RETURNING
+                pe.person_employment_id,
+                pe.person_id,
+                pe.establishment_id,
+                pe.start_date,
+                changes.current_end_date,
+                pe.employment_type,
+                pe.last_known_employed_date,
+                pe.last_extract_date,
+                pe.key,
+                changes.new_end_date
             """;
 
-        var batchCommands = new List<NpgsqlBatchCommand>();
+        bool hasRecordsToUpdate = false;
+        var events = new List<EventBase>();
 
-        await foreach (var item in readDbContext.Database.SqlQuery<UpdatedPersonEmploymentEndDate>(querySql).AsAsyncEnumerable())
+        do
         {
-            var updatePersonEmploymentsCommand = new NpgsqlBatchCommand(
-                $"""
-                    UPDATE
-                        person_employments
-                    SET
-                        end_date = last_known_employed_date,
-                        updated_on = now()
-                    WHERE
-                        person_employment_id = '{item.PersonEmploymentId}'
-                    """);
-
-            batchCommands.Add(updatePersonEmploymentsCommand);
-            writeDbContext.AddEvent(new PersonEmploymentUpdatedEvent
+            hasRecordsToUpdate = false;
+            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            dbContext.Database.UseTransaction(transaction);
+            await foreach (var item in dbContext.Database.SqlQuery<UpdatedPersonEmploymentEndDate>(querySql).AsAsyncEnumerable())
             {
-                EventId = Guid.NewGuid(),
-                PersonId = item.PersonEmploymentId,
-                PersonEmployment = new()
+                hasRecordsToUpdate = true;
+                var updatedEvent = new PersonEmploymentUpdatedEvent
                 {
-                    PersonEmploymentId = item.PersonEmploymentId,
-                    PersonId = item.PersonId,
-                    EstablishmentId = item.EstablishmentId,
-                    StartDate = item.StartDate,
-                    EndDate = item.CurrentEndDate,
-                    EmploymentType = item.EmploymentType,
-                    LastKnownEmployedDate = item.LastKnownEmployedDate,
-                    LastExtractDate = item.LastExtractDate,
-                    Key = item.Key
-                },
-                OldPersonEmployment = new()
-                {
-                    PersonEmploymentId = item.PersonEmploymentId,
-                    PersonId = item.PersonId,
-                    EstablishmentId = item.EstablishmentId,
-                    StartDate = item.StartDate,
-                    EndDate = item.EndDate,
-                    EmploymentType = item.EmploymentType,
-                    LastKnownEmployedDate = item.LastKnownEmployedDate,
-                    LastExtractDate = item.LastExtractDate,
-                    Key = item.Key
-                },
-                Changes = PersonEmploymentUpdatedEventChanges.EndDate,
-                CreatedUtc = clock.UtcNow,
-                RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
-            });
+                    EventId = Guid.NewGuid(),
+                    PersonId = item.PersonEmploymentId,
+                    PersonEmployment = new()
+                    {
+                        PersonEmploymentId = item.PersonEmploymentId,
+                        PersonId = item.PersonId,
+                        EstablishmentId = item.EstablishmentId,
+                        StartDate = item.StartDate,
+                        EndDate = item.CurrentEndDate,
+                        EmploymentType = item.EmploymentType,
+                        LastKnownEmployedDate = item.LastKnownEmployedDate,
+                        LastExtractDate = item.LastExtractDate,
+                        Key = item.Key
+                    },
+                    OldPersonEmployment = new()
+                    {
+                        PersonEmploymentId = item.PersonEmploymentId,
+                        PersonId = item.PersonId,
+                        EstablishmentId = item.EstablishmentId,
+                        StartDate = item.StartDate,
+                        EndDate = item.NewEndDate,
+                        EmploymentType = item.EmploymentType,
+                        LastKnownEmployedDate = item.LastKnownEmployedDate,
+                        LastExtractDate = item.LastExtractDate,
+                        Key = item.Key
+                    },
+                    Changes = PersonEmploymentUpdatedEventChanges.EndDate,
+                    CreatedUtc = clock.UtcNow,
+                    RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                };
 
-            if (batchCommands.Count == 50)
-            {
-                await SaveChanges();
-            }
-        }
-
-        if (batchCommands.Any())
-        {
-            await SaveChanges();
-        }
-
-        async Task SaveChanges()
-        {
-            if (writeDbContext.ChangeTracker.HasChanges())
-            {
-                await writeDbContext.SaveChangesAsync(cancellationToken);
+                events.Add(updatedEvent);
             }
 
-            if (batchCommands.Count > 0)
-            {
-                using var batch = new NpgsqlBatch(connection);
-                foreach (var command in batchCommands)
-                {
-                    batch.BatchCommands.Add(command);
-                }
-
-                await batch.ExecuteNonQueryAsync(cancellationToken);
-                batchCommands.Clear();
-            }
+            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            events.Clear();
         }
+        while (hasRecordsToUpdate);
     }
 }
