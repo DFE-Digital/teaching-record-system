@@ -1,3 +1,7 @@
+using System.Net;
+using System.Text.Json;
+using TeachingRecordSystem.Api.V3.ApiModels;
+using TeachingRecordSystem.Api.V3.Responses;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.Api.Tests.V3.V20240101;
@@ -155,16 +159,6 @@ public class GetTeacherTests : GetTeacherTestBase
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
-    {
-        var contact = await CreateContact();
-        var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
-        var baseUrl = "/v3/teacher";
-
-        await ValidRequestWithInduction_ReturnsExpectedInductionContent(httpClient, baseUrl, contact, true);
-    }
-
-    [Fact]
     public async Task Get_ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent()
     {
         var contact = await CreateContact();
@@ -228,6 +222,163 @@ public class GetTeacherTests : GetTeacherTestBase
                 }
             },
             responseMandatoryQualifications);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithQtlsDate_ReturnsExpectedInductionContent()
+    {
+        // Arrange
+        var qtlsDate = new DateOnly(2019, 01, 04);
+        var person = await TestData.CreatePerson(b =>
+                {
+                    b.WithTrn();
+                    b.WithQtlsDate(qtlsDate);
+                });
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/teacher?include=Induction");
+
+        // Act
+        var response = await GetHttpClientWithIdentityAccessToken(person.Trn!).SendAsync(request);
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responseMandatoryQualifications = jsonResponse.RootElement.GetProperty("induction");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var expectedJson = JsonSerializer.SerializeToNode(new
+        {
+            startDate = default(DateOnly?),
+            endDate = default(DateOnly?),
+            status = dfeta_InductionStatus.Exempt.GetDisplayName(),
+            statusDescription = dfeta_InductionStatus.Exempt.GetDescription(),
+            certificateUrl = default(string?),
+            periods = Array.Empty<GetTeacherResponseInductionPeriod>()
+        });
+    }
+
+    [Theory]
+    [InlineData(dfeta_InductionStatus.Exempt, dfeta_InductionExemptionReason.Exempt, "01/04/2018", dfeta_InductionStatus.Exempt)]
+    [InlineData(dfeta_InductionStatus.InProgress, null, "01/04/2018", dfeta_InductionStatus.Exempt)]
+    [InlineData(dfeta_InductionStatus.InductionExtended, null, "01/04/2018", dfeta_InductionStatus.Exempt)]
+    [InlineData(dfeta_InductionStatus.NotYetCompleted, null, "01/04/2018", dfeta_InductionStatus.Exempt)]
+    [InlineData(dfeta_InductionStatus.RequiredtoComplete, null, "01/04/2018", dfeta_InductionStatus.Exempt)]
+    [InlineData(dfeta_InductionStatus.FailedinWales, null, "01/04/2018", dfeta_InductionStatus.Exempt)]
+    [InlineData(dfeta_InductionStatus.Fail, null, "01/04/2018", dfeta_InductionStatus.Fail)]
+    public async Task Get_ValidRequestWithQtlsDate_ReturnsExpecte(dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? exemptionReason, string qtls, dfeta_InductionStatus expectedInductionStatus)
+    {
+        // Arrange
+        var qtlsDate = DateOnly.Parse(qtls);
+        var qtsDate = new DateOnly(2021, 01, 01);
+        var completedDate = new DateOnly(2022, 01, 01);
+        var inductionStartDate = new DateOnly(2021, 01, 01);
+        var inductionPeriodStart = new DateOnly(2021, 01, 01);
+        var inductionPeriodEndDate = new DateOnly(2022, 01, 01);
+        var establishment1 = await TestData.CreateAccount(x =>
+        {
+            x.WithName(Faker.Company.Name());
+        });
+
+        var contact = await TestData.CreatePerson(b =>
+        {
+            b.WithTrn();
+            b.WithQtlsDate(qtlsDate);
+            b.WithQts();
+            b.WithInduction(inductionStatus: inductionStatus, inductionExemptionReason: exemptionReason, inductionStartDate: inductionStartDate, completedDate: completedDate, inductionPeriodStartDate: inductionPeriodStart, inductionPeriodEndDate: inductionPeriodEndDate, appropriateBodyOrgId: establishment1.AccountId);
+        });
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.Trn!);
+        var baseUrl = "/v3/teacher";
+        var induction = contact.Inductions.First();
+        var inductionPeriod = contact.InductionPeriods.First();
+        await ValidRequestWithInductionAndExemptViaQtls_ReturnsExpected(httpClient, baseUrl, contact.Contact, induction, period: inductionPeriod, establishment1, expectedInductionStatus);
+    }
+
+    [Theory]
+    [InlineData(dfeta_InductionStatus.Exempt, dfeta_InductionExemptionReason.Exempt, "01/04/2018", dfeta_InductionStatus.Exempt)]
+    [InlineData(dfeta_InductionStatus.InProgress, null, "01/04/2018", dfeta_InductionStatus.InProgress)]
+    [InlineData(dfeta_InductionStatus.InductionExtended, null, "01/04/2018", dfeta_InductionStatus.InductionExtended)]
+    [InlineData(dfeta_InductionStatus.NotYetCompleted, null, "01/04/2018", dfeta_InductionStatus.NotYetCompleted)]
+    [InlineData(dfeta_InductionStatus.RequiredtoComplete, null, "01/04/2018", dfeta_InductionStatus.RequiredtoComplete)]
+    [InlineData(dfeta_InductionStatus.FailedinWales, null, "01/04/2018", dfeta_InductionStatus.FailedinWales)]
+    [InlineData(dfeta_InductionStatus.Fail, null, "01/04/2018", dfeta_InductionStatus.Fail)]
+    public async Task Get_ValidRequestWithoutQtlsDate_ReturnsExpected(dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? exemptionReason, string qtls, dfeta_InductionStatus expectedInductionStatus)
+    {
+        // Arrange
+        var qtlsDate = DateOnly.Parse(qtls);
+        var qtsDate = new DateOnly(2021, 01, 01);
+        var completedDate = new DateOnly(2022, 01, 01);
+        var inductionStartDate = new DateOnly(2021, 01, 01);
+        var inductionPeriodStart = new DateOnly(2021, 01, 01);
+        var inductionPeriodEndDate = new DateOnly(2022, 01, 01);
+        var establishment1 = await TestData.CreateAccount(x =>
+        {
+            x.WithName(Faker.Company.Name());
+        });
+
+        var contact = await TestData.CreatePerson(b =>
+        {
+            b.WithTrn();
+            b.WithQts();
+            b.WithInduction(inductionStatus: inductionStatus, inductionExemptionReason: exemptionReason, inductionStartDate: inductionStartDate, completedDate: completedDate, inductionPeriodStartDate: inductionPeriodStart, inductionPeriodEndDate: inductionPeriodEndDate, appropriateBodyOrgId: establishment1.AccountId);
+        });
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.Trn!);
+        var baseUrl = "/v3/teacher";
+        var induction = contact.Inductions.First();
+        var inductionPeriod = contact.InductionPeriods.First();
+        await ValidRequestWithInductionAndExemptViaQtls_ReturnsExpected(httpClient, baseUrl, contact.Contact, induction, period: inductionPeriod, establishment1, expectedInductionStatus);
+    }
+
+    [Theory]
+    [InlineData(dfeta_InductionStatus.Pass, null, "01/04/2018", dfeta_InductionStatus.Pass)]
+    [InlineData(dfeta_InductionStatus.PassedinWales, null, "01/04/2018", dfeta_InductionStatus.PassedinWales)]
+    public async Task Get_ValidRequestWithQtlsDate_ReturnsReturnsExpectedInductionWithCertificateUrl(dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? exemptionReason, string qtls, dfeta_InductionStatus expectedInductionStatus)
+    {
+        // Arrange
+        var qtlsDate = DateOnly.Parse(qtls);
+        var qtsDate = new DateOnly(2021, 01, 01);
+        var completedDate = new DateOnly(2022, 01, 01);
+        var inductionStartDate = new DateOnly(2021, 01, 01);
+        var inductionPeriodStart = new DateOnly(2021, 01, 01);
+        var inductionPeriodEndDate = new DateOnly(2022, 01, 01);
+        var establishment1 = await TestData.CreateAccount(x =>
+        {
+            x.WithName(Faker.Company.Name());
+        });
+
+        var contact = await TestData.CreatePerson(b =>
+        {
+            b.WithTrn();
+            b.WithQtlsDate(qtlsDate);
+            b.WithQts();
+            b.WithInduction(inductionStatus: inductionStatus, inductionExemptionReason: exemptionReason, inductionStartDate: inductionStartDate, completedDate: completedDate, inductionPeriodStartDate: inductionPeriodStart, inductionPeriodEndDate: inductionPeriodEndDate, appropriateBodyOrgId: establishment1.AccountId);
+        });
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.Trn!);
+        var baseUrl = "/v3/teacher";
+        var induction = contact.Inductions.First();
+        var inductionPeriod = contact.InductionPeriods.First();
+        await ValidRequestWithInductionAndExemptViaQtls_ReturnsExpectedWithCertificateUrl(httpClient, baseUrl, contact.Contact, induction, period: inductionPeriod, establishment1, expectedInductionStatus);
+    }
+
+    [Theory]
+    [InlineData("01/04/2018", dfeta_InductionStatus.Exempt)]
+    public async Task Get_ValidRequestWithQtlsDateWithoutInduction_ReturnsExpected(string qtls, dfeta_InductionStatus expectedInductionStatus)
+    {
+        // Arrange
+        var qtlsDate = DateOnly.Parse(qtls);
+        var qtsDate = new DateOnly(2021, 01, 01);
+        var startDate = new DateOnly(2021, 01, 01);
+        var endDate = new DateOnly(2022, 01, 01);
+        var establishment1 = await TestData.CreateAccount(x =>
+        {
+            x.WithName(Faker.Company.Name());
+        });
+
+        var contact = await TestData.CreatePerson(b =>
+        {
+            b.WithTrn();
+            b.WithQtlsDate(qtlsDate);
+            b.WithQts();
+        });
+        var httpClient = GetHttpClientWithIdentityAccessToken(contact.Trn!);
+        var baseUrl = "/v3/teacher";
+        await ValidRequestWithoutInductionAndExemptViaQtls_ReturnsExpected(httpClient, baseUrl, contact.Contact, establishment1, expectedInductionStatus);
     }
 
     [Fact]

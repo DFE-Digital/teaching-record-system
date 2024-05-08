@@ -40,7 +40,9 @@ public class GetTeacherHandler(
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_EYTSDate,
                     Contact.Fields.EMailAddress1,
-                    Contact.Fields.dfeta_AllowIDSignInWithProhibitions)));
+                    Contact.Fields.dfeta_AllowIDSignInWithProhibitions,
+                    Contact.Fields.dfeta_InductionStatus,
+                    Contact.Fields.dfeta_qtlsdate)));
 
         if (contactDetail is null)
         {
@@ -73,8 +75,8 @@ public class GetTeacherHandler(
                 },
                 appropriateBodyColumnNames: new[]
                 {
-                    TeachingRecordSystem.Core.Dqt.Models.Account.PrimaryIdAttribute,
-                    TeachingRecordSystem.Core.Dqt.Models.Account.Fields.Name
+                    Account.PrimaryIdAttribute,
+                    Account.Fields.Name
                 });
         }
 
@@ -222,7 +224,7 @@ public class GetTeacherHandler(
             Eyts = MapEyts(eyts?.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), request.AccessMode, eytsTeacherStatus != null ? GetEytsStatusDescription(eytsTeacherStatus!.dfeta_Value!) : null),
             Email = teacher.EMailAddress1,
             Induction = request.Include.HasFlag(GetTeacherRequestIncludes.Induction) ?
-                Option.Some(MapInduction(induction!, inductionPeriods!, request.AccessMode)) :
+                Option.Some(MapInduction(induction!, inductionPeriods!, request.AccessMode, teacher)) :
                 default,
             InitialTeacherTraining = request.Include.HasFlag(GetTeacherRequestIncludes.InitialTeacherTraining) ?
                 Option.Some(itt!
@@ -331,22 +333,32 @@ public class GetTeacherHandler(
             } :
             null;
 
-    private static GetTeacherResponseInduction? MapInduction(dfeta_induction induction, dfeta_inductionperiod[] inductionperiods, AccessMode accessMode) =>
+    private static GetTeacherResponseInduction? MapInduction(dfeta_induction induction, dfeta_inductionperiod[] inductionperiods, AccessMode accessMode, Contact contact) =>
         induction != null ?
             new GetTeacherResponseInduction()
             {
                 StartDate = induction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 EndDate = induction.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                Status = induction.dfeta_InductionStatus?.ConvertToInductionStatus(),
-                StatusDescription = induction.dfeta_InductionStatus?.GetDescription(),
+                Status = contact.dfeta_InductionStatus?.ConvertToInductionStatus(),
+                StatusDescription = contact.dfeta_InductionStatus?.GetDescription(),
                 CertificateUrl =
-                    (induction.dfeta_InductionStatus == dfeta_InductionStatus.Pass || induction.dfeta_InductionStatus == dfeta_InductionStatus.PassedinWales) &&
+                    (contact.dfeta_InductionStatus == dfeta_InductionStatus.Pass || contact.dfeta_InductionStatus == dfeta_InductionStatus.PassedinWales) &&
                         induction.dfeta_CompletionDate is not null &&
                         accessMode == AccessMode.IdentityAccessToken ?
                     "/v3/certificates/induction" :
                     null,
                 Periods = inductionperiods.Select(MapInductionPeriod).ToArray()
             } :
+            contact.dfeta_qtlsdate.HasValue ?
+                    new GetTeacherResponseInduction()
+                    {
+                        StartDate = null,
+                        EndDate = null,
+                        Status = contact.dfeta_InductionStatus?.ConvertToInductionStatus(),
+                        StatusDescription = contact.dfeta_InductionStatus?.GetDescription(),
+                        CertificateUrl = null,
+                        Periods = Array.Empty<GetTeacherResponseInductionPeriod>()
+                    } :
             null;
 
     private static GetTeacherResponseInductionPeriod MapInductionPeriod(dfeta_inductionperiod inductionPeriod)

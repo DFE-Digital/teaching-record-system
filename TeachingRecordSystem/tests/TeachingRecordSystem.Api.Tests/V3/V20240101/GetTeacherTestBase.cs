@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Api.V3.ApiModels;
+using TeachingRecordSystem.Api.V3.Responses;
 using TeachingRecordSystem.Core.Dqt;
 using static TeachingRecordSystem.TestCommon.TestData;
 
@@ -314,6 +315,160 @@ public abstract class GetTeacherTestBase : TestBase
         AssertEx.JsonObjectEquals(expectedJson, responseNpqQualifications);
     }
 
+    protected async Task ValidRequestWithInductionAndExemptViaQtls_ReturnsExpectedWithCertificateUrl(HttpClient httpClient,
+       string baseUrl,
+       Contact contact,
+       Induction induction,
+       InductionPeriod period,
+       Account account,
+       dfeta_InductionStatus expectedInductionStatus)
+    {
+        // Arrange
+        var induct = new dfeta_induction()
+        {
+            dfeta_inductionId = induction.InductionId,
+            dfeta_InductionStatus = induction.inductionStatus,
+            dfeta_StartDate = induction.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+            dfeta_CompletionDate = induction.CompletetionDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+        };
+
+        var id = new dfeta_inductionperiod()
+        {
+            dfeta_InductionId = period.InductionId.ToEntityReference(dfeta_induction.EntityLogicalName),
+            dfeta_StartDate = period.startDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+            dfeta_EndDate = period.endDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+            dfeta_AppropriateBodyId = account.Id.ToEntityReference(Account.EntityLogicalName)
+        };
+        id.Attributes.Add($"appropriatebody.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, account.Id));
+        id.Attributes.Add($"appropriatebody.{Account.Fields.Name}", new AliasedValue(Account.EntityLogicalName, Account.Fields.Name, account.Name));
+        var inductPer = new List<dfeta_inductionperiod>()
+        {
+            id
+        };
+
+        await ConfigureMocks(contact: contact, induction: induct, inductionPeriods: inductPer.ToArray());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Induction");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var inductionResponse = jsonResponse.RootElement.GetProperty("induction");
+        AssertEx.JsonObjectEquals(new
+        {
+            startDate = period.startDate,
+            endDate = period.endDate,
+            status = expectedInductionStatus.GetDisplayName(),
+            statusDescription = expectedInductionStatus.GetDescription(),
+            certificateUrl = "/v3/certificates/induction",
+            periods = new[]
+            {
+                new
+                {
+                    startDate = period.startDate,
+                    endDate = period.endDate,
+                    terms = default(int?),
+                    appropriateBody = new
+                    {
+                        name = account.Name
+                    }
+                }
+            }
+        }, inductionResponse);
+    }
+
+    protected async Task ValidRequestWithoutInductionAndExemptViaQtls_ReturnsExpected(HttpClient httpClient,
+        string baseUrl,
+        Contact contact,
+        Account account,
+    dfeta_InductionStatus expectedInductionStatus)
+    {
+        // Arrange
+        await ConfigureMocks(contact: contact);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Induction");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var inductionResponse = jsonResponse.RootElement.GetProperty("induction");
+        AssertEx.JsonObjectEquals(new
+        {
+            startDate = default(DateOnly?),
+            endDate = default(DateOnly?),
+            status = expectedInductionStatus.GetDisplayName(),
+            statusDescription = expectedInductionStatus.GetDescription(),
+            periods = Array.Empty<GetTeacherResponseInductionPeriod>()
+        }, inductionResponse);
+    }
+
+    protected async Task ValidRequestWithInductionAndExemptViaQtls_ReturnsExpected(HttpClient httpClient,
+        string baseUrl,
+        Contact contact,
+        Induction induction,
+        InductionPeriod period,
+        Account account,
+        dfeta_InductionStatus expectedInductionStatus)
+    {
+        // Arrange
+        var induct = new dfeta_induction()
+        {
+            dfeta_inductionId = induction.InductionId,
+            dfeta_InductionStatus = induction.inductionStatus,
+            dfeta_StartDate = induction.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+            dfeta_CompletionDate = induction.CompletetionDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+        };
+
+        var id = new dfeta_inductionperiod()
+        {
+            dfeta_InductionId = period.InductionId.ToEntityReference(dfeta_induction.EntityLogicalName),
+            dfeta_StartDate = period.startDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+            dfeta_EndDate = period.endDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+            dfeta_AppropriateBodyId = account.Id.ToEntityReference(Account.EntityLogicalName)
+        };
+        id.Attributes.Add($"appropriatebody.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, account.Id));
+        id.Attributes.Add($"appropriatebody.{Account.Fields.Name}", new AliasedValue(Account.EntityLogicalName, Account.Fields.Name, account.Name));
+        var inductPer = new List<dfeta_inductionperiod>()
+        {
+            id
+        };
+
+        await ConfigureMocks(contact: contact, induction: induct, inductionPeriods: inductPer.ToArray());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Induction");
+
+        // Act
+        var response = await httpClient.SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var inductionResponse = jsonResponse.RootElement.GetProperty("induction");
+        AssertEx.JsonObjectEquals(new
+        {
+            startDate = period.startDate,
+            endDate = period.endDate,
+            status = expectedInductionStatus.GetDisplayName(),
+            statusDescription = expectedInductionStatus.GetDescription(),
+            periods = new[]
+            {
+                new
+                {
+                    startDate = period.startDate,
+                    endDate = period.endDate,
+                    terms = default(int?),
+                    appropriateBody = new
+                    {
+                        name = account.Name
+                    }
+                }
+            }
+        }, inductionResponse);
+    }
+
     protected async Task ValidRequestWithHigherEducationQualifications_ReturnsExpectedHigherEducationQualificationsContent(
         HttpClient httpClient,
         string baseUrl,
@@ -585,6 +740,7 @@ public abstract class GetTeacherTestBase : TestBase
             b =>
             {
                 b.WithFirstName(firstName).WithTrn();
+                b.WithInduction(dfeta_InductionStatus.Pass, null, null, null, null, null, null);
 
                 foreach (var item in qtsRegistrations ?? Array.Empty<QtsRegistration>())
                 {
