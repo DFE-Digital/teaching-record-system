@@ -35,3 +35,31 @@
 .trs-nowrap {
   white-space: nowrap;
 }
+
+.trs-support-tasks {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.trs-support-tasks__filters {
+  flex: 0 0 240px;
+  border: 1px solid grey;
+  padding: 10px;
+}
+
+.trs-support-tasks__list {
+  flex: 1;
+}
+
+.trs-support-tasks__list__sort-by {
+  margin-top: 11px; /* trs-support-tasks__filters's padding + border width */
+}
+
+.trs-\!-inline {
+  display: inline;
+}
+
+.trs-\!-width-200 {
+  width: 200px;
+}

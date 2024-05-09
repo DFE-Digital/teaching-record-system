@@ -30,9 +30,9 @@ public class ChangeRequestTests : TestBase
 
         await page.GoToHomePage();
 
-        await page.ClickChangeRequestsLinkInNavigationBar();
+        await page.ClickSupportTasksLinkInNavigationBar();
 
-        await page.AssertOnChangeRequestsPage();
+        await page.AssertOnSupportTasksPage();
 
         await page.ClickCaseReferenceLinkChangeRequestsPage(caseReference);
 
@@ -44,7 +44,7 @@ public class ChangeRequestTests : TestBase
 
         await page.ClickConfirmButton();
 
-        await page.AssertOnChangeRequestsPage();
+        await page.AssertOnSupportTasksPage();
 
         await page.AssertFlashMessage("The request has been accepted");
     }
@@ -72,9 +72,9 @@ public class ChangeRequestTests : TestBase
 
         await page.GoToHomePage();
 
-        await page.ClickChangeRequestsLinkInNavigationBar();
+        await page.ClickSupportTasksLinkInNavigationBar();
 
-        await page.AssertOnChangeRequestsPage();
+        await page.AssertOnSupportTasksPage();
 
         await page.ClickCaseReferenceLinkChangeRequestsPage(caseReference);
 
@@ -88,7 +88,7 @@ public class ChangeRequestTests : TestBase
 
         await page.ClickRejectButton();
 
-        await page.AssertOnChangeRequestsPage();
+        await page.AssertOnSupportTasksPage();
 
         await page.AssertFlashMessage("The request has been rejected");
     }
@@ -116,9 +116,9 @@ public class ChangeRequestTests : TestBase
 
         await page.GoToHomePage();
 
-        await page.ClickChangeRequestsLinkInNavigationBar();
+        await page.ClickSupportTasksLinkInNavigationBar();
 
-        await page.AssertOnChangeRequestsPage();
+        await page.AssertOnSupportTasksPage();
 
         await page.ClickCaseReferenceLinkChangeRequestsPage(caseReference);
 
@@ -132,7 +132,7 @@ public class ChangeRequestTests : TestBase
 
         await page.ClickRejectButton();
 
-        await page.AssertOnChangeRequestsPage();
+        await page.AssertOnSupportTasksPage();
 
         await page.AssertFlashMessage("The request has been cancelled");
     }
