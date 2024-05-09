@@ -50,7 +50,7 @@ public class AcceptModel : PageModel
             $"The request has been accepted",
             "The user’s record has been changed and they have been notified.");
 
-        return Redirect(_linkGenerator.ChangeRequests());
+        return Redirect(_linkGenerator.SupportTasks());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

@@ -67,14 +67,14 @@ public static class PageExtensions
         await page.GetByTestId($"view-alert-link-{alertId}").ClickAsync();
     }
 
-    public static async Task ClickChangeRequestsLinkInNavigationBar(this IPage page)
+    public static async Task ClickSupportTasksLinkInNavigationBar(this IPage page)
     {
-        await page.ClickAsync("a:text-is('Change requests')");
+        await page.ClickAsync("a:text-is('Support tasks')");
     }
 
-    public static async Task AssertOnChangeRequestsPage(this IPage page)
+    public static async Task AssertOnSupportTasksPage(this IPage page)
     {
-        await page.WaitForUrlPathAsync("/change-requests");
+        await page.WaitForUrlPathAsync("/support-tasks");
     }
 
     public static async Task ClickCaseReferenceLinkChangeRequestsPage(this IPage page, string caseReference)

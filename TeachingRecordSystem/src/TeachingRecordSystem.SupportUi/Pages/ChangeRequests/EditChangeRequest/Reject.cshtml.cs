@@ -62,7 +62,7 @@ public class RejectModel : PageModel
             $"The request has been {requestStatus}",
             flashMessage);
 
-        return Redirect(_linkGenerator.ChangeRequests());
+        return Redirect(_linkGenerator.SupportTasks());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

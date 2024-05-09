@@ -1,0 +1,92 @@
+@page "/support-tasks"
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.IndexModel
+@{
+    ViewBag.Title = "Support tasks";
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="trs-support-tasks">
+    <div class="trs-support-tasks__filters">
+        @if (Model.SupportTaskCategories!.Length > 0)
+        {
+            <form action="@LinkGenerator.SupportTasks()" method="get" asp-antiforgery="false">
+                <govuk-checkboxes asp-for="Categories" name="category" class="govuk-checkboxes--small govuk-!-margin-bottom-2">
+                    <govuk-checkboxes-fieldset>
+                        <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s">Filter by category</govuk-checkboxes-fieldset-legend>
+                        @foreach (var type in Model.SupportTaskCategories)
+                        {
+                            <govuk-checkboxes-item value="@type.SupportTaskCategory">@type.SupportTaskCategoryDescription (@type.Count)</govuk-checkboxes-item>
+                        }
+                    </govuk-checkboxes-fieldset>
+                </govuk-checkboxes>
+                <input type="hidden" asp-for="Reference" name="reference" />
+                <input type="hidden" asp-for="SortBy" name="sortBy" />
+                <input type="hidden" name="_f" value="1" />
+                <govuk-button type="submit" class="govuk-button--secondary">Filter</govuk-button>
+            </form>
+        }
+
+        <form action="@LinkGenerator.SupportTasks()" method="get" asp-antiforgery="false">
+            <govuk-input asp-for="Reference" name="reference" class="govuk-!-margin-bottom-0">
+                <govuk-input-label class="govuk-label--s">Search by reference</govuk-input-label>
+            </govuk-input>
+            @foreach (var category in Model.Categories!)
+            {
+                <input type="hidden" name="category" value="@category" />
+            }
+            <input type="hidden" asp-for="SortBy" name="sortBy" />
+            <input type="hidden" name="_f" value="1" />
+        </form>
+    </div>
+    <div class="trs-support-tasks__list">
+        <div class="trs-support-tasks__list__sort-by govuk-body">
+            <h3 class="govuk-heading-s trs-!-inline">Sort by:</h3>
+            @if (Model.SortBy == IndexModel.SortByOption.DateRequested)
+            {
+                <text>Date requested</text>
+            }
+            else
+            {
+                <a href="@LinkGenerator.SupportTasks(Model.Categories, sortBy: IndexModel.SortByOption.DateRequested, reference: Model.Reference, filtersApplied: true)" class="govuk-link">Date requested</a>
+            }
+            &#65372;
+            @if (Model.SortBy == IndexModel.SortByOption.Type)
+            {
+                <text>Type</text>
+            }
+            else
+            {
+                <a href="@LinkGenerator.SupportTasks(Model.Categories, sortBy: IndexModel.SortByOption.Type, reference: Model.Reference, filtersApplied: true)" class="govuk-link">Type</a>
+            }
+        </div>
+
+        @if (Model.Results!.Length > 0)
+        {
+            <table class="govuk-table" data-testid="results">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header trs-!-width-200">Reference</th>
+                        <th scope="col" class="govuk-table__header">Type</th>
+                        <th scope="col" class="govuk-table__header">Requested on</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var result in Model.Results)
+                    {
+                        <tr class="govuk-table__row" data-reference="@result.Reference">
+                            <td class="govuk-table__cell"><a href="@LinkGenerator.SupportTaskDetail(result.Reference, result.Type)" class="govuk-link">@result.Reference</a></td>
+                            <td class="govuk-table__cell">@result.TypeTitle</td>
+                            <td class="govuk-table__cell">@($"{result.RequestedOn.ToString("d MMMM yyyy")} at {result.RequestedOn:h:mmtt}")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="govuk-body">No results</p>
+        }
+    </div>
+</div>

@@ -78,7 +78,7 @@ public class SupportTask
     internal static Type GetDataType(SupportTaskType supportTaskType) => supportTaskType switch
     {
         SupportTaskType.ConnectOneLoginUser => typeof(ConnectOneLoginUserData),
-        _ => throw new ArgumentNullException($"Unknown {nameof(SupportTaskType)}: {supportTaskType}'.")
+        _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: {supportTaskType}'.")
     };
 
     private Type GetDataType() => GetDataType(SupportTaskType);
