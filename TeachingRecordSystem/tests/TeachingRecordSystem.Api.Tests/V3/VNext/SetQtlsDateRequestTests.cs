@@ -105,7 +105,7 @@ public class SetQtlsDateRequestTests : TestBase
         await AssertEx.JsonResponseHasValidationErrorForProperty(
             response,
             propertyName: nameof(SetQtlsRequest.QtsDate),
-            expectedError: "QTLS Date cannot be in the future.");
+            expectedError: "Date cannot be in the future.");
     }
 
     [Fact]
