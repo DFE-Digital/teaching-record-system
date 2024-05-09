@@ -2,7 +2,7 @@
 SHELL				:=/bin/bash
 
 TERRAFILE_VERSION=0.8
-RG_TAGS={"Product" : "Teacher services cloud"}
+RG_TAGS={"Product" : "Teaching Record System"}
 ARM_TEMPLATE_TAG=1.1.10
 
 .PHONY: help
@@ -17,7 +17,6 @@ paas:
 	$(eval PLATFORM=paas)
 	$(eval REGION=West Europe)
 	$(eval SERVICE_SHORT=dqtapi)
-	$(eval RG_TAGS=$(shell echo '{"Portfolio": "Early Years and Schools Group", "Parent Business":"Teacher Training and Qualifications", "Product" : "Database of Qualified Teachers", "Service Line": "Teaching Workforce", "Service": "Teacher Training and Qualifications", "Service Offering": "Database of Qualified Teachers", "Environment" : "$(ENV_TAG)"}' | jq . ))
 
 .PHONY: aks
 aks:
