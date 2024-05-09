@@ -146,6 +146,14 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 throw CreateValidationExceptionFromFailedReasons(createTeacherResult.FailedReasons);
             }
 
+            // We sometimes see issues where the contact created above isn't retrievable
+            // (it seems CRM doesn't create the records even though the request succeeded).
+            // Check we can at least retrieve it here and fail the request if we can't.
+            {
+                var createdContact = await _dataverseAdapter.GetTeacher(createTeacherResult.TeacherId, columnNames: [], resolveMerges: false) ??
+                    throw new Exception($"Created contact '{createTeacherResult.TeacherId}' could not be retrieved.");
+            }
+
             if (request.QtsDate is not null && createTeacherResult.Trn is not null)
             {
                 var trnTokenRequest = new CreateTrnTokenRequest

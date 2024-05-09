@@ -94,9 +94,8 @@ public partial class DataverseAdapter
         }
 
         var txnResponse = (ExecuteTransactionResponse)await _service.ExecuteAsync(txnRequest);
-        var createdContactId = ((CreateResponse)txnResponse.Responses.First()).id;
 
-        return (CreateTeacherResult.Success(createdContactId, trn), txnRequest);
+        return (CreateTeacherResult.Success(helper.TeacherId, trn), txnRequest);
     }
 
     internal class CreateTeacherHelper
