@@ -196,6 +196,9 @@ public class GetOrCreateTrnRequestTests : TestBase
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .ReturnsAsync(new Contact() { Id = teacherId });
         var slugId = Guid.NewGuid().ToString();
         var request = CreateRequest(req =>
         {
@@ -234,6 +237,9 @@ public class GetOrCreateTrnRequestTests : TestBase
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(req => req.Qualification = null);
 
@@ -256,6 +262,9 @@ public class GetOrCreateTrnRequestTests : TestBase
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(req => req.Qualification.Subject2 = null);
 
@@ -278,6 +287,9 @@ public class GetOrCreateTrnRequestTests : TestBase
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(req => req.Qualification.Subject3 = null);
 
@@ -622,6 +634,9 @@ public class GetOrCreateTrnRequestTests : TestBase
         DataverseAdapterMock
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn));
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(cmd =>
         {
@@ -649,6 +664,9 @@ public class GetOrCreateTrnRequestTests : TestBase
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(req =>
         {
@@ -682,6 +700,9 @@ public class GetOrCreateTrnRequestTests : TestBase
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .ReturnsAsync(new Contact() { Id = teacherId });
 
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnToken(It.IsAny<CreateTrnTokenRequest>()))
@@ -738,6 +759,9 @@ public class GetOrCreateTrnRequestTests : TestBase
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
             .Verifiable();
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(req =>
         {
