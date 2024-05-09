@@ -9,7 +9,6 @@ using TeachingRecordSystem.Api.V3.VNext.Requests;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 
-[ApiController]
 [Route("persons")]
 public class PersonsController : ControllerBase
 {
@@ -27,7 +26,7 @@ public class PersonsController : ControllerBase
         [FromBody] SetQtlsRequest request,
         [FromServices] SetQtlsHandler handler)
     {
-        var command = new SetQtlsCommand(request.Trn!, request.QTSDate);
+        var command = new SetQtlsCommand(request.Trn!, request.QtsDate);
         var result = await handler.Handle(command);
         return result is { Succeeded: true } ? Ok(result.QtlsInfo!) : Accepted();
     }

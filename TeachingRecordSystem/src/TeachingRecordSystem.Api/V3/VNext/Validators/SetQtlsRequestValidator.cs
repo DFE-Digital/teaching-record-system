@@ -11,8 +11,8 @@ public class SetQtlsRequestValidator : AbstractValidator<SetQtlsRequest>
             .Matches(@"^\d{7}$")
             .WithMessage(Properties.StringResources.ErrorMessages_TRNMustBe7Digits);
 
-        RuleFor(x => x.QTSDate)
+        RuleFor(x => x.QtsDate)
             .LessThanOrEqualTo(clock.Today)
-            .WithMessage($"QTLS Date cannot be in the future.");
+            .WithMessage($"Date cannot be in the future.");
     }
 }

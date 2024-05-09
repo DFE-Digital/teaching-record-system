@@ -298,7 +298,7 @@ public partial class TestData
 
             if (_qtlsDate is not null)
             {
-                contact.dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: true);
+                contact.dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false);
             }
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
@@ -556,7 +556,7 @@ public partial class TestData
                 QtsDate = getQtsRegistationTask != null ? getQtsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_QTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 Sanctions = [.. _sanctions],
-                MandatoryQualifications = [.. mqs.Select(t => t)],
+                MandatoryQualifications = mqs,
                 Inductions = [.. _inductions],
                 InductionPeriods = [.. _inductionPeriods]
             };
