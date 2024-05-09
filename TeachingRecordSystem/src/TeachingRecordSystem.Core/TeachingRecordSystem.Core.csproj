@@ -24,6 +24,7 @@
     <None Remove="Services\DqtReporting\Migrations\0017_dfeta_qualification_dfeta_trsevent.sql" />
     <None Remove="Services\DqtReporting\Migrations\0018_ContactQTLSDate.sql" />
     <None Remove="Services\DqtReporting\Migrations\0019_dfeta_qtlsdatehasbeenset.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0020_incidentresolution_msdyn_proposeknowledge.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +47,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0017_dfeta_qualification_dfeta_trsevent.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0018_ContactQTLSDate.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0019_dfeta_qtlsdatehasbeenset.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0020_incidentresolution_msdyn_proposeknowledge.sql" />
   </ItemGroup>
 
   <ItemGroup>
