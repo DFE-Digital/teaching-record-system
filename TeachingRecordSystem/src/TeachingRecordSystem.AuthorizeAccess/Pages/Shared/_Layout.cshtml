@@ -17,7 +17,7 @@
 
 @section Head {
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" asp-href-include="~/Styles/*.css">
+    <link rel="stylesheet" asp-href-include="~/Styles/*.css" asp-append-version="true">
     @RenderSection("Styles", required: false)
 }
 
@@ -160,7 +160,7 @@
 
 @section BodyEnd {
     @PageTemplateHelper.GenerateScriptImports(NonceService.GetNonce())
-    <script src="~/Scripts/service-header.js" asp-add-nonce="true"></script>
-    <script src="~/Scripts/init-service-header.js" asp-add-nonce="true"></script>
+    <script src="~/Scripts/service-header.js" asp-add-nonce="true" asp-append-version="true"></script>
+    <script src="~/Scripts/init-service-header.js" asp-add-nonce="true" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 }

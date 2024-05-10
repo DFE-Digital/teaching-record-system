@@ -8,7 +8,7 @@
 
 @section Head {
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" asp-href-include="~/Styles/*.css">
+    <link rel="stylesheet" asp-href-include="~/Styles/*.css" asp-append-version="true">
     @RenderSection("Styles", required: false)
     @RenderSection("Scripts", required: false)
 }
