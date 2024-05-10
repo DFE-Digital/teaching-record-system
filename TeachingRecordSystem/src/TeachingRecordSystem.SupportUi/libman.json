@@ -3,11 +3,11 @@
   "defaultProvider": "jsdelivr",
   "libraries": [
     {
-      "library": "govuk-frontend@4.8.0",
+      "library": "govuk-frontend@5.1.0",
       "destination": "wwwroot/lib/govuk-frontend/"
     },
     {
-      "library": "@ministryofjustice/frontend@1.8.0",
+      "library": "@ministryofjustice/frontend@2.1.3",
       "destination": "wwwroot/lib/ministryofjustice/frontend/"
     }]
 }

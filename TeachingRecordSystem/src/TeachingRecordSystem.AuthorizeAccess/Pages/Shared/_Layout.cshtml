@@ -1,4 +1,4 @@
-@inject GovUk.Frontend.AspNetCore.PageTemplateHelper PageTemplateHelper
+@using GovUk.Frontend.AspNetCore
 @inject Joonasw.AspNetCore.SecurityHeaders.Csp.ICspNonceService NonceService
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
@@ -159,7 +159,7 @@
 }
 
 @section BodyEnd {
-    @PageTemplateHelper.GenerateScriptImports(NonceService.GetNonce())
+    @Html.GovUkFrontendScriptImports(cspNonce: NonceService.GetNonce(), appendVersion: true)
     <script src="~/Scripts/service-header.js" asp-add-nonce="true" asp-append-version="true"></script>
     <script src="~/Scripts/init-service-header.js" asp-add-nonce="true" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
