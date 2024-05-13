@@ -11,5 +11,5 @@ public record UpdatedPersonEmploymentEndDate
     public required DateOnly LastKnownEmployedDate { get; init; }
     public required DateOnly LastExtractDate { get; init; }
     public required string Key { get; init; }
-    public required DateOnly? EndDate { get; init; }
+    public required DateOnly? NewEndDate { get; init; }
 }
