@@ -333,13 +333,15 @@ public class GetTeacherHandler(
             } :
             null;
 
-    private static GetTeacherResponseInduction? MapInduction(dfeta_induction induction, dfeta_inductionperiod[] inductionperiods, AccessMode accessMode, Contact contact) =>
-        induction != null ?
+    private static GetTeacherResponseInduction? MapInduction(dfeta_induction induction, dfeta_inductionperiod[] inductionperiods, AccessMode accessMode, Contact contact)
+    {
+        var inductionStatus = contact.dfeta_InductionStatus?.ConvertToInductionStatus();
+        return induction != null ?
             new GetTeacherResponseInduction()
             {
                 StartDate = induction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 EndDate = induction.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                Status = contact.dfeta_InductionStatus?.ConvertToInductionStatus(),
+                Status = inductionStatus,
                 StatusDescription = contact.dfeta_InductionStatus?.GetDescription(),
                 CertificateUrl =
                     (contact.dfeta_InductionStatus == dfeta_InductionStatus.Pass || contact.dfeta_InductionStatus == dfeta_InductionStatus.PassedinWales) &&
@@ -349,17 +351,18 @@ public class GetTeacherHandler(
                     null,
                 Periods = inductionperiods.Select(MapInductionPeriod).ToArray()
             } :
-            contact.dfeta_qtlsdate.HasValue ?
+            inductionStatus.HasValue ?
                     new GetTeacherResponseInduction()
                     {
                         StartDate = null,
                         EndDate = null,
-                        Status = contact.dfeta_InductionStatus?.ConvertToInductionStatus(),
+                        Status = inductionStatus,
                         StatusDescription = contact.dfeta_InductionStatus?.GetDescription(),
                         CertificateUrl = null,
                         Periods = Array.Empty<GetTeacherResponseInductionPeriod>()
                     } :
             null;
+    }
 
     private static GetTeacherResponseInductionPeriod MapInductionPeriod(dfeta_inductionperiod inductionPeriod)
     {
