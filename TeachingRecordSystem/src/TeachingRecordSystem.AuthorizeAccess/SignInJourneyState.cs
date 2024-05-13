@@ -11,6 +11,7 @@ public class SignInJourneyState(
     string serviceName,
     string serviceUrl,
     string oneLoginAuthenticationScheme,
+    Guid clientApplicationUserId,
     string? trnToken = null)
 {
     public const string JourneyName = "SignInJourney";
@@ -26,7 +27,11 @@ public class SignInJourneyState(
 
     public string OneLoginAuthenticationScheme { get; } = oneLoginAuthenticationScheme;
 
+    public Guid ClientApplicationUserId { get; } = clientApplicationUserId;
+
     public string? TrnToken { get; } = trnToken;
+
+    public string? TrnTokenTrn { get; set; }
 
     [JsonConverter(typeof(AuthenticationTicketJsonConverter))]
     public AuthenticationTicket? AuthenticationTicket { get; set; }

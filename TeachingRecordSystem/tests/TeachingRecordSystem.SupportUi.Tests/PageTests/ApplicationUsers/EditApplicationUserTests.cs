@@ -41,7 +41,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: [ApiRoles.GetPerson, ApiRoles.UpdatePerson], hasOneLoginSettings: true);
+        var applicationUser = await TestData.CreateApplicationUser(apiRoles: [ApiRoles.GetPerson, ApiRoles.UpdatePerson], isOidcClient: true);
         var apiKeyUnexpired = await TestData.CreateApiKey(applicationUser.UserId, expired: false);
         var apiKeyExpired = await TestData.CreateApiKey(applicationUser.UserId, expired: true);
 
@@ -215,7 +215,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Post_ValidRequest_UpdatesNameAndRolesAndOneLoginSettingsAndCreatesEventAndRedirectsWithFlashMessage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: [], hasOneLoginSettings: false);
+        var applicationUser = await TestData.CreateApplicationUser(apiRoles: [], isOidcClient: false);
         var originalName = applicationUser.Name;
         var newName = TestData.GenerateChangedApplicationUserName(originalName);
         var newRoles = new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson };

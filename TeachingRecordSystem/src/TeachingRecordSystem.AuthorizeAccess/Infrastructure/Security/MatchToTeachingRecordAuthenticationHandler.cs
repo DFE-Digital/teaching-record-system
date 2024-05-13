@@ -42,11 +42,17 @@ public class MatchToTeachingRecordAuthenticationHandler(SignInJourneyHelper help
             throw new InvalidOperationException($"{nameof(AuthenticationProperties)} is missing one or more items.");
         }
 
+        Guid clientApplicationUserId = default;
+        if (properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.ClientApplicationUserId, out var clientApplicationUserIdStr))
+        {
+            Guid.TryParse(clientApplicationUserIdStr, out clientApplicationUserId);
+        }
+
         properties.Items.TryGetValue(AuthenticationPropertiesItemKeys.TrnToken, out var trnToken);
 
         var journeyInstance = await helper.UserInstanceStateProvider.GetOrCreateSignInJourneyInstanceAsync(
             _context,
-            createState: () => new SignInJourneyState(properties.RedirectUri ?? "/", serviceName, serviceUrl, oneLoginAuthenticationScheme, trnToken),
+            createState: () => new SignInJourneyState(properties.RedirectUri ?? "/", serviceName, serviceUrl, oneLoginAuthenticationScheme, clientApplicationUserId, trnToken),
             updateState: state => state.Reset());
 
         var result = helper.SignInWithOneLogin(journeyInstance);
@@ -85,6 +91,7 @@ public class MatchToTeachingRecordAuthenticationHandler(SignInJourneyHelper help
         public const string OneLoginAuthenticationScheme = "OneLoginAuthenticationScheme";
         public const string ServiceName = "ServiceName";
         public const string ServiceUrl = "ServiceUrl";
+        public const string ClientApplicationUserId = "ClientApplicationUserId";
         public const string TrnToken = "TrnToken";
     }
 }

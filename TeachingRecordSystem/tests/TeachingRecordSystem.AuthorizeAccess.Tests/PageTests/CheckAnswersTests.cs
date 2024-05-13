@@ -256,7 +256,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ValidRequest_CreatesSupportTicketAndRedirectsToSupportRequestedSubmitted()
     {
         // Arrange
-        var state = CreateNewState();
+        var person = await TestData.CreatePerson(b => b.WithTrn());
+        var trnToken = await CreateTrnToken(person.Trn!);
+        var applicationUser = await TestData.CreateApplicationUser(isOidcClient: true);
+        var state = CreateNewState(clientApplicationUserId: applicationUser.UserId, trnToken: trnToken);
         var journeyInstance = await CreateJourneyInstance(state);
 
         var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
@@ -272,6 +275,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             state.SetNationalInsuranceNumber(true, nationalInsuranceNumber);
             state.SetTrn(true, trn);
         });
+
+        EventObserver.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -297,6 +302,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(oneLoginUser.VerifiedDatesOfBirth, data.VerifiedDatesOfBirth);
         Assert.Equal(nationalInsuranceNumber, data.StatedNationalInsuranceNumber);
         Assert.Equal(trn, data.StatedTrn);
+        Assert.Equal(trnToken.Trn, data.TrnTokenTrn);
+        Assert.Equal(applicationUser.UserId, data.ClientApplicationUserId);
 
         EventObserver.AssertEventsSaved(e =>
         {
@@ -315,6 +322,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(oneLoginUser.VerifiedDatesOfBirth, eventData.VerifiedDatesOfBirth);
             Assert.Equal(nationalInsuranceNumber, eventData.StatedNationalInsuranceNumber);
             Assert.Equal(trn, eventData.StatedTrn);
+            Assert.Equal(trnToken.Trn, eventData.TrnTokenTrn);
+            Assert.Equal(applicationUser.UserId, eventData.ClientApplicationUserId);
         });
     }
 }

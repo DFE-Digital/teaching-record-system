@@ -154,15 +154,21 @@ public class SignInJourneyHelper(
         oneLoginUser.LastCoreIdentityVc = coreIdentityClaimVc;
 
         string? trn = null;
+        string? trnTokenTrn = null;
 
         if (await TryApplyTrnToken() is TryApplyTrnTokenResult result)
         {
-            oneLoginUser.PersonId = result.PersonId;
-            oneLoginUser.FirstSignIn = clock.UtcNow;
-            oneLoginUser.LastSignIn = clock.UtcNow;
-            oneLoginUser.MatchRoute = OneLoginUserMatchRoute.TrnToken;
-            oneLoginUser.MatchedAttributes = result.MatchedAttributes.ToArray();
-            trn = result.Trn;
+            trnTokenTrn = result.Trn;
+
+            if (result.Matched)
+            {
+                oneLoginUser.PersonId = result.PersonId;
+                oneLoginUser.FirstSignIn = clock.UtcNow;
+                oneLoginUser.LastSignIn = clock.UtcNow;
+                oneLoginUser.MatchRoute = OneLoginUserMatchRoute.TrnToken;
+                oneLoginUser.MatchedAttributes = result.MatchedAttributes!.ToArray();
+                trn = result.Trn;
+            }
         }
 
         await dbContext.SaveChangesAsync();
@@ -173,6 +179,8 @@ public class SignInJourneyHelper(
             state.AttemptedIdentityVerification = true;
 
             state.SetVerified(verifiedNames, verifiedDatesOfBirth);
+
+            state.TrnTokenTrn = trnTokenTrn;
 
             if (trn is not null)
             {
@@ -203,12 +211,12 @@ public class SignInJourneyHelper(
                 return null;
             }
 
-            // If the record's last name and DOB do not match the verified details then don't automatically link
+            // Check the record's last name and DOB match the verified details
             var matchedLastName = verifiedNames.Select(parts => parts.Last()).FirstOrDefault(name => name.Equals(trnTokenPerson.LastName, StringComparison.OrdinalIgnoreCase));
             var matchedDateOfBirth = verifiedDatesOfBirth.FirstOrDefault(dob => dob == trnTokenPerson.DateOfBirth);
             if (matchedLastName == default || matchedDateOfBirth == default)
             {
-                return null;
+                return new(trnTokenPerson.PersonId, trnTokenModel.Trn, Matched: false, MatchedAttributes: null);
             }
             var matchedAttributes = new Dictionary<OneLoginUserMatchedAttribute, string>()
             {
@@ -220,7 +228,7 @@ public class SignInJourneyHelper(
             trnTokenModel.UserId = _teacherAuthIdUserIdSentinel;
             await idDbContext.SaveChangesAsync();
 
-            return new(trnTokenPerson.PersonId, trnTokenModel.Trn, matchedAttributes);
+            return new(trnTokenPerson.PersonId, trnTokenModel.Trn, Matched: true, matchedAttributes);
         }
     }
 
@@ -353,5 +361,9 @@ public class SignInJourneyHelper(
         return Results.Challenge(delegatedProperties, authenticationSchemes: [journeyInstance.State.OneLoginAuthenticationScheme]);
     }
 
-    private record TryApplyTrnTokenResult(Guid PersonId, string Trn, IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>> MatchedAttributes);
+    private record TryApplyTrnTokenResult(
+        Guid PersonId,
+        string Trn,
+        bool Matched,
+        IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>? MatchedAttributes);
 }

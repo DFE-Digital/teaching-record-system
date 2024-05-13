@@ -7,8 +7,10 @@ public partial class TestData
 {
     public Task<SupportTask> CreateConnectOneLoginUserSupportTask(
         string oneLoginUserSubject,
+        Guid clientApplicationUserId = default,
         string? statedNationalInsuranceNumber = null,
-        string? statedTrn = null) =>
+        string? statedTrn = null,
+        string? trnTokenTrn = null) =>
         WithDbContext(async dbContext =>
         {
             var user = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUserSubject);
@@ -21,7 +23,9 @@ public partial class TestData
                 VerifiedNames = user.VerifiedNames,
                 VerifiedDatesOfBirth = user.VerifiedDatesOfBirth,
                 StatedNationalInsuranceNumber = statedNationalInsuranceNumber,
-                StatedTrn = statedTrn
+                StatedTrn = statedTrn,
+                ClientApplicationUserId = clientApplicationUserId,
+                TrnTokenTrn = trnTokenTrn
             };
 
             var reference = SupportTask.GenerateSupportTaskReference();
