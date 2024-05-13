@@ -49,7 +49,9 @@ public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContex
                 VerifiedNames = JourneyInstance.State.VerifiedNames,
                 VerifiedDatesOfBirth = JourneyInstance.State.VerifiedDatesOfBirth,
                 StatedNationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber,
-                StatedTrn = JourneyInstance.State.Trn
+                StatedTrn = JourneyInstance.State.Trn,
+                ClientApplicationUserId = JourneyInstance.State.ClientApplicationUserId,
+                TrnTokenTrn = JourneyInstance.State.TrnTokenTrn
             },
             OneLoginUserSubject = subject
         };

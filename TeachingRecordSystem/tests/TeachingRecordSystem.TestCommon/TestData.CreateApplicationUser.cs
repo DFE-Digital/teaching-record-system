@@ -8,13 +8,13 @@ public partial class TestData
     public async Task<ApplicationUser> CreateApplicationUser(
         string? name = null,
         string[]? apiRoles = null,
-        bool? hasOneLoginSettings = false)
+        bool? isOidcClient = false)
     {
         var user = await WithDbContext(async dbContext =>
         {
             name ??= GenerateApplicationUserName();
             apiRoles ??= [];
-            hasOneLoginSettings ??= false;
+            isOidcClient ??= false;
             string? clientId = null;
             string? clientSecret = null;
             List<string>? redirectUris = null;
@@ -25,7 +25,7 @@ public partial class TestData
             string? oneLoginRedirectUriPath = null;
             string? oneLoginPostLogoutRedirectUriPath = null;
 
-            if (hasOneLoginSettings == true)
+            if (isOidcClient == true)
             {
                 clientId = Guid.NewGuid().ToString();
                 clientSecret = Guid.NewGuid().ToString();
@@ -43,7 +43,7 @@ public partial class TestData
                 Name = name,
                 UserId = Guid.NewGuid(),
                 ApiRoles = apiRoles,
-                IsOidcClient = hasOneLoginSettings.Value,
+                IsOidcClient = isOidcClient.Value,
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 RedirectUris = redirectUris,

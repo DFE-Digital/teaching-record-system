@@ -158,6 +158,45 @@ public abstract class TestBase : IDisposable
             user.VerifiedNames?.First().Last(),
             user.VerifiedDatesOfBirth?.First());
 
-    public SignInJourneyState CreateNewState(string redirectUri = "/") =>
-        new(redirectUri, serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+    public SignInJourneyState CreateNewState(IdTrnToken trnToken, string redirectUri = "/", Guid clientApplicationUserId = default) =>
+        CreateNewState(redirectUri, clientApplicationUserId, trnToken?.TrnToken, trnToken?.Trn);
+
+    public SignInJourneyState CreateNewState(string redirectUri = "/", Guid clientApplicationUserId = default, string? trnToken = null, string? trnTokenTrn = null) =>
+        new(
+            redirectUri,
+            serviceName: "Test Service",
+            serviceUrl: "https://service",
+            oneLoginAuthenticationScheme: "dummy",
+            clientApplicationUserId,
+            trnToken)
+        {
+            TrnTokenTrn = trnTokenTrn
+        };
+
+    private static int _lastTrnToken = 0;
+
+    public async Task<IdTrnToken> CreateTrnToken(string trn, string? email = null)
+    {
+        var trnTokenStr = Interlocked.Increment(ref _lastTrnToken).ToString("D12");
+
+        email ??= Faker.Internet.Email();
+
+        using var scope = HostFixture.Services.CreateScope();
+        using var idDbContext = scope.ServiceProvider.GetRequiredService<IdDbContext>();
+
+        var trnToken = new IdTrnToken()
+        {
+            CreatedUtc = Clock.UtcNow,
+            Email = email,
+            ExpiresUtc = Clock.UtcNow.AddDays(30),
+            Trn = trn,
+            TrnToken = trnTokenStr,
+            UserId = null
+        };
+
+        idDbContext.TrnTokens.Add(trnToken);
+        await idDbContext.SaveChangesAsync();
+
+        return trnToken;
+    }
 }

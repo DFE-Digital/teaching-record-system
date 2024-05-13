@@ -21,7 +21,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(person);
             Clock.Advance();
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: user.Subject);
@@ -52,7 +57,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: user.Subject);
@@ -81,7 +91,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
@@ -115,7 +130,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
@@ -157,7 +177,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var lastName = Faker.Name.Last();
             var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
@@ -216,7 +241,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var lastName = person.LastName;
             var dateOfBirth = person.DateOfBirth;
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy", trnToken);
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default,
+                trnToken);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
@@ -269,7 +300,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var lastName = person.LastName;
             var dateOfBirth = person.DateOfBirth;
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy", trnToken);
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default,
+                trnToken);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
@@ -313,7 +350,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var lastName = person.LastName;
             var dateOfBirth = person.DateOfBirth;
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy", trnToken);
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default,
+                trnToken);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
@@ -353,7 +396,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
             var trnToken = await CreateTrnToken(person.Trn!, user.Email, userId: Guid.NewGuid());
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy", trnToken);
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default,
+                trnToken);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
@@ -397,7 +446,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var lastName = TestData.GenerateChangedLastName(person.LastName);
             var dateOfBirth = person.DateOfBirth;
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy", trnToken);
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default,
+                trnToken);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
@@ -441,7 +496,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var lastName = person.LastName;
             var dateOfBirth = person.DateOfBirth.AddDays(1);
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy", trnToken);
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default,
+                trnToken);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
@@ -482,16 +543,23 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([verifiedFirstName, verifiedLastName], verifiedDateOfBirth));
             Clock.Advance();
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 createCoreIdentityVc: false);
-            await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            await helper.OnOneLoginCallback(journeyInstance,
+                authenticationTicket);
 
-            await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, Faker.Identification.UkNationalInsuranceNumber()));
+            await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true,
+                Faker.Identification.UkNationalInsuranceNumber()));
 
             personMatchingServiceMock
                 .Setup(mock => mock.Match(It.Is<MatchRequest>(r =>
@@ -529,7 +597,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
             Clock.Advance();
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
@@ -583,7 +656,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
             Clock.Advance();
 
-            var state = new SignInJourneyState(redirectUri: "/", serviceName: "Test Service", serviceUrl: "https://service", oneLoginAuthenticationScheme: "dummy");
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
             var journeyInstance = await CreateJourneyInstance(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
