@@ -17,7 +17,7 @@
                         <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--s">Filter by category</govuk-checkboxes-fieldset-legend>
                         @foreach (var type in Model.SupportTaskCategories)
                         {
-                            <govuk-checkboxes-item value="@type.SupportTaskCategory">@type.SupportTaskCategoryDescription (@type.Count)</govuk-checkboxes-item>
+                            <govuk-checkboxes-item value="@type.SupportTaskCategory" label-class="trs-!-max-width-none">@type.SupportTaskCategoryDescription (@type.Count)</govuk-checkboxes-item>
                         }
                     </govuk-checkboxes-fieldset>
                 </govuk-checkboxes>

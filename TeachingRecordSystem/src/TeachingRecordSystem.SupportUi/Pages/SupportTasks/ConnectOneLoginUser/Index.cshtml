@@ -1,0 +1,113 @@
+@page "/support-tasks/connect-one-login-user/{supportTaskReference}"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ConnectOneLoginUser.IndexModel
+@{
+    ViewBag.Title = "Unable to connect GOV.UK One Login user to a teaching record";
+}
+
+<form action="@LinkGenerator.ConnectOneLoginUserSupportTask(Model.SupportTaskReference!)" method="post">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop">
+            <h1 class="govuk-heading-l">
+                <span class="govuk-caption-l">Connect to a record - @Model.SupportTaskReference</span>
+                @ViewBag.Title
+            </h1>
+
+            <p class="govuk-body">
+                The user was able to sign in and verify their identity with GOV.UK One Login, but we haven’t been able to connect these details automatically to a teaching record.
+            </p>
+        </div>
+        <div class="govuk-grid-column-full">
+            <h2 class="govuk-heading-l">Support request details</h2>
+
+            <h3 class="govuk-heading-m">GOV.UK One Login verified</h3>
+
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.Email</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.VerifiedName</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Previous names</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @if (Model.VerifiedPreviousNames!.Length > 0)
+                        {
+                            <ul class="govuk-list">
+                                @foreach (var name in Model.VerifiedPreviousNames)
+                                {
+                                    <li>@name</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <text>None</text>
+                        }
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.VerifiedDateOfBirth.ToString("dd/MM/yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <h3 class="govuk-heading-m">Additional</h3>
+
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@(Model.StatedNationalInsuranceNumber ?? "None")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>TRN</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@(Model.StatedTrn ?? "None")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            @functions {
+#pragma warning disable CS1998
+                async Task RenderConnectToTrnOption()
+                {
+                    <p class="govuk-body">
+                        <a href="@LinkGenerator.Persons()" target="_blank" rel="noreferrer" class="govuk-link">Find a record (opens in a new tab)</a>
+                    </p>
+
+                    <govuk-input asp-for="TrnOverride" input-class="govuk-input--width-10" label-class="govuk-label--s">
+                        <govuk-input-label>Connect to TRN (optional)</govuk-input-label>
+                    </govuk-input>
+                }
+#pragma warning restore CS1998
+            }
+
+            @if (Model.SuggestedMatches!.Length > 0)
+            {
+                <h2 class="govuk-heading-l">Suggested matches</h2>
+
+                @foreach (var suggestion in Model.SuggestedMatches)
+                {
+                    <partial name="_PersonDetail" model="@suggestion" />
+                }
+
+                <h2 class="govuk-heading-l">Which record do you wish to connect?</h2>
+
+                <govuk-radios asp-for="Trn">
+                    @foreach (var suggestion in Model.SuggestedMatches)
+                    {
+                        <govuk-radios-item value="@suggestion.Trn">@suggestion.Name</govuk-radios-item>
+                    }
+                    <govuk-radios-item value="@IndexModel.NoneOfTheAboveTrnSentinel">
+                        None of the above
+                        <govuk-radios-item-conditional>
+                            @{ await RenderConnectToTrnOption(); }
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                </govuk-radios>
+            }
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </div>
+    </div>
+</form>

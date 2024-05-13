@@ -23,10 +23,10 @@
 }
 
 @{
-    var personDetailModel = new PersonDetailModel()
+    var personDetailModel = new PersonDetailViewModel()
     {
         PersonId = Model.PersonId,
-        ShowChangeLinks = true,
+        Options = PersonDetailViewModelOptions.ShowAll,
         Trn = Model.Person.Trn,
         Name = Model.Person.Name,
         PreviousNames = Model.Person.PreviousNames,

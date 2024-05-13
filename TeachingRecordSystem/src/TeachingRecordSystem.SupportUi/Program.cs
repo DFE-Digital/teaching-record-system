@@ -15,6 +15,7 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
@@ -114,6 +115,13 @@ builder.Services
             model =>
             {
                 model.Filters.Add(new ServiceFilterAttribute<CheckMandatoryQualificationExistsFilter>() { Order = -200 });
+            });
+
+        options.Conventions.AddFolderApplicationModelConvention(
+            "/SupportTasks/ConnectOneLoginUser",
+            model =>
+            {
+                model.Filters.Add(new CheckSupportTaskExistsFilterFactory(openOnly: true, supportTaskType: SupportTaskType.ConnectOneLoginUser));
             });
     })
     .AddMvcOptions(options =>
@@ -259,7 +267,8 @@ builder.Services
     .AddSingleton<ReferenceDataCache>()
     .AddSingleton<SanctionTextLookup>()
     .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
-    .AddFileService();
+    .AddFileService()
+    .AddPersonMatching();
 
 var app = builder.Build();
 

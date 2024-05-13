@@ -187,8 +187,19 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string SupportTasks(SupportTaskCategory[]? categories = null, Pages.SupportTasks.IndexModel.SortByOption? sortBy = null, string? reference = null, bool? filtersApplied = null) =>
         GetRequiredPathByPage("/SupportTasks/Index", routeValues: new { category = categories, sortBy, reference, _f = filtersApplied == true ? "1" : null });
 
-    public string SupportTaskDetail(string reference, SupportTaskType supportTaskType) =>
-        reference.StartsWith("CAS-") ? EditChangeRequest(reference) : "#";
+    public string SupportTaskDetail(string supportTaskReference, SupportTaskType supportTaskType) =>
+        supportTaskReference.StartsWith("CAS-") ? EditChangeRequest(supportTaskReference) :
+        supportTaskType switch
+        {
+            SupportTaskType.ConnectOneLoginUser => ConnectOneLoginUserSupportTask(supportTaskReference),
+            _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
+        };
+
+    public string ConnectOneLoginUserSupportTask(string supportTaskReference) =>
+        GetRequiredPathByPage("/SupportTasks/ConnectOneLoginUser/Index", routeValues: new { supportTaskReference });
+
+    public string ConnectOneLoginUserSupportTaskConnect(string supportTaskReference, string trn) =>
+        GetRequiredPathByPage("/SupportTasks/ConnectOneLoginUser/Connect", routeValues: new { supportTaskReference, trn });
 
     private string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {

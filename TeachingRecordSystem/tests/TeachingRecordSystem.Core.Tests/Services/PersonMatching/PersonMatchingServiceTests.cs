@@ -195,7 +195,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             var person1 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
             // Person who matches on NINO
-            var person2 = await TestData.CreatePerson(b => b.WithNationalInsuranceNumber(hasNationalInsuranceNumber: true, nationalInsuranceNumber));
+            var person2 = await TestData.CreatePerson(b => b.WithNationalInsuranceNumber(nationalInsuranceNumber));
 
             // Person who matches on TRN
             var person3 = await TestData.CreatePerson(b => b.WithTrn());
@@ -220,6 +220,43 @@ public class PersonMatchingServiceTests : IAsyncLifetime
                 r => Assert.Equal(person3.PersonId, r.PersonId),
                 r => Assert.Equal(person2.PersonId, r.PersonId),
                 r => Assert.Equal(person1.PersonId, r.PersonId));
+        });
+
+    [Fact]
+    public Task GetMatchedAttributes_ReturnsExpectedResults() =>
+        DbFixture.WithDbContext(async dbContext =>
+        {
+            // Arrange
+            var firstName = TestData.GenerateFirstName();
+            var lastName = TestData.GenerateLastName();
+            var dateOfBirth = TestData.GenerateDateOfBirth();
+            var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+
+            var person = await TestData.CreatePerson(b => b.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+            string[][] names = [[firstName, lastName]];
+            DateOnly[] datesOfBirth = [dateOfBirth];
+
+            var service = new PersonMatchingService(dbContext);
+
+            // Act
+            var result = await service.GetMatchedAttributes(new(names, datesOfBirth, nationalInsuranceNumber, person.Trn!, TrnTokenTrnHint: null), person.PersonId);
+
+            // Assert
+            Assert.Collection(
+                result,
+                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.FullName, $"{firstName} {lastName}", m),
+                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.LastName, lastName, m),
+                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.DateOfBirth, dateOfBirth.ToString("yyyy-MM-dd"), m),
+                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.NationalInsuranceNumber, nationalInsuranceNumber, m),
+                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.Trn, person.Trn!, m),
+                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.FirstName, firstName, m));
+
+            static void AssertAttributeMatch(OneLoginUserMatchedAttribute expectedAttribute, string expectedValue, KeyValuePair<OneLoginUserMatchedAttribute, string> actual)
+            {
+                Assert.Equal(expectedAttribute, actual.Key);
+                Assert.Equal(expectedValue, actual.Value);
+            }
         });
 
     private static readonly OneLoginUserMatchedAttribute[] _matchNameDobNinoAndTrnAttributes =

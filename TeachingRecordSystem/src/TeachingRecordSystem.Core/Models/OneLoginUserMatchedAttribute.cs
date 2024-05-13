@@ -7,4 +7,5 @@ public enum OneLoginUserMatchedAttribute
     DateOfBirth = 3,
     NationalInsuranceNumber = 4,
     Trn = 5,
+    FirstName = 6,
 }
