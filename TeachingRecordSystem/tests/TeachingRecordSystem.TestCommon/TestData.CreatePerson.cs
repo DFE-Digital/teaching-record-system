@@ -183,6 +183,21 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithNationalInsuranceNumber(string nationalInsuranceNumber)
+        {
+            var hasNationalInsuranceNumber = true;
+
+            if ((_hasNationalInsuranceNumber is not null && _hasNationalInsuranceNumber != hasNationalInsuranceNumber)
+                || (_nationalInsuranceNumber is not null && _nationalInsuranceNumber != nationalInsuranceNumber))
+            {
+                throw new InvalidOperationException("WithNationalInsuranceNumber cannot be changed after it's set.");
+            }
+
+            _hasNationalInsuranceNumber = hasNationalInsuranceNumber;
+            _nationalInsuranceNumber = nationalInsuranceNumber;
+            return this;
+        }
+
         public CreatePersonBuilder WithQts(DateOnly? qtsDate = null)
         {
             _qtsRegistrations.Add(

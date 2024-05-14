@@ -14,6 +14,9 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             return null;
         }
 
+        var trn = NormalizeTrn(request.Trn);
+        var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(request.NationalInsuranceNumber);
+
         var results = await dbContext.Database.SqlQueryRaw<MatchQueryResult>(
                 """
                 WITH matches AS (
@@ -41,11 +44,11 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
                     new NpgsqlParameter("ni_number", NpgsqlTypes.NpgsqlDbType.Varchar)
                     {
-                        Value = request.NationalInsuranceNumber is not null ? request.NationalInsuranceNumber : DBNull.Value
+                        Value = nationalInsuranceNumber is not null ? nationalInsuranceNumber : DBNull.Value
                     },
                     new NpgsqlParameter("trn", NpgsqlTypes.NpgsqlDbType.Varchar)
                     {
-                        Value = request.Trn is not null ? request.Trn : DBNull.Value
+                        Value = trn is not null ? trn : DBNull.Value
                     }
                 ]
             ).ToArrayAsync();
@@ -70,13 +73,16 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         // Results should be ordered such that matches on TRN are returned before matches on NINO with matches on last name + DOB last.
 
         var lastNames = request.Names.Select(parts => parts.Last()).ToArray();
-        var trns = new[] { request.Trn, request.TrnTokenTrnHint }.Where(trn => trn is not null).Distinct().ToArray();
+        var firstNames = request.Names.Select(parts => parts.First()).ToArray();
+        var trns = new[] { request.Trn, request.TrnTokenTrnHint }.Where(trn => trn is not null).Distinct().Select(NormalizeTrn).ToArray();
+        var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(request.NationalInsuranceNumber);
 
         var results = await dbContext.Database.SqlQueryRaw<SuggestionsQueryResult>(
                 """
                 WITH matches AS (
                 	SELECT a.person_id, array_agg(DISTINCT a.attribute_type) matched_attr_keys FROM person_search_attributes a
                 	WHERE (a.attribute_type = 'LastName' AND a.attribute_value = ANY(:last_names))
+                	OR (a.attribute_type = 'FirstName' AND a.attribute_value = ANY(:first_names))
                 	OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY(:dobs))
                 	OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = :ni_number)
                 	OR (a.attribute_type = 'Trn' AND a.attribute_value = ANY(:trns))
@@ -101,10 +107,11 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 parameters:
                 [
                     new NpgsqlParameter("last_names", lastNames),
+                    new NpgsqlParameter("first_names", firstNames),
                     new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
                     new NpgsqlParameter("ni_number", NpgsqlTypes.NpgsqlDbType.Varchar)
                     {
-                        Value = request.NationalInsuranceNumber is not null ? request.NationalInsuranceNumber : DBNull.Value
+                        Value = nationalInsuranceNumber is not null ? nationalInsuranceNumber : DBNull.Value
                     },
                     new NpgsqlParameter("trns", trns)
                 ]
@@ -116,9 +123,11 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 var score = r.matched_attr_keys.Sum(
                     m => m switch
                     {
-                        "Trn" => 3,
-                        "NationalInsuranceNumber" => 2,
-                        "LastName" => 1,
+                        "Trn" => 20,
+                        "NationalInsuranceNumber" => 10,
+                        "DateOfBirth" => 2,
+                        "LastName" => 2,
+                        "FirstName" => 1,
                         _ => 0
                     });
 
@@ -139,6 +148,56 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             .AsReadOnly();
     }
 
+    public async Task<IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributes(GetSuggestedMatchesRequest request, Guid personId)
+    {
+        var fullNames = request.Names.Where(parts => parts.Length > 1).Select(parts => $"{parts.First()} {parts.Last()}").ToArray();
+        var lastNames = request.Names.Select(parts => parts.Last()).ToArray();
+        var firstNames = request.Names.Select(parts => parts.First()).ToArray();
+        var trns = new[] { request.Trn, request.TrnTokenTrnHint }.Where(trn => trn is not null).Distinct().Select(NormalizeTrn).ToArray();
+        var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(request.NationalInsuranceNumber);
+
+        var results = await dbContext.Database.SqlQueryRaw<MatchedAttributesQueryResult>(
+                """
+                SELECT
+                    a.attribute_type,
+                    a.attribute_value
+                FROM person_search_attributes a
+                WHERE ((a.attribute_type = 'FullName' AND a.attribute_value = ANY(:full_names))
+                OR (a.attribute_type = 'LastName' AND a.attribute_value = ANY(:last_names))
+                OR (a.attribute_type = 'FirstName' AND a.attribute_value = ANY(:first_names))
+                OR (a.attribute_type = 'DateOfBirth' AND a.attribute_value = ANY(:dobs))
+                OR (a.attribute_type = 'NationalInsuranceNumber' AND a.attribute_value = :ni_number)
+                OR (a.attribute_type = 'Trn' AND a.attribute_value = ANY(:trns)))
+                AND a.person_id = :person_id
+                """,
+                parameters:
+                [
+                    new NpgsqlParameter("person_id", personId),
+                    new NpgsqlParameter("full_names", fullNames),
+                    new NpgsqlParameter("last_names", lastNames),
+                    new NpgsqlParameter("first_names", firstNames),
+                    new NpgsqlParameter("dobs", request.DatesOfBirth.Select(d => d.ToString("yyyy-MM-dd")).ToArray()),
+                    new NpgsqlParameter("ni_number", NpgsqlTypes.NpgsqlDbType.Varchar)
+                    {
+                        Value = nationalInsuranceNumber is not null ? nationalInsuranceNumber : DBNull.Value
+                    },
+                    new NpgsqlParameter("trns", trns)
+                ]
+            ).ToArrayAsync();
+
+        return results
+            .Select(r => KeyValuePair.Create(Enum.Parse<OneLoginUserMatchedAttribute>(r.attribute_type), r.attribute_value))
+            .OrderBy(r => (int)r.Key)
+            .ThenBy(r => r.Value)
+            .AsReadOnly();
+    }
+
+    private static string? NormalizeTrn(string? value) =>
+        string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiDigit).ToArray());
+
+    private static string? NormalizeNationalInsuranceNumber(string? value) =>
+        string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiLetterOrDigit).ToArray());
+
 #pragma warning disable IDE1006 // Naming Styles
     private record MatchQueryResult(Guid person_id, string trn, JsonDocument matched_attrs);
 
@@ -154,5 +213,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         string last_name,
         DateOnly? date_of_birth,
         string? national_insurance_number);
+
+    private record MatchedAttributesQueryResult(string attribute_type, string attribute_value);
 #pragma warning restore IDE1006 // Naming Styles
 }

@@ -275,8 +275,8 @@ public class SignInJourneyHelper(
 
         var names = state.VerifiedNames;
         var datesOfBirth = state.VerifiedDatesOfBirth;
-        var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(state.NationalInsuranceNumber);
-        var trn = NormalizeTrn(state.Trn);
+        var nationalInsuranceNumber = state.NationalInsuranceNumber;
+        var trn = state.Trn;
 
         var matchResult = await personMatchingService.Match(new(names!, datesOfBirth!, nationalInsuranceNumber, trn));
 
@@ -305,12 +305,6 @@ public class SignInJourneyHelper(
         }
 
         return false;
-
-        static string? NormalizeNationalInsuranceNumber(string? value) =>
-            string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiLetterOrDigit).ToArray());
-
-        static string? NormalizeTrn(string? value) =>
-            string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiDigit).ToArray());
     }
 
     public void Complete(SignInJourneyState state, string trn)
