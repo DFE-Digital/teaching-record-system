@@ -106,6 +106,13 @@
                     </govuk-radios-item>
                 </govuk-radios>
             }
+            else
+            {
+                <h2 class="govuk-heading-l">No suggested matches</h2>
+
+                <input type="hidden" asp-for="Trn" value="@IndexModel.NoneOfTheAboveTrnSentinel" />
+                await RenderConnectToTrnOption();
+            }
 
             <govuk-button type="submit">Continue</govuk-button>
         </div>
