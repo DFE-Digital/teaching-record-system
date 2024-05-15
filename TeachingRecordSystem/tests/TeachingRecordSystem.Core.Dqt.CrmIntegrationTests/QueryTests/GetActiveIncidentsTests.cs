@@ -27,7 +27,7 @@ public class GetActiveIncidentsTests : IAsyncLifetime
         var approvedCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithApprovedStatus());
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveIncidentsQuery(1, 15));
+        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveIncidentsQuery(1, 50));
 
         // Assert        
         Assert.Contains(result.Incidents, i => i.Id == activeCreateNameChangeIncidentResult.IncidentId);
