@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
 public class CreateNameChangeIncidentTests : IAsyncLifetime
@@ -26,9 +24,10 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         var newFirstName = _dataScope.TestData.GenerateFirstName();
         var newMiddleName = _dataScope.TestData.GenerateMiddleName();
         var newLastName = _dataScope.TestData.GenerateLastName();
-        var evidenceFileName = "evidence.txt";
-        var evidenceFileContent = new MemoryStream(Encoding.UTF8.GetBytes("Test file"));
-        var evidenceFileMimeType = "text/plain";
+        var uniqueId = Guid.NewGuid();
+        var evidenceFileName = $"evidence-{uniqueId}.jpg";
+        var evidenceFileContent = new MemoryStream(TestCommon.TestData.JpegImage);
+        var evidenceFileMimeType = "image/jpeg";
 
         var query = new CreateNameChangeIncidentQuery()
         {
@@ -63,5 +62,16 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         Assert.Equal(newMiddleName, createdIncident.dfeta_StatedMiddleName);
         Assert.Equal(newLastName, createdIncident.dfeta_StatedLastName);
         Assert.Equal(query.FromIdentity, createdIncident.dfeta_FromIdentity);
+
+        var createdDocument = ctx.dfeta_documentSet.SingleOrDefault(i => i.GetAttributeValue<string>(dfeta_document.Fields.dfeta_name) == evidenceFileName);
+        Assert.NotNull(createdDocument);
+        Assert.Equal(createPersonResult.ContactId, createdDocument.dfeta_PersonId.Id);
+        Assert.Equal(createdIncident.Id, createdDocument.dfeta_CaseId.Id);
+        Assert.Equal(dfeta_DocumentType.ChangeofNameDOBEvidence, createdDocument.dfeta_Type);
+
+        var createdAnnotation = ctx.AnnotationSet.SingleOrDefault(i => i.GetAttributeValue<string>(Annotation.Fields.FileName) == evidenceFileName);
+        Assert.NotNull(createdAnnotation);
+        Assert.Equal(createdDocument.Id, createdAnnotation.ObjectId.Id);
+        Assert.Equal(dfeta_document.EntityLogicalName, createdAnnotation.ObjectTypeCode);
     }
 }
