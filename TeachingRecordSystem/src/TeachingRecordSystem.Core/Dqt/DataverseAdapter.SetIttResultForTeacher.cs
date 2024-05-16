@@ -116,8 +116,8 @@ public partial class DataverseAdapter
             {
                 return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.EytsDateMismatch), null);
             }
-            else if (!isEarlyYears && lookupData.Teacher.dfeta_QTSDate.HasValue &&
-                lookupData.Teacher.dfeta_QTSDate.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true) != assessmentDate.Value)
+            else if (!isEarlyYears && qtsRegistration.dfeta_QTSDate.HasValue &&
+                qtsRegistration.dfeta_QTSDate.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true) != assessmentDate.Value)
             {
                 return (SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.QtsDateMismatch), null);
             }
@@ -303,7 +303,8 @@ public partial class DataverseAdapter
                 {
                     dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
                     dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
-                    dfeta_qtsregistration.Fields.StateCode
+                    dfeta_qtsregistration.Fields.StateCode,
+                    dfeta_qtsregistration.Fields.dfeta_QTSDate
                 });
 
             await requestBuilder.Execute();
