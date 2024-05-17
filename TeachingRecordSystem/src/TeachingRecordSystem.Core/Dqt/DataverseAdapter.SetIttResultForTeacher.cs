@@ -170,7 +170,7 @@ public partial class DataverseAdapter
                 });
                 Debug.Assert(teacherStatus != null);
 
-                if (!lookupData.Teacher.dfeta_QTSDate.HasValue)
+                if (!qtsRegistration.dfeta_QTSDate.HasValue)
                 {
                     txnRequest.Requests.Add(new CreateRequest()
                     {
