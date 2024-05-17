@@ -1,5 +1,22 @@
 @page "/request-trn/email"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn.EmailModel
 @{
-    ViewBag.Title = "What is your email address?";
+    ViewBag.Title = Html.DisplayNameFor(m => m.Email);
 }
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.RequestTrn(Model.JourneyInstance!.InstanceId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RequestTrnEmail(Model.JourneyInstance!.InstanceId)" method="post">            
+
+            <govuk-input asp-for="Email" type="email" autocomplete="email">
+                <govuk-input-label is-page-heading="true" class="govuk-label--l" />
+            </govuk-input>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>
