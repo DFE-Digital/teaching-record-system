@@ -10,4 +10,7 @@ public class RequestTrnJourneyState()
         new JourneyDescriptor(JourneyName, typeof(RequestTrnJourneyState), requestDataKeys: [], appendUniqueKey: true);
 
     public string? Email { get; set; }
+    public string? Name { get; set; }
+    public bool? HasPreviousName { get; set; }
+    public string? PreviousName { get; set; }
 }

@@ -1,5 +1,33 @@
 @page "/request-trn/name"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn.NameModel
 @{
-    ViewBag.Title = "What is your name?";
+    ViewBag.Title = Html.DisplayNameFor(m => m.Name);
 }
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.RequestTrnEmail(Model.JourneyInstance!.InstanceId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RequestTrnName(Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-input asp-for="Name" spellcheck="false">
+                <govuk-input-label is-page-heading="true" class="govuk-label--l" />
+            </govuk-input>
+
+            <govuk-radios asp-for="HasPreviousName">
+                <govuk-radios-fieldset>
+                    <govuk-radios-item value="@true">
+                        Yes
+                        <govuk-radios-item-conditional>
+                            <govuk-input asp-for="PreviousName" spellcheck="false"/>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">No</govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>
