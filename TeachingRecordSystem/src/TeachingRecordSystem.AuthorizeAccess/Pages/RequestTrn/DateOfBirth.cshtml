@@ -1,5 +1,23 @@
 @page "/request-trn/date-of-birth"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn.DateOfBirthModel
 @{
-    ViewBag.Title = "What is your date of birth?";
+    ViewBag.Title = Html.DisplayNameFor(m => m.DateOfBirth);
 }
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.RequestTrnName(Model.JourneyInstance!.InstanceId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RequestTrnDateOfBirth(Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-date-input asp-for="DateOfBirth">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

@@ -25,6 +25,13 @@ public static class PageExtensions
         Assert.Equal(trn, await page.GetByTestId("trn").InnerTextAsync());
     }
 
+    public static async Task FillDateInput(this IPage page, DateOnly date)
+    {
+        await page.FillAsync("label:text-is('Day')", date.Day.ToString());
+        await page.FillAsync("label:text-is('Month')", date.Month.ToString());
+        await page.FillAsync("label:text-is('Year')", date.Year.ToString());
+    }
+
     public static Task ClickButton(this IPage page, string text) =>
         page.ClickAsync($".govuk-button:text-is('{text}')");
 }

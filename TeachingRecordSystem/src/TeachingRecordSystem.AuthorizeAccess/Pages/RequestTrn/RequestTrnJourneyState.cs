@@ -13,4 +13,5 @@ public class RequestTrnJourneyState()
     public string? Name { get; set; }
     public bool? HasPreviousName { get; set; }
     public string? PreviousName { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
 }

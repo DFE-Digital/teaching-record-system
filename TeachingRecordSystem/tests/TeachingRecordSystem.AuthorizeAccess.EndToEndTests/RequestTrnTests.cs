@@ -26,5 +26,11 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButton("Continue");
 
         await page.WaitForUrlPathAsync("/request-trn/date-of-birth");
+
+        var dateOfBirth = new DateOnly(1980, 3, 1);
+        await page.FillDateInput(dateOfBirth);
+        await page.ClickButton("Continue");
+
+        await page.WaitForUrlPathAsync("/request-trn/identity");
     }
 }
