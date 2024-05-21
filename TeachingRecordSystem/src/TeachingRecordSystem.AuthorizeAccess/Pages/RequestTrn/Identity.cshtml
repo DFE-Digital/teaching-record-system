@@ -3,3 +3,41 @@
 @{
     ViewBag.Title = "Upload proof of your identity";
 }
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.RequestTrnDateOfBirth(Model.JourneyInstance!.InstanceId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RequestTrnIdentity(Model.JourneyInstance!.InstanceId)" method="post" enctype="multipart/form-data">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-details open="true">
+                <govuk-details-summary>Documents we accept</govuk-details-summary>
+                <govuk-details-text>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>passport</li>
+                        <li>driving license</li>
+                        <li>birth certificate</li>
+                        <li>UK work permit</li>
+                    </ul>
+                </govuk-details-text>
+            </govuk-details>
+
+            @if (Model.EvidenceFileId is not null)
+            {
+                <span class="govuk-caption-m">Currently uploaded file</span>
+                <p class="govuk-body">
+                    <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} ({Model.EvidenceFileSizeDescription})")</a>
+                </p>
+            }
+
+            <govuk-file-upload asp-for="EvidenceFile" input-accept=".jpeg, .jpg, .pdf, .png">
+                <govuk-file-upload-label>Upload file</govuk-file-upload-label>
+            </govuk-file-upload>
+
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

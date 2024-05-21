@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
     <PackageReference Include="GovUk.OneLogin.AspNetCore" />
+    <PackageReference Include="Humanizer.Core" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
     <PackageReference Include="OpenIddict.AspNetCore" />
