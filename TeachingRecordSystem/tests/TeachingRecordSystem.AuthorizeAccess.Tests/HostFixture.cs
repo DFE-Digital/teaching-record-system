@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Events.Processing;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow.State;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -62,6 +63,19 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
             services.AddSingleton<FakeTrnGenerator>();
             services.AddSingleton<TrsDataSyncHelper>();
+            services.AddSingleton(GetMockFileService());
+
+            IFileService GetMockFileService()
+            {
+                var fileService = new Mock<IFileService>();
+                fileService
+                    .Setup(s => s.UploadFile(It.IsAny<Stream>(), It.IsAny<string?>()))
+                    .ReturnsAsync(Guid.NewGuid());
+                fileService
+                    .Setup(s => s.GetFileUrl(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                    .ReturnsAsync("https://fake.blob.core.windows.net/fake");
+                return fileService.Object;
+            }
         });
     }
 

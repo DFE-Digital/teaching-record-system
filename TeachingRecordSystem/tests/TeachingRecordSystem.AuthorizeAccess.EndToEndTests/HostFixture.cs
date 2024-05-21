@@ -8,6 +8,7 @@ using Microsoft.Playwright;
 using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.FormFlow.State;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
@@ -89,6 +90,19 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
                     services.AddSingleton<FakeTrnGenerator>();
                     services.AddSingleton<TrsDataSyncHelper>();
                     services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
+                    services.AddSingleton(GetMockFileService());
+
+                    IFileService GetMockFileService()
+                    {
+                        var fileService = new Mock<IFileService>();
+                        fileService
+                            .Setup(s => s.UploadFile(It.IsAny<Stream>(), It.IsAny<string?>()))
+                            .ReturnsAsync(Guid.NewGuid());
+                        fileService
+                            .Setup(s => s.GetFileUrl(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                            .ReturnsAsync("https://fake.blob.core.windows.net/fake");
+                        return fileService.Object;
+                    }
                 });
             });
 

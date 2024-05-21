@@ -1,3 +1,5 @@
+using Microsoft.Playwright;
+
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 
 public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -27,10 +29,23 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.WaitForUrlPathAsync("/request-trn/date-of-birth");
 
-        var dateOfBirth = new DateOnly(1980, 3, 1);
+        var dateOfBirth = new DateOnly(1980, 10, 12);
         await page.FillDateInput(dateOfBirth);
         await page.ClickButton("Continue");
 
         await page.WaitForUrlPathAsync("/request-trn/identity");
+
+        await page
+                .GetByLabel("Upload file")
+                .SetInputFilesAsync(
+                    new FilePayload()
+                    {
+                        Name = "evidence.jpg",
+                        MimeType = "image/jpeg",
+                        Buffer = TestData.JpegImage
+                    });
+        await page.ClickButton("Continue");
+
+        await page.WaitForUrlPathAsync("/request-trn/national-insurance-number");
     }
 }

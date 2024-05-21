@@ -14,4 +14,7 @@ public class RequestTrnJourneyState()
     public bool? HasPreviousName { get; set; }
     public string? PreviousName { get; set; }
     public DateOnly? DateOfBirth { get; set; }
+    public Guid? EvidenceFileId { get; set; }
+    public string? EvidenceFileName { get; set; }
+    public string? EvidenceFileSizeDescription { get; set; }
 }
