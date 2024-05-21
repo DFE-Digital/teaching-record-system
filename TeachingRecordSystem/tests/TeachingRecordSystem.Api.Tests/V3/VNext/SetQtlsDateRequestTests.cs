@@ -376,9 +376,9 @@ public class SetQtlsDateRequestTests : TestBase
         Assert.Equal(dfeta_InductionStatus.NotYetCompleted, contact!.dfeta_InductionStatus);
     }
 
-    //11 - verify about with ab
+    //11 - An AB does not have an induction period
     [Fact]
-    public async Task Put_SetQTLSWhenInductionStatusIsInductionExtendedWithoutAB_SetsInductionStatusExempt()
+    public async Task Put_InductionExtendedWithoutActiveInductionPeriod_SetsInductionStatusExempt()
     {
         // Arrange
         var account = await TestData.CreateAccount(x => x.WithName("someaccount"));
@@ -408,9 +408,41 @@ public class SetQtlsDateRequestTests : TestBase
         Assert.Equal(dfeta_InductionStatus.Exempt, contact!.dfeta_InductionStatus);
     }
 
+    //11 - AB Does not have an active induction period (has an enddate)
+    [Fact]
+    public async Task Put_InductionExtendedForAppropriateBodyWithoutActiveInductionPeriod_SetsInductionStatusExempt()
+    {
+        // Arrange
+        var account = await TestData.CreateAccount(x => x.WithName("someaccount"));
+        var existingInductionStatus = dfeta_InductionStatus.InductionExtended;
+        var existingQtlsDate = DateOnly.Parse("04/04/2019");
+        var existingQtsDate = DateOnly.Parse("04/04/2016");
+        var incomingqtlsDate = DateOnly.Parse("01/07/1997");
+        var existingContact = await TestData.CreatePerson(p => p
+            .WithTrn(hasTrn: true)
+            .WithQts(existingQtsDate)
+            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, Clock.Today.AddMonths(-1), Clock.Today.AddDays(-1), account.AccountId));
+
+        var requestBody = CreateJsonContent(new { QTSDate = incomingqtlsDate });
+        var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{existingContact.Trn}/qtls")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+        var contact = XrmFakedContext.CreateQuery<Contact>().FirstOrDefault(x => x.ContactId == existingContact.PersonId);
+        var task = XrmFakedContext.CreateQuery<Core.Dqt.Models.Task>().FirstOrDefault(x => x.RegardingObjectId.Id == existingContact.PersonId && x.Subject == "Notification for SET QTLS data collections team");
+
+        // Assert
+        Assert.Null(task);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(dfeta_InductionStatus.Exempt, contact!.dfeta_InductionStatus);
+    }
+
     //12 
     [Fact]
-    public async Task Put_ClearQTLSWhenInductionStatusIsInductionExtendedWithAB_SetsInductionStatusBackToInductionExtended()
+    public async Task Put_ClearQTLSWhenInductionStatusIsInductionExtendedWithAppropriateBody_SetsInductionStatusBackToInductionExtended()
     {
         // Arrange
         var account = await TestData.CreateAccount(x => x.WithName("someaccount"));
