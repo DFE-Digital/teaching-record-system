@@ -14,7 +14,14 @@ public class FileSizeAttribute : ValidationAttribute
 
     protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
     {
-        if (value is IFormFile file && file.Length > _maxFileSize)
+        var file = value as IFormFile;
+        if (file is null)
+        {
+            throw new NotSupportedException("FileSizeAttribute can only be used on property of type IFormFile");
+
+        }
+
+        if (file.Length > _maxFileSize)
         {
             return new ValidationResult(ErrorMessage);
         }

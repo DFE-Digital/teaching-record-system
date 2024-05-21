@@ -14,13 +14,13 @@ public class FileExtensionsAttribute : ValidationAttribute
 
     public override bool IsValid(object? value)
     {
-        if (value is IFormFile file)
+        var file = value as IFormFile;
+        if (file is null)
         {
-            var fileName = file.FileName;
-
-            return AllowedExtensions.Any(extension => fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase));
+            throw new NotSupportedException("FileExtensionsAttribute can only be used on property of type IFormFile");
         }
 
-        return true;
+        var fileName = file.FileName;
+        return AllowedExtensions.Any(extension => fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase));
     }
 }
