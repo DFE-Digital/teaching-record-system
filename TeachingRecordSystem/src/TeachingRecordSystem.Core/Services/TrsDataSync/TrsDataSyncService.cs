@@ -21,7 +21,7 @@ public class TrsDataSyncService(
     private static readonly ResiliencePipeline _resiliencePipeline = new ResiliencePipelineBuilder()
         .AddRetry(new Polly.Retry.RetryStrategyOptions()
         {
-            BackoffType = DelayBackoffType.Exponential,
+            BackoffType = DelayBackoffType.Linear,
             Delay = TimeSpan.FromSeconds(30),
             MaxRetryAttempts = 10
         })

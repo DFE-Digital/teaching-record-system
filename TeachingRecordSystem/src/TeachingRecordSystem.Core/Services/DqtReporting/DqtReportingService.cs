@@ -31,9 +31,9 @@ public partial class DqtReportingService : BackgroundService
     private static readonly ResiliencePipeline _resiliencePipeline = new ResiliencePipelineBuilder()
         .AddRetry(new Polly.Retry.RetryStrategyOptions()
         {
-            BackoffType = DelayBackoffType.Exponential,
+            BackoffType = DelayBackoffType.Linear,
             Delay = TimeSpan.FromSeconds(30),
-            MaxRetryAttempts = 3
+            MaxRetryAttempts = 10
         })
         .Build();
 
