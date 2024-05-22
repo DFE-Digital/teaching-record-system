@@ -86,7 +86,7 @@ public class SetQtlsHandler(ICrmQueryDispatcher _crmQueryDispatcher)
         }
         else
         {
-            var inductionPeriod = induction.InductionPeriods.Where(x=>x.dfeta_EndDate == null).OrderByDescending(x => x.dfeta_StartDate).FirstOrDefault();
+            var inductionPeriod = induction.InductionPeriods.Where(x => x.dfeta_EndDate == null).OrderByDescending(x => x.dfeta_StartDate).FirstOrDefault();
             return (induction.Induction, inductionPeriod != null);
         }
     }
