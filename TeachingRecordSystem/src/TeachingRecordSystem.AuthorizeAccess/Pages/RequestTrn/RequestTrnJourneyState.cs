@@ -17,4 +17,6 @@ public class RequestTrnJourneyState()
     public Guid? EvidenceFileId { get; set; }
     public string? EvidenceFileName { get; set; }
     public string? EvidenceFileSizeDescription { get; set; }
+    public bool? HasNationalInsuranceNumber { get; set; }
+    public string? NationalInsuranceNumber { get; set; }
 }
