@@ -4,8 +4,10 @@ namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 
 public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
-    public async Task RequestTrn()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task RequestTrn(bool hasNationalInsuranceNumber)
     {
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -47,5 +49,21 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickButton("Continue");
 
         await page.WaitForUrlPathAsync("/request-trn/national-insurance-number");
+
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+        if (hasNationalInsuranceNumber)
+        {
+            await page.CheckAsync("text=Yes");
+            await page.FillAsync("input[name=NationalInsuranceNumber]", nationalInsuranceNumber);
+            await page.ClickButton("Continue");
+
+            await page.WaitForUrlPathAsync("/request-trn/check-answers");
+        }
+        else
+        {
+            await page.CheckAsync("text=No");
+            await page.ClickButton("Continue");
+            await page.WaitForUrlPathAsync("/request-trn/address");
+        }
     }
 }

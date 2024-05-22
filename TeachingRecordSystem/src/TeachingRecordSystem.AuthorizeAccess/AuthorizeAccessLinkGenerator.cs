@@ -53,6 +53,14 @@ public abstract class AuthorizeAccessLinkGenerator
     public string RequestTrnNationalInsuranceNumber(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RequestTrn/NationalInsuranceNumber", journeyInstanceId: journeyInstanceId);
 
+    public string RequestTrnAddress(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RequestTrn/Address", journeyInstanceId: journeyInstanceId);
+
+    public string RequestTrnCheckAnswers(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RequestTrn/CheckAnswers", journeyInstanceId: journeyInstanceId);
+
+
+
     protected virtual string GetRequiredPathByPage(string page, string? handler = null, object? routeValues = null, JourneyInstanceId? journeyInstanceId = null)
     {
         var url = GetRequiredPathByPage(page, handler, routeValues);
