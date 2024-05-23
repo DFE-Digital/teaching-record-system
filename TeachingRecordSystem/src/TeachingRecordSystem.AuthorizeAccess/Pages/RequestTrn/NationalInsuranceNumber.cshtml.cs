@@ -17,7 +17,7 @@ public class NationalInsuranceNumberModel(AuthorizeAccessLinkGenerator linkGener
     public bool? HasNationalInsuranceNumber { get; set; }
 
     [BindProperty]
-    [Display(Name = "National Insurance number")]
+    [Display(Name = "National Insurance number", Description = "It’s on your National Insurance card, benefit letter, payslip or P60. For example, ‘QQ 12 34 56 C’.")]
     [Required(ErrorMessage = "Enter your National Insurance number")]
     public string? NationalInsuranceNumber { get; set; }
 

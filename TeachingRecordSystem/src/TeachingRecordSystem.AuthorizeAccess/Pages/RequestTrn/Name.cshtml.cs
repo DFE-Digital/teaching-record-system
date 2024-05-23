@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.AuthorizeAccess.DataAnnotations;
 using TeachingRecordSystem.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
@@ -15,17 +14,8 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
     [BindProperty]
     [Display(Name = "What is your name?", Description = "Full name")]
     [Required(ErrorMessage = "Enter your name")]
+    [MaxLength(200, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
-
-    [BindProperty]
-    [Display(Name = "Do you have a previous name?")]
-    [Required(ErrorMessage = "Tell us if you have a previous name")]
-    public bool? HasPreviousName { get; set; }
-
-    [BindProperty]
-    [Display(Name = "Previous full name")]
-    [RequiredIfOtherPropertyEquals(nameof(HasPreviousName), ErrorMessage = "Tell us your previous name")]
-    public string? PreviousName { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
@@ -37,11 +27,9 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.Name = Name;
-            state.HasPreviousName = HasPreviousName;
-            state.PreviousName = HasPreviousName!.Value ? PreviousName : null;
         });
 
-        return Redirect(linkGenerator.RequestTrnDateOfBirth(JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.RequestTrnPreviousName(JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -53,7 +41,5 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
         }
 
         Name ??= JourneyInstance!.State.Name;
-        HasPreviousName ??= JourneyInstance!.State.HasPreviousName;
-        PreviousName ??= JourneyInstance!.State.PreviousName;
     }
 }

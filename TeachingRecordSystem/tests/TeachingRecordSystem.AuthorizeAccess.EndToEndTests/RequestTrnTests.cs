@@ -25,6 +25,10 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var name = Faker.Name.FullName();
         var previousName = Faker.Name.FullName();
         await page.FillAsync("input[name=Name]", name);
+        await page.ClickButton("Continue");
+
+        await page.WaitForUrlPathAsync("/request-trn/previous-name");
+
         await page.CheckAsync("text=Yes");
         await page.FillAsync("input[name=PreviousName]", previousName);
         await page.ClickButton("Continue");
