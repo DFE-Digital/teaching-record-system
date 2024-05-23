@@ -9,6 +9,7 @@
   </Target>
 
   <ItemGroup>
+    <PackageReference Include="Dfe.Analytics" />
     <PackageReference Include="GovUk.Frontend.AspNetCore" />
     <PackageReference Include="GovUk.OneLogin.AspNetCore" />
     <PackageReference Include="Humanizer.Core" />

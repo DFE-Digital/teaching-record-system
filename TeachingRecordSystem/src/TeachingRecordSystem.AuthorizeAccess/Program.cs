@@ -1,8 +1,11 @@
 using System.Security.Cryptography;
+using Dfe.Analytics;
+using Dfe.Analytics.AspNetCore;
 using GovUk.Frontend.AspNetCore;
 using GovUk.OneLogin.AspNetCore;
 using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -130,6 +133,17 @@ builder.Services.AddOpenIddict()
             .EnableStatusCodePagesIntegration();
     });
 
+builder.Services.AddDfeAnalytics()
+    .AddAspNetCoreIntegration(options =>
+    {
+        options.UserIdClaimType = ClaimTypes.Subject;
+
+        options.RequestFilter = ctx =>
+            ctx.Request.Path != "/status" &&
+            ctx.Request.Path != "/health" &&
+            ctx.Features.Any(f => f.Key == typeof(IEndpointFeature));
+    });
+
 builder.Services
     .AddRazorPages()
     .AddMvcOptions(options =>
@@ -225,6 +239,11 @@ app.UseCsp(csp =>
 });
 
 app.UseStaticFiles();
+
+if (builder.Environment.IsProduction())
+{
+    app.UseDfeAnalytics();
+}
 
 app.UseRouting();
 
