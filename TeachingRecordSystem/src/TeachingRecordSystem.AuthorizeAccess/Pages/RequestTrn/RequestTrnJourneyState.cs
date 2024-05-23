@@ -19,4 +19,9 @@ public class RequestTrnJourneyState()
     public string? EvidenceFileSizeDescription { get; set; }
     public bool? HasNationalInsuranceNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
+    public string? AddressLine1 { get; set; }
+    public string? AddressLine2 { get; set; }
+    public string? TownOrCity { get; set; }
+    public string? Country { get; set; }
+    public string? PostalCode { get; set; }
 }
