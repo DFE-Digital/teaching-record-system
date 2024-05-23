@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.FormFlow;
+using EmailAddress = TeachingRecordSystem.AuthorizeAccess.DataAnnotations.EmailAddressAttribute;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
@@ -14,7 +15,7 @@ public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
     [BindProperty]
     [Display(Name = "What is your email address?", Description = "We’ll only use this to send you your TRN if you’re eligible for one.")]
     [Required(ErrorMessage = "Enter your email address")]
-    [EmailAddress(ErrorMessage = "Enter a valid email address")]
+    [@EmailAddress(ErrorMessage = "Enter a valid email address")]
     public string? Email { get; set; }
 
     public async Task<IActionResult> OnPost()

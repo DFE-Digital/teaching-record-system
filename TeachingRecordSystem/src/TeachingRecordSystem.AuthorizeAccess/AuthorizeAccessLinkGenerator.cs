@@ -44,6 +44,9 @@ public abstract class AuthorizeAccessLinkGenerator
     public string RequestTrnName(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RequestTrn/Name", journeyInstanceId: journeyInstanceId);
 
+    public string RequestTrnPreviousName(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RequestTrn/PreviousName", journeyInstanceId: journeyInstanceId);
+
     public string RequestTrnDateOfBirth(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RequestTrn/DateOfBirth", journeyInstanceId: journeyInstanceId);
 

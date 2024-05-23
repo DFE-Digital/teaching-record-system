@@ -26,8 +26,6 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         state.Email = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
-        state.PreviousName = Faker.Name.FullName();
-        state.HasPreviousName = true;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -38,10 +36,6 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(state.Name, doc.GetElementById("Name")?.GetAttribute("value"));
-        var radioButtons = doc.GetElementsByName("HasPreviousName");
-        var selectedRadioButton = radioButtons.Single(r => r.HasAttribute("checked"));
-        Assert.Equal("True", selectedRadioButton.GetAttribute("value"));
-        Assert.Equal(state.PreviousName, doc.GetElementById("PreviousName")?.GetAttribute("value"));
     }
 
     [Fact]
@@ -52,13 +46,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         state.Email = Faker.Internet.Email();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["HasPreviousName"] = "False",
-            }),
-        };
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -68,67 +56,13 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenHasPreviousNameHasNoSelection_ReturnsError()
-    {
-        // Arrange
-        var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
-        var journeyInstance = await CreateJourneyInstance(state);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["Name"] = Faker.Name.FullName(),
-            }),
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        await AssertEx.HtmlResponseHasError(response, "HasPreviousName", "Tell us if you have a previous name");
-    }
-
-    [Fact]
-    public async Task Post_WhenHasPreviousNameIsTrueAndPreviousNameIsEmpty_ReturnsError()
-    {
-        // Arrange
-        var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
-        var journeyInstance = await CreateJourneyInstance(state);
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["Name"] = Faker.Name.FullName(),
-                ["HasPreviousName"] = "True",
-            }),
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        await AssertEx.HtmlResponseHasError(response, "PreviousName", "Tell us your previous name");
-    }
-
-    [Fact]
     public async Task Post_EmailMissingFromState_RedirectsToEmail()
     {
         // Arrange
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["Name"] = Faker.Name.FullName(),
-                ["HasPreviousName"] = "False",
-            }),
-        };
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -147,14 +81,11 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(state);
 
         var name = Faker.Name.FullName();
-        var previousName = Faker.Name.FullName();
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["Name"] = name,
-                ["HasPreviousName"] = "True",
-                ["PreviousName"] = previousName,
+                ["Name"] = name
             }),
         };
 
@@ -163,11 +94,9 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         var reloadedJourneyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(name, reloadedJourneyInstance.State.Name);
-        Assert.Equal(previousName, reloadedJourneyInstance.State.PreviousName);
-        Assert.True(reloadedJourneyInstance.State.HasPreviousName);
     }
 }

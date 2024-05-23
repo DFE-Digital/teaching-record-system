@@ -30,9 +30,9 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator) : Page
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.Name is null)
+        if (JourneyInstance!.State.PreviousName is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.RequestTrnPreviousName(JourneyInstance.InstanceId));
             return;
         }
 
