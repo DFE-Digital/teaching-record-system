@@ -253,6 +253,15 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
 
+if (builder.Configuration["RootRedirect"] is string rootRedirect)
+{
+    app.MapGet("/", ctx =>
+    {
+        ctx.Response.Redirect(rootRedirect);
+        return Task.CompletedTask;
+    });
+}
+
 app.Run();
 
 public partial class Program { }
