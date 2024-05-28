@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="DataStore\Postgres\Procedures\fn_update_person_search_attributes_v1.sql" />
+    <None Remove="DataStore\Postgres\Procedures\p_refresh_name_person_search_attributes_v1.sql" />
+    <None Remove="DataStore\Postgres\Procedures\p_refresh_person_search_attributes_v1.sql" />
+    <None Remove="DataStore\Postgres\Triggers\trg_update_person_search_attributes_v1.sql" />
     <None Remove="Services\DqtReporting\Migrations\0001_Initial.sql" />
     <None Remove="Services\DqtReporting\Migrations\0002_TrackingColumns.sql" />
     <None Remove="Services\DqtReporting\Migrations\0003_ContactSentQtsAwardedEmail.sql" />
@@ -28,6 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_search_attributes_v1.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_name_person_search_attributes_v1.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_person_search_attributes_v1.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_update_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0001_Initial.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0002_TrackingColumns.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0003_ContactSentQtsAwardedEmail.sql" />
