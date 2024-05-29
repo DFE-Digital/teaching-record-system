@@ -88,7 +88,7 @@ public class DebugIdentityModel(
 
             if (dobs.Length == 0)
             {
-                ModelState.AddModelError(nameof(VerifiedDatesOfBirth), "Enter at least one name");
+                ModelState.AddModelError(nameof(VerifiedDatesOfBirth), "Enter at least one date of birth");
             }
             else if (dobs.Any(dob => dob is null))
             {
