@@ -99,7 +99,7 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.AddOrUpdate<PopulateAllPersonsSearchAttributesJob>(
                     nameof(PopulateAllPersonsSearchAttributesJob),
-                    job => job.Execute(),
+                    job => job.Execute(CancellationToken.None),
                     Cron.Never);
 
                 var giasOptions = sp.GetRequiredService<IOptions<GiasOptions>>();
