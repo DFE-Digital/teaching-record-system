@@ -36,6 +36,7 @@
     <None Remove="Services\DqtReporting\Migrations\0018_ContactQTLSDate.sql" />
     <None Remove="Services\DqtReporting\Migrations\0019_dfeta_qtlsdatehasbeenset.sql" />
     <None Remove="Services\DqtReporting\Migrations\0020_incidentresolution_msdyn_proposeknowledge.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0021_account_msdyn_primarytimezone.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,6 +71,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0018_ContactQTLSDate.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0019_dfeta_qtlsdatehasbeenset.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0020_incidentresolution_msdyn_proposeknowledge.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0021_account_msdyn_primarytimezone.sql" />
   </ItemGroup>
 
   <ItemGroup>
