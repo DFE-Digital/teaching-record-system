@@ -12,7 +12,11 @@ public static class HostApplicationBuilderExtensions
     {
         if (builder.Environment.IsProduction())
         {
-            SentrySdk.Init(dsn: builder.Configuration.GetRequiredValue("Sentry:Dsn"));
+            SentrySdk.Init(options =>
+            {
+                options.Dsn = builder.Configuration.GetRequiredValue("Sentry:Dsn");
+                options.IsGlobalModeEnabled = true;
+            });
         }
 
         builder.Services.AddApplicationInsightsTelemetryWorkerService();
