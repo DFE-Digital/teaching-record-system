@@ -5,12 +5,11 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class FindExistingTeacherHandler : ICrmQueryHandler<FindingExistingTeachersQuery, FindingExistingTeachersResult[]>
+public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotentialDuplicateContactsQuery, FindPotentialDuplicateContactsResult[]>
 {
-    public async Task<FindingExistingTeachersResult[]> Execute(FindingExistingTeachersQuery findQuery, IOrganizationServiceAsync organizationService)
+    public async Task<FindPotentialDuplicateContactsResult[]> Execute(FindPotentialDuplicateContactsQuery findQuery, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
-        var existing = new List<FindingExistingTeachersResult>();
         filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
 
         if (TryGetMatchCombinationsFilter(out var matchCombinationsFilter))
@@ -20,7 +19,7 @@ public class FindExistingTeacherHandler : ICrmQueryHandler<FindingExistingTeache
         else
         {
             // Not enough data in the input to match on
-            return Array.Empty<FindingExistingTeachersResult>();
+            return Array.Empty<FindPotentialDuplicateContactsResult>();
         }
 
         var query = new QueryExpression(Contact.EntityLogicalName)
@@ -43,51 +42,45 @@ public class FindExistingTeacherHandler : ICrmQueryHandler<FindingExistingTeache
             Criteria = filter
         };
 
-        var result = await organizationService.RetrieveMultipleAsync(query);
+        var queryResult = await organizationService.RetrieveMultipleAsync(query);
 
-        // Old implementation returns the first record that matches on at least three attributes; replicating that here
-        var matches = result.Entities.Select(entity => entity.ToEntity<Contact>()).ToList();
-
-        foreach (var match in matches)
-        {
-            if (match == null)
+        var results = queryResult.Entities.Select(entity => entity.ToEntity<Contact>())
+            .Select(match =>
             {
-                return Array.Empty<FindingExistingTeachersResult>(); ;
-            }
+                var attributeMatches = new[]
+                {
+                    (
+                        Attribute: Contact.Fields.FirstName,
+                        Matches: NamesAreEqual(findQuery.FirstName, match.FirstName)
+                    ),
+                    (
+                        Attribute: Contact.Fields.MiddleName,
+                        Matches: NamesAreEqual(findQuery.MiddleName, match.MiddleName ?? "")
+                    ),
+                    (
+                        Attribute: Contact.Fields.LastName,
+                        Matches: NamesAreEqual(findQuery.LastName, match.LastName)
+                    ),
+                    (
+                        Attribute: Contact.Fields.BirthDate,
+                        Matches: findQuery.DateOfBirth.ToDateTime().Equals(match.BirthDate)
+                    )
+                };
 
-            var attributeMatches = new[]
-            {
-                (
-                    Attribute: Contact.Fields.FirstName,
-                    Matches: NamesAreEqual(findQuery.FirstName, match.FirstName)
-                ),
-                (
-                    Attribute: Contact.Fields.MiddleName,
-                    Matches: NamesAreEqual(findQuery.MiddleName ?? "", match.MiddleName)
-                ),
-                (
-                    Attribute: Contact.Fields.LastName,
-                    Matches: NamesAreEqual(findQuery.LastName, match.LastName)
-                ),
-                (
-                    Attribute: Contact.Fields.BirthDate,
-                    Matches: findQuery.birthDate.ToDateTime().Equals(match.BirthDate)
-                )
-            };
+                var matchedAttributeNames = attributeMatches.Where(m => m.Matches).Select(m => m.Attribute).ToArray();
 
-            var matchedAttributeNames = attributeMatches.Where(m => m.Matches).Select(m => m.Attribute).ToArray();
-            existing.Add(new FindingExistingTeachersResult()
-            {
-                TeacherId = match.Id,
-                MatchedAttributes = matchedAttributeNames,
-                HasActiveSanctions = match.dfeta_ActiveSanctions == true,
-                HasQtsDate = match.dfeta_QTSDate.HasValue,
-                HasEytsDate = match.dfeta_EYTSDate.HasValue,
-            });
-        }
+                return new FindPotentialDuplicateContactsResult()
+                {
+                    TeacherId = match.Id,
+                    MatchedAttributes = matchedAttributeNames,
+                    HasActiveSanctions = match.dfeta_ActiveSanctions == true,
+                    HasQtsDate = match.dfeta_QTSDate.HasValue,
+                    HasEytsDate = match.dfeta_EYTSDate.HasValue,
+                };
+            })
+            .ToArray();
 
-        return existing != null ? existing.ToArray() : Array.Empty<FindingExistingTeachersResult>();
-
+        return results;
 
         bool TryGetMatchCombinationsFilter(out FilterExpression? filter)
         {
@@ -98,7 +91,7 @@ public class FindExistingTeacherHandler : ICrmQueryHandler<FindingExistingTeache
                 (FieldName: Contact.Fields.FirstName, Value: findQuery.FirstName),
                 (FieldName: Contact.Fields.MiddleName, Value: findQuery.MiddleName),
                 (FieldName: Contact.Fields.LastName, Value: findQuery.LastName),
-                (FieldName: Contact.Fields.BirthDate, Value: (object)findQuery.birthDate.ToDateTimeWithDqtBstFix(isLocalTime: false))
+                (FieldName: Contact.Fields.BirthDate, Value: (object)findQuery.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false))
             }.ToList();
 
             // If fields are null in the input then don't try to match them (typically MiddleName)
@@ -132,6 +125,5 @@ public class FindExistingTeacherHandler : ICrmQueryHandler<FindingExistingTeache
 
         static bool NamesAreEqual(string a, string b) =>
             string.Compare(a, b, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) == 0;
-
     }
 }

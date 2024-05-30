@@ -3,6 +3,7 @@ using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V3.V20240307.ApiModels;
 using TeachingRecordSystem.Api.V3.V20240307.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.Tests.V3.V20240307;
@@ -13,7 +14,7 @@ public class CreateTrnRequestTests : TestBase
     public CreateTrnRequestTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        SetCurrentApiClient(new[] { ApiRoles.CreateTrn });
+        SetCurrentApiClient([ApiRoles.CreateTrn]);
     }
 
     [Theory, RoleNamesData(except: ApiRoles.CreateTrn)]
@@ -223,7 +224,8 @@ public class CreateTrnRequestTests : TestBase
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
-        var firstName = Faker.Name.First();
+        var firstNames = new string[] { Faker.Name.First(), Faker.Name.First() };
+        var firstName = string.Join(" ", firstNames);
         var middleName = Faker.Name.Middle();
         var lastName = Faker.Name.Last();
         var dateOfBirth = new DateOnly(1990, 01, 01);
@@ -257,6 +259,15 @@ public class CreateTrnRequestTests : TestBase
         var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
         Assert.NotNull(contact);
         Assert.NotEmpty(contact.dfeta_TRN);
+        Assert.Equal(dateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false), contact.BirthDate);
+        Assert.Equal(firstNames.First(), contact.FirstName);
+        Assert.Equal(string.Join(" ", firstNames.Skip(1).Append(middleName)), contact.MiddleName);
+        Assert.Equal(lastName, contact.LastName);
+        Assert.Equal(firstName, contact.dfeta_StatedFirstName);
+        Assert.Equal(middleName, contact.dfeta_StatedMiddleName);
+        Assert.Equal(lastName, contact.dfeta_StatedLastName);
+        Assert.Equal(email, contact.EMailAddress1);
+        Assert.Equal(nationalInsuranceNumber, contact.dfeta_NINumber);
 
         await AssertEx.JsonResponseEquals(
             response,
@@ -376,7 +387,7 @@ public class CreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Post_PotentialDuplicateRequest_CreatesContactWithoutTrnAndReturnsPendingStatus()
+    public async Task Post_PotentialDuplicateContact_CreatesContactWithoutTrnAndReturnsPendingStatus()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();

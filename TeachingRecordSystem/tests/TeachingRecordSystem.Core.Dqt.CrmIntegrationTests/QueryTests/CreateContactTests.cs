@@ -1,12 +1,12 @@
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
-public class CreateTeacherTests : IAsyncLifetime
+public class CreateContactTests : IAsyncLifetime
 {
     private readonly CrmClientFixture.TestDataScope _dataScope;
     private readonly CrmQueryDispatcher _crmQueryDispatcher;
     private readonly CrmClientFixture _fixture;
 
-    public CreateTeacherTests(CrmClientFixture crmClientFixture)
+    public CreateContactTests(CrmClientFixture crmClientFixture)
     {
         _fixture = crmClientFixture;
         _dataScope = crmClientFixture.CreateTestDataScope();
@@ -34,11 +34,14 @@ public class CreateTeacherTests : IAsyncLifetime
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
+            StatedFirstName = firstName,
+            StatedMiddleName = middleName,
+            StatedLastName = lastName,
             Email = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn,
-            ExistingTeacherResults = []
+            PotentialDuplicates = []
         };
 
         // Act
@@ -78,11 +81,14 @@ public class CreateTeacherTests : IAsyncLifetime
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
+            StatedFirstName = firstName,
+            StatedMiddleName = middleName,
+            StatedLastName = lastName,
             Email = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn,
-            ExistingTeacherResults = []
+            PotentialDuplicates = []
         };
 
         // Act
@@ -116,11 +122,14 @@ public class CreateTeacherTests : IAsyncLifetime
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
+            StatedFirstName = firstName,
+            StatedMiddleName = middleName,
+            StatedLastName = lastName,
             Email = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn1,
-            ExistingTeacherResults = []
+            PotentialDuplicates = []
         };
 
         // Act
@@ -130,12 +139,15 @@ public class CreateTeacherTests : IAsyncLifetime
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
+            StatedFirstName = firstName,
+            StatedMiddleName = middleName,
+            StatedLastName = lastName,
             Email = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn2,
-            ExistingTeacherResults = new[] {
-                new FindingExistingTeachersResult()
+            PotentialDuplicates = new[] {
+                new FindPotentialDuplicateContactsResult()
                 {
                     TeacherId = createdTeacherId1,
                     MatchedAttributes = new[] { Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName },
