@@ -1,12 +1,9 @@
-using Medallion.Threading;
-using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 
@@ -27,18 +24,11 @@ public class CreateTrnRequestHandler(
     ICrmQueryDispatcher _crmQueryDispatcher,
     TrsDbContext _trsDbContext,
     ICurrentClientProvider _currentClientProvider,
-    IDistributedLockProvider _distributedLockProvider,
     ITrnGenerationApiClient _trnGenerationApiClient)
 {
-    private readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
-
     public async Task<TrnRequestInfo> Handle(CreateTrnRequestCommand command)
     {
         var currentClientId = _currentClientProvider.GetCurrentClientId();
-
-        await using var requestIdLock = await _distributedLockProvider.AcquireLockAsync(
-            DistributedLockKeys.TrnRequestId(currentClientId, command.RequestId),
-            _lockTimeout);
 
         var trnRequest = await _trsDbContext.TrnRequests
             .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == command.RequestId);
@@ -50,46 +40,38 @@ public class CreateTrnRequestHandler(
 
         string? trn = null;
 
-        var existingTeachers = await _crmQueryDispatcher.ExecuteQuery(
-            new FindingExistingTeachersQuery(command.FirstName, command.MiddleName, command.LastName, command.DateOfBirth));
+        var potentialDuplicates = await _crmQueryDispatcher.ExecuteQuery(
+            new FindPotentialDuplicateContactsQuery()
+            {
+                FirstName = command.FirstName,
+                MiddleName = command.MiddleName ?? "",
+                LastName = command.LastName,
+                DateOfBirth = command.DateOfBirth
+            });
 
-        if (existingTeachers.Length == 0)
+        if (potentialDuplicates.Length == 0)
         {
             trn = await _trnGenerationApiClient.GenerateTrn();
         }
 
-        var contactId = await _crmQueryDispatcher.ExecuteQuery(new CreateContactQuery
+        var firstAndMiddleNames = $"{command.FirstName} {command.MiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var firstName = firstAndMiddleNames.First();
+        var middleName = string.Join(' ', firstAndMiddleNames.Skip(1));
+
+        var contactId = await _crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
         {
-            FirstName = command.FirstName,
-            MiddleName = command.MiddleName,
+            FirstName = firstName,
+            MiddleName = middleName,
             LastName = command.LastName,
+            StatedFirstName = command.FirstName,
+            StatedMiddleName = command.MiddleName ?? "",
+            StatedLastName = command.LastName,
             DateOfBirth = command.DateOfBirth,
             Email = command.Email,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.NormalizeNationalInsuranceNumber(command.NationalInsuranceNumber),
-            ExistingTeacherResults = existingTeachers,
+            PotentialDuplicates = potentialDuplicates,
             Trn = trn
         });
-
-        // re-fetch teacher that was just created.
-        var teacher = (await _crmQueryDispatcher.ExecuteQuery(
-            new GetActiveContactDetailByIdQuery(
-                contactId,
-                new ColumnSet(
-                    Contact.Fields.dfeta_TRN,
-                    Contact.Fields.FirstName,
-                    Contact.Fields.MiddleName,
-                    Contact.Fields.LastName,
-                    Contact.Fields.EMailAddress1,
-                    Contact.Fields.dfeta_NINumber,
-                    Contact.Fields.BirthDate))))!;
-
-        trn = !string.IsNullOrEmpty(teacher!.Contact.dfeta_TRN) ? teacher.Contact.dfeta_TRN : null;
-        var firstName = teacher.Contact.FirstName;
-        var middleName = teacher.Contact.MiddleName ?? "";
-        var lastName = teacher.Contact.LastName;
-        var dob = teacher.Contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false);
-        var nationalInsuranceNumber = teacher.Contact.dfeta_NINumber;
-        var email = teacher.Contact.EMailAddress1;
 
         _trsDbContext.TrnRequests.Add(new TrnRequest()
         {
@@ -101,19 +83,19 @@ public class CreateTrnRequestHandler(
 
         await _trsDbContext.SaveChangesAsync();
 
-        var status = !string.IsNullOrEmpty(trn) ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
+        var status = trn is not null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
 
         return new TrnRequestInfo()
         {
             RequestId = command.RequestId,
             Person = new TrnRequestPerson()
             {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                Email = email,
-                DateOfBirth = dob!.Value,
-                NationalInsuranceNumber = nationalInsuranceNumber
+                FirstName = command.FirstName,
+                MiddleName = command.MiddleName,
+                LastName = command.LastName,
+                Email = command.Email,
+                DateOfBirth = command.DateOfBirth,
+                NationalInsuranceNumber = command.NationalInsuranceNumber
             },
             Trn = trn,
             Status = status

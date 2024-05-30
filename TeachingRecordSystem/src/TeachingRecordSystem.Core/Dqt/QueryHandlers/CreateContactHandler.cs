@@ -10,22 +10,19 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 {
     public async Task<Guid> Execute(CreateContactQuery query, IOrganizationServiceAsync organizationService)
     {
-        var TeacherId = Guid.NewGuid();
+        var contactId = Guid.NewGuid();
 
-        // Send a single Transaction request with all the data changes in.
-        // This is important for atomicity; we really do not want torn writes here.
-        var txnRequest = new ExecuteTransactionRequest()
-        {
-            ReturnResponses = true,
-            Requests = new()
-        };
+        var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
 
         var contact = new Contact()
         {
-            Id = TeacherId,
+            Id = contactId,
             FirstName = query.FirstName,
             MiddleName = query.MiddleName,
             LastName = query.LastName,
+            dfeta_StatedFirstName = query.StatedFirstName,
+            dfeta_StatedMiddleName = query.StatedMiddleName,
+            dfeta_StatedLastName = query.StatedLastName,
             BirthDate = query.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false),
             dfeta_NINumber = query.NationalInsuranceNumber,
             EMailAddress1 = query.Email,
@@ -33,31 +30,32 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         };
 
         // only set trn if there is not any potential duplicate matches on the query
-        if (query.ExistingTeacherResults.Length == 0)
+        if (query.PotentialDuplicates.Length == 0)
         {
             contact.dfeta_TRN = query.Trn;
         }
 
-        txnRequest.Requests.Add(new CreateRequest() { Target = contact });
-        if (query.ExistingTeacherResults.Length == 0)
+        requestBuilder.AddRequest(new CreateRequest() { Target = contact });
+
+        if (query.PotentialDuplicates.Length == 0)
         {
-            FlagBadData(txnRequest, query, TeacherId);
+            FlagBadData(requestBuilder, query, contactId);
         }
         else
         {
-            //add duplicate review task
-            foreach (var duplicate in query.ExistingTeacherResults)
+            foreach (var duplicate in query.PotentialDuplicates)
             {
-                var task = CreateDuplicateReviewTaskEntity(duplicate, query, TeacherId);
-                txnRequest.Requests.Add(new CreateRequest() { Target = task });
+                var task = CreateDuplicateReviewTaskEntity(duplicate, query, contactId);
+                requestBuilder.AddRequest(new CreateRequest() { Target = task });
             }
         }
 
-        await organizationService.ExecuteAsync(txnRequest);
-        return TeacherId;
+        await requestBuilder.Execute();
+
+        return contactId;
     }
 
-    public void FlagBadData(ExecuteTransactionRequest txnRequest, CreateContactQuery createTeacherRequest, Guid teacherId)
+    private void FlagBadData(RequestBuilder requestBuilder, CreateContactQuery createTeacherRequest, Guid contactId)
     {
         var firstNameContainsDigit = createTeacherRequest.FirstName.Any(Char.IsDigit);
         var middleNameContainsDigit = createTeacherRequest.MiddleName?.Any(Char.IsDigit) ?? false;
@@ -65,14 +63,14 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 
         if (firstNameContainsDigit || middleNameContainsDigit || lastNameContainsDigit)
         {
-            txnRequest.Requests.Add(new CreateRequest()
+            requestBuilder.AddRequest(new CreateRequest()
             {
-                Target = CreateNameWithDigitsReviewTaskEntity(firstNameContainsDigit, middleNameContainsDigit, lastNameContainsDigit, teacherId)
+                Target = CreateNameWithDigitsReviewTaskEntity(firstNameContainsDigit, middleNameContainsDigit, lastNameContainsDigit, contactId)
             });
         }
     }
 
-    public CrmTask CreateDuplicateReviewTaskEntity(FindingExistingTeachersResult duplicate, CreateContactQuery createTeacherRequest, Guid TeacherId)
+    private CrmTask CreateDuplicateReviewTaskEntity(FindPotentialDuplicateContactsResult duplicate, CreateContactQuery createTeacherRequest, Guid contactId)
     {
         var description = GetDescription();
 
@@ -80,7 +78,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 
         return new CrmTask()
         {
-            RegardingObjectId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
+            RegardingObjectId = contactId.ToEntityReference(Contact.EntityLogicalName),
             dfeta_potentialduplicateid = duplicate.TeacherId.ToEntityReference(Contact.EntityLogicalName),
             Category = category,
             Subject = "Notification for QTS Unit Team",
@@ -131,15 +129,15 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         }
     }
 
-    public Models.Task CreateNameWithDigitsReviewTaskEntity(
-          bool firstNameContainsDigit,
-          bool middleNameContainsDigit,
-          bool lastNameContainsDigit,
-          Guid teacherId)
+    private CrmTask CreateNameWithDigitsReviewTaskEntity(
+        bool firstNameContainsDigit,
+        bool middleNameContainsDigit,
+        bool lastNameContainsDigit,
+        Guid teacherId)
     {
         var description = GetDescription();
 
-        return new Models.Task()
+        return new CrmTask()
         {
             RegardingObjectId = teacherId.ToEntityReference(Contact.EntityLogicalName),
             Category = "DMSImportTrn",
@@ -169,7 +167,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             Debug.Assert(badFields.Count > 0);
 
             var description = badFields.ToCommaSeparatedString(finalValuesConjunction: "and")
-                              + $" contain{(badFields.Count == 1 ? "s" : "")} a digit";
+                + $" contain{(badFields.Count == 1 ? "s" : "")} a digit";
 
             description = description[0..1].ToUpper() + description[1..];
 

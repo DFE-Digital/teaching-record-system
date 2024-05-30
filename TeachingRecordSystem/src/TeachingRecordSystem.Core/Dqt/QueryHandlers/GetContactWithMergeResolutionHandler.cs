@@ -5,20 +5,13 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetContactWithParentByIdHandler : ICrmQueryHandler<GetContactWithParentById, (Contact, Contact?)>
+public class GetContactWithMergeResolutionHandler : ICrmQueryHandler<GetContactWithMergeResolutionQuery, Contact>
 {
-    public async Task<(Contact, Contact?)> Execute(GetContactWithParentById query, IOrganizationServiceAsync organizationService)
+    public async Task<Contact> Execute(GetContactWithMergeResolutionQuery query, IOrganizationServiceAsync organizationService)
     {
-        Contact contact = await FetchContact(query.ContactId, resolveMerges: false);
-        Contact? parentContact = default(Contact?);
+        return await FetchContact(query.ContactId);
 
-        if (contact.Merged == true)
-        {
-            parentContact = await FetchContact(contact.MasterId.Id, resolveMerges: true);
-        }
-        return (contact, parentContact);
-
-        async Task<Contact> FetchContact(Guid id, bool resolveMerges = true)
+        async Task<Contact> FetchContact(Guid id)
         {
             var filter = new FilterExpression();
             filter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, id);
@@ -46,9 +39,9 @@ public class GetContactWithParentByIdHandler : ICrmQueryHandler<GetContactWithPa
             var result = (RetrieveMultipleResponse)await organizationService.ExecuteAsync(request);
             var teacher = result.EntityCollection.Entities.Select(entity => entity.ToEntity<Contact>()).Single();
 
-            if (teacher.Merged == true && resolveMerges == true)
+            if (teacher.Merged == true)
             {
-                return await FetchContact(teacher.MasterId.Id, resolveMerges);
+                return await FetchContact(teacher.MasterId.Id);
             }
 
             return teacher;
