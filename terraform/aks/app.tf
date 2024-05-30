@@ -97,6 +97,7 @@ module "api_application" {
   probe_path   = "/health"
   replicas     = var.api_replicas
   max_memory   = var.api_max_memory
+  enable_logit = var.enable_logit
 }
 
 module "authz_application_configuration" {
@@ -147,6 +148,7 @@ module "authz_application" {
   probe_path   = "/health"
   replicas     = var.authz_replicas
   max_memory   = var.authz_max_memory
+  enable_logit = var.enable_logit
 }
 
 module "ui_application_configuration" {
@@ -195,6 +197,7 @@ module "ui_application" {
   web_port     = 80
   probe_path   = "/health"
   replicas     = var.ui_replicas
+  enable_logit = var.enable_logit
 }
 
 module "worker_application_configuration" {
@@ -243,4 +246,5 @@ module "worker_application" {
   command      = ["/bin/ash", "-c", "cd /Apps/Worker/; dotnet TeachingRecordSystem.Worker.dll;"]
   replicas     = var.worker_replicas
   max_memory   = var.worker_max_memory
+  enable_logit = var.enable_logit
 }
