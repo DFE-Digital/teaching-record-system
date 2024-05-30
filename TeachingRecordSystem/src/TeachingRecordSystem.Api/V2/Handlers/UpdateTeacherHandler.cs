@@ -45,9 +45,16 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
             throw new ErrorException(ErrorRegistry.MultipleTeachersFound());
         }
 
-        var firstAndMiddleNames = $"{request.FirstName.ValueOr("")} {request.MiddleName.ValueOr("")}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var firstName = firstAndMiddleNames.FirstOrDefault();
-        var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
+        Option<string> firstName = request.FirstName;
+        Option<string> middleName = request.MiddleName;
+
+        if (firstName.HasValue)
+        {
+            var firstAndMiddleNames = $"{request.FirstName.ValueOrFailure()} {request.MiddleName.ValueOr("")}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            firstName = Option.Some(firstAndMiddleNames.FirstOrDefault());
+            middleName = Option.Some(string.Join(" ", firstAndMiddleNames.Skip(1)));
+        }
+
         var updateTeacherResult = await _dataverseAdapter.UpdateTeacher(new UpdateTeacherCommand()
         {
             TeacherId = teachers[0].Id,
@@ -83,14 +90,14 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
                 null,
             HusId = request.HusId,
             SlugId = Option.Some(request.SlugId),
-            FirstName = request.FirstName,
-            MiddleName = request.MiddleName,
+            FirstName = firstName,
+            MiddleName = middleName,
             LastName = request.LastName,
             EmailAddress = request.EmailAddress,
             GenderCode = request.GenderCode.Map(x => x.ConvertToContact_GenderCode()),
             DateOfBirth = request.DateOfBirth.Map(x => x.ToDateTime()),
-            StatedFirstName = Option.Some(firstName),
-            StatedMiddleName = Option.Some(middleName),
+            StatedFirstName = request.FirstName,
+            StatedMiddleName = request.MiddleName,
             StatedLastName = request.LastName
         });
 
