@@ -112,6 +112,11 @@ variable "postgres_enable_high_availability" {
   default = false
 }
 
+variable "postgres_server_version" {
+  type    = string
+  default = "14"
+}
+
 variable "redis_capacity" {
   type    = number
   default = 1
