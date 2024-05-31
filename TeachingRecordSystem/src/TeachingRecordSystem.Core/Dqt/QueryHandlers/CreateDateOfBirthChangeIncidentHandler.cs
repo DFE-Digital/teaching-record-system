@@ -60,6 +60,7 @@ public class CreateDateOfBirthChangeIncidentHandler : ICrmQueryHandler<CreateDat
                 Target = incident.Id.ToEntityReference(Incident.EntityLogicalName),
                 ColumnSet = new(Incident.Fields.TicketNumber)
             });
+        requestBuilder.AddRequest(new UpdateRequest() { Target = new Contact() { Id = query.ContactId, dfeta_AllowPiiUpdatesFromRegister = false } });
         await requestBuilder.Execute();
 
         var ticketNumber = getIncidentResponse.GetResponse().Entity.ToEntity<Incident>().TicketNumber;

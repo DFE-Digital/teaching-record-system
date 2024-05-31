@@ -73,5 +73,8 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         Assert.NotNull(createdAnnotation);
         Assert.Equal(createdDocument.Id, createdAnnotation.ObjectId.Id);
         Assert.Equal(dfeta_document.EntityLogicalName, createdAnnotation.ObjectTypeCode);
+
+        var contact = ctx.ContactSet.Single(c => c.Id == createPersonResult.ContactId);
+        Assert.False(contact.dfeta_AllowPiiUpdatesFromRegister);
     }
 }
