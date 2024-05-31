@@ -33,7 +33,7 @@ module "postgres" {
   use_azure                      = var.deploy_azure_backing_services
   azure_enable_monitoring        = var.enable_monitoring
   azure_extensions               = ["pg_stat_statements"]
-  server_version                 = 14
+  server_version                 = var.postgres_server_version
   azure_sku_name                 = var.postgres_flexible_server_sku
   azure_enable_high_availability = var.postgres_enable_high_availability
 }
