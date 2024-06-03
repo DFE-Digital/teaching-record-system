@@ -40,6 +40,15 @@ public class AddressModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMode
     [MaxLength(200, ErrorMessage = "Country must be 200 characters or less")]
     public string? Country { get; set; }
 
+    public void OnGet()
+    {
+        AddressLine1 ??= JourneyInstance!.State.AddressLine1;
+        AddressLine2 ??= JourneyInstance!.State.AddressLine2;
+        TownOrCity ??= JourneyInstance!.State.TownOrCity;
+        PostalCode ??= JourneyInstance!.State.PostalCode;
+        Country ??= JourneyInstance!.State.Country;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -66,11 +75,5 @@ public class AddressModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMode
             context.Result = Redirect(linkGenerator.RequestTrnNationalInsuranceNumber(JourneyInstance.InstanceId));
             return;
         }
-
-        AddressLine1 ??= JourneyInstance!.State.AddressLine1;
-        AddressLine2 ??= JourneyInstance!.State.AddressLine2;
-        TownOrCity ??= JourneyInstance!.State.TownOrCity;
-        PostalCode ??= JourneyInstance!.State.PostalCode;
-        Country ??= JourneyInstance!.State.Country;
     }
 }

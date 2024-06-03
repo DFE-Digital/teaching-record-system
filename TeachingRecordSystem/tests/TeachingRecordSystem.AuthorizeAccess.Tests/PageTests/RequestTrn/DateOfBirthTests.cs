@@ -3,7 +3,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Get__HasPreviousNameMissingFromState_RedirectsToPreviousName()
+    public async Task Get_HasPreviousNameMissingFromState_RedirectsToPreviousName()
     {
         // Arrange
         var state = CreateNewState();
