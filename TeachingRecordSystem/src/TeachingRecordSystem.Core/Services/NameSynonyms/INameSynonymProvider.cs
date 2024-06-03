@@ -1,4 +1,4 @@
-﻿
+
 namespace TeachingRecordSystem.Core.Services.NameSynonyms;
 
 public interface INameSynonymProvider

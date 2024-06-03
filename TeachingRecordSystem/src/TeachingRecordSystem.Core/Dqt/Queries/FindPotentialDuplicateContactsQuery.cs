@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.Core.Dqt.Queries;
 
 public record FindPotentialDuplicateContactsQuery : ICrmQuery<FindPotentialDuplicateContactsResult[]>
 {
-    public required string FirstName { get; init; }
+    public required IEnumerable<string> FirstNames { get; init; }
     public required string MiddleName { get; init; }
     public required string LastName { get; init; }
     public required DateOnly DateOfBirth { get; init; }
