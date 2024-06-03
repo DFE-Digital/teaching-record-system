@@ -23,6 +23,7 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.ServiceDefaults;
 
@@ -224,7 +225,8 @@ public class Program
         builder
             .AddBlobStorage()
             .AddDistributedLocks()
-            .AddIdentityApi();
+            .AddIdentityApi()
+            .AddNameSynonyms();
 
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();
