@@ -68,6 +68,21 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             await page.CheckAsync("text=No");
             await page.ClickButton("Continue");
             await page.WaitForUrlPathAsync("/request-trn/address");
+
+            var addressLine1 = Faker.Address.StreetAddress();
+            var addressLine2 = Faker.Address.SecondaryAddress();
+            var townOrCity = Faker.Address.City();
+            var postalCode = Faker.Address.ZipCode();
+            var country = Faker.Address.Country();
+
+            await page.FillAsync("input[name=AddressLine1]", addressLine1);
+            await page.FillAsync("input[name=AddressLine2]", addressLine2);
+            await page.FillAsync("input[name=TownOrCity]", townOrCity);
+            await page.FillAsync("input[name=PostalCode]", postalCode);
+            await page.FillAsync("input[name=Country]", country);
+            await page.ClickButton("Continue");
+
+            await page.WaitForUrlPathAsync("/request-trn/check-answers");
         }
     }
 }
