@@ -51,7 +51,7 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                 {
                     (
                         Attribute: Contact.Fields.FirstName,
-                        Matches: NamesAreEqual(findQuery.FirstName, match.FirstName)
+                        Matches: NamesAreMatched(findQuery.FirstNames, match.FirstName)
                     ),
                     (
                         Attribute: Contact.Fields.MiddleName,
@@ -88,7 +88,7 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
 
             var fields = new[]
             {
-                (FieldName: Contact.Fields.FirstName, Value: findQuery.FirstName),
+                (FieldName: Contact.Fields.FirstName, Value: findQuery.FirstNames),
                 (FieldName: Contact.Fields.MiddleName, Value: findQuery.MiddleName),
                 (FieldName: Contact.Fields.LastName, Value: findQuery.LastName),
                 (FieldName: Contact.Fields.BirthDate, Value: (object)findQuery.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false))
@@ -113,7 +113,14 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
 
                 foreach (var (fieldName, value) in combination)
                 {
-                    innerFilter.AddCondition(fieldName, ConditionOperator.Equal, value);
+                    if (value is IEnumerable<string> collectionValue)
+                    {
+                        innerFilter.AddCondition(fieldName, ConditionOperator.In, collectionValue.ToArray());
+                    }
+                    else
+                    {
+                        innerFilter.AddCondition(fieldName, ConditionOperator.Equal, value);
+                    }
                 }
 
                 combinationsFilter.AddFilter(innerFilter);
@@ -125,5 +132,8 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
 
         static bool NamesAreEqual(string a, string b) =>
             string.Compare(a, b, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) == 0;
+
+        static bool NamesAreMatched(IEnumerable<string> inputs, string matched) =>
+            inputs.Any(i => NamesAreEqual(i, matched));
     }
 }

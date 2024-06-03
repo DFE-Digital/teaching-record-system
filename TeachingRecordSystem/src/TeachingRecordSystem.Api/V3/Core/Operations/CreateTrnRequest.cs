@@ -5,6 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 
 namespace TeachingRecordSystem.Api.V3.Core.Operations;
@@ -21,16 +22,17 @@ public record CreateTrnRequestCommand
 }
 
 public class CreateTrnRequestHandler(
-    ICrmQueryDispatcher _crmQueryDispatcher,
-    TrsDbContext _trsDbContext,
-    ICurrentClientProvider _currentClientProvider,
-    ITrnGenerationApiClient _trnGenerationApiClient)
+    ICrmQueryDispatcher crmQueryDispatcher,
+    TrsDbContext trsDbContext,
+    ICurrentClientProvider currentClientProvider,
+    ITrnGenerationApiClient trnGenerationApiClient,
+    INameSynonymProvider nameSynonymProvider)
 {
     public async Task<TrnRequestInfo> Handle(CreateTrnRequestCommand command)
     {
-        var currentClientId = _currentClientProvider.GetCurrentClientId();
+        var currentClientId = currentClientProvider.GetCurrentClientId();
 
-        var trnRequest = await _trsDbContext.TrnRequests
+        var trnRequest = await trsDbContext.TrnRequests
             .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == command.RequestId);
 
         if (trnRequest != null)
@@ -40,25 +42,27 @@ public class CreateTrnRequestHandler(
 
         string? trn = null;
 
-        var potentialDuplicates = await _crmQueryDispatcher.ExecuteQuery(
+        var firstAndMiddleNames = $"{command.FirstName} {command.MiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var firstName = firstAndMiddleNames.First();
+        var middleName = string.Join(' ', firstAndMiddleNames.Skip(1));
+
+        var firstNameSynonyms = (await nameSynonymProvider.GetAllNameSynonyms()).GetValueOrDefault(firstName, []);
+
+        var potentialDuplicates = await crmQueryDispatcher.ExecuteQuery(
             new FindPotentialDuplicateContactsQuery()
             {
-                FirstName = command.FirstName,
-                MiddleName = command.MiddleName ?? "",
+                FirstNames = firstNameSynonyms.Append(firstName),
+                MiddleName = middleName,
                 LastName = command.LastName,
                 DateOfBirth = command.DateOfBirth
             });
 
         if (potentialDuplicates.Length == 0)
         {
-            trn = await _trnGenerationApiClient.GenerateTrn();
+            trn = await trnGenerationApiClient.GenerateTrn();
         }
 
-        var firstAndMiddleNames = $"{command.FirstName} {command.MiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var firstName = firstAndMiddleNames.First();
-        var middleName = string.Join(' ', firstAndMiddleNames.Skip(1));
-
-        var contactId = await _crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
+        var contactId = await crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
         {
             FirstName = firstName,
             MiddleName = middleName,
@@ -73,7 +77,7 @@ public class CreateTrnRequestHandler(
             Trn = trn
         });
 
-        _trsDbContext.TrnRequests.Add(new TrnRequest()
+        trsDbContext.TrnRequests.Add(new TrnRequest()
         {
             ClientId = currentClientId,
             RequestId = command.RequestId,
@@ -81,7 +85,7 @@ public class CreateTrnRequestHandler(
             LinkedToIdentity = false
         });
 
-        await _trsDbContext.SaveChangesAsync();
+        await trsDbContext.SaveChangesAsync();
 
         var status = trn is not null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
 
