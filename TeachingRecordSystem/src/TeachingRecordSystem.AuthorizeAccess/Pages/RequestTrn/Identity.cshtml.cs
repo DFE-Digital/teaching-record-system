@@ -17,6 +17,9 @@ public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileServ
 
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
+    [FromQuery]
+    public bool? FromCheckAnswers { get; set; }
+
     [BindProperty]
     [EvidenceFile]
     [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
@@ -66,19 +69,28 @@ public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileServ
             });
         }
 
-        return Redirect(linkGenerator.RequestTrnNationalInsuranceNumber(JourneyInstance!.InstanceId));
+        return FromCheckAnswers == true ?
+            Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.RequestTrnNationalInsuranceNumber(JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.DateOfBirth is null)
+        var state = JourneyInstance!.State;
+        if (state.HasPendingTrnRequest)
+        {
+            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+        }
+        else if (state.DateOfBirth is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnDateOfBirth(JourneyInstance.InstanceId));
-            return;
         }
 
-        EvidenceFileId ??= JourneyInstance?.State.EvidenceFileId;
-        EvidenceFileName ??= JourneyInstance?.State.EvidenceFileName;
-        EvidenceFileSizeDescription ??= JourneyInstance?.State.EvidenceFileSizeDescription;
+        if (context.Result is null)
+        {
+            EvidenceFileId ??= JourneyInstance?.State.EvidenceFileId;
+            EvidenceFileName ??= JourneyInstance?.State.EvidenceFileName;
+            EvidenceFileSizeDescription ??= JourneyInstance?.State.EvidenceFileSizeDescription;
+        }
     }
 }

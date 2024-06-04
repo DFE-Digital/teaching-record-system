@@ -3,6 +3,24 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
+    public async Task Get_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.HasPendingTrnRequest = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/identity?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
     public async Task Get_DateOfBirthMissingFromState_RedirectsToDateOfBirth()
     {
         // Arrange
@@ -43,6 +61,24 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
         Assert.NotNull(uploadedEvidenceLink);
         Assert.Equal($"{state.EvidenceFileName} ({state.EvidenceFileSizeDescription})", uploadedEvidenceLink!.TextContent);
+    }
+
+    [Fact]
+    public async Task Post_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.HasPendingTrnRequest = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/identity?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

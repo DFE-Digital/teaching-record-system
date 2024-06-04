@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.RequestTrnIdentity(Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RequestTrnCheckAnswers(Model.JourneyInstance!.InstanceId) : LinkGenerator.RequestTrnIdentity(Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RequestTrnNationalInsuranceNumber(Model.JourneyInstance!.InstanceId)" method="post">            
+        <form action="@LinkGenerator.RequestTrnNationalInsuranceNumber(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <govuk-radios asp-for="HasNationalInsuranceNumber">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />

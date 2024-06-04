@@ -74,6 +74,9 @@ public class HostFixture : WebApplicationFactory<Program>
                 fileService
                     .Setup(s => s.GetFileUrl(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
                     .ReturnsAsync("https://fake.blob.core.windows.net/fake");
+                fileService
+                    .Setup(s => s.OpenReadStream(It.IsAny<Guid>()))
+                    .ReturnsAsync(() => new MemoryStream(TestData.JpegImage));
                 return fileService.Object;
             }
         });

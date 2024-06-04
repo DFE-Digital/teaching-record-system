@@ -3,6 +3,24 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
+    public async Task Get_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.HasPendingTrnRequest = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
     public async Task Get_NameMissingFromState_RedirectsToName()
     {
         // Arrange
@@ -41,6 +59,24 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var selectedRadioButton = radioButtons.Single(r => r.HasAttribute("checked"));
         Assert.Equal("True", selectedRadioButton.GetAttribute("value"));
         Assert.Equal(state.PreviousName, doc.GetElementById("PreviousName")?.GetAttribute("value"));
+    }
+
+    [Fact]
+    public async Task Post_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.HasPendingTrnRequest = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/previous-name?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

@@ -5,12 +5,12 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.RequestTrnPreviousName(Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RequestTrnCheckAnswers(Model.JourneyInstance!.InstanceId) : LinkGenerator.RequestTrnPreviousName(Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RequestTrnDateOfBirth(Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.RequestTrnDateOfBirth(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <govuk-date-input asp-for="DateOfBirth">
                 <govuk-date-input-fieldset>
                     <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />

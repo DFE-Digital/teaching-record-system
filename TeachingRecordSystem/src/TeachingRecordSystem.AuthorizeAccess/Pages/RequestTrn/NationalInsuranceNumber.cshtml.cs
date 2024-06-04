@@ -11,6 +11,9 @@ public class NationalInsuranceNumberModel(AuthorizeAccessLinkGenerator linkGener
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
+    [FromQuery]
+    public bool? FromCheckAnswers { get; set; }
+
     [BindProperty]
     [Display(Name = "Do you have a National Insurance number?")]
     [Required(ErrorMessage = "Tell us if you have a National Insurance number")]
@@ -56,13 +59,20 @@ public class NationalInsuranceNumberModel(AuthorizeAccessLinkGenerator linkGener
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.EvidenceFileId is null)
+        var state = JourneyInstance!.State;
+        if (state.HasPendingTrnRequest)
+        {
+            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+        }
+        else if (state.EvidenceFileId is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnIdentity(JourneyInstance.InstanceId));
-            return;
         }
 
-        HasNationalInsuranceNumber ??= JourneyInstance?.State.HasNationalInsuranceNumber;
-        NationalInsuranceNumber ??= JourneyInstance?.State.NationalInsuranceNumber;
+        if (context.Result is null)
+        {
+            HasNationalInsuranceNumber ??= JourneyInstance?.State.HasNationalInsuranceNumber;
+            NationalInsuranceNumber ??= JourneyInstance?.State.NationalInsuranceNumber;
+        }
     }
 }

@@ -84,5 +84,9 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
 
             await page.WaitForUrlPathAsync("/request-trn/check-answers");
         }
+
+        await page.ClickButton("Submit request");
+
+        await page.WaitForUrlPathAsync("/request-trn/submitted");
     }
 }

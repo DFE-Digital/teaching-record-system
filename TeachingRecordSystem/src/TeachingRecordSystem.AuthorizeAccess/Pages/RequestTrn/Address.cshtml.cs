@@ -11,6 +11,9 @@ public class AddressModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMode
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
+    [FromQuery]
+    public bool? FromCheckAnswers { get; set; }
+
     [BindProperty]
     [Display(Name = "Address line 1")]
     [Required(ErrorMessage = "Enter address line 1")]
@@ -70,10 +73,14 @@ public class AddressModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMode
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.HasNationalInsuranceNumber is null)
+        var state = JourneyInstance!.State;
+        if (state.HasPendingTrnRequest)
+        {
+            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+        }
+        else if (state.HasNationalInsuranceNumber is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnNationalInsuranceNumber(JourneyInstance.InstanceId));
-            return;
         }
     }
 }

@@ -12,6 +12,9 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
+    [FromQuery]
+    public bool? FromCheckAnswers { get; set; }
+
     [BindProperty]
     [Display(Name = "Have you ever changed your name?")]
     [Required(ErrorMessage = "Tell us if you have ever changed your name")]
@@ -36,18 +39,28 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
             state.PreviousName = HasPreviousName!.Value ? PreviousName : null;
         });
 
-        return Redirect(linkGenerator.RequestTrnDateOfBirth(JourneyInstance!.InstanceId));
+        return FromCheckAnswers == true ?
+            Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.RequestTrnDateOfBirth(JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.Name is null)
+        var state = JourneyInstance!.State;
+        if (state.HasPendingTrnRequest)
+        {
+            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+        }
+        else if (state.Name is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
             return;
         }
 
-        HasPreviousName ??= JourneyInstance!.State.HasPreviousName;
-        PreviousName ??= JourneyInstance!.State.PreviousName;
+        if (context.Result is null)
+        {
+            HasPreviousName ??= JourneyInstance!.State.HasPreviousName;
+            PreviousName ??= JourneyInstance!.State.PreviousName;
+        }
     }
 }
