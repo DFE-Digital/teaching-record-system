@@ -1,6 +1,6 @@
 # Request TRN API
 
-Draft specification v0.1.
+Draft specification v0.2.
 
 This API is for consumers who want to submit PII for a person and have that person's existing TRN returned or have a new TRN created, if the person does not already have one.
 
@@ -18,7 +18,7 @@ Request body structure:
     "middleName": "",
     "lastName": "",
     "dateOfBirth": "",
-    "email": "",
+    "emailAddresses": [],
     "nationalInsuranceNumber": ""
   }
 }
@@ -26,7 +26,8 @@ Request body structure:
 
 The `requestId`, `person.firstName`, `person.lastName` and `person.dateOfBirth` properties are all mandatory.
 
-`requestId`, `person.firstName`, `person.middleName`, `person.lastName` and `person.email` cannot be greater than 100 characters in length.
+`requestId`, `person.firstName`, `person.middleName`, and `person.lastName` properties cannot be greater than 100 characters in length.
+Each email address in the `person.emailAddresses` property cannot be greater than 100 characters in length.
 `person.dateOfBirth` must be formatted `yyyy-MM-dd`.
 `person.nationalInsuranceNumber` must be 9 characters in length, if provided.
 
@@ -38,20 +39,12 @@ Response body structure:
 ```json
 {
   "requestId": "",
-  "person": {
-    "firstName": "",
-    "middleName": "",
-    "lastName": "",
-    "dateOfBirth": "",
-    "email": "",
-    "nationalInsuranceNumber": ""
-  },
   "status": "Pending|Completed",
   "trn": ""
 }
 ```
 
-The response returns the submitted `requestId`, `person` and adds a `status` property. The `status` property will be either `Pending` or `Completed`. If the `status` is `Completed` the response will also include a `trn` property with the TRN.
+The response returns the submitted `requestId`, and adds a `status` property. The `status` property will be either `Pending` or `Completed`. If the `status` is `Completed` the response will also include a `trn` property with the TRN.
 
 ## `GET /trn-requests?requestId=<id>`
 
@@ -63,14 +56,6 @@ Response body structure:
 ```json
 {
   "requestId": "",
-  "person": {
-    "firstName": "",
-    "middleName": "",
-    "lastName": "",
-    "dateOfBirth": "",
-    "email": "",
-    "nationalInsuranceNumber": ""
-  },
   "status": "Pending|Completed",
   "trn": ""
 }
