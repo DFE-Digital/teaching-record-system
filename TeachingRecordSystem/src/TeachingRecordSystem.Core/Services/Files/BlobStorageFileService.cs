@@ -40,6 +40,13 @@ public class BlobStorageFileService : IFileService
         return blobClient.GenerateSasUri(sasBuilder).ToString();
     }
 
+    public async Task<Stream> OpenReadStream(Guid fileId)
+    {
+        var blobClient = await GetBlobClient(fileId);
+        var stream = await blobClient.OpenReadAsync();
+        return stream;
+    }
+
     public async Task DeleteFile(Guid fileId)
     {
         var blobClient = await GetBlobClient(fileId);

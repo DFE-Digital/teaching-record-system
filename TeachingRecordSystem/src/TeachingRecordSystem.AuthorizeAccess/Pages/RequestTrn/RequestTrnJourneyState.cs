@@ -24,4 +24,5 @@ public class RequestTrnJourneyState()
     public string? TownOrCity { get; set; }
     public string? Country { get; set; }
     public string? PostalCode { get; set; }
+    public bool HasPendingTrnRequest { get; set; }
 }

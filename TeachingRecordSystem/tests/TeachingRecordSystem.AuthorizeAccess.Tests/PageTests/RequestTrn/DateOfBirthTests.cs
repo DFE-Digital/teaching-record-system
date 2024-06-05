@@ -3,6 +3,24 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
+    public async Task Get_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.HasPendingTrnRequest = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
     public async Task Get_HasPreviousNameMissingFromState_RedirectsToPreviousName()
     {
         // Arrange
@@ -42,6 +60,24 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"{dateOfBirth:%d}", doc.GetElementById("DateOfBirth.Day")?.GetAttribute("value"));
         Assert.Equal($"{dateOfBirth:%M}", doc.GetElementById("DateOfBirth.Month")?.GetAttribute("value"));
         Assert.Equal($"{dateOfBirth:yyyy}", doc.GetElementById("DateOfBirth.Year")?.GetAttribute("value"));
+    }
+
+    [Fact]
+    public async Task Post_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.HasPendingTrnRequest = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

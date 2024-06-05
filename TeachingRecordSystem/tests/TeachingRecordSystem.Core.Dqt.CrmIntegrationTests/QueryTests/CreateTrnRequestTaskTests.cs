@@ -41,7 +41,7 @@ public class CreateTrnRequestTaskTests : IAsyncLifetime
 
         var createdCrmTask = ctx.TaskSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(CrmTask.PrimaryIdAttribute) == crmTaskId);
         Assert.NotNull(createdCrmTask);
-        Assert.Equal("TRN Request", createdCrmTask.Subject);
+        Assert.Equal("Notification for TRA Support Team - TRN request", createdCrmTask.Subject);
         Assert.Equal(description, createdCrmTask.Description);
 
         var createdAnnotation = ctx.AnnotationSet.SingleOrDefault(i => i.GetAttributeValue<string>(Annotation.Fields.FileName) == evidenceFileName);

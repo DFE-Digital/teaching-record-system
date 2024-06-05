@@ -3,6 +3,24 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
+    public async Task Get_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.HasPendingTrnRequest = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/address?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
     public async Task Get_HasNationalInsuranceNumberMissingFromState_RedirectsToNationalInsuranceNumber()
     {
         // Arrange
@@ -49,6 +67,24 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(state.TownOrCity, doc.GetElementById("TownOrCity")?.GetAttribute("value"));
         Assert.Equal(state.PostalCode, doc.GetElementById("PostalCode")?.GetAttribute("value"));
         Assert.Equal(state.Country, doc.GetElementById("Country")?.GetAttribute("value"));
+    }
+
+    [Fact]
+    public async Task Post_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.HasPendingTrnRequest = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/address?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

@@ -11,6 +11,9 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator) : Page
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
+    [FromQuery]
+    public bool? FromCheckAnswers { get; set; }
+
     [BindProperty]
     [Display(Name = "What is your date of birth?")]
     [Required(ErrorMessage = "Enter your date of birth")]
@@ -25,12 +28,19 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator) : Page
 
         await JourneyInstance!.UpdateStateAsync(state => state.DateOfBirth = DateOfBirth);
 
-        return Redirect(linkGenerator.RequestTrnIdentity(JourneyInstance!.InstanceId));
+        return FromCheckAnswers == true ?
+            Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.RequestTrnIdentity(JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.HasPreviousName is null)
+        var state = JourneyInstance!.State;
+        if (state.HasPendingTrnRequest)
+        {
+            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+        }
+        else if (state.HasPreviousName is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnPreviousName(JourneyInstance.InstanceId));
             return;

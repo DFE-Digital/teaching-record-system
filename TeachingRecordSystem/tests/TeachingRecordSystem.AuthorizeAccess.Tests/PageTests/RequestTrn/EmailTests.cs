@@ -3,6 +3,24 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 public class EmailTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
+    public async Task Get_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.HasPendingTrnRequest = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/email?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
@@ -34,6 +52,24 @@ public class EmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(email, doc.GetElementById("Email")?.GetAttribute("value"));
+    }
+
+    [Fact]
+    public async Task Post_HasPendingTrnRequestSetTrue_RedirectsToSubmitted()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.HasPendingTrnRequest = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/email?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/submitted?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

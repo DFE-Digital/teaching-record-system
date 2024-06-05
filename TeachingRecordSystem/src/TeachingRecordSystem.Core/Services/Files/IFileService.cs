@@ -6,5 +6,7 @@ public interface IFileService
 
     Task<string> GetFileUrl(Guid fileId, TimeSpan expiresAfter);
 
+    Task<Stream> OpenReadStream(Guid fileId);
+
     Task DeleteFile(Guid fileId);
 }

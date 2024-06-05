@@ -12,6 +12,9 @@ public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
+    [FromQuery]
+    public bool? FromCheckAnswers { get; set; }
+
     [BindProperty]
     [Display(Name = "What is your email address?", Description = "We’ll only use this to send you your TRN if you’re eligible for one.")]
     [Required(ErrorMessage = "Enter your email address")]
@@ -27,11 +30,20 @@ public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state => state.Email = Email);
 
-        return Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
+        return FromCheckAnswers == true ?
+            Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
+        var state = JourneyInstance!.State;
+        if (state.HasPendingTrnRequest)
+        {
+            context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
+            return;
+        }
+
         Email ??= JourneyInstance!.State.Email;
     }
 }
