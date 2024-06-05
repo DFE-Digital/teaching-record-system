@@ -7,7 +7,7 @@ using TeachingRecordSystem.FormFlow;
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
 [Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
+public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -21,6 +21,11 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator) : Page
 
     public async Task<IActionResult> OnPost()
     {
+        if (DateOfBirth >= clock.Today)
+        {
+            ModelState.AddModelError(nameof(DateOfBirth), "Date of birth must be in the past");
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();

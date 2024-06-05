@@ -16,7 +16,7 @@ public class NationalInsuranceNumberModel(AuthorizeAccessLinkGenerator linkGener
 
     [BindProperty]
     [Display(Name = "Do you have a National Insurance number?")]
-    [Required(ErrorMessage = "Tell us if you have a National Insurance number")]
+    [Required(ErrorMessage = "Select yes if you have a National Insurance number")]
     public bool? HasNationalInsuranceNumber { get; set; }
 
     [BindProperty]
@@ -30,7 +30,7 @@ public class NationalInsuranceNumberModel(AuthorizeAccessLinkGenerator linkGener
         {
             if (!string.IsNullOrEmpty(NationalInsuranceNumber) && !NationalInsuranceNumberHelper.IsValid(NationalInsuranceNumber))
             {
-                ModelState.AddModelError(nameof(NationalInsuranceNumber), "Enter a valid National Insurance number");
+                ModelState.AddModelError(nameof(NationalInsuranceNumber), "Enter a National Insurance number in the correct format");
             }
         }
         else

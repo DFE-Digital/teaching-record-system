@@ -17,7 +17,7 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
 
     [BindProperty]
     [Display(Name = "Have you ever changed your name?")]
-    [Required(ErrorMessage = "Tell us if you have ever changed your name")]
+    [Required(ErrorMessage = "Select yes if you’ve ever changed your name")]
     public bool? HasPreviousName { get; set; }
 
     [BindProperty]

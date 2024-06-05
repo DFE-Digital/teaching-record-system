@@ -103,6 +103,33 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_WhenDateOfBirthIsInTheFuture_ReturnsError()
+    {
+        var state = CreateNewState();
+        state.Email = Faker.Internet.Email();
+        state.Name = Faker.Name.FullName();
+        state.PreviousName = Faker.Name.FullName();
+        state.HasPreviousName = true;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder
+            {
+                { "DateOfBirth.Day", "1" },
+                { "DateOfBirth.Month", "3" },
+                { "DateOfBirth.Year", $"{Clock.Today.Year + 1}" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "DateOfBirth", "Date of birth must be in the past");
+    }
+
+    [Fact]
     public async Task Post_HasPreviousNameMissingFromState_RedirectsToPreviousName()
     {
         // Arrange
