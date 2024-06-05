@@ -1,8 +1,9 @@
-namespace TeachingRecordSystem.Api.V3.V20240101.Requests;
+namespace TeachingRecordSystem.Api.V3.V20240412.Requests;
 
+[AutoMap(typeof(Core.Operations.CreateNameChangeRequestCommand), ReverseMap = true)]
 public record CreateNameChangeRequestRequest
 {
-    public required string Trn { get; init; }
+    public string? Email { get; init; }
     public required string FirstName { get; init; }
     public required string MiddleName { get; init; }
     public required string LastName { get; init; }

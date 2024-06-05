@@ -1,4 +1,3 @@
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -11,7 +10,7 @@ namespace TeachingRecordSystem.Api.V3.V20240307.Controllers;
 
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.CreateTrn)]
-public class TrnRequestsController : ControllerBase
+public class TrnRequestsController(IMapper mapper) : ControllerBase
 {
     [HttpPost("")]
     [SwaggerOperation(
@@ -42,7 +41,7 @@ public class TrnRequestsController : ControllerBase
         };
         var result = await handler.Handle(command);
 
-        var response = result.Adapt<TrnRequestInfo>();
+        var response = mapper.Map<TrnRequestInfo>(result);
         return Ok(response);
     }
 
@@ -68,7 +67,7 @@ public class TrnRequestsController : ControllerBase
             return NotFound();
         }
 
-        var response = result.Adapt<TrnRequestInfo>();
+        var response = mapper.Map<TrnRequestInfo>(result);
         return Ok(response);
     }
 }

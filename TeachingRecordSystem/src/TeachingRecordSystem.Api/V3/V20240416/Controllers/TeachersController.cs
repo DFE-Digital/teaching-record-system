@@ -1,24 +1,17 @@
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.V3.Requests;
-using TeachingRecordSystem.Api.V3.Responses;
+using TeachingRecordSystem.Api.V3.Core.Operations;
+using TeachingRecordSystem.Api.V3.V20240416.Requests;
+using TeachingRecordSystem.Api.V3.V20240416.Responses;
 
 namespace TeachingRecordSystem.Api.V3.V20240416.Controllers;
 
 [Route("teachers")]
-public class TeachersController : ControllerBase
+public class TeachersController(IMapper mapper) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public TeachersController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet("{trn}")]
     [SwaggerOperation(
         OperationId = "GetTeacherByTrn",
@@ -31,22 +24,22 @@ public class TeachersController : ControllerBase
     public async Task<IActionResult> Get(
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
-        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth)
+        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
+        [FromServices] GetPersonHandler handler)
     {
-        var request = new GetTeacherRequest()
-        {
-            Trn = trn,
-            Include = include ?? GetTeacherRequestIncludes.None,
-            AccessMode = AccessMode.ApiKey
-        };
+        var command = new GetPersonCommand(
+            trn,
+            include is not null ? (GetPersonCommandIncludes)include : GetPersonCommandIncludes.None,
+            dateOfBirth);
 
-        var response = await _mediator.Send(request);
+        var result = await handler.Handle(command);
 
-        if (response is null || (dateOfBirth.HasValue && dateOfBirth.Value != response.DateOfBirth))
+        if (result is null)
         {
             return NotFound();
         }
 
+        var response = mapper.Map<GetTeacherResponse>(result);
         return Ok(response);
     }
 }

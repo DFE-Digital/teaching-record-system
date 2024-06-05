@@ -1,5 +1,6 @@
 namespace TeachingRecordSystem.Api.V3.V20240307.ApiModels;
 
+[AutoMap(typeof(Core.SharedModels.TrnRequestInfo))]
 public record TrnRequestInfo
 {
     public required string RequestId { get; init; }

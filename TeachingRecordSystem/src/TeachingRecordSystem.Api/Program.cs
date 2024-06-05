@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Optional;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Json;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
+using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.Infrastructure.Middleware;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.OpenApi;
@@ -194,6 +196,14 @@ public class Program
         services.Decorate<Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory, CamelCaseErrorKeysProblemDetailsFactory>();
 
         services.AddOpenApi(configuration);
+
+        services
+            .AddAutoMapper(cfg =>
+            {
+                cfg.AddMaps(typeof(Program).Assembly);
+                cfg.CreateMap(typeof(Option<>), typeof(Option<>)).ConvertUsing(typeof(OptionMapper<,>));
+            })
+            .AddTransient(typeof(OptionMapper<,>));
 
         services.Scan(scan =>
         {

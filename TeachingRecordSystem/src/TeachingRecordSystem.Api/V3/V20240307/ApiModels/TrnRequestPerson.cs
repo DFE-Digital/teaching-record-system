@@ -1,5 +1,6 @@
 namespace TeachingRecordSystem.Api.V3.V20240307.ApiModels;
 
+[AutoMap(typeof(Core.SharedModels.TrnRequestPerson))]
 public record TrnRequestPerson
 {
     public required string FirstName { get; init; }

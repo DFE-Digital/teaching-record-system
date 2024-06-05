@@ -62,7 +62,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestForTeacher_ReturnsExpectedContent(GetHttpClientWithApiKey(), baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
+        await ValidRequestForTeacher_ReturnsExpectedContent(GetHttpClientWithApiKey(), baseUrl, contact, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact();
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(GetHttpClientWithApiKey(), baseUrl, contact, expectCertificateUrls: false, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
+        await ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(GetHttpClientWithApiKey(), baseUrl, contact, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     public async Task Get_ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent()
     {
         var qualifications = new[]
-{
+        {
             new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.NPQLL, null, IsActive:true),
             new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.NPQSL, new DateOnly(2022, 5, 6), IsActive:false),
             new Qualification(Guid.NewGuid(), dfeta_qualification_dfeta_Type.NPQEYL, new DateOnly(2022, 3, 4), IsActive:true)
@@ -105,7 +105,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var contact = await CreateContact(qualifications: qualifications);
         var baseUrl = $"/v3/teachers/{contact.dfeta_TRN}";
 
-        await ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(GetHttpClientWithApiKey(), baseUrl, contact, qualifications, expectCertificateUrls: false);
+        await ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(GetHttpClientWithApiKey(), baseUrl, contact, qualifications);
     }
 
     [Fact]
