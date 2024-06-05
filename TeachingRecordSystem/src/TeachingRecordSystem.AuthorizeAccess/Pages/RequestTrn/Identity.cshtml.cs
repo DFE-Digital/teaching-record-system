@@ -13,7 +13,7 @@ public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileServ
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
-    public const int MaxFileSizeMb = 50;
+    public const int MaxFileSizeMb = 3;
 
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -22,7 +22,7 @@ public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileServ
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 3MB")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }

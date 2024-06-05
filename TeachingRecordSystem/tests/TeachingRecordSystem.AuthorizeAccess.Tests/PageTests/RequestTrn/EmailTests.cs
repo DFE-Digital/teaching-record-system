@@ -113,7 +113,7 @@ public class EmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Email", "Enter a valid email address");
+        await AssertEx.HtmlResponseHasError(response, "Email", "Enter an email address in the correct format, like name@example.com");
     }
 
 

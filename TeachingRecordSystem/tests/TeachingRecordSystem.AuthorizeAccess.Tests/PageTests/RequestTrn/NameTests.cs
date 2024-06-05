@@ -88,7 +88,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Name", "Enter your name");
+        await AssertEx.HtmlResponseHasError(response, "Name", "Enter your full name");
     }
 
     [Fact]

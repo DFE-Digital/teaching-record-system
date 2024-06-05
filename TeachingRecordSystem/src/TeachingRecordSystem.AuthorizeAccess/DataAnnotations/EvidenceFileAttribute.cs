@@ -8,7 +8,7 @@ public class EvidenceFileAttribute : FileExtensionsAttribute
     {
         if (ErrorMessage == null)
         {
-            ErrorMessage = "The selected file must be a JPEG, JPG, PNG or PDF";
+            ErrorMessage = "The selected file must be a PDF, JPG, JPEG or PNG";
         }
     }
 }

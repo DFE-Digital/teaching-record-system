@@ -16,7 +16,7 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Display(Name = "What is your name?", Description = "Full name")]
-    [Required(ErrorMessage = "Enter your name")]
+    [Required(ErrorMessage = "Enter your full name")]
     [MaxLength(200, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 

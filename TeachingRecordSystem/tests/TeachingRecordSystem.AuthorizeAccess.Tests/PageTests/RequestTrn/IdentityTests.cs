@@ -143,7 +143,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "The selected file must be a JPEG, JPG, PNG or PDF");
+        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "The selected file must be a PDF, JPG, JPEG or PNG");
     }
 
 
