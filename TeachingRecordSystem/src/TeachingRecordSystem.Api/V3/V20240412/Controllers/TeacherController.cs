@@ -10,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20240412.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240412.Controllers;
 
 [Route("teacher")]
-public class TeacherController(IMapper mapper) : ControllerBase
+public class TeacherController : ControllerBase
 {
     [HttpPost("name-changes")]
     [SwaggerOperation(
@@ -24,7 +24,16 @@ public class TeacherController(IMapper mapper) : ControllerBase
         [FromBody] CreateNameChangeRequestRequest request,
         [FromServices] CreateNameChangeRequestHandler handler)
     {
-        var command = mapper.Map<CreateNameChangeRequestCommand>(request) with { Trn = User.FindFirstValue("trn")! };
+        var command = new CreateNameChangeRequestCommand()
+        {
+            Trn = User.FindFirstValue("trn")!,
+            FirstName = request.FirstName,
+            MiddleName = request.MiddleName,
+            LastName = request.LastName,
+            EvidenceFileName = request.EvidenceFileName,
+            EvidenceFileUrl = request.EvidenceFileUrl,
+        };
+
         var caseNumber = await handler.Handle(command);
         var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
         return Ok(response);
@@ -42,7 +51,14 @@ public class TeacherController(IMapper mapper) : ControllerBase
         [FromBody] CreateDateOfBirthChangeRequestRequest request,
         [FromServices] CreateDateOfBirthChangeRequestHandler handler)
     {
-        var command = mapper.Map<CreateDateOfBirthChangeRequestCommand>(request) with { Trn = User.FindFirstValue("trn")! };
+        var command = new CreateDateOfBirthChangeRequestCommand()
+        {
+            Trn = User.FindFirstValue("trn")!,
+            DateOfBirth = request.DateOfBirth,
+            EvidenceFileName = request.EvidenceFileName,
+            EvidenceFileUrl = request.EvidenceFileUrl,
+        };
+
         var caseNumber = await handler.Handle(command);
         var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
         return Ok(response);
