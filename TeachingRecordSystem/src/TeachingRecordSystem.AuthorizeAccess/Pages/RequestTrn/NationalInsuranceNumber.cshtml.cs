@@ -45,8 +45,9 @@ public class NationalInsuranceNumberModel(AuthorizeAccessLinkGenerator linkGener
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            state.HasNationalInsuranceNumber = HasNationalInsuranceNumber!.Value;
-            state.NationalInsuranceNumber = NationalInsuranceNumber;
+            var hasNationalInsuranceNumber = HasNationalInsuranceNumber!.Value;
+            state.HasNationalInsuranceNumber = hasNationalInsuranceNumber;
+            state.NationalInsuranceNumber = hasNationalInsuranceNumber ? NationalInsuranceNumber : null;
         });
 
         if (HasNationalInsuranceNumber == false)

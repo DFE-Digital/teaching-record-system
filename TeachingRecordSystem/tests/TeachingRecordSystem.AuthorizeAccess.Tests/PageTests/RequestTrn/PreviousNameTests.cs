@@ -141,7 +141,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "PreviousName", "Tell us your previous name");
+        await AssertEx.HtmlResponseHasError(response, "PreviousName", "Enter your previous full name");
     }
 
     [Fact]
