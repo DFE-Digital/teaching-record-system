@@ -42,6 +42,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string AccountId = "accountid";
+			public const string Id = "accountid";
 			public const string dfeta_TrainingProvider = "dfeta_trainingprovider";
 			public const string dfeta_UKPRN = "dfeta_ukprn";
 			public const string Name = "name";
@@ -112,6 +114,49 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the account.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountid")]
+		public System.Nullable<System.Guid> AccountId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("accountid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("AccountId");
+				this.SetAttributeValue("accountid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("AccountId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.AccountId = value;
 			}
 		}
 		
@@ -2231,6 +2276,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
 			public const string dfeta_NINumber = "dfeta_ninumber";
 			public const string dfeta_PreviousLastName = "dfeta_previouslastname";
+			public const string dfeta_qtlsdate = "dfeta_qtlsdate";
+			public const string dfeta_QtlsDateHasBeenSet = "dfeta_qtlsdatehasbeenset";
 			public const string dfeta_QTSDate = "dfeta_qtsdate";
 			public const string dfeta_SlugId = "dfeta_slugid";
 			public const string dfeta_StatedFirstName = "dfeta_statedfirstname";
@@ -2734,6 +2781,46 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_PreviousLastName");
 				this.SetAttributeValue("dfeta_previouslastname", value);
 				this.OnPropertyChanged("dfeta_PreviousLastName");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtlsdate")]
+		public System.Nullable<System.DateTime> dfeta_qtlsdate
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_qtlsdate");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_qtlsdate");
+				this.SetAttributeValue("dfeta_qtlsdate", value);
+				this.OnPropertyChanged("dfeta_qtlsdate");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtlsdatehasbeenset")]
+		public System.Nullable<bool> dfeta_QtlsDateHasBeenSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_qtlsdatehasbeenset");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_QtlsDateHasBeenSet");
+				this.SetAttributeValue("dfeta_qtlsdatehasbeenset", value);
+				this.OnPropertyChanged("dfeta_QtlsDateHasBeenSet");
 			}
 		}
 		
@@ -6017,6 +6104,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string CreatedOn = "createdon";
 			public const string dfeta_CompletionDate = "dfeta_completiondate";
 			public const string dfeta_InductionExemptionReason = "dfeta_inductionexemptionreason";
+			public const string dfeta_inductionId = "dfeta_inductionid";
+			public const string Id = "dfeta_inductionid";
 			public const string dfeta_InductionStatus = "dfeta_inductionstatus";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_StartDate = "dfeta_startdate";
@@ -6133,6 +6222,49 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_InductionExemptionReason");
 				this.SetAttributeValue("dfeta_inductionexemptionreason", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
 				this.OnPropertyChanged("dfeta_InductionExemptionReason");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionid")]
+		public System.Nullable<System.Guid> dfeta_inductionId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_inductionid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_inductionId");
+				this.SetAttributeValue("dfeta_inductionid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_inductionId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_inductionId = value;
 			}
 		}
 		
@@ -16384,6 +16516,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		public static class Fields
 		{
 			public const string AsyncAutoDelete = "asyncautodelete";
+			public const string CanBeBypassed = "canbebypassed";
 			public const string CanUseReadOnlyConnection = "canusereadonlyconnection";
 			public const string Category = "category";
 			public const string ComponentState = "componentstate";
@@ -16501,6 +16634,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("AsyncAutoDelete");
 				this.SetAttributeValue("asyncautodelete", value);
 				this.OnPropertyChanged("AsyncAutoDelete");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("canbebypassed")]
+		public System.Nullable<bool> CanBeBypassed
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<bool>>("canbebypassed");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CanBeBypassed");
+				this.SetAttributeValue("canbebypassed", value);
+				this.OnPropertyChanged("CanBeBypassed");
 			}
 		}
 		

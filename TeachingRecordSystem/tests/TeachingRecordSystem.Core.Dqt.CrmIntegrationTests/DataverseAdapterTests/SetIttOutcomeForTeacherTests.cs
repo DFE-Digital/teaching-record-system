@@ -107,6 +107,84 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Given_assigning_pass_result_tointraining_with_qtls_returns_succeess()
+    {
+        // Arrange
+        var ittResult = dfeta_ITTResult.Pass;
+        var assessmentDate = _clock.Today.AddDays(-1);
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, iqts: true);
+        await _organizationService.UpdateAsync(new Contact()
+        {
+            Id = createPersonResult.TeacherId,
+            dfeta_qtlsdate = _clock.Today.ToDateTimeWithDqtBstFix(isLocalTime: true)
+        });
+
+        // Act
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        //Assert
+        Assert.True(result.Succeeded);
+    }
+
+    [Fact]
+    public async Task Given_assessmentdate_before_qtls_sets_contact_qtsdate()
+    {
+        // Arrange
+        var ittResult = dfeta_ITTResult.Pass;
+        var assessmentDate = _clock.Today.AddMonths(-1);
+        var qtlsDate = _clock.Today.ToDateTimeWithDqtBstFix(isLocalTime: true);
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, iqts: true);
+        await _organizationService.UpdateAsync(new Contact()
+        {
+            Id = createPersonResult.TeacherId,
+            dfeta_qtlsdate = qtlsDate
+        });
+
+        // Act
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        //Assert
+        Assert.True(result.Succeeded);
+        var teacher = await _dataverseAdapter.GetTeacher(createPersonResult.TeacherId, columnNames: new[] { Contact.Fields.dfeta_QTSDate });
+        Assert.Equal(assessmentDate.ToDateTime(), teacher.dfeta_QTSDate);
+    }
+
+    [Fact]
+    public async Task Given_assessmentdate_after_qtlsdate_does_not_update_contact_qtsdate()
+    {
+        // Arrange
+        var ittResult = dfeta_ITTResult.Pass;
+        var assessmentDate = _clock.Today.AddDays(-1);
+        var createPersonResult = await _testDataHelper.CreatePerson(earlyYears: false, iqts: true);
+        var qtlsDate = _clock.Today.AddYears(-1).ToDateTimeWithDqtBstFix(isLocalTime: true);
+        await _organizationService.UpdateAsync(new Contact()
+        {
+            Id = createPersonResult.TeacherId,
+            dfeta_qtlsdate = qtlsDate
+        });
+
+        // Act
+        var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+            createPersonResult.TeacherId,
+            createPersonResult.IttProviderUkprn,
+            ittResult,
+            assessmentDate);
+
+        //Assert
+        Assert.True(result.Succeeded);
+        var teacher = await _dataverseAdapter.GetTeacher(createPersonResult.TeacherId, columnNames: new[] { Contact.Fields.dfeta_QTSDate });
+        Assert.Equal(qtlsDate, teacher.dfeta_QTSDate);
+    }
+
+    [Fact]
     public async Task Given_existing_qts_update_with_different_assessment_date_returns_error()
     {
         // Arrange

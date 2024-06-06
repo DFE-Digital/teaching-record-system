@@ -48,6 +48,9 @@ public static class ServiceCollectionExtensions
         PersonNameChangedPlugin.Register(fakedXrmContext);
         CalculateActiveSanctionsPlugin.Register(fakedXrmContext);
         QtsRegistrationUpdatedPlugin.Register(fakedXrmContext);
+        UpdateInductionStatusPlugin.Register(fakedXrmContext);
+        UpdateQtlsDateSetPlugin.Register(fakedXrmContext);
+
 
         // SeedCrmReferenceData must be registered before AddDefaultServiceClient is called
         // to ensure this task runs before the cache pre-warming task
