@@ -36,7 +36,8 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                     Contact.Fields.LastName,
                     Contact.Fields.BirthDate,
                     Contact.Fields.dfeta_HUSID,
-                    Contact.Fields.dfeta_SlugId
+                    Contact.Fields.dfeta_SlugId,
+                    Contact.Fields.EMailAddress1,
                 }
             },
             Criteria = filter
@@ -64,6 +65,10 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                     (
                         Attribute: Contact.Fields.BirthDate,
                         Matches: findQuery.DateOfBirth.ToDateTime().Equals(match.BirthDate)
+                    ),
+                    (
+                        Attribute: Contact.Fields.EMailAddress1,
+                        Matches: findQuery.EmailAddresses.Contains(match.EMailAddress1, StringComparer.OrdinalIgnoreCase)
                     )
                 };
 
@@ -71,11 +76,16 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
 
                 return new FindPotentialDuplicateContactsResult()
                 {
-                    TeacherId = match.Id,
+                    ContactId = match.Id,
                     MatchedAttributes = matchedAttributeNames,
                     HasActiveSanctions = match.dfeta_ActiveSanctions == true,
                     HasQtsDate = match.dfeta_QTSDate.HasValue,
                     HasEytsDate = match.dfeta_EYTSDate.HasValue,
+                    FirstName = match.FirstName,
+                    MiddleName = match.MiddleName ?? "",
+                    LastName = match.LastName,
+                    DateOfBirth = match.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                    EmailAddress = match.EMailAddress1
                 };
             })
             .ToArray();
@@ -91,11 +101,15 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                 (FieldName: Contact.Fields.FirstName, Value: findQuery.FirstNames),
                 (FieldName: Contact.Fields.MiddleName, Value: findQuery.MiddleName),
                 (FieldName: Contact.Fields.LastName, Value: findQuery.LastName),
-                (FieldName: Contact.Fields.BirthDate, Value: (object)findQuery.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false))
+                (FieldName: Contact.Fields.BirthDate, Value: (object)findQuery.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false)),
+                (FieldName: Contact.Fields.EMailAddress1, Value: findQuery.EmailAddresses),
             }.ToList();
 
-            // If fields are null in the input then don't try to match them (typically MiddleName)
-            fields.RemoveAll(f => f.Value == null || (f.Value is string stringValue && string.IsNullOrEmpty(stringValue)));
+            // Don't try to match with any fields that are empty
+            fields.RemoveAll(f =>
+                f.Value == null ||
+                (f.Value is string stringValue && string.IsNullOrEmpty(stringValue)) ||
+                (f.Value is IEnumerable<string> stringEnumerable && !stringEnumerable.Any()));
 
             var combinations = fields.GetCombinations(length: 3).ToArray();
 

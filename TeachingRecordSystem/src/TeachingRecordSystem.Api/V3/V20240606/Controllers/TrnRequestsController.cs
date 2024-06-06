@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.V20240307.ApiModels;
-using TeachingRecordSystem.Api.V3.V20240307.Requests;
+using TeachingRecordSystem.Api.V3.V20240606.ApiModels;
+using TeachingRecordSystem.Api.V3.V20240606.Requests;
 
-namespace TeachingRecordSystem.Api.V3.V20240307.Controllers;
+namespace TeachingRecordSystem.Api.V3.V20240606.Controllers;
 
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.CreateTrn)]
@@ -36,7 +36,7 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             MiddleName = request.Person.MiddleName,
             LastName = request.Person.LastName,
             DateOfBirth = request.Person.DateOfBirth,
-            EmailAddresses = request.Person.Email is string emailAddress ? [emailAddress] : [],
+            EmailAddresses = request.Person.EmailAddresses ?? [],
             NationalInsuranceNumber = request.Person.NationalInsuranceNumber
         };
         var result = await handler.Handle(command);

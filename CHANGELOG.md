@@ -1,5 +1,16 @@
 # API Changelog
 
+## 20240606
+
+### `PUT /v3/trn-requests`
+
+The scalar `email` property in the request has been replaced with an `emailAddresses` collection property so that multiple email addresses can be provided to match on.
+The `person` property has been removed from the response.
+
+### `GET /v3/trn-requests`
+
+The `person` property has been removed from the response.
+
 ## 20240416
 
 ### `GET /v3/teachers/<trn>`

@@ -25,7 +25,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             dfeta_StatedLastName = query.StatedLastName,
             BirthDate = query.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false),
             dfeta_NINumber = query.NationalInsuranceNumber,
-            EMailAddress1 = query.Email,
+            EMailAddress1 = query.EmailAddress,
             dfeta_AllowPiiUpdatesFromRegister = false
         };
 
@@ -79,7 +79,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         return new CrmTask()
         {
             RegardingObjectId = contactId.ToEntityReference(Contact.EntityLogicalName),
-            dfeta_potentialduplicateid = duplicate.TeacherId.ToEntityReference(Contact.EntityLogicalName),
+            dfeta_potentialduplicateid = duplicate.ContactId.ToEntityReference(Contact.EntityLogicalName),
             Category = category,
             Subject = "Notification for QTS Unit Team",
             Description = description
@@ -95,10 +95,11 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             {
                 sb.AppendLine(matchedAttribute switch
                 {
-                    Contact.Fields.FirstName => $"  - First name: '{createTeacherRequest.FirstName}'",
-                    Contact.Fields.MiddleName => $"  - Middle name: '{createTeacherRequest.MiddleName}'",
-                    Contact.Fields.LastName => $"  - Last name: '{createTeacherRequest.LastName}'",
-                    Contact.Fields.BirthDate => $"  - Date of birth: '{createTeacherRequest.DateOfBirth:dd/MM/yyyy}'",
+                    Contact.Fields.FirstName => $"  - First name: '{duplicate.FirstName}'",
+                    Contact.Fields.MiddleName => $"  - Middle name: '{duplicate.MiddleName}'",
+                    Contact.Fields.LastName => $"  - Last name: '{duplicate.LastName}'",
+                    Contact.Fields.BirthDate => $"  - Date of birth: '{duplicate.DateOfBirth:dd/MM/yyyy}'",
+                    Contact.Fields.EMailAddress1 => $"  - Email address: '{duplicate.EmailAddress}'",
                     _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
                 });
             }

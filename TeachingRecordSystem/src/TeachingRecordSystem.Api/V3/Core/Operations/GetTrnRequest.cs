@@ -46,12 +46,12 @@ public class GetTrnRequestHandler(
         return new TrnRequestInfo()
         {
             RequestId = command.RequestId.ToString(),
-            Person = new TrnRequestPerson()
+            Person = new TrnRequestInfoPerson()
             {
                 FirstName = contact.FirstName,
                 LastName = contact.LastName,
                 MiddleName = contact.MiddleName,
-                Email = contact.EMailAddress1,
+                EmailAddress = contact.EMailAddress1,
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 DateOfBirth = contact.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false)
             },

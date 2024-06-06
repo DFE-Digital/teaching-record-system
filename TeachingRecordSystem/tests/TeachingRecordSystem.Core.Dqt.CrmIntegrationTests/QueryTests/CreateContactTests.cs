@@ -37,7 +37,7 @@ public class CreateContactTests : IAsyncLifetime
             StatedFirstName = firstName,
             StatedMiddleName = middleName,
             StatedLastName = lastName,
-            Email = email,
+            EmailAddress = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn,
@@ -84,7 +84,7 @@ public class CreateContactTests : IAsyncLifetime
             StatedFirstName = firstName,
             StatedMiddleName = middleName,
             StatedLastName = lastName,
-            Email = email,
+            EmailAddress = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn,
@@ -125,7 +125,7 @@ public class CreateContactTests : IAsyncLifetime
             StatedFirstName = firstName,
             StatedMiddleName = middleName,
             StatedLastName = lastName,
-            Email = email,
+            EmailAddress = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn1,
@@ -142,20 +142,26 @@ public class CreateContactTests : IAsyncLifetime
             StatedFirstName = firstName,
             StatedMiddleName = middleName,
             StatedLastName = lastName,
-            Email = email,
+            EmailAddress = email,
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn2,
-            PotentialDuplicates = new[] {
+            PotentialDuplicates =
+            [
                 new FindPotentialDuplicateContactsResult()
                 {
-                    TeacherId = createdTeacherId1,
-                    MatchedAttributes = new[] { Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName },
+                    ContactId = createdTeacherId1,
+                    MatchedAttributes = [Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName],
                     HasActiveSanctions = false,
                     HasEytsDate = false,
-                    HasQtsDate = false
+                    HasQtsDate = false,
+                    FirstName = firstName,
+                    MiddleName = middleName,
+                    LastName = lastName,
+                    DateOfBirth = dob,
+                    EmailAddress = email
                 }
-            }
+            ]
         };
         var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQuery(query2);
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
