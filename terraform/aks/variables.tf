@@ -45,6 +45,8 @@ variable "enable_monitoring" {
   default = true
 }
 
+variable "enable_logit" { default = false }
+
 variable "deploy_azure_backing_services" {
   type    = string
   default = true
