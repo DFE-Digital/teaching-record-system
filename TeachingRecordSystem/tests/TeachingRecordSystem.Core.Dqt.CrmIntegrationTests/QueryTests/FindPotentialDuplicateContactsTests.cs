@@ -30,21 +30,30 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
             .WithFirstName(firstNameSynonym)
             .WithLastName(lastName)
             .WithMiddleName(middleName)
-            .WithDateOfBirth(dob.ToDateOnlyWithDqtBstFix(isLocalTime: false)));
+            .WithDateOfBirth(dob.ToDateOnlyWithDqtBstFix(isLocalTime: false))
+            .WithEmail(email));
 
         var query = new FindPotentialDuplicateContactsQuery()
         {
             FirstNames = [firstName, firstNameSynonym],
             MiddleName = middleName,
             LastName = lastName,
-            DateOfBirth = dob.ToDateOnlyWithDqtBstFix(isLocalTime: false)
+            DateOfBirth = dob.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+            EmailAddresses = [email]
         };
 
         // Act
         var result = await _crmQueryDispatcher.ExecuteQuery(query);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Contains(person.PersonId, result!.Select(x => x.TeacherId));
+        var queryResult = Assert.Single(result, r => r.ContactId == person.PersonId);
+
+        Assert.Collection(
+            queryResult.MatchedAttributes,
+            a => Assert.Equal(Contact.Fields.FirstName, a),
+            a => Assert.Equal(Contact.Fields.MiddleName, a),
+            a => Assert.Equal(Contact.Fields.LastName, a),
+            a => Assert.Equal(Contact.Fields.BirthDate, a),
+            a => Assert.Equal(Contact.Fields.EMailAddress1, a));
     }
 }

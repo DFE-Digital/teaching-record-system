@@ -22,7 +22,7 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
 
     [BindProperty]
     [Display(Name = "Previous full name")]
-    [RequiredIfOtherPropertyEquals(nameof(HasPreviousName), ErrorMessage = "Tell us your previous name")]
+    [RequiredIfOtherPropertyEquals(nameof(HasPreviousName), ErrorMessage = "Enter your previous full name")]
     [MaxLength(200, ErrorMessage = "Previous name must be 200 characters or less")]
     public string? PreviousName { get; set; }
 

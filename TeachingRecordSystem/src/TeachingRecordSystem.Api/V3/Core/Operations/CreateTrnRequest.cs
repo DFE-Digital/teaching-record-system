@@ -17,7 +17,7 @@ public record CreateTrnRequestCommand
     public required string? MiddleName { get; init; }
     public required string LastName { get; init; }
     public required DateOnly DateOfBirth { get; init; }
-    public required string? Email { get; init; }
+    public required IReadOnlyCollection<string> EmailAddresses { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
 }
 
@@ -54,13 +54,16 @@ public class CreateTrnRequestHandler(
                 FirstNames = firstNameSynonyms.Append(firstName),
                 MiddleName = middleName,
                 LastName = command.LastName,
-                DateOfBirth = command.DateOfBirth
+                DateOfBirth = command.DateOfBirth,
+                EmailAddresses = command.EmailAddresses
             });
 
         if (potentialDuplicates.Length == 0)
         {
             trn = await trnGenerationApiClient.GenerateTrn();
         }
+
+        var emailAddress = command.EmailAddresses?.First();
 
         var contactId = await crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
         {
@@ -71,7 +74,7 @@ public class CreateTrnRequestHandler(
             StatedMiddleName = command.MiddleName ?? "",
             StatedLastName = command.LastName,
             DateOfBirth = command.DateOfBirth,
-            Email = command.Email,
+            EmailAddress = emailAddress,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.NormalizeNationalInsuranceNumber(command.NationalInsuranceNumber),
             PotentialDuplicates = potentialDuplicates,
             Trn = trn
@@ -92,12 +95,12 @@ public class CreateTrnRequestHandler(
         return new TrnRequestInfo()
         {
             RequestId = command.RequestId,
-            Person = new TrnRequestPerson()
+            Person = new TrnRequestInfoPerson()
             {
                 FirstName = command.FirstName,
                 MiddleName = command.MiddleName,
                 LastName = command.LastName,
-                Email = command.Email,
+                EmailAddress = emailAddress,
                 DateOfBirth = command.DateOfBirth,
                 NationalInsuranceNumber = command.NationalInsuranceNumber
             },
