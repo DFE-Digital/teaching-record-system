@@ -1,15 +1,6 @@
 using System.ComponentModel;
-using MediatR;
-using TeachingRecordSystem.Api.V3.Responses;
 
-namespace TeachingRecordSystem.Api.V3.Requests;
-
-public record GetTeacherRequest : IRequest<GetTeacherResponse?>
-{
-    public required string Trn { get; init; }
-    public required GetTeacherRequestIncludes Include { get; init; } = GetTeacherRequestIncludes.All;
-    public required AccessMode AccessMode { get; init; }
-}
+namespace TeachingRecordSystem.Api.V3.V20240416.Requests;
 
 [Flags]
 [Description("Comma-separated list of data to include in response.")]

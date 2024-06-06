@@ -1,28 +1,17 @@
-using Mapster;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.Requests;
-using TeachingRecordSystem.Api.V3.Responses;
 using TeachingRecordSystem.Api.V3.V20240101.Requests;
 using TeachingRecordSystem.Api.V3.V20240101.Responses;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
 [Route("teachers")]
-public class TeachersController : ControllerBase
+public class TeachersController(IMapper mapper) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public TeachersController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet("{trn}")]
     [SwaggerOperation(
         OperationId = "GetTeacherByTrn",
@@ -34,22 +23,22 @@ public class TeachersController : ControllerBase
     [Authorize(Policy = AuthorizationPolicies.GetPerson)]
     public async Task<IActionResult> Get(
         [FromRoute] string trn,
-        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include)
+        [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
+        [FromServices] GetPersonHandler handler)
     {
-        var request = new GetTeacherRequest()
-        {
-            Trn = trn,
-            Include = include ?? GetTeacherRequestIncludes.None,
-            AccessMode = AccessMode.ApiKey
-        };
+        var command = new GetPersonCommand(
+            trn,
+            include is not null ? (GetPersonCommandIncludes)include : GetPersonCommandIncludes.None,
+            DateOfBirth: null);
 
-        var response = await _mediator.Send(request);
+        var result = await handler.Handle(command);
 
-        if (response is null)
+        if (result is null)
         {
             return NotFound();
         }
 
+        var response = mapper.Map<GetTeacherResponse>(result);
         return Ok(response);
     }
 
@@ -65,7 +54,7 @@ public class TeachersController : ControllerBase
         [FromBody] CreateNameChangeRequestRequest request,
         [FromServices] CreateNameChangeRequestHandler handler)
     {
-        var command = request.Adapt<CreateNameChangeRequestCommand>();
+        var command = mapper.Map<CreateNameChangeRequestCommand>(request);
         await handler.Handle(command);
         return NoContent();
     }
@@ -82,7 +71,7 @@ public class TeachersController : ControllerBase
         [FromBody] CreateDateOfBirthChangeRequestRequest request,
         [FromServices] CreateDateOfBirthChangeRequestHandler handler)
     {
-        var command = request.Adapt<CreateDateOfBirthChangeRequestCommand>();
+        var command = mapper.Map<CreateDateOfBirthChangeRequestCommand>(request);
         await handler.Handle(command);
         return NoContent();
     }
@@ -106,7 +95,7 @@ public class TeachersController : ControllerBase
         {
             Total = result.Total,
             Query = request,
-            Results = result.Items.Select(i => i.Adapt<FindTeachersResponseResult>()).AsReadOnly()
+            Results = result.Items.Select(mapper.Map<FindTeachersResponseResult>).AsReadOnly()
         };
 
         return Ok(response);

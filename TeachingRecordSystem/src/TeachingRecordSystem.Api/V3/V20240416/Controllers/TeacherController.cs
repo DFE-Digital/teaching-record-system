@@ -5,10 +5,10 @@ using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.V20240101.Requests;
-using TeachingRecordSystem.Api.V3.V20240101.Responses;
+using TeachingRecordSystem.Api.V3.V20240416.Requests;
+using TeachingRecordSystem.Api.V3.V20240416.Responses;
 
-namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
+namespace TeachingRecordSystem.Api.V3.V20240416.Controllers;
 
 [Route("teacher")]
 public class TeacherController : ControllerBase

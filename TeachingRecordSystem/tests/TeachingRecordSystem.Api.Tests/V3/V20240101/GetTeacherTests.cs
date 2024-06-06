@@ -52,7 +52,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var contact = await CreateContact(qts);
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
-        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: true, expectEysCertificateUrl: false, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), qtsStatusDescription), expectedEyts: null);
+        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), qtsStatusDescription), expectedEyts: null);
     }
 
     [Theory]
@@ -70,7 +70,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var contact = await CreateContact(qts);
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
-        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: true, qtsRegistrations: qts, expectedQts: null, expectedEyts: (eytsDate.ToDateTime(), eytsStatusDescription));
+        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, qtsRegistrations: qts, expectedQts: null, expectedEyts: (eytsDate.ToDateTime(), eytsStatusDescription));
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var contact = await CreateContact(null);
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
-        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: false, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
+        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, qtsRegistrations: null, expectedQts: null, expectedEyts: null);
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: true, expectEysCertificateUrl: true, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), "Assessment only route candidate"), expectedEyts: (eytsDate.ToDateTime(), "Early years trainee"));
+        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), "Assessment only route candidate"), expectedEyts: (eytsDate.ToDateTime(), "Early years trainee"));
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: true, expectEysCertificateUrl: false, qtsRegistrations: qts, expectedQts: (qtsDate2.ToDateTime(), "Assessment only route candidate"), expectedEyts: null);
+        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, qtsRegistrations: qts, expectedQts: (qtsDate2.ToDateTime(), "Assessment only route candidate"), expectedEyts: null);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, expectQtsCertificateUrl: false, expectEysCertificateUrl: true, qtsRegistrations: qts, expectedQts: null, expectedEyts: (eytsDate2.ToDateTime(), "Early years trainee"));
+        await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, qtsRegistrations: qts, expectedQts: null, expectedEyts: (eytsDate2.ToDateTime(), "Early years trainee"));
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        await ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(httpClient, baseUrl, contact, expectCertificateUrls: true, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), "Assessment only route candidate"), expectedEyts: (eytsDate.ToDateTime(), "Early years trainee"));
+        await ValidRequestForTeacherWithMultiWordFirstName_ReturnsExpectedContent(httpClient, baseUrl, contact, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), "Assessment only route candidate"), expectedEyts: (eytsDate.ToDateTime(), "Early years trainee"));
     }
 
     [Fact]
@@ -161,7 +161,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        await ValidRequestWithInduction_ReturnsExpectedInductionContent(httpClient, baseUrl, contact, true);
+        await ValidRequestWithInduction_ReturnsExpectedInductionContent(httpClient, baseUrl, contact);
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public class GetTeacherTests : GetTeacherTestBase
         var httpClient = GetHttpClientWithIdentityAccessToken(contact.dfeta_TRN);
         var baseUrl = "/v3/teacher";
 
-        await ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(httpClient, baseUrl, contact, qualifications, expectCertificateUrls: true);
+        await ValidRequestWithNpqQualifications_ReturnsExpectedNpqQualificationsContent(httpClient, baseUrl, contact, qualifications);
     }
 
     [Fact]

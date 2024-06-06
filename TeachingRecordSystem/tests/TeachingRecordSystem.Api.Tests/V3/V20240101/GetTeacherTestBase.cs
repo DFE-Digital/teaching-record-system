@@ -1,33 +1,21 @@
 using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Xrm.Sdk;
-using TeachingRecordSystem.Api.V3.ApiModels;
+using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Core.Dqt;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.Api.Tests.V3.V20240101;
 
-public abstract class GetTeacherTestBase : TestBase
+public abstract class GetTeacherTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
     internal const string QualifiedTeacherTrainedTeacherStatusValue = "71";
     internal const string QtsAwardedInWalesTeacherStatusValue = "213";
-    private readonly Guid _qtsAwardedInWalesTeacherStatusId = Guid.NewGuid();
-
-    private readonly Guid _changeOfNameSubjectId = Guid.NewGuid();
-    private readonly Guid _changeOfDateOfBirthSubjectId = Guid.NewGuid();
-    private readonly DateOnly defaultqtsDate = new DateOnly(1997, 4, 23);
-    private readonly DateOnly defaulteytsDate = new DateOnly(1995, 5, 14);
-
-    protected GetTeacherTestBase(HostFixture hostFixture) : base(hostFixture)
-    {
-    }
 
     protected async Task ValidRequestForTeacher_ReturnsExpectedContent(
         HttpClient httpClient,
         string baseUrl,
         Contact contact,
-        bool expectQtsCertificateUrl,
-        bool expectEysCertificateUrl,
         QtsRegistration[]? qtsRegistrations,
         (DateTime? QTSDate, string StatusDescription)? expectedQts,
         (DateTime? EYTSDate, string StatusDescription)? expectedEyts)
@@ -68,24 +56,10 @@ public abstract class GetTeacherTestBase : TestBase
         {
             expectedJson["qts"] = null;
         }
-        else
-        {
-            if (!expectQtsCertificateUrl)
-            {
-                expectedJson["qts"]?.AsObject().Remove("certificateUrl");
-            }
-        }
 
         if (expectedEyts == null)
         {
             expectedJson["eyts"] = null;
-        }
-        else
-        {
-            if (!expectEysCertificateUrl)
-            {
-                expectedJson["eyts"]?.AsObject().Remove("certificateUrl");
-            }
         }
 
         await AssertEx.JsonResponseEquals(
@@ -98,10 +72,9 @@ public abstract class GetTeacherTestBase : TestBase
         HttpClient httpClient,
         string baseUrl,
         Contact contact,
-        bool expectCertificateUrls,
         QtsRegistration[]? qtsRegistrations,
-        (DateTime? QTSDate, string StatusDescription)? expectedQts,
-        (DateTime? EYTSDate, string StatusDescription)? expectedEyts)
+        (DateTime? QtsDate, string StatusDescription)? expectedQts,
+        (DateTime? EytsDate, string StatusDescription)? expectedEyts)
     {
         // Arrange
         await ConfigureMocks(contact, qtsRegistrations: qtsRegistrations);
@@ -122,13 +95,13 @@ public abstract class GetTeacherTestBase : TestBase
             nationalInsuranceNumber = contact.dfeta_NINumber,
             qts = new
             {
-                awarded = expectedQts?.QTSDate?.ToString("yyyy-MM-dd"),
+                awarded = expectedQts?.QtsDate?.ToString("yyyy-MM-dd"),
                 certificateUrl = "/v3/certificates/qts",
                 statusDescription = expectedQts?.StatusDescription
             },
             eyts = new
             {
-                awarded = expectedEyts?.EYTSDate?.ToString("yyyy-MM-dd"),
+                awarded = expectedEyts?.EytsDate?.ToString("yyyy-MM-dd"),
                 certificateUrl = "/v3/certificates/eyts",
                 statusDescription = expectedEyts?.StatusDescription
             },
@@ -143,11 +116,6 @@ public abstract class GetTeacherTestBase : TestBase
         {
             expectedJson["eyts"] = null;
         }
-        if (!expectCertificateUrls)
-        {
-            expectedJson["qts"]?.AsObject().Remove("certificateUrl");
-            expectedJson["eyts"]?.AsObject().Remove("certificateUrl");
-        }
 
         await AssertEx.JsonResponseEquals(
             response,
@@ -158,8 +126,7 @@ public abstract class GetTeacherTestBase : TestBase
     protected async Task ValidRequestWithInduction_ReturnsExpectedInductionContent(
         HttpClient httpClient,
         string baseUrl,
-        Contact contact,
-        bool expectCertificateUrl = false)
+        Contact contact)
     {
         // Arrange
         var induction = CreateInduction();
@@ -194,11 +161,6 @@ public abstract class GetTeacherTestBase : TestBase
                 }
             }
         })!;
-
-        if (!expectCertificateUrl)
-        {
-            expectedJson.AsObject().Remove("certificateUrl");
-        }
 
         var jsonResponse = await AssertEx.JsonResponse(response);
         var responseInduction = jsonResponse.RootElement.GetProperty("induction");
@@ -235,7 +197,7 @@ public abstract class GetTeacherTestBase : TestBase
                         name = itt.GetAttributeValue<AliasedValue>($"qualification.{dfeta_ittqualification.Fields.dfeta_name}").Value
                     },
                     programmeType = itt.dfeta_ProgrammeType.ToString(),
-                    programmeTypeDescription = itt.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
+                    programmeTypeDescription = itt.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, Api.V3.Core.SharedModels.IttProgrammeType>().GetDescription(),
                     startDate = itt.dfeta_ProgrammeStartDate?.ToString("yyyy-MM-dd"),
                     endDate = itt.dfeta_ProgrammeEndDate?.ToString("yyyy-MM-dd"),
                     result = itt.dfeta_Result?.ToString(),
@@ -275,8 +237,7 @@ public abstract class GetTeacherTestBase : TestBase
         HttpClient httpClient,
         string baseUrl,
         Contact contact,
-        Qualification[] qualifications,
-        bool expectCertificateUrls)
+        Qualification[] qualifications)
     {
         // Arrange
         var npqQualificationValid = qualifications[2];
@@ -302,11 +263,6 @@ public abstract class GetTeacherTestBase : TestBase
                 certificateUrl = $"/v3/certificates/npq/{npqQualificationValid.QualificationId}",
             }
         })!;
-
-        if (!expectCertificateUrls)
-        {
-            expectedJson[0]?.AsObject().Remove("certificateUrl");
-        }
 
         var jsonResponse = await AssertEx.JsonResponse(response);
         var responseNpqQualifications = jsonResponse.RootElement.GetProperty("npqQualifications");
@@ -393,13 +349,15 @@ public abstract class GetTeacherTestBase : TestBase
         Contact contact)
     {
         // Arrange
+        var changeOfNameSubject = await TestData.ReferenceDataCache.GetSubjectByTitle("Change of Name");
+
         var incidents = new[]
         {
             new Incident()
             {
                 CustomerId = contact.Id.ToEntityReference(Contact.EntityLogicalName),
                 Title = "Name change request",
-                SubjectId = _changeOfNameSubjectId.ToEntityReference(Subject.EntityLogicalName)
+                SubjectId = changeOfNameSubject.Id.ToEntityReference(Subject.EntityLogicalName)
             }
         };
 
@@ -421,13 +379,15 @@ public abstract class GetTeacherTestBase : TestBase
         Contact contact)
     {
         // Arrange
+        var changeOfDateOfBirthSubject = await TestData.ReferenceDataCache.GetSubjectByTitle("Change of Date of Birth");
+
         var incidents = new[]
         {
             new Incident()
             {
                 CustomerId = contact.Id.ToEntityReference(Contact.EntityLogicalName),
                 Title = "DOB change request",
-                SubjectId = _changeOfDateOfBirthSubjectId.ToEntityReference(Subject.EntityLogicalName)
+                SubjectId = changeOfDateOfBirthSubject.Id.ToEntityReference(Subject.EntityLogicalName)
             }
         };
 
@@ -612,14 +572,6 @@ public abstract class GetTeacherTestBase : TestBase
         QtsRegistration[]? qtsRegistrations = null)
     {
         DataverseAdapterMock
-            .Setup(mock => mock.GetSubjectByTitle("Change of Date of Birth"))
-            .ReturnsAsync(new Subject()
-            {
-                Id = _changeOfDateOfBirthSubjectId,
-                Title = "Change of Date of Birth"
-            });
-
-        DataverseAdapterMock
             .Setup(mock => mock.GetTeacherByTrn(contact.dfeta_TRN, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
@@ -717,22 +669,14 @@ public abstract class GetTeacherTestBase : TestBase
             await TestData.UpdatePerson(b => b.WithPersonId(contact.Id).WithUpdatedName(updatedName.FirstName, updatedName.MiddleName, updatedName.LastName));
             await Task.Delay(2000);
         }
-
-        DataverseAdapterMock
-            .Setup(mock => mock.GetSubjectByTitle("Change of Name"))
-            .ReturnsAsync(new Subject()
-            {
-                Id = _changeOfNameSubjectId,
-                Title = "Change of Name"
-            });
     }
 
     private static dfeta_initialteachertraining CreateItt(Contact teacher)
     {
         var ittStartDate = new DateOnly(2021, 9, 7);
         var ittEndDate = new DateOnly(2022, 7, 29);
-        var ittProgrammeType = IttProgrammeType.EYITTGraduateEntry;
-        var ittResult = IttOutcome.Pass;
+        var ittProgrammeType = Api.V3.V20240101.ApiModels.IttProgrammeType.EYITTGraduateEntry;
+        var ittResult = Api.V3.V20240101.ApiModels.IttOutcome.Pass;
         var ittAgeRangeFrom = dfeta_AgeRange._11;
         var ittAgeRangeTo = dfeta_AgeRange._16;
         var ittProviderName = Faker.Company.Name();
@@ -751,8 +695,8 @@ public abstract class GetTeacherTestBase : TestBase
             dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacher.Id),
             dfeta_ProgrammeStartDate = ittStartDate.ToDateTime(),
             dfeta_ProgrammeEndDate = ittEndDate.ToDateTime(),
-            dfeta_ProgrammeType = ittProgrammeType.ConvertToIttProgrammeType(),
-            dfeta_Result = ittResult.ConvertToITTResult(),
+            dfeta_ProgrammeType = Enum.Parse<IttProgrammeType>(ittProgrammeType.ToString()).ConvertToIttProgrammeType(),
+            dfeta_Result = Enum.Parse<IttOutcome>(ittResult.ToString()).ConvertToITTResult(),
             dfeta_AgeRangeFrom = ittAgeRangeFrom,
             dfeta_AgeRangeTo = ittAgeRangeTo,
             dfeta_TraineeID = ittTraineeId,

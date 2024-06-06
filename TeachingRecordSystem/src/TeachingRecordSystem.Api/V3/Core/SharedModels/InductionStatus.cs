@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Dqt.Models;
 
-namespace TeachingRecordSystem.Api.V3.ApiModels;
+namespace TeachingRecordSystem.Api.V3.Core.SharedModels;
 
 public enum InductionStatus
 {

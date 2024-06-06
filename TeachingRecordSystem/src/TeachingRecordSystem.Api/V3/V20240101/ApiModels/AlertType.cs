@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.V3.ApiModels;
+namespace TeachingRecordSystem.Api.V3.V20240101.ApiModels;
 
 public enum AlertType
 {

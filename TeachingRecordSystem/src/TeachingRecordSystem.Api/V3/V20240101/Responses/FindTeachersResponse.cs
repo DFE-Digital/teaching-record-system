@@ -1,8 +1,10 @@
+using TeachingRecordSystem.Api.V3.Core.Operations;
 using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
 using TeachingRecordSystem.Api.V3.V20240101.Requests;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Responses;
 
+[AutoMap(typeof(FindTeachersResult))]
 public record FindTeachersResponse
 {
     public required int Total { get; init; }
@@ -10,6 +12,7 @@ public record FindTeachersResponse
     public required IReadOnlyCollection<FindTeachersResponseResult> Results { get; init; }
 }
 
+[AutoMap(typeof(FindTeachersResultItem))]
 public record FindTeachersResponseResult
 {
     public required string Trn { get; init; }

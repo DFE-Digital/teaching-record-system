@@ -1,10 +1,11 @@
 using System.Text.Json.Serialization;
 using Optional;
-using TeachingRecordSystem.Api.V3.ApiModels;
+using TeachingRecordSystem.Api.V3.Core.Operations;
 using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
 
-namespace TeachingRecordSystem.Api.V3.Responses;
+namespace TeachingRecordSystem.Api.V3.V20240101.Responses;
 
+[AutoMap(typeof(GetPersonResult))]
 public record GetTeacherResponse
 {
     public required string Trn { get; init; }
@@ -29,22 +30,23 @@ public record GetTeacherResponse
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultQts))]
 public record GetTeacherResponseQts
 {
     public required DateOnly? Awarded { get; init; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public required string? CertificateUrl { get; init; }
+    public required string CertificateUrl { get; init; }
     public required string? StatusDescription { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultEyts))]
 public record GetTeacherResponseEyts
 {
     public required DateOnly? Awarded { get; init; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public required string? CertificateUrl { get; init; }
+    public required string CertificateUrl { get; init; }
     public required string? StatusDescription { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultInduction))]
 public record GetTeacherResponseInduction
 {
     public required DateOnly? StartDate { get; init; }
@@ -56,6 +58,7 @@ public record GetTeacherResponseInduction
     public required IReadOnlyCollection<GetTeacherResponseInductionPeriod> Periods { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultInductionPeriod))]
 public record GetTeacherResponseInductionPeriod
 {
     public required DateOnly? StartDate { get; init; }
@@ -64,11 +67,13 @@ public record GetTeacherResponseInductionPeriod
     public required GetTeacherResponseInductionPeriodAppropriateBody? AppropriateBody { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultInductionPeriodAppropriateBody))]
 public record GetTeacherResponseInductionPeriodAppropriateBody
 {
     public required string Name { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultInitialTeacherTraining))]
 public record GetTeacherResponseInitialTeacherTraining
 {
     public required GetTeacherResponseInitialTeacherTrainingQualification? Qualification { get; init; }
@@ -82,48 +87,55 @@ public record GetTeacherResponseInitialTeacherTraining
     public required IReadOnlyCollection<GetTeacherResponseInitialTeacherTrainingSubject> Subjects { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultInitialTeacherTrainingQualification))]
 public record GetTeacherResponseInitialTeacherTrainingQualification
 {
     public required string Name { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultInitialTeacherTrainingAgeRange))]
 public record GetTeacherResponseInitialTeacherTrainingAgeRange
 {
     public required string Description { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultInitialTeacherTrainingProvider))]
 public record GetTeacherResponseInitialTeacherTrainingProvider
 {
     public required string Name { get; init; }
     public required string Ukprn { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultInitialTeacherTrainingSubject))]
 public record GetTeacherResponseInitialTeacherTrainingSubject
 {
     public required string Code { get; init; }
     public required string Name { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultNpqQualification))]
 public record GetTeacherResponseNpqQualification
 {
     public required DateOnly Awarded { get; init; }
     public required GetTeacherResponseNpqQualificationType Type { get; init; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public required string? CertificateUrl { get; init; }
+    public required string CertificateUrl { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultNpqQualificationType))]
 public record GetTeacherResponseNpqQualificationType
 {
     public required NpqQualificationType Code { get; init; }
     public required string Name { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultMandatoryQualification))]
 public record GetTeacherResponseMandatoryQualification
 {
     public required DateOnly Awarded { get; init; }
     public required string Specialism { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultHigherEducationQualification))]
 public record GetTeacherResponseHigherEducationQualification
 {
     public required string? Name { get; init; }
@@ -131,6 +143,7 @@ public record GetTeacherResponseHigherEducationQualification
     public required IReadOnlyCollection<GetTeacherResponseHigherEducationQualificationSubject> Subjects { get; init; }
 }
 
+[AutoMap(typeof(GetPersonResultHigherEducationQualificationSubject))]
 public record GetTeacherResponseHigherEducationQualificationSubject
 {
     public required string Code { get; init; }

@@ -1,5 +1,6 @@
-namespace TeachingRecordSystem.Api.V3.ApiModels;
+namespace TeachingRecordSystem.Api.V3.V20240101.ApiModels;
 
+[AutoMap(typeof(Core.SharedModels.AlertInfo))]
 public record AlertInfo
 {
     public required AlertType AlertType { get; init; }

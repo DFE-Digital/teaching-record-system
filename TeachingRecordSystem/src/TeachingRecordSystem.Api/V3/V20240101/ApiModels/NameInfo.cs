@@ -1,5 +1,6 @@
 namespace TeachingRecordSystem.Api.V3.V20240101.ApiModels;
 
+[AutoMap(typeof(Core.SharedModels.NameInfo))]
 public record NameInfo
 {
     public required string FirstName { get; init; }

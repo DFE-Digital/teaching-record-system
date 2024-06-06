@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -11,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20240412.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240412.Controllers;
 
 [Route("teacher")]
-public class TeacherController : ControllerBase
+public class TeacherController(IMapper mapper) : ControllerBase
 {
     [HttpPost("name-changes")]
     [SwaggerOperation(
@@ -25,7 +24,7 @@ public class TeacherController : ControllerBase
         [FromBody] CreateNameChangeRequestRequest request,
         [FromServices] CreateNameChangeRequestHandler handler)
     {
-        var command = request.Adapt<CreateNameChangeRequestCommand>() with { Trn = User.FindFirstValue("trn")! };
+        var command = mapper.Map<CreateNameChangeRequestCommand>(request) with { Trn = User.FindFirstValue("trn")! };
         var caseNumber = await handler.Handle(command);
         var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
         return Ok(response);
@@ -43,7 +42,7 @@ public class TeacherController : ControllerBase
         [FromBody] CreateDateOfBirthChangeRequestRequest request,
         [FromServices] CreateDateOfBirthChangeRequestHandler handler)
     {
-        var command = request.Adapt<CreateDateOfBirthChangeRequestCommand>() with { Trn = User.FindFirstValue("trn")! };
+        var command = mapper.Map<CreateDateOfBirthChangeRequestCommand>(request) with { Trn = User.FindFirstValue("trn")! };
         var caseNumber = await handler.Handle(command);
         var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
         return Ok(response);
