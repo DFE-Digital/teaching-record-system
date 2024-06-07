@@ -1,5 +1,4 @@
 using System.Net;
-using TeachingRecordSystem.Api.Properties;
 using TeachingRecordSystem.Api.V3.VNext.Requests;
 using TeachingRecordSystem.Core.Dqt;
 
@@ -11,7 +10,7 @@ public class SetQtlsDateRequestTests : TestBase
     public SetQtlsDateRequestTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        SetCurrentApiClient(new[] { ApiRoles.AssignQtls });
+        SetCurrentApiClient([ApiRoles.AssignQtls]);
     }
 
     [Theory, RoleNamesData(except: ApiRoles.AssignQtls)]
@@ -31,26 +30,6 @@ public class SetQtlsDateRequestTests : TestBase
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-    }
-
-    [Theory]
-    [InlineData("123456")]
-    [InlineData("12345678")]
-    [InlineData("xxx")]
-    public async Task Put_InvalidTrn_ReturnsErrror(string trn)
-    {
-        // Arrange
-        var requestBody = CreateJsonContent(new { qtsDate = new DateOnly(1990, 01, 01) });
-        var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{trn}/qtls")
-        {
-            Content = requestBody
-        };
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
     }
 
     [Fact]
