@@ -8,18 +8,16 @@ namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
 public record GetQtlsCommand(string Trn);
 
-public class GetQtlsHandler(ICrmQueryDispatcher _crmQueryDispatcher)
+public class GetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher)
 {
     public async Task<QtlsInfo?> Handle(GetQtlsCommand command)
     {
-        var contact = (await _crmQueryDispatcher.ExecuteQuery(
+        var contact = (await crmQueryDispatcher.ExecuteQuery(
             new GetActiveContactByTrnQuery(
                 command.Trn,
                 new ColumnSet(
                     Contact.Fields.dfeta_TRN,
-                    Contact.Fields.dfeta_qtlsdate
-                    )
-                )
+                    Contact.Fields.dfeta_qtlsdate))
             ))!;
 
         if (contact is null)

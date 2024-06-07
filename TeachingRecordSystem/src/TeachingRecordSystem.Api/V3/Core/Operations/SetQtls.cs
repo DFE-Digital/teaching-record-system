@@ -29,11 +29,11 @@ public sealed class SetQtlsResult
     };
 }
 
-public class SetQtlsHandler(ICrmQueryDispatcher _crmQueryDispatcher, IClock _clock)
+public class SetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher, IClock clock)
 {
     public async Task<SetQtlsResult> Handle(SetQtlsCommand command)
     {
-        var contact = (await _crmQueryDispatcher.ExecuteQuery(
+        var contact = (await crmQueryDispatcher.ExecuteQuery(
             new GetActiveContactByTrnQuery(
                 command.Trn,
                 new ColumnSet(
@@ -41,9 +41,7 @@ public class SetQtlsHandler(ICrmQueryDispatcher _crmQueryDispatcher, IClock _clo
                     Contact.Fields.dfeta_InductionStatus,
                     Contact.Fields.dfeta_qtlsdate,
                     Contact.Fields.dfeta_QTSDate,
-                    Contact.Fields.dfeta_ActiveSanctions
-                    )
-                )
+                    Contact.Fields.dfeta_ActiveSanctions))
             ))!;
 
         if (contact == null)
@@ -55,21 +53,21 @@ public class SetQtlsHandler(ICrmQueryDispatcher _crmQueryDispatcher, IClock _clo
         var (canSetQtlsDate, reviewTaskDescription) = CanSetQtlsDate(hasQTS: contact.dfeta_QTSDate.HasValue, overallInductionStatus: contact.dfeta_InductionStatus, inductionStatus: induction?.Induction.dfeta_InductionStatus, hasInductionWithAB: induction?.HasAppropriateBody ?? false, existingQtlsdate: contact.dfeta_qtlsdate, incomingQtlsDate: command.QtsDate);
         if (!canSetQtlsDate)
         {
-            await _crmQueryDispatcher.ExecuteQuery(
+            await crmQueryDispatcher.ExecuteQuery(
                 new CreateTaskQuery()
                 {
                     ContactId = contact.Id,
                     Category = "Unable to set QTLSDate",
                     Description = reviewTaskDescription!,
                     Subject = "Notification for SET QTLS data collections team",
-                    ScheduledEnd = _clock.UtcNow
+                    ScheduledEnd = clock.UtcNow
                 }
             );
 
             return SetQtlsResult.Failed();
         }
-        await _crmQueryDispatcher.ExecuteQuery(
-             new SetQtlsDateQuery(contact.Id, command.QtsDate, contact.dfeta_ActiveSanctions == true, _clock.UtcNow))!;
+        await crmQueryDispatcher.ExecuteQuery(
+             new SetQtlsDateQuery(contact.Id, command.QtsDate, contact.dfeta_ActiveSanctions == true, clock.UtcNow))!;
 
         return SetQtlsResult.Success(new QtlsInfo()
         {
@@ -80,7 +78,7 @@ public class SetQtlsHandler(ICrmQueryDispatcher _crmQueryDispatcher, IClock _clo
 
     private async Task<(dfeta_induction Induction, bool HasAppropriateBody)?> GetInductionWithAppropriateBody(Guid contactId)
     {
-        var induction = await _crmQueryDispatcher.ExecuteQuery(new GetActiveInductionByContactIdQuery(contactId));
+        var induction = await crmQueryDispatcher.ExecuteQuery(new GetActiveInductionByContactIdQuery(contactId));
         if (induction.Induction == null)
         {
             return null;
