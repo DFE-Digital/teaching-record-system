@@ -54,7 +54,16 @@ public class TeachersController(IMapper mapper) : ControllerBase
         [FromBody] CreateNameChangeRequestRequest request,
         [FromServices] CreateNameChangeRequestHandler handler)
     {
-        var command = mapper.Map<CreateNameChangeRequestCommand>(request);
+        var command = new CreateNameChangeRequestCommand()
+        {
+            Trn = request.Trn,
+            FirstName = request.FirstName,
+            MiddleName = request.MiddleName,
+            LastName = request.LastName,
+            EvidenceFileName = request.EvidenceFileName,
+            EvidenceFileUrl = request.EvidenceFileUrl,
+        };
+
         await handler.Handle(command);
         return NoContent();
     }
@@ -71,7 +80,14 @@ public class TeachersController(IMapper mapper) : ControllerBase
         [FromBody] CreateDateOfBirthChangeRequestRequest request,
         [FromServices] CreateDateOfBirthChangeRequestHandler handler)
     {
-        var command = mapper.Map<CreateDateOfBirthChangeRequestCommand>(request);
+        var command = new CreateDateOfBirthChangeRequestCommand()
+        {
+            Trn = request.Trn,
+            DateOfBirth = request.DateOfBirth,
+            EvidenceFileName = request.EvidenceFileName,
+            EvidenceFileUrl = request.EvidenceFileUrl,
+        };
+
         await handler.Handle(command);
         return NoContent();
     }
