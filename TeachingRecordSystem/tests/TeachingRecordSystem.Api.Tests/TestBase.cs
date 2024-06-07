@@ -43,16 +43,22 @@ public abstract class TestBase
     public JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().Configure());
 
-    public virtual HttpClient GetHttpClientWithApiKey(string? version = null)
+    public virtual HttpClient GetHttpClient(string? version = null)
     {
         var client = HostFixture.CreateClient();
-        client.DefaultRequestHeaders.Add("X-Use-CurrentClientIdProvider", "true");  // Signal for TestAuthenticationHandler to run
 
         if (version is not null)
         {
             client.DefaultRequestHeaders.Add(VersionRegistry.MinorVersionHeaderName, version);
         }
 
+        return client;
+    }
+
+    public virtual HttpClient GetHttpClientWithApiKey(string? version = null)
+    {
+        var client = GetHttpClient(version);
+        client.DefaultRequestHeaders.Add("X-Use-CurrentClientIdProvider", "true");  // Signal for TestAuthenticationHandler to run
         return client;
     }
 

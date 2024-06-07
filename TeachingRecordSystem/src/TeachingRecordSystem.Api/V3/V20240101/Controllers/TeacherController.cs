@@ -11,7 +11,7 @@ using TeachingRecordSystem.Api.V3.V20240101.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240101.Controllers;
 
 [Route("teacher")]
-public class TeacherController : ControllerBase
+public class TeacherController(IMapper mapper) : ControllerBase
 {
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     [HttpGet]
@@ -44,7 +44,8 @@ public class TeacherController : ControllerBase
             return MissingOrInvalidTrn();
         }
 
-        return Ok(result);
+        var response = mapper.Map<GetTeacherResponse>(result);
+        return Ok(response);
 
         IActionResult MissingOrInvalidTrn() => Forbid();
     }

@@ -2,6 +2,12 @@
 
 ## 20240606
 
+All endpoints under `/teacher` and `/teachers` have been moved to `/person` and `/persons`, respectively.
+
+The `email` property on the response from `/teacher` (now `/person`) and `/teachers/<trn>` (now `/persons/<trn>`) has been renamed to `emailAddress`.
+
+The `email` property on the request to `/teacher/name-changes` (now `/person/name-changes`) and `/teacher/date-of-birth-changes` (now `/person/date-of-birth-changes`) has been renamed to `emailAddress`.
+
 ### `PUT /v3/trn-requests`
 
 The scalar `email` property in the request has been replaced with an `emailAddresses` collection property so that multiple email addresses can be provided to match on.
