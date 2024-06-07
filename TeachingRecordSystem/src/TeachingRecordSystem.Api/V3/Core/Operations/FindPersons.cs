@@ -7,11 +7,11 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
-public record FindTeachersCommand(string LastName, DateOnly? DateOfBirth);
+public record FindPersonsCommand(string LastName, DateOnly? DateOfBirth);
 
-public record FindTeachersResult(int Total, IReadOnlyCollection<FindTeachersResultItem> Items);
+public record FindPersonsResult(int Total, IReadOnlyCollection<FindPersonsResultItem> Items);
 
-public record FindTeachersResultItem
+public record FindPersonsResultItem
 {
     public required string Trn { get; init; }
     public required DateOnly DateOfBirth { get; init; }
@@ -22,11 +22,11 @@ public record FindTeachersResultItem
     public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
 }
 
-public class FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfiguration configuration)
+public class FindPersonsHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfiguration configuration)
 {
     private readonly TimeSpan _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue("ConcurrentNameChangeWindowSeconds", 5));
 
-    public async Task<FindTeachersResult> Handle(FindTeachersCommand command)
+    public async Task<FindPersonsResult> Handle(FindPersonsCommand command)
     {
         var contacts = await crmQueryDispatcher.ExecuteQuery(
             new GetActiveContactsByLastNameAndDateOfBirthQuery(
@@ -55,9 +55,9 @@ public class FindTeachersHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfig
                 kvp => kvp.Key,
                 kvp => PreviousNameHelper.GetFullPreviousNames(kvp.Value, contactsById[kvp.Key], _concurrentNameChangeWindow));
 
-        return new FindTeachersResult(
+        return new FindPersonsResult(
             Total: contacts.Length,
-            Items: contacts.Select(r => new FindTeachersResultItem()
+            Items: contacts.Select(r => new FindPersonsResultItem()
             {
                 Trn = r.dfeta_TRN,
                 DateOfBirth = r.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),

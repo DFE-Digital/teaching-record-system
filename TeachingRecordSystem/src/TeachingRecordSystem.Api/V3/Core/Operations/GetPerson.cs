@@ -38,7 +38,7 @@ public record GetPersonResult
     public required string? NationalInsuranceNumber { get; init; }
     public required Option<bool> PendingNameChange { get; init; }
     public required Option<bool> PendingDateOfBirthChange { get; init; }
-    public required string? Email { get; set; }
+    public required string? EmailAddress { get; set; }
     public required GetPersonResultQts? Qts { get; init; }
     public required GetPersonResultEyts? Eyts { get; init; }
     public required Option<GetPersonResultInduction?> Induction { get; init; }
@@ -375,7 +375,7 @@ public class GetPersonHandler(
             PendingDateOfBirthChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingDateOfBirthRequest) : default,
             Qts = MapQts(qts?.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), qtsStatus != null ? GetQtsStatusDescription(qtsStatus!.dfeta_Value!, qtsStatus.dfeta_name) : null),
             Eyts = MapEyts(eyts?.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), eytsTeacherStatus != null ? GetEytsStatusDescription(eytsTeacherStatus!.dfeta_Value!) : null),
-            Email = contact.EMailAddress1,
+            EmailAddress = contact.EMailAddress1,
             Induction = command.Include.HasFlag(GetPersonCommandIncludes.Induction) ?
                 Option.Some(MapInduction(await getInductionTask!)) :
                 default,

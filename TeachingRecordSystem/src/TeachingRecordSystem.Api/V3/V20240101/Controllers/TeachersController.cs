@@ -102,9 +102,9 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [Authorize(Policy = AuthorizationPolicies.GetPerson)]
     public async Task<IActionResult> FindTeachers(
         FindTeachersRequest request,
-        [FromServices] FindTeachersHandler handler)
+        [FromServices] FindPersonsHandler handler)
     {
-        var command = new FindTeachersCommand(request.LastName!, request.DateOfBirth!.Value);
+        var command = new FindPersonsCommand(request.LastName!, request.DateOfBirth!.Value);
         var result = await handler.Handle(command);
 
         var response = new FindTeachersResponse()

@@ -1,19 +1,19 @@
 using TeachingRecordSystem.Api.V3.Core.Operations;
 using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
-using TeachingRecordSystem.Api.V3.V20240101.Requests;
+using TeachingRecordSystem.Api.V3.V20240606.Requests;
 
-namespace TeachingRecordSystem.Api.V3.V20240101.Responses;
+namespace TeachingRecordSystem.Api.V3.V20240606.Responses;
 
 [AutoMap(typeof(FindPersonsResult))]
-public record FindTeachersResponse
+public record FindPersonsResponse
 {
     public required int Total { get; init; }
-    public required FindTeachersRequest Query { get; init; }
-    public required IReadOnlyCollection<FindTeachersResponseResult> Results { get; init; }
+    public required FindPersonsRequest Query { get; init; }
+    public required IReadOnlyCollection<FindPersonsResponseResult> Results { get; init; }
 }
 
 [AutoMap(typeof(FindPersonsResultItem))]
-public record FindTeachersResponseResult
+public record FindPersonsResponseResult
 {
     public required string Trn { get; init; }
     public required DateOnly DateOfBirth { get; init; }
