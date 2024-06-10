@@ -263,7 +263,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
         else
         {
-            Assert.Equal("No", doc.GetSummaryListValueForKey("National Insurance number"));
+            Assert.Equal("None", doc.GetSummaryListValueForKey("National Insurance number"));
             var address = doc.GetSummaryListValueForKey("Address");
             Assert.Contains(state.AddressLine1!, address);
             Assert.Contains(state.AddressLine2!, address);

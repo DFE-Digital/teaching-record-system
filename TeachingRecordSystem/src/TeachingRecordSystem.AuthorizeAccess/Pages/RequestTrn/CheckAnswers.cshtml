@@ -51,7 +51,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@(Model.NationalInsuranceNumber ?? "No")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>@(Model.NationalInsuranceNumber ?? "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnNationalInsuranceNumber(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="national insurance number">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
