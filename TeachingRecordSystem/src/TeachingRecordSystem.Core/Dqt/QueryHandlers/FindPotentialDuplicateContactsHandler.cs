@@ -9,18 +9,30 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
 {
     public async Task<FindPotentialDuplicateContactsResult[]> Execute(FindPotentialDuplicateContactsQuery findQuery, IOrganizationServiceAsync organizationService)
     {
+        var emails = findQuery.EmailAddresses.ToArray();
+
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
 
+        var childFilters = new FilterExpression(LogicalOperator.Or);
+
         if (TryGetMatchCombinationsFilter(out var matchCombinationsFilter))
         {
-            filter.AddFilter(matchCombinationsFilter);
+            childFilters.AddFilter(matchCombinationsFilter);
         }
-        else
+
+        if (emails.Length > 0)
+        {
+            childFilters.AddCondition(Contact.Fields.EMailAddress1, ConditionOperator.In, emails);
+        }
+
+        if (childFilters.Filters.Count == 0)
         {
             // Not enough data in the input to match on
             return Array.Empty<FindPotentialDuplicateContactsResult>();
         }
+
+        filter.AddFilter(childFilters);
 
         var query = new QueryExpression(Contact.EntityLogicalName)
         {
@@ -102,7 +114,6 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                 (FieldName: Contact.Fields.MiddleName, Value: findQuery.MiddleName),
                 (FieldName: Contact.Fields.LastName, Value: findQuery.LastName),
                 (FieldName: Contact.Fields.BirthDate, Value: (object)findQuery.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false)),
-                (FieldName: Contact.Fields.EMailAddress1, Value: findQuery.EmailAddresses),
             }.ToList();
 
             // Don't try to match with any fields that are empty
