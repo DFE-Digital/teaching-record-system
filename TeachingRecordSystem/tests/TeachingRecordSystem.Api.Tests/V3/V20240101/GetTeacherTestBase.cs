@@ -144,8 +144,8 @@ public abstract class GetTeacherTestBase(HostFixture hostFixture) : TestBase(hos
         {
             startDate = induction.dfeta_StartDate?.ToString("yyyy-MM-dd"),
             endDate = induction.dfeta_CompletionDate?.ToString("yyyy-MM-dd"),
-            status = induction.dfeta_InductionStatus?.ToString(),
-            statusDescription = induction.dfeta_InductionStatus?.GetDescription(),
+            status = contact.dfeta_InductionStatus?.ToString(),
+            statusDescription = contact.dfeta_InductionStatus?.GetDescription(),
             certificateUrl = "/v3/certificates/induction",
             periods = new[]
             {
