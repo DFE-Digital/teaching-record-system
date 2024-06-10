@@ -16,10 +16,9 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
     [Fact]
-    public async Task QueryExecutesSuccessfully()
+    public async Task MatchOnNameAndDob_ReturnsMatch()
     {
         // Arrange
-        var email = $"{Guid.NewGuid()}@test.com";
         var firstName = "Rob";
         var firstNameSynonym = "Robert";
         var middleName = Faker.Name.Middle();
@@ -30,8 +29,7 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
             .WithFirstName(firstNameSynonym)
             .WithLastName(lastName)
             .WithMiddleName(middleName)
-            .WithDateOfBirth(dob.ToDateOnlyWithDqtBstFix(isLocalTime: false))
-            .WithEmail(email));
+            .WithDateOfBirth(dob.ToDateOnlyWithDqtBstFix(isLocalTime: false)));
 
         var query = new FindPotentialDuplicateContactsQuery()
         {
@@ -39,7 +37,7 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
             MiddleName = middleName,
             LastName = lastName,
             DateOfBirth = dob.ToDateOnlyWithDqtBstFix(isLocalTime: false),
-            EmailAddresses = [email]
+            EmailAddresses = []
         };
 
         // Act
@@ -53,7 +51,34 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
             a => Assert.Equal(Contact.Fields.FirstName, a),
             a => Assert.Equal(Contact.Fields.MiddleName, a),
             a => Assert.Equal(Contact.Fields.LastName, a),
-            a => Assert.Equal(Contact.Fields.BirthDate, a),
-            a => Assert.Equal(Contact.Fields.EMailAddress1, a));
+            a => Assert.Equal(Contact.Fields.BirthDate, a));
+    }
+
+    [Fact]
+    public async Task MatchOnEmail_ReturnsMatch()
+    {
+        // Arrange
+        var email = $"{Guid.NewGuid()}@test.com";
+
+        var person = await _dataScope.TestData.CreatePerson(b => b.WithEmail(email));
+
+        var query = new FindPotentialDuplicateContactsQuery()
+        {
+            FirstNames = [Faker.Name.First()],
+            MiddleName = "",
+            LastName = Faker.Name.Last(),
+            DateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth()),
+            EmailAddresses = [email]
+        };
+
+        // Act
+        var result = await _crmQueryDispatcher.ExecuteQuery(query);
+
+        // Assert
+        var queryResult = Assert.Single(result, r => r.ContactId == person.PersonId);
+
+        Assert.Contains(
+            queryResult.MatchedAttributes,
+            a => Contact.Fields.EMailAddress1 == a);
     }
 }
