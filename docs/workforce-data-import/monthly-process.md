@@ -54,10 +54,8 @@ We need to load this into TRS each month.
 - Setup local Kubernetes config:
   - Run `az aks get-credentials --overwrite-existing -g s189p01-tsc-pd-rg -n s189p01-tsc-production-aks`.
   - Run `kubelogin convert-kubeconfig -l azurecli`.
-- List the Kubernetes pods in the production namespace:
-  - Run `kubectl get pods -n tra-production`.
-- Choose a Kubernetes pod starting with the prefix **trs-production** and start an interactive shell:
-  - Run `kubectl exec --stdin --tty trs-production-<appropriate pod> -n tra-production -- /bin/ash`.
+- Start an interactive shell in the Kubernetes pod running the TRS Worker app:
+  - Run `kubectl exec --stdin --tty deploy/trs-production-worker -n tra-production -- /bin/ash`.
 
 #### Query the TRS database
 
