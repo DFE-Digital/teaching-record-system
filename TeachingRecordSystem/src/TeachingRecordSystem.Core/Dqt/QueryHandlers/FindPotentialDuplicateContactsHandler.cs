@@ -46,6 +46,7 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                     Contact.Fields.FirstName,
                     Contact.Fields.MiddleName,
                     Contact.Fields.LastName,
+                    Contact.Fields.dfeta_PreviousLastName,
                     Contact.Fields.BirthDate,
                     Contact.Fields.dfeta_HUSID,
                     Contact.Fields.dfeta_SlugId,
@@ -73,6 +74,10 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                     (
                         Attribute: Contact.Fields.LastName,
                         Matches: NamesAreEqual(findQuery.LastName, match.LastName)
+                    ),
+                    (
+                        Attribute: Contact.Fields.dfeta_PreviousLastName,
+                        Matches: NamesAreEqual(findQuery.LastName, match.dfeta_PreviousLastName)
                     ),
                     (
                         Attribute: Contact.Fields.BirthDate,
@@ -113,6 +118,7 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                 (FieldName: Contact.Fields.FirstName, Value: findQuery.FirstNames),
                 (FieldName: Contact.Fields.MiddleName, Value: findQuery.MiddleName),
                 (FieldName: Contact.Fields.LastName, Value: findQuery.LastName),
+                (FieldName: Contact.Fields.dfeta_PreviousLastName, Value: findQuery.LastName),
                 (FieldName: Contact.Fields.BirthDate, Value: (object)findQuery.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false)),
             }.ToList();
 
