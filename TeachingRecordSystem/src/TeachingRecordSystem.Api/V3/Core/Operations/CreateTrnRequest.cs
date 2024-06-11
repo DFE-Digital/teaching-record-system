@@ -63,7 +63,7 @@ public class CreateTrnRequestHandler(
             trn = await trnGenerationApiClient.GenerateTrn();
         }
 
-        var emailAddress = command.EmailAddresses?.First();
+        var emailAddress = command.EmailAddresses?.FirstOrDefault();
 
         var contactId = await crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
         {

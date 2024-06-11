@@ -1,3 +1,4 @@
+using System.Net;
 using TeachingRecordSystem.Api.V3.V20240606.Requests;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
@@ -68,6 +69,40 @@ public class CreateTrnRequestTests : TestBase
                 status = "Pending"
             },
             expectedStatusCode: 200);
+    }
+
+    [Fact]
+    public async Task Post_RequestWithoutEmail_ReturnsOk()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     private static CreateTrnRequestRequest CreateDummyRequest() => new()
