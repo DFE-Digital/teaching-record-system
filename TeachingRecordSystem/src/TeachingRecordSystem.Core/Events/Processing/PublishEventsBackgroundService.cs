@@ -59,7 +59,7 @@ public class PublishEventsBackgroundService : BackgroundService
                 .FromSql($"""
                     select * from events
                     where published is false
-                    and inserted > {lastProcessedEventTimestamp}
+                    and inserted >= {lastProcessedEventTimestamp}
                     and event_id != {lastProcessedEventId}
                     order by inserted, created
                     for update skip locked
