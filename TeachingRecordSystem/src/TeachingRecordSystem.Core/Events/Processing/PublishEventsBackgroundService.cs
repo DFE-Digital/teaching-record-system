@@ -74,6 +74,11 @@ public class PublishEventsBackgroundService : BackgroundService
 
             foreach (var e in unpublishedEvents)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 try
                 {
                     var eventBase = e.ToEventBase();
@@ -94,10 +99,12 @@ public class PublishEventsBackgroundService : BackgroundService
                 }
             }
 
-            await dbContext.SaveChangesAsync(cancellationToken);
-            await txn.CommitAsync(cancellationToken);
+            await dbContext.SaveChangesAsync();
+            await txn.CommitAsync();
 
             processedCount = unpublishedEvents.Count;
+
+            cancellationToken.ThrowIfCancellationRequested();
         }
         while (processedCount == BatchSize);
     }
