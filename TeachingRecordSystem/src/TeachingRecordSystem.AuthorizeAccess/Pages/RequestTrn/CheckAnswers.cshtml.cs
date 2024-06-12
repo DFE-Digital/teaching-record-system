@@ -75,7 +75,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
             Name: {state.Name}
             Previous name: {state.PreviousName}
             Date of birth: {state.DateOfBirth:dd/MM/yyyy}                
-            National Insurance number: {state.NationalInsuranceNumber}
+            National Insurance number: {NationalInsuranceNumberHelper.Normalize(state.NationalInsuranceNumber)}
             """;
         if (state.HasNationalInsuranceNumber == false)
         {
