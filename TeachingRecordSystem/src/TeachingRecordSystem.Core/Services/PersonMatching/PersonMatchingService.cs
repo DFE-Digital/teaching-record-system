@@ -196,7 +196,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiDigit).ToArray());
 
     private static string? NormalizeNationalInsuranceNumber(string? value) =>
-        string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiLetterOrDigit).ToArray());
+        NationalInsuranceNumberHelper.Normalize(value);
 
 #pragma warning disable IDE1006 // Naming Styles
     private record MatchQueryResult(Guid person_id, string trn, JsonDocument matched_attrs);

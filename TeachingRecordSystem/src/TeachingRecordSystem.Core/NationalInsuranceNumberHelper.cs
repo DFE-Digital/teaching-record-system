@@ -11,7 +11,7 @@ public static partial class NationalInsuranceNumberHelper
             return false;
         }
 
-        var normalized = NormalizeNationalInsuranceNumber(value)!;
+        var normalized = Normalize(value)!;
 
         return ValidNinoPattern().IsMatch(normalized);
     }
@@ -19,9 +19,9 @@ public static partial class NationalInsuranceNumberHelper
     [GeneratedRegex("^[A-CEGHJ-PQR-TW-Za-ceghj-pr-tw-z]{1}[A-CEGHJ-NPQR-TW-Za-ceghj-npr-tw-z]{1}[0-9]{6}[A-DFMUa-dfm]{0,1}$")]
     private static partial Regex ValidNinoPattern();
 
-    public static string? NormalizeNationalInsuranceNumber(string? value)
+    public static string? Normalize(string? value)
     {
-        if (value is null)
+        if (string.IsNullOrWhiteSpace(value))
         {
             return null;
         }

@@ -75,7 +75,7 @@ public class CreateTrnRequestHandler(
             StatedLastName = command.LastName,
             DateOfBirth = command.DateOfBirth,
             EmailAddress = emailAddress,
-            NationalInsuranceNumber = NationalInsuranceNumberHelper.NormalizeNationalInsuranceNumber(command.NationalInsuranceNumber),
+            NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
             PotentialDuplicates = potentialDuplicates,
             Trn = trn
         });
