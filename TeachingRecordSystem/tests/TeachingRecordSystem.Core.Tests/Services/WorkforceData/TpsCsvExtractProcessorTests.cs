@@ -187,7 +187,9 @@ public class TpsCsvExtractProcessorTests
         var person = await TestData.CreatePerson();
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
-        var existingPersonEmployment = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25));
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var personPostcode = Faker.Address.UkPostCode();
+        var existingPersonEmployment = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode);
         var updatedEndDate = new DateOnly(2024, 03, 30);
         var updatedLastExtractDate = new DateOnly(2024, 04, 25);
         await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate, updatedLastExtractDate));
@@ -214,7 +216,9 @@ public class TpsCsvExtractProcessorTests
         var person = await TestData.CreatePerson();
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
-        var existingPersonEmployment = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25));
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var personPostcode = Faker.Address.UkPostCode();
+        var existingPersonEmployment = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode);
         await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, existingPersonEmployment.StartDate, existingPersonEmployment.LastKnownEmployedDate, existingPersonEmployment.LastExtractDate, "FT"));
 
         // Act
@@ -236,7 +240,9 @@ public class TpsCsvExtractProcessorTests
         var person = await TestData.CreatePerson();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "127", establishmentNumber: "1238", establishmentStatusCode: 2); // Closed
         var establishment2 = await TestData.CreateEstablishment(localAuthorityCode: "127", establishmentNumber: "1238", establishmentStatusCode: 1); // Open
-        var existingPersonEmployment = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25));
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var personPostcode = Faker.Address.UkPostCode();
+        var existingPersonEmployment = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode);
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -260,8 +266,10 @@ public class TpsCsvExtractProcessorTests
         var extractDate = new DateOnly(2024, 04, 25);
         var lastKnownEmployedDateWithinThreeMonthsOfExtractDate = new DateOnly(2024, 02, 29);
         var lastKnownEmployedDateOutsideThreeMonthsOfExtractDate = new DateOnly(2023, 09, 30);
-        var personEmploymentWhichHasEnded = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), lastKnownEmployedDateOutsideThreeMonthsOfExtractDate, EmploymentType.FullTime, extractDate);
-        var personEmploymentWhichHasNotEnded = await TestData.CreatePersonEmployment(person, establishment2, new DateOnly(2023, 02, 02), lastKnownEmployedDateWithinThreeMonthsOfExtractDate, EmploymentType.FullTime, extractDate);
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var personPostcode = Faker.Address.UkPostCode();
+        var personEmploymentWhichHasEnded = await TestData.CreatePersonEmployment(person, establishment1, new DateOnly(2023, 02, 02), lastKnownEmployedDateOutsideThreeMonthsOfExtractDate, EmploymentType.FullTime, extractDate, nationalInsuranceNumber, personPostcode);
+        var personEmploymentWhichHasNotEnded = await TestData.CreatePersonEmployment(person, establishment2, new DateOnly(2023, 02, 02), lastKnownEmployedDateWithinThreeMonthsOfExtractDate, EmploymentType.FullTime, extractDate, nationalInsuranceNumber, personPostcode);
 
         // Act
         var processor = new TpsCsvExtractProcessor(

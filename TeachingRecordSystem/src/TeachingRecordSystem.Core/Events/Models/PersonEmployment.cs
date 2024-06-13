@@ -9,7 +9,9 @@ public record PersonEmployment
     public required DateOnly? EndDate { get; init; }
     public required EmploymentType EmploymentType { get; init; }
     public required DateOnly LastKnownEmployedDate { get; init; }
-    public required DateOnly LastExtractDate { get; set; }
+    public required DateOnly LastExtractDate { get; init; }
+    public required string? NationalInsuranceNumber { get; init; }
+    public required string? PersonPostcode { get; init; }
     public required string Key { get; init; }
 
     public static PersonEmployment FromModel(DataStore.Postgres.Models.PersonEmployment model) => new()
@@ -22,6 +24,8 @@ public record PersonEmployment
         EmploymentType = model.EmploymentType,
         LastKnownEmployedDate = model.LastKnownEmployedDate,
         LastExtractDate = model.LastExtractDate,
+        NationalInsuranceNumber = model.NationalInsuranceNumber,
+        PersonPostcode = model.PersonPostcode,
         Key = model.Key
     };
 }

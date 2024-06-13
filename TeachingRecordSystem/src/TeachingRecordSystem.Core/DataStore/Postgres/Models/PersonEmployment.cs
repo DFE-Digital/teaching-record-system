@@ -17,4 +17,6 @@ public class PersonEmployment
     public required DateTime CreatedOn { get; set; }
     public required DateTime UpdatedOn { get; set; }
     public required string Key { get; set; }
+    public required string? NationalInsuranceNumber { get; set; }
+    public required string? PersonPostcode { get; set; }
 }
