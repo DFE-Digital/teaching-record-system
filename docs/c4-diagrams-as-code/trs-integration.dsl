@@ -127,12 +127,14 @@ workspace {
       tps-capita-api -> dqtApi "http:  Prohibitions, New TRNs)"
       ewclegacy-api -> tq-secure-email "email: Teaching alerts / prohibitions
 
-      trsApi -> tps-bancs-api  "http: Return a TRN"
+      tps-bancs-api -> trsApi "http: GET /trn-requests"
       trsApi -> tps-bancs-api "http: Prohibition outcomes"
 
-      tps-bancs-api -> trsApi "http: Request a TRN"
+      tps-bancs-api -> trsApi "http: GET /person validate TRN"
+
+      tps-bancs-api -> trsApi "http: POST /trn-requests"
       tps-bancs-api -> trsApi "http: Deceased active and inactive service"
-      tps-bancs-api -> trsApi "sftp: Workforce data"
+      tps-bancs-api -> trsApi "http: Workforce data (file download from portal)"
 
       tps-capita-api -> dqtApi "http: Claim Paymnets Check Return"
       dqtApi -> tps-capita-api "http: Claim Paymnets Check Request"
