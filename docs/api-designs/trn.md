@@ -1,8 +1,8 @@
 # Request TRN API
 
-Draft specification v0.2.
-
 This API is for consumers who want to submit PII for a person and have that person's existing TRN returned or have a new TRN created, if the person does not already have one.
+
+The API version this document applies to is `20240606`.
 
 There are two endpoints; one submits a request and the other retrieves the result of a request.
 Consumers must first submit a request (using `POST /trn-requests`) then, if that initial request returns a `Pending` status, poll the `GET /trn-requests` until the status is `Completed`. The same `requestId` should be used in the `GET` as was provided in the `POST`.
