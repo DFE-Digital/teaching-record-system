@@ -10,7 +10,7 @@ internal static class DataCollectionExtensions
     {
         var destinationCollection = new U();
 
-        foreach (var keyValuePair in sourceCollection.Where(kvp => kvp.Key.StartsWith(prefix)))
+        foreach (var keyValuePair in sourceCollection.Where(kvp => kvp.Key.StartsWith(prefix + ".")))
         {
             var newKey = keyValuePair.Key.Remove(0, prefix.Length + 1);
             destinationCollection.Add(newKey, getValue(keyValuePair));
