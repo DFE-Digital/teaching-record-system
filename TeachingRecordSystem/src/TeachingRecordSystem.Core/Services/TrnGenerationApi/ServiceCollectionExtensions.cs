@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
                 var options = sp.GetRequiredService<IOptions<TrnGenerationApiOptions>>();
                 httpClient.BaseAddress = new Uri(options.Value.BaseAddress);
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.Value.ApiKey);
+                httpClient.Timeout = TimeSpan.FromSeconds(5);
             });
 
         return services;
