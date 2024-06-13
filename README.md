@@ -6,12 +6,19 @@ Provides an API over the Database of Qualified Teachers (DQT). Provides the core
 # High level architecture (showing one of the citizen facing services that make use of the TRS API)
 * [Teaching Record System High Level Architecture (just showing core components)](docs/c4-diagrams-as-code/trs-core-containers.jpg)
 
-# Data Integrations
+# Data Integrations **
 TRS provides the the core teaching record data to a number of internal and external facing digital services:
+* Register Trainee Teachers
+* Apply For QTS
+* Access Your Teaching Qualifications
+* Check a Teachers Record
+* Register for an National Professional Qualification
+* Claim Teacher Payments
+* Teaching Councils and Societies (Wales, NI, Scotland)
+* [Teaching Record System : Data Integrations Pattern](docs/c4-diagrams-as-code/trs-core-containers.jpg)
+* [Teaching Record System : Teacher Pensions Integrations](docs/c4-diagrams-as-code/trs-tps.jpg)
 
-* [Teaching Record System : Data Integrations](docs/c4-diagrams-as-code/trs-integrations.jpg)
-* [Teaching Record System : Teacher Pensions Integrations](docs/c4-diagrams-as-code/trs-tps-as-is-and-to-be.jpg)
-
+** None exhaustive list
 ## What does it do?
 
 It is the primary source of teaching records for DfE. It holds data to meet UK Government statutory obligations as well as allow individuals working in the UK education system (including, but not limited to) teachers in schools withing England, Wales, Scotland and Northern Ireland to access digital services provided by the DfE.
