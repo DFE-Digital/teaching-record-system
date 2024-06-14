@@ -47,6 +47,7 @@
     <None Remove="Services\DqtReporting\Migrations\0021_account_msdyn_primarytimezone.sql" />
     <None Remove="Services\DqtReporting\Migrations\0022_contact_msdyn_primarytimezone.sql" />
     <None Remove="Services\DqtReporting\Migrations\0023_contact_trnrequestid.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0024_contact.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -92,6 +93,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0021_account_msdyn_primarytimezone.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0022_contact_msdyn_primarytimezone.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0023_contact_trnrequestid.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0024_contact.sql" />
   </ItemGroup>
 
   <ItemGroup>
