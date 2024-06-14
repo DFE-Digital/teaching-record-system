@@ -132,7 +132,9 @@ public class TpsCsvExtractProcessor(
                     x.employment_end_date as last_known_employed_date,
                     x.employment_type,
                     x.extract_date as last_extract_date,
-                    x.key
+                    x.key,
+                    x.national_insurance_number,
+                    x.member_postcode as person_postcode
                 FROM
                         tps_csv_extract_items x
                     JOIN
@@ -177,7 +179,9 @@ public class TpsCsvExtractProcessor(
                     u.employment_type,
                     u.last_extract_date,
                     u.last_known_employed_date,
-                    u.key
+                    u.key,
+                    u.national_insurance_number,
+                    u.person_postcode
             )
             INSERT INTO person_employments
                 (
@@ -189,6 +193,8 @@ public class TpsCsvExtractProcessor(
                     last_extract_date,
                     last_known_employed_date,
                     key,
+                    national_insurance_number,
+                    person_postcode,
                     created_on,
                     updated_on
                 )
@@ -207,6 +213,8 @@ public class TpsCsvExtractProcessor(
                 last_extract_date,
                 last_known_employed_date,
                 key,
+                national_insurance_number,
+                person_postcode,
                 created_on,
                 updated_on
             """;
@@ -234,7 +242,9 @@ public class TpsCsvExtractProcessor(
                     EmploymentType = item.EmploymentType,
                     CreatedOn = item.CreatedOn,
                     UpdatedOn = item.UpdatedOn,
-                    Key = item.Key
+                    Key = item.Key,
+                    NationalInsuranceNumber = item.NationalInsuranceNumber,
+                    PersonPostcode = item.PersonPostcode
                 };
 
                 var createdEvent = new PersonEmploymentCreatedEvent
@@ -270,10 +280,14 @@ public class TpsCsvExtractProcessor(
                     pe.person_employment_id,
                     pe.employment_type as current_employment_type,
                     pe.last_known_employed_date as current_last_known_employed_date,
-                    pe.last_extract_date as current_last_extract_date,                
+                    pe.last_extract_date as current_last_extract_date,
+                    pe.national_insurance_number as current_national_insurance_number,
+                    pe.person_postcode as current_person_postcode,
                     x.employment_type as new_employment_type,
                     x.employment_end_date as new_last_known_employed_date,
                     x.extract_date as new_last_extract_date,
+                    x.national_insurance_number as new_national_insurance_number,
+                    x.member_postcode as new_person_postcode,
                     x.key,
                     CASE WHEN pe.employment_type != x.employment_type OR pe.last_known_employed_date != x.employment_end_date OR pe.last_extract_date != x.extract_date THEN 2 ELSE 0 END as result
                 FROM
@@ -298,9 +312,13 @@ public class TpsCsvExtractProcessor(
                     u.current_employment_type,
                     u.current_last_known_employed_date,
                     u.current_last_extract_date,
+                    u.current_national_insurance_number,
+                    u.current_person_postcode,
                     u.new_employment_type,
                     u.new_last_known_employed_date,
-                    u.new_last_extract_date
+                    u.new_last_extract_date,
+                    u.new_national_insurance_number,
+                    u.new_person_postcode
             )
             UPDATE
                 person_employments pe
@@ -308,6 +326,8 @@ public class TpsCsvExtractProcessor(
                 employment_type = changes.new_employment_type,
                 last_known_employed_date = changes.new_last_known_employed_date,
                 last_extract_date = changes.new_last_extract_date,
+                national_insurance_number = changes.new_national_insurance_number,
+                person_postcode = changes.new_person_postcode,
                 updated_on = {clock.UtcNow}
             FROM
                 changes
@@ -322,9 +342,13 @@ public class TpsCsvExtractProcessor(
                 changes.current_employment_type,
                 changes.current_last_known_employed_date,
                 changes.current_last_extract_date,
+                changes.current_national_insurance_number,
+                changes.current_person_postcode,
                 changes.new_employment_type,
                 changes.new_last_known_employed_date,
                 changes.new_last_extract_date,
+                changes.new_national_insurance_number,
+                changes.new_person_postcode,
                 pe.key
             """;
 
@@ -342,7 +366,9 @@ public class TpsCsvExtractProcessor(
                 var changes = PersonEmploymentUpdatedEventChanges.None |
                     (item.CurrentEmploymentType != item.NewEmploymentType ? PersonEmploymentUpdatedEventChanges.EmploymentType : PersonEmploymentUpdatedEventChanges.None) |
                     (item.CurrentLastKnownEmployedDate != item.NewLastKnownEmployedDate ? PersonEmploymentUpdatedEventChanges.LastKnownEmployedDate : PersonEmploymentUpdatedEventChanges.None) |
-                    (item.CurrentLastExtractDate != item.NewLastExtractDate ? PersonEmploymentUpdatedEventChanges.LastExtractDate : PersonEmploymentUpdatedEventChanges.None);
+                    (item.CurrentLastExtractDate != item.NewLastExtractDate ? PersonEmploymentUpdatedEventChanges.LastExtractDate : PersonEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentNationalInsuranceNumber != item.NewNationalInsuranceNumber ? PersonEmploymentUpdatedEventChanges.NationalInsuranceNumber : PersonEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentPersonPostcode != item.NewPersonPostcode ? PersonEmploymentUpdatedEventChanges.PersonPostcode : PersonEmploymentUpdatedEventChanges.None);
 
                 if (changes != PersonEmploymentUpdatedEventChanges.None)
                 {
@@ -360,6 +386,8 @@ public class TpsCsvExtractProcessor(
                             EmploymentType = item.NewEmploymentType,
                             LastKnownEmployedDate = item.NewLastKnownEmployedDate,
                             LastExtractDate = item.NewLastExtractDate,
+                            NationalInsuranceNumber = item.NewNationalInsuranceNumber,
+                            PersonPostcode = item.NewPersonPostcode,
                             Key = item.Key
                         },
                         OldPersonEmployment = new()
@@ -372,6 +400,8 @@ public class TpsCsvExtractProcessor(
                             EmploymentType = item.CurrentEmploymentType,
                             LastKnownEmployedDate = item.CurrentLastKnownEmployedDate,
                             LastExtractDate = item.CurrentLastExtractDate,
+                            NationalInsuranceNumber = item.CurrentNationalInsuranceNumber,
+                            PersonPostcode = item.CurrentPersonPostcode,
                             Key = item.Key
                         },
                         Changes = changes,
@@ -445,7 +475,9 @@ public class TpsCsvExtractProcessor(
                 ec.employment_type,
                 ec.last_known_employed_date,
                 ec.last_extract_date,
-                ec.key,
+                ec.national_insurance_number,
+                ec.person_postcode,
+                ec.key,                
                 ue.establishment_id
             from
                     establishment_changes ec
@@ -495,6 +527,8 @@ public class TpsCsvExtractProcessor(
                     EmploymentType = item.EmploymentType,
                     LastKnownEmployedDate = item.LastKnownEmployedDate,
                     LastExtractDate = item.LastExtractDate,
+                    NationalInsuranceNumber = item.NationalInsuranceNumber,
+                    PersonPostcode = item.PersonPostcode,
                     Key = item.Key
                 },
                 OldPersonEmployment = new()
@@ -507,6 +541,8 @@ public class TpsCsvExtractProcessor(
                     EmploymentType = item.EmploymentType,
                     LastKnownEmployedDate = item.LastKnownEmployedDate,
                     LastExtractDate = item.LastExtractDate,
+                    NationalInsuranceNumber = item.NationalInsuranceNumber,
+                    PersonPostcode = item.PersonPostcode,
                     Key = item.Key
                 },
                 Changes = PersonEmploymentUpdatedEventChanges.EstablishmentId,
@@ -585,6 +621,8 @@ public class TpsCsvExtractProcessor(
                 pe.employment_type,
                 pe.last_known_employed_date,
                 pe.last_extract_date,
+                pe.national_insurance_number,
+                pe.person_postcode,
                 pe.key,
                 changes.new_end_date
             """;
@@ -614,6 +652,8 @@ public class TpsCsvExtractProcessor(
                         EmploymentType = item.EmploymentType,
                         LastKnownEmployedDate = item.LastKnownEmployedDate,
                         LastExtractDate = item.LastExtractDate,
+                        NationalInsuranceNumber = item.NationalInsuranceNumber,
+                        PersonPostcode = item.PersonPostcode,
                         Key = item.Key
                     },
                     OldPersonEmployment = new()
@@ -626,6 +666,8 @@ public class TpsCsvExtractProcessor(
                         EmploymentType = item.EmploymentType,
                         LastKnownEmployedDate = item.LastKnownEmployedDate,
                         LastExtractDate = item.LastExtractDate,
+                        NationalInsuranceNumber = item.NationalInsuranceNumber,
+                        PersonPostcode = item.PersonPostcode,
                         Key = item.Key
                     },
                     Changes = PersonEmploymentUpdatedEventChanges.EndDate,

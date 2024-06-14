@@ -12,6 +12,8 @@ public partial class TestData
         DateOnly lastKnownEmployedDate,
         EmploymentType employmentType,
         DateOnly lastExtractDate,
+        string? nationalInsuranceNumber = null,
+        string? personPostcode = null,
         DateOnly? endDate = null)
     {
         var key = $"{person.Trn}.{establishment.LaCode}.{establishment.EstablishmentNumber}.{startDate:yyyyMMdd}";
@@ -28,6 +30,8 @@ public partial class TestData
                 EmploymentType = employmentType,
                 LastKnownEmployedDate = lastKnownEmployedDate,
                 LastExtractDate = lastExtractDate,
+                NationalInsuranceNumber = nationalInsuranceNumber ?? GenerateNationalInsuranceNumber(),
+                PersonPostcode = personPostcode,
                 CreatedOn = Clock.UtcNow,
                 UpdatedOn = Clock.UtcNow,
                 Key = key
