@@ -51,13 +51,14 @@ public partial class TestData
             DateOnly extractDate,
             string? fullOrPartTimeIndicator = null,
             string? nationalInsuranceNumber = null,
-            DateOnly? dateOfBirth = null)
+            DateOnly? dateOfBirth = null,
+            string? memberPostcode = null)
         {
             nationalInsuranceNumber ??= Faker.Identification.UkNationalInsuranceNumber();
             dateOfBirth ??= DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
             fullOrPartTimeIndicator ??= validFullOrPartTimeIndicatorValues[Faker.RandomNumber.Next(0, 2)];
 
-            _items.Add(new TpsCsvExtractItem(trn, nationalInsuranceNumber, dateOfBirth.Value, localAuthorityCode, establishmentPostcode, establishmentNumber, startDate, endDate, fullOrPartTimeIndicator, extractDate));
+            _items.Add(new TpsCsvExtractItem(trn, nationalInsuranceNumber, dateOfBirth.Value, localAuthorityCode, establishmentPostcode, establishmentNumber, startDate, endDate, fullOrPartTimeIndicator, extractDate, memberPostcode));
             return this;
         }
 
@@ -93,7 +94,7 @@ public partial class TestData
                         NationalInsuranceNumber = item.NationalInsuranceNumber,
                         DateOfBirth = item.DateOfBirth.ToString("dd/MM/yyyy"),
                         DateOfDeath = null,
-                        MemberPostcode = null,
+                        MemberPostcode = item.MemberPostcode,
                         MemberEmailAddress = null,
                         LocalAuthorityCode = item.LocalAuthorityCode,
                         EstablishmentNumber = item.EstablishmentNumber,
@@ -147,5 +148,5 @@ public partial class TestData
         }
     }
 
-    public record TpsCsvExtractItem(string Trn, string NationalInsuranceNumber, DateOnly DateOfBirth, string LocalAuthorityCode, string EstablishmentPostcode, string? EstablishmentNumber, DateOnly StartDate, DateOnly EndDate, string FullOrPartTimeIndicator, DateOnly ExtractDate);
+    public record TpsCsvExtractItem(string Trn, string NationalInsuranceNumber, DateOnly DateOfBirth, string LocalAuthorityCode, string EstablishmentPostcode, string? EstablishmentNumber, DateOnly StartDate, DateOnly EndDate, string FullOrPartTimeIndicator, DateOnly ExtractDate, string? MemberPostcode);
 }

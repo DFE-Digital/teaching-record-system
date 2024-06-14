@@ -123,6 +123,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<BackfillNinoAndPersonPostcodeInEmploymentHistoryJob>(
+                    nameof(BackfillNinoAndPersonPostcodeInEmploymentHistoryJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }

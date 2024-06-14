@@ -30,7 +30,7 @@ public partial class TestData
                 EmploymentType = employmentType,
                 LastKnownEmployedDate = lastKnownEmployedDate,
                 LastExtractDate = lastExtractDate,
-                NationalInsuranceNumber = nationalInsuranceNumber ?? GenerateNationalInsuranceNumber(),
+                NationalInsuranceNumber = nationalInsuranceNumber,
                 PersonPostcode = personPostcode,
                 CreatedOn = Clock.UtcNow,
                 UpdatedOn = Clock.UtcNow,
