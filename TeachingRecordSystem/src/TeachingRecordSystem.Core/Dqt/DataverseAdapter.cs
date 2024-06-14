@@ -416,7 +416,8 @@ public partial class DataverseAdapter : IDataverseAdapter
                 Contact.Fields.dfeta_TRN,
                 Contact.Fields.dfeta_NINumber,
                 Contact.Fields.BirthDate,
-                Contact.Fields.dfeta_ActiveSanctions
+                Contact.Fields.dfeta_ActiveSanctions,
+                Contact.Fields.dfeta_InductionStatus
             ),
             Criteria = filter
         };

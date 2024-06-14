@@ -108,6 +108,7 @@ public class GetTeacherHandlerTests
             {
                 { Contact.Fields.StateCode, ContactState.Active.ToString() },
                 { $"{prefix}.{dfeta_induction.Fields.dfeta_InductionStatus}", inductionStatusName },
+                { $"{Contact.Fields.dfeta_InductionStatus}", inductionStatusName },
                 { $"{prefix}.{dfeta_induction.Fields.StateCode}", dfeta_inductionState.Active.ToString() }
             }
         };
@@ -283,5 +284,49 @@ public class GetTeacherHandlerTests
                 Assert.Equal("MandatoryQualification", qualification.Name);
                 Assert.Equal(new DateTime(2021, 12, 2), qualification.DateAwarded);
             });
+    }
+
+    [Theory]
+    [InlineData(dfeta_InductionStatus.Pass, dfeta_InductionStatus.Pass)]
+    [InlineData(dfeta_InductionStatus.Exempt, dfeta_InductionStatus.Exempt)]
+    public void Given_contact_has_induction_the_details_are_mapped(dfeta_InductionStatus inductionStatus, dfeta_InductionStatus expectedInductionStatus)
+    {
+        var completionDate = new DateTime(2021, 1, 1);
+        var inductionStatusName = inductionStatus.ToString();
+        var startDate = new DateTime(2020, 10, 1);
+
+        var prefix = nameof(dfeta_induction);
+
+        var contact = new Contact
+        {
+            dfeta_ActiveSanctions = false,
+            StateCode = ContactState.Active,
+            Attributes =
+            {
+                { $"{prefix}.{dfeta_induction.Fields.dfeta_CompletionDate}",
+                    new AliasedValue(dfeta_induction.EntityLogicalName, dfeta_induction.Fields.dfeta_CompletionDate, completionDate) },
+                { $"{prefix}.{dfeta_induction.Fields.dfeta_StartDate}",
+                    new AliasedValue(dfeta_induction.EntityLogicalName, dfeta_induction.Fields.dfeta_StartDate, startDate) },
+                { $"{prefix}.{dfeta_induction.Fields.StateCode}",
+                    new AliasedValue(dfeta_induction.EntityLogicalName, dfeta_induction.Fields.StateCode, new OptionSetValue((int)dfeta_inductionState.Active)) },
+                { $"{prefix}.{dfeta_induction.PrimaryIdAttribute}",
+                    new AliasedValue(dfeta_induction.EntityLogicalName, dfeta_induction.PrimaryIdAttribute, Guid.NewGuid())}
+            },
+            FormattedValues =
+            {
+                { Contact.Fields.StateCode, ContactState.Active.ToString() },
+                { $"{prefix}.{dfeta_induction.Fields.dfeta_InductionStatus}", inductionStatusName },
+                { $"{Contact.Fields.dfeta_InductionStatus}", inductionStatusName },
+                { $"{prefix}.{dfeta_induction.Fields.StateCode}", dfeta_inductionState.Active.ToString() }
+            }
+        };
+
+        var response = GetTeacherHandler.MapContactToResponse(contact);
+
+        var induction = response.Induction;
+
+        Assert.NotNull(induction);
+        Assert.Equal(completionDate, induction.CompletionDate);
+        Assert.Equal(expectedInductionStatus.ToString(), induction.InductionStatusName);
     }
 }

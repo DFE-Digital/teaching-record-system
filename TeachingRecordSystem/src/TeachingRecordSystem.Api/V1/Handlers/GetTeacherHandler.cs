@@ -90,19 +90,24 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         Induction MapInduction()
         {
             var induction = teacher.Extract<dfeta_induction>();
+            var inductionStatus = teacher.FormattedValues.ContainsKey(Contact.Fields.dfeta_InductionStatus) ? teacher.FormattedValues[Contact.Fields.dfeta_InductionStatus] : null;
 
             return induction != null ?
                 new Induction()
                 {
                     StartDate = induction.dfeta_StartDate,
                     CompletionDate = induction.dfeta_CompletionDate,
-                    InductionStatusName = induction.FormattedValues.ContainsKey(dfeta_induction.Fields.dfeta_InductionStatus) ?
-                        induction.FormattedValues[dfeta_induction.Fields.dfeta_InductionStatus] :
-                        null,
+                    InductionStatusName = inductionStatus,
                     State = induction.StateCode.Value,
                     StateName = induction.FormattedValues[dfeta_induction.Fields.StateCode]
                 } :
-                null;
+                !string.IsNullOrEmpty(inductionStatus) ?
+                    new Induction()
+                    {
+                        StartDate = null,
+                        CompletionDate = null,
+                        InductionStatusName = inductionStatus
+                    } : null;
         }
 
         QualifiedTeacherStatus MapQualifiedTeacherStatus()
