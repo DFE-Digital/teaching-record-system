@@ -2,12 +2,12 @@ using Microsoft.Xrm.Sdk.Query;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
-public class GetContactDetailByIdTests : IAsyncLifetime
+public class GetActiveContactDetailByIdTests : IAsyncLifetime
 {
     private readonly CrmClientFixture.TestDataScope _dataScope;
     private readonly CrmQueryDispatcher _crmQueryDispatcher;
 
-    public GetContactDetailByIdTests(CrmClientFixture crmClientFixture)
+    public GetActiveContactDetailByIdTests(CrmClientFixture crmClientFixture)
     {
         _dataScope = crmClientFixture.CreateTestDataScope();
         _crmQueryDispatcher = crmClientFixture.CreateQueryDispatcher();

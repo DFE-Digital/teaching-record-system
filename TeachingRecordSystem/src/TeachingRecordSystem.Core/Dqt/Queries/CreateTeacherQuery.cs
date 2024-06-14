@@ -13,4 +13,5 @@ public class CreateContactQuery : ICrmQuery<Guid>
     public required string? NationalInsuranceNumber { get; init; }
     public required FindPotentialDuplicateContactsResult[] PotentialDuplicates { get; init; }
     public required string? Trn { get; init; }
+    public required string? TrnRequestId { get; init; }
 }

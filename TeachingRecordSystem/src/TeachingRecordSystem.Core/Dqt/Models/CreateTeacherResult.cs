@@ -1,6 +1,5 @@
 #nullable disable
 
-
 namespace TeachingRecordSystem.Core.Dqt.Models;
 
 public sealed class CreateTeacherResult
@@ -9,12 +8,14 @@ public sealed class CreateTeacherResult
     public Guid TeacherId { get; private set; }
     public string Trn { get; private set; }
     public CreateTeacherFailedReasons FailedReasons { get; private set; }
+    public string TrnToken { get; private set; }
 
-    public static CreateTeacherResult Success(Guid teacherId, string trn) => new()
+    public static CreateTeacherResult Success(Guid teacherId, string trn, string trnToken) => new()
     {
         Succeeded = true,
         TeacherId = teacherId,
-        Trn = trn
+        Trn = trn,
+        TrnToken = trnToken
     };
 
     public static CreateTeacherResult Failed(CreateTeacherFailedReasons reasons) => new()

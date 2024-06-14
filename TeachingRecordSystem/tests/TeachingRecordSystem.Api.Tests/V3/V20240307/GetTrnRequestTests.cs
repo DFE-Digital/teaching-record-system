@@ -9,7 +9,7 @@ public class GetTrnRequestTests : TestBase
     public GetTrnRequestTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        SetCurrentApiClient(new[] { ApiRoles.CreateTrn });
+        SetCurrentApiClient([ApiRoles.CreateTrn]);
     }
 
     [Theory, RoleNamesData(except: ApiRoles.CreateTrn)]
@@ -95,19 +95,8 @@ public class GetTrnRequestTests : TestBase
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(email)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.Add(new TrnRequest()
-            {
-                ClientId = ClientId,
-                RequestId = requestId,
-                TeacherId = existingContact.ContactId
-            });
-
-            await dbContext.SaveChangesAsync();
-        });
+            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
+            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId)));
 
         XrmFakedContext.UpdateEntity(new Contact()
         {
@@ -160,19 +149,8 @@ public class GetTrnRequestTests : TestBase
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(email)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.Add(new TrnRequest()
-            {
-                ClientId = ClientId,
-                RequestId = requestId,
-                TeacherId = existingContact.ContactId
-            });
-
-            await dbContext.SaveChangesAsync();
-        });
+            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
+            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId)));
 
         // Act
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
@@ -217,19 +195,8 @@ public class GetTrnRequestTests : TestBase
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(email)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.Add(new TrnRequest()
-            {
-                ClientId = ClientId,
-                RequestId = requestId,
-                TeacherId = existingContact.ContactId
-            });
-
-            await dbContext.SaveChangesAsync();
-        });
+            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
+            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId)));
 
         // Act
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");

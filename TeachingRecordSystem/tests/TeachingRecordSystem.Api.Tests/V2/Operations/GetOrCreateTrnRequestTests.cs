@@ -11,42 +11,18 @@ public class GetOrCreateTrnRequestTests : TestBase
 {
     public GetOrCreateTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
+        SetCurrentApiClient([ApiRoles.UpdatePerson]);
     }
 
-    [Theory, RoleNamesData(new[] { ApiRoles.UpdatePerson })]
-    public async Task GetOrCreateTrn_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    [Theory, RoleNamesData(except: [ApiRoles.UpdatePerson])]
+    public async Task Put_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
         SetCurrentApiClient(roles);
+
         var requestId = Guid.NewGuid().ToString();
-        var teacherId = Guid.NewGuid();
-        var trn = "1234567";
 
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
-            .ReturnsAsync(new Contact()
-            {
-                Id = teacherId,
-                dfeta_TRN = trn
-            });
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.Add(new TrnRequest()
-            {
-                ClientId = ClientId,
-                RequestId = requestId,
-                TeacherId = teacherId
-            });
-
-            await dbContext.SaveChangesAsync();
-        });
-        var slugId = Guid.NewGuid().ToString();
-        var request = CreateRequest(req =>
-        {
-            req.SlugId = slugId;
-        });
+        var request = CreateRequest();
 
         // Act
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
@@ -56,7 +32,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_request_with_id_already_exists_for_client_and_status_is_completed_returns_existing_trn()
+    public async Task Put_ValidRequestInDbWithResolvedTrn_ReturnsOkWithCompletedStatus()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -82,11 +58,8 @@ public class GetOrCreateTrnRequestTests : TestBase
 
             await dbContext.SaveChangesAsync();
         });
-        var slugId = Guid.NewGuid().ToString();
-        var request = CreateRequest(req =>
-        {
-            req.SlugId = slugId;
-        });
+
+        var request = CreateRequest(req => req.RequestId = requestId);
 
         // Act
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
@@ -101,13 +74,51 @@ public class GetOrCreateTrnRequestTests : TestBase
                 status = "Completed",
                 qtsDate = (DateOnly?)null,
                 potentialDuplicate = false,
-                slugId = slugId
+                slugId = (string)null
             },
             expectedStatusCode: 200);
     }
 
     [Fact]
-    public async Task Given_request_with_id_already_exists_for_client_and_status_is_pending_returns_null_trn()
+    public async Task Put_ValidRequestInCrmWithResolvedTrn_ReturnsOkWithCompletedStatus()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var slugId = Guid.NewGuid().ToString();
+        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
+        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn().WithTrnRequestId(trnRequestId));
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
+            .ReturnsAsync(new Contact()
+            {
+                Id = createPersonResult.ContactId,
+                dfeta_TRN = createPersonResult.Trn,
+                dfeta_SlugId = slugId
+            });
+
+        var request = CreateRequest(req => req.RequestId = requestId);
+
+        // Act
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
+
+        // Assert
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId = requestId,
+                trn = createPersonResult.Trn,
+                status = "Completed",
+                qtsDate = (DateOnly?)null,
+                potentialDuplicate = false,
+                slugId = (string)null
+            },
+            expectedStatusCode: 200);
+    }
+
+    [Fact]
+    public async Task Put_ValidRequestInDbWithUnresolvedTrn_ReturnsOkWithPendingStatus()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -124,11 +135,8 @@ public class GetOrCreateTrnRequestTests : TestBase
 
             await dbContext.SaveChangesAsync();
         });
-        var slugId = Guid.NewGuid().ToString();
-        var request = CreateRequest(req =>
-        {
-            req.SlugId = slugId;
-        });
+
+        var request = CreateRequest(req => req.RequestId = requestId);
 
         // Act
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
@@ -143,13 +151,51 @@ public class GetOrCreateTrnRequestTests : TestBase
                 status = "Pending",
                 qtsDate = (DateOnly?)null,
                 potentialDuplicate = true,
-                slugId = slugId
+                slugId = (string)null
             },
             expectedStatusCode: 200);
     }
 
     [Fact]
-    public async Task Given_request_with_invalid_id_returns_error()
+    public async Task Put_ValidRequestInCrmWithUnresolvedTrn_ReturnsOkWithPendingStatus()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var slugId = Guid.NewGuid().ToString();
+        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
+        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn(false).WithTrnRequestId(trnRequestId).WithSlugId(slugId));
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
+            .ReturnsAsync(new Contact()
+            {
+                Id = createPersonResult.ContactId,
+                dfeta_TRN = null,
+                dfeta_SlugId = slugId
+            });
+
+        var request = CreateRequest(req => req.RequestId = requestId);
+
+        // Act
+        var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
+
+        // Assert
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId = requestId,
+                trn = (string)null,
+                status = "Pending",
+                qtsDate = (DateOnly?)null,
+                potentialDuplicate = true,
+                slugId = (string)null
+            },
+            expectedStatusCode: 200);
+    }
+
+    [Fact]
+    public async Task Put_InvalidRequestId_ReturnsError()
     {
         // Arrange
         var requestId = "$";
@@ -165,7 +211,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_request_with_too_long_invalid_id_returns_error()
+    public async Task Put_RequestIdTooLong_ReturnsError()
     {
         // Arrange
         var requestId = new string('x', 101);  // Limit is 100
@@ -183,7 +229,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     [Theory]
     [InlineData("1234567", "Completed", false)]
     [InlineData(null, "Pending", true)]
-    public async Task Given_request_with_new_id_creates_teacher_and_returns_created(
+    public async Task Put_ValidRequestWithNewId_CreatesContactRecordAndReturnsCreated(
         string trn,
         string expectedStatus,
         bool expectedPotentialDuplicate)
@@ -194,16 +240,14 @@ public class GetOrCreateTrnRequestTests : TestBase
 
         DataverseAdapterMock
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
-            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null))
             .Verifiable();
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
             .ReturnsAsync(new Contact() { Id = teacherId });
+
         var slugId = Guid.NewGuid().ToString();
-        var request = CreateRequest(req =>
-        {
-            req.SlugId = slugId;
-        });
+        var request = CreateRequest(req => req.SlugId = slugId);
 
         // Act
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
@@ -226,7 +270,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_request_with_null_qualification_passes_request_to_DataverseAdapter_successfully()
+    public async Task Put_ValidRequestWithNullQualification_Succeeds()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -235,7 +279,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
         DataverseAdapterMock
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
-            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null))
             .Verifiable();
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
@@ -251,7 +295,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_request_with_null_qualification_subject2_request_to_DataverseAdapter_successfully()
+    public async Task Put_ValidRequestWithNullQualificationSubject2_Succeeds()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -260,7 +304,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
         DataverseAdapterMock
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
-            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null))
             .Verifiable();
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
@@ -276,7 +320,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_request_with_null_qualification_subject3_request_to_DataverseAdapter_successfully()
+    public async Task Put_ValidRequestWithNullQualificationSubject3_Succeeds()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -285,7 +329,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
         DataverseAdapterMock
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
-            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null))
             .Verifiable();
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
@@ -301,7 +345,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_qualification_subject2_returns_error()
+    public async Task Put_RequestWithInvalidQualificationSubject2_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -323,7 +367,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_qualification_subject3_returns_error()
+    public async Task Put_RequestWithInvalidQualificationSubject3_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -345,7 +389,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_itt_provider_returns_error()
+    public async Task Put_RequestWithInvalidIttProvider_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -369,7 +413,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_itt_subject1_returns_error()
+    public async Task Put_RequestWithInvalidIttSubject1_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -392,7 +436,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_itt_subject2_returns_error()
+    public async Task Put_RequestWithInvalidIttSubject2_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -415,7 +459,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_itt_qualification_returns_error()
+    public async Task Put_RequestWithInvalidIttQualification_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -435,7 +479,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_qualification_country_returns_error()
+    public async Task Put_RequestWithInvalidIttCountry_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -458,7 +502,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_qualification_subject_returns_error()
+    public async Task Put_RequestWithInvalidQualificationSbject_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -481,7 +525,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_qualification_provider_returns_error()
+    public async Task Put_RequestWithInvalidQualificationProvider_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -504,7 +548,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_qualification_returns_error()
+    public async Task Put_RequestWithInvalidQualificationType_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -520,7 +564,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_invalid_qualificationtype_not_found_returns_error()
+    public async Task Put_RequestWithNotFoundQualificationType_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -544,7 +588,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
     [Theory]
     [InlineData(1900, 1, 1)]
-    public async Task Given_dob_before_1_1_1940_returns_error(int year, int month, int day)
+    public async Task Put_RequestWithDateOfBirthBefore01011940_ReturnsError(int year, int month, int day)
     {
         // Arrange
         var dob = new DateOnly(year, month, day);
@@ -569,7 +613,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     [Theory]
     [InlineData(2022, 1, 1)]
     [InlineData(2023, 1, 1)]
-    public async Task Given_dob_equal_or_after_today_returns_error(int year, int month, int day)
+    public async Task Put_RequestWithDateOfBirthInFuture_ReturnsError(int year, int month, int day)
     {
         // Arrange
         var dob = new DateOnly(year, month, day);
@@ -592,7 +636,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
     [Theory]
     [MemberData(nameof(InvalidAgeCombinationsData))]
-    public async Task Given_invalid_age_combination_returns_error(
+    public async Task Put_RequestWithInvalidAgeRange_ReturnsError(
         int? ageRangeFrom,
         int? ageRangeTo,
         string expectedErrorPropertyName,
@@ -620,7 +664,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     [Theory]
     [InlineData("Joe Xavier", "Andre", "Joe", "Xavier Andre")]
     [InlineData("Joe Xavier", "", "Joe", "Xavier")]
-    public async Task Given_trainee_with_multiple_first_names_populates_middlename_field(
+    public async Task Put_ValidRequestWithMultiWordFirstName_PopulatesContactMiddlenameField(
         string firstName,
         string middleName,
         string expectedFirstName,
@@ -633,7 +677,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
         DataverseAdapterMock
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
-            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn));
+            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null));
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
             .ReturnsAsync(new Contact() { Id = teacherId });
@@ -653,20 +697,11 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_OverseasQualifiedTeacher_and_EarlyYears_ProgrammeType_returns_error()
+    public async Task Put_OverseasQualifiedTeacherAndEarlyYearsProgrammeType_ReturnsError()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var teacherId = Guid.NewGuid();
-        var trn = "1234567";
-
-        DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
-            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
-            .Verifiable();
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
-            .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(req =>
         {
@@ -687,7 +722,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_valid_OverseasQualifiedTeacher_request_passes_request_to_DataverseAdapter_successfully()
+    public async Task Put_ValidRequestForOverseasQualifiedTeacher_ExecutesSuccessfully()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -698,7 +733,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
         DataverseAdapterMock
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
-            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, trnToken))
             .Verifiable();
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
@@ -748,7 +783,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_valid_InternationalQualifiedTeacherStatus_request_passes_request_to_DataverseAdapter_successfully()
+    public async Task Put_ValidRequestWithInternationalQualifiedTeacherStatus_ExecutesSuccessfully()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -757,7 +792,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
         DataverseAdapterMock
             .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
-            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn))
+            .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null))
             .Verifiable();
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
@@ -780,7 +815,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_request_with_too_long_invalid_slugid_returns_error()
+    public async Task Put_SlugIdTooLong_ReturnsError()
     {
         // Arrange
         var slugId = new string('x', 155);  // Limit is 150
@@ -801,7 +836,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_request_for_non_traineeteacher_with_slugid_returns_error()
+    public async Task Put_RequestForOverseasQualifiedTeacherWithSlugId_ReturnsError()
     {
         // Arrange
         var slugId = Guid.NewGuid().ToString();
@@ -852,7 +887,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             MiddleName = "Van",
             LastName = "Ryder",
             BirthDate = new(1990, 5, 23),
-            SlugId = Guid.NewGuid().ToString(),
+            SlugId = null,
             EmailAddress = "minnie.van.ryder@example.com",
             Address = new()
             {

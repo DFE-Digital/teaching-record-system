@@ -2,12 +2,12 @@ using Microsoft.Xrm.Sdk.Query;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
-public class GetContactByTrnTests : IAsyncLifetime
+public class GetContactByTrnRequestIdTests : IAsyncLifetime
 {
     private readonly CrmClientFixture.TestDataScope _dataScope;
     private readonly CrmQueryDispatcher _crmQueryDispatcher;
 
-    public GetContactByTrnTests(CrmClientFixture crmClientFixture)
+    public GetContactByTrnRequestIdTests(CrmClientFixture crmClientFixture)
     {
         _dataScope = crmClientFixture.CreateTestDataScope();
         _crmQueryDispatcher = crmClientFixture.CreateQueryDispatcher();
@@ -20,11 +20,11 @@ public class GetContactByTrnTests : IAsyncLifetime
     [Fact]
     public async Task WhenCalled_WithTrnForNonExistentContact_ReturnsNull()
     {
-        // Arrange        
-        var trn = "DodgyTrn";
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactByTrnQuery(trn, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQuery(new GetContactByTrnRequestIdQuery(requestId, new ColumnSet()));
 
         // Assert
         Assert.Null(result);
@@ -33,11 +33,12 @@ public class GetContactByTrnTests : IAsyncLifetime
     [Fact]
     public async Task WhenCalled_WithTrnForExistingContact_ReturnsContactDetail()
     {
-        // Arrange        
-        var person = await _dataScope.TestData.CreatePerson(b => b.WithTrn());
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var person = await _dataScope.TestData.CreatePerson(b => b.WithTrnRequestId(requestId));
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactByTrnQuery(person.Trn!, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQuery(new GetContactByTrnRequestIdQuery(requestId, new ColumnSet()));
 
         // Assert
         Assert.NotNull(result);

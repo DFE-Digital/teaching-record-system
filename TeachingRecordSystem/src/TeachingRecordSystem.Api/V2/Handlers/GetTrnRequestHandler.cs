@@ -13,18 +13,19 @@ namespace TeachingRecordSystem.Api.V2.Handlers;
 
 public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInfo>
 {
-    private readonly TrsDbContext _trsDbContext;
+    private readonly TrnRequestHelper _trnRequestHelper;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICurrentClientProvider _currentClientProvider;
     private readonly AccessYourTeachingQualificationsOptions _accessYourTeachingQualificationsOptions;
 
     public GetTrnRequestHandler(
+        TrnRequestHelper trnRequestHelper,
         TrsDbContext TrsDbContext,
         IDataverseAdapter dataverseAdapter,
         ICurrentClientProvider currentClientProvider,
         IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions)
     {
-        _trsDbContext = TrsDbContext;
+        _trnRequestHelper = trnRequestHelper;
         _dataverseAdapter = dataverseAdapter;
         _currentClientProvider = currentClientProvider;
         _accessYourTeachingQualificationsOptions = accessYourTeachingQualificationsOptions.Value;
@@ -34,25 +35,23 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
     {
         var currentClientId = _currentClientProvider.GetCurrentClientId();
 
-        var trnRequest = await _trsDbContext.TrnRequests
-            .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == request.RequestId);
-
+        var trnRequest = await _trnRequestHelper.GetTrnRequestInfo(currentClientId, request.RequestId);
         if (trnRequest == null)
         {
             return null;
         }
 
         var teacher = await _dataverseAdapter.GetTeacher(
-            trnRequest.TeacherId,
-            columnNames: new[]
-            {
+            trnRequest.ContactId,
+            columnNames:
+            [
                 Contact.Fields.dfeta_TRN,
                 Contact.Fields.dfeta_QTSDate
-            });
+            ]);
 
         if (teacher is null)
         {
-            throw new Exception($"Failed retrieving contact '{trnRequest.TeacherId}' for request ID '{request.RequestId}'.");
+            throw new Exception($"Failed retrieving contact '{trnRequest.ContactId}' for request ID '{request.RequestId}'.");
         }
 
         var trn = teacher.dfeta_TRN;

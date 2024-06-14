@@ -2285,7 +2285,9 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_StatedMiddleName = "dfeta_statedmiddlename";
 			public const string dfeta_TRN = "dfeta_trn";
 			public const string dfeta_TRNAllocateRequest = "dfeta_trnallocaterequest";
+			public const string dfeta_TrnRequestID = "dfeta_trnrequestid";
 			public const string dfeta_trnrequired = "dfeta_trnrequired";
+			public const string dfeta_TrnToken = "dfeta_trntoken";
 			public const string dfeta_TSPersonID = "dfeta_tspersonid";
 			public const string EMailAddress1 = "emailaddress1";
 			public const string EMailAddress2 = "emailaddress2";
@@ -2337,6 +2339,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string msa_contact_managingpartner = "msa_contact_managingpartner";
 			public const string system_user_contacts = "system_user_contacts";
 		}
+		
+		public const string AlternateKeys = "dfeta_trnrequestid";
 		
 		/// <summary>
 		/// Default Constructor.
@@ -2967,6 +2971,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// <summary>
 		/// 
 		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trnrequestid")]
+		public string dfeta_TrnRequestID
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_trnrequestid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_TrnRequestID");
+				this.SetAttributeValue("dfeta_trnrequestid", value);
+				this.OnPropertyChanged("dfeta_TrnRequestID");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trnrequired")]
 		public System.Nullable<bool> dfeta_trnrequired
 		{
@@ -2981,6 +3005,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_trnrequired");
 				this.SetAttributeValue("dfeta_trnrequired", value);
 				this.OnPropertyChanged("dfeta_trnrequired");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trntoken")]
+		public string dfeta_TrnToken
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_trntoken");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_TrnToken");
+				this.SetAttributeValue("dfeta_trntoken", value);
+				this.OnPropertyChanged("dfeta_TrnToken");
 			}
 		}
 		

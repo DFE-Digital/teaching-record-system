@@ -40,6 +40,9 @@ public partial class TestData
         private DateOnly? _qtlsDate;
         private readonly List<Induction> _inductions = [];
         private readonly List<InductionPeriod> _inductionPeriods = [];
+        private string? _trnRequestId;
+        private string? _trnToken;
+        private string? _slugId;
 
         public Guid PersonId { get; } = Guid.NewGuid();
 
@@ -257,6 +260,39 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithTrnRequestId(string trnRequestId)
+        {
+            if (_trnRequestId is not null && _trnRequestId != trnRequestId)
+            {
+                throw new InvalidOperationException("WithTrnRequestId cannot be changed after it's set.");
+            }
+
+            _trnRequestId = trnRequestId;
+            return this;
+        }
+
+        public CreatePersonBuilder WithTrnToken(string trnToken)
+        {
+            if (_trnToken is not null && _trnToken != trnToken)
+            {
+                throw new InvalidOperationException("WithTrnToken cannot be changed after it's set.");
+            }
+
+            _trnToken = trnToken;
+            return this;
+        }
+
+        public CreatePersonBuilder WithSlugId(string slugId)
+        {
+            if (_slugId is not null && _slugId != slugId)
+            {
+                throw new InvalidOperationException("WithSlugId cannot be changed after it's set.");
+            }
+
+            _slugId = slugId;
+            return this;
+        }
+
         internal async Task<CreatePersonResult> Execute(TestData testData)
         {
             var hasTrn = _hasTrn ?? true;
@@ -282,7 +318,10 @@ public partial class TestData
                 BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
                 dfeta_TRN = trn,
                 GenderCode = gender,
-                dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false)
+                dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
+                dfeta_TrnRequestID = _trnRequestId,
+                dfeta_TrnToken = _trnToken,
+                dfeta_SlugId = _slugId
             };
 
             if (_email is not null)

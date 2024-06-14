@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
+// N.B. This type should be considered legacy.
 public class TrnRequest
 {
     public const int RequestIdMaxLength = 100;

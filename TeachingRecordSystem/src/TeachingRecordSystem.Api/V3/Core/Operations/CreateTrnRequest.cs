@@ -1,8 +1,6 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Api.Validation;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
@@ -23,7 +21,7 @@ public record CreateTrnRequestCommand
 
 public class CreateTrnRequestHandler(
     ICrmQueryDispatcher crmQueryDispatcher,
-    TrsDbContext trsDbContext,
+    TrnRequestHelper trnRequestHelper,
     ICurrentClientProvider currentClientProvider,
     ITrnGenerationApiClient trnGenerationApiClient,
     INameSynonymProvider nameSynonymProvider)
@@ -32,9 +30,7 @@ public class CreateTrnRequestHandler(
     {
         var currentClientId = currentClientProvider.GetCurrentClientId();
 
-        var trnRequest = await trsDbContext.TrnRequests
-            .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == command.RequestId);
-
+        var trnRequest = await trnRequestHelper.GetTrnRequestInfo(currentClientId, command.RequestId);
         if (trnRequest != null)
         {
             throw new ErrorException(ErrorRegistry.CannotResubmitRequest());
@@ -77,18 +73,9 @@ public class CreateTrnRequestHandler(
             EmailAddress = emailAddress,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
             PotentialDuplicates = potentialDuplicates,
-            Trn = trn
+            Trn = trn,
+            TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentClientId, command.RequestId),
         });
-
-        trsDbContext.TrnRequests.Add(new TrnRequest()
-        {
-            ClientId = currentClientId,
-            RequestId = command.RequestId,
-            TeacherId = contactId,
-            LinkedToIdentity = false
-        });
-
-        await trsDbContext.SaveChangesAsync();
 
         var status = trn is not null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
 

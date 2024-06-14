@@ -10,8 +10,6 @@ using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 using TeachingRecordSystem.Api.Validation;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
@@ -23,7 +21,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
 {
     private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 
-    private readonly TrsDbContext _trsDbContext;
+    private readonly TrnRequestHelper _trnRequestHelper;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICurrentClientProvider _currentClientProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
@@ -31,14 +29,14 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
     private readonly AccessYourTeachingQualificationsOptions _accessYourTeachingQualificationsOptions;
 
     public GetOrCreateTrnRequestHandler(
-        TrsDbContext TrsDbContext,
+        TrnRequestHelper trnRequestHelper,
         IDataverseAdapter dataverseAdapter,
         ICurrentClientProvider currentClientProvider,
         IDistributedLockProvider distributedLockProvider,
         IGetAnIdentityApiClient identityApiClient,
         IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions)
     {
-        _trsDbContext = TrsDbContext;
+        _trnRequestHelper = trnRequestHelper;
         _dataverseAdapter = dataverseAdapter;
         _currentClientProvider = currentClientProvider;
         _distributedLockProvider = distributedLockProvider;
@@ -58,17 +56,16 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId), _lockTimeout) :
             NoopAsyncDisposable.Instance;
 
-        var trnRequest = await _trsDbContext.TrnRequests
-            .SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == request.RequestId);
+        var trnRequest = await _trnRequestHelper.GetTrnRequestInfo(currentClientId, request.RequestId);
 
         bool wasCreated;
         string trn;
         DateOnly? qtsDate = null;
         string trnToken = null;
 
-        if (trnRequest != null)
+        if (trnRequest is not null)
         {
-            var teacher = await _dataverseAdapter.GetTeacher(trnRequest.TeacherId, columnNames: new[] { Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_QTSDate });
+            var teacher = await _dataverseAdapter.GetTeacher(trnRequest.ContactId, columnNames: [Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_QTSDate]);
 
             wasCreated = false;
             trn = teacher?.dfeta_TRN;
@@ -138,7 +135,9 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 QtsDate = request.QtsDate,
                 InductionRequired = request.InductionRequired,
                 UnderNewOverseasRegulations = request.UnderNewOverseasRegulations,
-                SlugId = request.SlugId
+                SlugId = request.SlugId,
+                TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentClientId, request.RequestId),
+                GetTrnToken = GetTrnToken
             });
 
             if (!createTeacherResult.Succeeded)
@@ -146,40 +145,27 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 throw CreateValidationExceptionFromFailedReasons(createTeacherResult.FailedReasons);
             }
 
-            // We sometimes see issues where the contact created above isn't retrievable
-            // (it seems CRM doesn't create the records even though the request succeeded).
-            // Check we can at least retrieve it here and fail the request if we can't.
-            {
-                var createdContact = await _dataverseAdapter.GetTeacher(createTeacherResult.TeacherId, columnNames: [], resolveMerges: false) ??
-                    throw new Exception($"Created contact '{createTeacherResult.TeacherId}' could not be retrieved.");
-            }
-
-            if (request.QtsDate is not null && createTeacherResult.Trn is not null)
-            {
-                var trnTokenRequest = new CreateTrnTokenRequest
-                {
-                    Trn = createTeacherResult.Trn,
-                    Email = request.EmailAddress
-                };
-
-                var trnTokenResponse = await _identityApiClient.CreateTrnToken(trnTokenRequest);
-                trnToken = trnTokenResponse.TrnToken;
-            }
-
-            _trsDbContext.TrnRequests.Add(new TrnRequest()
-            {
-                ClientId = currentClientId,
-                RequestId = request.RequestId,
-                TeacherId = createTeacherResult.TeacherId,
-                LinkedToIdentity = false,
-                TrnToken = trnToken
-            });
-
-            await _trsDbContext.SaveChangesAsync();
-
             wasCreated = true;
             trn = createTeacherResult.Trn;
+            trnToken = createTeacherResult.TrnToken;
             qtsDate = request.QtsDate;
+
+            async Task<string> GetTrnToken(string trn)
+            {
+                if (request.QtsDate is not null && trn is not null)
+                {
+                    var trnTokenRequest = new CreateTrnTokenRequest
+                    {
+                        Trn = trn,
+                        Email = request.EmailAddress
+                    };
+
+                    var trnTokenResponse = await _identityApiClient.CreateTrnToken(trnTokenRequest);
+                    return trnTokenResponse.TrnToken;
+                }
+
+                return null;
+            }
         }
 
         var status = trn != null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;

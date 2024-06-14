@@ -9,11 +9,11 @@ public class GetTrnRequestTests : TestBase
 {
     public GetTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
+        SetCurrentApiClient([ApiRoles.UpdatePerson]);
     }
 
-    [Theory, RoleNamesData(new[] { ApiRoles.UpdatePerson })]
-    public async Task GetTrnRequest_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
+    [Theory, RoleNamesData(except: [ApiRoles.UpdatePerson])]
+    public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
         SetCurrentApiClient(roles);
@@ -27,7 +27,7 @@ public class GetTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_trn_request_with_specified_id_does_not_exist_returns_notfound()
+    public async Task Get_TrnRequestDoesNotExistInDbOrCrm_ReturnsNotFound()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -40,7 +40,7 @@ public class GetTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_trn_request_with_specified_id_does_not_exist_for_current_client_returns_notfound()
+    public async Task Get_TrnRequestDoesNotExistForCurrentClient_ReturnsNotFound()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -69,7 +69,7 @@ public class GetTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_valid_pending_trn_request_returns_ok_with_pending_status()
+    public async Task Get_ValidRequestInDbWithUnresolvedTrn_ReturnsOkWithPendingStatus()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -116,7 +116,43 @@ public class GetTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Given_valid_completed_trn_request_returns_ok_with_completed_status_and_trn()
+    public async Task Get_ValidRequestInCrmWithUnresolvedTrn_ReturnsOkWithPendingStatus()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var slugId = Guid.NewGuid().ToString();
+        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
+        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn(false).WithTrnRequestId(trnRequestId).WithSlugId(slugId));
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
+            .ReturnsAsync(new Contact()
+            {
+                Id = createPersonResult.ContactId,
+                dfeta_TRN = null,
+                dfeta_SlugId = slugId
+            });
+
+        // Act
+        var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
+
+        // Assert
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId = requestId,
+                status = "Pending",
+                trn = (string)null,
+                qtsDate = (DateOnly?)null,
+                potentialDuplicate = true,
+                slugId = slugId
+            },
+            expectedStatusCode: StatusCodes.Status200OK);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestInDbWithResolvedTrn_ReturnsOkWithCompletedStatus()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -164,7 +200,43 @@ public class GetTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Get_ForTrnRequestWithTrnToken_ReturnsAccessYourQualificationsLink()
+    public async Task Get_ValidRequestInCrmWithResolvedTrn_ReturnsOkWithCompletedStatus()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var slugId = Guid.NewGuid().ToString();
+        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
+        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn().WithTrnRequestId(trnRequestId));
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
+            .ReturnsAsync(new Contact()
+            {
+                Id = createPersonResult.ContactId,
+                dfeta_TRN = createPersonResult.Trn,
+                dfeta_SlugId = slugId
+            });
+
+        // Act
+        var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
+
+        // Assert
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId = requestId,
+                status = "Completed",
+                trn = createPersonResult.Trn,
+                qtsDate = (DateOnly?)null,
+                potentialDuplicate = false,
+                slugId = slugId
+            },
+            expectedStatusCode: StatusCodes.Status200OK);
+    }
+
+    [Fact]
+    public async Task Get_ForTrnRequestInDbWithTrnToken_ReturnsAccessYourQualificationsLink()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -211,6 +283,45 @@ public class GetTrnRequestTests : TestBase
                 qtsDate = qtsDate.ToDateOnlyWithDqtBstFix(true),
                 potentialDuplicate = false,
                 slugId = slugId,
+                accessYourTeachingQualificationsLink = $"https://aytq.com/qualifications/start?trn_token={trnToken}"
+            },
+            expectedStatusCode: StatusCodes.Status200OK);
+    }
+
+    [Fact]
+    public async Task Get_ForTrnRequestInCrmWithTrnToken_ReturnsAccessYourQualificationsLink()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var trnToken = "ABCDEFG1234567";
+        var qtsDate = new DateOnly(2020, 10, 03);
+        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
+        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn().WithTrnRequestId(trnRequestId).WithQts(qtsDate).WithTrnToken(trnToken));
+
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
+            .ReturnsAsync(new Contact()
+            {
+                Id = createPersonResult.ContactId,
+                dfeta_TRN = createPersonResult.Trn,
+                dfeta_SlugId = null,
+                dfeta_QTSDate = qtsDate.ToDateTimeWithDqtBstFix(isLocalTime: true)
+            });
+
+        // Act
+        var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
+
+        // Assert
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId = requestId,
+                status = "Completed",
+                trn = createPersonResult.Trn,
+                qtsDate = qtsDate,
+                potentialDuplicate = false,
+                slugId = (string)null,
                 accessYourTeachingQualificationsLink = $"https://aytq.com/qualifications/start?trn_token={trnToken}"
             },
             expectedStatusCode: StatusCodes.Status200OK);
