@@ -705,7 +705,8 @@ public class TpsCsvExtractProcessor(
                         person_employments pe ON pe.key = x.key
                                                  AND pe.last_extract_date = x.extract_date
                 WHERE
-                    pe.national_insurance_number IS NULL)
+                    pe.national_insurance_number IS NULL
+                LIMIT 1000)
                 UPDATE
                     person_employments pe
                 SET
