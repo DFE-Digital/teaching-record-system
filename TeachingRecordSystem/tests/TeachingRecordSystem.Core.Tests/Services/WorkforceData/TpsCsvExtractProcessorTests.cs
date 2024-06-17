@@ -285,6 +285,31 @@ public class TpsCsvExtractProcessorTests
         Assert.Null(updatedPersonEmploymentWhichShouldNotHaveEndDateSet.EndDate);
     }
 
+    [Fact]
+    public async Task BackfillNinoAndPersonPostcodeInEmploymentHistory_WhenCalledWithPersonEmploymentRecordsWithoutNinoAndPersonPostcode_SetsNinoAndPersonPostcode()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var tpsCsvExtractId = Guid.NewGuid();
+        var establishment = await TestData.CreateEstablishment(localAuthorityCode: "129", establishmentNumber: "1241");
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var memberPostcode = Faker.Address.UkPostCode();
+        var personEmploymentWithoutNinoAndPersonPostcode = await TestData.CreatePersonEmployment(person, establishment, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), null, null);
+        await TestData.CreateTpsCsvExtract(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, personEmploymentWithoutNinoAndPersonPostcode.StartDate, personEmploymentWithoutNinoAndPersonPostcode.LastKnownEmployedDate, personEmploymentWithoutNinoAndPersonPostcode.LastExtractDate, "FT", nationalInsuranceNumber, memberPostcode: memberPostcode));
+
+        // Act
+        var processor = new TpsCsvExtractProcessor(
+            TestData.DbContextFactory,
+            TestData.Clock);
+        await processor.BackfillNinoAndPersonPostcodeInEmploymentHistory(CancellationToken.None);
+
+        // Assert
+        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        var updatedPersonEmployment = await dbContext.PersonEmployments.SingleAsync(e => e.PersonEmploymentId == personEmploymentWithoutNinoAndPersonPostcode.PersonEmploymentId);
+        Assert.Equal(nationalInsuranceNumber, updatedPersonEmployment.NationalInsuranceNumber);
+        Assert.Equal(memberPostcode, updatedPersonEmployment.PersonPostcode);
+    }
+
     private DbFixture DbFixture { get; }
 
     private TestData TestData { get; }

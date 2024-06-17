@@ -420,7 +420,6 @@ public class TpsCsvExtractProcessor(
         while (hasRecordsToUpdate);
     }
 
-
     public async Task UpdateLatestEstablishmentVersions(CancellationToken cancellationToken)
     {
         using var readDbContext = dbContextFactory.CreateDbContext();
@@ -676,6 +675,119 @@ public class TpsCsvExtractProcessor(
                 };
 
                 events.Add(updatedEvent);
+            }
+
+            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            events.Clear();
+        }
+        while (hasRecordsToUpdate);
+    }
+
+    public async Task BackfillNinoAndPersonPostcodeInEmploymentHistory(CancellationToken cancellationToken)
+    {
+        using var dbContext = dbContextFactory.CreateDbContext();
+        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        FormattableString querySql =
+            $"""
+            WITH changes AS (
+                SELECT
+                    pe.person_employment_id,
+                    pe.national_insurance_number as current_national_insurance_number,
+                    pe.person_postcode as current_person_postcode,
+                    x.national_insurance_number as new_national_insurance_number,
+                    x.member_postcode as new_person_postcode		
+                FROM
+                        tps_csv_extract_items x
+                    JOIN
+                        person_employments pe ON pe.key = x.key
+                                                 AND pe.last_extract_date = x.extract_date
+                WHERE
+                    pe.national_insurance_number IS NULL)
+                UPDATE
+                    person_employments pe
+                SET
+                    national_insurance_number = changes.new_national_insurance_number,
+                    person_postcode = changes.new_person_postcode,
+                    updated_on = {clock.UtcNow}
+                FROM
+                    changes
+                WHERE
+                    changes.person_employment_id = pe.person_employment_id
+                RETURNING
+                    pe.person_employment_id,
+                    pe.person_id,
+                    pe.establishment_id,
+                    pe.start_date,
+                    pe.end_date,
+                    pe.employment_type,
+                    pe.last_known_employed_date,
+                    pe.last_extract_date,
+                    changes.current_national_insurance_number,
+                    changes.current_person_postcode,
+                    changes.new_national_insurance_number,
+                    changes.new_person_postcode,
+                    pe.key
+            """;
+
+        bool hasRecordsToUpdate = false;
+        var events = new List<EventBase>();
+
+        do
+        {
+            hasRecordsToUpdate = false;
+            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            dbContext.Database.UseTransaction(transaction);
+            await foreach (var item in dbContext.Database.SqlQuery<UpdatedPersonEmploymentNationalInsuranceNumberAndPersonPostcode>(querySql).AsAsyncEnumerable())
+            {
+                hasRecordsToUpdate = true;
+                var changes = PersonEmploymentUpdatedEventChanges.None |
+                    (item.CurrentNationalInsuranceNumber != item.NewNationalInsuranceNumber ? PersonEmploymentUpdatedEventChanges.NationalInsuranceNumber : PersonEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentPersonPostcode != item.NewPersonPostcode ? PersonEmploymentUpdatedEventChanges.PersonPostcode : PersonEmploymentUpdatedEventChanges.None);
+
+                if (changes != PersonEmploymentUpdatedEventChanges.None)
+                {
+                    var updatedEvent = new PersonEmploymentUpdatedEvent
+                    {
+                        EventId = Guid.NewGuid(),
+                        PersonId = item.PersonEmploymentId,
+                        PersonEmployment = new()
+                        {
+                            PersonEmploymentId = item.PersonEmploymentId,
+                            PersonId = item.PersonId,
+                            EstablishmentId = item.EstablishmentId,
+                            StartDate = item.StartDate,
+                            EndDate = item.EndDate,
+                            EmploymentType = item.EmploymentType,
+                            LastKnownEmployedDate = item.LastKnownEmployedDate,
+                            LastExtractDate = item.LastExtractDate,
+                            NationalInsuranceNumber = item.NewNationalInsuranceNumber,
+                            PersonPostcode = item.NewPersonPostcode,
+                            Key = item.Key
+                        },
+                        OldPersonEmployment = new()
+                        {
+                            PersonEmploymentId = item.PersonEmploymentId,
+                            PersonId = item.PersonId,
+                            EstablishmentId = item.EstablishmentId,
+                            StartDate = item.StartDate,
+                            EndDate = item.EndDate,
+                            EmploymentType = item.EmploymentType,
+                            LastKnownEmployedDate = item.LastKnownEmployedDate,
+                            LastExtractDate = item.LastExtractDate,
+                            NationalInsuranceNumber = item.CurrentNationalInsuranceNumber,
+                            PersonPostcode = item.CurrentPersonPostcode,
+                            Key = item.Key
+                        },
+                        Changes = changes,
+                        CreatedUtc = clock.UtcNow,
+                        RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                    };
+
+                    events.Add(updatedEvent);
+                }
             }
 
             await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
