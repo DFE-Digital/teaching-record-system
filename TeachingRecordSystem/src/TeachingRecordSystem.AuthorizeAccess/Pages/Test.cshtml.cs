@@ -18,6 +18,11 @@ public class TestModel : PageModel
 
     public IActionResult OnGet()
     {
+        if (string.IsNullOrEmpty(AuthenticationScheme))
+        {
+            return BadRequest();
+        }
+
         if (User.Identity?.IsAuthenticated != true)
         {
             return Challenge(
