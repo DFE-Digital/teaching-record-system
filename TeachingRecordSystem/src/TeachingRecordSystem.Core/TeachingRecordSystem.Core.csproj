@@ -10,8 +10,10 @@
     <None Remove="DataStore\Postgres\Procedures\fn_insert_person_employments_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_insert_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_update_person_employments_person_search_attributes_v1.sql" />
+    <None Remove="DataStore\Postgres\Procedures\fn_update_person_employments_person_search_attributes_v2.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_update_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\fn_update_person_search_attributes_v2.sql" />
+    <None Remove="DataStore\Postgres\Procedures\fn_update_person_search_attributes_v3.sql" />
     <None Remove="DataStore\Postgres\Procedures\p_refresh_name_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\p_refresh_person_employments_person_search_attributes_v1.sql" />
     <None Remove="DataStore\Postgres\Procedures\p_refresh_person_search_attributes_v1.sql" />
@@ -56,8 +58,10 @@
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_person_employments_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_insert_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_employments_person_search_attributes_v1.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_employments_person_search_attributes_v2.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_search_attributes_v2.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\fn_update_person_search_attributes_v3.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_name_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_person_employments_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_person_search_attributes_v1.sql" />
