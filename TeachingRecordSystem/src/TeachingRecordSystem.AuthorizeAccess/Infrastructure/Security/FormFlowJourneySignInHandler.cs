@@ -29,9 +29,13 @@ public class FormFlowJourneySignInHandler(SignInJourneyHelper helper) : IAuthent
         return AuthenticateResult.Success(journeyInstance.State.OneLoginAuthenticationTicket);
     }
 
-    public Task ChallengeAsync(AuthenticationProperties? properties)
+    public async Task ChallengeAsync(AuthenticationProperties? properties)
     {
-        throw new NotSupportedException();
+        // We'll get here if an instance ID wasn't provided in the query string
+        // (and MissingInstanceFilter won't have executed yet since authorization runs before resource filters).
+        EnsureInitialized();
+        var result = Results.BadRequest();
+        await result.ExecuteAsync(_context);
     }
 
     public Task ForbidAsync(AuthenticationProperties? properties)
