@@ -25,7 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.FormFlow\TeachingRecordSystem.FormFlow.csproj" />
-    <ProjectReference Include="..\TeachingRecordSystem.Hosting\TeachingRecordSystem.Hosting.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.ServiceDefaults\TeachingRecordSystem.ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>

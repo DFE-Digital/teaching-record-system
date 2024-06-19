@@ -110,6 +110,8 @@
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="GovukNotify" />
     <PackageReference Include="Hangfire.Core" />
+    <PackageReference Include="Hangfire.NetCore" />
+    <PackageReference Include="Hangfire.PostgreSql" />
     <PackageReference Include="IdentityModel" />
     <PackageReference Include="Microsoft.ApplicationInsights" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
@@ -136,6 +138,12 @@
     <PackageReference Include="Polly.Core" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="System.Net.Http.Json" />
+    <PackageReference Include="Sentry.Serilog" />
+    <PackageReference Include="Serilog.Formatting.Compact" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="SerilogTimings" />
     <PackageReference Include="System.Reactive" />
   </ItemGroup>
 

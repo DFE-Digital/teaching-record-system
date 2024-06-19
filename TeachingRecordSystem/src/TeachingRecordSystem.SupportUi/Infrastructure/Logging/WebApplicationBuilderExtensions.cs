@@ -1,5 +1,4 @@
 using Serilog;
-using TeachingRecordSystem.Hosting;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Logging;
 

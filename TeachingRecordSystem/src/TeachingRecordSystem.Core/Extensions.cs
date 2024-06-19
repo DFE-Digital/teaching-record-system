@@ -10,7 +10,7 @@ using Serilog.Formatting.Compact;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 
-namespace TeachingRecordSystem.Hosting;
+namespace TeachingRecordSystem.Core;
 
 public static class Extensions
 {
