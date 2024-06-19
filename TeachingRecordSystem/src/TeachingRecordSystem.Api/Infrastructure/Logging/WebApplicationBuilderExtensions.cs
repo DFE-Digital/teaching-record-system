@@ -1,7 +1,6 @@
 using Sentry.Extensibility;
 using Serilog;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationInsights;
-using TeachingRecordSystem.Hosting;
 
 namespace TeachingRecordSystem.Api.Infrastructure.Logging;
 

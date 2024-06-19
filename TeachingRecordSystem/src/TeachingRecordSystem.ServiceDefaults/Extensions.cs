@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
-using TeachingRecordSystem.Hosting;
 
 namespace TeachingRecordSystem.ServiceDefaults;
 
