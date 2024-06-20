@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Net.Http.Headers;
 
-namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
+namespace TeachingRecordSystem.UiCommon.Filters;
 
 public class NoCachePageFilter : IPageFilter
 {

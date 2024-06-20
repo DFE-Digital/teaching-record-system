@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
+namespace TeachingRecordSystem.UiCommon.Filters;
 
 public class NotFoundResourceFilter : IResourceFilter
 {
