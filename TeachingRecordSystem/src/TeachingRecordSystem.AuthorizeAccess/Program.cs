@@ -30,6 +30,7 @@ using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.UiCommon.Filters;
 using TeachingRecordSystem.UiCommon.FormFlow;
+using TeachingRecordSystem.UiCommon.Middleware;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -238,6 +239,8 @@ app.UseCsp(csp =>
             .ToAnywhere();
     }
 });
+
+app.UseMiddleware<AppendSecurityResponseHeadersMiddleware>();
 
 app.UseStaticFiles();
 

@@ -29,6 +29,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 using TeachingRecordSystem.UiCommon.Filters;
+using TeachingRecordSystem.UiCommon.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -306,6 +307,8 @@ app.UseCsp(csp =>
             .ToAnywhere();
     }
 });
+
+app.UseMiddleware<AppendSecurityResponseHeadersMiddleware>();
 
 app.UseStaticFiles();
 
