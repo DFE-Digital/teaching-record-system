@@ -50,6 +50,7 @@
     <None Remove="Services\DqtReporting\Migrations\0022_contact_msdyn_primarytimezone.sql" />
     <None Remove="Services\DqtReporting\Migrations\0023_contact_trnrequestid.sql" />
     <None Remove="Services\DqtReporting\Migrations\0024_contact.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0025_incident_msdyn_casesurveyinviteurl.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -98,6 +99,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0022_contact_msdyn_primarytimezone.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0023_contact_trnrequestid.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0024_contact.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0025_incident_msdyn_casesurveyinviteurl.sql" />
   </ItemGroup>
 
   <ItemGroup>
