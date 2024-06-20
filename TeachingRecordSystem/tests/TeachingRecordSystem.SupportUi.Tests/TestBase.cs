@@ -6,8 +6,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
-using TeachingRecordSystem.FormFlow.State;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
+using TeachingRecordSystem.UiCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 

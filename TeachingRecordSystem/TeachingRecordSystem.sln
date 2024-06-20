@@ -41,9 +41,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Servic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.AuthorizeAccess", "src\TeachingRecordSystem.AuthorizeAccess\TeachingRecordSystem.AuthorizeAccess.csproj", "{960D652A-7CB1-4EB5-9813-0CEC0BC6AB6C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.FormFlow", "src\TeachingRecordSystem.FormFlow\TeachingRecordSystem.FormFlow.csproj", "{3B40F089-387D-4721-A79D-1C39E682D550}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.UiCommon", "src\TeachingRecordSystem.UiCommon\TeachingRecordSystem.UiCommon.csproj", "{3B40F089-387D-4721-A79D-1C39E682D550}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.FormFlow.Tests", "tests\TeachingRecordSystem.FormFlow.Tests\TeachingRecordSystem.FormFlow.Tests.csproj", "{8F71F933-72A9-4512-89A1-B28ACEC38BC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.UiCommon.Tests", "tests\TeachingRecordSystem.UiCommon.Tests\TeachingRecordSystem.UiCommon.Tests.csproj", "{8F71F933-72A9-4512-89A1-B28ACEC38BC4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.AuthorizeAccess.Tests", "tests\TeachingRecordSystem.AuthorizeAccess.Tests\TeachingRecordSystem.AuthorizeAccess.Tests.csproj", "{08E99A19-AD1F-4F95-BF13-31248D486799}"
 EndProject

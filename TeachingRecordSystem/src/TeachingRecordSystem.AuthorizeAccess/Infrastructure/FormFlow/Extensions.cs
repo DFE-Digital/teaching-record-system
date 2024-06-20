@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using TeachingRecordSystem.FormFlow;
-using TeachingRecordSystem.FormFlow.State;
+using TeachingRecordSystem.UiCommon.FormFlow;
+using TeachingRecordSystem.UiCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 

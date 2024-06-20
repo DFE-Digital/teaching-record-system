@@ -1,4 +1,4 @@
-using TeachingRecordSystem.FormFlow;
+using TeachingRecordSystem.UiCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 

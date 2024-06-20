@@ -8,8 +8,8 @@ using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Events.Processing;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
-using TeachingRecordSystem.FormFlow.State;
 using TeachingRecordSystem.TestCommon.Infrastructure;
+using TeachingRecordSystem.UiCommon.FormFlow.State;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
