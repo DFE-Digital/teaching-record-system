@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using Dfe.Analytics;
+using Dfe.Analytics.AspNetCore;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -39,6 +41,11 @@ public class OAuth2Controller(
 
         var clientId = request.ClientId!;
         var client = await dbContext.ApplicationUsers.SingleAsync(u => u.ClientId == clientId);
+
+        if (HttpContext.GetWebRequestEvent() is Event webRequestEvent)
+        {
+            webRequestEvent.Data[DfeAnalyticsEventDataKeys.ApplicationUserId] = [client.UserId.ToString()];
+        }
 
         var childAuthenticationScheme = AuthenticationSchemes.MatchToTeachingRecord;
         var authenticateResult = await HttpContext.AuthenticateAsync(childAuthenticationScheme);

@@ -17,6 +17,7 @@ using TeachingRecordSystem.AuthorizeAccess;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Logging;
+using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Middleware;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Oidc;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
@@ -248,6 +249,8 @@ if (builder.Environment.IsProduction())
 {
     app.UseDfeAnalytics();
 }
+
+app.UseMiddleware<AddAnalyticsDataMiddleware>();
 
 app.UseRouting();
 
