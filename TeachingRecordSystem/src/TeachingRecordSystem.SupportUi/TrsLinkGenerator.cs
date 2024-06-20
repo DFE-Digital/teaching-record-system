@@ -207,7 +207,7 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
 
         if (journeyInstanceId?.UniqueKey is string journeyInstanceUniqueKey)
         {
-            url = QueryHelpers.AddQueryString(url, FormFlow.Constants.UniqueKeyQueryParameterName, journeyInstanceUniqueKey);
+            url = QueryHelpers.AddQueryString(url, UiCommon.FormFlow.Constants.UniqueKeyQueryParameterName, journeyInstanceUniqueKey);
         }
 
         return url;

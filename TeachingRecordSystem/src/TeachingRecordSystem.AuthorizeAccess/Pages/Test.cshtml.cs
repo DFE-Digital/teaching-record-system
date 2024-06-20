@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
-using TeachingRecordSystem.FormFlow;
+using TeachingRecordSystem.UiCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 

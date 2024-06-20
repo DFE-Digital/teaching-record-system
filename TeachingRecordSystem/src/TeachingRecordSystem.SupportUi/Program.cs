@@ -28,6 +28,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.TagHelpers;
+using TeachingRecordSystem.UiCommon.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 

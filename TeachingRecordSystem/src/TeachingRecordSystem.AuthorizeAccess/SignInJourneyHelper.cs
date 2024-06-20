@@ -9,8 +9,8 @@ using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.PersonMatching;
-using TeachingRecordSystem.FormFlow;
-using TeachingRecordSystem.FormFlow.State;
+using TeachingRecordSystem.UiCommon.FormFlow;
+using TeachingRecordSystem.UiCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 

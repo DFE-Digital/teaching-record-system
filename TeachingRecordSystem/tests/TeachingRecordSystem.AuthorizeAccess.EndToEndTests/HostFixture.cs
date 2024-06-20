@@ -10,7 +10,7 @@ using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
-using TeachingRecordSystem.FormFlow.State;
+using TeachingRecordSystem.UiCommon.FormFlow.State;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.FormFlow;
+using TeachingRecordSystem.UiCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 

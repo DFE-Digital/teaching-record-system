@@ -4,7 +4,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Filters;
+using TeachingRecordSystem.UiCommon.Filters;
 using static IdentityModel.OidcConstants;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
