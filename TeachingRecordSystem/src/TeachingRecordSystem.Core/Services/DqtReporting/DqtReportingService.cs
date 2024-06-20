@@ -255,7 +255,26 @@ public partial class DqtReportingService : BackgroundService
 
         foreach (var chunk in entities.Chunk(MaxUpsertBatchSize))
         {
-            await UpsertRows(chunk);
+            try
+            {
+                await UpsertRows(chunk);
+            }
+            catch (SqlException ex) when (ex.Number == 207)  // Likely means a column is missing
+            {
+                var missingColumns = ex.Message.Split("\n", StringSplitOptions.RemoveEmptyEntries)
+                    .Where(line => line.StartsWith("Invalid column name "))
+                    .Select(line => line.Split("'")[1])
+                    .ToArray();
+
+                if (missingColumns.Length == 0)
+                {
+                    throw;
+                }
+
+                await AddMissingColumns(missingColumns);
+
+                await UpsertRows(chunk);
+            }
         }
 
         await DropTempTable();
@@ -364,6 +383,24 @@ public partial class DqtReportingService : BackgroundService
             command.Connection = conn;
 
             await command.ExecuteNonQueryAsync();
+        }
+
+        async Task AddMissingColumns(string[] columnNames)
+        {
+            var attributes = entityTableMapping.Attributes.Where(a => a.ColumnDefinitions.Any(c => columnNames.Contains(c.ColumnName)));
+
+            using var conn = new SqlConnection(_options.ReportingDbConnectionString);
+            await conn.OpenAsync();
+
+            foreach (var attr in attributes)
+            {
+                var sql = entityTableMapping.GetAddAttributeColumnsSql(attr);
+
+                using var command = new SqlCommand(sql);
+                command.Connection = conn;
+
+                await command.ExecuteNonQueryAsync();
+            }
         }
     }
 
