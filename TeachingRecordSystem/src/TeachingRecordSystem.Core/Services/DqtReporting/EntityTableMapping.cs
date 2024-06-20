@@ -229,6 +229,18 @@ public class EntityTableMapping
 
         return command;
     }
+
+    public string GetAddAttributeColumnsSql(AttributeColumnMapping attribute)
+    {
+        var sqlBuilder = new StringBuilder();
+
+        foreach (var column in attribute.ColumnDefinitions)
+        {
+            sqlBuilder.AppendLine($"alter table [{TableName}] add [{column.ColumnName}] {column.ColumnDefinition}");
+        }
+
+        return sqlBuilder.ToString();
+    }
 }
 
 [DebuggerDisplay("{AttributeName,nq}")]
