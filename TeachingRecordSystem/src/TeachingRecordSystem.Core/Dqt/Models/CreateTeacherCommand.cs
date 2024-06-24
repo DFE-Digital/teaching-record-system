@@ -22,6 +22,8 @@ public class CreateTeacherCommand
     public bool? InductionRequired { get; set; }
     public bool? UnderNewOverseasRegulations { get; set; }
     public string SlugId { get; set; }
+    public string TrnRequestId { get; set; }
+    public Func<string, Task<string>> GetTrnToken { get; set; }
 }
 
 public class CreateTeacherCommandAddress

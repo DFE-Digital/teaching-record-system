@@ -218,6 +218,7 @@ public class Program
         services.AddSingleton<IClock, Clock>();
         services.AddMemoryCache();
         services.AddSingleton<AddTrnToSentryScopeResourceFilter>();
+        services.AddTransient<TrnRequestHelper>();
 
         builder.Services.AddOptions<EvidenceFilesOptions>()
             .Bind(builder.Configuration.GetSection("EvidenceFiles"))

@@ -31,6 +31,7 @@ public class CreateContactTests : IAsyncLifetime
 
         var query = new CreateContactQuery()
         {
+            TrnRequestId = null,
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
@@ -78,6 +79,7 @@ public class CreateContactTests : IAsyncLifetime
 
         var query = new CreateContactQuery()
         {
+            TrnRequestId = null,
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
@@ -119,6 +121,7 @@ public class CreateContactTests : IAsyncLifetime
 
         var query1 = new CreateContactQuery()
         {
+            TrnRequestId = null,
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
@@ -136,6 +139,7 @@ public class CreateContactTests : IAsyncLifetime
         var createdTeacherId1 = await _crmQueryDispatcher.ExecuteQuery(query1);
         var query2 = new CreateContactQuery()
         {
+            TrnRequestId = null,
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,

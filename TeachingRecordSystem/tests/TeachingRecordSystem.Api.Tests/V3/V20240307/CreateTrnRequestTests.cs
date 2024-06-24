@@ -162,7 +162,7 @@ public class CreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Post_RequestWithExistingRequestId_ReturnsConflict()
+    public async Task Post_RequestWithExistingRequestInCrm_ReturnsConflict()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -192,6 +192,53 @@ public class CreateTrnRequestTests : TestBase
 
             await dbContext.SaveChangesAsync();
         });
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
+    }
+
+    [Fact]
+    public async Task Post_RequestWithExistingRequestInDb_ReturnsConflict()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var existingContact = await TestData.CreatePerson(p => p
+            .WithFirstName(firstName)
+            .WithMiddleName(middleName)
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithEmail(email)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
+            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId)));
 
         var requestBody = CreateJsonContent(CreateDummyRequest() with
         {

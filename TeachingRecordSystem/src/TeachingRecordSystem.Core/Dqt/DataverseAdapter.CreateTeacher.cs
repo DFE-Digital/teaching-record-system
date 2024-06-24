@@ -57,6 +57,7 @@ public partial class DataverseAdapter
         {
             trn = await GenerateTrn();
             newContact.dfeta_TRN = trn;
+            newContact.dfeta_TrnToken = command.GetTrnToken is not null ? await command.GetTrnToken(trn) : null;
         }
         else
         {
@@ -95,7 +96,7 @@ public partial class DataverseAdapter
 
         var txnResponse = (ExecuteTransactionResponse)await _service.ExecuteAsync(txnRequest);
 
-        return (CreateTeacherResult.Success(helper.TeacherId, trn), txnRequest);
+        return (CreateTeacherResult.Success(helper.TeacherId, trn, newContact.dfeta_TrnToken), txnRequest);
     }
 
     internal class CreateTeacherHelper
@@ -249,7 +250,8 @@ public partial class DataverseAdapter
                 GenderCode = _command.GenderCode,
                 dfeta_HUSID = _command.HusId,
                 dfeta_SlugId = _command.SlugId,
-                dfeta_AllowPiiUpdatesFromRegister = true
+                dfeta_AllowPiiUpdatesFromRegister = true,
+                dfeta_TrnRequestID = _command.TrnRequestId
             };
 
             // We get a NullReferenceException back from CRM if City is null or empty
