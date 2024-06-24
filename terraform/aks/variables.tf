@@ -145,3 +145,11 @@ variable "statuscake_extra_urls" {
   description = "List of extra URLs for StatusCake, on top of the internal teacherservices.cloud ones"
   default     = []
 }
+
+variable "app_name" { default = null }
+
+variable "app_name_suffix" { default = null }
+
+locals {
+  app_name_suffix = var.app_name == null ? var.environment_name : var.app_name
+}

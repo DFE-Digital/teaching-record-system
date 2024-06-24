@@ -1,5 +1,5 @@
 resource "azurerm_application_insights" "app" {
-  name                = "${var.azure_resource_prefix}${var.service_short_name}${var.environment_short_name}ai"
+  name                = "${var.azure_resource_prefix}${var.service_short_name}${var.environment_short_name}${var.app_name != null && var.app_name != "" ? var.app_name : ""}ai"
   resource_group_name = var.resource_group_name
   location            = var.region
   application_type    = "web"
@@ -13,7 +13,7 @@ resource "azurerm_application_insights" "app" {
 
 resource "kubernetes_job" "migrations" {
   metadata {
-    name      = "${var.service_name}-${var.environment_name}-migrations"
+    name      = "${var.service_name}-${local.app_name_suffix}-migrations"
     namespace = var.namespace
   }
 
@@ -52,7 +52,7 @@ module "api_application_configuration" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
 
   namespace              = var.namespace
-  environment            = var.environment_name
+  environment            = local.app_name_suffix
   azure_resource_prefix  = var.azure_resource_prefix
   service_short          = var.service_short_name
   config_short           = var.environment_short_name
@@ -62,7 +62,7 @@ module "api_application_configuration" {
     DataProtectionKeysContainerName = azurerm_storage_container.keys.name
     DistributedLockContainerName    = azurerm_storage_container.locks.name
     RecurringJobs__Enabled          = var.run_recurring_jobs
-    SENTRY_ENVIRONMENT              = var.environment_name
+    SENTRY_ENVIRONMENT              = local.app_name_suffix
   }
 
   secret_variables = {
@@ -83,7 +83,7 @@ module "api_application" {
   is_web = true
 
   namespace    = var.namespace
-  environment  = var.environment_name
+  environment  = local.app_name_suffix
   service_name = var.service_name
 
   cluster_configuration_map = module.cluster_data.configuration_map
@@ -104,7 +104,7 @@ module "authz_application_configuration" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
 
   namespace              = var.namespace
-  environment            = var.environment_name
+  environment            = local.app_name_suffix
   azure_resource_prefix  = var.azure_resource_prefix
   service_short          = var.service_short_name
   config_short           = var.environment_short_name
@@ -112,7 +112,7 @@ module "authz_application_configuration" {
 
   config_variables = {
     DataProtectionKeysContainerName = azurerm_storage_container.keys.name
-    SENTRY_ENVIRONMENT              = var.environment_name
+    SENTRY_ENVIRONMENT              = local.app_name_suffix
     DUMMY                           = "Dummy variable to force new Kubernetes config map to be created"
   }
 
@@ -134,7 +134,7 @@ module "authz_application" {
   is_web = true
 
   namespace    = var.namespace
-  environment  = var.environment_name
+  environment  = local.app_name_suffix
   service_name = var.service_name
 
   cluster_configuration_map = module.cluster_data.configuration_map
@@ -155,7 +155,7 @@ module "ui_application_configuration" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
 
   namespace              = var.namespace
-  environment            = var.environment_name
+  environment            = local.app_name_suffix
   azure_resource_prefix  = var.azure_resource_prefix
   service_short          = var.service_short_name
   config_short           = var.environment_short_name
@@ -163,7 +163,7 @@ module "ui_application_configuration" {
 
   config_variables = {
     DataProtectionKeysContainerName = azurerm_storage_container.keys.name
-    SENTRY_ENVIRONMENT              = var.environment_name
+    SENTRY_ENVIRONMENT              = local.app_name_suffix
   }
 
   secret_variables = {
@@ -184,7 +184,7 @@ module "ui_application" {
   is_web = true
 
   namespace    = var.namespace
-  environment  = var.environment_name
+  environment  = local.app_name_suffix
   service_name = var.service_name
 
   cluster_configuration_map = module.cluster_data.configuration_map
@@ -204,7 +204,7 @@ module "worker_application_configuration" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
 
   namespace              = var.namespace
-  environment            = var.environment_name
+  environment            = local.app_name_suffix
   azure_resource_prefix  = var.azure_resource_prefix
   service_short          = var.service_short_name
   config_short           = var.environment_short_name
@@ -213,7 +213,7 @@ module "worker_application_configuration" {
   config_variables = {
     DistributedLockContainerName = azurerm_storage_container.locks.name
     DqtReporting__RunService     = var.run_dqt_reporting_service
-    SENTRY_ENVIRONMENT           = var.environment_name
+    SENTRY_ENVIRONMENT           = local.app_name_suffix
   }
 
   secret_variables = {
@@ -234,7 +234,7 @@ module "worker_application" {
   is_web = false
 
   namespace    = var.namespace
-  environment  = var.environment_name
+  environment  = local.app_name_suffix
   service_name = var.service_name
 
   cluster_configuration_map = module.cluster_data.configuration_map
