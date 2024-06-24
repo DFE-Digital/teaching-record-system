@@ -58,7 +58,7 @@ resource "azurerm_mssql_database" "reporting_db" {
 
 resource "kubernetes_job" "reporting_migrations" {
   metadata {
-    name      = "${var.service_name}-${var.environment_name}-reporting-migrations"
+    name      = "${var.service_name}-${local.app_name_suffix}-reporting-migrations"
     namespace = var.namespace
   }
 
