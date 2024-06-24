@@ -285,7 +285,8 @@
     "statecode",
     "statuscode",
     "ticketnumber",
-    "title"
+    "title",
+    "dfeta_emailaddress"
   ],
   "incidentresolution": [
     "activityid",

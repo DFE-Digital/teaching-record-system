@@ -24,7 +24,8 @@ public class CreateDateOfBirthChangeIncidentHandler : ICrmQueryHandler<CreateDat
             SubjectId = subject.Id.ToEntityReference(Subject.EntityLogicalName),
             CustomerId = query.ContactId.ToEntityReference(Contact.EntityLogicalName),
             dfeta_NewDateofBirth = query.DateOfBirth.ToDateTime(),
-            dfeta_FromIdentity = query.FromIdentity
+            dfeta_FromIdentity = query.FromIdentity,
+            dfeta_emailaddress = query.EmailAddress,
         };
 
         var document = new dfeta_document()

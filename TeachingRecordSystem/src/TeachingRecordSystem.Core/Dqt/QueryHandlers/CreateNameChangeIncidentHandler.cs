@@ -29,7 +29,8 @@ public class CreateNameChangeIncidentHandler : ICrmQueryHandler<CreateNameChange
             dfeta_StatedFirstName = query.StatedFirstName,
             dfeta_StatedMiddleName = query.StatedMiddleName,
             dfeta_StatedLastName = query.StatedLastName,
-            dfeta_FromIdentity = query.FromIdentity
+            dfeta_FromIdentity = query.FromIdentity,
+            dfeta_emailaddress = query.EmailAddress,
         };
 
         var document = new dfeta_document()
