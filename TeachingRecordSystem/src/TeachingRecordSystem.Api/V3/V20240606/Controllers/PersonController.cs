@@ -56,6 +56,7 @@ public class PersonController(IMapper mapper) : ControllerBase
             LastName = request.LastName,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileUrl = request.EvidenceFileUrl,
+            EmailAddress = request.EmailAddress
         };
 
         var caseNumber = await handler.Handle(command);
@@ -81,6 +82,7 @@ public class PersonController(IMapper mapper) : ControllerBase
             DateOfBirth = request.DateOfBirth,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileUrl = request.EvidenceFileUrl,
+            EmailAddress = request.EmailAddress
         };
 
         var caseNumber = await handler.Handle(command);
