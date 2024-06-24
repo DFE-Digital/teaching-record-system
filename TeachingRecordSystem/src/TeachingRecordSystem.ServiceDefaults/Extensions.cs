@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Prometheus;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 
 namespace TeachingRecordSystem.ServiceDefaults;
@@ -68,6 +69,9 @@ public static class Extensions
         });
 
         app.UseHealthChecks("/status");
+
+        app.MapMetrics();
+        app.UseHttpMetrics();
 
         return app;
     }
