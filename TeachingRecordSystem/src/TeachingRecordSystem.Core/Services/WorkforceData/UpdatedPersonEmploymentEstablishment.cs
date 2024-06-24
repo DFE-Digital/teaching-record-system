@@ -13,5 +13,5 @@ public record UpdatedPersonEmploymentEstablishment
     public required string? NationalInsuranceNumber { get; set; }
     public required string? PersonPostcode { get; set; }
     public required string Key { get; init; }
-    public required Guid EstablishmentId { get; init; }
+    public required Guid NewEstablishmentId { get; init; }
 }
