@@ -95,6 +95,7 @@ public class TpsCsvExtractProcessor(
     public async Task ProcessNewEmploymentHistory(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
+        dbContext.Database.SetCommandTimeout(300);
         var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
         await connection.OpenAsync(cancellationToken);
 
@@ -269,6 +270,7 @@ public class TpsCsvExtractProcessor(
     public async Task ProcessUpdatedEmploymentHistory(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
+        dbContext.Database.SetCommandTimeout(300);
         var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
         await connection.OpenAsync(cancellationToken);
 
@@ -422,10 +424,9 @@ public class TpsCsvExtractProcessor(
 
     public async Task UpdateLatestEstablishmentVersions(CancellationToken cancellationToken)
     {
-        using var readDbContext = dbContextFactory.CreateDbContext();
-        readDbContext.Database.SetCommandTimeout(5400);
-        using var writeDbContext = dbContextFactory.CreateDbContext();
-        var connection = (NpgsqlConnection)writeDbContext.Database.GetDbConnection();
+        using var dbContext = dbContextFactory.CreateDbContext();
+        dbContext.Database.SetCommandTimeout(300);
+        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
         await connection.OpenAsync(CancellationToken.None);
 
         FormattableString querySql =
@@ -454,9 +455,16 @@ public class TpsCsvExtractProcessor(
             ),
             establishment_changes AS (
                 SELECT
-                    *
+                    pe.person_employment_id,
+                    e.establishment_id as current_establishment_id,
+                    e.establishment_number,
+                    e.la_code,
+                    e.establishment_type_code,
+                    e.postcode
                 FROM
-                    person_employments pe
+                        person_employments pe
+                    JOIN
+                        establishments e ON e.establishment_id = pe.establishment_id
                 WHERE
                     NOT EXISTS (SELECT
                                     1
@@ -464,127 +472,110 @@ public class TpsCsvExtractProcessor(
                                     unique_establishments e
                                 WHERE
                                     e.establishment_id = pe.establishment_id)
+                LIMIT 1000
             )
-            select
-                ec.person_employment_id,
-                ec.person_id,
-                ec.establishment_id as current_establishment_id,
-                ec.start_date,
-                ec.end_date,
-                ec.employment_type,
-                ec.last_known_employed_date,
-                ec.last_extract_date,
-                ec.national_insurance_number,
-                ec.person_postcode,
-                ec.key,                
-                ue.establishment_id
-            from
-                    establishment_changes ec
-                JOIN
-                    establishments e ON e.establishment_id = ec.establishment_id
-                JOIN
-                    unique_establishments ue ON ue.la_code = e.la_code
-                        AND (ue.establishment_number = e.establishment_number
-                             OR (e.establishment_type_code = '29' 
-                                 AND ue.postcode = e.postcode
-                                 AND NOT EXISTS (SELECT
-                                                    1
-                                                 FROM
-                                                    unique_establishments e2
-                                                 WHERE
-                                                    e2.la_code = e.la_code
-                                                    AND e2.establishment_number = e.establishment_number)))
+            UPDATE
+                person_employments pe
+            SET
+                establishment_id = changes.new_establishment_id,
+                updated_on = {clock.UtcNow}
+            FROM                
+                (SELECT
+                    ec.person_employment_id,
+                    ec.current_establishment_id,
+                    ue.establishment_id as new_establishment_id				 
+                FROM
+                        establishment_changes ec                
+                    JOIN
+                        unique_establishments ue ON ue.la_code = ec.la_code
+                            AND (ue.establishment_number = ec.establishment_number
+                                OR (ec.establishment_type_code = '29' 
+                                    AND ue.postcode = ec.postcode
+                                    AND NOT EXISTS (SELECT
+                                                        1
+                                                    FROM
+                                                        unique_establishments e2
+                                                    WHERE
+                                                        e2.la_code = ec.la_code
+                                                        AND e2.establishment_number = ec.establishment_number)))) changes
+            WHERE
+                pe.person_employment_id = changes.person_employment_id
+            RETURNING
+                pe.person_employment_id,
+                pe.person_id,
+                changes.current_establishment_id,
+                pe.start_date,
+                pe.end_date,
+                pe.employment_type,
+                pe.last_known_employed_date,
+                pe.last_extract_date,
+                pe.national_insurance_number,
+                pe.person_postcode,
+                pe.key,
+                changes.new_establishment_id            
             """;
 
-        var batchCommands = new List<NpgsqlBatchCommand>();
+        bool hasRecordsToUpdate = false;
+        var events = new List<EventBase>();
 
-        await foreach (var item in readDbContext.Database.SqlQuery<UpdatedPersonEmploymentEstablishment>(querySql).AsAsyncEnumerable())
+        do
         {
-            var updatePersonEmploymentsCommand = new NpgsqlBatchCommand(
-                $"""
-                    UPDATE
-                        person_employments
-                    SET
-                        establishment_id = '{item.EstablishmentId}',
-                        updated_on = now()
-                    WHERE
-                        person_employment_id = '{item.PersonEmploymentId}'
-                    """);
-
-            batchCommands.Add(updatePersonEmploymentsCommand);
-            writeDbContext.AddEvent(new PersonEmploymentUpdatedEvent
+            hasRecordsToUpdate = false;
+            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            dbContext.Database.UseTransaction(transaction);
+            await foreach (var item in dbContext.Database.SqlQuery<UpdatedPersonEmploymentEstablishment>(querySql).AsAsyncEnumerable())
             {
-                EventId = Guid.NewGuid(),
-                PersonId = item.PersonEmploymentId,
-                PersonEmployment = new()
+                var updatedEvent = new PersonEmploymentUpdatedEvent
                 {
-                    PersonEmploymentId = item.PersonEmploymentId,
-                    PersonId = item.PersonId,
-                    EstablishmentId = item.EstablishmentId,
-                    StartDate = item.StartDate,
-                    EndDate = item.EndDate,
-                    EmploymentType = item.EmploymentType,
-                    LastKnownEmployedDate = item.LastKnownEmployedDate,
-                    LastExtractDate = item.LastExtractDate,
-                    NationalInsuranceNumber = item.NationalInsuranceNumber,
-                    PersonPostcode = item.PersonPostcode,
-                    Key = item.Key
-                },
-                OldPersonEmployment = new()
-                {
-                    PersonEmploymentId = item.PersonEmploymentId,
-                    PersonId = item.PersonId,
-                    EstablishmentId = item.CurrentEstablishmentId,
-                    StartDate = item.StartDate,
-                    EndDate = item.EndDate,
-                    EmploymentType = item.EmploymentType,
-                    LastKnownEmployedDate = item.LastKnownEmployedDate,
-                    LastExtractDate = item.LastExtractDate,
-                    NationalInsuranceNumber = item.NationalInsuranceNumber,
-                    PersonPostcode = item.PersonPostcode,
-                    Key = item.Key
-                },
-                Changes = PersonEmploymentUpdatedEventChanges.EstablishmentId,
-                CreatedUtc = clock.UtcNow,
-                RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
-            });
+                    EventId = Guid.NewGuid(),
+                    PersonId = item.PersonEmploymentId,
+                    PersonEmployment = new()
+                    {
+                        PersonEmploymentId = item.PersonEmploymentId,
+                        PersonId = item.PersonId,
+                        EstablishmentId = item.NewEstablishmentId,
+                        StartDate = item.StartDate,
+                        EndDate = item.EndDate,
+                        EmploymentType = item.EmploymentType,
+                        LastKnownEmployedDate = item.LastKnownEmployedDate,
+                        LastExtractDate = item.LastExtractDate,
+                        NationalInsuranceNumber = item.NationalInsuranceNumber,
+                        PersonPostcode = item.PersonPostcode,
+                        Key = item.Key
+                    },
+                    OldPersonEmployment = new()
+                    {
+                        PersonEmploymentId = item.PersonEmploymentId,
+                        PersonId = item.PersonId,
+                        EstablishmentId = item.CurrentEstablishmentId,
+                        StartDate = item.StartDate,
+                        EndDate = item.EndDate,
+                        EmploymentType = item.EmploymentType,
+                        LastKnownEmployedDate = item.LastKnownEmployedDate,
+                        LastExtractDate = item.LastExtractDate,
+                        NationalInsuranceNumber = item.NationalInsuranceNumber,
+                        PersonPostcode = item.PersonPostcode,
+                        Key = item.Key
+                    },
+                    Changes = PersonEmploymentUpdatedEventChanges.EstablishmentId,
+                    CreatedUtc = clock.UtcNow,
+                    RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                };
 
-            if (batchCommands.Count == 50)
-            {
-                await SaveChanges();
-            }
-        }
-
-        if (batchCommands.Any())
-        {
-            await SaveChanges();
-        }
-
-        async Task SaveChanges()
-        {
-            if (writeDbContext.ChangeTracker.HasChanges())
-            {
-                await writeDbContext.SaveChangesAsync(cancellationToken);
-                writeDbContext.ChangeTracker.Clear();
+                events.Add(updatedEvent);
             }
 
-            if (batchCommands.Count > 0)
-            {
-                using var batch = new NpgsqlBatch(connection);
-                foreach (var command in batchCommands)
-                {
-                    batch.BatchCommands.Add(command);
-                }
-
-                await batch.ExecuteNonQueryAsync(cancellationToken);
-                batchCommands.Clear();
-            }
+            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            events.Clear();
         }
+        while (hasRecordsToUpdate);
     }
 
     public async Task ProcessEndedEmployments(CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
+        dbContext.Database.SetCommandTimeout(300);
         var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
         await connection.OpenAsync(cancellationToken);
 
@@ -687,6 +678,7 @@ public class TpsCsvExtractProcessor(
     public async Task BackfillNinoAndPersonPostcodeInEmploymentHistory(CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
+        dbContext.Database.SetCommandTimeout(300);
         var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
         await connection.OpenAsync(cancellationToken);
 
