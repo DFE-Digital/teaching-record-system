@@ -42,6 +42,6 @@ public class NameSynonymProvider(HttpClient httpClient) : INameSynonymProvider
             }
         }
 
-        return namesLookup.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.AsReadOnly());
+        return namesLookup.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.AsReadOnly(), StringComparer.OrdinalIgnoreCase);
     }
 }
