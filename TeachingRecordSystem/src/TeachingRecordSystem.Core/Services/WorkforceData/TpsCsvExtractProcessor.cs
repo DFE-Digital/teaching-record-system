@@ -260,7 +260,7 @@ public class TpsCsvExtractProcessor(
                 events.Add(createdEvent);
             }
 
-            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
@@ -415,7 +415,7 @@ public class TpsCsvExtractProcessor(
                 }
             }
 
-            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
@@ -565,7 +565,7 @@ public class TpsCsvExtractProcessor(
                 events.Add(updatedEvent);
             }
 
-            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
@@ -668,7 +668,7 @@ public class TpsCsvExtractProcessor(
                 events.Add(updatedEvent);
             }
 
-            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
@@ -783,7 +783,7 @@ public class TpsCsvExtractProcessor(
                 }
             }
 
-            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken);
+            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
