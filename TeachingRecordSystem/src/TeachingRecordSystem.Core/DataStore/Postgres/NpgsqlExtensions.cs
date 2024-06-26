@@ -32,7 +32,7 @@ public static class NpgsqlExtensions
         }
     }
 
-    public static async Task<int> SaveEvents(this NpgsqlTransaction transaction, IReadOnlyCollection<EventBase> events, string tempTableSuffix, IClock clock, CancellationToken cancellationToken)
+    public static async Task<int> SaveEvents(this NpgsqlTransaction transaction, IReadOnlyCollection<EventBase> events, string tempTableSuffix, IClock clock, CancellationToken cancellationToken, int? timeoutSeconds = null)
     {
         if (events.Count == 0)
         {
@@ -107,6 +107,10 @@ public static class NpgsqlExtensions
         using (var mergeCommand = transaction.Connection!.CreateCommand())
         {
             mergeCommand.CommandText = insertStatement;
+            if (timeoutSeconds.HasValue)
+            {
+                mergeCommand.CommandTimeout = timeoutSeconds.Value;
+            }
             mergeCommand.Parameters.Add(new NpgsqlParameter("@now", clock.UtcNow));
             mergeCommand.Transaction = transaction;
             await mergeCommand.ExecuteNonQueryAsync();
