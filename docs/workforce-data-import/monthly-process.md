@@ -14,7 +14,7 @@ We need to load this into TRS each month.
 
 - Check files are available:
   - 2 files should be ready to download on the 25th of each month from an agreed secure location.  
-  The files will be named Workforce-Dataset-1-*YYYYMM*25-1329.csv and Workforce-Dataset-2-*YYYYMM*25-1329.csv where *YYYYMM* is the year and month of the extract date.  
+  The files will be named Workforce-Dataset-1-*YYYYMMDD*-1329.csv and Workforce-Dataset-2-*YYYYMMDD-1329.csv where *YYYYMMDD* is the year, month and day of the extract date.  
   - If this is not the case then email the contact at TPS to chase when it will be available.
 
 - Ensure files are in CSV format:
@@ -61,7 +61,7 @@ We need to load this into TRS each month.
 
 - Connect to the TRS Postgres database and start a **psql** session:
   - Run `./db.sh`.
-- Get the **tps_csv_extract_id** values from the **tps_csv_extract** table associated with the import where *YYYYMM* is the year and month of the extract date.
+- Get the **tps_csv_extract_id** values from the **tps_csv_extract** table associated with the import where *YYYYMMDD* is the year, month and day of the extract date.
   - Execute the query
     ```
     SELECT
@@ -69,7 +69,7 @@ We need to load this into TRS each month.
     FROM
       tps_csv_extracts
     WHERE
-      filename like '%YYYYMM25%';
+      filename like '%YYYYMMDD%';
     ```
 - Get the counts of records with valid / invalid format fields from the initial import from the CSV files into the **tps_csv_extract_load_items** table:
   - Execute the query
@@ -121,12 +121,21 @@ We need to load this into TRS each month.
     SELECT
       trn
     FROM 
-      tps_csv_extract_items 
+      tps_csv_extract_items x1
     WHERE 
       tps_csv_extract_id in ('<tps_csv_extract_id of 1st file>', '<tps_csv_extract_id of 2nd file>')
-      AND result = 3;
-    ```
-  - Add a sheet to the Excel spreadsheet **TRNs in TPS extract but not in DQT** for the extract month and add the list of TRNS from the previous query.
+      AND result = 3
+      AND NOT EXISTS (SELECT
+                        1
+                      FROM
+                        tps_csv_extract_items x2
+                      WHERE
+                        x2.trn = x1.trn
+                        AND x2.tps_csv_extract_id not in ('<tps_csv_extract_id of 1st file>', '<tps_csv_extract_id of 2nd file>'))
+    ORDER BY
+      trn;  
+    ```  
+  - Make a note of the TRNs in order to feedback to TPS.
 - Drill into records where no `establishments` record could be found which match the Local Authority Code and Establishment Number provided:
   - Execute the query
     ```
@@ -141,8 +150,12 @@ We need to load this into TRS each month.
       AND result = 4
     GROUP BY
       local_authority_code,
-      establishment_number;
+      establishment_number;  
     ```
+  - Make a note of the LA Code / Establishment Numbers in order to feedback to TPS.
+- If there are any issues with the data in the extract:
+  - Add a sheet to the Excel spreadsheet **TPS Monthly Extract Issues** for the extract month.
+  - Detail the specific issues.
 
 ### 5. Feedback to TPS with any issues
 
