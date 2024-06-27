@@ -13,6 +13,7 @@ public record CreateNameChangeRequestCommand
     public required string LastName { get; init; }
     public required string EvidenceFileName { get; init; }
     public required string EvidenceFileUrl { get; init; }
+    public required string? EmailAddress { get; init; }
 }
 
 public class CreateNameChangeRequestHandler(ICrmQueryDispatcher crmQueryDispatcher, IHttpClientFactory httpClientFactory)
@@ -62,7 +63,8 @@ public class CreateNameChangeRequestHandler(ICrmQueryDispatcher crmQueryDispatch
             EvidenceFileName = command.EvidenceFileName,
             EvidenceFileContent = await evidenceFileResponse.Content.ReadAsStreamAsync(),
             EvidenceFileMimeType = evidenceFileMimeType,
-            FromIdentity = true
+            FromIdentity = true,
+            EmailAddress = command.EmailAddress,
         });
 
         return ticketNumber;

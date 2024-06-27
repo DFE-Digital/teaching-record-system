@@ -12371,6 +12371,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string CreatedOn = "createdon";
 			public const string CustomerId = "customerid";
 			public const string Description = "description";
+			public const string dfeta_emailaddress = "dfeta_emailaddress";
 			public const string dfeta_FromIdentity = "dfeta_fromidentity";
 			public const string dfeta_NewDateofBirth = "dfeta_newdateofbirth";
 			public const string dfeta_NewFirstName = "dfeta_newfirstname";
@@ -12509,6 +12510,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Description");
 				this.SetAttributeValue("description", value);
 				this.OnPropertyChanged("Description");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_emailaddress")]
+		public string dfeta_emailaddress
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_emailaddress");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_emailaddress");
+				this.SetAttributeValue("dfeta_emailaddress", value);
+				this.OnPropertyChanged("dfeta_emailaddress");
 			}
 		}
 		

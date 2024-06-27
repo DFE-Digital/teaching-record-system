@@ -62,6 +62,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
             LastName = request.LastName,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileUrl = request.EvidenceFileUrl,
+            EmailAddress = null
         };
 
         await handler.Handle(command);
@@ -86,6 +87,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
             DateOfBirth = request.DateOfBirth,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileUrl = request.EvidenceFileUrl,
+            EmailAddress = null
         };
 
         await handler.Handle(command);
