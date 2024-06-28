@@ -66,6 +66,7 @@ public partial class TestData
             var dateOfBirth = testData.GenerateDateOfBirth();
 
             var incidentId = Guid.NewGuid();
+            var annotationId = Guid.NewGuid();
             var title = "Request to change date of birth";
             var subjectTitle = "Change of Date of Birth";
             var dateOfBirthChangeSubject = await testData.ReferenceDataCache.GetSubjectByTitle(subjectTitle);
@@ -93,6 +94,7 @@ public partial class TestData
 
             var annotation = new Annotation()
             {
+                AnnotationId = annotationId,
                 ObjectId = document.Id.ToEntityReference(dfeta_document.EntityLogicalName),
                 ObjectTypeCode = dfeta_document.EntityLogicalName,
                 Subject = _defaultEvidenceFileName,
@@ -182,7 +184,8 @@ public partial class TestData
                     FileName = _defaultEvidenceFileName,
                     Base64EncodedFileContent = annotationBody,
                     MimeType = _defaultEvidenceFileMimeType
-                }
+                },
+                AnnotationId = annotationId
             };
         }
 
@@ -206,6 +209,7 @@ public partial class TestData
         public required string SubjectTitle { get; init; }
         public required DateOnly NewDateOfBirth { get; init; }
         public required CreateDateOfBirthChangeIncidentEvidence Evidence { get; init; }
+        public required Guid AnnotationId { get; init; }
     }
 
     public record CreateDateOfBirthChangeIncidentEvidence
