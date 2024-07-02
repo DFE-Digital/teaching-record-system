@@ -268,6 +268,12 @@
     "dfeta_startdate",
     "statecode"
   ],
+  "dfeta_trsevent": [
+    "dfeta_trseventid",
+    "dfeta_eventname",
+    "dfeta_payload",
+    "statecode"
+  ],
   "incident": [
     "customerid",
     "createdon",
@@ -285,7 +291,8 @@
     "statecode",
     "statuscode",
     "ticketnumber",
-    "title"
+    "title",
+    "modifiedon"
   ],
   "incidentresolution": [
     "activityid",
