@@ -8,6 +8,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons;
 
+[RedactParameters("Search")]
 public partial class IndexModel : PageModel
 {
     private const int MaxSearchResultCount = 500;

@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Prometheus;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
+using TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
 
 namespace TeachingRecordSystem.ServiceDefaults;
 
@@ -24,6 +25,7 @@ public static class Extensions
 
         builder.Services.AddHealthChecks().AddNpgSql(builder.Configuration.GetPostgresConnectionString());
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+        builder.Services.AddSingleton<UrlRedactor>();
 
         if (builder.Environment.IsProduction())
         {
