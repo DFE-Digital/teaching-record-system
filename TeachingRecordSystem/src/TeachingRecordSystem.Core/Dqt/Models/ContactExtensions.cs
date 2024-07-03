@@ -45,6 +45,6 @@ public static class ContactExtensions
     }
 
     public static bool HasStatedNames(this Contact contact) =>
-        !string.IsNullOrEmpty(contact.dfeta_StatedFirstName) ||
+        !string.IsNullOrEmpty(contact.dfeta_StatedFirstName) &&
         !string.IsNullOrEmpty(contact.dfeta_StatedLastName);
 }
