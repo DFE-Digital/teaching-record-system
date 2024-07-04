@@ -3,7 +3,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class DeleteOldIncidentAttachmentsJob(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCache referenceDataCache, IClock clock)
+public class DeleteOldAttachmentsJob(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCache referenceDataCache, IClock clock)
 {
     public const string JobSchedule = "0 3 * * *";
 
@@ -16,19 +16,24 @@ public class DeleteOldIncidentAttachmentsJob(ICrmQueryDispatcher crmQueryDispatc
 
         var modifiedBefore = clock.UtcNow.Subtract(_modifiedBeforeWindow);
 
-        var annotations = await crmQueryDispatcher.ExecuteQuery(
+        var incidentAnnotations = await crmQueryDispatcher.ExecuteQuery(
             new GetResolvedIncidentAnnotationsQuery(SubjectIds: [changeDateOfBirthSubject.Id, changeNameSubject.Id], modifiedBefore, ColumnSet: new()));
 
-        foreach (var annotation in annotations)
+        var taskAnnotations = await crmQueryDispatcher.ExecuteQuery(
+            new GetNonOpenTaskAnnotationsQuery(Subjects: [CreateTrnRequestTaskQuery.TaskSubject], modifiedBefore, ColumnSet: new()));
+
+        var annotationIds = incidentAnnotations.Select(i => i.AnnotationId!.Value).Concat(taskAnnotations.Select(i => i.AnnotationId!.Value));
+
+        foreach (var annotationId in annotationIds)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             await crmQueryDispatcher.ExecuteQuery(
                 new DeleteAnnotationQuery(
-                    annotation.Id,
+                    annotationId,
                     Event: EventInfo.Create(new DqtAnnotationDeletedEvent()
                     {
-                        AnnotationId = annotation.Id,
+                        AnnotationId = annotationId,
                         CreatedUtc = clock.UtcNow,
                         EventId = Guid.NewGuid(),
                         RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
