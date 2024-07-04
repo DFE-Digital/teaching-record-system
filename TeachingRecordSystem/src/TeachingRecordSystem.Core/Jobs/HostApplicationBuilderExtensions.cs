@@ -128,10 +128,10 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<DeleteOldIncidentAttachmentsJob>(
-                    nameof(DeleteOldIncidentAttachmentsJob),
+                recurringJobManager.AddOrUpdate<DeleteOldAttachmentsJob>(
+                    nameof(DeleteOldAttachmentsJob),
                     job => job.Execute(CancellationToken.None),
-                    DeleteOldIncidentAttachmentsJob.JobSchedule);
+                    DeleteOldAttachmentsJob.JobSchedule);
 
                 return Task.CompletedTask;
             });
