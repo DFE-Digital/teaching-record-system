@@ -14,10 +14,7 @@
     <PackageReference Include="GovUk.OneLogin.AspNetCore" />
     <PackageReference Include="Humanizer.Core" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
     <PackageReference Include="OpenIddict.AspNetCore" />
-    <PackageReference Include="Sentry.AspNetCore" />
-    <PackageReference Include="Serilog.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>

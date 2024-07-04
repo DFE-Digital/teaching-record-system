@@ -2,7 +2,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using TeachingRecordSystem.Api.Infrastructure.Logging;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
@@ -53,7 +52,6 @@ public class TeachersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
     [MapError(10002, statusCode: StatusCodes.Status409Conflict)]
-    [RedactQueryParam("birthdate")]
     [Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
     public async Task<IActionResult> Update([FromBody] UpdateTeacherRequest request)
     {

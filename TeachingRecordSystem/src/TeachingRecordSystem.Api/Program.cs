@@ -12,7 +12,6 @@ using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Json;
-using TeachingRecordSystem.Api.Infrastructure.Logging;
 using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.Infrastructure.Middleware;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
@@ -28,6 +27,7 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.ServiceDefaults;
+using TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
 
 [assembly: ApiController]
 namespace TeachingRecordSystem.Api;
