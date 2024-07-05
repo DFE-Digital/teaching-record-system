@@ -228,7 +228,7 @@ module "worker_application_configuration" {
 
 module "worker_application" {
   source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
-  depends_on = [kubernetes_job.migrations, kubernetes_job.reporting_migrations]
+  depends_on = [kubernetes_job.migrations]
 
   name   = "worker"
   is_web = false

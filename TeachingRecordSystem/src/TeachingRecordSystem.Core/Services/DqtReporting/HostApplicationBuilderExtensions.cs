@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
@@ -26,6 +27,15 @@ public static class HostApplicationBuilderExtensions
                 sp => new ServiceClient(sp.GetRequiredService<IOptions<DqtReportingOptions>>().Value.CrmConnectionString));
 
             builder.Services.AddCrmEntityChangesService(name: DqtReportingService.CrmClientName);
+
+            builder.Services.AddStartupTask(sp =>
+            {
+                var migrator = new Migrator(
+                    connectionString: sp.GetRequiredService<IOptions<DqtReportingOptions>>().Value.ReportingDbConnectionString,
+                    logger: sp.GetRequiredService<ILoggerFactory>().CreateLogger<Migrator>());
+                migrator.MigrateDb();
+                return Task.CompletedTask;
+            });
         }
 
         return builder;
