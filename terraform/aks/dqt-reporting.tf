@@ -55,35 +55,3 @@ resource "azurerm_mssql_database" "reporting_db" {
     ]
   }
 }
-
-resource "kubernetes_job" "reporting_migrations" {
-  metadata {
-    name      = "${var.service_name}-${var.environment_name}-reporting-migrations"
-    namespace = var.namespace
-  }
-
-  spec {
-    template {
-      metadata {}
-      spec {
-        container {
-          name    = "cli"
-          image   = var.docker_image
-          command = ["trscli"]
-          args    = ["migrate-reporting-db", "--connection-string", "$(CONNECTION_STRING)"]
-
-          env {
-            name  = "CONNECTION_STRING"
-            value = local.reporting_db_connection_string
-          }
-        }
-
-        restart_policy = "Never"
-      }
-    }
-
-    backoff_limit = 1
-  }
-
-  wait_for_completion = true
-}
