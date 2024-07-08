@@ -2,7 +2,7 @@ module "redis" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/redis?ref=testing"
 
   namespace             = var.namespace
-  environment           = var.environment_name
+  environment           = local.app_name_suffix
   azure_resource_prefix = var.azure_resource_prefix
   service_name          = var.service_name
   service_short         = var.service_short_name
@@ -22,7 +22,7 @@ module "postgres" {
   source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/postgres?ref=testing"
 
   namespace             = var.namespace
-  environment           = var.environment_name
+  environment           = local.app_name_suffix
   azure_resource_prefix = var.azure_resource_prefix
   service_name          = var.service_name
   service_short         = var.service_short_name
