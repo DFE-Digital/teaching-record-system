@@ -33,9 +33,12 @@ public abstract class EventInfo
     private protected EventInfo(EventBase @event)
     {
         Event = @event;
+        EventName = @event.GetEventName();
     }
 
     public EventBase Event { get; }
+
+    public string EventName { get; }
 
     public static EventInfo<TEvent> Create<TEvent>(TEvent @event) where TEvent : EventBase => new EventInfo<TEvent>(@event);
 
@@ -110,7 +113,7 @@ file class EventInfoJsonConverter : JsonConverter<EventInfo>
     public override void Write(Utf8JsonWriter writer, EventInfo value, JsonSerializerOptions options)
     {
         var eventType = value.Event.GetType();
-        var eventName = value.Event.GetEventName();
+        var eventName = value.EventName;
 
         writer.WriteStartObject();
         writer.WritePropertyName("EventName");
