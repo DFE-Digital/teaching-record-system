@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Npgsql;
 using NpgsqlTypes;
 
@@ -32,7 +31,13 @@ public static class NpgsqlExtensions
         }
     }
 
-    public static async Task<int> SaveEvents(this NpgsqlTransaction transaction, IReadOnlyCollection<EventBase> events, string tempTableSuffix, IClock clock, CancellationToken cancellationToken, int? timeoutSeconds = null)
+    public static async Task<int> SaveEvents(
+        this NpgsqlTransaction transaction,
+        IReadOnlyCollection<EventBase> events,
+        string tempTableSuffix,
+        IClock clock,
+        CancellationToken cancellationToken,
+        int? timeoutSeconds = null)
     {
         if (events.Count == 0)
         {
@@ -88,16 +93,13 @@ public static class NpgsqlExtensions
 
         foreach (var e in events)
         {
-            var payload = JsonSerializer.Serialize(e, e.GetType(), EventBase.JsonSerializerOptions);
-            var key = e is IEventWithKey eventWithKey ? eventWithKey.Key : null;
-
             writer.StartRow();
             writer.WriteValueOrNull(e.EventId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(e.GetEventName(), NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(e.CreatedUtc, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(clock.UtcNow, NpgsqlDbType.TimestampTz);
-            writer.WriteValueOrNull(payload, NpgsqlDbType.Jsonb);
-            writer.WriteValueOrNull(key, NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull(e.Serialize(), NpgsqlDbType.Jsonb);  // payload
+            writer.WriteValueOrNull((e as IEventWithKey)?.Key, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull((e as IEventWithPersonId)?.PersonId, NpgsqlDbType.Uuid);
         }
 

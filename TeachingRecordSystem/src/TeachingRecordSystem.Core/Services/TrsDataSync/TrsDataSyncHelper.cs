@@ -33,6 +33,7 @@ public class TrsDataSyncHelper(
     {
         { ModelTypes.Person, GetModelTypeSyncInfoForPerson() },
         { ModelTypes.MandatoryQualification, GetModelTypeSyncInfoForMandatoryQualification() },
+        { ModelTypes.Event, GetModelTypeSyncInfoForEvent() },
     };
 
     private readonly ISubject<object[]> _syncedEntitiesSubject = new Subject<object[]>();
@@ -114,6 +115,11 @@ public class TrsDataSyncHelper(
 
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
 
+        if (modelTypeSyncInfo.DeleteStatement is null)
+        {
+            throw new NotSupportedException($"Cannot delete a {modelType}.");
+        }
+
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
         var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
@@ -130,6 +136,11 @@ public class TrsDataSyncHelper(
     public async Task<DateTime?> GetLastModifiedOnForModelType(string modelType)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
+
+        if (modelTypeSyncInfo.GetLastModifiedOnStatement is null)
+        {
+            return null;
+        }
 
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
@@ -203,12 +214,12 @@ public class TrsDataSyncHelper(
             await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
         }
 
-        using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement, cancellationToken);
+        using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement!, cancellationToken);
 
         foreach (var person in people)
         {
             writer.StartRow();
-            modelTypeSyncInfo.WriteRecord(writer, person);
+            modelTypeSyncInfo.WriteRecord!(writer, person);
         }
 
         await writer.CompleteAsync(cancellationToken);
@@ -361,12 +372,12 @@ public class TrsDataSyncHelper(
                     await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
                 }
 
-                using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement, cancellationToken);
+                using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement!, cancellationToken);
 
                 foreach (var mq in toSync)
                 {
                     writer.StartRow();
-                    modelTypeSyncInfo.WriteRecord(writer, mq);
+                    modelTypeSyncInfo.WriteRecord!(writer, mq);
                 }
 
                 await writer.CompleteAsync(cancellationToken);
@@ -424,6 +435,24 @@ public class TrsDataSyncHelper(
 
         _syncedEntitiesSubject.OnNext([.. toSync, .. events]);
         return toSync.Count;
+    }
+
+    public async Task<int> SyncEvents(IReadOnlyCollection<dfeta_TRSEvent> events, CancellationToken cancellationToken = default)
+    {
+        var modelTypeSyncInfo = GetModelTypeSyncInfo<EventInfo>(ModelTypes.Event);
+
+        var mapped = events.Select(e => EventInfo.Deserialize(e.dfeta_Payload).Event).ToArray();
+
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+
+        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
+        await connection.OpenAsync(cancellationToken);
+        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+        await txn.SaveEvents(mapped, tempTableSuffix: "events_import", clock, cancellationToken);
+        await txn.CommitAsync();
+
+        _syncedEntitiesSubject.OnNext(events.ToArray());
+        return events.Count;
     }
 
     private EntityVersionInfo<TEntity>[] GetEntityVersions<TEntity>(TEntity latest, IEnumerable<AuditDetail> auditDetails, string[] attributeNames)
@@ -843,6 +872,30 @@ public class TrsDataSyncHelper(
         };
     }
 
+    private static ModelTypeSyncInfo GetModelTypeSyncInfoForEvent()
+    {
+        var attributeNames = new[]
+        {
+            dfeta_TRSEvent.Fields.dfeta_TRSEventId,
+            dfeta_TRSEvent.Fields.dfeta_EventName,
+            dfeta_TRSEvent.Fields.dfeta_Payload,
+        };
+
+        return new ModelTypeSyncInfo<EventInfo>()
+        {
+            CreateTempTableStatement = null,
+            CopyStatement = null,
+            InsertStatement = null,
+            DeleteStatement = null,
+            GetLastModifiedOnStatement = null,
+            EntityLogicalName = dfeta_TRSEvent.EntityLogicalName,
+            AttributeNames = attributeNames,
+            GetSyncHandler = helper => (entities, ignoreInvalid, ct) =>
+                helper.SyncEvents(entities.Select(e => e.ToEntity<dfeta_TRSEvent>()).ToArray(), ct),
+            WriteRecord = null
+        };
+    }
+
     private static List<Person> MapPersons(IEnumerable<Contact> contacts) => contacts
         .Select(c => new Person()
         {
@@ -1119,11 +1172,11 @@ public class TrsDataSyncHelper(
 
     private record ModelTypeSyncInfo
     {
-        public required string CreateTempTableStatement { get; init; }
-        public required string CopyStatement { get; init; }
-        public required string InsertStatement { get; init; }
-        public required string DeleteStatement { get; init; }
-        public required string GetLastModifiedOnStatement { get; init; }
+        public required string? CreateTempTableStatement { get; init; }
+        public required string? CopyStatement { get; init; }
+        public required string? InsertStatement { get; init; }
+        public required string? DeleteStatement { get; init; }
+        public required string? GetLastModifiedOnStatement { get; init; }
         public required string EntityLogicalName { get; init; }
         public required string[] AttributeNames { get; init; }
         public required Func<TrsDataSyncHelper, SyncEntitiesHandler> GetSyncHandler { get; init; }
@@ -1131,7 +1184,7 @@ public class TrsDataSyncHelper(
 
     private record ModelTypeSyncInfo<TModel> : ModelTypeSyncInfo
     {
-        public required Action<NpgsqlBinaryImporter, TModel> WriteRecord { get; init; }
+        public required Action<NpgsqlBinaryImporter, TModel>? WriteRecord { get; init; }
     }
 
     private record EntityVersionInfo<TEntity>(
@@ -1147,6 +1200,7 @@ public class TrsDataSyncHelper(
     {
         public const string Person = "Person";
         public const string MandatoryQualification = "MandatoryQualification";
+        public const string Event = "Event";
     }
 }
 
