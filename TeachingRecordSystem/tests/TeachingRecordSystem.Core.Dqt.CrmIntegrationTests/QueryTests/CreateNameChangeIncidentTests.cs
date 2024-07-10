@@ -24,6 +24,7 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         var newFirstName = _dataScope.TestData.GenerateFirstName();
         var newMiddleName = _dataScope.TestData.GenerateMiddleName();
         var newLastName = _dataScope.TestData.GenerateLastName();
+        var email = _dataScope.TestData.GenerateUniqueEmail();
         var uniqueId = Guid.NewGuid();
         var evidenceFileName = $"evidence-{uniqueId}.jpg";
         var evidenceFileContent = new MemoryStream(TestCommon.TestData.JpegImage);
@@ -41,7 +42,8 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
             EvidenceFileName = evidenceFileName,
             EvidenceFileContent = evidenceFileContent,
             EvidenceFileMimeType = evidenceFileMimeType,
-            FromIdentity = true
+            FromIdentity = true,
+            EmailAddress = email,
         };
 
         // Act
@@ -62,6 +64,7 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         Assert.Equal(newMiddleName, createdIncident.dfeta_StatedMiddleName);
         Assert.Equal(newLastName, createdIncident.dfeta_StatedLastName);
         Assert.Equal(query.FromIdentity, createdIncident.dfeta_FromIdentity);
+        Assert.Equal(query.EmailAddress, createdIncident.dfeta_emailaddress);
 
         var createdDocument = ctx.dfeta_documentSet.SingleOrDefault(i => i.GetAttributeValue<string>(dfeta_document.Fields.dfeta_name) == evidenceFileName);
         Assert.NotNull(createdDocument);

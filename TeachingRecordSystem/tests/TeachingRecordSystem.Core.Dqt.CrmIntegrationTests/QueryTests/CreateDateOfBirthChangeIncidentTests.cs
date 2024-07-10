@@ -20,7 +20,7 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
     {
         // Arrange
         var createPersonResult = await _dataScope.TestData.CreatePerson();
-
+        var email = _dataScope.TestData.GenerateUniqueEmail();
         var newDateOfBirth = _dataScope.TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth);
         var uniqueId = Guid.NewGuid();
         var evidenceFileName = $"evidence-{uniqueId}.jpg";
@@ -34,7 +34,8 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
             EvidenceFileName = evidenceFileName,
             EvidenceFileContent = evidenceFileContent,
             EvidenceFileMimeType = evidenceFileMimeType,
-            FromIdentity = true
+            FromIdentity = true,
+            EmailAddress = email
         };
 
         // Act
@@ -50,6 +51,7 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
         Assert.Equal("Request to change date of birth", createdIncident.Title);
         Assert.Equal(newDateOfBirth, DateOnly.FromDateTime(createdIncident.dfeta_NewDateofBirth!.Value));
         Assert.Equal(query.FromIdentity, createdIncident.dfeta_FromIdentity);
+        Assert.Equal(query.EmailAddress, createdIncident.dfeta_emailaddress);
 
         var createdDocument = ctx.dfeta_documentSet.SingleOrDefault(i => i.GetAttributeValue<string>(dfeta_document.Fields.dfeta_name) == evidenceFileName);
         Assert.NotNull(createdDocument);

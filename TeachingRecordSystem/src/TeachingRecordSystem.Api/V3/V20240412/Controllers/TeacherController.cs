@@ -32,6 +32,7 @@ public class TeacherController : ControllerBase
             LastName = request.LastName,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileUrl = request.EvidenceFileUrl,
+            EmailAddress = request.Email
         };
 
         var caseNumber = await handler.Handle(command);
@@ -57,6 +58,7 @@ public class TeacherController : ControllerBase
             DateOfBirth = request.DateOfBirth,
             EvidenceFileName = request.EvidenceFileName,
             EvidenceFileUrl = request.EvidenceFileUrl,
+            EmailAddress = request.Email
         };
 
         var caseNumber = await handler.Handle(command);

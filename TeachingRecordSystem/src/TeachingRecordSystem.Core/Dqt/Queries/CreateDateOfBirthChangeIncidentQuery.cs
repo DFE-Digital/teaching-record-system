@@ -8,4 +8,5 @@ public record CreateDateOfBirthChangeIncidentQuery : ICrmQuery<(Guid IncidentId,
     public required Stream EvidenceFileContent { get; init; }
     public required string EvidenceFileMimeType { get; init; }
     public required bool FromIdentity { get; init; }
+    public required string? EmailAddress { get; init; }
 }

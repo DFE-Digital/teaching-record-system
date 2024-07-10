@@ -11,6 +11,7 @@ public record CreateDateOfBirthChangeRequestCommand
     public required DateOnly DateOfBirth { get; init; }
     public required string EvidenceFileName { get; init; }
     public required string EvidenceFileUrl { get; init; }
+    public required string? EmailAddress { get; init; }
 }
 
 public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryDispatcher, IHttpClientFactory httpClientFactory)
@@ -50,7 +51,8 @@ public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryD
             EvidenceFileName = command.EvidenceFileName,
             EvidenceFileContent = await evidenceFileResponse.Content.ReadAsStreamAsync(),
             EvidenceFileMimeType = evidenceFileMimeType,
-            FromIdentity = true
+            FromIdentity = true,
+            EmailAddress = command.EmailAddress,
         });
 
         return ticketNumber;
