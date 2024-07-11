@@ -248,7 +248,7 @@ public class EditUserTests : TestBase
 
         if (expectedEvent)
         {
-            EventObserver.AssertEventsSaved(e =>
+            EventPublisher.AssertEventsSaved(e =>
             {
                 var userCreatedEvent = Assert.IsType<UserUpdatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
@@ -300,7 +300,7 @@ public class EditUserTests : TestBase
 
         Assert.False(updatedUser.Active);
 
-        EventObserver.AssertEventsSaved(e =>
+        EventPublisher.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
@@ -346,7 +346,7 @@ public class EditUserTests : TestBase
 
         Assert.True(updatedUser.Active);
 
-        EventObserver.AssertEventsSaved(e =>
+        EventPublisher.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserActivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);

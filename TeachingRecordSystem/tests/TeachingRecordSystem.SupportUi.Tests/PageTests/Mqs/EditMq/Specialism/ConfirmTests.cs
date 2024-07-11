@@ -120,7 +120,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
         var changeReasonDetail = "Some reason";
 
-        EventObserver.Clear();
+        EventPublisher.Clear();
 
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -157,7 +157,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(newMqSpecialism, qualification.Specialism);
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        EventPublisher.AssertEventsSaved(e =>
         {
             var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent()
             {

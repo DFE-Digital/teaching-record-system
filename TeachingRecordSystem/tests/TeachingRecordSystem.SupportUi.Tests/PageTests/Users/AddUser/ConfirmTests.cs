@@ -299,7 +299,7 @@ public class ConfirmTests : TestBase
         Assert.Equal(userId, user.AzureAdUserId);
         Assert.Collection(user.Roles, r => Assert.Equal(role, r));
 
-        EventObserver.AssertEventsSaved(e =>
+        EventPublisher.AssertEventsSaved(e =>
         {
             var userCreatedEvent = Assert.IsType<UserAddedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);

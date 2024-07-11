@@ -172,7 +172,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId = qualification.QualificationId;
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        EventPublisher.AssertEventsSaved(e =>
         {
             var expectedMqCreatedEvent = new MandatoryQualificationCreatedEvent()
             {

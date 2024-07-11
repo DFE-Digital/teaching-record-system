@@ -14,7 +14,7 @@ public static class ServiceCollectionExtensions
             services.AddSingleton<IHostedService, PublishEventsBackgroundService>();
         }
 
-        services.AddSingleton<IEventObserver, NoopEventObserver>();
+        services.AddSingleton<IEventPublisher, NoopEventPublisher>();
 
         return services;
     }

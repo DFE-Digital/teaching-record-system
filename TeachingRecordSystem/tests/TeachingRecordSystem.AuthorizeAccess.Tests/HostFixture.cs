@@ -52,7 +52,7 @@ public class HostFixture : WebApplicationFactory<Program>
             // Publish events synchronously
             PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
-            services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
+            services.AddSingleton<IEventPublisher>(_ => new ForwardToTestScopedEventPublisher());
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddSingleton<TestData>(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
@@ -110,11 +110,11 @@ public class HostFixture : WebApplicationFactory<Program>
         }
     }
 
-    // IEventObserver needs to be a singleton but we want it to resolve to a test-scoped CaptureEventObserver.
-    // This provides a wrapper that can be registered as a singleon that delegates to the test-scoped IEventObserver instance.
-    private class ForwardToTestScopedEventObserver : IEventObserver
+    // IEventPublisher needs to be a singleton but we want it to resolve to a test-scoped CaptureEventPublisher.
+    // This provides a wrapper that can be registered as a singleon that delegates to the test-scoped IEventPublisher instance.
+    private class ForwardToTestScopedEventPublisher : IEventPublisher
     {
-        public Task OnEventSaved(EventBase @event) => TestScopedServices.GetCurrent().EventObserver.OnEventSaved(@event);
+        public Task PublishEvent(EventBase @event) => TestScopedServices.GetCurrent().EventPublisher.PublishEvent(@event);
     }
 
     private class ForwardToTestScopedClock : IClock

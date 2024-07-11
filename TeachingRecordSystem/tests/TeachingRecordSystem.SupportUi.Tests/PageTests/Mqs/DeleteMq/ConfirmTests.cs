@@ -139,7 +139,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithStartDate(startDate)
             .WithStatus(status, endDate)));
 
-        EventObserver.Clear();
+        EventPublisher.Clear();
 
         var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
 
@@ -170,7 +170,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var redirectDoc = await redirectResponse.GetDocument();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification deleted");
 
-        EventObserver.AssertEventsSaved(e =>
+        EventPublisher.AssertEventsSaved(e =>
         {
             var expectedMqDeletedEvent = new MandatoryQualificationDeletedEvent()
             {

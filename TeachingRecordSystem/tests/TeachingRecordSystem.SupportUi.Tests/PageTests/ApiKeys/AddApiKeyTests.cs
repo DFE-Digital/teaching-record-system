@@ -183,7 +183,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
             }
         };
 
-        EventObserver.Clear();
+        EventPublisher.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -203,7 +203,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
             return apiKey;
         });
 
-        EventObserver.AssertEventsSaved(
+        EventPublisher.AssertEventsSaved(
             e =>
             {
                 var apiKeyCreatedEvent = Assert.IsType<ApiKeyCreatedEvent>(e);

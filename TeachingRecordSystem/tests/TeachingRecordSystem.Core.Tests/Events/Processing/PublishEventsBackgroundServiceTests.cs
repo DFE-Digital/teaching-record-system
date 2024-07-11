@@ -25,17 +25,17 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
         await dbContext.SaveChangesAsync();
         var dbEvent = dbContext.ChangeTracker.Entries<Event>().Last().Entity;
 
-        var eventObserver = new TestableEventObserver();
+        var eventPublisher = new TestableEventPublisher();
 
         var logger = new NullLogger<PublishEventsBackgroundService>();
 
-        var service = new PublishEventsBackgroundService(eventObserver, _dbFixture.GetDbContextFactory(), logger);
+        var service = new PublishEventsBackgroundService(eventPublisher, _dbFixture.GetDbContextFactory(), logger);
 
         // Act
         await service.PublishEvents(CancellationToken.None);
 
         // Assert
-        Assert.Collection(eventObserver.Events, e => e.Equals(@event));
+        Assert.Collection(eventPublisher.Events, e => e.Equals(@event));
 
         await dbContext.Entry(dbEvent).ReloadAsync();
         Assert.True(dbEvent.Published);
@@ -51,21 +51,21 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
         dbContext.ChangeTracker.Entries<Event>().Last().Entity.Published = true;
         await dbContext.SaveChangesAsync();
 
-        var eventObserver = new TestableEventObserver();
+        var eventPublisher = new TestableEventPublisher();
 
         var logger = new NullLogger<PublishEventsBackgroundService>();
 
-        var service = new PublishEventsBackgroundService(eventObserver, _dbFixture.GetDbContextFactory(), logger);
+        var service = new PublishEventsBackgroundService(eventPublisher, _dbFixture.GetDbContextFactory(), logger);
 
         // Act
         await service.PublishEvents(CancellationToken.None);
 
         // Assert
-        Assert.Empty(eventObserver.Events);
+        Assert.Empty(eventPublisher.Events);
     }
 
     [Fact]
-    public async Task PublishEvents_EventObserverThrows_DoesNotThrow()
+    public async Task PublishEvents_EventPublisherThrows_DoesNotThrow()
     {
         // Arrange
         using var dbContext = _dbFixture.GetDbContext();
@@ -74,13 +74,13 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
         await dbContext.SaveChangesAsync();
         var dbEvent = dbContext.ChangeTracker.Entries<Event>().Last().Entity;
 
-        var eventObserver = new Mock<IEventObserver>();
+        var eventPublisher = new Mock<IEventPublisher>();
         var publishException = new Exception("Bang!");
-        eventObserver.Setup(mock => mock.OnEventSaved(It.IsAny<EventBase>())).ThrowsAsync(publishException);
+        eventPublisher.Setup(mock => mock.PublishEvent(It.IsAny<EventBase>())).ThrowsAsync(publishException);
 
         var logger = new Mock<ILogger<PublishEventsBackgroundService>>();
 
-        var service = new PublishEventsBackgroundService(eventObserver.Object, _dbFixture.GetDbContextFactory(), logger.Object);
+        var service = new PublishEventsBackgroundService(eventPublisher.Object, _dbFixture.GetDbContextFactory(), logger.Object);
 
         // Act
         await service.PublishEvents(CancellationToken.None);
@@ -96,13 +96,13 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
         RaisedBy = SystemUser.SystemUserId
     };
 
-    private class TestableEventObserver : IEventObserver
+    private class TestableEventPublisher : IEventPublisher
     {
         private readonly List<EventBase> _events = new();
 
         public IReadOnlyCollection<EventBase> Events => _events.AsReadOnly();
 
-        public Task OnEventSaved(EventBase @event)
+        public Task PublishEvent(EventBase @event)
         {
             _events.Add(@event);
             return Task.CompletedTask;

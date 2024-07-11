@@ -116,7 +116,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
 
-        EventObserver.Clear();
+        EventPublisher.Clear();
 
         var journeyInstance = await CreateJourneyInstance(
             qualificationId,
@@ -153,7 +153,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(newProvider.MandatoryQualificationProviderId, qualification.ProviderId);
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        EventPublisher.AssertEventsSaved(e =>
         {
             var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent()
             {

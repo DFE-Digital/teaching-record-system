@@ -276,7 +276,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             state.SetTrn(true, trn);
         });
 
-        EventObserver.Clear();
+        EventPublisher.Clear();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -305,7 +305,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(trnToken.Trn, data.TrnTokenTrn);
         Assert.Equal(applicationUser.UserId, data.ClientApplicationUserId);
 
-        EventObserver.AssertEventsSaved(e =>
+        EventPublisher.AssertEventsSaved(e =>
         {
             var supportTaskCreatedEvent = Assert.IsType<SupportTaskCreatedEvent>(e);
             Assert.Equal(Clock.UtcNow, supportTaskCreatedEvent.CreatedUtc);
