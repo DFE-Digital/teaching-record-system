@@ -748,6 +748,7 @@ public partial class TestData
                     {
                         EventId = Guid.NewGuid(),
                         CreatedUtc = createdUtc!.Value,
+                        Key = null,
                         RaisedBy = _importedByUser.ValueOrFailure(),
                         PersonId = personId,
                         MandatoryQualification = new()
@@ -779,6 +780,7 @@ public partial class TestData
                         CreatedUtc = createdUtc!.Value,
                         RaisedBy = createdByUser,
                         PersonId = personId,
+                        Key = null,
                         MandatoryQualification = new()
                         {
                             QualificationId = QualificationId,

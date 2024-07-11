@@ -62,6 +62,7 @@ public class ConfirmModel(
                 EventId = Guid.NewGuid(),
                 CreatedUtc = now,
                 RaisedBy = User.GetUserId(),
+                Key = null,
                 PersonId = PersonId,
                 MandatoryQualification = EventModels.MandatoryQualification.FromModel(qualification),
                 OldMandatoryQualification = oldMqEventModel,

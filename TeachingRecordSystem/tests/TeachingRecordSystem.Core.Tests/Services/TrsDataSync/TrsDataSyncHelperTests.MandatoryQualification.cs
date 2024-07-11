@@ -669,6 +669,7 @@ public partial class TrsDataSyncHelperTests
                 EventId = eventId,
                 CreatedUtc = Clock.UtcNow,
                 RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(currentDqtUser.Id, currentDqtUser.Name),
+                Key = null,
                 PersonId = newQualification.dfeta_PersonId.Id,
                 MandatoryQualification = new()
                 {
@@ -796,6 +797,7 @@ public partial class TrsDataSyncHelperTests
                 EventId = eventId,
                 CreatedUtc = Clock.UtcNow,
                 RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(currentDqtUser.Id, currentDqtUser.Name),
+                Key = null,
                 PersonId = updatedQualification.dfeta_PersonId.Id,
                 MandatoryQualification = new()
                 {

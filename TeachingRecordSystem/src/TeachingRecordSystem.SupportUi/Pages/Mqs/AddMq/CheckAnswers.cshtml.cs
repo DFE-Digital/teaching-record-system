@@ -49,6 +49,7 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
             EventId = Guid.NewGuid(),
             CreatedUtc = clock.UtcNow,
             RaisedBy = User.GetUserId(),
+            Key = null,
             PersonId = PersonId,
             MandatoryQualification = EventModels.MandatoryQualification.FromModel(qualification, providerNameHint: ProviderName)
         };
