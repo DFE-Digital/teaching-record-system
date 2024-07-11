@@ -63,6 +63,7 @@ public class TrsDataSyncService(
         // Order is important here; the dependees should come before dependents
         await SyncIfEnabled(TrsDataSyncHelper.ModelTypes.Person);
         await SyncIfEnabled(TrsDataSyncHelper.ModelTypes.MandatoryQualification);
+        await SyncIfEnabled(TrsDataSyncHelper.ModelTypes.Event);
 
         async Task SyncIfEnabled(string modelType)
         {
