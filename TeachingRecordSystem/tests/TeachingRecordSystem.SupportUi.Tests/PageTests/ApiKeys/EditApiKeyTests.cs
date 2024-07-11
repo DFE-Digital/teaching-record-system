@@ -145,7 +145,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/{apiKey.ApiKeyId}/Expire");
 
-        EventObserver.Clear();
+        EventPublisher.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -160,7 +160,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(Clock.UtcNow, apiKey.Expires);
         });
 
-        EventObserver.AssertEventsSaved(
+        EventPublisher.AssertEventsSaved(
             e =>
             {
                 var apiKeyUpdatedEvent = Assert.IsType<ApiKeyUpdatedEvent>(e);

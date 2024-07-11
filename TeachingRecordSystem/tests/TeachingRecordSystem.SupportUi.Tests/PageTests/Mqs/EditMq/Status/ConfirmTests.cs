@@ -229,7 +229,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = qualification.QualificationId;
         var provider = MandatoryQualificationProvider.GetById(qualification.ProviderId!.Value);
 
-        EventObserver.Clear();
+        EventPublisher.Clear();
 
         Guid? evidenceFileId = uploadEvidence ? Guid.NewGuid() : null;
         string? evidenceFileName = uploadEvidence ? "test.pdf" : null;
@@ -276,7 +276,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Equal(newEndDate, qualification.EndDate);
         });
 
-        EventObserver.AssertEventsSaved(e =>
+        EventPublisher.AssertEventsSaved(e =>
         {
             var expectedMqUpdatedEvent = new MandatoryQualificationUpdatedEvent()
             {

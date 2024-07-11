@@ -127,7 +127,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
 
         Assert.Equal($"/application-users/{applicationUser.UserId}", response.Headers.Location?.OriginalString);
 
-        EventObserver.AssertEventsSaved(
+        EventPublisher.AssertEventsSaved(
             e =>
             {
                 var applicationUserCreatedEvent = Assert.IsType<ApplicationUserCreatedEvent>(e);

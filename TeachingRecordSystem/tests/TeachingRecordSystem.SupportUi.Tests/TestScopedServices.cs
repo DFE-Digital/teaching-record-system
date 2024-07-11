@@ -12,7 +12,7 @@ public class TestScopedServices
         Clock = new();
         DataverseAdapterMock = new();
         AzureActiveDirectoryUserServiceMock = new();
-        EventObserver = new();
+        EventPublisher = new();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -34,5 +34,5 @@ public class TestScopedServices
 
     public Mock<IAadUserService> AzureActiveDirectoryUserServiceMock { get; }
 
-    public CaptureEventObserver EventObserver { get; }
+    public CaptureEventPublisher EventPublisher { get; }
 }

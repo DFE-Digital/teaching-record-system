@@ -4,13 +4,13 @@ using Xunit;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class CaptureEventObserver : IEventObserver
+public class CaptureEventPublisher : IEventPublisher
 {
     private readonly HashSet<EventBase> _events = new(new EventIdEqualityComparer());
 
     public void Clear() => _events.Clear();
 
-    public Task OnEventSaved(EventBase @event)
+    public Task PublishEvent(EventBase @event)
     {
         _events.Add(@event);
         return Task.CompletedTask;

@@ -34,14 +34,14 @@ public abstract class TestBase : IDisposable
                 var events = synced.OfType<EventBase>();
                 foreach (var e in events)
                 {
-                    TestScopedServices.GetCurrent().EventObserver.OnEventSaved(e);
+                    TestScopedServices.GetCurrent().EventPublisher.PublishEvent(e);
                 }
             });
     }
 
     public HostFixture HostFixture { get; }
 
-    public CaptureEventObserver EventObserver => _testServices.EventObserver;
+    public CaptureEventPublisher EventPublisher => _testServices.EventPublisher;
 
     public Mock<IDataverseAdapter> DataverseAdapterMock => _testServices.DataverseAdapterMock;
 

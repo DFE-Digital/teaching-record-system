@@ -9,11 +9,11 @@ namespace TeachingRecordSystem.TestCommon.Infrastructure;
 
 public class PublishEventsDbCommandInterceptor : SaveChangesInterceptor
 {
-    private readonly IEventObserver _eventObserver;
+    private readonly IEventPublisher _eventPublisher;
 
-    public PublishEventsDbCommandInterceptor(IEventObserver eventObserver)
+    public PublishEventsDbCommandInterceptor(IEventPublisher eventPublisher)
     {
-        _eventObserver = eventObserver;
+        _eventPublisher = eventPublisher;
     }
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
@@ -35,7 +35,7 @@ public class PublishEventsDbCommandInterceptor : SaveChangesInterceptor
 
                 void OnEventSaved(object? sender, SavedChangesEventArgs args)
                 {
-                    _eventObserver.OnEventSaved(e.Entity.ToEventBase()).GetAwaiter().GetResult();
+                    _eventPublisher.PublishEvent(e.Entity.ToEventBase()).GetAwaiter().GetResult();
                     eventData.Context.SavedChanges -= OnEventSaved;
                 }
             }

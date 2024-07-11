@@ -248,7 +248,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             }
         };
 
-        EventObserver.Clear();
+        EventPublisher.Clear();
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -263,7 +263,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.True(new HashSet<string>(applicationUser.ApiRoles ?? []).SetEquals(new HashSet<string>(newRoles)));
         });
 
-        EventObserver.AssertEventsSaved(
+        EventPublisher.AssertEventsSaved(
             e =>
             {
                 var applicationUserUpdatedEvent = Assert.IsType<ApplicationUserUpdatedEvent>(e);
