@@ -242,9 +242,10 @@ module "worker_application" {
   kubernetes_config_map_name = module.worker_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.worker_application_configuration.kubernetes_secret_name
 
-  docker_image = var.docker_image
-  command      = ["/bin/ash", "-c", "cd /Apps/Worker/; dotnet TeachingRecordSystem.Worker.dll;"]
-  replicas     = var.worker_replicas
-  max_memory   = var.worker_max_memory
-  enable_logit = var.enable_logit
+  docker_image   = var.docker_image
+  command        = ["/bin/ash", "-c", "cd /Apps/Worker/; dotnet TeachingRecordSystem.Worker.dll;"]
+  replicas       = var.worker_replicas
+  max_memory     = var.worker_max_memory
+  enable_logit   = var.enable_logit
+  enable_gcp_wif = var.enable_gcp_wif
 }

@@ -47,6 +47,8 @@ variable "enable_monitoring" {
 
 variable "enable_logit" { default = false }
 
+variable "enable_gcp_wif" { default = true }
+
 variable "deploy_azure_backing_services" {
   type    = string
   default = true
