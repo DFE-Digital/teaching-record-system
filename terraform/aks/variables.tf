@@ -61,6 +61,12 @@ variable "deploy_dqt_reporting_server" {
   default = false
 }
 
+variable "gcp_wif_namespaces" {
+  description = "List of namespaces with Azure GCP Wokload Identity Federation enabled"
+  type        = list(string)
+  default     = []
+}
+
 variable "run_dqt_reporting_service" {
   type = bool
 }
