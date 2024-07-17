@@ -1000,6 +1000,18 @@
           "Microsoft.Extensions.Logging.Abstractions": "8.0.0"
         }
       },
+      "NSign.Abstractions": {
+        "type": "Transitive",
+        "resolved": "1.0.4",
+        "contentHash": "KRQIrv0MYqTYeg1AjvKS1SDacck8QoiE92rucD0A0shIRzp+i1NyIsADPOBVvYi4BHz54eGEAVhKEOu2isea+w==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.1",
+          "Microsoft.Extensions.Options": "8.0.2",
+          "Microsoft.Extensions.Options.DataAnnotations": "8.0.0",
+          "StructuredFieldValues": "0.6.3",
+          "System.Collections.Immutable": "8.0.0"
+        }
+      },
       "OpenIddict.Abstractions": {
         "type": "Transitive",
         "resolved": "5.2.0",
@@ -1209,6 +1221,11 @@
           "Pipelines.Sockets.Unofficial": "2.2.8"
         }
       },
+      "StructuredFieldValues": {
+        "type": "Transitive",
+        "resolved": "0.6.3",
+        "contentHash": "EgCsxEnSeXuamDL6AV8ygCI+WHNodfgARlpqBT1MQjy4Qxg8VQA7IHlH5jFbzhXKpWIL2mU8+/Ed3yW/At9vWg=="
+      },
       "Swashbuckle.AspNetCore.Swagger": {
         "type": "Transitive",
         "resolved": "6.6.2",
@@ -1278,8 +1295,8 @@
       },
       "System.Collections.Immutable": {
         "type": "Transitive",
-        "resolved": "1.5.0",
-        "contentHash": "EXKiDFsChZW0RjrZ4FYHu9aW6+P4MCgEDCklsVseRfhoO0F+dXeMSsMRAlVXIo06kGJ/zv+2w1a2uc2+kxxSaQ=="
+        "resolved": "8.0.0",
+        "contentHash": "AurL6Y5BA1WotzlEvVaIDpqzpIPvYnnldxru8oXJU2yFxFUy3+pNXjXd1ymO+RA0rq0+590Q8gaz2l3Sr7fmqg=="
       },
       "System.Collections.NonGeneric": {
         "type": "Transitive",
@@ -2403,11 +2420,15 @@
         "dependencies": {
           "AspNetCore.HealthChecks.Redis": "[8.0.1, )",
           "AutoMapper": "[13.0.1, )",
+          "CloudNative.CloudEvents": "[2.7.1, )",
+          "CloudNative.CloudEvents.SystemTextJson": "[2.7.1, )",
           "FluentValidation.AspNetCore": "[11.3.0, )",
           "MediatR": "[12.2.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[8.0.7, )",
           "Microsoft.Extensions.Caching.StackExchangeRedis": "[8.0.8, )",
           "Moq": "[4.20.70, )",
+          "NSign.Client": "[1.0.3, )",
+          "NSign.SignatureProviders": "[1.0.4, )",
           "RedisRateLimiting.AspNetCore": "[1.1.0, )",
           "Swashbuckle.AspNetCore": "[6.6.2, )",
           "Swashbuckle.AspNetCore.Annotations": "[6.6.2, )",
@@ -2548,6 +2569,25 @@
         "contentHash": "rpYtIczkzGpf+EkZgDr9CClTdemhsrwA/W5hMoPjLkRFnXzH44zDLoovXeKtmxb1ykXK9aJVODSpiJml8CTw2g==",
         "dependencies": {
           "System.Diagnostics.EventLog": "6.0.0"
+        }
+      },
+      "CloudNative.CloudEvents": {
+        "type": "CentralTransitive",
+        "requested": "[2.7.1, )",
+        "resolved": "2.7.1",
+        "contentHash": "3Ks+uACmqqHjrZ51/3pfSagWULEsw+CmcOpThouPtclApCt5U1MfRmm0ktGbzKb6/9aYNnPkQF6FZ57NSfqoQQ==",
+        "dependencies": {
+          "System.Memory": "4.5.5"
+        }
+      },
+      "CloudNative.CloudEvents.SystemTextJson": {
+        "type": "CentralTransitive",
+        "requested": "[2.7.1, )",
+        "resolved": "2.7.1",
+        "contentHash": "9uVvLEjzimt44enwqhV2s/9eaKD/78sTeI96H1enJrVFJHcoS3zObWcc3/yu9VdfoPdM4mNQ/+WU+99FIUo+tg==",
+        "dependencies": {
+          "CloudNative.CloudEvents": "2.7.1",
+          "System.Text.Json": "5.0.2"
         }
       },
       "CsvHelper": {
@@ -2990,6 +3030,30 @@
           "Microsoft.EntityFrameworkCore.Abstractions": "8.0.4",
           "Microsoft.EntityFrameworkCore.Relational": "8.0.4",
           "Npgsql": "8.0.3"
+        }
+      },
+      "NSign.Client": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.3, )",
+        "resolved": "1.0.3",
+        "contentHash": "WUyCQXGUU0dgPbKmtjKPOR8MXrlfJqJ9m3ujZ4IA6lLr9Lu5Fb50YFIdHcw4ZGEsgD82rUQd0FpJ3W/VLXJDwg==",
+        "dependencies": {
+          "Microsoft.Extensions.Http": "8.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.1",
+          "Microsoft.Extensions.Options": "8.0.2",
+          "NSign.Abstractions": "1.0.3",
+          "StructuredFieldValues": "0.5.3",
+          "System.Collections.Immutable": "8.0.0",
+          "System.IO.Pipelines": "8.0.0"
+        }
+      },
+      "NSign.SignatureProviders": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.4, )",
+        "resolved": "1.0.4",
+        "contentHash": "yzmWJubN27Z7ZhD0KRIegh0lQz0DL6pn38UPZn2/khENWP8IzcKZybA1CKnBfwYJCEc1ymYyCZWcbZ62aTEQ8A==",
+        "dependencies": {
+          "NSign.Abstractions": "1.0.4"
         }
       },
       "OpenIddict.EntityFrameworkCore": {

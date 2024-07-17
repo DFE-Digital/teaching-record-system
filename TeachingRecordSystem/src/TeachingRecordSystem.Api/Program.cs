@@ -22,6 +22,7 @@ using TeachingRecordSystem.Api.Infrastructure.Redis;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Events.Processing.EventPublishing;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -210,7 +211,8 @@ public class Program
             .AddBlobStorage()
             .AddDistributedLocks()
             .AddIdentityApi()
-            .AddNameSynonyms();
+            .AddNameSynonyms()
+            .AddEventPublishing();
 
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();

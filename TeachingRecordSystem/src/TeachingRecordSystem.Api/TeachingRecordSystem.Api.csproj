@@ -8,12 +8,16 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Redis" />
     <PackageReference Include="AutoMapper" />
+    <PackageReference Include="CloudNative.CloudEvents" />
+    <PackageReference Include="CloudNative.CloudEvents.SystemTextJson" />
     <PackageReference Include="FluentValidation.AspNetCore" />
     <PackageReference Include="idunno.Authentication.Basic" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
     <PackageReference Include="Moq" />
+    <PackageReference Include="NSign.Client" />
+    <PackageReference Include="NSign.SignatureProviders" />
     <PackageReference Include="RedisRateLimiting.AspNetCore" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
