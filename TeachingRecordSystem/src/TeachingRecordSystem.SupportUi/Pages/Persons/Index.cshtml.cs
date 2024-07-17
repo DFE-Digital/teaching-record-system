@@ -9,24 +9,13 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons;
 
 [RedactParameters("Search")]
-public partial class IndexModel : PageModel
+public partial class IndexModel(TrsLinkGenerator linkGenerator, ICrmQueryDispatcher crmQueryDispatcher) : PageModel
 {
     private const int MaxSearchResultCount = 500;
     private const int PageSize = 15;
 
     [GeneratedRegex("^\\d{7}$")]
     private static partial Regex TrnRegex();
-
-    private readonly TrsLinkGenerator _linkGenerator;
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
-
-    public IndexModel(
-        TrsLinkGenerator linkGenerator,
-        ICrmQueryDispatcher crmQueryDispatcher)
-    {
-        _linkGenerator = linkGenerator;
-        _crmQueryDispatcher = crmQueryDispatcher;
-    }
 
     [BindProperty(SupportsGet = true)]
     [Display(Name = "Search", Description = "TRN, name or date of birth, for example 4/3/1975")]
@@ -85,18 +74,18 @@ public partial class IndexModel : PageModel
             Contact.Fields.dfeta_NINumber);
 
         // Check if the search string is a date of birth, TRN or one or more names
-        if (DateOnly.TryParse(Search, out var dateOfBirth))
+        if (DateOnly.TryParse(Search, EnGbCulture, out var dateOfBirth))
         {
-            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByDateOfBirthQuery(dateOfBirth, SortBy, MaxSearchResultCount, columnSet));
+            contacts = await crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByDateOfBirthQuery(dateOfBirth, SortBy, MaxSearchResultCount, columnSet));
         }
         else if (TrnRegex().IsMatch(Search!))
         {
-            var contact = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactByTrnQuery(Search!, columnSet));
+            var contact = await crmQueryDispatcher.ExecuteQuery(new GetActiveContactByTrnQuery(Search!, columnSet));
             contacts = contact is not null ? [contact] : [];
         }
         else
         {
-            contacts = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByNameQuery(Search!, SortBy, MaxSearchResultCount, columnSet));
+            contacts = await crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByNameQuery(Search!, SortBy, MaxSearchResultCount, columnSet));
         }
         Debug.Assert(contacts is not null);
 
@@ -126,7 +115,7 @@ public partial class IndexModel : PageModel
         // if the page number is greater than the total number of pages, redirect to the first page
         if (PageNumber > TotalKnownPages)
         {
-            return Redirect(_linkGenerator.Persons(search: Search));
+            return Redirect(linkGenerator.Persons(search: Search));
         }
 
         return Page();
