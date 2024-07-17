@@ -1,0 +1,60 @@
+name: Create dbml from database
+
+on:
+  push:
+    branches:
+    - '*'
+  workflow_dispatch:
+
+jobs:
+  update_dbdocs:
+    name: Create trs.dbml
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: trs
+          POSTGRES_DB: trs
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: extractions/setup-just@v2
+
+      - name: Install postgresql-client
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/trusted.gpg.d/pgdg.asc &>/dev/null
+          sudo apt update
+          sudo apt install postgresql-client-15 -y
+
+      - name: Update DB schema
+        run: dotnet run --project TeachingRecordSystem/src/TeachingRecordSystem.Cli -- migrate-db --connection-string "Host=localhost;Username=postgres;Password=trs;Database=trs"
+
+      - name: Dump database
+        run: |
+          export PGHOST="localhost"
+          export PGDATABASE="trs"
+          export PGUSER="postgres"
+          export PGPASSWORD="trs"
+
+          psql -c '\dt' | sed '1,3d' | head -n -2 | sed 's/ //g' | cut -d'|' -f 2 | tr '\n' ' ' | xargs printf -- ' -t %s' | xargs pg_dump --schema-only >trs.dump
+
+      - name: Create dbml file
+        run: npx -p @dbml/cli sql2dbml trs.dump --postgres -o trs.dbml
+
+      - name: Publish dbml file
+        uses: actions/upload-artifact@v4
+        with:
+          name: trs.dbml
+          path: trs.dbml
+          if-no-files-found: error
