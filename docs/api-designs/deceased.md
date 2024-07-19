@@ -13,6 +13,6 @@ Request body structure:
 
 The `dateOfDeath` property is mandatory and should be formatted `yyyy-MM-dd`.
 
-If no record exists with the specified TRN, a `404 Not Found` status code will be returned.
+If no record exists with the specified TRN, a `400 Bad Request` status code will be returned.
 
 If the request is valid, a `204 No Content` status code will be returned.
