@@ -2057,6 +2057,14 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		OverseasTrainedTeacherProgramme = 389040007,
 		
 		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Primary and secondary postgraduate fee funded", 26, "#0000ff")]
+		Primaryandsecondarypostgraduatefeefunded = 389040026,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Primary and secondary undergraduate fee funded", 25, "#0000ff")]
+		Primaryandsecondaryundergraduatefeefunded = 389040025,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Provider-led (postgrad)", 21, "#0000ff")]
 		Providerled_postgrad = 389040021,
 		
@@ -3175,6 +3183,19 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("PreImage", 0)]
 		PreImage = 0,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum securityrole_IsAutoAssigned
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("No", 0)]
+		No = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Yes", 1)]
+		Yes = 1,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
