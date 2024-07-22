@@ -15,7 +15,7 @@
     <PackageVersion Include="dbup-sqlserver" Version="5.0.37" />
     <PackageVersion Include="Dfe.Analytics" Version="0.2.2" />
     <PackageVersion Include="DistributedLock.Azure" Version="1.0.0" />
-    <PackageVersion Include="DistributedLock.FileSystem" Version="1.0.1" />
+    <PackageVersion Include="DistributedLock.FileSystem" Version="1.0.2" />
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
     <PackageVersion Include="Faker.Net" Version="2.0.154" />
     <PackageVersion Include="FakeXrmEasy.v9" Version="3.3.3" />
