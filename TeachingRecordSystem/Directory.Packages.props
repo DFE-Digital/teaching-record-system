@@ -59,8 +59,8 @@
     <PackageVersion Include="Microsoft.Identity.Web.GraphServiceClientBeta" Version="2.16.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageVersion Include="Microsoft.Playwright" Version="1.41.2" />
-    <PackageVersion Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.1.16" />
-    <PackageVersion Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" Version="1.1.16" />
+    <PackageVersion Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.1.27" />
+    <PackageVersion Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" Version="1.1.27" />
     <PackageVersion Include="Moq" Version="4.20.70" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="5.2.0" />
