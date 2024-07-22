@@ -12,7 +12,6 @@ public class UrlRedactor(IHttpContextAccessor httpContextAccessor)
 
     private static readonly HashSet<string> _knownPiiFieldNames = new(
         [
-            "trn",
             "birthdate",
             "dateofbirth",
             "firstname",
@@ -26,7 +25,6 @@ public class UrlRedactor(IHttpContextAccessor httpContextAccessor)
             "emailaddress",
             "nationalinsurancenumber",
             "nino",
-            "teacherid",
         ],
         StringComparer.OrdinalIgnoreCase);
 
