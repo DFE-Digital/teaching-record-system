@@ -2,26 +2,45 @@
 
 TRS uses [webhooks](https://en.wikipedia.org/wiki/Webhook) to push notifications to other services when interesting things happen.
 
-Webhooks are sent as JSON and follow the guidelines in [Standard Webhooks](https://www.standardwebhooks.com/).
+Webhooks are sent as [CloudEvents](https://cloudevents.io/) formatted with JSON.
+Messages can be uniquely identified by their type and ID (the `ce-type` and `ce-id` headers, respectively).
 
-```json
+Each message is signed with an [HTTP Message Signature](https://www.rfc-editor.org/rfc/rfc9421.html) with
+[ECDSA Using Curve P-384 DSS and SHA-384](https://www.rfc-editor.org/rfc/rfc9421.html#section-3.3.5).
+
+An example message is shown below:
+```
+POST /trs-webhooks HTTP/1.1
+Host: localhost:8080
+signature-input: whsig=("@target-uri" "content-digest" "content-length" "ce-id" "ce-type" "ce-time");created=1721657853;expires=1721658153;alg="ecdsa-p384-sha384";keyid="key123"
+signature: whsig=:umon9i06iXAbphdsz4julfGHvY8H17j81IdivYnEv7OeGXIuYroXhr9lX0wipzEDEFv9bCaPrbBVLhoOC4hRWzVtOO4qOAHJNWsQirbPC/MjYSQcvlCztY0LJvXVydWq:
+Content-Type: application/json
+ce-specversion: 1.0
+ce-id: 34921f5b-e623-401e-87ea-5a754dd262c3
+ce-source: https://preprod.teacher-qualifications-api.education.gov.uk/
+ce-type: alert.created
+ce-dataschema: https://preprod.teacher-qualifications-api.education.gov.uk/swagger/v3_20240606.json
+ce-time: 2024-07-22T14:17:33.7685924Z
+content-digest: SHA-256=BKUBa2HuBCsCeb29BexPok4WhWLwqNcqrIwCfv1YaA0=
+Content-Length: 433
+
 {
-  "type": "",
-  "timestamp": "",
-  "apiVersion": "",
-  "data": {
-    //...
+  "trn": "1234567",
+  "alert": {
+    "alertId": "32c934c8-3aa4-4edc-aff2-f46e72385bb1",
+    "alertType": {
+      "alertTypeId": "17440175-d2bc-488e-ad4b-9975a1d16cc1",
+      "alertCategory": {
+        "alertCategoryId": "47d5fd72-a8cc-4f4f-b78d-63f65bdcc4ef",
+        "name": "Prohibitions"
+      },
+      "name": "Prohibited by the Secretary of State"
+    },
+    "startDate": "2024-07-22",
+    "endDate": null
   }
 }
 ```
-
-`type` is a string identifying the type of event that generated the webhook. See [message types](#message-types).
-
-`timestamp` is a UTC ISO 8601 timestamp describing when the webhook was generated.
-
-`apiVersion` is the schema version used to format the `data` and aligns with the `X-Api-Version` header values used when calling the API.
-
-`data` is a type-specific object with the details of the event. Each `type` has its own message schema.
 
 
 ## Receiving webhooks
@@ -47,8 +66,8 @@ If after the final retry the message was still not delivered successfully no fur
 
 ## Verifying the webhook
 
-Follow [the spec](https://github.com/standard-webhooks/standard-webhooks/blob/main/spec/standard-webhooks.md#verifying-signatures) for verifying the webhook's signature.
-We use asymmetric signatures; you will be given the public key to use for verifying webhooks when your endpoint is configured.
+Follow [the spec](https://www.rfc-editor.org/rfc/rfc9421.html#name-verifying-a-signature) for verifying the webhook's signature.
+You will be given a public key to use for verifying webhooks when your endpoint is configured.
 
 The `ping` message can be used to aid verification.
 
