@@ -62,6 +62,7 @@
     <PackageVersion Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.1.27" />
     <PackageVersion Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" Version="1.1.27" />
     <PackageVersion Include="Moq" Version="4.20.70" />
+    <PackageVersion Include="Npgsql.DependencyInjection" Version="8.0.3" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="5.2.0" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="5.2.0" />

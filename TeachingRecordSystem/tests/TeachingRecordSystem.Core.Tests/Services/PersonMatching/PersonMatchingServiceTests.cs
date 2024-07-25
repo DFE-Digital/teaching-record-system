@@ -18,16 +18,14 @@ public class PersonMatchingServiceTests : IAsyncLifetime
         DbFixture = dbFixture;
         Clock = new();
 
-        var dbContextFactory = dbFixture.GetDbContextFactory();
-
         var syncHelper = new TrsDataSyncHelper(
-            dbContextFactory,
+            dbFixture.GetDataSource(),
             organizationService,
             referenceDataCache,
             Clock);
 
         TestData = new TestData(
-            dbContextFactory,
+            dbFixture.GetDbContextFactory(),
             organizationService,
             referenceDataCache,
             Clock,

@@ -34,16 +34,14 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         DbFixture = dbFixture;
         Clock = new();
 
-        var dbContextFactory = dbFixture.GetDbContextFactory();
-
         Helper = new TrsDataSyncHelper(
-            dbContextFactory,
+            dbFixture.GetDataSource(),
             organizationService,
             referenceDataCache,
             Clock);
 
         TestData = new TestData(
-            dbContextFactory,
+            dbFixture.GetDbContextFactory(),
             organizationService,
             referenceDataCache,
             Clock,
