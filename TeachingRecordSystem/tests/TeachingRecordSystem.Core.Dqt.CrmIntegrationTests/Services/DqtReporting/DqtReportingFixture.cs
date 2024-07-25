@@ -23,7 +23,11 @@ public class DqtReportingFixture
 
     public IClock Clock => _crmClientFixture.Clock;
 
+    public DbFixture DbFixture => _crmClientFixture.DbFixture;
+
     public string ReportingDbConnectionString { get; }
+
+    public CrmClientFixture.TestDataScope CreateTestDataScope(bool withSync) => _crmClientFixture.CreateTestDataScope(withSync);
 
     public Task PublishChangedItemsAndConsume(params IChangedItem[] changedItems) =>
         WithService(async (service, changesObserver) =>
@@ -31,7 +35,7 @@ public class DqtReportingFixture
             await service.LoadEntityMetadata();
 
             changesObserver.OnNext(changedItems);
-            var processTask = service.ProcessChangesForEntityType(Contact.EntityLogicalName, CancellationToken.None);
+            var processTask = service.ProcessCrmChangesForEntityType(Contact.EntityLogicalName, CancellationToken.None);
             changesObserver.OnCompleted();
             await processTask;
         });
@@ -45,7 +49,8 @@ public class DqtReportingFixture
             PollIntervalSeconds = 60,
             ProcessAllEntityTypesConcurrently = false,
             ReportingDbConnectionString = ReportingDbConnectionString,
-            RunService = true
+            RunService = true,
+            SyncTrsChanges = true
         });
 
         using var crmEntityChangesService = new TestableCrmEntityChangesService();
@@ -61,6 +66,7 @@ public class DqtReportingFixture
             _crmClientFixture.CreateQueryDispatcher(),
             Clock,
             telemetryClient,
+            _crmClientFixture.Configuration,
             logger);
 
         await action(service, changesObserver);

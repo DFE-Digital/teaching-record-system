@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
+using Npgsql.Replication;
+using Npgsql.Replication.PgOutput;
+using Npgsql.Replication.PgOutput.Messages;
 using Polly;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
@@ -22,6 +26,8 @@ public partial class DqtReportingService : BackgroundService
     public const string ChangesKey = "DqtReporting";
     public const string CrmClientName = "DqtReporting";
     public const string ProcessChangesOperationName = "DqtReporting: process changes";
+    public const string TrsDbPublicationName = "dqt_rep_sync";
+    public const string TrsDbReplicationSlotName = "dqt_rep_sync_slot";
 
     private const int MaxParameters = 1024;
     private const int PageSize = 500;
@@ -42,6 +48,7 @@ public partial class DqtReportingService : BackgroundService
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly IClock _clock;
     private readonly TelemetryClient _telemetryClient;
+    private readonly IConfiguration _configuration;
     private readonly ILogger<DqtReportingService> _logger;
     private readonly Dictionary<string, (EntityMetadata EntityMetadata, EntityTableMapping EntityTableMapping)> _entityMetadata = new();
 
@@ -51,6 +58,7 @@ public partial class DqtReportingService : BackgroundService
         [FromKeyedServices(CrmClientName)] ICrmQueryDispatcher crmQueryDispatcher,
         IClock clock,
         TelemetryClient telemetryClient,
+        IConfiguration configuration,
         ILogger<DqtReportingService> logger)
     {
         _options = optionsAccessor.Value;
@@ -58,43 +66,57 @@ public partial class DqtReportingService : BackgroundService
         _crmQueryDispatcher = crmQueryDispatcher;
         _clock = clock;
         _telemetryClient = telemetryClient;
+        _configuration = configuration;
         _logger = logger;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await LoadEntityMetadata();
+        var tasks = new List<Task>();
+        tasks.Add(PollCrmChanges());
 
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(_options.PollIntervalSeconds));
-
-        do
+        if (_options.SyncTrsChanges)
         {
-            try
-            {
-                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessChanges(ct), stoppingToken);
-            }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-            }
-            catch (ProcessChangesException ex)
-                when (ex.InnerException is SqlException sqlException &&
-                    (sqlException.IsTransient || sqlException.Message.StartsWith("Execution Timeout Expired.")))
-            {
-                _logger.LogWarning(ex, "Transient SQL exception thrown.");
-                continue;
-            }
-            catch (ProcessChangesException ex)
-            {
-                _logger.LogError(ex.InnerException, ex.Message);
-                return;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed processing entity changes.");
-                return;
-            }
+            tasks.Add(ProcessTrsChanges(stoppingToken));
         }
-        while (await timer.WaitForNextTickAsync(stoppingToken));
+
+        return Task.WhenAll(tasks);
+
+        async Task PollCrmChanges()
+        {
+            await LoadEntityMetadata();
+
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(_options.PollIntervalSeconds));
+
+            do
+            {
+                try
+                {
+                    await _resiliencePipeline.ExecuteAsync(async ct => await ProcessCrmChanges(ct), stoppingToken);
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                }
+                catch (ProcessCrmChangesException ex)
+                    when (ex.InnerException is SqlException sqlException &&
+                        (sqlException.IsTransient || sqlException.Message.StartsWith("Execution Timeout Expired.")))
+                {
+                    _logger.LogWarning(ex, "Transient SQL exception thrown.");
+                    continue;
+                }
+                catch (ProcessCrmChangesException ex)
+                {
+                    _logger.LogError(ex.InnerException, ex.Message);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed processing entity changes.");
+                    return;
+                }
+            }
+            while (await timer.WaitForNextTickAsync(stoppingToken));
+        }
     }
 
     internal async Task LoadEntityMetadata()
@@ -139,7 +161,7 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    internal async Task ProcessChanges(CancellationToken cancellationToken)
+    internal async Task ProcessCrmChanges(CancellationToken cancellationToken)
     {
         using var operation = _telemetryClient.StartOperation<DependencyTelemetry>(ProcessChangesOperationName);
 
@@ -154,7 +176,7 @@ public partial class DqtReportingService : BackgroundService
             {
                 try
                 {
-                    await ProcessChangesForEntityType(entityType, ct);
+                    await ProcessCrmChangesForEntityType(entityType, ct);
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {
@@ -162,12 +184,12 @@ public partial class DqtReportingService : BackgroundService
                 }
                 catch (Exception ex)
                 {
-                    throw new ProcessChangesException(entityType, ex);
+                    throw new ProcessCrmChangesException(entityType, ex);
                 }
             });
     }
 
-    internal async Task ProcessChangesForEntityType(string entityLogicalName, CancellationToken cancellationToken)
+    internal async Task ProcessCrmChangesForEntityType(string entityLogicalName, CancellationToken cancellationToken)
     {
         var totalProcessed = 0;
 
@@ -428,11 +450,134 @@ public partial class DqtReportingService : BackgroundService
             await command.ExecuteNonQueryAsync(cancellationToken);
         }
     }
+
+    internal async Task ProcessTrsChanges(CancellationToken cancellationToken, IObserver<PgOutputReplicationMessage>? observer = null)
+    {
+        await using var conn = new LogicalReplicationConnection(_configuration.GetPostgresConnectionString());
+        await conn.Open();
+
+        var slot = new PgOutputReplicationSlot(TrsDbReplicationSlotName);
+
+        await foreach (var message in conn.StartReplication(slot, new PgOutputReplicationOptions(TrsDbPublicationName, protocolVersion: 1, binary: true), cancellationToken))
+        {
+            if (message is InsertMessage insertMessage)
+            {
+                var values = await GetTupleValues(insertMessage.NewRow).ToListAsync();
+                var columns = insertMessage.Relation.Columns;
+                var columnValues = columns.Zip(values, (c, v) => (Column: c, Value: v)).ToDictionary(t => t.Column.ColumnName, t => t.Value);
+                await InsertRowFromTrs($"trs_{insertMessage.Relation.RelationName}", columnValues);
+
+                PublishConsumedMessage();
+            }
+            else if (message is UpdateMessage updateMessage)
+            {
+                var values = await GetTupleValues(updateMessage.NewRow).ToListAsync();
+                var columns = updateMessage.Relation.Columns.ToArray();
+                var idColumn = columns.Single(c => c.Flags == RelationMessage.Column.ColumnFlags.PartOfKey);
+                var columnValues = columns.Zip(values, (c, v) => (Column: c, Value: v)).Where(t => t.Column.ColumnName != idColumn.ColumnName).ToDictionary(t => t.Column.ColumnName, t => t.Value);
+                var id = values[Array.IndexOf(columns, idColumn)]!;
+                await UpdateRowFromTrs($"trs_{updateMessage.Relation.RelationName}", idColumn.ColumnName, id, columnValues);
+
+                PublishConsumedMessage();
+            }
+            else if (message is DeleteMessage deleteMessage)
+            {
+                throw new NotSupportedException();
+            }
+
+            conn.SetReplicationStatus(message.WalEnd);
+
+            void PublishConsumedMessage() => observer?.OnNext(message);
+        }
+
+        static async IAsyncEnumerable<object?> GetTupleValues(ReplicationTuple tuple)
+        {
+            await foreach (var value in tuple)
+            {
+                yield return value.IsDBNull ? null : await value.Get();
+            }
+        }
+    }
+
+    private async Task InsertRowFromTrs(string destinationTableName, IReadOnlyDictionary<string, object?> columnValues)
+    {
+        var parameters = new List<SqlParameter>();
+        var columnNames = new List<string>();
+
+        foreach (var (columnName, columnValue) in columnValues)
+        {
+            var parameterName = $"@p{parameters.Count + 1}";
+            parameters.Add(new SqlParameter(parameterName, columnValue ?? DBNull.Value));
+            columnNames.Add(columnName);
+        }
+
+        var nowParameterName = "@UtcNow";
+
+        var sql = $"""
+            insert into {destinationTableName}
+            ({string.Join(", ", columnNames.Append("__Inserted").Append("__Updated"))}) values
+            ({string.Join(", ", parameters.Select(p => p.ParameterName).Append(nowParameterName).Append(nowParameterName))})
+            """;
+
+        parameters.Add(new SqlParameter(nowParameterName, _clock.UtcNow));
+
+        using var conn = new SqlConnection(_options.ReportingDbConnectionString);
+        await conn.OpenAsync();
+
+        using var cmd = new SqlCommand(sql, conn);
+        cmd.Parameters.AddRange(parameters.ToArray());
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    private async Task UpdateRowFromTrs(string destinationTableName, string idColumnName, object id, IReadOnlyDictionary<string, object?> columnValues)
+    {
+        var parameters = new List<SqlParameter>();
+        var columnNames = new List<string>();
+
+        foreach (var (columnName, columnValue) in columnValues)
+        {
+            var parameterName = $"@p{parameters.Count + 1}";
+            parameters.Add(new SqlParameter(parameterName, columnValue ?? DBNull.Value));
+            columnNames.Add(columnName);
+        }
+
+        var nowParameterName = "@UtcNow";
+        var idParameterName = "@id";
+
+        var sql = $""""
+            update {destinationTableName} set
+            {string.Join(", ", parameters.Zip(columnNames, (p, c) => (ParameterName: p.ParameterName, ColumnName: c)).Append((ParameterName: nowParameterName, ColumnName: "__Updated")).Select(t => $"{t.ColumnName} = {t.ParameterName}"))}
+            where {idColumnName} = {idParameterName}
+            """";
+
+        parameters.Add(new SqlParameter(nowParameterName, _clock.UtcNow));
+        parameters.Add(new SqlParameter(idParameterName, id));
+
+        using var conn = new SqlConnection(_options.ReportingDbConnectionString);
+        await conn.OpenAsync();
+
+        using var txn = (SqlTransaction)await conn.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+
+        using var cmd = new SqlCommand(sql, conn, txn);
+        cmd.Parameters.AddRange(parameters.ToArray());
+        var updated = await cmd.ExecuteNonQueryAsync();
+
+        if (updated == 0)
+        {
+            throw new Exception($"Update failed; row does not exist (table: '{destinationTableName}', id: '{id}').");
+        }
+        else if (updated > 1)
+        {
+            throw new Exception($"Update failed; multiple rows would be updated (table: '{destinationTableName}', id: '{id}').");
+        }
+
+        await txn.CommitAsync();
+    }
 }
 
-file class ProcessChangesException : Exception
+file class ProcessCrmChangesException : Exception
 {
-    public ProcessChangesException(string entityType, Exception innerException)
+    public ProcessCrmChangesException(string entityType, Exception innerException)
         : base(GetMessage(entityType), innerException)
     {
         EntityType = entityType;

@@ -87,6 +87,12 @@ just install-tools
 Install Postgres then set a connection string configuration entry in user secrets for running the apps and another for running the tests.
 Note you should use a different database for tests as the test database will be cleared down whenever tests are run.
 
+The server's `wal_level` must be set to `logical`:
+```
+ALTER SYSTEM SET wal_level = logical;
+```
+You may have to restart the server after amending this configuration.
+
 e.g.
 ```shell
 just set-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
