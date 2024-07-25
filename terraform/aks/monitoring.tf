@@ -13,5 +13,5 @@ module "statuscake" {
 
   ssl_urls = var.ssl_urls
 
-  contact_groups = [288912]
+  contact_groups = [288912, 282453]
 }
