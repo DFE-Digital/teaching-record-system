@@ -103,7 +103,8 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
                 Description = description,
                 EvidenceFileName = JourneyInstance!.State.EvidenceFileName!,
                 EvidenceFileContent = stream,
-                EvidenceFileMimeType = evidenceFileMimeType
+                EvidenceFileMimeType = evidenceFileMimeType,
+                EmailAddress = JourneyInstance!.State.Email!
             });
 
         await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
