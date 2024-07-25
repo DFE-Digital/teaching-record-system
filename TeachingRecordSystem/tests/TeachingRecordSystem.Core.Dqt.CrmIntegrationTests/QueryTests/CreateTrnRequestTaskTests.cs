@@ -24,13 +24,15 @@ public class CreateTrnRequestTaskTests : IAsyncLifetime
         var evidenceFileName = $"evidence-{uniqueId}.jpg";
         var evidenceFileContent = new MemoryStream(TestCommon.TestData.JpegImage);
         var evidenceFileMimeType = "image/jpeg";
+        var email = Faker.Internet.Email();
 
         var query = new CreateTrnRequestTaskQuery()
         {
             Description = description,
             EvidenceFileName = evidenceFileName,
             EvidenceFileContent = evidenceFileContent,
-            EvidenceFileMimeType = evidenceFileMimeType
+            EvidenceFileMimeType = evidenceFileMimeType,
+            EmailAddress = email
         };
 
         // Act
@@ -43,6 +45,7 @@ public class CreateTrnRequestTaskTests : IAsyncLifetime
         Assert.NotNull(createdCrmTask);
         Assert.Equal("Notification for TRA Support Team - TRN request", createdCrmTask.Subject);
         Assert.Equal(description, createdCrmTask.Description);
+        Assert.Equal(createdCrmTask.dfeta_EmailAddress, email);
 
         var createdAnnotation = ctx.AnnotationSet.SingleOrDefault(i => i.GetAttributeValue<string>(Annotation.Fields.FileName) == evidenceFileName);
         Assert.NotNull(createdAnnotation);

@@ -116,7 +116,6 @@ public class EmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasError(response, "Email", "Enter an email address in the correct format, like name@example.com");
     }
 
-
     [Fact]
     public async Task Post_ValidRequestWithValidData_RedirectsToNamePage()
     {
@@ -139,5 +138,35 @@ public class EmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_RequestForEmailWithOpenTasks_RedirectsToEmailInUse()
+    {
+        // Arrange
+        var email = Faker.Internet.Email();
+        var state = CreateNewState();
+        var journeyInstance = await CreateJourneyInstance(state);
+        var person = await TestData.CreatePerson();
+        await TestData.CreateCrmTask(x =>
+        {
+            x.WithPersonId(person.ContactId);
+            x.WithEmailAddress(email);
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/email?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "Email", email }
+            })
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/emailinuse?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 }
