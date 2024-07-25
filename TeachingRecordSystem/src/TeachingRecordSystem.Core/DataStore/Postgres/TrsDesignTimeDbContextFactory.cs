@@ -11,7 +11,7 @@ public class TrsDesignTimeDbContextFactory : IDesignTimeDbContextFactory<TrsDbCo
             .AddUserSecrets<TrsDesignTimeDbContextFactory>(optional: true)  // Optional for CI
             .Build();
 
-        var connectionString = configuration.GetRequiredConnectionString("DefaultConnection");
+        var connectionString = configuration.GetPostgresConnectionString();
 
         var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
         TrsDbContext.ConfigureOptions(optionsBuilder, connectionString);

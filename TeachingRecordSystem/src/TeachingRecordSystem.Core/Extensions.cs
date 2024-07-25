@@ -32,14 +32,23 @@ public static class Extensions
     {
         var pgConnectionString = GetPostgresConnectionString(builder.Configuration);
 
-        builder.Services.AddDbContext<TrsDbContext>(
-            options => TrsDbContext.ConfigureOptions(options, pgConnectionString),
+        builder.Services.AddDatabase(pgConnectionString);
+
+        return builder;
+    }
+
+    public static IServiceCollection AddDatabase(this IServiceCollection services, string connectionString)
+    {
+        services.AddNpgsqlDataSource(connectionString, builder => builder.Name = "TrsDb");
+
+        services.AddDbContext<TrsDbContext>(
+            options => TrsDbContext.ConfigureOptions(options),
             contextLifetime: ServiceLifetime.Transient,
             optionsLifetime: ServiceLifetime.Singleton);
 
-        builder.Services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options, pgConnectionString));
+        services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options));
 
-        return builder;
+        return services;
     }
 
     public static IHostApplicationBuilder AddHangfire(this IHostApplicationBuilder builder)
@@ -48,11 +57,11 @@ public static class Extensions
         {
             var pgConnectionString = GetPostgresConnectionString(builder.Configuration);
 
-            builder.Services.AddHangfire(configuration => configuration
+            builder.Services.AddHangfire((sp, configuration) => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(o => o.UseNpgsqlConnection(pgConnectionString)));
+                .UsePostgreSqlStorage(o => o.UseExistingNpgsqlConnection(sp.GetRequiredService<NpgsqlDataSource>().CreateConnection())));
         }
 
         return builder;

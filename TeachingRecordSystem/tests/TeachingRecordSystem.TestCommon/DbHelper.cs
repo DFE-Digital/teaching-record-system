@@ -8,31 +8,26 @@ using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUse
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class DbHelper(string connectionString)
+public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
 {
     private Respawner? _respawner;
     private readonly SemaphoreSlim _schemaLock = new(1, 1);
     private bool _haveResetSchema = false;
 
-    public string ConnectionString { get; } = connectionString;
+    public IDbContextFactory<TrsDbContext> DbContextFactory { get; } = dbContextFactory;
 
     public static void ConfigureDbServices(IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<TrsDbContext>(
-            options => TrsDbContext.ConfigureOptions(options, connectionString),
-            contextLifetime: ServiceLifetime.Transient);
+        services.AddDatabase(connectionString);
 
-        services.AddDbContextFactory<TrsDbContext>(
-            options => TrsDbContext.ConfigureOptions(options, connectionString));
-
-        services.AddSingleton(new DbHelper(connectionString));
+        services.AddSingleton<DbHelper>();
 
         services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().EnsureSchema());
     }
 
     public async Task ClearData()
     {
-        using var dbContext = TrsDbContext.Create(ConnectionString);
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
         await dbContext.Database.OpenConnectionAsync();
         var connection = dbContext.Database.GetDbConnection();
         await EnsureRespawner(connection);
@@ -63,7 +58,7 @@ public class DbHelper(string connectionString)
 
     public async Task ResetSchema()
     {
-        using var dbContext = TrsDbContext.Create(ConnectionString);
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
         var connection = dbContext.Database.GetDbConnection();
         var dbName = connection.Database;

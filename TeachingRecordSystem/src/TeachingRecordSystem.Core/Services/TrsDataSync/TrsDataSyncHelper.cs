@@ -18,7 +18,7 @@ using TeachingRecordSystem.Core.Dqt;
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
 public class TrsDataSyncHelper(
-    IDbContextFactory<TrsDbContext> dbContextFactory,
+    NpgsqlDataSource trsDbDataSource,
     [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
     ReferenceDataCache referenceDataCache,
     IClock clock)
@@ -114,10 +114,7 @@ public class TrsDataSyncHelper(
 
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
 
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-
-        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
-        await connection.OpenAsync(cancellationToken);
+        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
 
         using (var cmd = connection.CreateCommand())
         {
@@ -131,10 +128,7 @@ public class TrsDataSyncHelper(
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
 
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-
-        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
-        await connection.OpenAsync();
+        await using var connection = await trsDbDataSource.OpenConnectionAsync();
 
         using (var cmd = connection.CreateCommand())
         {
@@ -190,10 +184,7 @@ public class TrsDataSyncHelper(
 
         var modelTypeSyncInfo = GetModelTypeSyncInfo<Person>(ModelTypes.Person);
 
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-
-        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
-        await connection.OpenAsync(cancellationToken);
+        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
         using var txn = await connection.BeginTransactionAsync(cancellationToken);
 
         using (var createTempTableCommand = connection.CreateCommand())
@@ -249,7 +240,6 @@ public class TrsDataSyncHelper(
 
             await txn.DisposeAsync();
             await connection.DisposeAsync();
-            await dbContext.DisposeAsync();
 
             return await SyncPersons(entitiesExceptFailedOne, ignoreInvalid, cancellationToken);
         }
@@ -341,10 +331,7 @@ public class TrsDataSyncHelper(
 
         var modelTypeSyncInfo = GetModelTypeSyncInfo<MandatoryQualification>(ModelTypes.MandatoryQualification);
 
-        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-
-        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
-        await connection.OpenAsync(cancellationToken);
+        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
 
         var toSync = mqs.ToList();
 

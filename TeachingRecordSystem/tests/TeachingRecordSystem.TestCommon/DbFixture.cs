@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -8,6 +9,8 @@ public class DbFixture(DbHelper dbHelper, IServiceProvider serviceProvider)
     public DbHelper DbHelper { get; } = dbHelper;
 
     public IServiceProvider Services { get; } = serviceProvider;
+
+    public NpgsqlDataSource GetDataSource() => Services.GetRequiredService<NpgsqlDataSource>();
 
     public TrsDbContext GetDbContext() => Services.GetRequiredService<TrsDbContext>();
 
