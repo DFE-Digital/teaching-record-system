@@ -1,3 +1,4 @@
+using Medallion.Threading.FileSystem;
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -23,7 +24,13 @@ public class DqtReportingFixture
 
     public IClock Clock => _crmClientFixture.Clock;
 
+    public DbFixture DbFixture => _crmClientFixture.DbFixture;
+
     public string ReportingDbConnectionString { get; }
+
+    public string TrsDbReplicationSlotName { get; } = "dqt_rep_sync_slot_test";
+
+    public CrmClientFixture.TestDataScope CreateTestDataScope(bool withSync) => _crmClientFixture.CreateTestDataScope(withSync);
 
     public Task PublishChangedItemsAndConsume(params IChangedItem[] changedItems) =>
         WithService(async (service, changesObserver) =>
@@ -31,7 +38,7 @@ public class DqtReportingFixture
             await service.LoadEntityMetadata();
 
             changesObserver.OnNext(changedItems);
-            var processTask = service.ProcessChangesForEntityType(Contact.EntityLogicalName, CancellationToken.None);
+            var processTask = service.ProcessCrmChangesForEntityType(Contact.EntityLogicalName, CancellationToken.None);
             changesObserver.OnCompleted();
             await processTask;
         });
@@ -45,11 +52,15 @@ public class DqtReportingFixture
             PollIntervalSeconds = 60,
             ProcessAllEntityTypesConcurrently = false,
             ReportingDbConnectionString = ReportingDbConnectionString,
-            RunService = true
+            RunService = true,
+            TrsDbReplicationSlotName = TrsDbReplicationSlotName
         });
 
         using var crmEntityChangesService = new TestableCrmEntityChangesService();
         var changesObserver = crmEntityChangesService.GetChangedItemsObserver(Contact.EntityLogicalName);
+
+        var lockFileDirectory = Path.Combine(Path.GetTempPath(), "trstestlocks");
+        var distributedLockProvider = new FileDistributedSynchronizationProvider(new DirectoryInfo(lockFileDirectory));
 
         var telemetryClient = new TelemetryClient(new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration());
 
@@ -59,8 +70,10 @@ public class DqtReportingFixture
             options,
             crmEntityChangesService,
             _crmClientFixture.CreateQueryDispatcher(),
+            distributedLockProvider,
             Clock,
             telemetryClient,
+            _crmClientFixture.Configuration,
             logger);
 
         await action(service, changesObserver);
