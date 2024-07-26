@@ -61,7 +61,7 @@ public static class Extensions
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(o => o.UseExistingNpgsqlConnection(sp.GetRequiredService<NpgsqlDataSource>().CreateConnection())));
+                .UsePostgreSqlStorage(o => o.UseConnectionFactory(new DbDataSourceConnectionFactory(sp.GetRequiredService<NpgsqlDataSource>()))));
         }
 
         return builder;
@@ -94,4 +94,9 @@ public static class Extensions
             // We rely on error details to get the offending duplicate key values in the TrsDataSyncHelper
             IncludeErrorDetail = true
         }.ConnectionString;
+
+    private class DbDataSourceConnectionFactory(NpgsqlDataSource dataSource) : IConnectionFactory
+    {
+        public NpgsqlConnection GetOrCreateConnection() => dataSource.CreateConnection();
+    }
 }
