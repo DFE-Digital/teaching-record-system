@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Npgsql;
 using Prometheus;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
@@ -23,7 +24,7 @@ public static class Extensions
         builder.AddHangfire();
         builder.AddBackgroundWorkScheduler();
 
-        builder.Services.AddHealthChecks().AddNpgSql(builder.Configuration.GetPostgresConnectionString());
+        builder.Services.AddHealthChecks().AddNpgSql(sp => sp.GetRequiredService<NpgsqlDataSource>());
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         builder.Services.AddSingleton<UrlRedactor>();
 
