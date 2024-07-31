@@ -47,6 +47,11 @@ variable "enable_monitoring" {
 
 variable "enable_logit" { default = false }
 
+variable "enable_prometheus_monitoring" {
+  type    = bool
+  default = false
+}
+
 variable "deploy_azure_backing_services" {
   type    = string
   default = true

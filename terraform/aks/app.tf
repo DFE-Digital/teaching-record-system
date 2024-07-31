@@ -192,12 +192,13 @@ module "ui_application" {
   kubernetes_config_map_name = module.ui_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.ui_application_configuration.kubernetes_secret_name
 
-  docker_image = var.docker_image
-  command      = ["/bin/ash", "-c", "cd /Apps/SupportUi/; dotnet TeachingRecordSystem.SupportUi.dll;"]
-  web_port     = 80
-  probe_path   = "/health"
-  replicas     = var.ui_replicas
-  enable_logit = var.enable_logit
+  docker_image                 = var.docker_image
+  command                      = ["/bin/ash", "-c", "cd /Apps/SupportUi/; dotnet TeachingRecordSystem.SupportUi.dll;"]
+  web_port                     = 80
+  probe_path                   = "/health"
+  replicas                     = var.ui_replicas
+  enable_logit                 = var.enable_logit
+  enable_prometheus_monitoring = var.enable_prometheus_monitoring
 }
 
 module "worker_application_configuration" {
@@ -242,9 +243,10 @@ module "worker_application" {
   kubernetes_config_map_name = module.worker_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.worker_application_configuration.kubernetes_secret_name
 
-  docker_image = var.docker_image
-  command      = ["/bin/ash", "-c", "cd /Apps/Worker/; dotnet TeachingRecordSystem.Worker.dll;"]
-  replicas     = var.worker_replicas
-  max_memory   = var.worker_max_memory
-  enable_logit = var.enable_logit
+  docker_image                 = var.docker_image
+  command                      = ["/bin/ash", "-c", "cd /Apps/Worker/; dotnet TeachingRecordSystem.Worker.dll;"]
+  replicas                     = var.worker_replicas
+  max_memory                   = var.worker_max_memory
+  enable_logit                 = var.enable_logit
+  enable_prometheus_monitoring = var.enable_prometheus_monitoring
 }
