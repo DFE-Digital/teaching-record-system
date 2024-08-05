@@ -82,10 +82,10 @@ public enum IttProgrammeType
     HighPotentialITT = 389040024,
 
     [Description("Primary and secondary undergraduate fee funded")]
-    Primaryandsecondaryundergraduatefeefunded = 389040025,
+    PrimaryAndSecondaryUndergraduateFeeFunded = 389040025,
 
     [Description("Primary and secondary postgraduate fee funded")]
-    Primaryandsecondarypostgraduatefeefunded = 389040026
+    PrimaryAndSecondaryPostgraduateFeeFunded = 389040026
 }
 
 public static class IttProgrammeTypeExtensions
