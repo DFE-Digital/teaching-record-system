@@ -800,6 +800,8 @@ public class UpdateTeacherTests : TestBase
     [InlineData(IttProgrammeType.UndergraduateOptIn)]
     [InlineData(IttProgrammeType.LicensedTeacherProgramme)]
     [InlineData(IttProgrammeType.ProviderLedPostgrad)]
+    [InlineData(IttProgrammeType.PrimaryAndSecondaryPostgraduateFeeFunded)]
+    [InlineData(IttProgrammeType.PrimaryAndSecondaryUndergraduateFeeFunded)]
     public async Task Given_non_asessmentonlyroute_programmetypes_then_underassessment_outcome_is_not_permitted(IttProgrammeType programmeType)
     {
         // Arrange
