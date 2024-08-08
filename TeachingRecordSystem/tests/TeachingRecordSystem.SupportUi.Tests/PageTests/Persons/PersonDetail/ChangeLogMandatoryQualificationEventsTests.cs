@@ -321,6 +321,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 EventId = Guid.NewGuid(),
                 CreatedUtc = now,
                 RaisedBy = dqtUser,
+                Key = null,
                 PersonId = qualification.PersonId,
                 MandatoryQualification = new()
                 {
@@ -994,6 +995,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
             RaisedBy = deactivatedBy,
+            Key = null,
             PersonId = qualification.PersonId,
             MandatoryQualification = new()
             {
@@ -1073,6 +1075,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 EventId = Guid.NewGuid(),
                 CreatedUtc = now,
                 RaisedBy = updatedBy,
+                Key = null,
                 PersonId = qualification.PersonId,
                 MandatoryQualification = new()
                 {

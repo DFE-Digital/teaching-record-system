@@ -164,6 +164,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EventId = Guid.Empty,
                 CreatedUtc = Clock.UtcNow,
                 RaisedBy = GetCurrentUserId(),
+                Key = null,
                 PersonId = person.PersonId,
                 MandatoryQualification = new()
                 {
