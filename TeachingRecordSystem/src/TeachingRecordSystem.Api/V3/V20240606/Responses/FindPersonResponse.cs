@@ -4,16 +4,16 @@ using TeachingRecordSystem.Api.V3.V20240606.Requests;
 
 namespace TeachingRecordSystem.Api.V3.V20240606.Responses;
 
-[AutoMap(typeof(FindPersonsResult))]
-public record FindPersonsResponse
+[AutoMap(typeof(FindPersonByLastNameAndDateOfBirthResult))]
+public record FindPersonResponse
 {
     public required int Total { get; init; }
-    public required FindPersonsRequest Query { get; init; }
-    public required IReadOnlyCollection<FindPersonsResponseResult> Results { get; init; }
+    public required FindPersonRequest Query { get; init; }
+    public required IReadOnlyCollection<FindPersonResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonsResultItem))]
-public record FindPersonsResponseResult
+[AutoMap(typeof(FindPersonByLastNameAndDateOfBirthResultItem))]
+public record FindPersonResponseResult
 {
     public required string Trn { get; init; }
     public required DateOnly DateOfBirth { get; init; }

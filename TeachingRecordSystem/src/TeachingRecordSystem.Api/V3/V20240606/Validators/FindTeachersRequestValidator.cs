@@ -3,7 +3,7 @@ using TeachingRecordSystem.Api.V3.V20240606.Requests;
 
 namespace TeachingRecordSystem.Api.V3.V20240606.Validators;
 
-public class FindTeachersRequestValidator : AbstractValidator<FindPersonsRequest>
+public class FindTeachersRequestValidator : AbstractValidator<FindPersonRequest>
 {
     public FindTeachersRequestValidator()
     {
@@ -13,12 +13,12 @@ public class FindTeachersRequestValidator : AbstractValidator<FindPersonsRequest
 
         RuleFor(r => r.DateOfBirth)
             .NotNull()
-            .When(r => r.FindBy == FindPersonsFindBy.LastNameAndDateOfBirth)
-            .WithMessage($"A value is required when findBy is '{nameof(FindPersonsFindBy.LastNameAndDateOfBirth)}'.");
+            .When(r => r.FindBy == FindPersonFindBy.LastNameAndDateOfBirth)
+            .WithMessage($"A value is required when findBy is '{nameof(FindPersonFindBy.LastNameAndDateOfBirth)}'.");
 
         RuleFor(r => r.LastName)
             .NotEmpty()
-            .When(r => r.FindBy == FindPersonsFindBy.LastNameAndDateOfBirth)
-            .WithMessage($"A value is required when findBy is '{nameof(FindPersonsFindBy.LastNameAndDateOfBirth)}'.");
+            .When(r => r.FindBy == FindPersonFindBy.LastNameAndDateOfBirth)
+            .WithMessage($"A value is required when findBy is '{nameof(FindPersonFindBy.LastNameAndDateOfBirth)}'.");
     }
 }

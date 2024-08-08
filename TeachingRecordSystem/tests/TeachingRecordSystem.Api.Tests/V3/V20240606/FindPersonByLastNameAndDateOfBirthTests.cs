@@ -3,9 +3,9 @@ using System.Diagnostics;
 namespace TeachingRecordSystem.Api.Tests.V3.V20240606;
 
 [Collection(nameof(DisableParallelization))]
-public class FindTeachersTests : TestBase
+public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 {
-    public FindTeachersTests(HostFixture hostFixture)
+    public FindPersonByLastNameAndDateOfBirthTests(HostFixture hostFixture)
         : base(hostFixture)
     {
         XrmFakedContext.DeleteAllEntities<Contact>();
