@@ -7,11 +7,11 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
-public record FindPersonsCommand(string LastName, DateOnly? DateOfBirth);
+public record FindPersonByLastNameAndDateOfBirthCommand(string LastName, DateOnly? DateOfBirth);
 
-public record FindPersonsResult(int Total, IReadOnlyCollection<FindPersonsResultItem> Items);
+public record FindPersonByLastNameAndDateOfBirthResult(int Total, IReadOnlyCollection<FindPersonByLastNameAndDateOfBirthResultItem> Items);
 
-public record FindPersonsResultItem
+public record FindPersonByLastNameAndDateOfBirthResultItem
 {
     public required string Trn { get; init; }
     public required DateOnly DateOfBirth { get; init; }
@@ -22,11 +22,11 @@ public record FindPersonsResultItem
     public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
 }
 
-public class FindPersonsHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfiguration configuration)
+public class FindPersonByLastNameAndDateOfBirthHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfiguration configuration)
 {
     private readonly TimeSpan _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue("ConcurrentNameChangeWindowSeconds", 5));
 
-    public async Task<FindPersonsResult> Handle(FindPersonsCommand command)
+    public async Task<FindPersonByLastNameAndDateOfBirthResult> Handle(FindPersonByLastNameAndDateOfBirthCommand command)
     {
         var contacts = await crmQueryDispatcher.ExecuteQuery(
             new GetActiveContactsByLastNameAndDateOfBirthQuery(
@@ -55,9 +55,9 @@ public class FindPersonsHandler(ICrmQueryDispatcher crmQueryDispatcher, IConfigu
                 kvp => kvp.Key,
                 kvp => PreviousNameHelper.GetFullPreviousNames(kvp.Value, contactsById[kvp.Key], _concurrentNameChangeWindow));
 
-        return new FindPersonsResult(
+        return new FindPersonByLastNameAndDateOfBirthResult(
             Total: contacts.Length,
-            Items: contacts.Select(r => new FindPersonsResultItem()
+            Items: contacts.Select(r => new FindPersonByLastNameAndDateOfBirthResultItem()
             {
                 Trn = r.dfeta_TRN,
                 DateOfBirth = r.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),

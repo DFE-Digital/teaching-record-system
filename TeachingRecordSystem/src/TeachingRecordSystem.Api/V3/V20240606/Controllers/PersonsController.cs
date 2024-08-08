@@ -45,24 +45,24 @@ public class PersonsController(IMapper mapper) : ControllerBase
 
     [HttpGet("")]
     [SwaggerOperation(
-        OperationId = "FindPersons",
-        Summary = "Find persons",
-        Description = "Finds persons with a TRN matching the specified criteria.")]
-    [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
+        OperationId = "FindPerson",
+        Summary = "Find person",
+        Description = "Finds a person matching the specified criteria.")]
+    [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.GetPerson)]
     public async Task<IActionResult> FindTeachers(
-        FindPersonsRequest request,
-        [FromServices] FindPersonsHandler handler)
+        FindPersonRequest request,
+        [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
     {
-        var command = new FindPersonsCommand(request.LastName!, request.DateOfBirth!.Value);
+        var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
         var result = await handler.Handle(command);
 
-        var response = new FindPersonsResponse()
+        var response = new FindPersonResponse()
         {
             Total = result.Total,
             Query = request,
-            Results = result.Items.Select(mapper.Map<FindPersonsResponseResult>).AsReadOnly()
+            Results = result.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
         };
 
         return Ok(response);
