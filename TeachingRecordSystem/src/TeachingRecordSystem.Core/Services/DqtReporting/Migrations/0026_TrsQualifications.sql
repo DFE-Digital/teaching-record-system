@@ -1,0 +1,23 @@
+create table trs_qualifications (
+    qualification_id uniqueidentifier primary key,
+    created_on datetime,
+    updated_on datetime,
+    deleted_on datetime,
+    qualification_type integer,
+    person_id uniqueidentifier,
+    dqt_qualification_id uniqueidentifier,
+    dqt_first_sync datetime,
+    dqt_last_sync datetime,
+    dqt_state integer,
+    dqt_created_on datetime,
+    dqt_modified_on datetime,
+    mq_specialism integer,
+    mq_status integer,
+    start_date date,
+    end_date date,
+    dqt_mq_establishment_id uniqueidentifier,
+    dqt_specialism_id uniqueidentifier,
+    mq_provider_id uniqueidentifier,
+    [__Inserted] datetime,
+    [__Updated] datetime
+)

@@ -21,4 +21,7 @@ public class DqtReportingOptions
 
     [Required]
     public required bool RunService { get; set; }
+
+    [Required]
+    public required bool SyncTrsChanges { get; set; }
 }

@@ -1,9 +1,15 @@
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Xrm.Sdk;
+using Npgsql.Replication.PgOutput.Messages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.DqtReporting;
 using Xunit.Sdk;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.Services.DqtReporting;
 
+[Collection(nameof(ExclusiveCrmTestCollection))]
 public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixture<DqtReportingFixture>
 {
     private static readonly TimeSpan _dateTimeComparisonTolerance = TimeSpan.FromMilliseconds(500);
@@ -150,6 +156,134 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
         Assert.Equal(fixture.Clock.UtcNow, (DateTime)row["__Updated"]!, _dateTimeComparisonTolerance);
     }
 
+    [Fact]
+    public Task ProcessTrsChanges_NewRow_IsInsertedIntoDbWithCorrectValues() => ProcessTrsChangesSingle(async processChangesTask =>
+    {
+        // Arrange
+        await using var testDataScope = fixture.CreateTestDataScope(withSync: true);
+
+        var mqProviderId = MandatoryQualificationProvider.All.First().MandatoryQualificationProviderId;
+        var mqSpecialism = MandatoryQualificationSpecialism.MultiSensory;
+        var mqStatus = MandatoryQualificationStatus.Passed;
+        var mqStartDate = new DateOnly(2022, 5, 1);
+        var mqEndDate = new DateOnly(2023, 4, 1);
+
+        // Act
+        var createPersonResult = await testDataScope.TestData.CreatePerson(p => p
+            .WithMandatoryQualification(m => m
+                .WithProvider(mqProviderId)
+                .WithSpecialism(mqSpecialism)
+                .WithStartDate(mqStartDate)
+                .WithStatus(mqStatus, mqEndDate)));
+        var mq = createPersonResult.MandatoryQualifications.Single();
+
+        await processChangesTask;
+
+        // Assert
+        var row = await GetRowById("trs_qualifications", mq.QualificationId, idColumnName: "qualification_id");
+        Assert.NotNull(row);
+        Assert.Equal(createPersonResult.PersonId, row["person_id"]);
+        Assert.Equal((int)QualificationType.MandatoryQualification, row["qualification_type"]);
+        Assert.Equal(mqProviderId, row["mq_provider_id"]);
+        Assert.Equal((int)mqSpecialism, row["mq_specialism"]);
+        Assert.Equal((int)mqStatus, row["mq_status"]);
+        Assert.Equal(mqStartDate, ConvertDateTimeColumn(row["start_date"]));
+        Assert.Equal(mqEndDate, ConvertDateTimeColumn(row["end_date"]));
+        Assert.Equal(fixture.Clock.UtcNow, (DateTime)row["__Inserted"]!, _dateTimeComparisonTolerance);
+        Assert.Equal(fixture.Clock.UtcNow, (DateTime)row["__Updated"]!, _dateTimeComparisonTolerance);
+
+        static DateOnly? ConvertDateTimeColumn(object? value) => value is null ? null : DateOnly.FromDateTime((DateTime)value);
+    });
+
+    [Fact]
+    public async Task ProcessTrsChanges_ExistingRow_IsUpdatedInDbWithCorrectValues()
+    {
+        // Arrange
+        await using var testDataScope = fixture.CreateTestDataScope(withSync: true);
+
+        var insertedTime = fixture.Clock.UtcNow.AddDays(-10);
+
+        var mqProviderId = MandatoryQualificationProvider.All.First().MandatoryQualificationProviderId;
+        var mqSpecialism = MandatoryQualificationSpecialism.MultiSensory;
+        var mqStatus = MandatoryQualificationStatus.Passed;
+        var mqStartDate = new DateOnly(2022, 5, 1);
+        var mqEndDate = new DateOnly(2023, 4, 1);
+
+        var createPersonResult = await testDataScope.TestData.CreatePerson(p => p.WithMandatoryQualification());
+        var mq = createPersonResult.MandatoryQualifications.Single();
+
+        await InsertRow("trs_qualifications", new Dictionary<string, object?>()
+        {
+            { "qualification_id", mq.QualificationId },
+            { "person_id", createPersonResult.PersonId },
+            { "qualification_type", (int)QualificationType.MandatoryQualification },
+            { "mq_provider_id", mq.ProviderId },
+            { "mq_specialism", mq.Specialism },
+            { "mq_status", mq.Status },
+            { "start_date", mq.StartDate },
+            { "end_date", mq.EndDate },
+            { "__Inserted", insertedTime }
+        });
+
+        await ProcessTrsChangesSingle(async processChangesTask =>
+        {
+            // Act
+            await fixture.DbFixture.WithDbContext(async dbContext =>
+            {
+                var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.QualificationId == mq.QualificationId);
+                qualification.ProviderId = mqProviderId;
+                qualification.Specialism = mqSpecialism;
+                qualification.Status = mqStatus;
+                qualification.StartDate = mqStartDate;
+                qualification.EndDate = mqEndDate;
+                await dbContext.SaveChangesAsync();
+            });
+
+            await processChangesTask;
+
+            // Assert
+            var row = await GetRowById("trs_qualifications", mq.QualificationId, idColumnName: "qualification_id");
+            Assert.NotNull(row);
+            Assert.Equal(createPersonResult.PersonId, row["person_id"]);
+            Assert.Equal((int)QualificationType.MandatoryQualification, row["qualification_type"]);
+            Assert.Equal(mqProviderId, row["mq_provider_id"]);
+            Assert.Equal((int)mqSpecialism, row["mq_specialism"]);
+            Assert.Equal((int)mqStatus, row["mq_status"]);
+            Assert.Equal(mqStartDate, ConvertDateTimeColumn(row["start_date"]));
+            Assert.Equal(mqEndDate, ConvertDateTimeColumn(row["end_date"]));
+            Assert.Equal(fixture.Clock.UtcNow, (DateTime)row["__Updated"]!, _dateTimeComparisonTolerance);
+        });
+
+        static DateOnly? ConvertDateTimeColumn(object? value) => value is null ? null : DateOnly.FromDateTime((DateTime)value);
+    }
+
+    private Task ProcessTrsChangesSingle(Func<Task, Task> action) => fixture.WithService(async (service, _) =>
+    {
+        // This helper method invokes ProcessTrsChanges and waits for a single message to be consumed
+        // or an exception to be thrown.
+        // The observer passed in provides the signal when a message has been successfully consumed.
+        // The cancellation token with a delay ensures we don't wait forever.
+
+        await fixture.DbFixture.AdvanceReplicationSlotToCurrentWalLsn(DqtReportingService.TrsDbReplicationSlotName);
+
+        var replicationMessageSubject = new System.Reactive.Subjects.ReplaySubject<PgOutputReplicationMessage>();
+
+        using var cts = new CancellationTokenSource();
+        var processChangesTask = service.ProcessTrsChanges(cts.Token, replicationMessageSubject);
+
+        cts.CancelAfter(5000);
+        var t = Task.WhenAny(processChangesTask, replicationMessageSubject.FirstAsync().ToTask(cts.Token)).Unwrap();
+
+        try
+        {
+            await action(t);
+        }
+        finally
+        {
+            cts.Cancel();
+        }
+    });
+
     private async Task AssertInDeleteLog(string entityLogicalName, Guid entityId, DateTime expectedDeleted)
     {
         using var sqlConnection = new SqlConnection(fixture.ReportingDbConnectionString);
@@ -171,12 +305,12 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
         Assert.Equal(expectedDeleted, deleted, _dateTimeComparisonTolerance);
     }
 
-    private async Task<IReadOnlyDictionary<string, object?>?> GetRowById(string tableName, Guid id)
+    private async Task<IReadOnlyDictionary<string, object?>?> GetRowById(string tableName, Guid id, string idColumnName = "id")
     {
         using var sqlConnection = new SqlConnection(fixture.ReportingDbConnectionString);
         await sqlConnection.OpenAsync();
 
-        var cmd = new SqlCommand($"select * from {tableName} where id = @id");
+        var cmd = new SqlCommand($"select * from {tableName} where {idColumnName} = @id");
         cmd.Connection = sqlConnection;
         cmd.Parameters.Add(new SqlParameter("@id", id));
 
@@ -207,7 +341,7 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
         var columnValues = columns.Values.ToArray();
         for (var i = 0; i < columns.Count; i++)
         {
-            cmd.Parameters.Add(new SqlParameter($"@p{i}", columnValues[i]));
+            cmd.Parameters.Add(new SqlParameter($"@p{i}", columnValues[i] ?? DBNull.Value));
         }
 
         await cmd.ExecuteNonQueryAsync();

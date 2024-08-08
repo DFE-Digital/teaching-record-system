@@ -12,6 +12,9 @@ public class DbFixture(DbHelper dbHelper, IServiceProvider serviceProvider)
 
     public NpgsqlDataSource GetDataSource() => Services.GetRequiredService<NpgsqlDataSource>();
 
+    public Task AdvanceReplicationSlotToCurrentWalLsn(string slot) => WithDbContext(dbContext =>
+        dbContext.Database.ExecuteSqlAsync($"SELECT * FROM pg_replication_slot_advance({slot}, pg_current_wal_lsn());"));
+
     public TrsDbContext GetDbContext() => Services.GetRequiredService<TrsDbContext>();
 
     public IDbContextFactory<TrsDbContext> GetDbContextFactory() => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
