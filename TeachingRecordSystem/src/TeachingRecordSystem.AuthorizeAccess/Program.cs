@@ -145,7 +145,8 @@ builder.Services.AddDfeAnalytics()
             ctx.Request.Path != "/status" &&
             ctx.Request.Path != "/health" &&
             ctx.Features.Any(f => f.Key == typeof(IEndpointFeature));
-    });
+    })
+    .UseFederatedAksBigQueryClientProvider();
 
 builder.Services
     .AddRazorPages()
