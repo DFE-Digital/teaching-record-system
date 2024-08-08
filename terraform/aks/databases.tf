@@ -37,3 +37,9 @@ module "postgres" {
   azure_sku_name                 = var.postgres_flexible_server_sku
   azure_enable_high_availability = var.postgres_enable_high_availability
 }
+
+resource "azurerm_postgresql_flexible_server_configuration" "wal_level" {
+  name      = "wal_level"
+  server_id = module.postgres.azure_server_id
+  value     = "logical"
+}
