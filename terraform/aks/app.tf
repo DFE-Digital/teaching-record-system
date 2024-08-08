@@ -37,7 +37,7 @@ resource "kubernetes_job" "migrations" {
       }
     }
 
-    backoff_limit = 1
+    backoff_limit = 0
   }
 
   wait_for_completion = true
