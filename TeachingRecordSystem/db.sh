@@ -5,4 +5,4 @@ ENV_VARS=$(env | grep DefaultConnection | sed 's/^ConnectionStrings__DefaultConn
 /^Password/ { print "export PGPASSWORD=" substr($0, 10) }
 ')
 eval "$ENV_VARS"
-psql
+psql "$@"
