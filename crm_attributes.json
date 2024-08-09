@@ -333,6 +333,7 @@
     "regardingobjectid",
     "scheduledend",
     "statecode",
-    "subject"
+    "subject",
+    "dfeta_EmailAddress"
   ]
 }

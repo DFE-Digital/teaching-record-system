@@ -23294,6 +23294,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Id = "activityid";
 			public const string Category = "category";
 			public const string Description = "description";
+			public const string dfeta_EmailAddress = "dfeta_emailaddress";
 			public const string dfeta_potentialduplicateid = "dfeta_potentialduplicateid";
 			public const string ModifiedBy = "modifiedby";
 			public const string ModifiedOn = "modifiedon";
@@ -23438,6 +23439,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Description");
 				this.SetAttributeValue("description", value);
 				this.OnPropertyChanged("Description");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_emailaddress")]
+		public string dfeta_EmailAddress
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_emailaddress");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_EmailAddress");
+				this.SetAttributeValue("dfeta_emailaddress", value);
+				this.OnPropertyChanged("dfeta_EmailAddress");
 			}
 		}
 		

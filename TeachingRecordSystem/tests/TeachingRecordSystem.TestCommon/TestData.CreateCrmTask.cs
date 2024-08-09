@@ -23,6 +23,7 @@ public partial class TestData
         private string? _description = null;
         private DateTime? _dueDate = null;
         private TaskState? _stateCode = null;
+        private string? _emailAddress = null;
 
         public CreateCrmTaskBuilder WithPersonId(Guid personId)
         {
@@ -43,6 +44,17 @@ public partial class TestData
             }
 
             _category = category;
+            return this;
+        }
+
+        public CreateCrmTaskBuilder WithEmailAddress(string email)
+        {
+            if (_emailAddress is not null && _emailAddress != email)
+            {
+                throw new InvalidOperationException("WithEmailAddress has already been set");
+            }
+
+            _emailAddress = email;
             return this;
         }
 
@@ -132,7 +144,8 @@ public partial class TestData
                 Subject = subject,
                 Description = description,
                 ScheduledEnd = _dueDate,
-                StateCode = stateCode
+                StateCode = stateCode,
+                dfeta_EmailAddress = _emailAddress
             };
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(crmTestData.OrganizationService);

@@ -6,4 +6,5 @@ public record CreateTrnRequestTaskQuery : ICrmQuery<Guid>
     public required string EvidenceFileName { get; init; }
     public required Stream EvidenceFileContent { get; init; }
     public required string EvidenceFileMimeType { get; init; }
+    public required string EmailAddress { get; init; }
 }
