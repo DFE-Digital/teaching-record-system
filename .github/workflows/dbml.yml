@@ -50,7 +50,7 @@ jobs:
           psql -c '\dt' | sed '1,3d' | head -n -2 | sed 's/ //g' | cut -d'|' -f 2 | tr '\n' ' ' | xargs printf -- ' -t %s' | xargs pg_dump --schema-only >trs.dump
 
       - name: Create dbml file
-        run: npx -p @dbml/cli sql2dbml trs.dump --postgres -o trs.dbml
+        run: npx -p @dbml/cli@3.6.2 sql2dbml trs.dump --postgres -o trs.dbml
 
       - name: Publish dbml file
         uses: actions/upload-artifact@v4
