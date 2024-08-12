@@ -12,25 +12,25 @@ A check for the reliability of the Withdrawal Indicator by establishments to ind
 
 ```
 WITH withdrawal_indicator_revert_keys AS (
-	SELECT
-		distinct key
-	FROM
-		tps_csv_extract_items x1
-	WHERE
-		withdrawl_indicator = 'W'
-		AND EXISTS (SELECT
-			   			1
-			    	FROM
-			   			tps_csv_extract_items x2
-				    WHERE
-				   		x2.key = x1.key
-						AND x2.extract_date > x1.extract_date
-				   		AND x2.withdrawl_indicator IS NULL)
+  SELECT
+    distinct key
+  FROM
+    tps_csv_extract_items x1
+  WHERE
+    withdrawal_indicator = 'W'
+    AND EXISTS (SELECT
+                  1
+                FROM
+                  tps_csv_extract_items x2
+                WHERE
+                  x2.key = x1.key
+                  AND x2.extract_date > x1.extract_date
+                  AND x2.withdrawal_indicator IS NULL)
 )
 SELECT
-	COUNT(1)
+  COUNT(1)
 FROM
-	withdrawal_indicator_revert_keys
+  withdrawal_indicator_revert_keys
 ```
 
 ### Get examples of records with Withdrawal Indicator 'W' that reverts in future extracts
@@ -39,47 +39,47 @@ A check for the reliability of the Withdrawal Indicator by establishments to ind
 
 ```
 WITH withdrawal_indicator_revert_keys AS (
-	SELECT
-		distinct key
-	FROM
-		tps_csv_extract_items x1
-	WHERE
-		withdrawl_indicator = 'W'
-		AND EXISTS (SELECT
-			   			1
-			    	FROM
-			   			tps_csv_extract_items x2
-				    WHERE
-				   		x2.key = x1.key
-						AND x2.extract_date > x1.extract_date
-				   		AND x2.withdrawl_indicator IS NULL)
+  SELECT
+    distinct key
+  FROM
+    tps_csv_extract_items x1
+  WHERE
+    withdrawal_indicator = 'W'
+    AND EXISTS (SELECT
+                  1
+                FROM
+                  tps_csv_extract_items x2
+                WHERE
+                  x2.key = x1.key
+                  AND x2.extract_date > x1.extract_date
+                  AND x2.withdrawal_indicator IS NULL)
 )
 SELECT
-	trn,
-	local_authority_code,
-	establishment_number,	
-	employment_start_date,
-	employment_end_date,
-	CASE
-		WHEN employment_type = 0 THEN 'FT'
-		WHEN employment_type = 1 THEN 'PTR'
-		WHEN employment_type = 2 THEN 'PTI'
-		WHEN employment_type = 3 THEN 'PT'
-	END employment_type,
-	withdrawl_indicator,
-	extract_date
+  trn,
+  local_authority_code,
+  establishment_number,	
+  employment_start_date,
+  employment_end_date,
+  CASE
+    WHEN employment_type = 0 THEN 'FT'
+    WHEN employment_type = 1 THEN 'PTR'
+    WHEN employment_type = 2 THEN 'PTI'
+    WHEN employment_type = 3 THEN 'PT'
+  END employment_type,
+  withdrawal_indicator,
+  extract_date
 FROM
-	tps_csv_extract_items x
+  tps_csv_extract_items x
 WHERE
-	EXISTS (SELECT
-		   		1
-		    FROM
-		   		withdrawal_indicator_revert_keys w
-		    WHERE
-		   		w.key = x.key)
+  EXISTS (SELECT
+            1
+          FROM
+            withdrawal_indicator_revert_keys w
+          WHERE
+            w.key = x.key)
 ORDER BY
-	x.key desc,
-	x.extract_date
+  x.key desc,
+  x.extract_date
 LIMIT 1000
 ```
 
@@ -89,26 +89,26 @@ A check for the reliability of the Withdrawal Indicator by establishments to ind
 
 ```
 WITH withdrawal_end_date_change_keys AS (
-	SELECT
-		distinct key
-	FROM
-		tps_csv_extract_items x1
-	WHERE
-		withdrawl_indicator = 'W'
-		AND EXISTS (SELECT
-			   			1
-			    	FROM
-			   			tps_csv_extract_items x2
-				    WHERE
-				   		x2.key = x1.key
-						AND x2.extract_date > x1.extract_date
-						AND x2.withdrawl_indicator = 'W'
-				   		AND x2.employment_end_date <> x1.employment_end_date)
+  SELECT
+    distinct key
+  FROM
+    tps_csv_extract_items x1
+  WHERE
+    withdrawal_indicator = 'W'
+    AND EXISTS (SELECT
+                  1
+                FROM
+                  tps_csv_extract_items x2
+                WHERE
+                  x2.key = x1.key
+                  AND x2.extract_date > x1.extract_date
+                  AND x2.withdrawal_indicator = 'W'
+                  AND x2.employment_end_date <> x1.employment_end_date)
 )
 SELECT
-	COUNT(1)
+  COUNT(1)
 FROM
-	withdrawal_end_date_change_keys
+  withdrawal_end_date_change_keys
 ```
 
 ### Get examples of records with Withdrawal Indicator 'W' that change end date in future extracts
@@ -117,48 +117,48 @@ A check for the reliability of the Withdrawal Indicator by establishments to ind
 
 ```
 WITH withdrawal_end_date_change_keys AS (
-	SELECT
-		distinct key
-	FROM
-		tps_csv_extract_items x1
-	WHERE
-		withdrawl_indicator = 'W'
-		AND EXISTS (SELECT
-			   			1
-			    	FROM
-			   			tps_csv_extract_items x2
-				    WHERE
-				   		x2.key = x1.key
-						AND x2.extract_date > x1.extract_date
-						AND x2.withdrawl_indicator = 'W'
-				   		AND x2.employment_end_date <> x1.employment_end_date)
+  SELECT
+    distinct key
+  FROM
+    tps_csv_extract_items x1
+  WHERE
+    withdrawal_indicator = 'W'
+    AND EXISTS (SELECT
+              1
+            FROM
+              tps_csv_extract_items x2
+            WHERE
+              x2.key = x1.key
+              AND x2.extract_date > x1.extract_date
+              AND x2.withdrawal_indicator = 'W'
+              AND x2.employment_end_date <> x1.employment_end_date)
 )
 SELECT
-	trn,
-	local_authority_code,
-	establishment_number,	
-	employment_start_date,
-	employment_end_date,
-	CASE
-		WHEN employment_type = 0 THEN 'FT'
-		WHEN employment_type = 1 THEN 'PTR'
-		WHEN employment_type = 2 THEN 'PTI'
-		WHEN employment_type = 3 THEN 'PT'
-	END employment_type,
-	withdrawl_indicator,
-	extract_date
+  trn,
+  local_authority_code,
+  establishment_number,	
+  employment_start_date,
+  employment_end_date,
+  CASE
+    WHEN employment_type = 0 THEN 'FT'
+    WHEN employment_type = 1 THEN 'PTR'
+    WHEN employment_type = 2 THEN 'PTI'
+    WHEN employment_type = 3 THEN 'PT'
+  END employment_type,
+  withdrawal_indicator,
+  extract_date
 FROM
-	tps_csv_extract_items x
+  tps_csv_extract_items x
 WHERE
-	EXISTS (SELECT
-		   		1
-		    FROM
-		   		withdrawal_end_date_change_keys w
-		    WHERE
-		   		w.key = x.key)
+  EXISTS (SELECT
+            1
+          FROM
+            withdrawal_end_date_change_keys w
+          WHERE
+            w.key = x.key)
 ORDER BY
-	x.key desc,
-	x.extract_date
+  x.key desc,
+  x.extract_date
 LIMIT 1000
 ```
 
@@ -168,32 +168,32 @@ A check for the reliability of the Withdrawal Indicator by establishments to ind
 
 ```
 WITH withdrawal_no_change_keys AS (
-	SELECT
-		distinct key
-	FROM
-		tps_csv_extract_items x1
-	WHERE
-		withdrawl_indicator = 'W'
-		AND EXISTS (SELECT
-			   			1
-			    	FROM
-			   			tps_csv_extract_items x2
-				    WHERE
-				   		x2.key = x1.key
-						AND x2.extract_date > x1.extract_date)
-		AND NOT EXISTS (SELECT
-							1
-						FROM
-							tps_csv_extract_items x2
-						WHERE
-							x2.key = x1.key
-							AND x2.extract_date > x1.extract_date
-							AND (x2.withdrawl_indicator IS NULL OR x2.employment_end_date <> x1.employment_end_date))
+  SELECT
+    distinct key
+  FROM
+    tps_csv_extract_items x1
+  WHERE
+    withdrawal_indicator = 'W'
+    AND EXISTS (SELECT
+                  1
+                FROM
+                  tps_csv_extract_items x2
+                WHERE
+                  x2.key = x1.key
+                  AND x2.extract_date > x1.extract_date)
+    AND NOT EXISTS (SELECT
+                      1
+                    FROM
+                      tps_csv_extract_items x2
+                    WHERE
+                      x2.key = x1.key
+                      AND x2.extract_date > x1.extract_date
+                      AND (x2.withdrawal_indicator IS NULL OR x2.employment_end_date <> x1.employment_end_date))
 )
 SELECT
-	COUNT(1)
+  COUNT(1)
 FROM
-	withdrawal_no_change_keys
+  withdrawal_no_change_keys
 ```
 
 ### Get counts of records where the end date hasn't changed for over 5 months and there is no further alternative employment
@@ -202,40 +202,94 @@ This gives an idea of people who have potentially left the teaching profession
 
 ```
 WITH latest_extracts AS (
-	SELECT
-		*
-	FROM
-		(SELECT
-			trn,
-		 	local_authority_code,
-		 	establishment_number,
-		 	employment_start_date,
-		 	employment_end_date,
-		 	employment_type,
-		 	withdrawl_indicator,
-		 	extract_date,
-		 	key,
-		 	ROW_NUMBER() OVER (PARTITION BY key ORDER BY extract_date desc) as row_number
-		 FROM
-			tps_csv_extract_items) x
-	WHERE
-		x.row_number = 1		 	
+  SELECT
+    *
+  FROM
+    (SELECT
+      trn,
+      local_authority_code,
+      establishment_number,
+      employment_start_date,
+      employment_end_date,
+      employment_type,
+      withdrawal_indicator,
+      extract_date,
+      key,
+      ROW_NUMBER() OVER (PARTITION BY key ORDER BY extract_date desc) as row_number
+     FROM
+      tps_csv_extract_items) x
+  WHERE
+    x.row_number = 1		 	
 )
 SELECT
-	SUM(CASE WHEN withdrawl_indicator = 'W' THEN 1 ELSE 0 END) as count_with_withdrawal_indicator,
-	SUM(CASE WHEN withdrawl_indicator IS NULL THEN 1 ELSE 0 END) as count_without_withdrawal_indicator
+  SUM(CASE WHEN withdrawal_indicator = 'W' THEN 1 ELSE 0 END) as count_with_withdrawal_indicator,
+  SUM(CASE WHEN withdrawal_indicator IS NULL THEN 1 ELSE 0 END) as count_without_withdrawal_indicator
 FROM
-	latest_extracts x1
+  latest_extracts x1
 WHERE
-	AGE(x1.extract_date, x1.employment_end_date) > INTERVAL '5 months'
-	AND NOT EXISTS (SELECT
-					   		1
-					    FROM
-					   		latest_extracts x2
-					    WHERE
-					   		x2.trn = x1.trn
-							AND x2.key <> x1.key
-							AND AGE(x2.extract_date, x2.employment_end_date) <= INTERVAL '5 months')
+  AGE(x1.extract_date, x1.employment_end_date) > INTERVAL '5 months'
+  AND NOT EXISTS (SELECT
+                    1
+                  FROM
+                    latest_extracts x2
+                  WHERE
+                    x2.trn = x1.trn
+                    AND x2.key <> x1.key
+                    AND AGE(x2.extract_date, x2.employment_end_date) <= INTERVAL '5 months')
+```
+
+### Get examples of records where the end date hasn't changed for over 5 months and there is no further alternative employment
+
+This gives an idea of people who have potentially left the teaching profession
+
+```
+WITH latest_extracts AS (
+  SELECT
+    *
+  FROM
+    (SELECT
+      trn,
+      local_authority_code,
+      establishment_number,
+      employment_start_date,
+      employment_end_date,
+      employment_type,
+      withdrawal_indicator,
+      extract_date,
+      key,
+      ROW_NUMBER() OVER (PARTITION BY key ORDER BY extract_date desc) as row_number
+     FROM
+      tps_csv_extract_items) x
+  WHERE
+    x.row_number = 1		 	
+)
+SELECT
+  trn,
+  local_authority_code,
+  establishment_number,	
+  employment_start_date,
+  employment_end_date,
+  CASE
+    WHEN employment_type = 0 THEN 'FT'
+    WHEN employment_type = 1 THEN 'PTR'
+    WHEN employment_type = 2 THEN 'PTI'
+    WHEN employment_type = 3 THEN 'PT'
+  END employment_type,
+  withdrawal_indicator,
+  extract_date
+FROM
+  latest_extracts x1
+WHERE
+  AGE(x1.extract_date, x1.employment_end_date) > INTERVAL '5 months'
+  AND x1.withdrawal_indicator IS NULL
+  AND NOT EXISTS (SELECT
+                    1
+                  FROM
+                    latest_extracts x2
+                  WHERE
+                    x2.trn = x1.trn
+                    AND x2.key <> x1.key
+                    AND AGE(x2.extract_date, x2.employment_end_date) <= INTERVAL '5 months')
 ```
 
 ### Get counts of records which are in the first extract and missing from multiple extracts before re-appearing in the most recent extract
@@ -244,39 +298,39 @@ This is to check that it is indeed possible that records can skip multiple extra
 
 ```
 WITH keys AS (
-	SELECT
-		*,
-	    CASE 
-			WHEN extract_date = to_date('20240325','YYYYMMDD') THEN 1 
-			WHEN extract_date = to_date('20240425','YYYYMMDD') THEN 2
-			WHEN extract_date = to_date('20240525','YYYYMMDD') THEN 3 
-			WHEN extract_date = to_date('20240626','YYYYMMDD') THEN 4 
-		END as extract_number
-	FROM
-		tps_csv_extract_items
-	WHERE
-		extract_date <> to_date('20240307','YYYYMMDD')
+  SELECT
+    *,
+      CASE 
+      WHEN extract_date = to_date('20240325','YYYYMMDD') THEN 1 
+      WHEN extract_date = to_date('20240425','YYYYMMDD') THEN 2
+      WHEN extract_date = to_date('20240525','YYYYMMDD') THEN 3 
+      WHEN extract_date = to_date('20240626','YYYYMMDD') THEN 4 
+    END as extract_number
+  FROM
+    tps_csv_extract_items
+  WHERE
+    extract_date <> to_date('20240307','YYYYMMDD')
 )
 SELECT
-	COUNT(1)
+  COUNT(1)
 FROM
-	keys k1
+  keys k1
 WHERE
-	k1.extract_number = 1
-	AND NOT EXISTS (SELECT
-			   			1
-			    	FROM
-			   		    keys k2
-				    WHERE
-						k2.key = k1.key
-						AND k2.extract_number in (2, 3))
-	AND EXISTS (SELECT
-			   			1
-			    	FROM
-			   		    keys k4
-				    WHERE
-						k4.key = k1.key
-						AND k4.extract_number = 4)
+  k1.extract_number = 1
+  AND NOT EXISTS (SELECT
+                    1
+                  FROM
+                    keys k2
+                  WHERE
+                    k2.key = k1.key
+                    AND k2.extract_number in (2, 3))
+  AND EXISTS (SELECT
+                1
+              FROM
+                keys k4
+              WHERE
+                k4.key = k1.key
+                AND k4.extract_number = 4)
 ```
 
 ### Get counts of employment types with Withdrawal Indicator 'W' 
@@ -285,17 +339,17 @@ Check that the Withrawal Indicator can also be applied to part-time employment
 
 ```
 SELECT
-	extract_date,
-	SUM(CASE WHEN employment_type = 0 THEN 1 ELSE 0 END) full_time_count,
-	SUM(CASE WHEN employment_type = 1 THEN 1 ELSE 0 END) part_time_regular_count,
-	SUM(CASE WHEN employment_type = 2 THEN 1 ELSE 0 END) part_time_irregular_count,
-	SUM(CASE WHEN employment_type = 3 THEN 1 ELSE 0 END) part_time_count
+  extract_date,
+  SUM(CASE WHEN employment_type = 0 THEN 1 ELSE 0 END) full_time_count,
+  SUM(CASE WHEN employment_type = 1 THEN 1 ELSE 0 END) part_time_regular_count,
+  SUM(CASE WHEN employment_type = 2 THEN 1 ELSE 0 END) part_time_irregular_count,
+  SUM(CASE WHEN employment_type = 3 THEN 1 ELSE 0 END) part_time_count
 FROM
-	tps_csv_extract_items
+  tps_csv_extract_items
 WHERE
-	withdrawl_indicator = 'W'
+  withdrawal_indicator = 'W'
 GROUP BY
-	extract_date
+  extract_date
 ```
 
 ### Check if we are getting data with end dates within the expected date range (i.e. 6 months of the extract date) 
@@ -304,13 +358,13 @@ This is a sanity check on the data
 
 ```
 SELECT
-	extract_date,
-	MIN(employment_end_date) min_employment_end_date,
-	(date_trunc('month', extract_date) - interval '6 month')::date expected_minimum_end_date
+  extract_date,
+  MIN(employment_end_date) min_employment_end_date,
+  (date_trunc('month', extract_date) - interval '6 month')::date expected_minimum_end_date
 FROM
-	tps_csv_extract_items
+  tps_csv_extract_items
 GROUP BY
-	extract_date
+  extract_date
 ```
 
 ###  Get the count end dates which are beyond the end of the month of the extract date
@@ -319,108 +373,108 @@ We appear to get records where the end date is in the future
 
 ```
 WITH latest_extracts AS (
-	SELECT
-		*,
-		(date_trunc('month', extract_date) + interval '1 month' - interval '1 day')::date report_end_date
-	FROM
-		(SELECT
-			trn,
-		 	local_authority_code,
-		 	establishment_number,
-		 	employment_start_date,
-		 	employment_end_date,
-		 	employment_type,
-		 	withdrawl_indicator,
-		 	extract_date,
-		 	key,
-		 	ROW_NUMBER() OVER (PARTITION BY key ORDER BY extract_date desc) as row_number
-		 FROM
-			tps_csv_extract_items) x
-	WHERE
-		x.row_number = 1		 	
+  SELECT
+    *,
+    (date_trunc('month', extract_date) + interval '1 month' - interval '1 day')::date report_end_date
+  FROM
+    (SELECT
+      trn,
+      local_authority_code,
+      establishment_number,
+      employment_start_date,
+      employment_end_date,
+      employment_type,
+      withdrawal_indicator,
+      extract_date,
+      key,
+      ROW_NUMBER() OVER (PARTITION BY key ORDER BY extract_date desc) as row_number
+     FROM
+      tps_csv_extract_items) x
+  WHERE
+    x.row_number = 1		 	
 )
 SELECT
-	COUNT(1)
+  COUNT(1)
 FROM
-	latest_extracts
+  latest_extracts
 WHERE
-	employment_end_date > report_end_date
+  employment_end_date > report_end_date
 ```
 
 ### Get count of people who are in multiple full time employments at the same time
 
 ```
 WITH overlapping_full_time AS (
-	SELECT
-		distinct pe1.person_id
-	FROM
-		person_employments pe1
-	WHERE
-		pe1.start_date <= pe1.last_known_employed_date
-		AND pe1.employment_type = 0
-		AND EXISTS (SELECT
-			     		1
-			        FROM
-			   		    person_employments pe2
-			        WHERE
-						pe1.person_id = pe2.person_id
-						AND pe1.person_employment_id <> pe2.person_employment_id
-				   		AND pe2.employment_type = 0
-						AND pe2.start_date <= pe2.last_known_employed_date
-				   		AND daterange(pe1.start_date, pe1.last_known_employed_date,'[]') && daterange(pe2.start_date, pe2.last_known_employed_date,'[]'))
+  SELECT
+    distinct te1.person_id
+  FROM
+    tps_employments te1
+  WHERE
+    te1.start_date <= te1.last_known_employed_date
+    AND pe1.employment_type = 0
+    AND EXISTS (SELECT
+              1
+              FROM
+                tps_employments te2
+              WHERE
+                te1.person_id = te2.person_id
+                AND te1.tps_employment_id <> te2.tps_employment_id
+                AND te2.employment_type = 0
+                AND te2.start_date <= te2.last_known_employed_date
+                AND daterange(te1.start_date, te1.last_known_employed_date,'[]') && daterange(te2.start_date, te2.last_known_employed_date,'[]'))
 )
 SELECT
-	COUNT(1)
+  COUNT(1)
 FROM
-	overlapping_full_time
+  overlapping_full_time
 ```
 
 ### Examples of people who are in multiple full time employments at the same time
 
 ```
 WITH overlapping_full_time AS (
-	SELECT
-		distinct pe1.person_id
-	FROM
-		person_employments pe1
-	WHERE
-		pe1.start_date <= pe1.last_known_employed_date
-		AND pe1.employment_type = 0
-		AND EXISTS (SELECT
-			     		1
-			        FROM
-			   		    person_employments pe2
-			        WHERE
-						pe1.person_id = pe2.person_id
-						AND pe1.person_employment_id <> pe2.person_employment_id
-				   		AND pe2.employment_type = 0
-						AND pe2.start_date <= pe2.last_known_employed_date
-				   		AND daterange(pe1.start_date, pe1.last_known_employed_date,'[]') && daterange(pe2.start_date, pe2.last_known_employed_date,'[]'))
+  SELECT
+    distinct pe1.person_id
+  FROM
+    tps_employments te1
+  WHERE
+    te1.start_date <= te1.last_known_employed_date
+    AND te1.employment_type = 0
+    AND EXISTS (SELECT
+                  1
+                FROM
+                  tps_employments te2
+                WHERE
+                  te1.person_id = te2.person_id
+                  AND te1.tps_employment_id <> te2.tps_employment_id
+                  AND te2.employment_type = 0
+                  AND te2.start_date <= te2.last_known_employed_date
+                  AND daterange(te1.start_date, te1.last_known_employed_date,'[]') && daterange(te2.start_date, te2.last_known_employed_date,'[]'))
 )
 SELECT
-	p.trn,
-    e.la_code,
-    e.establishment_number,
-	substr(e.establishment_name, 1, 30),
-	pe.start_date,
-	pe.last_known_employed_date	
+  p.trn,
+  e.la_code,
+  e.establishment_number,
+  substr(e.establishment_name, 1, 30),
+  te.start_date,
+  te.last_known_employed_date	
 FROM
-		person_employments pe
-	JOIN
-		persons p ON p.person_id = pe.person_id
-	JOIN
-		establishments e ON e.establishment_id = pe.establishment_id
+    tps_employments te
+  JOIN
+    persons p ON p.person_id = te.person_id
+  JOIN
+    establishments e ON e.establishment_id = pe.establishment_id
 WHERE
-	pe.employment_type = 0
-	AND EXISTS (SELECT
-		   		1
-		    FROM
-		   		overlapping_full_time o
-		    WHERE
-		   		o.person_id = pe.person_id)
+  pe.employment_type = 0
+  AND EXISTS (SELECT
+                1
+              FROM
+                overlapping_full_time o
+              WHERE
+                o.person_id = pe.person_id)
 ORDER BY
-	p.trn,
-	start_date
+  p.trn,
+  start_date
 ```
 
 ### Get most frequent end dates for extract
@@ -429,16 +483,16 @@ Check which are the most frequent end dates for a given extract
 
 ```
 SELECT
-	employment_end_date,
-	COUNT(1)
+  employment_end_date,
+  COUNT(1)
 FROM
-	tps_csv_extract_items
+  tps_csv_extract_items
 WHERE
-	extract_date = to_date('20240626','YYYYMMDD')
+  extract_date = to_date('20240626','YYYYMMDD')
 GROUP BY
-	employment_end_date
+  employment_end_date
 ORDER BY 
-	COUNT(1) DESC
+  COUNT(1) DESC
 LIMIT 10
 ```
 
@@ -446,70 +500,70 @@ LIMIT 10
 
 ```
 WITH updated_employment_type_keys AS (
-	SELECT
-		distinct key
-	FROM
-		tps_csv_extract_items x1
-	WHERE		
-		EXISTS (SELECT
-			   			1
-			    	FROM
-			   			tps_csv_extract_items x2
-				    WHERE
-				   		x2.key = x1.key
-						AND x2.employment_type <> x1.employment_type
-						AND x2.extract_date > x1.extract_date)
+  SELECT
+    distinct key
+  FROM
+    tps_csv_extract_items x1
+  WHERE		
+    EXISTS (SELECT
+              1
+            FROM
+              tps_csv_extract_items x2
+            WHERE
+              x2.key = x1.key
+              AND x2.employment_type <> x1.employment_type
+              AND x2.extract_date > x1.extract_date)
 )
 SELECT
-	COUNT(key)
+  COUNT(key)
 FROM
-	updated_employment_type_keys
+  updated_employment_type_keys
 ```
 
 ### Get example records which change employment type between extracts
 
 ```
 WITH updated_employment_type_keys AS (
-	SELECT
-		distinct key
-	FROM
-		tps_csv_extract_items x1
-	WHERE
-		EXISTS (SELECT
-			   			1
-			    	FROM
-			   			tps_csv_extract_items x2
-				    WHERE
-				   		x2.key = x1.key
-						AND x2.employment_type <> x1.employment_type
-						AND x2.extract_date > x1.extract_date)
+  SELECT
+    distinct key
+  FROM
+    tps_csv_extract_items x1
+  WHERE
+    EXISTS (SELECT
+              1
+            FROM
+              tps_csv_extract_items x2
+            WHERE
+              x2.key = x1.key
+              AND x2.employment_type <> x1.employment_type
+              AND x2.extract_date > x1.extract_date)
 )
 SELECT
-	trn,
-	local_authority_code,
-	establishment_number,	
-	employment_start_date,
-	employment_end_date,
-	CASE
-		WHEN employment_type = 0 THEN 'FT'
-		WHEN employment_type = 1 THEN 'PTR'
-		WHEN employment_type = 2 THEN 'PTI'
-		WHEN employment_type = 3 THEN 'PT'
-	END employment_type,
-	withdrawl_indicator,
-	extract_date
+  trn,
+  local_authority_code,
+  establishment_number,	
+  employment_start_date,
+  employment_end_date,
+  CASE
+    WHEN employment_type = 0 THEN 'FT'
+    WHEN employment_type = 1 THEN 'PTR'
+    WHEN employment_type = 2 THEN 'PTI'
+    WHEN employment_type = 3 THEN 'PT'
+  END employment_type,
+  withdrawal_indicator,
+  extract_date
 FROM
-	tps_csv_extract_items x
+  tps_csv_extract_items x
 WHERE
-	EXISTS (SELECT
-		   		1
-		    FROM
-		   		updated_employment_type_keys e
-		    WHERE
-		   		e.key = x.key)
+  EXISTS (SELECT
+            1
+          FROM
+            updated_employment_type_keys e
+          WHERE
+            e.key = x.key)
 ORDER BY
-	x.key desc,
-	x.extract_date
+  x.key desc,
+  x.extract_date
 LIMIT 1000
 ```
 
@@ -565,25 +619,25 @@ unique_tps_establishments AS (
         e.row_number = 1
 )
 SELECT
-	*
+  *
 FROM
-	unique_tps_establishments e
+  unique_tps_establishments e
 WHERE
-	NOT EXISTS (SELECT
-					1
-				FROM
-					unique_gias_establishments g
-				WHERE
-					g.la_code = e.la_code
-					AND g.establishment_number = e.establishment_code)
-	AND NOT EXISTS (SELECT
-				   		1
-				    FROM
-				   		tps_establishment_types t
-					WHERE
-						e.establishment_code::int >= t.establishment_range_from::int
-                        AND e.establishment_code::int <= t.establishment_range_to::int)
+  NOT EXISTS (SELECT
+                1
+              FROM
+                unique_gias_establishments g
+              WHERE
+                g.la_code = e.la_code
+                AND g.establishment_number = e.establishment_code)
+  AND NOT EXISTS (SELECT
+                    1
+                  FROM
+                    tps_establishment_types t
+                  WHERE
+                     e.establishment_code::int >= t.establishment_range_from::int
+                     AND e.establishment_code::int <= t.establishment_range_to::int)
 ORDER BY
-	la_code,
-	establishment_code
+  la_code,
+  establishment_code
 ```

@@ -72,7 +72,7 @@ public class TrsDbContext : DbContext
 
     public DbSet<TpsCsvExtractItem> TpsCsvExtractItems => Set<TpsCsvExtractItem>();
 
-    public DbSet<PersonEmployment> PersonEmployments => Set<PersonEmployment>();
+    public DbSet<TpsEmployment> TpsEmployments => Set<TpsEmployment>();
 
     public DbSet<SupportTask> SupportTasks => Set<SupportTask>();
 

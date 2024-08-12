@@ -22,7 +22,7 @@ public class TpsCsvExtractLoadItem
     public required string? EmploymentStartDate { get; set; }
     public required string? EmploymentEndDate { get; set; }
     public required string? FullOrPartTimeIndicator { get; set; }
-    public required string? WithdrawlIndicator { get; set; }
+    public required string? WithdrawalIndicator { get; set; }
     public required string? ExtractDate { get; set; }
     public required string? Gender { get; set; }
     public required DateTime Created { get; set; }

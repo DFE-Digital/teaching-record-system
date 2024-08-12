@@ -24,7 +24,7 @@ public class TpsCsvExtractLoadItemMapping : IEntityTypeConfiguration<TpsCsvExtra
         builder.Property(x => x.EmploymentStartDate).HasMaxLength(TpsCsvExtractLoadItem.FieldMaxLength);
         builder.Property(x => x.EmploymentEndDate).HasMaxLength(TpsCsvExtractLoadItem.FieldMaxLength);
         builder.Property(x => x.FullOrPartTimeIndicator).HasMaxLength(TpsCsvExtractLoadItem.FieldMaxLength);
-        builder.Property(x => x.WithdrawlIndicator).HasMaxLength(TpsCsvExtractLoadItem.FieldMaxLength);
+        builder.Property(x => x.WithdrawalIndicator).HasMaxLength(TpsCsvExtractLoadItem.FieldMaxLength);
         builder.Property(x => x.ExtractDate).HasMaxLength(TpsCsvExtractLoadItem.FieldMaxLength);
         builder.Property(x => x.Gender).HasMaxLength(TpsCsvExtractLoadItem.FieldMaxLength);
         builder.Property(x => x.Created).IsRequired();

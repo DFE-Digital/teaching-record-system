@@ -52,13 +52,14 @@ public partial class TestData
             string? fullOrPartTimeIndicator = null,
             string? nationalInsuranceNumber = null,
             DateOnly? dateOfBirth = null,
-            string? memberPostcode = null)
+            string? memberPostcode = null,
+            string? withdrawalIndicator = null)
         {
             nationalInsuranceNumber ??= Faker.Identification.UkNationalInsuranceNumber();
             dateOfBirth ??= DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
             fullOrPartTimeIndicator ??= validFullOrPartTimeIndicatorValues[Faker.RandomNumber.Next(0, 2)];
 
-            _items.Add(new TpsCsvExtractItem(trn, nationalInsuranceNumber, dateOfBirth.Value, localAuthorityCode, establishmentPostcode, establishmentNumber, startDate, endDate, fullOrPartTimeIndicator, extractDate, memberPostcode));
+            _items.Add(new TpsCsvExtractItem(trn, nationalInsuranceNumber, dateOfBirth.Value, localAuthorityCode, establishmentPostcode, establishmentNumber, startDate, endDate, fullOrPartTimeIndicator, extractDate, memberPostcode, withdrawalIndicator));
             return this;
         }
 
@@ -104,7 +105,7 @@ public partial class TestData
                         EmploymentStartDate = item.StartDate.ToString("dd/MM/yyyy"),
                         EmploymentEndDate = item.EndDate.ToString("dd/MM/yyyy"),
                         FullOrPartTimeIndicator = item.FullOrPartTimeIndicator,
-                        WithdrawlIndicator = null,
+                        WithdrawalIndicator = item.WithdrawalIndicator,
                         ExtractDate = item.ExtractDate.ToString("dd/MM/yyyy"),
                         Gender = validGenderValues[Faker.RandomNumber.Next(0, 1)],
                         Errors = TpsCsvExtractItemLoadErrors.None,
@@ -133,7 +134,7 @@ public partial class TestData
                         EmploymentStartDate = item.StartDate,
                         EmploymentEndDate = item.EndDate,
                         EmploymentType = EmploymentTypeHelper.FromFullOrPartTimeIndicator(loadItem.FullOrPartTimeIndicator),
-                        WithdrawlIndicator = loadItem.WithdrawlIndicator,
+                        WithdrawalIndicator = loadItem.WithdrawalIndicator,
                         ExtractDate = item.ExtractDate,
                         Created = createdOn,
                         Result = null,
@@ -148,5 +149,5 @@ public partial class TestData
         }
     }
 
-    public record TpsCsvExtractItem(string Trn, string NationalInsuranceNumber, DateOnly DateOfBirth, string LocalAuthorityCode, string EstablishmentPostcode, string? EstablishmentNumber, DateOnly StartDate, DateOnly EndDate, string FullOrPartTimeIndicator, DateOnly ExtractDate, string? MemberPostcode);
+    public record TpsCsvExtractItem(string Trn, string NationalInsuranceNumber, DateOnly DateOfBirth, string LocalAuthorityCode, string EstablishmentPostcode, string? EstablishmentNumber, DateOnly StartDate, DateOnly EndDate, string FullOrPartTimeIndicator, DateOnly ExtractDate, string? MemberPostcode, string? WithdrawalIndicator);
 }

@@ -2,8 +2,8 @@ using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record PersonEmploymentCreatedEvent : EventBase, IEventWithPersonId
+public record TpsEmploymentCreatedEvent : EventBase, IEventWithPersonId
 {
     public required Guid PersonId { get; init; }
-    public required PersonEmployment PersonEmployment { get; init; }
+    public required TpsEmployment TpsEmployment { get; init; }
 }

@@ -28,7 +28,7 @@ public class TpsCsvExtractItem
     public required DateOnly EmploymentStartDate { get; set; }
     public required DateOnly? EmploymentEndDate { get; set; }
     public required EmploymentType EmploymentType { get; set; }
-    public required string? WithdrawlIndicator { get; set; }
+    public required string? WithdrawalIndicator { get; set; }
     public required DateOnly ExtractDate { get; set; }
     public required DateTime Created { get; set; }
     public required TpsCsvExtractItemResult? Result { get; set; }
