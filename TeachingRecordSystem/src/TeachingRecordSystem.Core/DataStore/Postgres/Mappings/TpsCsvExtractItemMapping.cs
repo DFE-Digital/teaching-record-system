@@ -20,7 +20,7 @@ public class TpsCsvExtractItemMapping : IEntityTypeConfiguration<TpsCsvExtractIt
         builder.Property(x => x.EstablishmentEmailAddress).HasMaxLength(200);
         builder.Property(x => x.EmploymentStartDate).IsRequired();
         builder.Property(x => x.EmploymentType).IsRequired();
-        builder.Property(x => x.WithdrawlIndicator).HasMaxLength(1).IsFixedLength();
+        builder.Property(x => x.WithdrawalIndicator).HasMaxLength(1).IsFixedLength();
         builder.Property(x => x.Gender).HasMaxLength(10).IsRequired();
         builder.Property(x => x.Created).IsRequired();
         builder.Property(x => x.Key).HasMaxLength(50).IsRequired();

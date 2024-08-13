@@ -126,12 +126,14 @@ public class TpsCsvExtractProcessor(
             update_extract_items AS (
                 SELECT
                     x.tps_csv_extract_item_id,
-                    gen_random_uuid() as person_employment_id,
+                    gen_random_uuid() as tps_employment_id,
                     p.person_id,
                     e.establishment_id,
                     x.employment_start_date as start_date,
-                    x.employment_end_date as last_known_employed_date,
+                    CASE WHEN x.withdrawal_indicator = 'W' OR AGE(x.extract_date, least(x.employment_end_date, x.extract_date)) > INTERVAL '5 months' THEN x.employment_end_date ELSE NULL END as end_date,
+                    least(x.employment_end_date, x.extract_date) as last_known_tps_employed_date,
                     x.employment_type,
+                    CASE WHEN x.withdrawal_indicator = 'W' THEN TRUE ELSE FALSE END as withdrawal_confirmed,
                     x.extract_date as last_extract_date,
                     x.key,
                     x.national_insurance_number,
@@ -158,12 +160,12 @@ public class TpsCsvExtractProcessor(
                     AND NOT EXISTS (SELECT
                                         1
                                     FROM
-                                        person_employments pe
+                                        tps_employments te
                                     WHERE
-                                        pe.key = x.key)
+                                        te.key = x.key)
                 LIMIT 1000
             ),
-            new_person_employments AS (
+            new_tps_employments AS (
                 UPDATE
                     tps_csv_extract_items x
                 SET
@@ -173,26 +175,30 @@ public class TpsCsvExtractProcessor(
                 WHERE
                     x.tps_csv_extract_item_id = u.tps_csv_extract_item_id
                 RETURNING
-                    u.person_employment_id,
+                    u.tps_employment_id,
                     u.person_id,
                     u.establishment_id,
                     u.start_date,
+                    u.end_date,
+                    u.last_known_tps_employed_date,
                     u.employment_type,
-                    u.last_extract_date,
-                    u.last_known_employed_date,
+                    u.withdrawal_confirmed,
+                    u.last_extract_date,                    
                     u.key,
                     u.national_insurance_number,
                     u.person_postcode
             )
-            INSERT INTO person_employments
+            INSERT INTO tps_employments
                 (
-                    person_employment_id,
+                    tps_employment_id,
                     person_id,
                     establishment_id,
                     start_date,
+                    end_date,
+                    last_known_tps_employed_date,
                     employment_type,
-                    last_extract_date,
-                    last_known_employed_date,
+                    withdrawal_confirmed,
+                    last_extract_date,                 
                     key,
                     national_insurance_number,
                     person_postcode,
@@ -204,15 +210,17 @@ public class TpsCsvExtractProcessor(
                 {clock.UtcNow} as created_on,
                 {clock.UtcNow} as updated_on
             FROM
-                new_person_employments
+                new_tps_employments
             RETURNING
-                person_employment_id,
+                tps_employment_id,
                 person_id,
                 establishment_id,
                 start_date,
+                end_date,
+                last_known_tps_employed_date,
                 employment_type,
+                withdrawal_confirmed,
                 last_extract_date,
-                last_known_employed_date,
                 key,
                 national_insurance_number,
                 person_postcode,
@@ -228,19 +236,20 @@ public class TpsCsvExtractProcessor(
             hasRecordsToUpdate = false;
             using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             dbContext.Database.UseTransaction(transaction);
-            await foreach (var item in dbContext.Database.SqlQuery<NewPersonEmployment>(querySql).AsAsyncEnumerable())
+            await foreach (var item in dbContext.Database.SqlQuery<NewTpsEmployment>(querySql).AsAsyncEnumerable())
             {
                 hasRecordsToUpdate = true;
-                var personEmployment = new PersonEmployment
+                var personEmployment = new TpsEmployment
                 {
-                    PersonEmploymentId = item.PersonEmploymentId,
+                    TpsEmploymentId = item.TpsEmploymentId,
                     PersonId = item.PersonId,
                     EstablishmentId = item.EstablishmentId,
                     StartDate = item.StartDate,
-                    EndDate = null,
-                    LastKnownEmployedDate = item.LastKnownEmployedDate,
-                    LastExtractDate = item.LastExtractDate,
+                    EndDate = item.EndDate,
+                    LastKnownTpsEmployedDate = item.LastKnownTpsEmployedDate,
                     EmploymentType = item.EmploymentType,
+                    WithdrawalConfirmed = item.WithdrawalConfirmed,
+                    LastExtractDate = item.LastExtractDate,
                     CreatedOn = item.CreatedOn,
                     UpdatedOn = item.UpdatedOn,
                     Key = item.Key,
@@ -248,11 +257,11 @@ public class TpsCsvExtractProcessor(
                     PersonPostcode = item.PersonPostcode
                 };
 
-                var createdEvent = new PersonEmploymentCreatedEvent
+                var createdEvent = new TpsEmploymentCreatedEvent
                 {
                     EventId = Guid.NewGuid(),
                     PersonId = item.PersonId,
-                    PersonEmployment = Core.Events.Models.PersonEmployment.FromModel(personEmployment),
+                    TpsEmployment = Core.Events.Models.TpsEmployment.FromModel(personEmployment),
                     CreatedUtc = clock.UtcNow,
                     RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
                 };
@@ -279,23 +288,27 @@ public class TpsCsvExtractProcessor(
             WITH extract_items AS (
                 SELECT
                     x.tps_csv_extract_item_id,
-                    pe.person_employment_id,
-                    pe.employment_type as current_employment_type,
-                    pe.last_known_employed_date as current_last_known_employed_date,
-                    pe.last_extract_date as current_last_extract_date,
-                    pe.national_insurance_number as current_national_insurance_number,
-                    pe.person_postcode as current_person_postcode,
+                    te.tps_employment_id,
+                    te.employment_type as current_employment_type,
+                    te.end_date as current_end_date,
+                    te.last_known_tps_employed_date as current_last_known_tps_employed_date,
+                    te.withdrawal_confirmed as current_withdrawal_confirmed,
+                    te.last_extract_date as current_last_extract_date,
+                    te.national_insurance_number as current_national_insurance_number,
+                    te.person_postcode as current_person_postcode,
                     x.employment_type as new_employment_type,
-                    x.employment_end_date as new_last_known_employed_date,
+                    CASE WHEN x.withdrawal_indicator = 'W' OR AGE(x.extract_date, least(x.employment_end_date, x.extract_date)) > INTERVAL '5 months' THEN x.employment_end_date ELSE NULL END as new_end_date,
+                    least(x.employment_end_date, x.extract_date) as new_last_known_tps_employed_date,
+                    CASE WHEN x.withdrawal_indicator = 'W' THEN TRUE ELSE FALSE END as new_withdrawal_confirmed,
                     x.extract_date as new_last_extract_date,
                     x.national_insurance_number as new_national_insurance_number,
                     x.member_postcode as new_person_postcode,
                     x.key,
-                    CASE WHEN pe.employment_type != x.employment_type OR pe.last_known_employed_date != x.employment_end_date OR pe.last_extract_date != x.extract_date THEN 2 ELSE 0 END as result
+                    CASE WHEN te.employment_type != x.employment_type OR te.last_known_tps_employed_date != least(x.employment_end_date, x.extract_date) OR te.last_extract_date != x.extract_date THEN 2 ELSE 0 END as result
                 FROM
                         tps_csv_extract_items x
                     JOIN
-                        person_employments pe ON pe.key = x.key
+                        tps_employments te ON te.key = x.key
                 WHERE
                     x.tps_csv_extract_id = {tpsCsvExtractId}
                     AND x.result IS NULL
@@ -310,23 +323,29 @@ public class TpsCsvExtractProcessor(
                 WHERE
                     x.tps_csv_extract_item_id = u.tps_csv_extract_item_id
                 RETURNING
-                    u.person_employment_id,
+                    u.tps_employment_id,                    
+                    u.current_end_date,
+                    u.current_last_known_tps_employed_date,
                     u.current_employment_type,
-                    u.current_last_known_employed_date,
+                    u.current_withdrawal_confirmed,
                     u.current_last_extract_date,
                     u.current_national_insurance_number,
-                    u.current_person_postcode,
+                    u.current_person_postcode,                    
+                    u.new_end_date,
+                    u.new_last_known_tps_employed_date,
                     u.new_employment_type,
-                    u.new_last_known_employed_date,
+                    u.new_withdrawal_confirmed,
                     u.new_last_extract_date,
                     u.new_national_insurance_number,
                     u.new_person_postcode
             )
             UPDATE
-                person_employments pe
+                tps_employments te
             SET
+                end_date = changes.new_end_date,
+                last_known_tps_employed_date = changes.new_last_known_tps_employed_date,
                 employment_type = changes.new_employment_type,
-                last_known_employed_date = changes.new_last_known_employed_date,
+                withdrawal_confirmed = changes.new_withdrawal_confirmed,
                 last_extract_date = changes.new_last_extract_date,
                 national_insurance_number = changes.new_national_insurance_number,
                 person_postcode = changes.new_person_postcode,
@@ -334,24 +353,27 @@ public class TpsCsvExtractProcessor(
             FROM
                 changes
             WHERE
-                changes.person_employment_id = pe.person_employment_id
+                changes.tps_employment_id = te.tps_employment_id
             RETURNING
-                pe.person_employment_id,
-                pe.person_id,
-                pe.establishment_id,
-                pe.start_date,
-                pe.end_date,
-                changes.current_employment_type,
-                changes.current_last_known_employed_date,
+                te.tps_employment_id,
+                te.person_id,
+                te.establishment_id,
+                te.start_date,
+                changes.current_end_date,
+                changes.current_last_known_tps_employed_date,
+                changes.current_employment_type,            
+                changes.current_withdrawal_confirmed,
                 changes.current_last_extract_date,
                 changes.current_national_insurance_number,
                 changes.current_person_postcode,
+                changes.new_end_date,
+                changes.new_last_known_tps_employed_date,
                 changes.new_employment_type,
-                changes.new_last_known_employed_date,
+                changes.new_withdrawal_confirmed,
                 changes.new_last_extract_date,
                 changes.new_national_insurance_number,
                 changes.new_person_postcode,
-                pe.key
+                te.key
             """;
 
         bool hasRecordsToUpdate = false;
@@ -362,45 +384,49 @@ public class TpsCsvExtractProcessor(
             hasRecordsToUpdate = false;
             using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             dbContext.Database.UseTransaction(transaction);
-            await foreach (var item in dbContext.Database.SqlQuery<UpdatedPersonEmployment>(querySql).AsAsyncEnumerable())
+            await foreach (var item in dbContext.Database.SqlQuery<UpdatedTpsEmployment>(querySql).AsAsyncEnumerable())
             {
                 hasRecordsToUpdate = true;
-                var changes = PersonEmploymentUpdatedEventChanges.None |
-                    (item.CurrentEmploymentType != item.NewEmploymentType ? PersonEmploymentUpdatedEventChanges.EmploymentType : PersonEmploymentUpdatedEventChanges.None) |
-                    (item.CurrentLastKnownEmployedDate != item.NewLastKnownEmployedDate ? PersonEmploymentUpdatedEventChanges.LastKnownEmployedDate : PersonEmploymentUpdatedEventChanges.None) |
-                    (item.CurrentLastExtractDate != item.NewLastExtractDate ? PersonEmploymentUpdatedEventChanges.LastExtractDate : PersonEmploymentUpdatedEventChanges.None) |
-                    (item.CurrentNationalInsuranceNumber != item.NewNationalInsuranceNumber ? PersonEmploymentUpdatedEventChanges.NationalInsuranceNumber : PersonEmploymentUpdatedEventChanges.None) |
-                    (item.CurrentPersonPostcode != item.NewPersonPostcode ? PersonEmploymentUpdatedEventChanges.PersonPostcode : PersonEmploymentUpdatedEventChanges.None);
+                var changes = TpsEmploymentUpdatedEventChanges.None |
+                    (item.CurrentEmploymentType != item.NewEmploymentType ? TpsEmploymentUpdatedEventChanges.EmploymentType : TpsEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentEndDate != item.NewEndDate ? TpsEmploymentUpdatedEventChanges.EndDate : TpsEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentLastKnownTpsEmployedDate != item.NewLastKnownTpsEmployedDate ? TpsEmploymentUpdatedEventChanges.LastKnownTpsEmployedDate : TpsEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentWithdrawalConfirmed != item.NewWithdrawalConfirmed ? TpsEmploymentUpdatedEventChanges.WithdrawalConfirmed : TpsEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentLastExtractDate != item.NewLastExtractDate ? TpsEmploymentUpdatedEventChanges.LastExtractDate : TpsEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentNationalInsuranceNumber != item.NewNationalInsuranceNumber ? TpsEmploymentUpdatedEventChanges.NationalInsuranceNumber : TpsEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentPersonPostcode != item.NewPersonPostcode ? TpsEmploymentUpdatedEventChanges.PersonPostcode : TpsEmploymentUpdatedEventChanges.None);
 
-                if (changes != PersonEmploymentUpdatedEventChanges.None)
+                if (changes != TpsEmploymentUpdatedEventChanges.None)
                 {
-                    var updatedEvent = new PersonEmploymentUpdatedEvent
+                    var updatedEvent = new TpsEmploymentUpdatedEvent
                     {
                         EventId = Guid.NewGuid(),
-                        PersonId = item.PersonEmploymentId,
-                        PersonEmployment = new()
+                        PersonId = item.TpsEmploymentId,
+                        TpsEmployment = new()
                         {
-                            PersonEmploymentId = item.PersonEmploymentId,
+                            PersonEmploymentId = item.TpsEmploymentId,
                             PersonId = item.PersonId,
                             EstablishmentId = item.EstablishmentId,
                             StartDate = item.StartDate,
-                            EndDate = item.EndDate,
+                            EndDate = item.NewEndDate,
+                            LastKnownTpsEmployedDate = item.NewLastKnownTpsEmployedDate,
                             EmploymentType = item.NewEmploymentType,
-                            LastKnownEmployedDate = item.NewLastKnownEmployedDate,
+                            WithdrawalConfirmed = item.NewWithdrawalConfirmed,
                             LastExtractDate = item.NewLastExtractDate,
                             NationalInsuranceNumber = item.NewNationalInsuranceNumber,
                             PersonPostcode = item.NewPersonPostcode,
                             Key = item.Key
                         },
-                        OldPersonEmployment = new()
+                        OldTpsEmployment = new()
                         {
-                            PersonEmploymentId = item.PersonEmploymentId,
+                            PersonEmploymentId = item.TpsEmploymentId,
                             PersonId = item.PersonId,
                             EstablishmentId = item.EstablishmentId,
                             StartDate = item.StartDate,
-                            EndDate = item.EndDate,
+                            EndDate = item.CurrentEndDate,
+                            LastKnownTpsEmployedDate = item.CurrentLastKnownTpsEmployedDate,
                             EmploymentType = item.CurrentEmploymentType,
-                            LastKnownEmployedDate = item.CurrentLastKnownEmployedDate,
+                            WithdrawalConfirmed = item.CurrentWithdrawalConfirmed,
                             LastExtractDate = item.CurrentLastExtractDate,
                             NationalInsuranceNumber = item.CurrentNationalInsuranceNumber,
                             PersonPostcode = item.CurrentPersonPostcode,
@@ -455,33 +481,33 @@ public class TpsCsvExtractProcessor(
             ),
             establishment_changes AS (
                 SELECT
-                    pe.person_employment_id,
+                    te.tps_employment_id,
                     e.establishment_id as current_establishment_id,
                     e.establishment_number,
                     e.la_code,
                     e.establishment_type_code,
                     e.postcode
                 FROM
-                        person_employments pe
+                        tps_employments te
                     JOIN
-                        establishments e ON e.establishment_id = pe.establishment_id
+                        establishments e ON e.establishment_id = te.establishment_id
                 WHERE
                     NOT EXISTS (SELECT
                                     1
                                 FROM
                                     unique_establishments e
                                 WHERE
-                                    e.establishment_id = pe.establishment_id)
+                                    e.establishment_id = te.establishment_id)
                 LIMIT 1000
             )
             UPDATE
-                person_employments pe
+                tps_employments te
             SET
                 establishment_id = changes.new_establishment_id,
                 updated_on = {clock.UtcNow}
             FROM                
                 (SELECT
-                    ec.person_employment_id,
+                    ec.tps_employment_id,
                     ec.current_establishment_id,
                     ue.establishment_id as new_establishment_id				 
                 FROM
@@ -499,19 +525,20 @@ public class TpsCsvExtractProcessor(
                                                         e2.la_code = ec.la_code
                                                         AND e2.establishment_number = ec.establishment_number)))) changes
             WHERE
-                pe.person_employment_id = changes.person_employment_id
+                te.tps_employment_id = changes.tps_employment_id
             RETURNING
-                pe.person_employment_id,
-                pe.person_id,
+                te.tps_employment_id,
+                te.person_id,
                 changes.current_establishment_id,
-                pe.start_date,
-                pe.end_date,
-                pe.employment_type,
-                pe.last_known_employed_date,
-                pe.last_extract_date,
-                pe.national_insurance_number,
-                pe.person_postcode,
-                pe.key,
+                te.start_date,
+                te.end_date,
+                te.employment_type,
+                te.withdrawal_confirmed,
+                te.last_known_tps_employed_date,
+                te.last_extract_date,
+                te.national_insurance_number,
+                te.person_postcode,
+                te.key,
                 changes.new_establishment_id            
             """;
 
@@ -523,41 +550,43 @@ public class TpsCsvExtractProcessor(
             hasRecordsToUpdate = false;
             using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             dbContext.Database.UseTransaction(transaction);
-            await foreach (var item in dbContext.Database.SqlQuery<UpdatedPersonEmploymentEstablishment>(querySql).AsAsyncEnumerable())
+            await foreach (var item in dbContext.Database.SqlQuery<UpdatedTpsEmploymentEstablishment>(querySql).AsAsyncEnumerable())
             {
-                var updatedEvent = new PersonEmploymentUpdatedEvent
+                var updatedEvent = new TpsEmploymentUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    PersonId = item.PersonEmploymentId,
-                    PersonEmployment = new()
+                    PersonId = item.TpsEmploymentId,
+                    TpsEmployment = new()
                     {
-                        PersonEmploymentId = item.PersonEmploymentId,
+                        PersonEmploymentId = item.TpsEmploymentId,
                         PersonId = item.PersonId,
                         EstablishmentId = item.NewEstablishmentId,
                         StartDate = item.StartDate,
                         EndDate = item.EndDate,
+                        LastKnownTpsEmployedDate = item.LastKnownTpsEmployedDate,
+                        WithdrawalConfirmed = item.WithdrawalConfirmed,
                         EmploymentType = item.EmploymentType,
-                        LastKnownEmployedDate = item.LastKnownEmployedDate,
                         LastExtractDate = item.LastExtractDate,
                         NationalInsuranceNumber = item.NationalInsuranceNumber,
                         PersonPostcode = item.PersonPostcode,
                         Key = item.Key
                     },
-                    OldPersonEmployment = new()
+                    OldTpsEmployment = new()
                     {
-                        PersonEmploymentId = item.PersonEmploymentId,
+                        PersonEmploymentId = item.TpsEmploymentId,
                         PersonId = item.PersonId,
                         EstablishmentId = item.CurrentEstablishmentId,
                         StartDate = item.StartDate,
                         EndDate = item.EndDate,
+                        LastKnownTpsEmployedDate = item.LastKnownTpsEmployedDate,
                         EmploymentType = item.EmploymentType,
-                        LastKnownEmployedDate = item.LastKnownEmployedDate,
+                        WithdrawalConfirmed = item.WithdrawalConfirmed,
                         LastExtractDate = item.LastExtractDate,
                         NationalInsuranceNumber = item.NationalInsuranceNumber,
                         PersonPostcode = item.PersonPostcode,
                         Key = item.Key
                     },
-                    Changes = PersonEmploymentUpdatedEventChanges.EstablishmentId,
+                    Changes = TpsEmploymentUpdatedEventChanges.EstablishmentId,
                     CreatedUtc = clock.UtcNow,
                     RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
                 };
@@ -583,37 +612,38 @@ public class TpsCsvExtractProcessor(
             $"""
             WITH changes AS (
                SELECT
-                    person_employment_id,
+                    tps_employment_id,
                     end_date as current_end_date,
-                    last_known_employed_date as new_end_date
+                    last_known_tps_employed_date as new_end_date
                 FROM
-                    person_employments
+                    tps_employments
                 WHERE
                     end_date IS NULL
-                    AND AGE(last_extract_date, last_known_employed_date) > INTERVAL '5 months'
+                    AND AGE(last_extract_date, last_known_tps_employed_date) > INTERVAL '5 months'
                 LIMIT 1000
             )
             UPDATE
-                person_employments pe
+                tps_employments te
             SET
                 end_date = new_end_date,
                 updated_on = {clock.UtcNow}
             FROM
                 changes 
             WHERE
-                pe.person_employment_id = changes.person_employment_id
+                te.tps_employment_id = changes.tps_employment_id
             RETURNING
-                pe.person_employment_id,
-                pe.person_id,
-                pe.establishment_id,
-                pe.start_date,
+                te.tps_employment_id,
+                te.person_id,
+                te.establishment_id,
+                te.start_date,
                 changes.current_end_date,
-                pe.employment_type,
-                pe.last_known_employed_date,
-                pe.last_extract_date,
-                pe.national_insurance_number,
-                pe.person_postcode,
-                pe.key,
+                te.employment_type,
+                te.withdrawal_confirmed,
+                te.last_known_tps_employed_date,
+                te.last_extract_date,
+                te.national_insurance_number,
+                te.person_postcode,
+                te.key,
                 changes.new_end_date
             """;
 
@@ -625,42 +655,44 @@ public class TpsCsvExtractProcessor(
             hasRecordsToUpdate = false;
             using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             dbContext.Database.UseTransaction(transaction);
-            await foreach (var item in dbContext.Database.SqlQuery<UpdatedPersonEmploymentEndDate>(querySql).AsAsyncEnumerable())
+            await foreach (var item in dbContext.Database.SqlQuery<UpdatedTpsEmploymentEndDate>(querySql).AsAsyncEnumerable())
             {
                 hasRecordsToUpdate = true;
-                var updatedEvent = new PersonEmploymentUpdatedEvent
+                var updatedEvent = new TpsEmploymentUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    PersonId = item.PersonEmploymentId,
-                    PersonEmployment = new()
+                    PersonId = item.TpsEmploymentId,
+                    TpsEmployment = new()
                     {
-                        PersonEmploymentId = item.PersonEmploymentId,
+                        PersonEmploymentId = item.TpsEmploymentId,
                         PersonId = item.PersonId,
                         EstablishmentId = item.EstablishmentId,
                         StartDate = item.StartDate,
                         EndDate = item.CurrentEndDate,
+                        LastKnownTpsEmployedDate = item.LastKnownTpsEmployedDate,
                         EmploymentType = item.EmploymentType,
-                        LastKnownEmployedDate = item.LastKnownEmployedDate,
+                        WithdrawalConfirmed = item.WithdrawalConfirmed,
                         LastExtractDate = item.LastExtractDate,
                         NationalInsuranceNumber = item.NationalInsuranceNumber,
                         PersonPostcode = item.PersonPostcode,
                         Key = item.Key
                     },
-                    OldPersonEmployment = new()
+                    OldTpsEmployment = new()
                     {
-                        PersonEmploymentId = item.PersonEmploymentId,
+                        PersonEmploymentId = item.TpsEmploymentId,
                         PersonId = item.PersonId,
                         EstablishmentId = item.EstablishmentId,
                         StartDate = item.StartDate,
                         EndDate = item.NewEndDate,
+                        LastKnownTpsEmployedDate = item.LastKnownTpsEmployedDate,
                         EmploymentType = item.EmploymentType,
-                        LastKnownEmployedDate = item.LastKnownEmployedDate,
+                        WithdrawalConfirmed = item.WithdrawalConfirmed,
                         LastExtractDate = item.LastExtractDate,
                         NationalInsuranceNumber = item.NationalInsuranceNumber,
                         PersonPostcode = item.PersonPostcode,
                         Key = item.Key
                     },
-                    Changes = PersonEmploymentUpdatedEventChanges.EndDate,
+                    Changes = TpsEmploymentUpdatedEventChanges.EndDate,
                     CreatedUtc = clock.UtcNow,
                     RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
                 };
@@ -686,21 +718,21 @@ public class TpsCsvExtractProcessor(
             $"""
             WITH changes AS (
                 SELECT
-                    pe.person_employment_id,
-                    pe.national_insurance_number as current_national_insurance_number,
-                    pe.person_postcode as current_person_postcode,
+                    te.tps_employment_id,
+                    te.national_insurance_number as current_national_insurance_number,
+                    te.person_postcode as current_person_postcode,
                     x.national_insurance_number as new_national_insurance_number,
                     x.member_postcode as new_person_postcode		
                 FROM
                         tps_csv_extract_items x
                     JOIN
-                        person_employments pe ON pe.key = x.key
-                                                 AND pe.last_extract_date = x.extract_date
+                        tps_employments te ON te.key = x.key
+                                              AND te.last_extract_date = x.extract_date
                 WHERE
-                    pe.national_insurance_number IS NULL
+                    te.national_insurance_number IS NULL
                 LIMIT 1000)
                 UPDATE
-                    person_employments pe
+                    tps_employments te
                 SET
                     national_insurance_number = changes.new_national_insurance_number,
                     person_postcode = changes.new_person_postcode,
@@ -708,21 +740,22 @@ public class TpsCsvExtractProcessor(
                 FROM
                     changes
                 WHERE
-                    changes.person_employment_id = pe.person_employment_id
+                    changes.tps_employment_id = te.tps_employment_id
                 RETURNING
-                    pe.person_employment_id,
-                    pe.person_id,
-                    pe.establishment_id,
-                    pe.start_date,
-                    pe.end_date,
-                    pe.employment_type,
-                    pe.last_known_employed_date,
-                    pe.last_extract_date,
+                    te.tps_employment_id,
+                    te.person_id,
+                    te.establishment_id,
+                    te.start_date,
+                    te.end_date,
+                    te.employment_type,
+                    te.withdrawal_confirmed,
+                    te.last_known_tps_employed_date,
+                    te.last_extract_date,
                     changes.current_national_insurance_number,
                     changes.current_person_postcode,
                     changes.new_national_insurance_number,
                     changes.new_person_postcode,
-                    pe.key
+                    te.key
             """;
 
         bool hasRecordsToUpdate = false;
@@ -733,42 +766,44 @@ public class TpsCsvExtractProcessor(
             hasRecordsToUpdate = false;
             using var transaction = await connection.BeginTransactionAsync(cancellationToken);
             dbContext.Database.UseTransaction(transaction);
-            await foreach (var item in dbContext.Database.SqlQuery<UpdatedPersonEmploymentNationalInsuranceNumberAndPersonPostcode>(querySql).AsAsyncEnumerable())
+            await foreach (var item in dbContext.Database.SqlQuery<UpdatedTpsEmploymentNationalInsuranceNumberAndPersonPostcode>(querySql).AsAsyncEnumerable())
             {
                 hasRecordsToUpdate = true;
-                var changes = PersonEmploymentUpdatedEventChanges.None |
-                    (item.CurrentNationalInsuranceNumber != item.NewNationalInsuranceNumber ? PersonEmploymentUpdatedEventChanges.NationalInsuranceNumber : PersonEmploymentUpdatedEventChanges.None) |
-                    (item.CurrentPersonPostcode != item.NewPersonPostcode ? PersonEmploymentUpdatedEventChanges.PersonPostcode : PersonEmploymentUpdatedEventChanges.None);
+                var changes = TpsEmploymentUpdatedEventChanges.None |
+                    (item.CurrentNationalInsuranceNumber != item.NewNationalInsuranceNumber ? TpsEmploymentUpdatedEventChanges.NationalInsuranceNumber : TpsEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentPersonPostcode != item.NewPersonPostcode ? TpsEmploymentUpdatedEventChanges.PersonPostcode : TpsEmploymentUpdatedEventChanges.None);
 
-                if (changes != PersonEmploymentUpdatedEventChanges.None)
+                if (changes != TpsEmploymentUpdatedEventChanges.None)
                 {
-                    var updatedEvent = new PersonEmploymentUpdatedEvent
+                    var updatedEvent = new TpsEmploymentUpdatedEvent
                     {
                         EventId = Guid.NewGuid(),
-                        PersonId = item.PersonEmploymentId,
-                        PersonEmployment = new()
+                        PersonId = item.TpsEmploymentId,
+                        TpsEmployment = new()
                         {
-                            PersonEmploymentId = item.PersonEmploymentId,
+                            PersonEmploymentId = item.TpsEmploymentId,
                             PersonId = item.PersonId,
                             EstablishmentId = item.EstablishmentId,
                             StartDate = item.StartDate,
                             EndDate = item.EndDate,
+                            LastKnownTpsEmployedDate = item.LastKnownTpsEmployedDate,
                             EmploymentType = item.EmploymentType,
-                            LastKnownEmployedDate = item.LastKnownEmployedDate,
+                            WithdrawalConfirmed = item.WithdrawalConfirmed,
                             LastExtractDate = item.LastExtractDate,
                             NationalInsuranceNumber = item.NewNationalInsuranceNumber,
                             PersonPostcode = item.NewPersonPostcode,
                             Key = item.Key
                         },
-                        OldPersonEmployment = new()
+                        OldTpsEmployment = new()
                         {
-                            PersonEmploymentId = item.PersonEmploymentId,
+                            PersonEmploymentId = item.TpsEmploymentId,
                             PersonId = item.PersonId,
                             EstablishmentId = item.EstablishmentId,
                             StartDate = item.StartDate,
                             EndDate = item.EndDate,
+                            LastKnownTpsEmployedDate = item.LastKnownTpsEmployedDate,
                             EmploymentType = item.EmploymentType,
-                            LastKnownEmployedDate = item.LastKnownEmployedDate,
+                            WithdrawalConfirmed = item.WithdrawalConfirmed,
                             LastExtractDate = item.LastExtractDate,
                             NationalInsuranceNumber = item.CurrentNationalInsuranceNumber,
                             PersonPostcode = item.CurrentPersonPostcode,

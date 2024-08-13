@@ -59,7 +59,7 @@ public class TpsCsvExtractFileImporter(
                     employment_start_date,
                     employment_end_date,
                     full_or_part_time_indicator,
-                    withdrawl_indicator,
+                    withdrawal_indicator,
                     extract_date,
                     gender,                    
                     created,
@@ -197,7 +197,7 @@ public class TpsCsvExtractFileImporter(
                     employment_start_date,
                     employment_end_date,
                     employment_type,
-                    withdrawl_indicator,
+                    withdrawal_indicator,
                     extract_date,
                     gender,                    
                     created,
@@ -230,7 +230,7 @@ public class TpsCsvExtractFileImporter(
             writer.Write(employmentStartDate, NpgsqlDbType.Date);
             writer.Write(!string.IsNullOrEmpty(item.EmploymentEndDate) ? DateOnly.ParseExact(item.EmploymentEndDate!, "dd/MM/yyyy") : (DateOnly?)null, NpgsqlDbType.Date);
             writer.Write((int)EmploymentTypeHelper.FromFullOrPartTimeIndicator(item.FullOrPartTimeIndicator!), NpgsqlDbType.Integer);
-            writer.Write(item.WithdrawlIndicator, NpgsqlDbType.Char);
+            writer.Write(item.WithdrawalIndicator, NpgsqlDbType.Char);
             writer.Write(DateOnly.ParseExact(item.ExtractDate!, "dd/MM/yyyy"), NpgsqlDbType.Date);
             writer.Write(item.Gender, NpgsqlDbType.Varchar);
             writer.Write(clock.UtcNow, NpgsqlDbType.TimestampTz);

@@ -71,7 +71,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName));
             var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
             var employmentNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
-            var personEmployment = await TestData.CreatePersonEmployment(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
+            var personEmployment = await TestData.CreateTpsEmployment(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
 
             string[][] names = nameOption switch
             {
@@ -202,7 +202,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             // Person who matches on NINO            
             var person2 = await TestData.CreatePerson(b => b.WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
             var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
-            var personEmployment = await TestData.CreatePersonEmployment(person2, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
+            var personEmployment = await TestData.CreateTpsEmployment(person2, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
 
             // Person who matches on TRN
             var person3 = await TestData.CreatePerson(b => b.WithTrn());
@@ -244,7 +244,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
 
             var person = await TestData.CreatePerson(b => b.WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
             var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
-            var personEmployment = await TestData.CreatePersonEmployment(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
+            var personEmployment = await TestData.CreateTpsEmployment(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
 
             string[][] names = [[firstName, lastName]];
             DateOnly[] datesOfBirth = [dateOfBirth];
