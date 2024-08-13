@@ -38,6 +38,12 @@ public abstract class AuthorizeAccessLinkGenerator
     public string RequestTrn(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RequestTrn/Index", journeyInstanceId: journeyInstanceId);
 
+    public string RequestTrnNpqCheck(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RequestTrn/NpqCheck", journeyInstanceId: journeyInstanceId);
+
+    public string RequestTrnNotEligible(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RequestTrn/NotEligible", journeyInstanceId: journeyInstanceId);
+
     public string RequestTrnEmail(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RequestTrn/Email", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 

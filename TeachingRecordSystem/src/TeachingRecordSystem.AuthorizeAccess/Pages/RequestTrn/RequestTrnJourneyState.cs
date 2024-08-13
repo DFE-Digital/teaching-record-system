@@ -9,6 +9,7 @@ public class RequestTrnJourneyState()
     public static JourneyDescriptor JourneyDescriptor { get; } =
         new JourneyDescriptor(JourneyName, typeof(RequestTrnJourneyState), requestDataKeys: [], appendUniqueKey: true);
 
+    public bool? IsPlanningToTakeAnNpq { get; set; }
     public string? Email { get; set; }
     public string? Name { get; set; }
     public bool? HasPreviousName { get; set; }
