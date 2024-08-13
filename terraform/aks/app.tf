@@ -24,17 +24,12 @@ resource "kubernetes_job" "migrations" {
         container {
           name    = "cli"
           image   = var.docker_image
-          command = ["/bin/ash", "-e", "-c"]
-          args    = ["./db.sh -c 'alter user $(PG_USER) with replication;'", "trscli migrate-db --connection-string $(ConnectionStrings__DefaultConnection)"]
+          command = ["trscli"]
+          args    = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
 
           env {
-            name  = "ConnectionStrings__DefaultConnection"
+            name  = "CONNECTION_STRING"
             value = module.postgres.dotnet_connection_string
-          }
-
-          env {
-            name  = "PG_USER"
-            value = module.postgres.username
           }
         }
 

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.Cli;
@@ -27,6 +28,13 @@ public static partial class Commands
             async (string connectionString, string? targetMigration) =>
             {
                 using var dbContext = TrsDbContext.Create(connectionString, commandTimeout: (int)TimeSpan.FromMinutes(10).TotalSeconds);
+
+                // Ensure the user has the replication permission
+                var user = new NpgsqlConnectionStringBuilder(connectionString).Username;
+#pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
+                await dbContext.Database.ExecuteSqlRawAsync($"alter user {user} with replication");
+#pragma warning restore EF1002 // Risk of vulnerability to SQL injection.
+
                 await dbContext.GetService<IMigrator>().MigrateAsync(targetMigration);
             },
             connectionStringOption,
