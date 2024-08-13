@@ -24,7 +24,7 @@ resource "kubernetes_job" "migrations" {
         container {
           name    = "cli"
           image   = var.docker_image
-          command = ["/bin/ash", "-c"]
+          command = ["/bin/ash", "-e", "-c"]
           args    = ["./db.sh -c 'alter user $(PG_USER) with replication;'", "trscli migrate-db --connection-string $(ConnectionStrings__DefaultConnection)"]
 
           env {
