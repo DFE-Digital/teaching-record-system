@@ -62,6 +62,9 @@ public abstract class AuthorizeAccessLinkGenerator
     public string RequestTrnCheckAnswers(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RequestTrn/CheckAnswers", journeyInstanceId: journeyInstanceId);
 
+    public string RequestTrnEmailInUse(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RequestTrn/EmailInUse", journeyInstanceId: journeyInstanceId);
+
     public string RequestTrnSubmitted(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RequestTrn/Submitted", journeyInstanceId: journeyInstanceId);
 

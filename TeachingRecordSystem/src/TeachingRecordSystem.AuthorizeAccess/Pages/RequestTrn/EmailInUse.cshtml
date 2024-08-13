@@ -1,0 +1,15 @@
+@page "/request-trn/emailinuse"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn.EmailInUseModel
+@{
+    ViewBag.Title = "Email Address in use";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(LinkGenerator.RequestTrnEmail(Model.JourneyInstance!.InstanceId))" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <h1 class="govuk-heading-l">You’ve already submitted a request for a TRN</h1>
+    </div>
+</div>

@@ -12,7 +12,8 @@ public class CreateTrnRequestTaskHandler : ICrmQueryHandler<CreateTrnRequestTask
         {
             Id = Guid.NewGuid(),
             Subject = "Notification for TRA Support Team - TRN request",
-            Description = query.Description
+            Description = query.Description,
+            dfeta_EmailAddress = query.EmailAddress
         };
 
         var annotationBody = await StreamHelper.GetBase64EncodedFileContent(query.EvidenceFileContent);

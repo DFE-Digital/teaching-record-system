@@ -2,13 +2,15 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.UiCommon.FormFlow;
 using EmailAddress = TeachingRecordSystem.AuthorizeAccess.DataAnnotations.EmailAddressAttribute;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
 [Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
+public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDispatcher crmQueryDispatcher) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -29,6 +31,14 @@ public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
         }
 
         await JourneyInstance!.UpdateStateAsync(state => state.Email = Email);
+
+        var openTasks = await crmQueryDispatcher.ExecuteQuery(
+            new GetOpenTasksForEmailAddressQuery(EmailAddress: JourneyInstance!.State.Email!));
+
+        if (openTasks.Any())
+        {
+            return Redirect(linkGenerator.RequestTrnEmailInUse(JourneyInstance!.InstanceId));
+        }
 
         return FromCheckAnswers == true ?
             Redirect(linkGenerator.RequestTrnCheckAnswers(JourneyInstance!.InstanceId)) :
