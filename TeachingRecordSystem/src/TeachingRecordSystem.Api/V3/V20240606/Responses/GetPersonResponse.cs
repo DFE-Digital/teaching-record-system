@@ -29,11 +29,11 @@ public partial record GetPersonResponse
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultQts))]
+[AutoMap(typeof(Core.SharedModels.QtsInfo))]
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseQts))]
 public partial record GetPersonResponseQts;
 
-[AutoMap(typeof(GetPersonResultEyts))]
+[AutoMap(typeof(Core.SharedModels.EytsInfo))]
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseEyts))]
 public partial record GetPersonResponseEyts;
 

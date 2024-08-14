@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.V3.VNext.Requests;
+namespace TeachingRecordSystem.Api.V3.V20240814.Requests;
 
 public record FindPersonsRequest
 {

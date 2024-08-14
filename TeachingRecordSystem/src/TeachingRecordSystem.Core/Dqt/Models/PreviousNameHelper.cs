@@ -1,13 +1,14 @@
-namespace TeachingRecordSystem.Core.Dqt.Models;
+using Microsoft.Extensions.Configuration;
 using FullName = (string FirstName, string MiddleName, string LastName);
 
-public static class PreviousNameHelper
+namespace TeachingRecordSystem.Core.Dqt.Models;
+
+public class PreviousNameHelper(IConfiguration configuration)
 {
-    public static FullName[] GetFullPreviousNames(
-        IEnumerable<dfeta_previousname> previousNames,
-        Contact contact,
-        TimeSpan concurrentNameChangeWindow)
+    public FullName[] GetFullPreviousNames(IEnumerable<dfeta_previousname> previousNames, Contact contact)
     {
+        var concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue("ConcurrentNameChangeWindowSeconds", 5));
+
         var result = new List<FullName>();
 
         var currentFirstName = contact.FirstName!;

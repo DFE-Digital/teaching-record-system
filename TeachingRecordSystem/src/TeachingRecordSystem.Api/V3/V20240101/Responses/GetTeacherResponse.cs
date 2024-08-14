@@ -32,7 +32,7 @@ public record GetTeacherResponse
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultQts))]
+[AutoMap(typeof(Core.SharedModels.QtsInfo))]
 public record GetTeacherResponseQts
 {
     public required DateOnly? Awarded { get; init; }
@@ -40,7 +40,7 @@ public record GetTeacherResponseQts
     public required string? StatusDescription { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultEyts))]
+[AutoMap(typeof(Core.SharedModels.EytsInfo))]
 public record GetTeacherResponseEyts
 {
     public required DateOnly? Awarded { get; init; }

@@ -11,7 +11,8 @@ public static partial class ServiceCollectionExtensions
     {
         return services
             .AddSingleton<IClock, Clock>()
-            .AddCrmQueries();
+            .AddCrmQueries()
+            .AddSingleton<PreviousNameHelper>();
     }
 
     public static IServiceCollection AddAccessYourTeachingQualificationsOptions(

@@ -39,8 +39,8 @@ public record GetPersonResult
     public required Option<bool> PendingNameChange { get; init; }
     public required Option<bool> PendingDateOfBirthChange { get; init; }
     public required string? EmailAddress { get; set; }
-    public required GetPersonResultQts? Qts { get; init; }
-    public required GetPersonResultEyts? Eyts { get; init; }
+    public required QtsInfo? Qts { get; init; }
+    public required EytsInfo? Eyts { get; init; }
     public required Option<GetPersonResultInduction?> Induction { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultInitialTeacherTraining>> InitialTeacherTraining { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultNpqQualification>> NpqQualifications { get; init; }
@@ -50,20 +50,6 @@ public record GetPersonResult
     public required Option<IReadOnlyCollection<AlertInfo>> Alerts { get; init; }
     public required Option<IReadOnlyCollection<NameInfo>> PreviousNames { get; init; }
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
-}
-
-public record GetPersonResultQts
-{
-    public required DateOnly? Awarded { get; init; }
-    public required string CertificateUrl { get; init; }
-    public required string? StatusDescription { get; init; }
-}
-
-public record GetPersonResultEyts
-{
-    public required DateOnly? Awarded { get; init; }
-    public required string CertificateUrl { get; init; }
-    public required string? StatusDescription { get; init; }
 }
 
 public record GetPersonResultInduction
@@ -161,12 +147,10 @@ public class GetPersonHandler(
     ICrmQueryDispatcher crmQueryDispatcher,
     ReferenceDataCache referenceDataCache,
     IDataverseAdapter dataverseAdapter,
-    IConfiguration configuration)
+    PreviousNameHelper previousNameHelper)
 {
     public async Task<GetPersonResult?> Handle(GetPersonCommand command)
     {
-        var concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue<int>("ConcurrentNameChangeWindowSeconds", 5));
-
         var contactDetail = await crmQueryDispatcher.ExecuteQuery(
             new GetActiveContactDetailByTrnQuery(
                 command.Trn,
@@ -330,7 +314,7 @@ public class GetPersonHandler(
             GetSanctions() :
             null;
 
-        IEnumerable<NameInfo>? previousNames = PreviousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact, concurrentNameChangeWindow)
+        IEnumerable<NameInfo>? previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
             .Select(name => new NameInfo()
             {
                 FirstName = name.FirstName,
@@ -356,9 +340,10 @@ public class GetPersonHandler(
 
         var qts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_QTSDate is not null);
         var eyts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_EYTSDate is not null);
-        var eytsTeacherStatus = eyts != null ? await dataverseAdapter.GetEarlyYearsStatus(eyts!.dfeta_EarlyYearsStatusId.Id) : null;
         var allTeacherStatuses = await referenceDataCache.GetTeacherStatuses();
-        var qtsStatus = qts != null ? allTeacherStatuses.Single(x => x.Id == qts.dfeta_TeacherStatusId.Id) : null;
+        var allEarlyYearsStatuses = await referenceDataCache.GetEytsStatuses();
+        var eytsStatus = eyts is not null ? allEarlyYearsStatuses.Single(x => x.Id == eyts.dfeta_EarlyYearsStatusId.Id) : null;
+        var qtsStatus = qts is not null ? allTeacherStatuses.Single(x => x.Id == qts.dfeta_TeacherStatusId.Id) : null;
 
         var allowIdSignInWithProhibitions = command.Include.HasFlag(GetPersonCommandIncludes.AllowIdSignInWithProhibitions) ?
             Option.Some(contact.dfeta_AllowIDSignInWithProhibitions == true) :
@@ -374,8 +359,8 @@ public class GetPersonHandler(
             NationalInsuranceNumber = contact.dfeta_NINumber,
             PendingNameChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingNameRequest) : default,
             PendingDateOfBirthChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingDateOfBirthRequest) : default,
-            Qts = MapQts(qts?.dfeta_QTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), qtsStatus != null ? GetQtsStatusDescription(qtsStatus!.dfeta_Value!, qtsStatus.dfeta_name) : null),
-            Eyts = MapEyts(eyts?.dfeta_EYTSDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), eytsTeacherStatus != null ? GetEytsStatusDescription(eytsTeacherStatus!.dfeta_Value!) : null),
+            Qts = await QtsInfo.Create(qts, referenceDataCache),
+            Eyts = await EytsInfo.Create(eyts, referenceDataCache),
             EmailAddress = contact.EMailAddress1,
             Induction = command.Include.HasFlag(GetPersonCommandIncludes.Induction) ?
                 Option.Some(MapInduction(await getInductionTask!, contact)) :
@@ -434,58 +419,6 @@ public class GetPersonHandler(
             AllowIdSignInWithProhibitions = allowIdSignInWithProhibitions
         };
     }
-
-    private static string GetEytsStatusDescription(string? value) => value switch
-    {
-        "222" => "Early years professional status",
-        "221" => "Qualified",
-        "220" => "Early years trainee",
-        _ => throw new ArgumentException($"Unregonized EYTS status: '{value}'.", nameof(value))
-    };
-
-    private static string GetQtsStatusDescription(string value, string statusDescription) => value switch
-    {
-        "28" => "Qualified",
-        "50" => "Qualified",
-        "67" => "Qualified",
-        "68" => "Qualified",
-        "69" => "Qualified",
-        "71" => "Qualified",
-        "87" => "Qualified",
-        "90" => "Qualified",
-        "100" => "Qualified",
-        "103" => "Qualified",
-        "104" => "Qualified",
-        "206" => "Qualified",
-        "211" => "Trainee teacher",
-        "212" => "Assessment only route candidate",
-        "213" => "Qualified",
-        "214" => "Partial qualified teacher status",
-        "223" => "Qualified",
-        _ when statusDescription.StartsWith("Qualified teacher", StringComparison.InvariantCultureIgnoreCase) => "Qualified",
-        _ => throw new ArgumentException($"Unregonized QTS status: '{value}'.", nameof(value))
-    };
-
-    private static GetPersonResultQts? MapQts(DateOnly? qtsDate, string? statusDescription) =>
-        statusDescription is not null ?
-            new GetPersonResultQts()
-            {
-                Awarded = qtsDate,
-                CertificateUrl = "/v3/certificates/qts",
-                StatusDescription = statusDescription
-            } :
-            null;
-
-    private static GetPersonResultEyts? MapEyts(DateOnly? eytsDate, string? statusDescription) =>
-        statusDescription != null ?
-            new GetPersonResultEyts()
-            {
-                Awarded = eytsDate,
-                CertificateUrl = "/v3/certificates/eyts",
-                StatusDescription = statusDescription
-            } :
-            null;
-
 
     private static GetPersonResultInduction? MapInduction((dfeta_induction Induction, dfeta_inductionperiod[] Inductionperiods) data, TeachingRecordSystem.Core.Dqt.Models.Contact contact)
     {
