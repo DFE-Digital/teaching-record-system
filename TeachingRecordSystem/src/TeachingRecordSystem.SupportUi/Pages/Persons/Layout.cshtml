@@ -28,10 +28,6 @@
                 </li>
 
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonAlerts(personId, search, sortBy, pageNumber)">Alerts</a>
-                </li>
-
-                <li class="moj-sub-navigation__item">
                     <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.ChangeHistory ? "page" : null)" href="@LinkGenerator.PersonChangeHistory(personId, search, sortBy, pageNumber)">Change history</a>
                 </li>
             </ul>
