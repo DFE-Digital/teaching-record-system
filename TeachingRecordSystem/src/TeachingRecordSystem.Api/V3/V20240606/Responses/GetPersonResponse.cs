@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Optional;
 using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+using TeachingRecordSystem.Api.V3.V20240606.ApiModels;
 
 namespace TeachingRecordSystem.Api.V3.V20240606.Responses;
 

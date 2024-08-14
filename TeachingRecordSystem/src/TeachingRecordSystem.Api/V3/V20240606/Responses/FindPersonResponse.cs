@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+using TeachingRecordSystem.Api.V3.V20240606.ApiModels;
 using TeachingRecordSystem.Api.V3.V20240606.Requests;
 
 namespace TeachingRecordSystem.Api.V3.V20240606.Responses;
