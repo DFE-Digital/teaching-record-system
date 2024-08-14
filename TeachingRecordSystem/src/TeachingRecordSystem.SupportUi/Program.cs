@@ -199,18 +199,6 @@ builder.Services
     .AddFormFlow(options =>
     {
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.AddAlert,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.AddAlertState),
-            requestDataKeys: ["personId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.CloseAlert,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert.CloseAlertState),
-            requestDataKeys: ["alertId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditName,
             typeof(TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditName.EditNameState),
             requestDataKeys: ["personId"],

@@ -4,6 +4,5 @@ public enum PersonSubNavigationTab
 {
     General,
     Qualifications,
-    Alerts,
     ChangeHistory
 }

@@ -12,16 +12,6 @@
     ViewBag.Title = Model.Person!.Name;
 }
 
-@if (Model.Person.HasAlerts)
-{
-    <govuk-notification-banner>
-        <p class="govuk-notification-banner__heading">
-            Alert on record.
-            <a class="govuk-notification-banner__link" href="@LinkGenerator.PersonAlerts(Model.PersonId, Model.Search, Model.SortBy, Model.PageNumber)">View alerts</a>.
-        </p>
-    </govuk-notification-banner>
-}
-
 @{
     var personDetailModel = new PersonDetailViewModel()
     {
