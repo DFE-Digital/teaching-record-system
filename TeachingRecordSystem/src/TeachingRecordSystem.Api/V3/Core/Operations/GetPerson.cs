@@ -421,7 +421,7 @@ public class GetPersonHandler(
                     .Where(s => Constants.ProhibitionSanctionCodes.Contains(s.SanctionCode))
                     .Select(s => new AlertInfo()
                     {
-                        AlertType = AlertType.Prohibition,
+                        AlertType = SharedModels.AlertType.Prohibition,
                         DqtSanctionCode = s.SanctionCode,
                         StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                         EndDate = s.Sanction.dfeta_EndDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
