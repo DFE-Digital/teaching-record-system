@@ -9,9 +9,10 @@ public class AlertMapping : IEntityTypeConfiguration<Alert>
     {
         builder.ToTable("alerts");
         builder.HasKey(x => x.AlertId);
+        builder.HasQueryFilter(q => EF.Property<DateTime?>(q, nameof(Alert.DeletedOn)) == null);
         builder.Property(x => x.AlertTypeId).IsRequired();
         builder.Property(x => x.PersonId).IsRequired();
-        builder.Property(x => x.Details).IsRequired();
+        builder.Property(x => x.Details);
         builder.HasIndex(x => x.AlertTypeId).HasDatabaseName(Alert.AlertTypeIdIndexName);
         builder.HasOne<AlertType>().WithMany().HasForeignKey(x => x.AlertTypeId).HasConstraintName(Alert.AlertTypeForeignKeyName);
         builder.HasIndex(x => x.PersonId).HasDatabaseName(Alert.PersonIdIndexName);

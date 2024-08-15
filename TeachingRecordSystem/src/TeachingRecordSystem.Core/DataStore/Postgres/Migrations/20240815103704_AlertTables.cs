@@ -49,10 +49,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     alert_id = table.Column<Guid>(type: "uuid", nullable: false),
                     alert_type_id = table.Column<Guid>(type: "uuid", nullable: false),
                     person_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    details = table.Column<string>(type: "text", nullable: false),
+                    details = table.Column<string>(type: "text", nullable: true),
                     external_link = table.Column<string>(type: "text", nullable: true),
                     start_date = table.Column<DateOnly>(type: "date", nullable: true),
-                    end_date = table.Column<DateOnly>(type: "date", nullable: true)
+                    end_date = table.Column<DateOnly>(type: "date", nullable: true),
+                    created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    deleted_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
