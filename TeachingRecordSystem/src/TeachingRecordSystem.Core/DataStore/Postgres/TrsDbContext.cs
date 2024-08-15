@@ -80,6 +80,12 @@ public class TrsDbContext : DbContext
 
     public DbSet<TpsEstablishmentType> TpsEstablishmentTypes => Set<TpsEstablishmentType>();
 
+    public DbSet<Alert> Alerts => Set<Alert>();
+
+    public DbSet<AlertType> AlertTypes => Set<AlertType>();
+
+    public DbSet<AlertCategory> AlertCategories => Set<AlertCategory>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);
