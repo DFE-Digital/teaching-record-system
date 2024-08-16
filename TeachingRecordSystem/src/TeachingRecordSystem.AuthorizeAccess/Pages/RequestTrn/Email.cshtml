@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RequestTrnCheckAnswers(Model.JourneyInstance!.InstanceId) : LinkGenerator.RequestTrn(Model.JourneyInstance!.InstanceId))" />
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RequestTrnCheckAnswers(Model.JourneyInstance!.InstanceId) : LinkGenerator.RequestTrnNpqCheck(Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">

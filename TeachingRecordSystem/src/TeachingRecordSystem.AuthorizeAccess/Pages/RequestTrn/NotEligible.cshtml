@@ -1,0 +1,25 @@
+@page "/request-trn/not-eligible"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn.NotEligibleModel
+@{
+    ViewBag.Title = "You cannot use this service to get a TRN";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.RequestTrnNpqCheck(Model.JourneyInstance!.InstanceId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full-from-desktop">
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+        <p class="govuk-body">You can only use this service if you need a TRN to register for an NPQ.</p>
+        <p class="govuk-body">
+            Find out how to <a class="govuk-link" href="https://www.gov.uk/guidance/teacher-reference-number-trn#if-youre-a-mentor-for-a-trainee-or-early-career-teacher">get a TRN if you’re a mentor for a trainee or early career teacher</a>.
+        </p>
+        <p class="govuk-body">If you’ve forgotten your TRN, you can:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>check your payslip or pension statement</li>
+            <li>use the <a class="govuk-link" href="https://find-a-lost-trn.education.gov.uk/start">Find a lost TRN service</a> to check if you have a TRN or to find your TRN</li>
+        </ul>
+    </div>
+</div>
