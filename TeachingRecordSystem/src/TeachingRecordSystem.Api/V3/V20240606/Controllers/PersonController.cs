@@ -7,7 +7,6 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.Operations;
 using TeachingRecordSystem.Api.V3.V20240606.Requests;
 using TeachingRecordSystem.Api.V3.V20240606.Responses;
-using CreateDetailChangeResponseVersion = TeachingRecordSystem.Api.V3.V20240412;
 
 namespace TeachingRecordSystem.Api.V3.V20240606.Controllers;
 
@@ -41,7 +40,7 @@ public class PersonController(IMapper mapper) : ControllerBase
         OperationId = "CreateNameChange",
         Summary = "Create name change request",
         Description = "Creates a name change request for the authenticated teacher.")]
-    [ProducesResponseType(typeof(CreateDetailChangeResponseVersion.Responses.CreateNameChangeResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     public async Task<IActionResult> CreateNameChange(
@@ -60,7 +59,7 @@ public class PersonController(IMapper mapper) : ControllerBase
         };
 
         var caseNumber = await handler.Handle(command);
-        var response = new CreateDetailChangeResponseVersion.Responses.CreateNameChangeResponse() { CaseNumber = caseNumber };
+        var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
         return Ok(response);
     }
 
@@ -69,7 +68,7 @@ public class PersonController(IMapper mapper) : ControllerBase
         OperationId = "CreateDobChange",
         Summary = "Create DOB change request",
         Description = "Creates a date of birth change request for the authenticated teacher.")]
-    [ProducesResponseType(typeof(CreateDetailChangeResponseVersion.Responses.CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
     public async Task<IActionResult> CreateDateOfBirthChange(
@@ -86,7 +85,7 @@ public class PersonController(IMapper mapper) : ControllerBase
         };
 
         var caseNumber = await handler.Handle(command);
-        var response = new CreateDetailChangeResponseVersion.Responses.CreateNameChangeResponse() { CaseNumber = caseNumber };
+        var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
         return Ok(response);
     }
 }
