@@ -6,12 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <IsTestProject Condition="'$(IsTestProject)' == '' and $(MSBuildProjectName.EndsWith('Tests'))">true</IsTestProject>
+    <IsSourceGeneratorProject Condition="'$(IsSourceGeneratorProject)' == '' and $(MSBuildProjectName.EndsWith('Generator'))">true</IsSourceGeneratorProject>
 
     <UserSecretsId>TeachingRecordSystem</UserSecretsId>
     <UserSecretsId Condition="'$(IsTestProject)' == 'true'">TeachingRecordSystemTests</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(IsSourceGeneratorProject)' != 'true'">
     <Using Include="Microsoft.EntityFrameworkCore" />
     <Using Include="TeachingRecordSystem.Core" />
     <Using Include="TeachingRecordSystem.Core.CoreConstants" Static="true" />
