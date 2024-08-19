@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -9,37 +10,43 @@ using TeachingRecordSystem.Api.V3.V20240416.Responses;
 
 namespace TeachingRecordSystem.Api.V3.V20240416.Controllers;
 
-[Route("teachers")]
-public class TeachersController(IMapper mapper) : ControllerBase
+[Route("teacher")]
+public class TeacherController(IMapper mapper) : ControllerBase
 {
-    [HttpGet("{trn}")]
+    [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
+    [HttpGet]
     [SwaggerOperation(
-        OperationId = "GetTeacherByTrn",
-        Summary = "Get teacher details by TRN",
-        Description = "Gets the details of the teacher corresponding to the given TRN.")]
+        OperationId = "GetCurrentTeacher",
+        Summary = "Get the current teacher's details",
+        Description = "Gets the details for the authenticated teacher.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    [Authorize(Policy = AuthorizationPolicies.GetPerson)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Get(
-        [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
-        [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
         [FromServices] GetPersonHandler handler)
     {
+        var trn = User.FindFirstValue("trn");
+
+        if (trn is null)
+        {
+            return MissingOrInvalidTrn();
+        }
+
         var command = new GetPersonCommand(
             trn,
             include is not null ? (GetPersonCommandIncludes)include : GetPersonCommandIncludes.None,
-            dateOfBirth);
+            DateOfBirth: null);
 
         var result = await handler.Handle(command);
 
         if (result is null)
         {
-            return NotFound();
+            return MissingOrInvalidTrn();
         }
 
         var response = mapper.Map<GetTeacherResponse>(result);
         return Ok(response);
+
+        IActionResult MissingOrInvalidTrn() => Forbid();
     }
 }

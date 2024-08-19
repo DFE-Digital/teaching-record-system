@@ -4,7 +4,6 @@ using TeachingRecordSystem.Api.V3.V20240101.Requests;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Responses;
 
-[AutoMap(typeof(FindPersonByLastNameAndDateOfBirthResult))]
 public record FindTeachersResponse
 {
     public required int Total { get; init; }
