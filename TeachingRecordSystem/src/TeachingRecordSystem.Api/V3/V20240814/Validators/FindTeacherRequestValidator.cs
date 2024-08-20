@@ -1,7 +1,7 @@
 using FluentValidation;
-using TeachingRecordSystem.Api.V3.V20240606.Requests;
+using TeachingRecordSystem.Api.V3.V20240814.Requests;
 
-namespace TeachingRecordSystem.Api.V3.V20240606.Validators;
+namespace TeachingRecordSystem.Api.V3.V20240814.Validators;
 
 public class FindPersonRequestValidator : AbstractValidator<FindPersonRequest>
 {

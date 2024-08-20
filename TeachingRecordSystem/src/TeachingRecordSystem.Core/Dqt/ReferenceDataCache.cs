@@ -44,6 +44,12 @@ public class ReferenceDataCache : IStartupTask
         return subjects.Single(s => s.Title == title, $"Could not find subject with title: '{title}'.");
     }
 
+    public async Task<dfeta_teacherstatus> GetTeacherStatusById(Guid id)
+    {
+        var teacherStatuses = await EnsureTeacherStatuses();
+        return teacherStatuses.Single(ts => ts.Id == id, $"Could not find teacher status with ID: '{id}'.");
+    }
+
     public async Task<dfeta_teacherstatus> GetTeacherStatusByValue(string value)
     {
         var teacherStatuses = await EnsureTeacherStatuses();
@@ -60,6 +66,12 @@ public class ReferenceDataCache : IStartupTask
     {
         var earlyyearStatuses = await EnsureEarlyYearsStatuses();
         return earlyyearStatuses;
+    }
+
+    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusById(Guid id)
+    {
+        var earlyYearsStatuses = await EnsureEarlyYearsStatuses();
+        return earlyYearsStatuses.Single(ey => ey.Id == id, $"Could not find early years teacher status with ID: '{id}'.");
     }
 
     public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusByValue(string value)

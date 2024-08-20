@@ -7,11 +7,11 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
-public record FindPersonByLastNameAndDateOfBirthCommand(string LastName, DateOnly? DateOfBirth);
+public record FindPersonsByTrnAndDateOfBirthCommand(IEnumerable<(string Trn, DateOnly DateOfBirth)> Persons);
 
-public record FindPersonByLastNameAndDateOfBirthResult(int Total, IReadOnlyCollection<FindPersonByLastNameAndDateOfBirthResultItem> Items);
+public record FindPersonsByTrnAndDateOfBirthResult(int Total, IReadOnlyCollection<FindPersonsByTrnAndDateOfBirthResultItem> Items);
 
-public record FindPersonByLastNameAndDateOfBirthResultItem
+public record FindPersonsByTrnAndDateOfBirthResultItem
 {
     public required string Trn { get; init; }
     public required DateOnly DateOfBirth { get; init; }
@@ -25,17 +25,16 @@ public record FindPersonByLastNameAndDateOfBirthResultItem
     public required EytsInfo? Eyts { get; init; }
 }
 
-public class FindPersonByLastNameAndDateOfBirthHandler(
+public class FindPersonsByTrnAndDateOfBirthHandler(
     ICrmQueryDispatcher crmQueryDispatcher,
     PreviousNameHelper previousNameHelper,
     ReferenceDataCache referenceDataCache)
 {
-    public async Task<FindPersonByLastNameAndDateOfBirthResult> Handle(FindPersonByLastNameAndDateOfBirthCommand command)
+    public async Task<FindPersonsByTrnAndDateOfBirthResult> Handle(FindPersonsByTrnAndDateOfBirthCommand command)
     {
-        var matched = await crmQueryDispatcher.ExecuteQuery(
-            new GetActiveContactsByLastNameAndDateOfBirthQuery(
-                command.LastName!,
-                command.DateOfBirth!.Value,
+        var contacts = await crmQueryDispatcher.ExecuteQuery(
+            new GetActiveContactsByTrnsQuery(
+                command.Persons.Select(p => p.Trn).Distinct(),
                 new ColumnSet(
                     Contact.Fields.dfeta_TRN,
                     Contact.Fields.BirthDate,
@@ -47,7 +46,15 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
                     Contact.Fields.dfeta_StatedLastName,
                     Contact.Fields.dfeta_InductionStatus)));
 
-        var contactsById = matched.ToDictionary(r => r.Id, r => r);
+        // Remove any results where the request DOB doesn't match the contact's DOB
+        // (we can't easily do this in the query itself).
+        var matched = contacts
+            .Where(kvp => kvp.Value is not null)
+            .Where(kvp => command.Persons.First(p => p.Trn == kvp.Key).DateOfBirth == kvp.Value!.BirthDate?.ToDateOnlyWithDqtBstFix(isLocalTime: false))
+            .Select(kvp => kvp.Value!)
+            .ToArray();
+
+        var contactsById = matched.ToDictionary(c => c.Id, c => c);
 
         var sanctions = await crmQueryDispatcher.ExecuteQuery(
             new GetSanctionsByContactIdsQuery(
@@ -71,11 +78,11 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
                     dfeta_qtsregistration.Fields.dfeta_PersonId,
                     dfeta_qtsregistration.Fields.dfeta_TeacherStatusId)));
 
-        return new FindPersonByLastNameAndDateOfBirthResult(
+        return new FindPersonsByTrnAndDateOfBirthResult(
             Total: matched.Length,
             Items: await matched
                 .ToAsyncEnumerable()
-                .SelectAwait(async r => new FindPersonByLastNameAndDateOfBirthResultItem()
+                .SelectAwait(async r => new FindPersonsByTrnAndDateOfBirthResultItem()
                 {
                     Trn = r.dfeta_TRN,
                     DateOfBirth = r.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),

@@ -14,6 +14,7 @@ public static class VersionRegistry
         V3MinorVersions.V20240412,
         V3MinorVersions.V20240416,
         V3MinorVersions.V20240606,
+        V3MinorVersions.V20240814,
         V3MinorVersions.VNext,
     ];
 
@@ -54,6 +55,7 @@ public static class VersionRegistry
         public const string V20240412 = "20240412";
         public const string V20240416 = "20240416";
         public const string V20240606 = "20240606";
+        public const string V20240814 = "20240814";
         public const string VNext = VNextVersion;
     }
 }

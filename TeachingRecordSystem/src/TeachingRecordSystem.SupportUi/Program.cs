@@ -194,6 +194,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 }
 
 builder.Services
+    .AddTrsBaseServices()
     .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
     .AddTransient<CheckMandatoryQualificationExistsFilter>()
     .AddFormFlow(options =>
@@ -252,7 +253,6 @@ builder.AddBlobStorage();
 builder.Services
     .AddTransient<TrsLinkGenerator>()
     .AddTransient<CheckUserExistsFilter>()
-    .AddSingleton<IClock, Clock>()
     .AddSupportUiServices(builder.Configuration, builder.Environment)
     .AddSingleton<ReferenceDataCache>()
     .AddSingleton<SanctionTextLookup>()

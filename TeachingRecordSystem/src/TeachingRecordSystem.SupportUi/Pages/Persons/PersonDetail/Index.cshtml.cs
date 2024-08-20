@@ -8,10 +8,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 public class IndexModel(
     ICrmQueryDispatcher crmQueryDispatcher,
-    IConfiguration configuration) : PageModel
+    PreviousNameHelper previousNameHelper) : PageModel
 {
-    private readonly TimeSpan _concurrentNameChangeWindow = TimeSpan.FromSeconds(configuration.GetValue<int>("ConcurrentNameChangeWindowSeconds", 5));
-
     [FromRoute]
     public Guid PersonId { get; set; }
 
@@ -48,7 +46,7 @@ public class IndexModel(
                     Contact.Fields.dfeta_ActiveSanctions)));
 
         var contact = contactDetail!.Contact;
-        var previousNames = PreviousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact, _concurrentNameChangeWindow);
+        var previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact);
 
         Person = new PersonInfo()
         {

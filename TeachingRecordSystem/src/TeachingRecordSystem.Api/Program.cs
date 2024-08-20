@@ -215,7 +215,6 @@ public class Program
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
         services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
-        services.AddSingleton<IClock, Clock>();
         services.AddMemoryCache();
         services.AddSingleton<AddTrnToSentryScopeResourceFilter>();
         services.AddTransient<TrnRequestHelper>();
@@ -241,7 +240,7 @@ public class Program
 
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();
-        services.AddCrmQueries();
+        services.AddTrsBaseServices();
 
         if (!env.IsUnitTests())
         {

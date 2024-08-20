@@ -5,7 +5,6 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.Operations;
 using TeachingRecordSystem.Api.V3.VNext.ApiModels;
 using TeachingRecordSystem.Api.V3.VNext.Requests;
-using TeachingRecordSystem.Api.V3.VNext.Responses;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 
@@ -46,18 +45,5 @@ public class PersonsController(IMapper mapper) : ControllerBase
         var result = await handler.Handle(command);
         var response = mapper.Map<QtlsInfo?>(result);
         return response is not null ? Ok(response) : NotFound();
-    }
-
-    [HttpPost("find")]
-    [SwaggerOperation(
-        OperationId = "FindPersons",
-        Summary = "Find persons",
-        Description = "Finds persons matching the specified criteria.")]
-    [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(Policy = AuthorizationPolicies.GetPerson)]
-    public Task<IActionResult> FindTeachers([FromBody] FindPersonsRequest request)
-    {
-        throw new NotImplementedException();
     }
 }

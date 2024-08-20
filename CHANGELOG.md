@@ -1,5 +1,15 @@
 # API Changelog
 
+## 20240814
+
+### `POST /v3/persons/find`
+
+New endpoint added for bulk person lookup by TRN and date of birth.
+
+### `GET /v3/persons?findBy=LastNameAndDateOfBirth&lastName={lastName}&dateOfBirth={dateOfBirth}`
+
+`inductionStatus`, `qts` and `eyts` members have been added to align with the bulk `POST` endpoint.
+
 ## 20240606
 
 All endpoints under `/teacher` and `/teachers` have been moved to `/person` and `/persons`, respectively.

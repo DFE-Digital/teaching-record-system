@@ -106,7 +106,14 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithInduction(dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? inductionStartDate, DateOnly? completedDate, DateOnly? inductionPeriodStartDate, DateOnly? inductionPeriodEndDate, Guid? appropriateBodyOrgId)
+        public CreatePersonBuilder WithInduction(
+            dfeta_InductionStatus inductionStatus,
+            dfeta_InductionExemptionReason? inductionExemptionReason,
+            DateOnly? inductionStartDate,
+            DateOnly? completedDate,
+            DateOnly? inductionPeriodStartDate = null,
+            DateOnly? inductionPeriodEndDate = null,
+            Guid? appropriateBodyOrgId = null)
         {
             var inductionId = Guid.NewGuid();
             if (inductionStatus == dfeta_InductionStatus.Exempt && inductionExemptionReason == null)
@@ -253,7 +260,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithEyts(DateOnly? eytsDate, string? eytsStatusValue, DateTime? createdDate)
+        public CreatePersonBuilder WithEyts(DateOnly? eytsDate, string? eytsStatusValue, DateTime? createdDate = null)
         {
             _qtsRegistrations.Add(new QtsRegistration(null, null, createdDate, eytsDate, eytsStatusValue));
             return this;
