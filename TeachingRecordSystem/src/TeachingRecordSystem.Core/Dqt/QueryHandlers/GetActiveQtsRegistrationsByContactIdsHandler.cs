@@ -10,13 +10,20 @@ public class GetActiveQtsRegistrationsByContactIdsHandler : ICrmQueryHandler<Get
 {
     public async Task<IDictionary<Guid, dfeta_qtsregistration[]>> Execute(GetActiveQtsRegistrationsByContactIdsQuery query, IOrganizationServiceAsync organizationService)
     {
+        var contactIdsArray = query.ContactIds.ToArray();
+
+        if (contactIdsArray.Length == 0)
+        {
+            return new Dictionary<Guid, dfeta_qtsregistration[]>();
+        }
+
         var queryExpression = new QueryExpression()
         {
             EntityName = dfeta_qtsregistration.EntityLogicalName,
             ColumnSet = query.ColumnSet
         };
         queryExpression.Criteria.AddCondition(dfeta_qtsregistration.Fields.StateCode, ConditionOperator.Equal, (int)TaskState.Open);
-        queryExpression.Criteria.AddCondition(dfeta_qtsregistration.Fields.dfeta_PersonId, ConditionOperator.In, query.ContactIds.Cast<object>().ToArray());
+        queryExpression.Criteria.AddCondition(dfeta_qtsregistration.Fields.dfeta_PersonId, ConditionOperator.In, contactIdsArray.Cast<object>().ToArray());
 
         var request = new RetrieveMultipleRequest()
         {
