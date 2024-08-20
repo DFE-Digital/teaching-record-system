@@ -8,7 +8,7 @@ public class FindPersonsRequestValidator : AbstractValidator<FindPersonsRequest>
     public FindPersonsRequestValidator()
     {
         RuleFor(r => r.Persons.Count)
-            .LessThan(500)
+            .LessThanOrEqualTo(500)
             .WithMessage("Only 500 persons or less can be specified.")
             .OverridePropertyName("Persons");
     }
