@@ -56,18 +56,15 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
 
         var contactsById = matched.ToDictionary(c => c.Id, c => c);
 
-        var sanctions = await crmQueryDispatcher.ExecuteQuery(
+        var getSanctionsTask = crmQueryDispatcher.ExecuteQuery(
             new GetSanctionsByContactIdsQuery(
                 contactsById.Keys,
                 ActiveOnly: true,
                 new()));
 
-        var previousNames = (await crmQueryDispatcher.ExecuteQuery(new GetPreviousNamesByContactIdsQuery(contactsById.Keys)))
-            .ToDictionary(
-                kvp => kvp.Key,
-                kvp => previousNameHelper.GetFullPreviousNames(kvp.Value, contactsById[kvp.Key]));
+        var getPreviousNamesTask = crmQueryDispatcher.ExecuteQuery(new GetPreviousNamesByContactIdsQuery(contactsById.Keys));
 
-        var qtsRegistrations = await crmQueryDispatcher.ExecuteQuery(
+        var getQtsRegistrationsTask = crmQueryDispatcher.ExecuteQuery(
             new GetActiveQtsRegistrationsByContactIdsQuery(
                 contactsById.Keys,
                 new ColumnSet(
@@ -77,6 +74,12 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
                     dfeta_qtsregistration.Fields.dfeta_QTSDate,
                     dfeta_qtsregistration.Fields.dfeta_PersonId,
                     dfeta_qtsregistration.Fields.dfeta_TeacherStatusId)));
+
+        await Task.WhenAll(getSanctionsTask, getPreviousNamesTask, getQtsRegistrationsTask);
+
+        var sanctions = getSanctionsTask.Result;
+        var previousNames = getPreviousNamesTask.Result;
+        var qtsRegistrations = getQtsRegistrationsTask.Result;
 
         return new FindPersonsByTrnAndDateOfBirthResult(
             Total: matched.Length,
@@ -97,7 +100,7 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
                             StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
                         })
                         .AsReadOnly(),
-                    PreviousNames = previousNames[r.Id]
+                    PreviousNames = previousNameHelper.GetFullPreviousNames(previousNames[r.Id], contactsById[r.Id])
                         .Select(name => new NameInfo()
                         {
                             FirstName = name.FirstName,
