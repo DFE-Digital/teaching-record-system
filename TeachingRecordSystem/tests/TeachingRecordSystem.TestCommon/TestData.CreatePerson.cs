@@ -33,7 +33,6 @@ public partial class TestData
         private bool? _hasNationalInsuranceNumber;
         private string? _nationalInsuranceNumber;
         private readonly List<Qualification> _qualifications = new();
-        private readonly List<MandatoryQualificationInfo> _mandatoryQualifications = new();
         private readonly List<QtsRegistration> _qtsRegistrations = new();
         private readonly List<Sanction> _sanctions = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
@@ -710,7 +709,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<MandatoryQualificationInfo> Execute(CreatePersonBuilder createPersonBuilder, TestData testData)
+        internal async Task<MandatoryQualification> Execute(CreatePersonBuilder createPersonBuilder, TestData testData)
         {
             var personId = createPersonBuilder.PersonId;
 
@@ -721,13 +720,13 @@ public partial class TestData
             var endDate = _endDate.ValueOr(status == MandatoryQualificationStatus.Passed ? testData.GenerateDate(min: (startDate ?? new DateOnly(2000, 1, 1)).AddYears(1)) : null);
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
-            await testData.WithDbContext(async dbContext =>
+            return await testData.WithDbContext(async dbContext =>
             {
                 var provider = providerId.HasValue ?
                     await dbContext.MandatoryQualificationProviders.SingleAsync(p => p.MandatoryQualificationProviderId == providerId) :
                     null;
 
-                dbContext.MandatoryQualifications.Add(new MandatoryQualification()
+                var mq = new MandatoryQualification()
                 {
                     QualificationId = QualificationId,
                     CreatedOn = testData.Clock.UtcNow,
@@ -740,7 +739,9 @@ public partial class TestData
                     EndDate = endDate,
                     DqtSpecialismId = _dqtSpecialismId.ValueOr((Guid?)null),
                     DqtMqEstablishmentId = _mqEstablishmentId.ValueOr((Guid?)null)
-                });
+                };
+
+                dbContext.MandatoryQualifications.Add(mq);
 
                 if (_importedByUser.HasValue)
                 {
@@ -799,18 +800,9 @@ public partial class TestData
                 }
 
                 await dbContext.SaveChangesAsync();
+
+                return mq;
             });
-
-            var mqInfo = new MandatoryQualificationInfo(
-                QualificationId,
-                providerId,
-                specialism,
-                status,
-                startDate,
-                endDate
-            );
-
-            return mqInfo;
         }
     }
 
@@ -834,7 +826,7 @@ public partial class TestData
         public required DateOnly? QtsDate { get; init; }
         public required DateOnly? EytsDate { get; init; }
         public required IReadOnlyCollection<Sanction> Sanctions { get; init; }
-        public required IReadOnlyCollection<MandatoryQualificationInfo> MandatoryQualifications { get; init; }
+        public required IReadOnlyCollection<MandatoryQualification> MandatoryQualifications { get; init; }
         public required IReadOnlyCollection<Induction> Inductions { get; init; }
         public required IReadOnlyCollection<InductionPeriod> InductionPeriods { get; init; }
     }
@@ -843,14 +835,6 @@ public partial class TestData
     public record InductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId);
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);
-
-    public record MandatoryQualificationInfo(
-        Guid QualificationId,
-        Guid? ProviderId,
-        MandatoryQualificationSpecialism? Specialism,
-        MandatoryQualificationStatus? Status,
-        DateOnly? StartDate,
-        DateOnly? EndDate);
 
     public record QtsRegistration(DateOnly? QtsDate, string? TeacherStatusValue, DateTime? CreatedOn, DateOnly? EytsDate, string? EytsStatusValue);
 
