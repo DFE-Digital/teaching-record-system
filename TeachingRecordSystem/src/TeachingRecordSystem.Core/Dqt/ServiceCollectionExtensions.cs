@@ -13,6 +13,9 @@ public static partial class ServiceCollectionExtensions
             .FromAssembliesOf(typeof(ICrmQuery<>))
             .AddClasses(classes => classes.AssignableTo(typeof(ICrmQueryHandler<,>)))
                 .AsImplementedInterfaces()
+                .WithTransientLifetime()
+            .AddClasses(classes => classes.AssignableTo(typeof(IEnumerableCrmQueryHandler<,>)))
+                .AsImplementedInterfaces()
                 .WithTransientLifetime());
 
         return services;
