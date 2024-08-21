@@ -227,7 +227,7 @@ terraform-init:
 	$(eval export TF_VAR_azure_resource_prefix=$(RESOURCE_NAME_PREFIX))
 
 	[[ "${SP_AUTH}" != "true" ]] && az account set -s $(AZURE_SUBSCRIPTION) || true
-	terraform -chdir=terraform/$(PLATFORM) init -backend-config workspace_variables/${DEPLOY_ENV}.backend.tfvars  $(backend_key) -reconfigure
+	terraform -chdir=terraform/$(PLATFORM) init -upgrade -backend-config workspace_variables/${DEPLOY_ENV}.backend.tfvars  $(backend_key) -reconfigure
 
 terraform-plan: terraform-init # make [env] terraform-plan init
 	terraform -chdir=terraform/$(PLATFORM) plan -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json
