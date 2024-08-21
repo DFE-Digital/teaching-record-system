@@ -11,7 +11,7 @@ public class CreateTrnRequestTaskHandler : ICrmQueryHandler<CreateTrnRequestTask
         var crmTask = new CrmTask()
         {
             Id = Guid.NewGuid(),
-            Subject = "Notification for TRA Support Team - TRN request",
+            Subject = CreateTrnRequestTaskQuery.TaskSubject,
             Description = query.Description,
             dfeta_EmailAddress = query.EmailAddress
         };
