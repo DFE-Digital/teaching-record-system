@@ -47,4 +47,9 @@ public class CrmQueryDispatcherDecorator(ICrmQueryDispatcher innerDispatcher, Cr
         spy.RegisterQuery(query, result);
         return result;
     }
+
+    public IAsyncEnumerable<TResult> ExecuteQuery<TResult>(IEnumerableCrmQuery<TResult> query, CancellationToken cancellationToken = default)
+    {
+        return innerDispatcher.ExecuteQuery(query, cancellationToken);
+    }
 }

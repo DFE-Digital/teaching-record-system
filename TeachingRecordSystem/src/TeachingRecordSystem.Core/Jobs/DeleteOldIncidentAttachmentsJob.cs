@@ -16,13 +16,19 @@ public class DeleteOldAttachmentsJob(ICrmQueryDispatcher crmQueryDispatcher, Ref
 
         var modifiedBefore = clock.UtcNow.Subtract(_modifiedBeforeWindow);
 
-        var incidentAnnotations = await crmQueryDispatcher.ExecuteQuery(
-            new GetResolvedIncidentAnnotationsQuery(SubjectIds: [changeDateOfBirthSubject.Id, changeNameSubject.Id], modifiedBefore, ColumnSet: new()));
+        var annotationIds = new List<Guid>();
 
-        var taskAnnotations = await crmQueryDispatcher.ExecuteQuery(
-            new GetNonOpenTaskAnnotationsQuery(Subjects: [CreateTrnRequestTaskQuery.TaskSubject], modifiedBefore, ColumnSet: new()));
+        await foreach (var annotations in crmQueryDispatcher.ExecuteQuery(
+            new GetResolvedIncidentAnnotationsQuery(SubjectIds: [changeDateOfBirthSubject.Id, changeNameSubject.Id], modifiedBefore, ColumnSet: new()), cancellationToken))
+        {
+            annotationIds.AddRange(annotations.Select(i => i.AnnotationId!.Value));
+        }
 
-        var annotationIds = incidentAnnotations.Select(i => i.AnnotationId!.Value).Concat(taskAnnotations.Select(i => i.AnnotationId!.Value));
+        await foreach (var annotations in crmQueryDispatcher.ExecuteQuery(
+            new GetNonOpenTaskAnnotationsQuery(Subjects: [CreateTrnRequestTaskQuery.TaskSubject], modifiedBefore, ColumnSet: new()), cancellationToken))
+        {
+            annotationIds.AddRange(annotations.Select(i => i.AnnotationId!.Value));
+        }
 
         foreach (var annotationId in annotationIds)
         {

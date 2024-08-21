@@ -1,13 +1,18 @@
+using System.Runtime.CompilerServices;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetResolvedIncidentAnnotationsHandler : ICrmQueryHandler<GetResolvedIncidentAnnotationsQuery, Annotation[]>
+public class GetResolvedIncidentAnnotationsHandler : IEnumerableCrmQueryHandler<GetResolvedIncidentAnnotationsQuery, Annotation[]>
 {
-    public async Task<Annotation[]> Execute(GetResolvedIncidentAnnotationsQuery query, IOrganizationServiceAsync organizationService)
+    public async IAsyncEnumerable<Annotation[]> Execute(
+        GetResolvedIncidentAnnotationsQuery query,
+        IOrganizationServiceAsync organizationService,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var queryExpression = new QueryExpression()
         {
@@ -34,13 +39,33 @@ public class GetResolvedIncidentAnnotationsHandler : ICrmQueryHandler<GetResolve
         incidentLink.LinkCriteria.AddCondition(Incident.Fields.SubjectId, ConditionOperator.In, query.SubjectIds.Cast<object>().ToArray());
         documentLink.LinkEntities.Add(incidentLink);
 
+        queryExpression.PageInfo = new()
+        {
+            Count = 50,
+            PageNumber = 1
+        };
+
         var request = new RetrieveMultipleRequest()
         {
             Query = queryExpression
         };
 
-        var response = await organizationService.RetrieveMultipleAsync(queryExpression);
+        EntityCollection response;
+        do
+        {
+            cancellationToken.ThrowIfCancellationRequested();
 
-        return response.Entities.Select(e => e.ToEntity<Annotation>()).ToArray();
+            response = await organizationService.RetrieveMultipleAsync(queryExpression);
+
+            var annotations = response.Entities.Select(e => e.ToEntity<Annotation>()).ToArray();
+            if (annotations.Length > 0)
+            {
+                yield return annotations;
+            }
+
+            queryExpression.PageInfo.PageNumber++;
+            queryExpression.PageInfo.PagingCookie = response.PagingCookie;
+        }
+        while (response.MoreRecords);
     }
 }
