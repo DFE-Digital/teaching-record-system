@@ -133,6 +133,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.Execute(CancellationToken.None),
                     DeleteOldAttachmentsJob.JobSchedule);
 
+                recurringJobManager.AddOrUpdate<BackfillDqtReportingQualifications>(
+                    nameof(BackfillDqtReportingQualifications),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }

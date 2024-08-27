@@ -103,17 +103,31 @@ The databases will be created automatically when running the tests.
 
 #### DQT Reporting database setup
 
-This solution contains a service that synchronises changes from CRM into a SQL Server database used for reporting (this replaces the now-deprecated Data Export Service). By default this is disabled for local development. For the tests to pass, you will need a test database and a connection string defined in user secrets e.g.
+This solution contains a service that synchronises changes from CRM into a SQL Server database used for reporting (this replaces the now-deprecated Data Export Service).
+It also synronises selected tables from TRS.
+By default this is disabled for local development. For the tests to pass, you will need a test database and a connection string defined in user secrets e.g.
 ```shell
 just set-tests-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReportingTests;Integrated Security=Yes;TrustServerCertificate=True"
 ```
 
-To run the service locally, override the configuration option to run the service and ensure a connection string is provided e.g.
+Your postgres server's `wal_level` must be set to `logical`:
+```
+ALTER SYSTEM SET wal_level = logical;
+```
+You will have to restart the server after amending this configuration.
+
+To run the service locally override the configuration option to run the service and ensure a connection string is provided e.g.
 ```shell
 just set-secret DqtReporting:RunService true
 just set-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReporting;Integrated Security=Yes;TrustServerCertificate=True"
 ```
 The service will now run as a background service of the `Worker` project.
+
+It is a good idea to remove the replication slot when you're not working on this service to avoid a backlog on unprocessed changes accumulating in postgres.
+```shell
+just set-secret DqtReporting:RunService false
+just cli drop-dqt-reporting-replication-slot
+```
 
 
 ### Admin user setup

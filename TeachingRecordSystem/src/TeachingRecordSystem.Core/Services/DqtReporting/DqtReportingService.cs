@@ -1,8 +1,10 @@
 using System.Data;
 using System.Text;
+using Medallion.Threading;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,6 +12,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
+using Npgsql;
+using Npgsql.Replication;
+using Npgsql.Replication.PgOutput;
+using Npgsql.Replication.PgOutput.Messages;
+using NpgsqlTypes;
 using Polly;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
@@ -22,6 +29,7 @@ public partial class DqtReportingService : BackgroundService
     public const string ChangesKey = "DqtReporting";
     public const string CrmClientName = "DqtReporting";
     public const string ProcessChangesOperationName = "DqtReporting: process changes";
+    public const string TrsDbPublicationName = "dqt_rep_sync";
 
     private const int MaxParameters = 1024;
     private const int PageSize = 500;
@@ -40,8 +48,10 @@ public partial class DqtReportingService : BackgroundService
     private readonly DqtReportingOptions _options;
     private readonly ICrmEntityChangesService _crmEntityChangesService;
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
+    private readonly IDistributedLockProvider _distributedLockProvider;
     private readonly IClock _clock;
     private readonly TelemetryClient _telemetryClient;
+    private readonly IConfiguration _configuration;
     private readonly ILogger<DqtReportingService> _logger;
     private readonly Dictionary<string, (EntityMetadata EntityMetadata, EntityTableMapping EntityTableMapping)> _entityMetadata = new();
 
@@ -49,52 +59,70 @@ public partial class DqtReportingService : BackgroundService
         IOptions<DqtReportingOptions> optionsAccessor,
         [FromKeyedServices(CrmClientName)] ICrmEntityChangesService crmEntityChangesService,
         [FromKeyedServices(CrmClientName)] ICrmQueryDispatcher crmQueryDispatcher,
+        IDistributedLockProvider distributedLockProvider,
         IClock clock,
         TelemetryClient telemetryClient,
+        IConfiguration configuration,
         ILogger<DqtReportingService> logger)
     {
         _options = optionsAccessor.Value;
         _crmEntityChangesService = crmEntityChangesService;
         _crmQueryDispatcher = crmQueryDispatcher;
+        _distributedLockProvider = distributedLockProvider;
         _clock = clock;
         _telemetryClient = telemetryClient;
+        _configuration = configuration;
         _logger = logger;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await LoadEntityMetadata();
+        return Task.WhenAll(ProcessCrmChangesWrapper(), ProcessTrsChangesWrapper());
 
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(_options.PollIntervalSeconds));
+        async Task ProcessCrmChangesWrapper()
+        {
+            await LoadEntityMetadata();
 
-        do
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(_options.PollIntervalSeconds));
+
+            do
+            {
+                try
+                {
+                    await _resiliencePipeline.ExecuteAsync(async ct => await ProcessCrmChanges(ct), stoppingToken);
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                }
+                catch (ProcessCrmChangesException ex)
+                {
+                    _logger.LogError(ex.InnerException, ex.Message);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed processing entity changes.");
+                    return;
+                }
+            }
+            while (await timer.WaitForNextTickAsync(stoppingToken));
+        }
+
+        async Task ProcessTrsChangesWrapper()
         {
             try
             {
-                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessChanges(ct), stoppingToken);
+                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChanges(observer: null, ct));
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
             }
-            catch (ProcessChangesException ex)
-                when (ex.InnerException is SqlException sqlException &&
-                    (sqlException.IsTransient || sqlException.Message.StartsWith("Execution Timeout Expired.")))
-            {
-                _logger.LogWarning(ex, "Transient SQL exception thrown.");
-                continue;
-            }
-            catch (ProcessChangesException ex)
-            {
-                _logger.LogError(ex.InnerException, ex.Message);
-                return;
-            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed processing entity changes.");
+                _logger.LogError(ex, "Failed processing TRS changes.");
                 return;
             }
         }
-        while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
     internal async Task LoadEntityMetadata()
@@ -139,7 +167,7 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    internal async Task ProcessChanges(CancellationToken cancellationToken)
+    internal async Task ProcessCrmChanges(CancellationToken cancellationToken)
     {
         using var operation = _telemetryClient.StartOperation<DependencyTelemetry>(ProcessChangesOperationName);
 
@@ -154,7 +182,7 @@ public partial class DqtReportingService : BackgroundService
             {
                 try
                 {
-                    await ProcessChangesForEntityType(entityType, ct);
+                    await ProcessCrmChangesForEntityType(entityType, ct);
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {
@@ -162,12 +190,12 @@ public partial class DqtReportingService : BackgroundService
                 }
                 catch (Exception ex)
                 {
-                    throw new ProcessChangesException(entityType, ex);
+                    throw new ProcessCrmChangesException(entityType, ex);
                 }
             });
     }
 
-    internal async Task ProcessChangesForEntityType(string entityLogicalName, CancellationToken cancellationToken)
+    internal async Task ProcessCrmChangesForEntityType(string entityLogicalName, CancellationToken cancellationToken)
     {
         var totalProcessed = 0;
 
@@ -428,11 +456,141 @@ public partial class DqtReportingService : BackgroundService
             await command.ExecuteNonQueryAsync(cancellationToken);
         }
     }
+
+    internal async Task ProcessTrsChanges(
+        IObserver<PgOutputReplicationMessage>? observer,
+        CancellationToken cancellationToken)
+    {
+        await using var @lock = await _distributedLockProvider.TryAcquireLockAsync(DistributedLockKeys.DqtReportingReplicationSlot());
+        if (@lock is null)
+        {
+            return;
+        }
+
+        await using var replicationConn = new LogicalReplicationConnection(_configuration.GetPostgresConnectionString());
+        await replicationConn.Open();
+
+        var slot = await GetReplicationSlot(replicationConn, cancellationToken);
+        var replicationOptions = new PgOutputReplicationOptions(TrsDbPublicationName, protocolVersion: 1, binary: true);
+
+        await foreach (var message in replicationConn.StartReplication(slot, replicationOptions, cancellationToken))
+        {
+            if (message is InsertMessage or UpdateMessage)
+            {
+                var tuple = (message as InsertMessage)?.NewRow ?? (message as UpdateMessage)!.NewRow;
+                var relation = (message as InsertMessage)?.Relation ?? (message as UpdateMessage)!.Relation;
+
+                var targetTableName = $"trs_{relation.RelationName}";
+                var values = await GetTupleValues(tuple);
+                var columns = relation.Columns.ToArray();
+                var idColumn = columns.Single(c => c.Flags == RelationMessage.Column.ColumnFlags.PartOfKey);
+                var columnValues = columns.Zip(values, (c, v) => (Column: c, Value: v)).ToDictionary(t => t.Column.ColumnName, t => t.Value);
+                var id = values[Array.IndexOf(columns, idColumn)]!;
+
+                await UpsertRowFromTrs(targetTableName, idColumn.ColumnName, id, columnValues);
+
+                observer?.OnNext(message);
+            }
+            else if (message is DeleteMessage or TruncateMessage)
+            {
+                throw new NotSupportedException();
+            }
+
+            replicationConn.SetReplicationStatus(message.WalEnd);
+        }
+
+        static ValueTask<object?[]> GetTupleValues(ReplicationTuple tuple)
+        {
+            return Core().ToArrayAsync();
+
+            async IAsyncEnumerable<object?> Core()
+            {
+                await foreach (var value in tuple)
+                {
+                    yield return value.IsDBNull ? null : await value.Get();
+                }
+            }
+        }
+    }
+
+    private async Task<PgOutputReplicationSlot> GetReplicationSlot(
+        LogicalReplicationConnection replicationConn,
+        CancellationToken cancellationToken)
+    {
+        await using var dataSource = NpgsqlDataSource.Create(_configuration.GetPostgresConnectionString());
+
+        var slotName = _options.TrsDbReplicationSlotName;
+        var startLsn = NpgsqlLogSequenceNumber.Invalid;
+
+        await using (var cmd = dataSource.CreateCommand("SELECT confirmed_flush_lsn FROM pg_replication_slots WHERE slot_name = $1"))
+        {
+            cmd.Parameters.AddWithValue(slotName);
+
+            await using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
+            {
+                if (await reader.ReadAsync())
+                {
+                    startLsn = reader.GetFieldValue<NpgsqlLogSequenceNumber>(0);
+                }
+            }
+        }
+
+        if (startLsn == NpgsqlLogSequenceNumber.Invalid)
+        {
+            return await replicationConn.CreatePgOutputReplicationSlot(slotName);
+        }
+        else
+        {
+            return new PgOutputReplicationSlot(new ReplicationSlotOptions(slotName, startLsn));
+        }
+    }
+
+    private async Task UpsertRowFromTrs(string destinationTableName, string idColumnName, object id, IReadOnlyDictionary<string, object?> columnValues)
+    {
+        var parameters = new List<SqlParameter>();
+        var columnNames = new List<string>();
+
+        foreach (var (columnName, columnValue) in columnValues)
+        {
+            var parameterName = $"@p{parameters.Count + 1}";
+            parameters.Add(new SqlParameter(parameterName, columnValue ?? DBNull.Value));
+            columnNames.Add(columnName);
+        }
+
+        var parametersAndColumns = parameters.Zip(columnNames, (p, c) => (ParameterName: p.ParameterName, ColumnName: c)).ToArray();
+
+        var nowParameterName = "@UtcNow";
+        var idParameterName = "@id";
+
+        var sql = $""""
+            merge {destinationTableName} as target
+            using (
+                select {(string.Join(",\n\t", parametersAndColumns.Select(p => $"{p.ParameterName} as {p.ColumnName}")))}
+            ) as source
+            on target.{idColumnName} = source.{idColumnName}
+            when not matched then
+                insert ({(string.Join(", ", parametersAndColumns.Select(p => p.ColumnName)))}, __Inserted, __Updated)
+                values ({(string.Join(", ", parametersAndColumns.Select(p => $"source.{p.ColumnName}")))}, {nowParameterName}, {nowParameterName})
+            when matched then
+                update set {(string.Join(", ", parametersAndColumns.Where(p => p.ColumnName != idColumnName).Select(p => $"{p.ColumnName} = source.{p.ColumnName}")))}, __Updated = {nowParameterName}
+            ;
+            """";
+
+        parameters.Add(new SqlParameter(nowParameterName, _clock.UtcNow));
+        parameters.Add(new SqlParameter(idParameterName, id));
+
+        using var conn = new SqlConnection(_options.ReportingDbConnectionString);
+        await conn.OpenAsync();
+
+        using var cmd = new SqlCommand(sql, conn);
+        cmd.Parameters.AddRange(parameters.ToArray());
+        await cmd.ExecuteNonQueryAsync();
+    }
 }
 
-file class ProcessChangesException : Exception
+file class ProcessCrmChangesException : Exception
 {
-    public ProcessChangesException(string entityType, Exception innerException)
+    public ProcessCrmChangesException(string entityType, Exception innerException)
         : base(GetMessage(entityType), innerException)
     {
         EntityType = entityType;

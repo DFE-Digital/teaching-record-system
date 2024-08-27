@@ -15,7 +15,6 @@ namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests;
 public sealed class CrmClientFixture : IDisposable
 {
     private readonly ServiceClient _baseServiceClient;
-    private readonly DbFixture _dbFixture;
     private readonly CancellationTokenSource _completedCts;
     private readonly EnvironmentLockManager _lockManager;
     private readonly IMemoryCache _memoryCache;
@@ -27,7 +26,7 @@ public sealed class CrmClientFixture : IDisposable
         Clock = new Clock();
         Configuration = configuration;
         _baseServiceClient = serviceClient;
-        _dbFixture = dbFixture;
+        DbFixture = dbFixture;
         _completedCts = new CancellationTokenSource();
         _lockManager = new EnvironmentLockManager(Configuration);
         _lockManager.AcquireLock(_completedCts.Token);
@@ -42,6 +41,8 @@ public sealed class CrmClientFixture : IDisposable
 
     public IConfiguration Configuration { get; }
 
+    public DbFixture DbFixture { get; }
+
     public CrmQueryDispatcher CreateQueryDispatcher() =>
         new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, _referenceDataCache), serviceClientName: null);
 
@@ -49,17 +50,17 @@ public sealed class CrmClientFixture : IDisposable
     /// Creates a scope that owns an implementation of <see cref="IOrganizationServiceAsync2"/> that tracks the entities created through it.
     /// When <see cref="IAsyncDisposable.DisposeAsync"/> is called the created entities will be deleted from CRM.
     /// </summary>
-    public TestDataScope CreateTestDataScope() => new(
+    public TestDataScope CreateTestDataScope(bool withSync = false) => new(
         _baseServiceClient,
         orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient),
         orgService => new CrmQueryDispatcher(CreateQueryServiceProvider(orgService, _referenceDataCache), serviceClientName: null),
         orgService => TestData.CreateWithCustomTrnGeneration(
-            _dbFixture.GetDbContextFactory(),
+            DbFixture.GetDbContextFactory(),
             orgService,
             _referenceDataCache,
             Clock,
             () => _trnGenerationApiClient.GenerateTrn(),
-            TestDataSyncConfiguration.NoSync()),
+            withSync ? TestDataSyncConfiguration.Sync(new(DbFixture.GetDataSource(), orgService, _referenceDataCache, Clock)) : TestDataSyncConfiguration.NoSync()),
         _memoryCache);
 
     public void Dispose()
