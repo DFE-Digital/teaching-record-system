@@ -59,6 +59,8 @@
     <None Remove="Services\DqtReporting\Migrations\0024_contact.sql" />
     <None Remove="Services\DqtReporting\Migrations\0025_incident_msdyn_casesurveyinviteurl.sql" />
     <None Remove="Services\DqtReporting\Migrations\0026_TrsQualifications.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0027_TrsWorkforceData.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0028_TrsEstablishments.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -116,6 +118,8 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0024_contact.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0025_incident_msdyn_casesurveyinviteurl.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0026_TrsQualifications.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0027_TrsWorkforceData.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0028_TrsEstablishments.sql" />
   </ItemGroup>
 
   <ItemGroup>
