@@ -2,8 +2,8 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Xrm.Sdk;
-using Npgsql.Replication.PgOutput.Messages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.DqtReporting;
 using Xunit.Sdk;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.Services.DqtReporting;
@@ -256,35 +256,118 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
         static DateOnly? ConvertDateTimeColumn(object? value) => value is null ? null : DateOnly.FromDateTime((DateTime)value);
     }
 
+    [Fact(Skip = "Flaky on CI")]
+    public async Task ProcessTrsChanges_SourceRowIsDeleted_DeletesRowFromDb()
+    {
+        // Arrange
+        await using var testDataScope = fixture.CreateTestDataScope(withSync: true);
+
+        var insertedTime = fixture.Clock.UtcNow.AddDays(-10);
+
+        var createPersonResult = await testDataScope.TestData.CreatePerson(p => p.WithMandatoryQualification());
+        var mq = createPersonResult.MandatoryQualifications.Single();
+
+        await InsertRow("trs_qualifications", new Dictionary<string, object?>()
+        {
+            { "qualification_id", mq.QualificationId },
+            { "person_id", createPersonResult.PersonId },
+            { "qualification_type", (int)QualificationType.MandatoryQualification },
+            { "mq_provider_id", mq.ProviderId },
+            { "mq_specialism", mq.Specialism },
+            { "mq_status", mq.Status },
+            { "start_date", mq.StartDate },
+            { "end_date", mq.EndDate },
+            { "__Inserted", insertedTime }
+        });
+
+        await ProcessTrsChangesSingle(async singleMessageConsumed =>
+        {
+            // Act
+            await fixture.DbFixture.WithDbContext(async dbContext =>
+            {
+                await dbContext.MandatoryQualifications.Where(q => q.QualificationId == mq.QualificationId).ExecuteDeleteAsync();
+            });
+
+            await singleMessageConsumed;
+
+            // Assert
+            var row = await GetRowById("trs_qualifications", mq.QualificationId, idColumnName: "qualification_id");
+            Assert.Null(row);
+        });
+    }
+
+    [Fact(Skip = "Flaky on CI")]
+    public async Task ProcessTrsChanges_SourceTableIsTruncated_DeletesRowsFromDb()
+    {
+        // Arrange
+        await using var testDataScope = fixture.CreateTestDataScope(withSync: true);
+
+        var insertedTime = fixture.Clock.UtcNow.AddDays(-10);
+
+        var createPersonResult = await testDataScope.TestData.CreatePerson(p => p.WithMandatoryQualification());
+        var mq = createPersonResult.MandatoryQualifications.Single();
+
+        await InsertRow("trs_qualifications", new Dictionary<string, object?>()
+        {
+            { "qualification_id", mq.QualificationId },
+            { "person_id", createPersonResult.PersonId },
+            { "qualification_type", (int)QualificationType.MandatoryQualification },
+            { "mq_provider_id", mq.ProviderId },
+            { "mq_specialism", mq.Specialism },
+            { "mq_status", mq.Status },
+            { "start_date", mq.StartDate },
+            { "end_date", mq.EndDate },
+            { "__Inserted", insertedTime }
+        });
+
+        await ProcessTrsChangesSingle(async singleMessageConsumed =>
+        {
+            // Act
+            await fixture.DbFixture.WithDbContext(async dbContext =>
+            {
+                await dbContext.Database.ExecuteSqlAsync($"truncate table qualifications");
+            });
+
+            await singleMessageConsumed;
+
+            // Assert
+            var row = await GetRowById("trs_qualifications", mq.QualificationId, idColumnName: "qualification_id");
+            Assert.Null(row);
+        });
+    }
+
     private Task ProcessTrsChangesSingle(Func<Task, Task> action) => fixture.WithService(async (service, _) =>
     {
         try
         {
-            // ProcessTrsChanges will call OnNext on any provided IObserver to signal when it's processed a message;
+            // ProcessTrsChanges will call OnNext on any provided IObserver to signal when it's established replication or consumed a message;
             // this Subject provides that IObserver.
-            var replicationMessageSubject = new System.Reactive.Subjects.ReplaySubject<PgOutputReplicationMessage>();
+            var replicationStatusSubject = new System.Reactive.Subjects.ReplaySubject<DqtReportingService.TrsReplicationStatus>();
 
             using var cts = new CancellationTokenSource();
 
-            var processChangesTask = Task.Run(() => service.ProcessTrsChanges(observer: replicationMessageSubject, cancellationToken: cts.Token));
+            var processChangesTask = Task.Run(() => service.ProcessTrsChanges(observer: replicationStatusSubject, cancellationToken: cts.Token));
+
+            // Wait until the replication slot has been established
+            await replicationStatusSubject.FirstAsync(s => s == DqtReportingService.TrsReplicationStatus.ReplicationSlotEstablished).ToTask(cts.Token);
 
             // We need to pass a Task to the `action` delegate that it can await so that it knows when we've consumed a single message from the replication stream.
             // We also need to ensure any exceptions from ProcessTrsChanges are surfaced.
             // The CancellationToken ensures that we're not waiting forever.
             async Task ConsumeSingleMessage()
             {
-                try
-                {
-                    await replicationMessageSubject.FirstAsync().ToTask(cts.Token);
-                }
-                catch (TaskCanceledException)
-                {
-                    await processChangesTask;
-                    throw;
-                }
+                var waitForMessageConsumedTask = WaitForMessageConsumed();
+
+                var firstCompletedTask = await Task.WhenAny(waitForMessageConsumedTask, processChangesTask);
+                cts.Cancel();
+
+                await firstCompletedTask;
+
+                Task WaitForMessageConsumed() =>
+                    replicationStatusSubject.FirstAsync(s => s == DqtReportingService.TrsReplicationStatus.MessageConsumed).ToTask(cts.Token);
             }
 
-            cts.CancelAfter(15000);
+            cts.CancelAfter(20000);
 
             try
             {

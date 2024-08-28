@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics;
 using System.Text;
 using Medallion.Threading;
 using Microsoft.ApplicationInsights;
@@ -112,7 +113,7 @@ public partial class DqtReportingService : BackgroundService
         {
             try
             {
-                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChanges(observer: null, ct));
+                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChanges(observer: null, ct), stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -458,7 +459,7 @@ public partial class DqtReportingService : BackgroundService
     }
 
     internal async Task ProcessTrsChanges(
-        IObserver<PgOutputReplicationMessage>? observer,
+        IObserver<TrsReplicationStatus>? observer,
         CancellationToken cancellationToken)
     {
         await using var @lock = await _distributedLockProvider.TryAcquireLockAsync(DistributedLockKeys.DqtReportingReplicationSlot());
@@ -471,33 +472,67 @@ public partial class DqtReportingService : BackgroundService
         await replicationConn.Open();
 
         var slot = await GetReplicationSlot(replicationConn, cancellationToken);
+        observer?.OnNext(TrsReplicationStatus.ReplicationSlotEstablished);
+
         var replicationOptions = new PgOutputReplicationOptions(TrsDbPublicationName, protocolVersion: 1, binary: true);
 
         await foreach (var message in replicationConn.StartReplication(slot, replicationOptions, cancellationToken))
         {
-            if (message is InsertMessage or UpdateMessage)
+            if (message is BeginMessage or CommitMessage or RelationMessage)
             {
-                var tuple = (message as InsertMessage)?.NewRow ?? (message as UpdateMessage)!.NewRow;
-                var relation = (message as InsertMessage)?.Relation ?? (message as UpdateMessage)!.Relation;
+                replicationConn.SetReplicationStatus(message.WalEnd);
+                continue;
+            }
 
-                var targetTableName = $"trs_{relation.RelationName}";
+            if (message is TruncateMessage truncateMessage)
+            {
+                foreach (var relation in truncateMessage.Relations)
+                {
+                    var targetTableName = GetTargetTableName(relation);
+
+                    await TruncateTableFromTrs(targetTableName);
+                    PublishMessageConsumed();
+                }
+
+                replicationConn.SetReplicationStatus(message.WalEnd);
+                continue;
+            }
+
+            {
+                var (tuple, relation) = message switch
+                {
+                    InsertMessage insertMessage => (insertMessage.NewRow, insertMessage.Relation),
+                    UpdateMessage updateMessage => (updateMessage.NewRow, updateMessage.Relation),
+                    KeyDeleteMessage deleteMessage => (deleteMessage.Key, deleteMessage.Relation),
+                    FullDeleteMessage deleteMessage => (deleteMessage.OldRow, deleteMessage.Relation),
+                    _ => throw new NotSupportedException($"{message.GetType().Name} messages are not supported.")
+                };
+
+                var targetTableName = GetTargetTableName(relation);
                 var values = await GetTupleValues(tuple);
                 var columns = relation.Columns.ToArray();
                 var idColumn = columns.Single(c => c.Flags == RelationMessage.Column.ColumnFlags.PartOfKey);
                 var columnValues = columns.Zip(values, (c, v) => (Column: c, Value: v)).ToDictionary(t => t.Column.ColumnName, t => t.Value);
                 var id = values[Array.IndexOf(columns, idColumn)]!;
 
-                await UpsertRowFromTrs(targetTableName, idColumn.ColumnName, id, columnValues);
+                if (message is InsertMessage or UpdateMessage)
+                {
+                    await UpsertRowFromTrs(targetTableName, idColumn.ColumnName, id, columnValues);
+                }
+                else
+                {
+                    Debug.Assert(message is DeleteMessage);
+                    await DeleteRowFromTrs(targetTableName, idColumn.ColumnName, id);
+                }
 
-                observer?.OnNext(message);
-            }
-            else if (message is DeleteMessage or TruncateMessage)
-            {
-                throw new NotSupportedException();
+                replicationConn.SetReplicationStatus(message.WalEnd);
+                PublishMessageConsumed();
             }
 
-            replicationConn.SetReplicationStatus(message.WalEnd);
+            void PublishMessageConsumed() => observer?.OnNext(TrsReplicationStatus.MessageConsumed);
         }
+
+        static string GetTargetTableName(RelationMessage relation) => $"trs_{relation.RelationName}";
 
         static ValueTask<object?[]> GetTupleValues(ReplicationTuple tuple)
         {
@@ -545,7 +580,7 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    private async Task UpsertRowFromTrs(string destinationTableName, string idColumnName, object id, IReadOnlyDictionary<string, object?> columnValues)
+    private async Task UpsertRowFromTrs(string targetTableName, string idColumnName, object id, IReadOnlyDictionary<string, object?> columnValues)
     {
         var parameters = new List<SqlParameter>();
         var columnNames = new List<string>();
@@ -563,7 +598,7 @@ public partial class DqtReportingService : BackgroundService
         var idParameterName = "@id";
 
         var sql = $""""
-            merge {destinationTableName} as target
+            merge {targetTableName} as target
             using (
                 select {(string.Join(",\n\t", parametersAndColumns.Select(p => $"{p.ParameterName} as {p.ColumnName}")))}
             ) as source
@@ -585,6 +620,46 @@ public partial class DqtReportingService : BackgroundService
         using var cmd = new SqlCommand(sql, conn);
         cmd.Parameters.AddRange(parameters.ToArray());
         await cmd.ExecuteNonQueryAsync();
+    }
+
+    private async Task DeleteRowFromTrs(string targetTableName, string idColumnName, object id)
+    {
+        var parameters = new List<SqlParameter>();
+
+        var idParameterName = "@id";
+
+        var sql = $"""
+            delete from {targetTableName}
+            where {idColumnName} = {idParameterName}
+            """;
+
+        parameters.Add(new SqlParameter(idParameterName, id));
+
+        using var conn = new SqlConnection(_options.ReportingDbConnectionString);
+        await conn.OpenAsync();
+
+        using var cmd = new SqlCommand(sql, conn);
+        cmd.Parameters.AddRange(parameters.ToArray());
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    private async Task TruncateTableFromTrs(string targetTableName)
+    {
+        var sql = $"""
+            truncate table {targetTableName}
+            """;
+
+        using var conn = new SqlConnection(_options.ReportingDbConnectionString);
+        await conn.OpenAsync();
+
+        using var cmd = new SqlCommand(sql, conn);
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    internal enum TrsReplicationStatus
+    {
+        ReplicationSlotEstablished = 0,
+        MessageConsumed = 1,
     }
 }
 
