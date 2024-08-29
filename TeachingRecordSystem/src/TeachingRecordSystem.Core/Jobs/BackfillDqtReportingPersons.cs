@@ -18,7 +18,7 @@ public class BackfillDqtReportingPersons(IOptions<DqtReportingOptions> dqtReport
 
         var dataTable = new DataTable();
         dataTable.Columns.Add("person_id", typeof(Guid));
-        dataTable.Columns.Add("trn", typeof(char));
+        dataTable.Columns.Add("trn", typeof(string));
         dataTable.Columns.Add("first_name", typeof(string));
         dataTable.Columns.Add("middle_name", typeof(string));
         dataTable.Columns.Add("last_name", typeof(string));
