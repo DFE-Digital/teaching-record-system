@@ -19,8 +19,6 @@ using TeachingRecordSystem.Worker.Infrastructure.Logging;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.Configure<HostOptions>(o => o.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore);
-
 if (builder.Environment.IsProduction())
 {
     builder.Configuration

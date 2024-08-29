@@ -1,3 +1,4 @@
+using Medallion.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,13 +29,21 @@ public static class HostApplicationBuilderExtensions
 
             builder.Services.AddCrmEntityChangesService(name: DqtReportingService.CrmClientName);
 
-            builder.Services.AddStartupTask(sp =>
+            builder.Services.AddStartupTask(async sp =>
             {
+                var distributedLockProvider = sp.GetRequiredService<IDistributedLockProvider>();
+
+                await using var @lock = await distributedLockProvider.TryAcquireLockAsync(DistributedLockKeys.DqtReportingMigrations());
+                if (@lock is null)
+                {
+                    return;
+                }
+
                 var migrator = new Migrator(
                     connectionString: sp.GetRequiredService<IOptions<DqtReportingOptions>>().Value.ReportingDbConnectionString,
                     logger: sp.GetRequiredService<ILoggerFactory>().CreateLogger<Migrator>());
+
                 migrator.MigrateDb();
-                return Task.CompletedTask;
             });
         }
 
