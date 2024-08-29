@@ -124,6 +124,11 @@ variable "postgres_server_version" {
   default = "14"
 }
 
+variable "postgres_azure_storage_mb" {
+  type    = number
+  default = 32768
+}
+
 variable "redis_capacity" {
   type    = number
   default = 1
