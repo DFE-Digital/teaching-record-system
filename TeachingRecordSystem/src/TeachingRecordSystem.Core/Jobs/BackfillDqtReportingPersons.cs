@@ -1,4 +1,5 @@
 using System.Data;
+using Hangfire;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -6,6 +7,7 @@ using TeachingRecordSystem.Core.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
+[AutomaticRetry(Attempts = 0)]
 public class BackfillDqtReportingPersons(IOptions<DqtReportingOptions> dqtReportingOptionsAccessor, TrsDbContext dbContext, IClock clock)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -14,6 +16,13 @@ public class BackfillDqtReportingPersons(IOptions<DqtReportingOptions> dqtReport
 
         using var conn = new SqlConnection(dqtReportingOptionsAccessor.Value.ReportingDbConnectionString);
         conn.Open();
+
+        using (var truncateCmd = conn.CreateCommand())
+        {
+            truncateCmd.CommandText = "truncate table trs_persons";
+            await truncateCmd.ExecuteNonQueryAsync();
+        }
+
         var txn = conn.BeginTransaction();
 
         var dataTable = new DataTable();
@@ -49,10 +58,19 @@ public class BackfillDqtReportingPersons(IOptions<DqtReportingOptions> dqtReport
             sqlBulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
         }
 
+        var personIds = new HashSet<Guid>();
+
         await foreach (var chunk in dbContext.Persons.AsNoTracking().AsAsyncEnumerable().Chunk(200))
         {
             foreach (var e in chunk)
             {
+                if (personIds.Contains(e.PersonId))
+                {
+                    continue;
+                }
+
+                personIds.Add(e.PersonId);
+
                 dataTable.Rows.Add(
                     e.PersonId,
                     e.Trn,
