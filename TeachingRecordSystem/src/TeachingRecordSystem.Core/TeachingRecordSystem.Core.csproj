@@ -61,6 +61,7 @@
     <None Remove="Services\DqtReporting\Migrations\0026_TrsQualifications.sql" />
     <None Remove="Services\DqtReporting\Migrations\0027_TrsWorkforceData.sql" />
     <None Remove="Services\DqtReporting\Migrations\0028_TrsEstablishments.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0029_TrsPersons.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -120,6 +121,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0026_TrsQualifications.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0027_TrsWorkforceData.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0028_TrsEstablishments.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0029_TrsPersons.sql" />
   </ItemGroup>
 
   <ItemGroup>
