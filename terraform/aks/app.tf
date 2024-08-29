@@ -93,7 +93,7 @@ module "api_application" {
 
   docker_image = var.docker_image
   command      = ["/bin/ash", "-c", "cd /Apps/Api/; dotnet TeachingRecordSystem.Api.dll;"]
-  web_port     = 80
+  web_port     = 3000
   probe_path   = "/health"
   replicas     = var.api_replicas
   max_memory   = var.api_max_memory
@@ -144,7 +144,7 @@ module "authz_application" {
 
   docker_image = var.docker_image
   command      = ["/bin/ash", "-c", "cd /Apps/AuthorizeAccess/; dotnet TeachingRecordSystem.AuthorizeAccess.dll;"]
-  web_port     = 80
+  web_port     = 3000
   probe_path   = "/health"
   replicas     = var.authz_replicas
   max_memory   = var.authz_max_memory
@@ -194,7 +194,7 @@ module "ui_application" {
 
   docker_image                 = var.docker_image
   command                      = ["/bin/ash", "-c", "cd /Apps/SupportUi/; dotnet TeachingRecordSystem.SupportUi.dll;"]
-  web_port                     = 80
+  web_port                     = 3000
   probe_path                   = "/health"
   replicas                     = var.ui_replicas
   enable_logit                 = var.enable_logit

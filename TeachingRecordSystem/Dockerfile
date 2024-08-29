@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine3.18
 ARG GIT_SHA
 ENV SENTRY_RELEASE ${GIT_SHA}
-ENV ASPNETCORE_HTTP_PORTS 80
+ENV ASPNETCORE_HTTP_PORTS 3000
 COPY src/TeachingRecordSystem.Api/bin/Release/net8.0/publish/ Apps/Api/
 COPY src/TeachingRecordSystem.Cli/bin/Release/net8.0/publish/ Apps/TrsCli/
 COPY src/TeachingRecordSystem.SupportUi/bin/Release/net8.0/publish/ Apps/SupportUi/
