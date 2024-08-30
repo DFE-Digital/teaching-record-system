@@ -19,7 +19,6 @@ public class BackfillDqtReportingPersons(IOptions<DqtReportingOptions> dqtReport
 
         using (var truncateCmd = conn.CreateCommand())
         {
-            truncateCmd.CommandTimeout = 0;
             truncateCmd.CommandText = "truncate table trs_persons";
             await truncateCmd.ExecuteNonQueryAsync();
         }
@@ -59,54 +58,45 @@ public class BackfillDqtReportingPersons(IOptions<DqtReportingOptions> dqtReport
             sqlBulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
         }
 
+        var personIds = new HashSet<Guid>();
+
         await foreach (var chunk in dbContext.Persons.AsNoTracking().AsAsyncEnumerable().Chunk(200))
         {
-            var personList = chunk.ToList();
-
-            while (personList.Count > 0)
+            foreach (var e in chunk)
             {
-                foreach (var e in personList)
+                if (personIds.Contains(e.PersonId))
                 {
-                    dataTable.Rows.Add(
-                        e.PersonId,
-                        e.Trn,
-                        e.FirstName,
-                        e.MiddleName,
-                        e.LastName,
-                        e.DateOfBirth,
-                        e.EmailAddress,
-                        e.NationalInsuranceNumber,
-                        e.DqtContactId,
-                        e.DqtState,
-                        e.DqtFirstName,
-                        e.DqtMiddleName,
-                        e.DqtLastName,
-                        e.DqtFirstSync,
-                        e.DqtLastSync,
-                        e.DqtCreatedOn,
-                        e.DqtModifiedOn,
-                        e.CreatedOn,
-                        e.DeletedOn,
-                        e.UpdatedOn,
-                        clock.UtcNow,
-                        clock.UtcNow);
-                }
-
-                try
-                {
-                    await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);
                     continue;
                 }
-                catch (SqlException ex) when (ex.Message.Contains("Cannot insert duplicate key"))
-                {
-                    var key = Guid.Parse(ex.Message.Substring(
-                        ex.Message.IndexOf("The duplicate key value is (") + "The duplicate key value is (".Length,
-                        Guid.Empty.ToString().Length));
 
-                    personList.RemoveAll(p => p.PersonId == key);
-                    dataTable.Rows.Clear();
-                }
+                personIds.Add(e.PersonId);
+
+                dataTable.Rows.Add(
+                    e.PersonId,
+                    e.Trn,
+                    e.FirstName,
+                    e.MiddleName,
+                    e.LastName,
+                    e.DateOfBirth,
+                    e.EmailAddress,
+                    e.NationalInsuranceNumber,
+                    e.DqtContactId,
+                    e.DqtState,
+                    e.DqtFirstName,
+                    e.DqtMiddleName,
+                    e.DqtLastName,
+                    e.DqtFirstSync,
+                    e.DqtLastSync,
+                    e.DqtCreatedOn,
+                    e.DqtModifiedOn,
+                    e.CreatedOn,
+                    e.DeletedOn,
+                    e.UpdatedOn,
+                    clock.UtcNow,
+                    clock.UtcNow);
             }
+
+            await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);
 
             dataTable.Rows.Clear();
         }
