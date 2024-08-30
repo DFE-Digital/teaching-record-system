@@ -17,13 +17,21 @@ public class BackfillDqtReportingPersons(IOptions<DqtReportingOptions> dqtReport
         using var conn = new SqlConnection(dqtReportingOptionsAccessor.Value.ReportingDbConnectionString);
         conn.Open();
 
+        var txn = conn.BeginTransaction();
+
+        using (var lockCmd = conn.CreateCommand())
+        {
+            lockCmd.Transaction = txn;
+            lockCmd.CommandText = "lock table trs_persons";
+            await lockCmd.ExecuteNonQueryAsync();
+        }
+
         using (var truncateCmd = conn.CreateCommand())
         {
+            truncateCmd.Transaction = txn;
             truncateCmd.CommandText = "truncate table trs_persons";
             await truncateCmd.ExecuteNonQueryAsync();
         }
-
-        var txn = conn.BeginTransaction();
 
         var dataTable = new DataTable();
         dataTable.Columns.Add("person_id", typeof(Guid));
@@ -58,19 +66,10 @@ public class BackfillDqtReportingPersons(IOptions<DqtReportingOptions> dqtReport
             sqlBulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
         }
 
-        var personIds = new HashSet<Guid>();
-
         await foreach (var chunk in dbContext.Persons.AsNoTracking().AsAsyncEnumerable().Chunk(200))
         {
             foreach (var e in chunk)
             {
-                if (personIds.Contains(e.PersonId))
-                {
-                    continue;
-                }
-
-                personIds.Add(e.PersonId);
-
                 dataTable.Rows.Add(
                     e.PersonId,
                     e.Trn,
