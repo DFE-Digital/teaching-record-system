@@ -132,6 +132,7 @@
     <PackageReference Include="DistributedLock.Azure" />
     <PackageReference Include="DistributedLock.FileSystem" />
     <PackageReference Include="EFCore.NamingConventions" />
+    <PackageReference Include="Google.Cloud.Storage.V1" />
     <PackageReference Include="GovukNotify" />
     <PackageReference Include="Hangfire.Core" />
     <PackageReference Include="Hangfire.NetCore" />
@@ -159,6 +160,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
     <PackageReference Include="Optional" />
+    <PackageReference Include="Parquet.Net" />
     <PackageReference Include="PdfSharpCore" />
     <PackageReference Include="Polly.Core" />
     <PackageReference Include="Scrutor" />
