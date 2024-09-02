@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<TpsEstablishmentRefresher>();
         services.AddSingleton<IConfigureOptions<WorkforceDataExportOptions>, WorkforceDataExportConfigureOptions>();
         services.AddSingleton<IStorageClientProvider, OptionsStorageClientProvider>();
+        services.AddSingleton<WorkforceDataExporter>();
 
         return services;
     }
