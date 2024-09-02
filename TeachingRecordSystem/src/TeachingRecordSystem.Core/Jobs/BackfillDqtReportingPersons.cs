@@ -1,30 +1,29 @@
 using System.Data;
 using Hangfire;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.DqtReporting;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
 [AutomaticRetry(Attempts = 0)]
-public class BackfillDqtReportingPersons(IOptions<DqtReportingOptions> dqtReportingOptionsAccessor, TrsDbContext dbContext, IClock clock)
+public class BackfillDqtReportingPersons(IConfiguration configuration, TrsDbContext dbContext, IClock clock)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         dbContext.Database.SetCommandTimeout(0);
 
-        using var conn = new SqlConnection(dqtReportingOptionsAccessor.Value.ReportingDbConnectionString);
+        using var conn = new SqlConnection(configuration.GetRequiredValue("DqtReporting:ReportingDbConnectionString"));
         conn.Open();
+
+        var txn = conn.BeginTransaction();
 
         using (var truncateCmd = conn.CreateCommand())
         {
-            truncateCmd.CommandTimeout = 0;
+            truncateCmd.Transaction = txn;
             truncateCmd.CommandText = "truncate table trs_persons";
             await truncateCmd.ExecuteNonQueryAsync();
         }
-
-        var txn = conn.BeginTransaction();
 
         var dataTable = new DataTable();
         dataTable.Columns.Add("person_id", typeof(Guid));
@@ -59,54 +58,36 @@ public class BackfillDqtReportingPersons(IOptions<DqtReportingOptions> dqtReport
             sqlBulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
         }
 
-        await foreach (var chunk in dbContext.Persons.AsNoTracking().AsAsyncEnumerable().Chunk(200))
+        await foreach (var chunk in dbContext.Persons.AsNoTracking().AsAsyncEnumerable().Chunk(200).WithCancellation(cancellationToken))
         {
-            var personList = chunk.ToList();
-
-            while (personList.Count > 0)
+            foreach (var e in chunk)
             {
-                foreach (var e in personList)
-                {
-                    dataTable.Rows.Add(
-                        e.PersonId,
-                        e.Trn,
-                        e.FirstName,
-                        e.MiddleName,
-                        e.LastName,
-                        e.DateOfBirth,
-                        e.EmailAddress,
-                        e.NationalInsuranceNumber,
-                        e.DqtContactId,
-                        e.DqtState,
-                        e.DqtFirstName,
-                        e.DqtMiddleName,
-                        e.DqtLastName,
-                        e.DqtFirstSync,
-                        e.DqtLastSync,
-                        e.DqtCreatedOn,
-                        e.DqtModifiedOn,
-                        e.CreatedOn,
-                        e.DeletedOn,
-                        e.UpdatedOn,
-                        clock.UtcNow,
-                        clock.UtcNow);
-                }
-
-                try
-                {
-                    await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);
-                    continue;
-                }
-                catch (SqlException ex) when (ex.Message.Contains("Cannot insert duplicate key"))
-                {
-                    var key = Guid.Parse(ex.Message.Substring(
-                        ex.Message.IndexOf("The duplicate key value is (") + "The duplicate key value is (".Length,
-                        Guid.Empty.ToString().Length));
-
-                    personList.RemoveAll(p => p.PersonId == key);
-                    dataTable.Rows.Clear();
-                }
+                dataTable.Rows.Add(
+                    e.PersonId,
+                    e.Trn,
+                    e.FirstName,
+                    e.MiddleName,
+                    e.LastName,
+                    e.DateOfBirth,
+                    e.EmailAddress,
+                    e.NationalInsuranceNumber,
+                    e.DqtContactId,
+                    e.DqtState,
+                    e.DqtFirstName,
+                    e.DqtMiddleName,
+                    e.DqtLastName,
+                    e.DqtFirstSync,
+                    e.DqtLastSync,
+                    e.DqtCreatedOn,
+                    e.DqtModifiedOn,
+                    e.CreatedOn,
+                    e.DeletedOn,
+                    e.UpdatedOn,
+                    clock.UtcNow,
+                    clock.UtcNow);
             }
+
+            await sqlBulkCopy.WriteToServerAsync(dataTable, cancellationToken);
 
             dataTable.Rows.Clear();
         }
