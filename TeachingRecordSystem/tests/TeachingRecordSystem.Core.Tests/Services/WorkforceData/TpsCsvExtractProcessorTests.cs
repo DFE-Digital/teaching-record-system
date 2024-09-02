@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Services.WorkforceData;
 
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
-public class TpsCsvExtractProcessorTests
+public class TpsCsvExtractProcessorTests : IAsyncLifetime
 {
     public TpsCsvExtractProcessorTests(
         DbFixture dbFixture,
@@ -514,6 +514,10 @@ public class TpsCsvExtractProcessorTests
         Assert.Equal(nationalInsuranceNumber, updatedPersonEmployment.NationalInsuranceNumber);
         Assert.Equal(memberPostcode, updatedPersonEmployment.PersonPostcode);
     }
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public Task DisposeAsync() => DbFixture.DbHelper.ClearData();
 
     private DbFixture DbFixture { get; }
 

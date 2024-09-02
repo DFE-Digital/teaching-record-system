@@ -10,7 +10,7 @@ using TeachingRecordSystem.Core.Services.WorkforceData.Google;
 
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
-public class WorkforceDataExporterTests
+public class WorkforceDataExporterTests : IAsyncLifetime
 {
     public WorkforceDataExporterTests(
         DbFixture dbFixture,
@@ -101,6 +101,10 @@ public class WorkforceDataExporterTests
         Assert.Equal(personEmployment.CreatedOn, (DateTime)exportItem[nameof(WorkforceDataExportItem.CreatedOn)]);
         Assert.Equal(personEmployment.UpdatedOn, (DateTime)exportItem[nameof(WorkforceDataExportItem.UpdatedOn)]);
     }
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public Task DisposeAsync() => DbFixture.DbHelper.ClearData();
 
     private DbFixture DbFixture { get; }
 
