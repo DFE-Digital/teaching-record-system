@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.Services.WorkforceData;
 
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
+[Collection(nameof(WorkforceDataTestCollection))]
 public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
 {
     public static TheoryData<TpsCsvExtractFileImportTestScenarioData> GetImportFileTestScenarioData()
