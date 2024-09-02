@@ -10,6 +10,7 @@ using TeachingRecordSystem.Core.Services.WorkforceData.Google;
 
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
+[Collection(nameof(WorkforceDataTestCollection))]
 public class WorkforceDataExporterTests : IAsyncLifetime
 {
     public WorkforceDataExporterTests(

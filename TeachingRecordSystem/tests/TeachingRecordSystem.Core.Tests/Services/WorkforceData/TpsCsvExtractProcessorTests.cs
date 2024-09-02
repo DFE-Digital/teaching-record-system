@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core.Services.WorkforceData;
 
 namespace TeachingRecordSystem.Core.Tests.Services.WorkforceData;
 
+[Collection(nameof(WorkforceDataTestCollection))]
 public class TpsCsvExtractProcessorTests : IAsyncLifetime
 {
     public TpsCsvExtractProcessorTests(
