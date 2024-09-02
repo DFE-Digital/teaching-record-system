@@ -22,7 +22,7 @@
                     <td class="govuk-table__cell">
                         <a href="@LinkGenerator.EditUser(user.UserId)" class="govuk-link" data-testid="edit-user-@user.UserId">@user.Name</a>
                     </td>
-                    <td class="govuk-table__cell empty-hyphens">@Html.ShyEmail(user.Email!)</td>
+                    <td class="govuk-table__cell">@user.Email</td>
                 </tr>
             }
         }
