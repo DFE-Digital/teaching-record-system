@@ -600,14 +600,14 @@ public partial class DqtReportingService : BackgroundService
         var sql = $""""
             merge {targetTableName} as target
             using (
-                select {(string.Join(",\n\t", parametersAndColumns.Select(p => $"{p.ParameterName} as {p.ColumnName}")))}
+                select {(string.Join(",\n\t", parametersAndColumns.Select(p => $"{p.ParameterName} as [{p.ColumnName}]")))}
             ) as source
-            on target.{idColumnName} = source.{idColumnName}
+            on target.[{idColumnName}] = source.[{idColumnName}]
             when not matched then
-                insert ({(string.Join(", ", parametersAndColumns.Select(p => p.ColumnName)))}, __Inserted, __Updated)
-                values ({(string.Join(", ", parametersAndColumns.Select(p => $"source.{p.ColumnName}")))}, {nowParameterName}, {nowParameterName})
+                insert ({(string.Join(", ", parametersAndColumns.Select(p => $"[{p.ColumnName}]")))}, __Inserted, __Updated)
+                values ({(string.Join(", ", parametersAndColumns.Select(p => $"source.[{p.ColumnName}]")))}, {nowParameterName}, {nowParameterName})
             when matched then
-                update set {(string.Join(", ", parametersAndColumns.Where(p => p.ColumnName != idColumnName).Select(p => $"{p.ColumnName} = source.{p.ColumnName}")))}, __Updated = {nowParameterName}
+                update set {(string.Join(", ", parametersAndColumns.Where(p => p.ColumnName != idColumnName).Select(p => $"[{p.ColumnName}] = source.[{p.ColumnName}]")))}, __Updated = {nowParameterName}
             ;
             """";
 
