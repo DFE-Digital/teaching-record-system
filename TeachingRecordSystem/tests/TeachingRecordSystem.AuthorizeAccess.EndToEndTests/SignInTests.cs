@@ -1,3 +1,5 @@
+using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
+
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
 
 public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -216,6 +218,122 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = await context.NewPageAsync();
 
         await page.GoToTestStartPage(trnToken: trnToken);
+
+        await page.AssertSignedIn(person.Trn!);
+    }
+
+    [Fact]
+    public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountAndMatchingDetails_MatchesWithTrn()
+    {
+        var person = await TestData.CreatePerson(x => x.WithTrn());
+
+        var subject = TestData.CreateOneLoginUserSubject();
+        var email = Faker.Internet.Email();
+        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
+
+        var trnToken = Guid.NewGuid().ToString();
+
+        using (var idDbContext = HostFixture.Services.GetRequiredService<IdDbContext>())
+        {
+            idDbContext.Users.Add(new User()
+            {
+                UserId = Guid.NewGuid(),
+                EmailAddress = email,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                Created = Clock.UtcNow,
+                Updated = Clock.UtcNow,
+                UserType = IdModelTypes.UserType.Teacher,
+                TrnVerificationLevel = TrnVerificationLevel.Medium,
+                Trn = person.Trn!
+            });
+
+            await idDbContext.SaveChangesAsync();
+        }
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPage();
+
+        await page.AssertSignedIn(person.Trn!);
+    }
+
+    [Fact]
+    public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountWithTrnAssociatedByTrnTokenAndMatchingDetails_MatchesWithTrn()
+    {
+        var person = await TestData.CreatePerson(x => x.WithTrn());
+
+        var subject = TestData.CreateOneLoginUserSubject();
+        var email = Faker.Internet.Email();
+        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
+
+        var trnToken = Guid.NewGuid().ToString();
+
+        using (var idDbContext = HostFixture.Services.GetRequiredService<IdDbContext>())
+        {
+            idDbContext.Users.Add(new User()
+            {
+                UserId = Guid.NewGuid(),
+                EmailAddress = email,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                Created = Clock.UtcNow,
+                Updated = Clock.UtcNow,
+                UserType = IdModelTypes.UserType.Teacher,
+                TrnVerificationLevel = TrnVerificationLevel.Low,
+                TrnAssociationSource = TrnAssociationSource.TrnToken,
+                Trn = person.Trn!
+            });
+
+            await idDbContext.SaveChangesAsync();
+        }
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPage();
+
+        await page.AssertSignedIn(person.Trn!);
+    }
+
+    [Fact]
+    public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountWithTrnAssociatedBySupportAndMatchingDetails_MatchesWithTrn()
+    {
+        var person = await TestData.CreatePerson(x => x.WithTrn());
+
+        var subject = TestData.CreateOneLoginUserSubject();
+        var email = Faker.Internet.Email();
+        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(subject, email, coreIdentityVc));
+
+        var trnToken = Guid.NewGuid().ToString();
+
+        using (var idDbContext = HostFixture.Services.GetRequiredService<IdDbContext>())
+        {
+            idDbContext.Users.Add(new User()
+            {
+                UserId = Guid.NewGuid(),
+                EmailAddress = email,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                Created = Clock.UtcNow,
+                Updated = Clock.UtcNow,
+                UserType = IdModelTypes.UserType.Teacher,
+                TrnVerificationLevel = TrnVerificationLevel.Low,
+                TrnAssociationSource = TrnAssociationSource.SupportUi,
+                Trn = person.Trn!
+            });
+
+            await idDbContext.SaveChangesAsync();
+        }
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPage();
 
         await page.AssertSignedIn(person.Trn!);
     }

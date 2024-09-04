@@ -7,10 +7,12 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.UiCommon.FormFlow;
 using TeachingRecordSystem.UiCommon.FormFlow.State;
+using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
@@ -156,16 +158,19 @@ public class SignInJourneyHelper(
         string? trn = null;
         string? trnTokenTrn = null;
 
-        if (await TryApplyTrnToken() is TryApplyTrnTokenResult result)
+        if (await TryMatchToIdentityUser() is TryMatchToIdentityUserResult result)
         {
-            trnTokenTrn = result.Trn;
+            if (result.MatchRoute == OneLoginUserMatchRoute.TrnToken)
+            {
+                trnTokenTrn = result.Trn;
+            }
 
-            if (result.Matched)
+            if (result.MatchRoute is not null)
             {
                 oneLoginUser.PersonId = result.PersonId;
                 oneLoginUser.FirstSignIn = clock.UtcNow;
                 oneLoginUser.LastSignIn = clock.UtcNow;
-                oneLoginUser.MatchRoute = OneLoginUserMatchRoute.TrnToken;
+                oneLoginUser.MatchRoute = result.MatchRoute.Value;
                 oneLoginUser.MatchedAttributes = result.MatchedAttributes!.ToArray();
                 trn = result.Trn;
             }
@@ -188,35 +193,54 @@ public class SignInJourneyHelper(
             }
         });
 
-        async Task<TryApplyTrnTokenResult?> TryApplyTrnToken()
+        async Task<TryMatchToIdentityUserResult?> TryMatchToIdentityUser()
         {
-            if (journeyInstance.State.TrnToken is not string trnToken)
+            Person? getAnIdentityPerson = null;
+            OneLoginUserMatchRoute? matchRoute = null;
+            IdTrnToken? trnTokenModel = null;
+
+            // First try and match on TRN Token
+            if (journeyInstance.State.TrnToken is string trnToken)
             {
-                return null;
+                trnTokenModel = await idDbContext.TrnTokens.SingleOrDefaultAsync(
+                    t => t.TrnToken == trnToken && t.ExpiresUtc > clock.UtcNow && t.UserId == null);
+                if (trnTokenModel is not null)
+                {
+                    getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(
+                        p => p.Trn == trnTokenModel.Trn && p.DqtState == (int)ContactState.Active);
+                    matchRoute = getAnIdentityPerson is not null ? OneLoginUserMatchRoute.TrnToken : null;
+                }
             }
 
-            var trnTokenModel = await idDbContext.TrnTokens.SingleOrDefaultAsync(
-                t => t.TrnToken == trnToken && t.ExpiresUtc > clock.UtcNow && t.UserId == null);
-
-            if (trnTokenModel is null)
+            // Couldn't match on TRN Token, try and match on email and TRN
+            if (getAnIdentityPerson is null)
             {
-                return null;
+                var identityUser = await idDbContext.Users.SingleOrDefaultAsync(
+                    u => u.EmailAddress == oneLoginUser.Email
+                        && u.Trn != null
+                        && u.IsDeleted == false
+                        && (u.TrnVerificationLevel == TrnVerificationLevel.Medium
+                            || u.TrnAssociationSource == TrnAssociationSource.TrnToken
+                            || u.TrnAssociationSource == TrnAssociationSource.SupportUi));
+                if (identityUser is not null)
+                {
+                    getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(
+                        p => p.Trn == identityUser.Trn && p.DqtState == (int)ContactState.Active);
+                    matchRoute = getAnIdentityPerson is not null ? OneLoginUserMatchRoute.GetAnIdentityUser : null;
+                }
             }
 
-            var trnTokenPerson = await dbContext.Persons.SingleOrDefaultAsync(
-                p => p.Trn == trnTokenModel.Trn && p.DqtState == (int)ContactState.Active);
-
-            if (trnTokenPerson is null)
+            if (getAnIdentityPerson is null)
             {
                 return null;
             }
 
             // Check the record's last name and DOB match the verified details
-            var matchedLastName = verifiedNames.Select(parts => parts.Last()).FirstOrDefault(name => name.Equals(trnTokenPerson.LastName, StringComparison.OrdinalIgnoreCase));
-            var matchedDateOfBirth = verifiedDatesOfBirth.FirstOrDefault(dob => dob == trnTokenPerson.DateOfBirth);
+            var matchedLastName = verifiedNames.Select(parts => parts.Last()).FirstOrDefault(name => name.Equals(getAnIdentityPerson.LastName, StringComparison.OrdinalIgnoreCase));
+            var matchedDateOfBirth = verifiedDatesOfBirth.FirstOrDefault(dob => dob == getAnIdentityPerson.DateOfBirth);
             if (matchedLastName == default || matchedDateOfBirth == default)
             {
-                return new(trnTokenPerson.PersonId, trnTokenModel.Trn, Matched: false, MatchedAttributes: null);
+                return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn!, MatchRoute: null, MatchedAttributes: null);
             }
             var matchedAttributes = new Dictionary<OneLoginUserMatchedAttribute, string>()
             {
@@ -224,11 +248,14 @@ public class SignInJourneyHelper(
                 { OneLoginUserMatchedAttribute.DateOfBirth, matchedDateOfBirth.ToString("yyyy-MM-dd") }
             };
 
-            // Invalidate the token
-            trnTokenModel.UserId = _teacherAuthIdUserIdSentinel;
-            await idDbContext.SaveChangesAsync();
+            if (trnTokenModel is not null)
+            {
+                // Invalidate the token
+                trnTokenModel.UserId = _teacherAuthIdUserIdSentinel;
+                await idDbContext.SaveChangesAsync();
+            }
 
-            return new(trnTokenPerson.PersonId, trnTokenModel.Trn, Matched: true, matchedAttributes);
+            return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn!, MatchRoute: matchRoute, matchedAttributes);
         }
     }
 
@@ -355,9 +382,9 @@ public class SignInJourneyHelper(
         return Results.Challenge(delegatedProperties, authenticationSchemes: [journeyInstance.State.OneLoginAuthenticationScheme]);
     }
 
-    private record TryApplyTrnTokenResult(
+    private record TryMatchToIdentityUserResult(
         Guid PersonId,
         string Trn,
-        bool Matched,
+        OneLoginUserMatchRoute? MatchRoute,
         IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>? MatchedAttributes);
 }

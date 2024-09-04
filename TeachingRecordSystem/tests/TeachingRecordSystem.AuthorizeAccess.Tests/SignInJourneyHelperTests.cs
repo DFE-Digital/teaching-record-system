@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -141,7 +142,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
-                email: user.Subject,
+                email: user.Email,
                 createCoreIdentityVc: false);
             var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
@@ -188,7 +189,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
-                email: user.Subject,
+                email: user.Email,
                 createCoreIdentityVc: false);
             var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
@@ -225,6 +226,331 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         });
 
     [Fact]
+    public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserTrnMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
+        WithDbContext(async dbContext =>
+        {
+            // Arrange
+            var helper = CreateHelper(dbContext);
+
+            var email = Faker.Internet.Email();
+            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var user = await TestData.CreateOneLoginUser(personId: null);
+            Clock.Advance();
+
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Medium);
+
+            var firstName = person.FirstName;
+            var lastName = person.LastName;
+            var dateOfBirth = person.DateOfBirth;
+
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
+            var journeyInstance = await CreateJourneyInstance(state);
+
+            var authenticationTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
+                sub: user.Subject,
+                email: user.Email,
+                createCoreIdentityVc: false);
+            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            Debug.Assert(callbackResult is ChallengeHttpResult);
+
+            var verifiedTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
+                sub: user.Subject,
+                firstName: firstName,
+                lastName: lastName,
+                dateOfBirth: dateOfBirth,
+                createCoreIdentityVc: true);
+
+            // Act
+            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+
+            // Assert
+            Assert.NotNull(state.AuthenticationTicket);
+
+            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
+            Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
+            Assert.Equal(Clock.UtcNow, user.FirstSignIn);
+            Assert.Equal(Clock.UtcNow, user.LastSignIn);
+            Assert.Equal(OneLoginUserMatchRoute.GetAnIdentityUser, user.MatchRoute);
+
+            var redirectResult = Assert.IsType<RedirectHttpResult>(result);
+            Assert.Equal($"{state.RedirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", redirectResult.Url);
+        });
+
+    [Fact]
+    public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserWithTrnAssociatedBySupportMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
+        WithDbContext(async dbContext =>
+        {
+            // Arrange
+            var helper = CreateHelper(dbContext);
+
+            var email = Faker.Internet.Email();
+            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var user = await TestData.CreateOneLoginUser(personId: null);
+            Clock.Advance();
+
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Low, TrnAssociationSource.SupportUi);
+
+            var firstName = person.FirstName;
+            var lastName = person.LastName;
+            var dateOfBirth = person.DateOfBirth;
+
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
+            var journeyInstance = await CreateJourneyInstance(state);
+
+            var authenticationTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
+                sub: user.Subject,
+                email: user.Email,
+                createCoreIdentityVc: false);
+            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            Debug.Assert(callbackResult is ChallengeHttpResult);
+
+            var verifiedTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
+                sub: user.Subject,
+                firstName: firstName,
+                lastName: lastName,
+                dateOfBirth: dateOfBirth,
+                createCoreIdentityVc: true);
+
+            // Act
+            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+
+            // Assert
+            Assert.NotNull(state.AuthenticationTicket);
+
+            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
+            Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
+            Assert.Equal(Clock.UtcNow, user.FirstSignIn);
+            Assert.Equal(Clock.UtcNow, user.LastSignIn);
+            Assert.Equal(OneLoginUserMatchRoute.GetAnIdentityUser, user.MatchRoute);
+
+            var redirectResult = Assert.IsType<RedirectHttpResult>(result);
+            Assert.Equal($"{state.RedirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", redirectResult.Url);
+        });
+
+    [Fact]
+    public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserWithTrnAssociatedByTrnTokenMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
+        WithDbContext(async dbContext =>
+        {
+            // Arrange
+            var helper = CreateHelper(dbContext);
+
+            var email = Faker.Internet.Email();
+            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var user = await TestData.CreateOneLoginUser(personId: null);
+            Clock.Advance();
+
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Low, TrnAssociationSource.TrnToken);
+
+            var firstName = person.FirstName;
+            var lastName = person.LastName;
+            var dateOfBirth = person.DateOfBirth;
+
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
+            var journeyInstance = await CreateJourneyInstance(state);
+
+            var authenticationTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
+                sub: user.Subject,
+                email: user.Email,
+                createCoreIdentityVc: false);
+            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            Debug.Assert(callbackResult is ChallengeHttpResult);
+
+            var verifiedTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
+                sub: user.Subject,
+                firstName: firstName,
+                lastName: lastName,
+                dateOfBirth: dateOfBirth,
+                createCoreIdentityVc: true);
+
+            // Act
+            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+
+            // Assert
+            Assert.NotNull(state.AuthenticationTicket);
+
+            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
+            Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
+            Assert.Equal(Clock.UtcNow, user.FirstSignIn);
+            Assert.Equal(Clock.UtcNow, user.LastSignIn);
+            Assert.Equal(OneLoginUserMatchRoute.GetAnIdentityUser, user.MatchRoute);
+
+            var redirectResult = Assert.IsType<RedirectHttpResult>(result);
+            Assert.Equal($"{state.RedirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", redirectResult.Url);
+        });
+
+    [Fact]
+    public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButIdentityUserHasTrnVerificationLevelLow_RedirectsToStartOfMatchingJourney() =>
+        WithDbContext(async dbContext =>
+        {
+            // Arrange
+            var helper = CreateHelper(dbContext);
+
+            var email = Faker.Internet.Email();
+            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var user = await TestData.CreateOneLoginUser(personId: null);
+            Clock.Advance();
+
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Low);
+
+            var firstName = person.FirstName;
+            var lastName = person.LastName;
+            var dateOfBirth = person.DateOfBirth;
+
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
+            var journeyInstance = await CreateJourneyInstance(state);
+
+            var authenticationTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
+                sub: user.Subject,
+                email: user.Email,
+                createCoreIdentityVc: false);
+            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            Debug.Assert(callbackResult is ChallengeHttpResult);
+
+            var verifiedTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
+                sub: user.Subject,
+                firstName: firstName,
+                lastName: lastName,
+                dateOfBirth: dateOfBirth,
+                createCoreIdentityVc: true);
+
+            // Act
+            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectHttpResult>(result);
+            Assert.Equal($"/Connect?{journeyInstance.GetUniqueIdQueryParameter()}", redirectResult.Url);
+        });
+
+    [Fact]
+    public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButRecordFromIdentityUserTrnDoesNotMatchLastName_RedirectsToStartOfMatchingJourney() =>
+        WithDbContext(async dbContext =>
+        {
+            // Arrange
+            var helper = CreateHelper(dbContext);
+
+            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var user = await TestData.CreateOneLoginUser(personId: null);
+            Clock.Advance();
+
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Medium);
+
+            var firstName = person.FirstName;
+            var lastName = TestData.GenerateChangedLastName(person.LastName);
+            var dateOfBirth = person.DateOfBirth;
+
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
+            var journeyInstance = await CreateJourneyInstance(state);
+
+            var authenticationTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
+                sub: user.Subject,
+                email: user.Email,
+                createCoreIdentityVc: false);
+            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            Debug.Assert(callbackResult is ChallengeHttpResult);
+
+            var verifiedTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
+                sub: user.Subject,
+                firstName: firstName,
+                lastName: lastName,
+                dateOfBirth: dateOfBirth,
+                createCoreIdentityVc: true);
+
+            // Act
+            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectHttpResult>(result);
+            Assert.Equal($"/Connect?{journeyInstance.GetUniqueIdQueryParameter()}", redirectResult.Url);
+        });
+
+    [Fact]
+    public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButRecordFromIdentityUserTrnDoesNotMatchDateOfBirth_RedirectsToStartOfMatchingJourney() =>
+        WithDbContext(async dbContext =>
+        {
+            // Arrange
+            var helper = CreateHelper(dbContext);
+
+            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var user = await TestData.CreateOneLoginUser(personId: null);
+            Clock.Advance();
+
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Medium);
+
+            var firstName = person.FirstName;
+            var lastName = person.LastName;
+            var dateOfBirth = person.DateOfBirth.AddDays(1);
+
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
+            var journeyInstance = await CreateJourneyInstance(state);
+
+            var authenticationTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
+                sub: user.Subject,
+                email: user.Email,
+                createCoreIdentityVc: false);
+            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            Debug.Assert(callbackResult is ChallengeHttpResult);
+
+            var verifiedTicket = CreateOneLoginAuthenticationTicket(
+                vtr: SignInJourneyHelper.AuthenticationAndIdentityVerificationVtr,
+                sub: user.Subject,
+                firstName: firstName,
+                lastName: lastName,
+                dateOfBirth: dateOfBirth,
+                createCoreIdentityVc: true);
+
+            // Act
+            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectHttpResult>(result);
+            Assert.Equal($"/Connect?{journeyInstance.GetUniqueIdQueryParameter()}", redirectResult.Url);
+        });
+
+    [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndTrnTokenMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
         WithDbContext(async dbContext =>
         {
@@ -253,7 +579,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
-                email: user.Subject,
+                email: user.Email,
                 createCoreIdentityVc: false);
             var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
@@ -362,7 +688,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
-                email: user.Subject,
+                email: user.Email,
                 createCoreIdentityVc: false);
             var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
@@ -408,7 +734,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
-                email: user.Subject,
+                email: user.Email,
                 createCoreIdentityVc: false);
             var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
@@ -458,7 +784,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
-                email: user.Subject,
+                email: user.Email,
                 createCoreIdentityVc: false);
             var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
@@ -508,7 +834,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
-                email: user.Subject,
+                email: user.Email,
                 createCoreIdentityVc: false);
             var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
@@ -712,6 +1038,28 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
         personMatchingService ??= Mock.Of<IPersonMatchingService>();
 
         return ActivatorUtilities.CreateInstance<SignInJourneyHelper>(HostFixture.Services, dbContext, personMatchingService, linkGenerator, options, Clock);
+    }
+
+    private async Task CreateIdentityUser(string firstName, string lastName, string trn, string email, TrnVerificationLevel trnVerificationLevel, TrnAssociationSource trnAssociationSource = TrnAssociationSource.Lookup)
+    {
+        using (var idDbContext = HostFixture.Services.GetRequiredService<IdDbContext>())
+        {
+            idDbContext.Users.Add(new User()
+            {
+                UserId = Guid.NewGuid(),
+                EmailAddress = email,
+                FirstName = firstName,
+                LastName = lastName,
+                Created = Clock.UtcNow,
+                Updated = Clock.UtcNow,
+                UserType = IdModelTypes.UserType.Teacher,
+                TrnVerificationLevel = trnVerificationLevel,
+                TrnAssociationSource = trnAssociationSource,
+                Trn = trn
+            });
+
+            await idDbContext.SaveChangesAsync();
+        }
     }
 
     private async Task<string> CreateTrnToken(string trn, string email, TimeSpan? expires = null, Guid? userId = null)

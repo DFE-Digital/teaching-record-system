@@ -1,14 +1,17 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 
 public class IdDbContext(DbContextOptions<IdDbContext> options) : DbContext(options)
 {
     public DbSet<IdTrnToken> TrnTokens => Set<IdTrnToken>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<IdTrnToken>().HasKey(t => t.TrnToken);
+        modelBuilder.Entity<User>().HasKey(u => u.UserId);
     }
 }
 
@@ -27,4 +30,58 @@ public class IdTrnToken
     public required DateTime ExpiresUtc { get; set; }
     [Column("user_id")]
     public Guid? UserId { get; set; }
+}
+
+[Table("users")]
+public class User
+{
+    [Column("user_id")]
+    public Guid UserId { get; set; }
+    [Column("email_address")]
+    public required string EmailAddress { get; set; }
+    [Column("first_name")]
+    public required string FirstName { get; set; }
+    [Column("last_name")]
+    public required string LastName { get; set; }
+    [Column("created")]
+    public required DateTime Created { get; set; }
+    [Column("updated")]
+    public required DateTime Updated { get; set; }
+    [Column("user_type")]
+    public IdModelTypes.UserType UserType { get; set; }
+    [Column("trn")]
+    public string? Trn { get; set; }
+    [Column("trn_association_source")]
+    public TrnAssociationSource? TrnAssociationSource { get; set; }
+    [Column("is_deleted")]
+    public bool IsDeleted { get; set; }
+    [Column("trn_lookup_support_ticket_created")]
+    public bool TrnLookupSupportTicketCreated { get; set; }
+    [Column("trn_verification_level")]
+    public TrnVerificationLevel? TrnVerificationLevel { get; set; }
+}
+
+public static class IdModelTypes
+{
+    public enum UserType
+    {
+        Default = 0,
+        Teacher = 0,
+        Staff = 1
+    }
+
+    public enum TrnAssociationSource
+    {
+        Lookup = 0,
+        Api = 1,
+        SupportUi = 2,
+        UserImport = 3,
+        TrnToken = 4,
+    }
+
+    public enum TrnVerificationLevel
+    {
+        Low = 0,
+        Medium = 1
+    }
 }
