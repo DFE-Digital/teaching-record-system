@@ -9,7 +9,7 @@ using TeachingRecordSystem.Api.V2.Responses;
 namespace TeachingRecordSystem.Api.V2.Controllers;
 
 [Route("teachers/{trn}/itt-outcome")]
-[Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
+[Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
 public class IttOutcomeController : ControllerBase
 {
     private readonly IMediator _mediator;

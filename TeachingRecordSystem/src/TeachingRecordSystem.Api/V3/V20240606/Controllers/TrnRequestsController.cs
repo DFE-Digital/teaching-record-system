@@ -9,7 +9,7 @@ using TeachingRecordSystem.Api.V3.V20240606.Requests;
 namespace TeachingRecordSystem.Api.V3.V20240606.Controllers;
 
 [Route("trn-requests")]
-[Authorize(Policy = AuthorizationPolicies.CreateTrn)]
+[Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.CreateTrn)]
 public class TrnRequestsController(IMapper mapper) : ControllerBase
 {
     [HttpPost("")]

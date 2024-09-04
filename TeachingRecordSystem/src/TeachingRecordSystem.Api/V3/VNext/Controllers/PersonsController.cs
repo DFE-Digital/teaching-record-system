@@ -19,7 +19,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(QtlsInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
     [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
-    [Authorize(Policy = AuthorizationPolicies.AssignQtls)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
     public async Task<IActionResult> PutQtls(
         [FromRoute] string trn,
         [FromBody] SetQtlsRequest request,
@@ -36,7 +36,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
         Summary = "Get QTLS status for a teacher",
         Description = "Gets the QTLS status for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(QtlsInfo), StatusCodes.Status200OK)]
-    [Authorize(Policy = AuthorizationPolicies.AssignQtls)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
     public async Task<IActionResult> GetQtls(
         [FromRoute] string trn,
         [FromServices] GetQtlsHandler handler)

@@ -18,7 +18,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
         Description = "Finds persons matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(Policy = AuthorizationPolicies.GetPerson)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> FindTeachers(
         [FromBody] FindPersonsRequest request,
         [FromServices] FindPersonsByTrnAndDateOfBirthHandler handler)
@@ -36,7 +36,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
         Description = "Finds a person matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(Policy = AuthorizationPolicies.GetPerson)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> FindTeachers(
         FindPersonRequest request,
         [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)

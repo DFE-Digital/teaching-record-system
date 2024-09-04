@@ -9,7 +9,7 @@ using TeachingRecordSystem.Api.V2.Responses;
 namespace TeachingRecordSystem.Api.V2.Controllers;
 
 [Route("unlock-teacher")]
-[Authorize(Policy = AuthorizationPolicies.UnlockPerson)]
+[Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UnlockPerson)]
 public class UnlockTeacherController : ControllerBase
 {
     private readonly IMediator _mediator;
