@@ -116,42 +116,6 @@ public class Program
                         return scopes.Contains("dqt:read") || scopes.Contains("teaching_record");
                     })
                     .RequireClaim("trn"));
-
-            options.AddPolicy(
-                AuthorizationPolicies.GetPerson,
-                policy => policy
-                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireRole([ApiRoles.GetPerson, ApiRoles.UpdatePerson]));
-
-            options.AddPolicy(
-                AuthorizationPolicies.UpdatePerson,
-                policy => policy
-                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireRole([ApiRoles.UpdatePerson]));
-
-            options.AddPolicy(
-                AuthorizationPolicies.UpdateNpq,
-                policy => policy
-                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireRole([ApiRoles.UpdateNpq]));
-
-            options.AddPolicy(
-                AuthorizationPolicies.UnlockPerson,
-                policy => policy
-                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireRole([ApiRoles.UnlockPerson]));
-
-            options.AddPolicy(
-                AuthorizationPolicies.CreateTrn,
-                policy => policy
-                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireRole([ApiRoles.CreateTrn]));
-
-            options.AddPolicy(
-                AuthorizationPolicies.AssignQtls,
-                policy => policy
-                    .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.AuthenticationScheme)
-                    .RequireRole([ApiRoles.AssignQtls]));
         });
 
         services

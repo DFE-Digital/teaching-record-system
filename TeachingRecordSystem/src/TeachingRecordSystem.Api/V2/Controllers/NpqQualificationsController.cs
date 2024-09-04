@@ -8,7 +8,7 @@ using TeachingRecordSystem.Api.V2.Requests;
 namespace TeachingRecordSystem.Api.V2.Controllers;
 
 [Route("npq-qualifications")]
-[Authorize(Policy = AuthorizationPolicies.UpdateNpq)]
+[Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdateNpq)]
 public class NpqQualificationsController : ControllerBase
 {
     private readonly IMediator _mediator;

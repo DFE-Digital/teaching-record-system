@@ -20,7 +20,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    [Authorize(Policy = AuthorizationPolicies.GetPerson)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> Get(
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
@@ -49,7 +49,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
         Description = "Creates a name change request for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> CreateNameChange(
         [FromBody] CreateNameChangeRequestRequest request,
         [FromServices] CreateNameChangeRequestHandler handler)
@@ -76,7 +76,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
         Description = "Creates a date of birth change request for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> CreateDateOfBirthChange(
         [FromBody] CreateDateOfBirthChangeRequestRequest request,
         [FromServices] CreateDateOfBirthChangeRequestHandler handler)
@@ -101,7 +101,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
         Description = "Finds teachers with a TRN matching the specified criteria.")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(Policy = AuthorizationPolicies.GetPerson)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> FindTeachers(
         FindTeachersRequest request,
         [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)

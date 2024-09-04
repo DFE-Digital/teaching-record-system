@@ -9,7 +9,7 @@ using TeachingRecordSystem.Api.V2.Responses;
 namespace TeachingRecordSystem.Api.V2.Controllers;
 
 [Route("trn-requests")]
-[Authorize(Policy = AuthorizationPolicies.UpdatePerson)]
+[Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
 public class TrnRequestsController : ControllerBase
 {
     private readonly IMediator _mediator;

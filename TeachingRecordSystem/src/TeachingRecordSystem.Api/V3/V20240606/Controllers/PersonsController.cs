@@ -20,7 +20,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    [Authorize(Policy = AuthorizationPolicies.GetPerson)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> Get(
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
@@ -50,7 +50,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
         Description = "Finds a person matching the specified criteria.")]
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [Authorize(Policy = AuthorizationPolicies.GetPerson)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> FindTeachers(
         FindPersonRequest request,
         [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
