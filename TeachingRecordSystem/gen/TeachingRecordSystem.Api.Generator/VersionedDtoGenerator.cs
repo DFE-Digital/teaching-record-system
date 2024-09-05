@@ -3,7 +3,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using GeneratedTypeInfo = (string DestinationType, string ReferenceType);
-using VersionedReference = (string DestinationFullyQualifiedTypeName, string ReferenceVersion, int ReferenceType);
+using VersionedReference = (string DestinationFullyQualifiedTypeName, string ReferenceFullyQualifiedTypeName, int ReferenceType);
 
 [Generator(LanguageNames.CSharp)]
 public class VersionedDtoGenerator : ISourceGenerator
@@ -92,7 +92,7 @@ public class VersionedDtoGenerator : ISourceGenerator
                 {
                     GeneratePartialRecordDeclaration(
                         reference.DestinationFullyQualifiedTypeName,
-                        ReplaceVersion(reference.DestinationFullyQualifiedTypeName, reference.ReferenceVersion),
+                        reference.ReferenceFullyQualifiedTypeName,
                         copyAttributes: true,
                         excludeMembers: []);
                 }
@@ -102,7 +102,7 @@ public class VersionedDtoGenerator : ISourceGenerator
 
                     GenerateEnum(
                         reference.DestinationFullyQualifiedTypeName,
-                        ReplaceVersion(reference.DestinationFullyQualifiedTypeName, reference.ReferenceVersion));
+                        reference.ReferenceFullyQualifiedTypeName);
                 }
             }
         }
@@ -115,7 +115,6 @@ public class VersionedDtoGenerator : ISourceGenerator
         {
             var destinationVersion = GetTypeVersion(destinationFullyQualifiedTypeName);
             var destinationNamespace = GetNamespaceFromFullyQualifiedTypeName(destinationFullyQualifiedTypeName);
-            var referenceVersion = GetTypeVersion(referenceFullyQualifiedTypeName);
             var referenceNamespace = GetNamespaceFromFullyQualifiedTypeName(referenceFullyQualifiedTypeName);
             var destinationTypeName = destinationFullyQualifiedTypeName.Split('.').Last();
 
@@ -267,7 +266,7 @@ public class VersionedDtoGenerator : ISourceGenerator
 
                     var referenceType = symbol.TypeKind is TypeKind.Enum ? EnumReferenceType : RecordReferenceType;
 
-                    EnsureReference((ReplaceVersion(fullPropertyType, destinationVersion), referenceVersion, referenceType));
+                    EnsureReference((ReplaceVersion(fullPropertyType, destinationVersion), fullPropertyType, referenceType));
                 }
 
                 if (symbol.IsGenericType)

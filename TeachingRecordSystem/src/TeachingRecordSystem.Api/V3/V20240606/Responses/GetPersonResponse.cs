@@ -38,20 +38,32 @@ public partial record GetPersonResponseQts;
 public partial record GetPersonResponseEyts;
 
 [AutoMap(typeof(GetPersonResultInduction))]
-[GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInduction))]
-public partial record GetPersonResponseInduction;
+[GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInduction), excludeMembers: ["Periods"])]
+public partial record GetPersonResponseInduction
+{
+    public required IReadOnlyCollection<GetPersonResponseInductionPeriod> Periods { get; init; }
+}
 
 [AutoMap(typeof(GetPersonResultInductionPeriod))]
-[GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInductionPeriod))]
-public partial record GetPersonResponseInductionPeriod;
+[GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInductionPeriod), excludeMembers: ["AppropriateBody"])]
+public partial record GetPersonResponseInductionPeriod
+{
+    public required GetPersonResponseInductionPeriodAppropriateBody? AppropriateBody { get; init; }
+}
 
 [AutoMap(typeof(GetPersonResultInductionPeriodAppropriateBody))]
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInductionPeriodAppropriateBody))]
 public partial record GetPersonResponseInductionPeriodAppropriateBody;
 
 [AutoMap(typeof(GetPersonResultInitialTeacherTraining))]
-[GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInitialTeacherTraining))]
-public partial record GetPersonResponseInitialTeacherTraining;
+[GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInitialTeacherTraining), excludeMembers: ["Qualification", "AgeRange", "Provider", "Subjects"])]
+public partial record GetPersonResponseInitialTeacherTraining
+{
+    public required GetPersonResponseInitialTeacherTrainingQualification? Qualification { get; init; }
+    public required GetPersonResponseInitialTeacherTrainingAgeRange? AgeRange { get; init; }
+    public required GetPersonResponseInitialTeacherTrainingProvider? Provider { get; init; }
+    public required IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingSubject> Subjects { get; init; }
+}
 
 [AutoMap(typeof(GetPersonResultInitialTeacherTrainingQualification))]
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInitialTeacherTrainingQualification))]
@@ -70,8 +82,11 @@ public partial record GetPersonResponseInitialTeacherTrainingProvider;
 public partial record GetPersonResponseInitialTeacherTrainingSubject;
 
 [AutoMap(typeof(GetPersonResultNpqQualification))]
-[GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseNpqQualification))]
-public partial record GetPersonResponseNpqQualification;
+[GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseNpqQualification), excludeMembers: "Type")]
+public partial record GetPersonResponseNpqQualification
+{
+    public required GetPersonResponseNpqQualificationType Type { get; init; }
+}
 
 [AutoMap(typeof(GetPersonResultNpqQualificationType))]
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseNpqQualificationType))]
@@ -82,8 +97,11 @@ public partial record GetPersonResponseNpqQualificationType;
 public partial record GetPersonResponseMandatoryQualification;
 
 [AutoMap(typeof(GetPersonResultHigherEducationQualification))]
-[GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseHigherEducationQualification))]
-public partial record GetPersonResponseHigherEducationQualification;
+[GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseHigherEducationQualification), excludeMembers: "Subjects")]
+public partial record GetPersonResponseHigherEducationQualification
+{
+    public required IReadOnlyCollection<GetPersonResponseHigherEducationQualificationSubject> Subjects { get; init; }
+}
 
 [AutoMap(typeof(GetPersonResultHigherEducationQualificationSubject))]
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseHigherEducationQualificationSubject))]
