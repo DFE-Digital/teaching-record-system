@@ -8,6 +8,7 @@ public static class ApiRoles
     public const string UnlockPerson = "UnlockPerson";
     public const string CreateTrn = "CreateTrn";
     public const string AssignQtls = "AssignQtls";
+    public const string AppropriateBody = "AppropriateBody";
 
     public static IReadOnlyCollection<string> All { get; } = new[]
     {
@@ -16,6 +17,7 @@ public static class ApiRoles
         UpdateNpq,
         UnlockPerson,
         CreateTrn,
-        AssignQtls
+        AssignQtls,
+        AppropriateBody,
     };
 }

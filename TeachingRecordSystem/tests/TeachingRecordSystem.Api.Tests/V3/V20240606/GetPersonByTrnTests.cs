@@ -24,7 +24,7 @@ public class GetPersonByTrnTests : GetPersonTestBase
         Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
     }
 
-    [Theory, RoleNamesData(except: [ApiRoles.GetPerson, ApiRoles.UpdatePerson])]
+    [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
     public async Task GetTeacher_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange

@@ -12,7 +12,7 @@ public class FindTeachersTests : TestBase
         SetCurrentApiClient(new[] { ApiRoles.GetPerson });
     }
 
-    [Theory, RoleNamesData(except: [ApiRoles.GetPerson, ApiRoles.UpdatePerson])]
+    [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
     public async Task Get_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
