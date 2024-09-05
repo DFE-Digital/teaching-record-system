@@ -35,6 +35,7 @@ public partial class TestData
         private readonly List<Qualification> _qualifications = new();
         private readonly List<QtsRegistration> _qtsRegistrations = new();
         private readonly List<Sanction> _sanctions = [];
+        private readonly List<CreatePersonAlertBuilder> _alertBuilders = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
         private DateOnly? _qtlsDate;
         private readonly List<Induction> _inductions = [];
@@ -156,6 +157,14 @@ public partial class TestData
             bool isActive = true)
         {
             _sanctions.Add(new(Guid.NewGuid(), sanctionCode, startDate, endDate, reviewDate, spent, details, detailsLink, isActive));
+            return this;
+        }
+
+        public CreatePersonBuilder WithAlert(Action<CreatePersonAlertBuilder>? configure = null)
+        {
+            var alertBuilder = new CreatePersonAlertBuilder();
+            configure?.Invoke(alertBuilder);
+            _alertBuilders.Add(alertBuilder);
             return this;
         }
 
@@ -585,6 +594,7 @@ public partial class TestData
                 _syncEnabledOverride);
 
             var mqs = await Task.WhenAll(_mqBuilders.Select(mqb => mqb.Execute(this, testData)));
+            var alerts = await Task.WhenAll(_alertBuilders.Select(ab => ab.Execute(this, testData)));
 
             return new CreatePersonResult()
             {
@@ -607,8 +617,125 @@ public partial class TestData
                 Sanctions = [.. _sanctions],
                 MandatoryQualifications = mqs,
                 Inductions = [.. _inductions],
-                InductionPeriods = [.. _inductionPeriods]
+                InductionPeriods = [.. _inductionPeriods],
+                Alerts = alerts
             };
+        }
+    }
+
+    public class CreatePersonAlertBuilder
+    {
+        private Option<Guid?> _alertTypeId;
+        private Option<string?> _details;
+        private Option<string?> _externalLink;
+        private Option<DateOnly?> _startDate;
+        private Option<DateOnly?> _endDate;
+        private Option<EventModels.RaisedByUserInfo> _createdByUser;
+        private Option<DateTime?> _createdUtc;
+
+        public Guid AlertId { get; } = Guid.NewGuid();
+
+        public CreatePersonAlertBuilder WithAlertTypeId(Guid? alertTypeId)
+        {
+            _alertTypeId = Option.Some(alertTypeId);
+            return this;
+        }
+
+        public CreatePersonAlertBuilder WithDetails(string? details)
+        {
+            _details = Option.Some(details);
+            return this;
+        }
+
+        public CreatePersonAlertBuilder WithExternalLink(string? externalLink)
+        {
+            _externalLink = Option.Some(externalLink);
+            return this;
+        }
+
+        public CreatePersonAlertBuilder WithStartDate(DateOnly? startDate)
+        {
+            _startDate = Option.Some(startDate);
+            return this;
+        }
+
+        public CreatePersonAlertBuilder WithEndDate(DateOnly? endDate)
+        {
+            if (endDate.HasValue && !_startDate.HasValue)
+            {
+                throw new ArgumentException($"{nameof(endDate)} cannot be specified until {nameof(WithStartDate)} has been called with a non null startDate.");
+            }
+
+            if (endDate.HasValue && endDate < _startDate.ValueOrDefault())
+            {
+                throw new ArgumentException($"{nameof(endDate)} must be after startDate specified in {nameof(WithStartDate)}.");
+            }
+
+            _endDate = Option.Some(endDate);
+            return this;
+        }
+
+        public CreatePersonAlertBuilder WithCreatedUtc(DateTime? createdUtc)
+        {
+            _createdUtc = Option.Some(createdUtc);
+            return this;
+        }
+
+        public CreatePersonAlertBuilder WithCreatedByUser(EventModels.RaisedByUserInfo user)
+        {
+            _createdByUser = Option.Some(user);
+            return this;
+        }
+
+        internal async Task<Alert> Execute(CreatePersonBuilder createPersonBuilder, TestData testData)
+        {
+            var personId = createPersonBuilder.PersonId;
+
+            if (_alertTypeId.HasValue && !(await testData.ReferenceDataCache.GetAlertTypes()).Any(a => a.AlertTypeId == _alertTypeId.ValueOrDefault()))
+            {
+                throw new ArgumentException("AlertTypeId is invalid.");
+            }
+
+            var alertTypeId = _alertTypeId.ValueOr((await testData.ReferenceDataCache.GetAlertTypes()).RandomOne().AlertTypeId);
+            var details = _details.ValueOr(testData.GenerateLoremIpsum());
+            var externalLink = _externalLink.ValueOr(testData.GenerateUrl());
+            var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
+            var endDate = _endDate.ValueOr((DateOnly?)null);
+            var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
+            var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
+
+            return await testData.WithDbContext(async dbContext =>
+            {
+                var alert = new Alert()
+                {
+                    AlertId = AlertId,
+                    PersonId = personId,
+                    AlertTypeId = alertTypeId!.Value,
+                    Details = details,
+                    ExternalLink = externalLink,
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    CreatedOn = createdUtc!.Value,
+                    UpdatedOn = createdUtc!.Value
+                };
+
+                dbContext.Alerts.Add(alert);
+
+                var createdEvent = new AlertCreatedEvent()
+                {
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = createdUtc!.Value,
+                    RaisedBy = createdByUser,
+                    Alert = TeachingRecordSystem.Core.Events.Models.Alert.FromModel(alert),
+                    PersonId = personId
+                };
+
+                dbContext.AddEvent(createdEvent);
+
+                await dbContext.SaveChangesAsync();
+
+                return alert;
+            });
         }
     }
 
@@ -836,9 +963,11 @@ public partial class TestData
         public required IReadOnlyCollection<MandatoryQualification> MandatoryQualifications { get; init; }
         public required IReadOnlyCollection<Induction> Inductions { get; init; }
         public required IReadOnlyCollection<InductionPeriod> InductionPeriods { get; init; }
+        public required IReadOnlyCollection<Alert> Alerts { get; init; }
     }
 
     public record Induction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? StartDate, DateOnly? CompletetionDate);
+
     public record InductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId);
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);

@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -257,6 +256,10 @@ public partial class TestData
     }
 
     public string GenerateNationalInsuranceNumber() => Faker.Identification.UkNationalInsuranceNumber();
+
+    public string GenerateLoremIpsum() => Faker.Lorem.Paragraph();
+
+    public string GenerateUrl() => Faker.Internet.Url();
 
     protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {
