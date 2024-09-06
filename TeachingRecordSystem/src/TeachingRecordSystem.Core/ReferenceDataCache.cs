@@ -1,10 +1,15 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
-namespace TeachingRecordSystem.Core.Dqt;
+namespace TeachingRecordSystem.Core;
 
-public class ReferenceDataCache : IStartupTask
+public class ReferenceDataCache(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    IDbContextFactory<TrsDbContext> dbContextFactory) : IStartupTask
 {
-    private readonly ICrmQueryDispatcher _crmQueryDispatcher;
+    // CRM
     private Task<dfeta_mqestablishment[]>? _mqEstablishmentsTask;
     private Task<dfeta_sanctioncode[]>? _getSanctionCodesTask;
     private Task<Subject[]>? _getSubjectsTask;
@@ -14,10 +19,9 @@ public class ReferenceDataCache : IStartupTask
     private Task<dfeta_hequalification[]>? _getHeQualificationsTask;
     private Task<dfeta_hesubject[]>? _getHeSubjectsTask;
 
-    public ReferenceDataCache(ICrmQueryDispatcher crmQueryDispatcher)
-    {
-        _crmQueryDispatcher = crmQueryDispatcher;
-    }
+    // TRS
+    private Task<AlertCategory[]>? _alertCategoriesTask;
+    private Task<AlertType[]>? _alertTypesTask;
 
     public async Task<dfeta_sanctioncode> GetSanctionCodeByValue(string value)
     {
@@ -144,48 +148,91 @@ public class ReferenceDataCache : IStartupTask
         return heSubjects.First(s => s.dfeta_Value == value, $"Could not find HE subject with value: '{value}'.");
     }
 
+    public async Task<AlertCategory[]> GetAlertCategories()
+    {
+        var alertCategories = await EnsureAlertCategories();
+        return alertCategories;
+    }
+
+    public async Task<AlertCategory> GetAlertCategoryById(Guid alertCategoryId)
+    {
+        var alertCategories = await EnsureAlertCategories();
+        return alertCategories.Single(ac => ac.AlertCategoryId == alertCategoryId, $"Could not find alert category with ID: '{alertCategoryId}'.");
+    }
+
+    public async Task<AlertType> GetAlertTypeById(Guid alertTypeId)
+    {
+        var alertTypes = await EnsureAlertTypes();
+        return alertTypes.Single(at => at.AlertTypeId == alertTypeId, $"Could not find alert type with ID: '{alertTypeId}'.");
+    }
+
+    public async Task<AlertType[]> GetAlertTypes()
+    {
+        var alertTypes = await EnsureAlertTypes();
+        return alertTypes;
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllActiveSanctionCodesQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllActiveSanctionCodesQuery()));
 
     private Task<Subject[]> EnsureSubjects() =>
         LazyInitializer.EnsureInitialized(
             ref _getSubjectsTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllSubjectsQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllSubjectsQuery()));
 
     private Task<dfeta_teacherstatus[]> EnsureTeacherStatuses() =>
         LazyInitializer.EnsureInitialized(
             ref _getTeacherStatusesTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllTeacherStatusesQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllTeacherStatusesQuery()));
 
     private Task<dfeta_earlyyearsstatus[]> EnsureEarlyYearsStatuses() =>
         LazyInitializer.EnsureInitialized(
             ref _getEarlyYearsStatusesTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllActiveEarlyYearsStatusesQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllActiveEarlyYearsStatusesQuery()));
 
     private Task<dfeta_specialism[]> EnsureSpecialisms() =>
         LazyInitializer.EnsureInitialized(
             ref _getSpecialismsTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllSpecialismsQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllSpecialismsQuery()));
 
     private Task<dfeta_mqestablishment[]> EnsureMqEstablishments() =>
         LazyInitializer.EnsureInitialized(
             ref _mqEstablishmentsTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllMqEstablishmentsQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllMqEstablishmentsQuery()));
 
     private Task<dfeta_hequalification[]> EnsureHeQualifications() =>
         LazyInitializer.EnsureInitialized(
             ref _getHeQualificationsTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllActiveHeQualificationsQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllActiveHeQualificationsQuery()));
 
     private Task<dfeta_hesubject[]> EnsureHeSubjects() =>
         LazyInitializer.EnsureInitialized(
             ref _getHeSubjectsTask,
-            () => _crmQueryDispatcher.ExecuteQuery(new GetAllActiveHeSubjectsQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllActiveHeSubjectsQuery()));
+
+    private Task<AlertCategory[]> EnsureAlertCategories() =>
+        LazyInitializer.EnsureInitialized(
+            ref _alertCategoriesTask,
+            () =>
+            {
+                using var dbContext = dbContextFactory.CreateDbContext();
+                return dbContext.AlertCategories.ToArrayAsync();
+            });
+
+    private Task<AlertType[]> EnsureAlertTypes() =>
+        LazyInitializer.EnsureInitialized(
+            ref _alertTypesTask,
+            () =>
+            {
+                using var dbContext = dbContextFactory.CreateDbContext();
+                return dbContext.AlertTypes.ToArrayAsync();
+            });
 
     async Task IStartupTask.Execute()
     {
+        // CRM
         await EnsureSanctionCodes();
         await EnsureSubjects();
         await EnsureTeacherStatuses();
@@ -194,5 +241,9 @@ public class ReferenceDataCache : IStartupTask
         await EnsureMqEstablishments();
         await EnsureHeQualifications();
         await EnsureHeSubjects();
+
+        // TRS
+        await EnsureAlertCategories();
+        await EnsureAlertTypes();
     }
 }

@@ -1,7 +1,6 @@
 using System.Text;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Establishments.Tps;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.WorkforceData;

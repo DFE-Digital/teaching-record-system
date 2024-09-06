@@ -3,7 +3,6 @@ using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Parquet.Serialization;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 using TeachingRecordSystem.Core.Services.WorkforceData.Google;

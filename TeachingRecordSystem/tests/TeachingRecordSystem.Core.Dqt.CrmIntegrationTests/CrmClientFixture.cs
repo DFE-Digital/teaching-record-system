@@ -33,8 +33,8 @@ public sealed class CrmClientFixture : IDisposable
         _memoryCache = memoryCache;
         _trnGenerationApiClient = GetTrnGenerationApiClient();
         _referenceDataCache = new ReferenceDataCache(
-            new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, referenceDataCache: null),
-            serviceClientName: null));
+            new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, referenceDataCache: null), serviceClientName: null),
+            dbFixture.GetDbContextFactory());
     }
 
     public IClock Clock { get; }

@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
