@@ -14,7 +14,7 @@ public class CreateNameChangeTests : TestBase
         SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
     }
 
-    [Theory, RoleNamesData(except: [ApiRoles.GetPerson, ApiRoles.UpdatePerson])]
+    [Theory, RoleNamesData(except: [ApiRoles.UpdatePerson])]
     public async Task PostNameChanges_ClientDoesNotHavePermission_ReturnsForbidden(string[] roles)
     {
         // Arrange
