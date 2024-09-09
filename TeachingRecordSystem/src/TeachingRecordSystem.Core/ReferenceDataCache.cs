@@ -160,16 +160,16 @@ public class ReferenceDataCache(
         return alertCategories.Single(ac => ac.AlertCategoryId == alertCategoryId, $"Could not find alert category with ID: '{alertCategoryId}'.");
     }
 
+    public async Task<AlertType[]> GetAlertTypes(bool activeOnly = false)
+    {
+        var alertTypes = await EnsureAlertTypes();
+        return alertTypes.Where(t => !activeOnly || t.IsActive).ToArray();
+    }
+
     public async Task<AlertType> GetAlertTypeById(Guid alertTypeId)
     {
         var alertTypes = await EnsureAlertTypes();
         return alertTypes.Single(at => at.AlertTypeId == alertTypeId, $"Could not find alert type with ID: '{alertTypeId}'.");
-    }
-
-    public async Task<AlertType[]> GetAlertTypes()
-    {
-        var alertTypes = await EnsureAlertTypes();
-        return alertTypes;
     }
 
     public async Task<AlertType> GetAlertTypeByDqtSanctionCode(string dqtSanctionCode)
@@ -230,7 +230,7 @@ public class ReferenceDataCache(
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
-                return await dbContext.AlertCategories.ToArrayAsync();
+                return await dbContext.AlertCategories.Include(c => c.AlertTypes).ToArrayAsync();
             });
 
     private Task<AlertType[]> EnsureAlertTypes() =>

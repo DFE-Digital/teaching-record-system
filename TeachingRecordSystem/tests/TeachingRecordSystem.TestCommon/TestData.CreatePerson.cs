@@ -630,6 +630,7 @@ public partial class TestData
         private Option<string?> _externalLink;
         private Option<DateOnly?> _startDate;
         private Option<DateOnly?> _endDate;
+        private Option<string?> _reason;
         private Option<EventModels.RaisedByUserInfo> _createdByUser;
         private Option<DateTime?> _createdUtc;
 
@@ -675,6 +676,12 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonAlertBuilder WithCreatedReason(string? reason)
+        {
+            _reason = Option.Some(reason);
+            return this;
+        }
+
         public CreatePersonAlertBuilder WithCreatedUtc(DateTime? createdUtc)
         {
             _createdUtc = Option.Some(createdUtc);
@@ -701,6 +708,7 @@ public partial class TestData
             var externalLink = _externalLink.ValueOr(testData.GenerateUrl());
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
             var endDate = _endDate.ValueOr((DateOnly?)null);
+            var reason = _reason.ValueOr(testData.GenerateLoremIpsum());
             var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
@@ -727,7 +735,9 @@ public partial class TestData
                     CreatedUtc = createdUtc!.Value,
                     RaisedBy = createdByUser,
                     Alert = TeachingRecordSystem.Core.Events.Models.Alert.FromModel(alert),
-                    PersonId = personId
+                    PersonId = personId,
+                    Reason = reason,
+                    EvidenceFile = null
                 };
 
                 dbContext.AddEvent(createdEvent);

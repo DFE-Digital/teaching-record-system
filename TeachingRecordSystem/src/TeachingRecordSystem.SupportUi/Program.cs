@@ -99,6 +99,14 @@ builder.Services
             });
 
         options.Conventions.AddFolderApplicationModelConvention(
+            "/Alerts/AddAlert",
+            model =>
+            {
+                model.Filters.Add(new RequireFeatureEnabledFilterFactory("Alerts"));
+                model.Filters.Add(new CheckPersonExistsFilterFactory());
+            });
+
+        options.Conventions.AddFolderApplicationModelConvention(
             "/Mqs/AddMq",
             model =>
             {
@@ -208,6 +216,12 @@ builder.Services
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditDateOfBirth,
             typeof(TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDateOfBirth.EditDateOfBirthState),
+            requestDataKeys: ["personId"],
+            appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.AddAlert,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.AddAlertState),
             requestDataKeys: ["personId"],
             appendUniqueKey: true));
 
