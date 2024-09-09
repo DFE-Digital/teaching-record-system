@@ -215,19 +215,19 @@ public class ReferenceDataCache(
     private Task<AlertCategory[]> EnsureAlertCategories() =>
         LazyInitializer.EnsureInitialized(
             ref _alertCategoriesTask,
-            () =>
+            async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
-                return dbContext.AlertCategories.ToArrayAsync();
+                return await dbContext.AlertCategories.ToArrayAsync();
             });
 
     private Task<AlertType[]> EnsureAlertTypes() =>
         LazyInitializer.EnsureInitialized(
             ref _alertTypesTask,
-            () =>
+            async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
-                return dbContext.AlertTypes.ToArrayAsync();
+                return await dbContext.AlertTypes.ToArrayAsync();
             });
 
     async Task IStartupTask.Execute()
