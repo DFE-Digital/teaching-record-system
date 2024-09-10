@@ -137,6 +137,7 @@ builder.Services.AddOpenIddict()
     });
 
 builder.Services.AddDfeAnalytics()
+    .UseFederatedAksBigQueryClientProvider()
     .AddAspNetCoreIntegration(options =>
     {
         options.UserIdClaimType = ClaimTypes.Subject;
