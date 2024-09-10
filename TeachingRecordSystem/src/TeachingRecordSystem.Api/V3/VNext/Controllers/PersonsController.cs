@@ -101,4 +101,21 @@ public class PersonsController(IMapper mapper) : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpPut("deceased/{trn}")]
+    [SwaggerOperation(
+        OperationId = "SetDeceased",
+        Summary = "Mark person as deceased",
+        Description = "Marks a person as deceased.")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = $"{ApiRoles.UpdatePerson}")]
+    public async Task<IActionResult> Deceased(
+        [FromRoute] string trn,
+        [FromBody] SetDeceasedRequest request,
+        [FromServices] SetDeceasedHandler handler)
+    {
+        var command = new SetDeceasedCommand(trn, request.DateOfDeath);
+        await handler.Handle(command);
+        return NoContent();
+    }
 }

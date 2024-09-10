@@ -2290,6 +2290,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
 			public const string dfeta_AllowIDSignInWithProhibitions = "dfeta_allowidsigninwithprohibitions";
 			public const string dfeta_AllowPiiUpdatesFromRegister = "dfeta_allowpiiupdatesfromregister";
+			public const string dfeta_DateofDeath = "dfeta_dateofdeath";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_HUSID = "dfeta_husid";
 			public const string dfeta_InductionStatus = "dfeta_inductionstatus";
@@ -2666,6 +2667,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_AllowPiiUpdatesFromRegister");
 				this.SetAttributeValue("dfeta_allowpiiupdatesfromregister", value);
 				this.OnPropertyChanged("dfeta_AllowPiiUpdatesFromRegister");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_dateofdeath")]
+		public System.Nullable<System.DateTime> dfeta_DateofDeath
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_dateofdeath");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_DateofDeath");
+				this.SetAttributeValue("dfeta_dateofdeath", value);
+				this.OnPropertyChanged("dfeta_DateofDeath");
 			}
 		}
 		
