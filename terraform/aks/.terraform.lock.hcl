@@ -29,6 +29,7 @@ provider "registry.terraform.io/hashicorp/azurerm" {
   version     = "3.116.0"
   constraints = "3.116.0"
   hashes = [
+    "h1:2QbjtN4oMXzdA++Nvrj/wSmWZTPgXKOSFGGQCLEMrb4=",
     "h1:BCR3NIorFSvGG3v/+JOiiw3VM4PkChLO4m84wzD9NDo=",
     "zh:02b6606aff025fc2a962b3e568e000300abe959adac987183c24dac8eb057f4d",
     "zh:2a23a8ce24ff9e885925ffee0c3ea7eadba7a702541d05869275778aa47bdea7",
@@ -50,6 +51,7 @@ provider "registry.terraform.io/hashicorp/kubernetes" {
   constraints = "2.32.0"
   hashes = [
     "h1:3j4XBR5UWQA7xXaiEnzZp0bHbcwOhWetHYKTWIrUTI0=",
+    "h1:Cj3RHyw3wE3AkNlCtSNrZfjFNkShvaZR0K/K3pJlYJU=",
     "zh:0e715d7fb13a8ad569a5fdc937b488590633f6942e986196fdb17cd7b8f7720e",
     "zh:495fc23acfe508ed981e60af9a3758218b0967993065e10a297fdbc210874974",
     "zh:4b930a8619910ef528bc90dae739cb4236b9b76ce41367281e3bc3cf586101c7",
@@ -91,6 +93,7 @@ provider "registry.terraform.io/statuscakedev/statuscake" {
   constraints = "2.2.2"
   hashes = [
     "h1:nVaJkDBk4sv0yWFzg3p+yeJGzE8mB4KJv3Q6/UgU164=",
+    "h1:wFoZJfmNvG6XTf65NLai67geSHqYV1Tilx7OITrHilE=",
     "zh:0916313344c579d6e05d70f88129a10fe48f7dabe0e61cad17874d6c496f288d",
     "zh:0d491ff72c2eda6482855033ca2146c5ace1663d07cb3da7253b59ed2e2ec6f4",
     "zh:11fffbce18eb3d3c283e877242f477e0c561342c19090240b60af7d948bd84ac",
