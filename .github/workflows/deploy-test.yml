@@ -7,6 +7,12 @@ on:
         type: string
         required: true
 
+  workflow_dispatch:
+    inputs:
+      docker_image:
+        required: true
+        type: string
+
 concurrency: deploy_test
 jobs:
   deploy_aks:
@@ -25,4 +31,3 @@ jobs:
         environment_name: test
         docker_image: ${{ inputs.docker_image }}
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-
