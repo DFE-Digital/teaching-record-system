@@ -92,13 +92,14 @@ module "api_application" {
   kubernetes_config_map_name = module.api_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.api_application_configuration.kubernetes_secret_name
 
-  docker_image = var.docker_image
-  command      = ["/bin/ash", "-c", "cd /Apps/Api/; dotnet TeachingRecordSystem.Api.dll;"]
-  web_port     = 3000
-  probe_path   = "/health"
-  replicas     = var.api_replicas
-  max_memory   = var.api_max_memory
-  enable_logit = var.enable_logit
+  docker_image   = var.docker_image
+  command        = ["/bin/ash", "-c", "cd /Apps/Api/; dotnet TeachingRecordSystem.Api.dll;"]
+  web_port       = 3000
+  probe_path     = "/health"
+  replicas       = var.api_replicas
+  max_memory     = var.api_max_memory
+  enable_logit   = var.enable_logit
+  enable_gcp_wif = true
 }
 
 module "authz_application_configuration" {
@@ -144,13 +145,14 @@ module "authz_application" {
   kubernetes_config_map_name = module.authz_application_configuration.kubernetes_config_map_name
   kubernetes_secret_name     = module.authz_application_configuration.kubernetes_secret_name
 
-  docker_image = var.docker_image
-  command      = ["/bin/ash", "-c", "cd /Apps/AuthorizeAccess/; dotnet TeachingRecordSystem.AuthorizeAccess.dll;"]
-  web_port     = 3000
-  probe_path   = "/health"
-  replicas     = var.authz_replicas
-  max_memory   = var.authz_max_memory
-  enable_logit = var.enable_logit
+  docker_image   = var.docker_image
+  command        = ["/bin/ash", "-c", "cd /Apps/AuthorizeAccess/; dotnet TeachingRecordSystem.AuthorizeAccess.dll;"]
+  web_port       = 3000
+  probe_path     = "/health"
+  replicas       = var.authz_replicas
+  max_memory     = var.authz_max_memory
+  enable_logit   = var.enable_logit
+  enable_gcp_wif = true
 }
 
 module "ui_application_configuration" {
@@ -202,6 +204,7 @@ module "ui_application" {
   replicas                     = var.ui_replicas
   enable_logit                 = var.enable_logit
   enable_prometheus_monitoring = var.enable_prometheus_monitoring
+  enable_gcp_wif               = true
 }
 
 module "worker_application_configuration" {
@@ -253,4 +256,5 @@ module "worker_application" {
   max_memory                   = var.worker_max_memory
   enable_logit                 = var.enable_logit
   enable_prometheus_monitoring = var.enable_prometheus_monitoring
+  enable_gcp_wif               = true
 }
