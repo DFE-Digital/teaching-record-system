@@ -69,6 +69,7 @@ module "api_application_configuration" {
     ApplicationInsights__ConnectionString = azurerm_application_insights.app.connection_string
     ConnectionStrings__DefaultConnection  = module.postgres.dotnet_connection_string
     ConnectionStrings__Redis              = module.redis.connection_string
+    DATABASE_URL                          = module.postgres.url
     StorageConnectionString               = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
     Sentry__Dsn                           = module.infrastructure_secrets.map.SENTRY-DSN
     SharedConfig                          = module.infrastructure_secrets.map.SharedConfig
@@ -121,6 +122,7 @@ module "authz_application_configuration" {
     ApplicationInsights__ConnectionString = azurerm_application_insights.app.connection_string
     ConnectionStrings__DefaultConnection  = module.postgres.dotnet_connection_string
     ConnectionStrings__Redis              = "${module.redis.connection_string},defaultDatabase=1"
+    DATABASE_URL                          = module.postgres.url
     Sentry__Dsn                           = module.infrastructure_secrets.map.SENTRY-DSN
     SharedConfig                          = module.infrastructure_secrets.map.SharedConfig
     StorageConnectionString               = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
@@ -172,6 +174,7 @@ module "ui_application_configuration" {
     ApplicationInsights__ConnectionString = azurerm_application_insights.app.connection_string
     ConnectionStrings__DefaultConnection  = module.postgres.dotnet_connection_string
     ConnectionStrings__Redis              = "${module.redis.connection_string},defaultDatabase=1"
+    DATABASE_URL                          = module.postgres.url
     Sentry__Dsn                           = module.infrastructure_secrets.map.SENTRY-DSN
     SharedConfig                          = module.infrastructure_secrets.map.SharedConfig
     StorageConnectionString               = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
@@ -224,6 +227,7 @@ module "worker_application_configuration" {
     ApplicationInsights__ConnectionString     = azurerm_application_insights.app.connection_string
     ConnectionStrings__DefaultConnection      = module.postgres.dotnet_connection_string
     DqtReporting__ReportingDbConnectionString = local.reporting_db_connection_string
+    DATABASE_URL                              = module.postgres.url
     Sentry__Dsn                               = module.infrastructure_secrets.map.SENTRY-DSN
     StorageConnectionString                   = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
     SharedConfig                              = module.infrastructure_secrets.map.SharedConfig
