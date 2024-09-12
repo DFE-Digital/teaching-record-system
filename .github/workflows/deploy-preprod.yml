@@ -6,7 +6,11 @@ on:
       docker_image:
         type: string
         required: true
+
   workflow_dispatch:
+    inputs:
+      docker_image:
+        type: string
 
 concurrency: deploy_preprod
 jobs:

@@ -7,6 +7,12 @@ on:
         type: string
         required: true
 
+  workflow_dispatch:
+    inputs:
+      docker_image:
+        required: true
+        type: string
+
 concurrency: deploy_prod
 jobs:
   deploy_aks:
