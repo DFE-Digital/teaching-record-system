@@ -166,13 +166,17 @@ public class Program
             {
                 cfg.AddMaps(typeof(Program).Assembly);
                 cfg.CreateMap(typeof(Option<>), typeof(Option<>)).ConvertUsing(typeof(OptionMapper<,>));
-            })
-            .AddTransient(typeof(OptionMapper<,>));
+            });
 
         services.Scan(scan =>
         {
             scan.FromAssemblyOf<Program>()
                 .AddClasses(filter => filter.InNamespaces("TeachingRecordSystem.Api.V3.Core.Operations").Where(type => type.Name.EndsWith("Handler")))
+                    .AsSelf()
+                    .WithTransientLifetime();
+
+            scan.FromAssemblyOf<Program>()
+                .AddClasses(filter => filter.AssignableTo(typeof(ITypeConverter<,>)))
                     .AsSelf()
                     .WithTransientLifetime();
         });

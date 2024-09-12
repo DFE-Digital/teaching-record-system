@@ -3,14 +3,13 @@ using Microsoft.Xrm.Sdk.Query;
 using Optional;
 using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
-public record GetPersonCommand(string Trn, GetPersonCommandIncludes Include, DateOnly? DateOfBirth);
+public record GetPersonCommand(string Trn, GetPersonCommandIncludes Include, DateOnly? DateOfBirth, bool ApplyLegacyAlertsBehavior);
 
 [Flags]
 public enum GetPersonCommandIncludes
@@ -47,7 +46,7 @@ public record GetPersonResult
     public required Option<IReadOnlyCollection<GetPersonResultMandatoryQualification>> MandatoryQualifications { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultHigherEducationQualification>> HigherEducationQualifications { get; init; }
     public required Option<IReadOnlyCollection<SanctionInfo>> Sanctions { get; init; }
-    public required Option<IReadOnlyCollection<AlertInfo>> Alerts { get; init; }
+    public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
     public required Option<IReadOnlyCollection<NameInfo>> PreviousNames { get; init; }
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
 }
@@ -392,7 +391,7 @@ public class GetPersonHandler(
                 default,
             Sanctions = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) ?
                 Option.Some((await getSanctionsTask!)
-                    .Where(s => Constants.ExposableSanctionCodes.Contains(s.SanctionCode))
+                    .Where(s => Constants.LegacyExposableSanctionCodes.Contains(s.SanctionCode))
                     .Where(s => s.Sanction.dfeta_EndDate is null && s.Sanction.dfeta_Spent != true)
                     .Select(s => new SanctionInfo()
                     {
@@ -402,16 +401,34 @@ public class GetPersonHandler(
                     .AsReadOnly()) :
                 default,
             Alerts = command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
-                Option.Some((await getSanctionsTask!)
-                    .Where(s => Constants.ProhibitionSanctionCodes.Contains(s.SanctionCode))
-                    .Select(s => new AlertInfo()
+                Option.Some(await (await getSanctionsTask!)
+                    .ToAsyncEnumerable()
+                    // The Legacy behavior is to only return prohibition-type alerts
+                    .Where(s => !command.ApplyLegacyAlertsBehavior || Constants.LegacyProhibitionSanctionCodes.Contains(s.SanctionCode))
+                    .SelectAwait(async s =>
                     {
-                        AlertType = SharedModels.AlertType.Prohibition,
-                        DqtSanctionCode = s.SanctionCode,
-                        StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                        EndDate = s.Sanction.dfeta_EndDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                        var alertType = await referenceDataCache.GetAlertTypeByDqtSanctionCode(s.SanctionCode);
+                        var alertCategory = await referenceDataCache.GetAlertCategoryById(alertType.AlertCategoryId);
+
+                        return new Alert()
+                        {
+                            AlertId = s.Sanction.Id,
+                            AlertType = new()
+                            {
+                                AlertTypeId = alertType.AlertTypeId,
+                                AlertCategory = new()
+                                {
+                                    AlertCategoryId = alertCategory.AlertCategoryId,
+                                    Name = alertCategory.Name
+                                },
+                                Name = alertType.Name,
+                                DqtSanctionCode = alertType.DqtSanctionCode!
+                            },
+                            StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            EndDate = s.Sanction.dfeta_EndDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                        };
                     })
-                    .AsReadOnly()) :
+                    .AsReadOnlyAsync()) :
                 default,
             PreviousNames = command.Include.HasFlag(GetPersonCommandIncludes.PreviousNames) ?
                 Option.Some(previousNames.Select(n => n).AsReadOnly()) :
@@ -576,7 +593,7 @@ public class GetPersonHandler(
             _ => throw new ArgumentException($"Unrecognized qualification type: '{qualificationType}'.", nameof(qualificationType))
         };
 
-    private static IReadOnlyCollection<GetPersonResultMandatoryQualification> MapMandatoryQualifications(MandatoryQualification[] qualifications) =>
+    private static IReadOnlyCollection<GetPersonResultMandatoryQualification> MapMandatoryQualifications(PostgresModels.MandatoryQualification[] qualifications) =>
         qualifications
             .Where(q => q.EndDate.HasValue && q.Specialism.HasValue)
             .Select(mq => new GetPersonResultMandatoryQualification()

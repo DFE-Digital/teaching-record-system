@@ -1,33 +1,45 @@
 namespace TeachingRecordSystem.Api.Tests.V3.VNext;
 
-public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
+[Collection(nameof(DisableParallelization))]
+public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 {
+    public FindPersonsByTrnAndDateOfBirthTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        XrmFakedContext.DeleteAllEntities<Contact>();
+        SetCurrentApiClient([ApiRoles.GetPerson]);
+    }
+
     [Fact]
-    public async Task Get_ValidRequestWithAlerts_ReturnsExpectedAlertsContent()
+    public async Task Get_ValidRequestWithMatchOnPersonWithAlerts_ReturnsExpectedAlertsContent()
     {
         // Arrange
+        var findBy = "LastNameAndDateOfBirth";
+        var lastName = "Smith";
+        var dateOfBirth = new DateOnly(1990, 1, 1);
+
         var sanctionCode = "G1";
         var startDate = new DateOnly(2022, 4, 1);
         var endDate = new DateOnly(2023, 1, 20);
         var alertType = await ReferenceDataCache.GetAlertTypeByDqtSanctionCode(sanctionCode);
         var alertCategory = await ReferenceDataCache.GetAlertCategoryById(alertType.AlertCategoryId);
 
-        var person = await TestData.CreatePerson(x => x
-            .WithTrn()
+        var person = await TestData.CreatePerson(b => b
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
             .WithSanction(sanctionCode, startDate, endDate));
 
         var sanction = person.Sanctions.Single();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/person?include=Alerts");
-
-        var httpClient = GetHttpClientWithIdentityAccessToken(person.Trn!);
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/v3/persons?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
 
         // Act
-        var response = await httpClient.SendAsync(request);
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
         var jsonResponse = await AssertEx.JsonResponse(response);
-        var responseAlerts = jsonResponse.RootElement.GetProperty("alerts");
+        var responseAlerts = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("alerts");
 
         AssertEx.JsonObjectEquals(
             new[]
@@ -46,7 +58,7 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
                         }
                     },
                     startDate = startDate,
-                    endDate = endDate
+                    endDate = endDate,
                 }
             },
             responseAlerts);

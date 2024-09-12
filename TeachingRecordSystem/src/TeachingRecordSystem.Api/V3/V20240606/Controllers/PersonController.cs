@@ -28,11 +28,12 @@ public class PersonController(IMapper mapper) : ControllerBase
         var command = new GetPersonCommand(
             Trn: User.FindFirstValue("trn")!,
             include is not null ? (GetPersonCommandIncludes)include : GetPersonCommandIncludes.None,
-            DateOfBirth: null);
+            DateOfBirth: null,
+            ApplyLegacyAlertsBehavior: true);
 
         var result = await handler.Handle(command);
         var response = mapper.Map<GetPersonResponse?>(result);
-        return response is null ? Forbid() : Ok(result);
+        return response is null ? Forbid() : Ok(response);
     }
 
     [HttpPost("name-changes")]

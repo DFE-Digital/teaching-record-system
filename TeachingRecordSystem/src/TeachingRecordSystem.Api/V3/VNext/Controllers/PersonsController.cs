@@ -82,7 +82,8 @@ public class PersonsController(IMapper mapper) : ControllerBase
         var command = new GetPersonCommand(
             trn,
             (GetPersonCommandIncludes)include,
-            dateOfBirth);
+            dateOfBirth,
+            ApplyLegacyAlertsBehavior: false);
 
         var result = await handler.Handle(command);
 
@@ -92,6 +93,49 @@ public class PersonsController(IMapper mapper) : ControllerBase
         }
 
         var response = mapper.Map<GetPersonResponse>(result);
+        return Ok(response);
+    }
+
+    [HttpPost("find")]
+    [SwaggerOperation(
+        OperationId = "FindPersons",
+        Summary = "Find persons",
+        Description = "Finds persons matching the specified criteria.")]
+    [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
+    public async Task<IActionResult> FindPersons(
+        [FromBody] FindPersonsRequest request,
+        [FromServices] FindPersonsByTrnAndDateOfBirthHandler handler)
+    {
+        var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
+        var result = await handler.Handle(command);
+        var response = mapper.Map<FindPersonsResponse>(result);
+        return Ok(response);
+    }
+
+    [HttpGet("")]
+    [SwaggerOperation(
+        OperationId = "FindPerson",
+        Summary = "Find person",
+        Description = "Finds a person matching the specified criteria.")]
+    [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
+    public async Task<IActionResult> FindPersons(
+        FindPersonRequest request,
+        [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
+    {
+        var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
+        var result = await handler.Handle(command);
+
+        var response = new FindPersonResponse()
+        {
+            Total = result.Total,
+            Query = request,
+            Results = result.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
+        };
+
         return Ok(response);
     }
 }

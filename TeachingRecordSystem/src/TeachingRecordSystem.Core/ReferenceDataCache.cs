@@ -172,6 +172,12 @@ public class ReferenceDataCache(
         return alertTypes;
     }
 
+    public async Task<AlertType> GetAlertTypeByDqtSanctionCode(string dqtSanctionCode)
+    {
+        var alertTypes = await EnsureAlertTypes();
+        return alertTypes.Single(at => at.DqtSanctionCode == dqtSanctionCode, $"Could not find alert type with DQT sanction code: '{dqtSanctionCode}'.");
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,

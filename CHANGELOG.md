@@ -1,5 +1,14 @@
 # API Changelog
 
+## Unreleased
+
+All references to `sanctions` have been removed and replaced with `alerts`; the following endpoints are affected:
+- `GET /v3/persons/<trn>`
+- `GET /v3/person`
+- `GET /v3/persons`
+- `GET /v3/persons/find`
+
+
 ## 20240814
 
 ### `POST /v3/persons/find`
@@ -9,6 +18,7 @@ New endpoint added for bulk person lookup by TRN and date of birth.
 ### `GET /v3/persons?findBy=LastNameAndDateOfBirth&lastName={lastName}&dateOfBirth={dateOfBirth}`
 
 `inductionStatus`, `qts` and `eyts` members have been added to align with the bulk `POST` endpoint.
+
 
 ## 20240606
 
@@ -26,6 +36,7 @@ The `person` property has been removed from the response.
 ### `GET /v3/trn-requests`
 
 The `person` property has been removed from the response.
+
 
 ## 20240416
 

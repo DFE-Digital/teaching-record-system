@@ -19,6 +19,7 @@ public record FindPersonByLastNameAndDateOfBirthResultItem
     public required string MiddleName { get; init; }
     public required string LastName { get; init; }
     public required IReadOnlyCollection<SanctionInfo> Sanctions { get; init; }
+    public required IReadOnlyCollection<Alert> Alerts { get; init; }
     public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
     public required InductionStatusInfo? InductionStatus { get; init; }
     public required QtsInfo? Qts { get; init; }
@@ -53,7 +54,7 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
             new GetSanctionsByContactIdsQuery(
                 contactsById.Keys,
                 ActiveOnly: true,
-                new()));
+                new(dfeta_sanction.Fields.dfeta_StartDate, dfeta_sanction.Fields.dfeta_EndDate)));
 
         var getPreviousNamesTask = crmQueryDispatcher.ExecuteQuery(new GetPreviousNamesByContactIdsQuery(contactsById.Keys));
 
@@ -86,13 +87,39 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
                     MiddleName = r.ResolveMiddleName(),
                     LastName = r.ResolveLastName(),
                     Sanctions = sanctions[r.Id]
-                        .Where(s => Constants.ExposableSanctionCodes.Contains(s.SanctionCode))
+                        .Where(s => Constants.LegacyExposableSanctionCodes.Contains(s.SanctionCode))
                         .Select(s => new SanctionInfo()
                         {
                             Code = s.SanctionCode,
                             StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
                         })
                         .AsReadOnly(),
+                    Alerts = await sanctions[r.Id]
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async s =>
+                        {
+                            var alertType = await referenceDataCache.GetAlertTypeByDqtSanctionCode(s.SanctionCode);
+                            var alertCategory = await referenceDataCache.GetAlertCategoryById(alertType.AlertCategoryId);
+
+                            return new Alert()
+                            {
+                                AlertId = s.Sanction.Id,
+                                AlertType = new()
+                                {
+                                    AlertTypeId = alertType.AlertTypeId,
+                                    AlertCategory = new()
+                                    {
+                                        AlertCategoryId = alertCategory.AlertCategoryId,
+                                        Name = alertCategory.Name
+                                    },
+                                    Name = alertType.Name,
+                                    DqtSanctionCode = alertType.DqtSanctionCode!
+                                },
+                                StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                                EndDate = s.Sanction.dfeta_EndDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                            };
+                        })
+                        .AsReadOnlyAsync(),
                     PreviousNames = previousNameHelper.GetFullPreviousNames(previousNames[r.Id], contactsById[r.Id])
                         .Select(name => new NameInfo()
                         {

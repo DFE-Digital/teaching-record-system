@@ -196,7 +196,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
         var sanctionCode = "A17";
-        Debug.Assert(!Api.V3.Constants.ExposableSanctionCodes.Contains(sanctionCode));
+        Debug.Assert(!Api.V3.Constants.LegacyExposableSanctionCodes.Contains(sanctionCode));
         var person = await TestData.CreatePerson(b => b
             .WithDateOfBirth(dateOfBirth)
             .WithSanction(sanctionCode));
