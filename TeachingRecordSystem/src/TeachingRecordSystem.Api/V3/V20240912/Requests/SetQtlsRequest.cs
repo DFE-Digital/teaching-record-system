@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.V3.VNext.Requests;
+namespace TeachingRecordSystem.Api.V3.V20240912.Requests;
 
 public record SetQtlsRequest
 {

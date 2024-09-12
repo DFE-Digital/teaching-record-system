@@ -9,6 +9,13 @@ All references to `sanctions` have been removed and replaced with `alerts`; the 
 - `GET /v3/persons/find`
 
 
+## 20240912
+
+Endpoints have been added for setting and retrieving QTS via QTLS date.
+- `GET /v3/persons/<trn>/qtls`
+- `PUT /v3/persons/<trn>/qtls`
+
+
 ## 20240814
 
 ### `POST /v3/persons/find`

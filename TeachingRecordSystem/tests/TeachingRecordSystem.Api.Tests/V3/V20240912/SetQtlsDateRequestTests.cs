@@ -1,8 +1,8 @@
 using System.Net;
-using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.V20240912.Requests;
 using TeachingRecordSystem.Core.Dqt;
 
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240912;
 
 [Collection(nameof(DisableParallelization))]
 public class SetQtlsDateRequestTests : TestBase

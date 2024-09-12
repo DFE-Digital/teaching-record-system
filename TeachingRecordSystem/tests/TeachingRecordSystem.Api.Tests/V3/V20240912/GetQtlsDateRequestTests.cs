@@ -1,13 +1,13 @@
 using System.Net;
 
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240912;
 
 public class GetQtlsDateRequestTests : TestBase
 {
     public GetQtlsDateRequestTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        SetCurrentApiClient(new[] { ApiRoles.AssignQtls });
+        SetCurrentApiClient([ApiRoles.AssignQtls]);
     }
 
     [Theory, RoleNamesData(except: ApiRoles.AssignQtls)]
