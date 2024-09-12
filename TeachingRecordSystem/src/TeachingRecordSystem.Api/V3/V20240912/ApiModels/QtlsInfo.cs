@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.V3.VNext.ApiModels;
+namespace TeachingRecordSystem.Api.V3.V20240912.ApiModels;
 
 [AutoMap(typeof(Core.SharedModels.QtlsInfo))]
 public record QtlsInfo
