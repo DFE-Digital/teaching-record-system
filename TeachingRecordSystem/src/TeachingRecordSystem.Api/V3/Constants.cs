@@ -4,7 +4,6 @@ public static class Constants
 {
     public static IReadOnlyCollection<string> LegacyExposableSanctionCodes { get; } = new[]
     {
-        "G1",
         "A18",
         "A7",
         "A3",

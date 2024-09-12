@@ -412,7 +412,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
         var sanctions = new (string SanctionCode, DateOnly? StartDate)[]
         {
             new("A18", null),
-            new("G1", new DateOnly(2022, 4, 1)),
+            new("A21B", new DateOnly(2022, 4, 1)),
         };
         Debug.Assert(sanctions.Select(s => s.SanctionCode).All(Api.V3.Constants.LegacyExposableSanctionCodes.Contains));
 

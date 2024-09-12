@@ -88,7 +88,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var person1 = await TestData.CreatePerson(b => b
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithSanction("G1")
+            .WithSanction("A21B")
             .WithInduction(dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionStartDate: new(2022, 1, 1), completedDate: new DateOnly(2023, 1, 1))
             .WithQts(qtsDate: new(2021, 7, 1))
             .WithEyts(eytsDate: new(2021, 8, 1), eytsStatusValue: "222"));
@@ -96,7 +96,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var person2 = await TestData.CreatePerson(b => b
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithSanction("G1"));
+            .WithSanction("A21B"));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
