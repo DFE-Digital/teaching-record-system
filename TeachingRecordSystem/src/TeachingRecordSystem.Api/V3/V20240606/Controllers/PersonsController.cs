@@ -30,7 +30,8 @@ public class PersonsController(IMapper mapper) : ControllerBase
         var command = new GetPersonCommand(
             trn,
             include is not null ? (GetPersonCommandIncludes)include : GetPersonCommandIncludes.None,
-            dateOfBirth);
+            dateOfBirth,
+            ApplyLegacyAlertsBehavior: true);
 
         var result = await handler.Handle(command);
 
@@ -51,7 +52,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindTeachers(
+    public async Task<IActionResult> FindPersons(
         FindPersonRequest request,
         [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
     {

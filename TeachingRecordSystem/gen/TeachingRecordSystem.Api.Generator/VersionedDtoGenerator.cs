@@ -201,6 +201,11 @@ public class VersionedDtoGenerator : ISourceGenerator
 
                 foreach (var (property, propertyType) in referenceGeneratedTypeInfo.Properties)
                 {
+                    if (excludeMembers.Contains(property.Identifier.ValueText))
+                    {
+                        continue;
+                    }
+
                     AddProperty(property, propertyType);
                 }
             }

@@ -414,7 +414,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             new("A18", null),
             new("G1", new DateOnly(2022, 4, 1)),
         };
-        Debug.Assert(sanctions.Select(s => s.SanctionCode).All(Api.V3.Constants.ExposableSanctionCodes.Contains));
+        Debug.Assert(sanctions.Select(s => s.SanctionCode).All(Api.V3.Constants.LegacyExposableSanctionCodes.Contains));
 
         await ConfigureMocks(contact, sanctions: sanctions);
 
@@ -455,7 +455,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             new("B1", null),
             new("G1", new DateOnly(2022, 4, 1)),
         };
-        Debug.Assert(sanctions.Select(s => s.SanctionCode).All(Api.V3.Constants.ProhibitionSanctionCodes.Contains));
+        Debug.Assert(sanctions.Select(s => s.SanctionCode).All(Api.V3.Constants.LegacyProhibitionSanctionCodes.Contains));
 
         await ConfigureMocks(contact, sanctions: sanctions);
 

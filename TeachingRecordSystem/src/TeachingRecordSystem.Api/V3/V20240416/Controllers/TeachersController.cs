@@ -30,7 +30,8 @@ public class TeachersController(IMapper mapper) : ControllerBase
         var command = new GetPersonCommand(
             trn,
             include is not null ? (GetPersonCommandIncludes)include : GetPersonCommandIncludes.None,
-            dateOfBirth);
+            dateOfBirth,
+            ApplyLegacyAlertsBehavior: true);
 
         var result = await handler.Handle(command);
 

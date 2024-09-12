@@ -101,6 +101,12 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
             new RespawnerOptions()
             {
                 DbAdapter = DbAdapter.Postgres,
-                TablesToIgnore = ["mandatory_qualification_providers", "establishment_sources", "tps_establishment_types"]
+                TablesToIgnore = [
+                    "mandatory_qualification_providers",
+                    "establishment_sources",
+                    "tps_establishment_types",
+                    "alert_types",
+                    "alert_categories"
+                ]
             });
 }

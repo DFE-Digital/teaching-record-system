@@ -237,7 +237,7 @@ public class FindTeachersTests : TestBase
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
         var sanctionCode = "A17";
-        Debug.Assert(!TeachingRecordSystem.Api.V3.Constants.ExposableSanctionCodes.Contains(sanctionCode));
+        Debug.Assert(!TeachingRecordSystem.Api.V3.Constants.LegacyExposableSanctionCodes.Contains(sanctionCode));
         var person = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction(sanctionCode));
 
         var request = new HttpRequestMessage(
