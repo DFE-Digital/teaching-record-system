@@ -412,7 +412,7 @@ public abstract class GetTeacherTestBase(HostFixture hostFixture) : TestBase(hos
         var sanctions = new (string SanctionCode, DateOnly? StartDate)[]
         {
             new("A18", null),
-            new("G1", new DateOnly(2022, 4, 1)),
+            new("A21B", new DateOnly(2022, 4, 1)),
         };
         Debug.Assert(sanctions.Select(s => s.SanctionCode).All(TeachingRecordSystem.Api.V3.Constants.LegacyExposableSanctionCodes.Contains));
 
@@ -452,8 +452,8 @@ public abstract class GetTeacherTestBase(HostFixture hostFixture) : TestBase(hos
         // Arrange
         var sanctions = new (string SanctionCode, DateOnly? StartDate)[]
         {
-            new("B1", null),
-            new("G1", new DateOnly(2022, 4, 1)),
+            new("A21B", null),
+            new("A21B", new DateOnly(2022, 4, 1)),
         };
         Debug.Assert(sanctions.Select(s => s.SanctionCode).All(TeachingRecordSystem.Api.V3.Constants.LegacyProhibitionSanctionCodes.Contains));
 

@@ -70,6 +70,12 @@ public class SeedCrmReferenceData : IStartupTask
             dfeta_Value = "B1",
             dfeta_name = "B1 Description"
         });
+
+        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
+        {
+            dfeta_Value = "A21B",
+            dfeta_name = "A21B Description"
+        });
     }
 
     private void AddTeacherStatuses()
