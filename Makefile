@@ -64,7 +64,7 @@ bin/terrafile: ## Install terrafile to manage terraform modules
 	curl -sL https://github.com/coretech/terrafile/releases/download/v${TERRAFILE_VERSION}/terrafile_${TERRAFILE_VERSION}_$$(uname)_x86_64.tar.gz \
 		| tar xz -C ./bin terrafile
 
-terraform-init:
+terraform-init: bin/terrafile
 	$(eval export TF_VAR_service_name=$(SERVICE_SHORT))
 	$(eval export TF_VAR_service_short_name=$(SERVICE_SHORT))
 	$(eval export TF_VAR_environment_short_name=$(CONFIG_SHORT))
