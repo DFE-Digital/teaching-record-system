@@ -5,8 +5,13 @@ using TeachingRecordSystem.Api.V3.VNext.ApiModels;
 namespace TeachingRecordSystem.Api.V3.VNext.Responses;
 
 [AutoMap(typeof(GetPersonResult))]
-[GenerateVersionedDto(typeof(V20240606.Responses.GetPersonResponse), excludeMembers: ["Alerts", "Sanctions"])]
+[GenerateVersionedDto(typeof(V20240606.Responses.GetPersonResponse), excludeMembers: ["Alerts", "Sanctions", "Induction"])]
 public partial record GetPersonResponse
 {
     public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
+    public required Option<GetPersonResponseInduction?> Induction { get; init; }
 }
+
+[AutoMap(typeof(GetPersonResultInduction))]
+[GenerateVersionedDto(typeof(V20240606.Responses.GetPersonResponseInduction), excludeMembers: ["Periods"])]
+public partial record GetPersonResponseInduction;
