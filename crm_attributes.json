@@ -78,7 +78,8 @@
     "dfeta_previouslastname",
     "dfeta_AllowIDSignInWithProhibitions",
     "dfeta_qtlsdate",
-    "dfeta_qtlsdatehasbeenset"
+    "dfeta_qtlsdatehasbeenset",
+    "dfeta_dateofdeath"
   ],
   "dfeta_businesseventaudit":[
     "createdon",
