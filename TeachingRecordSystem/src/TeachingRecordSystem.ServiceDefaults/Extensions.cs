@@ -71,6 +71,15 @@ public static class Extensions
             await context.Response.WriteAsync("OK");
         });
 
+        var gitSha = Environment.GetEnvironmentVariable("GIT_SHA");
+        if (gitSha is not null)
+        {
+            app.MapGet("/sha", async context =>
+            {
+                await context.Response.WriteAsync(gitSha);
+            });
+        }
+
         app.UseHealthChecks("/status");
 
         app.MapMetrics();
