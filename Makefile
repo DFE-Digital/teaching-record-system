@@ -4,6 +4,8 @@ SHELL				:=/bin/bash
 TERRAFILE_VERSION=0.8
 RG_TAGS={"Product" : "Teaching Record System"}
 ARM_TEMPLATE_TAG=1.1.10
+REGION=UK South
+SERVICE_SHORT=trs
 
 .PHONY: help
 help: ## Show this help
@@ -11,14 +13,8 @@ help: ## Show this help
 	## environments:
 	## - AKS:  dev, test, pre-production, production
 
-.PHONY: aks
-aks:
-	$(eval PLATFORM=aks)
-	$(eval REGION=UK South)
-	$(eval SERVICE_SHORT=trs)
-
 .PHONY: dv_review
-dv_review: aks dev-cluster
+dv_review: dev-cluster
 	$(if $(CLUSTER), , $(error Missing environment variable "CLUSTER", Please specify a dev cluster name (eg 'cluster1')))
 	$(if $(IMAGE), , $(error Missing environment variable "IMAGE", Please specify an image tag for your review app))
 	$(if $(APP_NAME), , $(error Missing environment variable "APP_NAME", Please specify a pr number for your review app))
@@ -34,7 +30,7 @@ dv_review: aks dev-cluster
 	$(eval export TF_VAR_app_name=$(APP_NAME))
 
 .PHONY: dev
-dev: aks test-cluster
+dev: test-cluster
 	$(eval DEPLOY_ENV=dev)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
 	$(eval RESOURCE_NAME_PREFIX=s189t01)
@@ -42,7 +38,7 @@ dev: aks test-cluster
 	$(eval ENV_TAG=dev)
 
 .PHONY: test
-test: aks test-cluster
+test: test-cluster
 	$(eval DEPLOY_ENV=test)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
 	$(eval RESOURCE_NAME_PREFIX=s189t01)
@@ -50,7 +46,7 @@ test: aks test-cluster
 	$(eval ENV_TAG=test)
 
 .PHONY: pre-production
-pre-production: aks test-cluster
+pre-production: test-cluster
 	$(eval DEPLOY_ENV=pre-production)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
 	$(eval RESOURCE_NAME_PREFIX=s189t01)
@@ -58,7 +54,7 @@ pre-production: aks test-cluster
 	$(eval ENV_TAG=pre-prod)
 
 .PHONY: production
-production: aks production-cluster
+production: production-cluster
 	$(eval DEPLOY_ENV=production)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-production)
 	$(eval RESOURCE_NAME_PREFIX=s189p01)
@@ -66,8 +62,8 @@ production: aks production-cluster
 	$(eval ENV_TAG=prod)
 	$(if $(or ${SKIP_CONFIRM}, ${CONFIRM_DEPLOY}), , $(error can only run with CONFIRM_DEPLOY))
 
-.PHONY: aks_domain
-aks_domain:
+.PHONY: domain
+domain:
 	$(eval DEPLOY_ENV=production)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-production)
 	$(eval RESOURCE_NAME_PREFIX=s189p01)
@@ -75,8 +71,8 @@ aks_domain:
 	$(eval ENV_TAG=prod)
 
 read-keyvault-config:
-	$(eval KEY_VAULT_NAME=$(shell jq -r '.key_vault_name' terraform/$(PLATFORM)/workspace_variables/$(DEPLOY_ENV).tfvars.json))
-	$(eval KEY_VAULT_SECRET_NAME=$(shell jq -r '.key_vault_secret_name' terraform/$(PLATFORM)/workspace_variables/$(DEPLOY_ENV).tfvars.json))
+	$(eval KEY_VAULT_NAME=$(shell jq -r '.key_vault_name' terraform/aks/workspace_variables/$(DEPLOY_ENV).tfvars.json))
+	$(eval KEY_VAULT_SECRET_NAME=$(shell jq -r '.key_vault_secret_name' terraform/aks/workspace_variables/$(DEPLOY_ENV).tfvars.json))
 
 set-azure-account: ${environment}
 	echo "Logging on to ${AZURE_SUBSCRIPTION}"
@@ -100,7 +96,6 @@ bin/terrafile: ## Install terrafile to manage terraform modules
 
 terraform-init:
 	$(if $(or $(DISABLE_PASSCODE),$(PASSCODE)), , $(error Missing environment variable "PASSCODE", retrieve from https://login.london.cloud.service.gov.uk/passcode))
-	$(if $(PLATFORM), , $(error Missing environment variable "PLATFORM"))
 
 	$(eval export TF_VAR_service_name=$(SERVICE_SHORT))
 	$(eval export TF_VAR_service_short_name=$(SERVICE_SHORT))
@@ -108,16 +103,16 @@ terraform-init:
 	$(eval export TF_VAR_azure_resource_prefix=$(RESOURCE_NAME_PREFIX))
 
 	[[ "${SP_AUTH}" != "true" ]] && az account set -s $(AZURE_SUBSCRIPTION) || true
-	terraform -chdir=terraform/$(PLATFORM) init -upgrade -backend-config workspace_variables/${DEPLOY_ENV}.backend.tfvars  $(backend_key) -reconfigure
+	terraform -chdir=terraform/aks init -upgrade -backend-config workspace_variables/${DEPLOY_ENV}.backend.tfvars  $(backend_key) -reconfigure
 
 terraform-plan: terraform-init # make [env] terraform-plan init
-	terraform -chdir=terraform/$(PLATFORM) plan -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json
+	terraform -chdir=terraform/aks plan -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json
 
 terraform-apply: terraform-init
-	terraform -chdir=terraform/$(PLATFORM) apply -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json ${AUTO_APPROVE}
+	terraform -chdir=terraform/aks apply -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json ${AUTO_APPROVE}
 
 terraform-destroy: terraform-init
-	terraform -chdir=terraform/$(PLATFORM) destroy -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json ${AUTO_APPROVE}
+	terraform -chdir=terraform/aks destroy -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json ${AUTO_APPROVE}
 
 deploy-azure-resources: set-azure-account # make dev deploy-azure-resources CONFIRM_DEPLOY=1
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
@@ -136,7 +131,7 @@ domains-plan: domains-init ## terraform plan for environment dns/afd resources
 domains-apply: domains-init ## terraform apply for environment dns/afd resources, needs CONFIRM_DEPLOY=1 for production
 	terraform -chdir=terraform/domains/environment_domains apply -var-file config/${DEPLOY_ENV}.tfvars.json
 
-domains-infra-init: bin/terrafile set-azure-pd-subscription ## make aks_domain domains-infra-init - terraform init for dns/afd core resources, eg Main FrontDoor resource
+domains-infra-init: bin/terrafile set-azure-pd-subscription ## make domain domains-infra-init - terraform init for dns/afd core resources, eg Main FrontDoor resource
 	./bin/terrafile -p terraform/domains/infrastructure/vendor/modules -f terraform/domains/infrastructure/config/trs_Terrafile
 	terraform -chdir=terraform/domains/infrastructure init -reconfigure -upgrade
 
@@ -146,7 +141,7 @@ domains-infra-plan: domains-infra-init ## terraform plan for dns core resources
 domains-infra-apply: domains-infra-init ## terraform apply for dns core resources
 	terraform -chdir=terraform/domains/infrastructure apply -var-file config/trs.tfvars.json
 
-domain-azure-resources: set-azure-account # make aks_domain domain-azure-resources CONFIRM_DEPLOY=1, creates core DNA/AKS
+domain-azure-resources: set-azure-account # make domain domain-azure-resources CONFIRM_DEPLOY=1, creates core DNA/AKS
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
 	az deployment sub create -l "UK South" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-trsdomains-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}trsdomainstf" "tfStorageContainerName=trsdomains-tf"  "keyVaultName=${RESOURCE_NAME_PREFIX}-trsdomain-kv"
 
