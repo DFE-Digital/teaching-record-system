@@ -96,6 +96,7 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
                         .AsReadOnly(),
                     Alerts = await sanctions[r.Id]
                         .ToAsyncEnumerable()
+                        .WhereAwait(async s => await referenceDataCache.HaveAlertTypeForDqtSanctionCode(s.SanctionCode))
                         .SelectAwait(async s =>
                         {
                             var alertType = await referenceDataCache.GetAlertTypeByDqtSanctionCode(s.SanctionCode);
