@@ -11,7 +11,7 @@ SERVICE_SHORT=trs
 help: ## Show this help
 	@grep -E '^[a-zA-Z\.\-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	## environments:
-	## - AKS:  dev, test, pre-production, production
+	## - AKS: dev, test, pre-production, production
 
 .PHONY: dv_review
 dv_review: dev-cluster
@@ -99,7 +99,7 @@ terraform-init:
 	$(eval export TF_VAR_azure_resource_prefix=$(RESOURCE_NAME_PREFIX))
 
 	[[ "${SP_AUTH}" != "true" ]] && az account set -s $(AZURE_SUBSCRIPTION) || true
-	terraform -chdir=terraform/aks init -upgrade -backend-config workspace_variables/${DEPLOY_ENV}.backend.tfvars  $(backend_key) -reconfigure
+	terraform -chdir=terraform/aks init -upgrade -backend-config workspace_variables/${DEPLOY_ENV}.backend.tfvars $(backend_key) -reconfigure
 
 terraform-plan: terraform-init # make [env] terraform-plan init
 	terraform -chdir=terraform/aks plan -var-file workspace_variables/${DEPLOY_ENV}.tfvars.json
@@ -115,9 +115,9 @@ deploy-azure-resources: set-azure-account # make dev deploy-azure-resources CONF
 	az deployment sub create --name "resourcedeploy-trs-$(shell date +%Y%m%d%H%M%S)" -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}${SERVICE_SHORT}tfstate${ENV_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultNames=['${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-api-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-authz-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-inf-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-ui-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-worker-kv']"
 
 validate-azure-resources: set-azure-account # make dev validate-azure-resources
-	az deployment sub create --name "resourcedeploy-trs-$(shell date +%Y%m%d%H%M%S)"  -l  "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}${SERVICE_SHORT}tfstate${ENV_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultNames=['${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-api-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-authz-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-inf-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-ui-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-worker-kv']" --what-if
+	az deployment sub create --name "resourcedeploy-trs-$(shell date +%Y%m%d%H%M%S)" -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}${SERVICE_SHORT}tfstate${ENV_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultNames=['${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-api-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-authz-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-inf-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-ui-kv', '${RESOURCE_NAME_PREFIX}-${SERVICE_SHORT}-${ENV_SHORT}-worker-kv']" --what-if
 
-domains-init: bin/terrafile set-azure-pd-subscription ## make [env] domains-init -  terraform init for environment dns/afd resources
+domains-init: bin/terrafile set-azure-pd-subscription ## make [env] domains-init - terraform init for environment dns/afd resources
 	./bin/terrafile -p terraform/domains/environment_domains/vendor/modules -f terraform/domains/environment_domains/config/${DEPLOY_ENV}_Terrafile
 	terraform -chdir=terraform/domains/environment_domains init -reconfigure -upgrade -backend-config=config/${DEPLOY_ENV}_backend.tfvars
 
@@ -139,7 +139,7 @@ domains-infra-apply: domains-infra-init ## terraform apply for dns core resource
 
 domain-azure-resources: set-azure-account # make domain domain-azure-resources CONFIRM_DEPLOY=1, creates core DNA/AKS
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
-	az deployment sub create -l "UK South" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-trsdomains-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}trsdomainstf" "tfStorageContainerName=trsdomains-tf"  "keyVaultName=${RESOURCE_NAME_PREFIX}-trsdomain-kv"
+	az deployment sub create -l "UK South" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${RESOURCE_NAME_PREFIX}-trsdomains-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${RESOURCE_NAME_PREFIX}trsdomainstf" "tfStorageContainerName=trsdomains-tf" "keyVaultName=${RESOURCE_NAME_PREFIX}-trsdomain-kv"
 
 .PHONY: install-konduit
 install-konduit: ## Install the konduit script, for accessing backend services
