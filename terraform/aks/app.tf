@@ -49,7 +49,7 @@ resource "kubernetes_job" "migrations" {
 }
 
 module "api_application_configuration" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
+  source = "./vendor/modules/aks//aks/application_configuration"
 
   namespace              = var.namespace
   environment            = local.app_name_suffix
@@ -77,7 +77,8 @@ module "api_application_configuration" {
 }
 
 module "api_application" {
-  source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+  source = "./vendor/modules/aks//aks/application"
+
   depends_on = [kubernetes_job.migrations]
 
   name   = "api"
@@ -103,7 +104,7 @@ module "api_application" {
 }
 
 module "authz_application_configuration" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
+  source = "./vendor/modules/aks//aks/application_configuration"
 
   namespace              = var.namespace
   environment            = local.app_name_suffix
@@ -130,7 +131,8 @@ module "authz_application_configuration" {
 }
 
 module "authz_application" {
-  source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+  source = "./vendor/modules/aks//aks/application"
+
   depends_on = [kubernetes_job.migrations]
 
   name   = "authz"
@@ -156,7 +158,7 @@ module "authz_application" {
 }
 
 module "ui_application_configuration" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
+  source = "./vendor/modules/aks//aks/application_configuration"
 
   namespace              = var.namespace
   environment            = local.app_name_suffix
@@ -182,7 +184,8 @@ module "ui_application_configuration" {
 }
 
 module "ui_application" {
-  source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+  source = "./vendor/modules/aks//aks/application"
+
   depends_on = [kubernetes_job.migrations]
 
   name   = "ui"
@@ -208,7 +211,7 @@ module "ui_application" {
 }
 
 module "worker_application_configuration" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application_configuration?ref=testing"
+  source = "./vendor/modules/aks//aks/application_configuration"
 
   namespace              = var.namespace
   environment            = local.app_name_suffix
@@ -235,7 +238,8 @@ module "worker_application_configuration" {
 }
 
 module "worker_application" {
-  source     = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=testing"
+  source = "./vendor/modules/aks//aks/application"
+
   depends_on = [kubernetes_job.migrations]
 
   name   = "worker"

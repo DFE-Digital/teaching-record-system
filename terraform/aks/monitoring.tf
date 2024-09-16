@@ -1,7 +1,7 @@
 module "statuscake" {
   count = var.enable_monitoring ? 1 : 0
 
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//monitoring/statuscake?ref=stable"
+  source = "./vendor/modules/aks//monitoring/statuscake"
 
   uptime_urls = concat(
     [

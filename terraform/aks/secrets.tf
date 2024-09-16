@@ -1,5 +1,5 @@
 module "infrastructure_secrets" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/secrets?ref=testing"
+  source = "./vendor/modules/aks//aks/secrets"
 
   azure_resource_prefix = var.azure_resource_prefix
   service_short         = var.service_short_name

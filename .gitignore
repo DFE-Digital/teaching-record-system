@@ -9,3 +9,4 @@ docs/source/dqt-api.yaml
 bin/terrafile
 terraform/domains/environment_domains/vendor/
 terraform/domains/infrastructure/vendor/
+terraform/aks/vendor/

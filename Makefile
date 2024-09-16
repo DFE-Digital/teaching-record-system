@@ -71,16 +71,17 @@ terraform-init:
 	$(eval export TF_VAR_azure_resource_prefix=$(AZURE_RESOURCE_PREFIX))
 
 	[[ "${SP_AUTH}" != "true" ]] && az account set -s $(AZURE_SUBSCRIPTION) || true
-	terraform -chdir=terraform/aks init -upgrade -backend-config workspace_variables/${CONFIG}.backend.tfvars $(backend_key) -reconfigure
+	./bin/terrafile -p terraform/aks/vendor/modules -f terraform/aks/config/${CONFIG}_Terrafile
+	terraform -chdir=terraform/aks init -upgrade -backend-config config/${CONFIG}.backend.tfvars $(backend_key) -reconfigure
 
 terraform-plan: terraform-init # make [env] terraform-plan init
-	terraform -chdir=terraform/aks plan -var-file workspace_variables/${CONFIG}.tfvars.json
+	terraform -chdir=terraform/aks plan -var-file config/${CONFIG}.tfvars.json
 
 terraform-apply: terraform-init
-	terraform -chdir=terraform/aks apply -var-file workspace_variables/${CONFIG}.tfvars.json ${AUTO_APPROVE}
+	terraform -chdir=terraform/aks apply -var-file config/${CONFIG}.tfvars.json ${AUTO_APPROVE}
 
 terraform-destroy: terraform-init
-	terraform -chdir=terraform/aks destroy -var-file workspace_variables/${CONFIG}.tfvars.json ${AUTO_APPROVE}
+	terraform -chdir=terraform/aks destroy -var-file config/${CONFIG}.tfvars.json ${AUTO_APPROVE}
 
 deploy-azure-resources: set-azure-account # make dev deploy-azure-resources CONFIRM_DEPLOY=1
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
