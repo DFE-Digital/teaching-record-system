@@ -27,7 +27,7 @@ runs:
     - name: Terraform
       id: terraform
       run: |
-        make ci ${{ inputs.environment_name }}_aks terraform-apply
+        make ci ${{ inputs.environment_name }} terraform-apply
       env:
         TF_VAR_azure_sp_credentials_json: ${{ inputs.azure_credentials }}
         TF_VAR_docker_image: ${{ inputs.docker_image }}

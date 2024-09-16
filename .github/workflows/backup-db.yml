@@ -10,7 +10,7 @@ jobs:
     name: Backup database
     runs-on: ubuntu-latest
 
-    environment: production_aks
+    environment: production
 
     env:
       RESOURCE_GROUP: s189p01-trs-pd-rg
@@ -38,7 +38,7 @@ jobs:
         uses: azure/setup-kubectl@v4
 
       - name: Get k8s credentials
-        run: make ci production_aks get-cluster-credentials
+        run: make ci production get-cluster-credentials
 
       - name: Install konduit
         run: make install-konduit
@@ -49,7 +49,7 @@ jobs:
       - name: Get backup storage account
         id: azure-backup-storage
         run: |
-          make ci production_aks terraform-init
+          make ci production terraform-init
           echo "account-name=$(terraform -chdir=terraform/aks output -raw postgres_azure_backup_storage_account_name)" >> $GITHUB_OUTPUT
           echo "container-name=$(terraform -chdir=terraform/aks output -raw postgres_azure_backup_storage_container_name)" >> $GITHUB_OUTPUT
 

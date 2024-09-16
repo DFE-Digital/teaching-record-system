@@ -9,7 +9,7 @@ ARM_TEMPLATE_TAG=1.1.10
 help: ## Show this help
 	@grep -E '^[a-zA-Z\.\-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	## environments:
-	## - AKS:  dev_aks, test_aks, pre-production_aks, production_aks
+	## - AKS:  dev, test, pre-production, production
 
 .PHONY: aks
 aks:
@@ -33,32 +33,32 @@ dv_review: aks dev-cluster
 	$(eval export TF_VAR_docker_image=$(IMAGE))
 	$(eval export TF_VAR_app_name=$(APP_NAME))
 
-.PHONY: dev_aks
-dev_aks: aks test-cluster
+.PHONY: dev
+dev: aks test-cluster
 	$(eval DEPLOY_ENV=dev)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
 	$(eval RESOURCE_NAME_PREFIX=s189t01)
 	$(eval ENV_SHORT=dv)
 	$(eval ENV_TAG=dev)
 
-.PHONY: test_aks
-test_aks: aks test-cluster
+.PHONY: test
+test: aks test-cluster
 	$(eval DEPLOY_ENV=test)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
 	$(eval RESOURCE_NAME_PREFIX=s189t01)
 	$(eval ENV_SHORT=ts)
 	$(eval ENV_TAG=test)
 
-.PHONY: pre-production_aks
-pre-production_aks: aks test-cluster
+.PHONY: pre-production
+pre-production: aks test-cluster
 	$(eval DEPLOY_ENV=pre-production)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-test)
 	$(eval RESOURCE_NAME_PREFIX=s189t01)
 	$(eval ENV_SHORT=pp)
 	$(eval ENV_TAG=pre-prod)
 
-.PHONY: production_aks
-production_aks: aks production-cluster
+.PHONY: production
+production: aks production-cluster
 	$(eval DEPLOY_ENV=production)
 	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-production)
 	$(eval RESOURCE_NAME_PREFIX=s189p01)
