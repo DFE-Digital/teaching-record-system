@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: pre-production_aks
+      name: pre-production
 
     steps:
     - uses: actions/checkout@v4

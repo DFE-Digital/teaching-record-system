@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: test_aks
+      name: test
 
     steps:
     - uses: actions/checkout@v4

@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: dev_aks
+      name: dev
 
     steps:
     - uses: actions/checkout@v4
