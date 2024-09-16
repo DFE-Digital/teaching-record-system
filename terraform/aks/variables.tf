@@ -22,11 +22,6 @@ variable "namespace" {
   type = string
 }
 
-variable "azure_sp_credentials_json" {
-  type    = string
-  default = null
-}
-
 variable "resource_group_name" {
   type = string
 }
