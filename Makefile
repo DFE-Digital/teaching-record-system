@@ -23,7 +23,6 @@ dv_review: dev-cluster
 	$(eval RESOURCE_NAME_PREFIX=s189d01)
 	$(eval ENV_SHORT=rv)
 	$(eval ENV_TAG=dev)
-	$(eval DISABLE_PASSCODE=false)
 	$(eval backend_key=-backend-config=key=$(APP_NAME).tfstate)
 	$(eval export TF_VAR_cluster=$(CLUSTER))
 	$(eval export TF_VAR_docker_image=$(IMAGE))
@@ -84,7 +83,6 @@ set-azure-pd-subscription:
 	az account set -s ${AZURE_SUBSCRIPTION}
 
 ci:	## Run in automation environment
-	$(eval DISABLE_PASSCODE=true)
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SP_AUTH=true)
 	$(eval CONFIRM_DEPLOY=true)
@@ -95,8 +93,6 @@ bin/terrafile: ## Install terrafile to manage terraform modules
 		| tar xz -C ./bin terrafile
 
 terraform-init:
-	$(if $(or $(DISABLE_PASSCODE),$(PASSCODE)), , $(error Missing environment variable "PASSCODE", retrieve from https://login.london.cloud.service.gov.uk/passcode))
-
 	$(eval export TF_VAR_service_name=$(SERVICE_SHORT))
 	$(eval export TF_VAR_service_short_name=$(SERVICE_SHORT))
 	$(eval export TF_VAR_environment_short_name=$(ENV_SHORT))
