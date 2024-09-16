@@ -1,0 +1,4 @@
+CONFIG=dv_review
+CONFIG_SHORT=rv
+AZURE_SUBSCRIPTION=s189-teacher-services-cloud-development
+AZURE_RESOURCE_PREFIX=s189d01
