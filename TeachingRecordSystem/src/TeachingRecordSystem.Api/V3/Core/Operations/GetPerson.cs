@@ -404,7 +404,8 @@ public class GetPersonHandler(
                 Option.Some(await (await getSanctionsTask!)
                     .ToAsyncEnumerable()
                     // The Legacy behavior is to only return prohibition-type alerts
-                    .Where(s => !command.ApplyLegacyAlertsBehavior || Constants.LegacyProhibitionSanctionCodes.Contains(s.SanctionCode))
+                    .WhereAwait(async s => await referenceDataCache.HaveAlertTypeForDqtSanctionCode(s.SanctionCode) &&
+                        (!command.ApplyLegacyAlertsBehavior || Constants.LegacyProhibitionSanctionCodes.Contains(s.SanctionCode)))
                     .SelectAwait(async s =>
                     {
                         var alertType = await referenceDataCache.GetAlertTypeByDqtSanctionCode(s.SanctionCode);
