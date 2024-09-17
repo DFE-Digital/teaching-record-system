@@ -638,7 +638,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
-                email: user.Subject,
+                email: user.Email,
                 createCoreIdentityVc: false);
             var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
