@@ -2,71 +2,92 @@ name: Backup production database
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to backup
+        required: true
+        default: tes
+        type: choice
+        options:
+        - test
+        - production
+      backupFileName:
+        description: Backup file name. Default is [SERVICE_NAME]_[CONFIG_SHORT]_adhoc_YYYY-MM-DD
+        required: false
+        type: string
+        default: default
+      backupPTRServer:
+        description: Set to true if backing up a point in time restored database server
+        required: false
+        type: boolean
+        default: false
   schedule:
     - cron: "0 4 * * *" # 04:00 UTC
 
+env:
+  SERVICE_NAME: trs
+  TF_VARS_PATH: terraform/aks/config
+
 jobs:
+
   backup:
     name: Backup database
     runs-on: ubuntu-latest
-
-    environment: production
-
+    environment:
+      name: ${{ inputs.environment || production }}
     env:
-      RESOURCE_GROUP: s189p01-trs-pd-rg
-      KEYVAULT_NAME: s189p01-trs-pd-inf-kv
-      CLUSTER_NAME: s189p01-tsc-production-aks
-      CLUSTER_RESOURCE_GROUP: s189p01-tsc-pd-rg
+      DEPLOY_ENV: ${{ inputs.environment || production  }}
+      BACKUP_FILE: ${{ inputs.backupFileName || schedule  }}
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.5.0
-          terraform_wrapper: false
+    - name: Set environment variables
+      run: |
+        source global_config/${DEPLOY_ENV}.sh
+        tf_vars_file=${{ env.TF_VARS_PATH }}/${DEPLOY_ENV}.tfvars.json
+        echo "CLUSTER=$(jq -r '.cluster' ${tf_vars_file})" >> $GITHUB_ENV
+        echo "RESOURCE_GROUP_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_NAME}-${CONFIG_SHORT}-rg" >> $GITHUB_ENV
+        echo "STORAGE_ACCOUNT_NAME=${AZURE_RESOURCE_PREFIX}${SERVICE_NAME}dbbkp${CONFIG_SHORT}sa" >> $GITHUB_ENV
+        TODAY=$(date +"%F")
+        echo "DB_SERVER=${AZURE_RESOURCE_PREFIX}-${SERVICE_NAME}-${CONFIG_SHORT}-pg" >> $GITHUB_ENV
+        if [ "${{ env.BACKUP_FILE }}" == "schedule" ]; then
+          BACKUP_FILE=${SERVICE_NAME}_${CONFIG_SHORT}_${TODAY}
+        elif [ "${{ env.BACKUP_FILE }}" == "default" ]; then
+          BACKUP_FILE=${SERVICE_NAME}_${CONFIG_SHORT}_adhoc_${TODAY}
+        else
+          BACKUP_FILE=${{ env.BACKUP_FILE }}
+        fi
+        echo "BACKUP_FILE=$BACKUP_FILE" >> $GITHUB_ENV
+        echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
 
-      - uses: Azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Set PTR variables
+      if: ${{ github.event.inputs.backupPTRServer == 'true' }}
+      run: |
+        echo "PTR_DB_SERVER=${{ env.DB_SERVER }}-ptr" >> $GITHUB_ENV
+        echo "BACKUP_FILE=${{ env.BACKUP_FILE }}-ptr" >> $GITHUB_ENV
 
-      - uses: DFE-Digital/github-actions/set-kubelogin-environment@master
-        with:
-          azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Backup ${{ env.DEPLOY_ENV }} postgres
+      uses: DFE-Digital/github-actions/backup-postgres@master
+      with:
+        storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
+        resource-group: ${{ env.RESOURCE_GROUP_NAME }}
+        app-name: ${{ env.SERVICE_NAME }}-${{ env.DEPLOY_ENV }}-api
+        cluster: ${{ env.CLUSTER }}
+        azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+        backup-file: ${{ env.BACKUP_FILE }}.sql
+        ptr-db-server-name: ${{ env.PTR_DB_SERVER }}
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
-
-      - name: Get k8s credentials
-        run: make ci production get-cluster-credentials
-
-      - name: Install konduit
-        run: make install-konduit
-
-      - name: Dump database
-        run: bin/konduit.sh -k ${{ env.KEYVAULT_NAME }} -d trs trs-production-worker -- pg_dump -E utf8 --compress=1 --clean --if-exists --no-owner --verbose -f backup.sql.gz
-
-      - name: Get backup storage account
-        id: azure-backup-storage
-        run: |
-          make ci production terraform-init
-          echo "account-name=$(terraform -chdir=terraform/aks output -raw postgres_azure_backup_storage_account_name)" >> $GITHUB_OUTPUT
-          echo "container-name=$(terraform -chdir=terraform/aks output -raw postgres_azure_backup_storage_container_name)" >> $GITHUB_OUTPUT
-
-      - name: Get storage account connection string
-        run: |
-          STORAGE_CONN_STR=$(az storage account show-connection-string -g ${{ env.RESOURCE_GROUP }} -n ${{ steps.azure-backup-storage.outputs.account-name }} --query 'connectionString')
-          echo "::add-mask::$STORAGE_CONN_STR"
-          echo "AZURE_STORAGE_CONNECTION_STRING=$STORAGE_CONN_STR" >> $GITHUB_ENV
-
-      - name: Upload backup
-        run: |
-          az config set extension.use_dynamic_install=yes_without_prompt
-          az config set core.only_show_errors=true
-          az storage azcopy blob upload \
-            --container ${{ steps.azure-backup-storage.outputs.container-name }} \
-            --source backup.sql.gz \
-            --destination $(date +"%F-%H").sql.gz
+    - name: Backup Summary
+      if: success()
+      run: |
+        NOW=$(TZ=Europe/London date +"%F %R")
+        echo 'BACKUP SUCCESSFUL!' >> $GITHUB_STEP_SUMMARY
+        echo '  ENV: ${{ env.DEPLOY_ENV }}' >> $GITHUB_STEP_SUMMARY
+        echo "  AT : ${NOW}" >> $GITHUB_STEP_SUMMARY
+        echo '  DB SERVER: ${{ env.PTR_DB_SERVER || env.DB_SERVER  }}' >> $GITHUB_STEP_SUMMARY
+        echo '  STORAGE ACCOUNT: ${{ env.STORAGE_ACCOUNT_NAME }}' >> $GITHUB_STEP_SUMMARY
+        echo '  FILENAME: ${{ env.BACKUP_FILE }}.sql.gz' >> $GITHUB_STEP_SUMMARY
 
       - name: Get Slack webhook
         uses: Azure/get-keyvault-secrets@v1
