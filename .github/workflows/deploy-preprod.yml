@@ -12,7 +12,7 @@ on:
       docker_image:
         type: string
 
-concurrency: deploy_preprod
+concurrency: deploy_pre-production
 jobs:
   package:
     name: Package application
