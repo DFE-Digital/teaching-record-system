@@ -6,7 +6,7 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequestWithAlerts_ReturnsExpectedAlertsContent()
     {
         // Arrange
-        var sanctionCode = "G1";
+        var sanctionCode = "A13";
         var startDate = new DateOnly(2022, 4, 1);
         var endDate = new DateOnly(2023, 1, 20);
         var alertType = await ReferenceDataCache.GetAlertTypeByDqtSanctionCode(sanctionCode);

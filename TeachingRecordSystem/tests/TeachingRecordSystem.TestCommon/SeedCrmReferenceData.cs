@@ -44,37 +44,37 @@ public class SeedCrmReferenceData : IStartupTask
         _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
         {
             dfeta_Value = "G1",
-            dfeta_name = "G1 Description"
-        });
-
-        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
-        {
-            dfeta_Value = "A1",
-            dfeta_name = "A1 Description"
+            dfeta_name = "Barring by the Secretary of State"
         });
 
         _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
         {
             dfeta_Value = "A17",
-            dfeta_name = "A17 Description"
+            dfeta_name = "Reprimand  -  conviction of a relevant offence"
         });
 
         _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
         {
             dfeta_Value = "A18",
-            dfeta_name = "A18 Description"
+            dfeta_name = "Conditional Registration Order  -  conviction of a relevant offence"
         });
 
         _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
         {
             dfeta_Value = "B1",
-            dfeta_name = "B1 Description"
+            dfeta_name = "Barring by the Secretary of State"
         });
 
         _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
         {
             dfeta_Value = "A21B",
-            dfeta_name = "A21B Description"
+            dfeta_name = "Prohibition Order  -  conviction of a relevant offence  -  eligible to reapply after specified time"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
+        {
+            dfeta_Value = "A13",
+            dfeta_name = "Suspension order  -  unacceptable professional conduct  -  with conditions"
         });
     }
 
