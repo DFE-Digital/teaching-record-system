@@ -6,7 +6,7 @@ on:
       environment:
         description: Environment to backup
         required: true
-        default: tes
+        default: test
         type: choice
         options:
         - test
@@ -29,7 +29,6 @@ env:
   TF_VARS_PATH: terraform/aks/config
 
 jobs:
-
   backup:
     name: Backup database
     runs-on: ubuntu-latest
@@ -45,20 +44,20 @@ jobs:
     - name: Set environment variables
       run: |
         source global_config/${DEPLOY_ENV}.sh
-        tf_vars_file=${{ env.TF_VARS_PATH }}/${DEPLOY_ENV}.tfvars.json
+        tf_vars_file=${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json
         echo "CLUSTER=$(jq -r '.cluster' ${tf_vars_file})" >> $GITHUB_ENV
         echo "RESOURCE_GROUP_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_NAME}-${CONFIG_SHORT}-rg" >> $GITHUB_ENV
         echo "STORAGE_ACCOUNT_NAME=${AZURE_RESOURCE_PREFIX}${SERVICE_NAME}dbbkp${CONFIG_SHORT}sa" >> $GITHUB_ENV
         TODAY=$(date +"%F")
         echo "DB_SERVER=${AZURE_RESOURCE_PREFIX}-${SERVICE_NAME}-${CONFIG_SHORT}-pg" >> $GITHUB_ENV
-        if [ "${{ env.BACKUP_FILE }}" == "schedule" ]; then
+        if [ "${BACKUP_FILE}" == "schedule" ]; then
           BACKUP_FILE=${SERVICE_NAME}_${CONFIG_SHORT}_${TODAY}
-        elif [ "${{ env.BACKUP_FILE }}" == "default" ]; then
+        elif [ "${BACKUP_FILE}" == "default" ]; then
           BACKUP_FILE=${SERVICE_NAME}_${CONFIG_SHORT}_adhoc_${TODAY}
         else
-          BACKUP_FILE=${{ env.BACKUP_FILE }}
+          BACKUP_FILE=${BACKUP_FILE}
         fi
-        echo "BACKUP_FILE=$BACKUP_FILE" >> $GITHUB_ENV
+        echo "BACKUP_FILE=${BACKUP_FILE}" >> $GITHUB_ENV
         echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
 
     - name: Set PTR variables
@@ -89,21 +88,21 @@ jobs:
         echo '  STORAGE ACCOUNT: ${{ env.STORAGE_ACCOUNT_NAME }}' >> $GITHUB_STEP_SUMMARY
         echo '  FILENAME: ${{ env.BACKUP_FILE }}.sql.gz' >> $GITHUB_STEP_SUMMARY
 
-      - name: Get Slack webhook
-        uses: Azure/get-keyvault-secrets@v1
-        if: failure()
-        id: key-vault-secrets
-        with:
-          keyvault: ${{ env.KEYVAULT_NAME }}
-          secrets: "SLACK-WEBHOOK"
+    - name: Get Slack webhook
+      uses: Azure/get-keyvault-secrets@v1
+      if: failure()
+      id: key-vault-secrets
+      with:
+        keyvault: ${{ env.KEYVAULT_NAME }}
+        secrets: "SLACK-WEBHOOK"
 
-      - name: Notify Slack channel on job failure
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_USERNAME: CI Deployment
-          SLACK_TITLE: Database backup failure
-          SLACK_MESSAGE: Production database backup job failed
-          SLACK_WEBHOOK: ${{ steps.key-vault-secrets.outputs.SLACK-WEBHOOK }}
-          SLACK_COLOR: failure
-          SLACK_FOOTER: Sent from backup job in backup-db workflow
+    - name: Notify Slack channel on job failure
+      if: failure()
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_USERNAME: CI Deployment
+        SLACK_TITLE: Database backup failure
+        SLACK_MESSAGE: Production database backup job failed
+        SLACK_WEBHOOK: ${{ steps.key-vault-secrets.outputs.SLACK-WEBHOOK }}
+        SLACK_COLOR: failure
+        SLACK_FOOTER: Sent from backup job in backup-db workflow
