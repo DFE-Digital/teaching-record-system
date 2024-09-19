@@ -12,7 +12,7 @@ on:
         - test
         - production
       backupFileName:
-        description: Backup file name. Default is [SERVICE_NAME]_[CONFIG_SHORT]_adhoc_YYYY-MM-DD
+        description: Backup file name. Default is [SERVICE_SHORT]_[CONFIG_SHORT]_adhoc_YYYY-MM-DD
         required: false
         type: string
         default: default
@@ -25,7 +25,7 @@ on:
     - cron: "0 4 * * *" # 04:00 UTC
 
 env:
-  SERVICE_NAME: trs
+  SERVICE_SHORT: trs
   TF_VARS_PATH: terraform/aks/config
 
 jobs:
@@ -33,10 +33,10 @@ jobs:
     name: Backup database
     runs-on: ubuntu-latest
     environment:
-      name: ${{ inputs.environment || production }}
+      name: ${{ inputs.environment || 'production' }}
     env:
-      DEPLOY_ENV: ${{ inputs.environment || production  }}
-      BACKUP_FILE: ${{ inputs.backupFileName || schedule  }}
+      DEPLOY_ENV: ${{ inputs.environment || 'production'  }}
+      BACKUP_FILE: ${{ inputs.backupFileName || 'schedule'  }}
 
     steps:
     - uses: actions/checkout@v4
@@ -46,14 +46,14 @@ jobs:
         source global_config/${DEPLOY_ENV}.sh
         tf_vars_file=${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json
         echo "CLUSTER=$(jq -r '.cluster' ${tf_vars_file})" >> $GITHUB_ENV
-        echo "RESOURCE_GROUP_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_NAME}-${CONFIG_SHORT}-rg" >> $GITHUB_ENV
-        echo "STORAGE_ACCOUNT_NAME=${AZURE_RESOURCE_PREFIX}${SERVICE_NAME}dbbkp${CONFIG_SHORT}sa" >> $GITHUB_ENV
+        echo "RESOURCE_GROUP_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-rg" >> $GITHUB_ENV
+        echo "STORAGE_ACCOUNT_NAME=${AZURE_RESOURCE_PREFIX}${SERVICE_SHORT}dbbkp${CONFIG_SHORT}sa" >> $GITHUB_ENV
         TODAY=$(date +"%F")
-        echo "DB_SERVER=${AZURE_RESOURCE_PREFIX}-${SERVICE_NAME}-${CONFIG_SHORT}-pg" >> $GITHUB_ENV
+        echo "DB_SERVER=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-pg" >> $GITHUB_ENV
         if [ "${BACKUP_FILE}" == "schedule" ]; then
-          BACKUP_FILE=${SERVICE_NAME}_${CONFIG_SHORT}_${TODAY}
+          BACKUP_FILE=${SERVICE_SHORT}_${CONFIG_SHORT}_${TODAY}
         elif [ "${BACKUP_FILE}" == "default" ]; then
-          BACKUP_FILE=${SERVICE_NAME}_${CONFIG_SHORT}_adhoc_${TODAY}
+          BACKUP_FILE=${SERVICE_SHORT}_${CONFIG_SHORT}_adhoc_${TODAY}
         else
           BACKUP_FILE=${BACKUP_FILE}
         fi
@@ -71,7 +71,7 @@ jobs:
       with:
         storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
         resource-group: ${{ env.RESOURCE_GROUP_NAME }}
-        app-name: ${{ env.SERVICE_NAME }}-${{ env.DEPLOY_ENV }}-api
+        app-name: ${{ env.SERVICE_SHORT }}-${{ env.DEPLOY_ENV }}-api
         cluster: ${{ env.CLUSTER }}
         azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
         backup-file: ${{ env.BACKUP_FILE }}.sql
