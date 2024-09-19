@@ -25,7 +25,6 @@ on:
         required: false
 
 env:
-  SERVICE_NAME: trs
   SERVICE_SHORT: trs
   TF_VARS_PATH: terraform/aks/config
 
@@ -63,7 +62,7 @@ jobs:
       with:
         storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
         resource-group: ${{ env.RESOURCE_GROUP_NAME }}
-        app-name: ${{ env.SERVICE_NAME }}-${{ inputs.environment }}-api
+        app-name: ${{ env.SERVICE_SHORT }}-${{ inputs.environment }}-api
         cluster: ${{ env.CLUSTER }}
         azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
         backup-file: ${{ env.BACKUP_FILE }}
