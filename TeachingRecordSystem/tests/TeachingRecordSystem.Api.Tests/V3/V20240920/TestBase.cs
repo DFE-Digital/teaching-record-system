@@ -1,8 +1,8 @@
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240920;
 
 public abstract class TestBase : Tests.TestBase
 {
-    public const string Version = VersionRegistry.V3MinorVersions.VNext;
+    public const string Version = VersionRegistry.V3MinorVersions.V20240920;
 
     protected TestBase(HostFixture hostFixture) : base(hostFixture)
     {

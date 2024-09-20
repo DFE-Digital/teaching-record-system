@@ -2,7 +2,7 @@ using System.Net;
 using TeachingRecordSystem.Api.V3.Core.Operations;
 using TeachingRecordSystem.Core.Dqt;
 
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240920;
 
 [Collection(nameof(DisableParallelization))]
 public class SetDeceasedTests : TestBase

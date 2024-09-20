@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240920;
 
 public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {

@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Requests;
+namespace TeachingRecordSystem.Api.V3.V20240920.Requests;
 
 [Flags]
 [Description("Comma-separated list of data to include in response.")]

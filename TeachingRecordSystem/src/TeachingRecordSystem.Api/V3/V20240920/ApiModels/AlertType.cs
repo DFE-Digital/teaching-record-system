@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.V3.VNext.ApiModels;
+namespace TeachingRecordSystem.Api.V3.V20240920.ApiModels;
 
 [AutoMap(typeof(Core.SharedModels.AlertType))]
 public record AlertType

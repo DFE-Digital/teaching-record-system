@@ -1,6 +1,6 @@
 using Optional;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Requests;
+namespace TeachingRecordSystem.Api.V3.V20240920.Requests;
 
 public record CreateAlertRequestBody
 {

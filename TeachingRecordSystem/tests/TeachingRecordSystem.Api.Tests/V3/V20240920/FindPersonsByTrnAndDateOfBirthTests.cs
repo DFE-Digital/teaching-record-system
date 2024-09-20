@@ -1,9 +1,9 @@
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240920;
 
 [Collection(nameof(DisableParallelization))]
-public class FindPersonByLastNameAndDateOfBirthTests : TestBase
+public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 {
-    public FindPersonByLastNameAndDateOfBirthTests(HostFixture hostFixture) : base(hostFixture)
+    public FindPersonsByTrnAndDateOfBirthTests(HostFixture hostFixture) : base(hostFixture)
     {
         XrmFakedContext.DeleteAllEntities<Contact>();
         SetCurrentApiClient([ApiRoles.GetPerson]);
@@ -13,6 +13,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
     public async Task Get_ValidRequestWithMatchOnPersonWithAlerts_ReturnsExpectedAlertsContent()
     {
         // Arrange
+        var findBy = "LastNameAndDateOfBirth";
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
@@ -29,20 +30,9 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 
         var sanction = person.Sanctions.Single();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/v3/persons/find")
-        {
-            Content = JsonContent.Create(new
-            {
-                persons = new[]
-                {
-                    new
-                    {
-                        trn = person.Trn,
-                        dateOfBirth = person.DateOfBirth
-                    }
-                }
-            })
-        };
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/v3/persons?findBy={findBy}&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
