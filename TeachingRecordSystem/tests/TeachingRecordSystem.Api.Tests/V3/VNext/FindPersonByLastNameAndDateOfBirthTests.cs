@@ -16,7 +16,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var sanctionCode = "G1";
+        var sanctionCode = "A13";
         var startDate = new DateOnly(2022, 4, 1);
         var endDate = new DateOnly(2023, 1, 20);
         var alertType = await ReferenceDataCache.GetAlertTypeByDqtSanctionCode(sanctionCode);
