@@ -1,8 +1,8 @@
 using AutoMapper.Configuration.Annotations;
 using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.VNext.ApiModels;
+using TeachingRecordSystem.Api.V3.V20240920.ApiModels;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Responses;
+namespace TeachingRecordSystem.Api.V3.V20240920.Responses;
 
 [AutoMap(typeof(FindPersonsByTrnAndDateOfBirthResult))]
 [GenerateVersionedDto(typeof(V20240814.Responses.FindPersonsResponse), excludeMembers: ["Results"])]

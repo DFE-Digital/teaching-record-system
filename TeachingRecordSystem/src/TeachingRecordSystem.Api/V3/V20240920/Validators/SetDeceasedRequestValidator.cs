@@ -1,7 +1,7 @@
 using FluentValidation;
-using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.V20240920.Requests;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Validators;
+namespace TeachingRecordSystem.Api.V3.V20240920.Validators;
 
 public class SetDeceasedRequestValidator : AbstractValidator<SetDeceasedRequest>
 {

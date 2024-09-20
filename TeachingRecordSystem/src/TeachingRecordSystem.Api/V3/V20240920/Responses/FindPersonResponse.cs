@@ -1,8 +1,8 @@
 using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.VNext.ApiModels;
-using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.V20240920.ApiModels;
+using TeachingRecordSystem.Api.V3.V20240920.Requests;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Responses;
+namespace TeachingRecordSystem.Api.V3.V20240920.Responses;
 
 [GenerateVersionedDto(typeof(V20240814.Responses.FindPersonResponse), excludeMembers: ["Query", "Results"])]
 public partial record FindPersonResponse

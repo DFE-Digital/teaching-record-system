@@ -1,6 +1,6 @@
-using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.V20240920.Requests;
 
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20240920;
 
 public class GetPersonByTrnTests : TestBase
 {

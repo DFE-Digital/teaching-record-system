@@ -1,7 +1,7 @@
 using FluentValidation;
 using TeachingRecordSystem.Api.V3.V20240912.Requests;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Validators;
+namespace TeachingRecordSystem.Api.V3.V20240920.Validators;
 
 public class SetQtlsRequestValidator : AbstractValidator<SetQtlsRequest>
 {

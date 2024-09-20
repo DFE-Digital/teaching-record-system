@@ -1,8 +1,8 @@
 using Optional;
 using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.VNext.ApiModels;
+using TeachingRecordSystem.Api.V3.V20240920.ApiModels;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Responses;
+namespace TeachingRecordSystem.Api.V3.V20240920.Responses;
 
 [AutoMap(typeof(GetPersonResult))]
 [GenerateVersionedDto(typeof(V20240606.Responses.GetPersonResponse), excludeMembers: ["Alerts", "Sanctions", "Induction"])]

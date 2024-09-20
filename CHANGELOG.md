@@ -1,17 +1,19 @@
 # API Changelog
 
-## Unreleased
+## 20240920
 
 All references to `sanctions` have been removed and replaced with `alerts`; the following endpoints are affected:
 - `GET /v3/persons/<trn>`
 - `GET /v3/person`
-- `GET /v3/persons`
+- `GET /v3/persons?findBy=LastNameAndDateOfBirth`
 - `GET /v3/persons/find`
+
+An endpoint has been added to mark a person as deceased: `PUT /v3/persons/deceased/<trn>`.
 
 
 ## 20240912
 
-Endpoints have been added for setting and retrieving QTS via QTLS date.
+Endpoints have been added for setting and retrieving the QTS via QTLS date.
 - `GET /v3/persons/<trn>/qtls`
 - `PUT /v3/persons/<trn>/qtls`
 
