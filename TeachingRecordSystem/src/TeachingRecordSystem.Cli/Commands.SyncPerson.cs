@@ -52,7 +52,7 @@ public partial class Commands
                     return;
                 }
 
-                await syncHelper.SyncPerson(contact, ignoreInvalid: false);
+                await syncHelper.SyncPerson(contact, ignoreInvalid: false, dryRun: false);
                 //return 0;
             },
             connectionStringOption,

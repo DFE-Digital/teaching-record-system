@@ -23,7 +23,7 @@ public class TrsDataSyncHelper(
     ReferenceDataCache referenceDataCache,
     IClock clock)
 {
-    private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, CancellationToken cancellationToken);
+    private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
 
     private const string NowParameterName = "@now";
     private const string IdsParameterName = "@ids";
@@ -151,13 +151,13 @@ public class TrsDataSyncHelper(
         }
     }
 
-    public Task SyncRecords(string modelType, IReadOnlyCollection<Entity> entities, bool ignoreInvalid, CancellationToken cancellationToken = default)
+    public Task SyncRecords(string modelType, IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
-        return modelTypeSyncInfo.GetSyncHandler(this)(entities, ignoreInvalid, cancellationToken);
+        return modelTypeSyncInfo.GetSyncHandler(this)(entities, ignoreInvalid, dryRun, cancellationToken);
     }
 
-    public async Task<bool> SyncPerson(Guid contactId, CancellationToken cancellationToken)
+    public async Task<bool> SyncPerson(Guid contactId, bool dryRun = false, CancellationToken cancellationToken = default)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.Person);
 
@@ -168,13 +168,13 @@ public class TrsDataSyncHelper(
             modelTypeSyncInfo.AttributeNames,
             cancellationToken);
 
-        return await SyncPersons(contacts, ignoreInvalid: false, cancellationToken) == 1;
+        return await SyncPersons(contacts, ignoreInvalid: false, dryRun, cancellationToken) == 1;
     }
 
-    public async Task<bool> SyncPerson(Contact entity, bool ignoreInvalid, CancellationToken cancellationToken = default) =>
-        await SyncPersons(new[] { entity }, ignoreInvalid, cancellationToken) == 1;
+    public async Task<bool> SyncPerson(Contact entity, bool ignoreInvalid, bool dryRun = false, CancellationToken cancellationToken = default) =>
+        await SyncPersons(new[] { entity }, ignoreInvalid, dryRun, cancellationToken) == 1;
 
-    public async Task<int> SyncPersons(IReadOnlyCollection<Contact> entities, bool ignoreInvalid, CancellationToken cancellationToken = default)
+    public async Task<int> SyncPersons(IReadOnlyCollection<Contact> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
     {
         // We're syncing all contacts for now.
         // Keep this in sync with the filter in the SyncAllContactsFromCrmJob job.
@@ -252,16 +252,19 @@ public class TrsDataSyncHelper(
             await txn.DisposeAsync();
             await connection.DisposeAsync();
 
-            return await SyncPersons(entitiesExceptFailedOne, ignoreInvalid, cancellationToken);
+            return await SyncPersons(entitiesExceptFailedOne, ignoreInvalid, dryRun, cancellationToken);
         }
 
-        await txn.CommitAsync(cancellationToken);
+        if (!dryRun)
+        {
+            await txn.CommitAsync(cancellationToken);
+        }
 
         _syncedEntitiesSubject.OnNext(people.ToArray());
         return people.Count;
     }
 
-    public async Task<bool> SyncMandatoryQualification(Guid qualificationId, IReadOnlyCollection<EventBase> events, CancellationToken cancellationToken)
+    public async Task<bool> SyncMandatoryQualification(Guid qualificationId, IReadOnlyCollection<EventBase> events, bool dryRun, CancellationToken cancellationToken)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.MandatoryQualification);
 
@@ -279,11 +282,11 @@ public class TrsDataSyncHelper(
 
             var mqs = qualifications.Select(q => MapMandatoryQualificationFromDqtQualification(q, mqEstablishments, mqSpecialisms, applyMigrationMappings: false)).ToArray();
 
-            return await SyncMandatoryQualifications(mqs, events, ignoreInvalid: false, cancellationToken) == 1;
+            return await SyncMandatoryQualifications(mqs, events, ignoreInvalid: false, dryRun, cancellationToken) == 1;
         }
         else
         {
-            return await SyncMandatoryQualifications(qualifications, ignoreInvalid: false, createMigratedEvent: false, cancellationToken) == 1;
+            return await SyncMandatoryQualifications(qualifications, ignoreInvalid: false, createMigratedEvent: false, dryRun, cancellationToken) == 1;
         }
     }
 
@@ -292,6 +295,7 @@ public class TrsDataSyncHelper(
         AuditDetailCollection auditDetails,
         bool ignoreInvalid,
         bool createMigratedEvent,
+        bool dryRun = false,
         CancellationToken cancellationToken = default)
     {
         var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
@@ -299,18 +303,19 @@ public class TrsDataSyncHelper(
             { entity.Id, auditDetails }
         };
 
-        return await SyncMandatoryQualifications(new[] { entity }, auditDetailsDict, ignoreInvalid, createMigratedEvent, cancellationToken) == 1;
+        return await SyncMandatoryQualifications(new[] { entity }, auditDetailsDict, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken) == 1;
     }
 
     public async Task<int> SyncMandatoryQualifications(
         IReadOnlyCollection<dfeta_qualification> entities,
         bool ignoreInvalid,
         bool createMigratedEvent,
+        bool dryRun,
         CancellationToken cancellationToken)
     {
         var auditDetails = await GetAuditRecords(dfeta_qualification.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
 
-        return await SyncMandatoryQualifications(entities, auditDetails, ignoreInvalid, createMigratedEvent, cancellationToken);
+        return await SyncMandatoryQualifications(entities, auditDetails, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
     }
 
     public async Task<int> SyncMandatoryQualifications(
@@ -318,6 +323,7 @@ public class TrsDataSyncHelper(
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
         bool ignoreInvalid,
         bool createMigratedEvent,
+        bool dryRun,
         CancellationToken cancellationToken = default)
     {
         // Not all dfeta_qualification records are MQs..
@@ -325,13 +331,14 @@ public class TrsDataSyncHelper(
 
         var (mqs, events) = await MapMandatoryQualificationsAndAudits(toSync, auditDetails, createMigratedEvent);
 
-        return await SyncMandatoryQualifications(mqs, events, ignoreInvalid, cancellationToken);
+        return await SyncMandatoryQualifications(mqs, events, ignoreInvalid, dryRun, cancellationToken);
     }
 
     private async Task<int> SyncMandatoryQualifications(
         IReadOnlyCollection<MandatoryQualification> mqs,
         IReadOnlyCollection<EventBase> events,
         bool ignoreInvalid,
+        bool dryRun,
         CancellationToken cancellationToken)
     {
         if (mqs.Count == 0)
@@ -380,7 +387,10 @@ public class TrsDataSyncHelper(
 
                 await txn.SaveEvents(events, "events_import", clock, cancellationToken);
 
-                await txn.CommitAsync(cancellationToken);
+                if (!dryRun)
+                {
+                    await txn.CommitAsync(cancellationToken);
+                }
             }
             catch (PostgresException ex) when (ex.SqlState == "23503" && ex.ConstraintName == Qualification.PersonForeignKeyName)
             {
@@ -391,7 +401,7 @@ public class TrsDataSyncHelper(
                 // ex.Detail will be something like "Key (person_id)=(6ac8dc26-c8ae-e311-b8ed-005056822391) is not present in table "persons"."
                 var personId = Guid.Parse(ex.Detail!.Substring("Key (person_id)=(".Length, Guid.Empty.ToString().Length));
 
-                var personSynced = await SyncPerson(personId, cancellationToken);
+                var personSynced = await SyncPerson(personId, dryRun, cancellationToken);
                 if (!personSynced)
                 {
                     // The person sync may fail if the record doesn't meet the criteria (e.g. it doesn't have a TRN).
@@ -424,7 +434,7 @@ public class TrsDataSyncHelper(
         return toSync.Count;
     }
 
-    public async Task<int> SyncEvents(IReadOnlyCollection<dfeta_TRSEvent> events, CancellationToken cancellationToken = default)
+    public async Task<int> SyncEvents(IReadOnlyCollection<dfeta_TRSEvent> events, bool dryRun = false, CancellationToken cancellationToken = default)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo<EventInfo>(ModelTypes.Event);
 
@@ -434,7 +444,11 @@ public class TrsDataSyncHelper(
 
         using var txn = await connection.BeginTransactionAsync(cancellationToken);
         await txn.SaveEvents(mapped, tempTableSuffix: "events_import", clock, cancellationToken);
-        await txn.CommitAsync();
+
+        if (!dryRun)
+        {
+            await txn.CommitAsync();
+        }
 
         _syncedEntitiesSubject.OnNext(events.ToArray());
         return events.Count;
@@ -751,7 +765,8 @@ public class TrsDataSyncHelper(
             GetLastModifiedOnStatement = getLastModifiedOnStatement,
             EntityLogicalName = Contact.EntityLogicalName,
             AttributeNames = attributeNames,
-            GetSyncHandler = helper => (entities, ignoreInvalid, ct) => helper.SyncPersons(entities.Select(e => e.ToEntity<Contact>()).ToArray(), ignoreInvalid, ct),
+            GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
+                helper.SyncPersons(entities.Select(e => e.ToEntity<Contact>()).ToArray(), ignoreInvalid, dryRun, ct),
             WriteRecord = writeRecord
         };
     }
@@ -851,8 +866,8 @@ public class TrsDataSyncHelper(
             GetLastModifiedOnStatement = getLastModifiedOnStatement,
             EntityLogicalName = dfeta_qualification.EntityLogicalName,
             AttributeNames = attributeNames,
-            GetSyncHandler = helper => (entities, ignoreInvalid, ct) =>
-                helper.SyncMandatoryQualifications(entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(), ignoreInvalid, createMigratedEvent: false, ct),
+            GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
+                helper.SyncMandatoryQualifications(entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(), ignoreInvalid, createMigratedEvent: false, dryRun, ct),
             WriteRecord = writeRecord
         };
     }
@@ -875,8 +890,8 @@ public class TrsDataSyncHelper(
             GetLastModifiedOnStatement = null,
             EntityLogicalName = dfeta_TRSEvent.EntityLogicalName,
             AttributeNames = attributeNames,
-            GetSyncHandler = helper => (entities, ignoreInvalid, ct) =>
-                helper.SyncEvents(entities.Select(e => e.ToEntity<dfeta_TRSEvent>()).ToArray(), ct),
+            GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
+                helper.SyncEvents(entities.Select(e => e.ToEntity<dfeta_TRSEvent>()).ToArray(), dryRun, ct),
             WriteRecord = null
         };
     }

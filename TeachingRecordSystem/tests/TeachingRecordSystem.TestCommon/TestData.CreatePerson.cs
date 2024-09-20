@@ -590,7 +590,7 @@ public partial class TestData
             contact = retrieveContactHandle.GetResponse().Entity.ToEntity<Contact>();
 
             await testData.SyncConfiguration.SyncIfEnabled(
-                helper => helper.SyncPerson(contact, ignoreInvalid: false, CancellationToken.None),
+                helper => helper.SyncPerson(contact, ignoreInvalid: false),
                 _syncEnabledOverride);
 
             var mqs = await Task.WhenAll(_mqBuilders.Select(mqb => mqb.Execute(this, testData)));

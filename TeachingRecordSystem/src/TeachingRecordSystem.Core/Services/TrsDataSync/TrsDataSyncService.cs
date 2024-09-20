@@ -130,6 +130,7 @@ public class TrsDataSyncService(
                 modelType,
                 newOrUpdatedItems.Select(i => i.NewOrUpdatedEntity).ToArray(),
                 optionsAccessor.Value.IgnoreInvalidData,
+                dryRun: false,
                 cancellationToken);
 
             await trsDataSyncHelper.DeleteRecords(

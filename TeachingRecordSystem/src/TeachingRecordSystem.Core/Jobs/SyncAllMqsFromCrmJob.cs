@@ -80,6 +80,7 @@ public class SyncAllMqsFromCrmJob
                 result.Entities.Select(e => e.ToEntity<dfeta_qualification>()).ToArray(),
                 ignoreInvalid: _syncOptionsAccessor.Value.IgnoreInvalidData,
                 createMigratedEvent: true,
+                dryRun: false,
                 cancellationToken);
 
             if (result.MoreRecords)

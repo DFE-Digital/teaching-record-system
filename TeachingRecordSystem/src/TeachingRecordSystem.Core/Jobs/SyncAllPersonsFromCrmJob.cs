@@ -68,6 +68,7 @@ public class SyncAllPersonsFromCrmJob
             await _trsDataSyncHelper.SyncPersons(
                 result.Entities.Select(e => e.ToEntity<Contact>()).ToArray(),
                 ignoreInvalid: _syncOptionsAccessor.Value.IgnoreInvalidData,
+                dryRun: false,
                 cancellationToken);
 
             if (result.MoreRecords)
