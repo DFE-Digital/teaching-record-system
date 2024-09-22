@@ -1,0 +1,34 @@
+@page "/alerts/add/end-date/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.EndDateModel
+@{
+    ViewBag.Title = "End date";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.AlertAddCheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId) : LinkGenerator.AlertAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.AlertAddEndDate(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+            <span class="govuk-caption-l">Add an alert - @Model.PersonName</span>
+
+            <govuk-radios asp-for="HasEndDate">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-radios-item value="@true">Yes
+                        <govuk-radios-item-conditional>
+                            <govuk-date-input asp-for="EndDate"/>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">No</govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.AlertAddEndDateCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

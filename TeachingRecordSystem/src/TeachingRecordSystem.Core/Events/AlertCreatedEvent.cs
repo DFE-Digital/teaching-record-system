@@ -6,4 +6,6 @@ public record class AlertCreatedEvent : EventBase, IEventWithPersonId, IEventWit
 {
     public required Guid PersonId { get; init; }
     public required Alert Alert { get; init; }
+    public required string? Reason { get; init; }
+    public required Models.File? EvidenceFile { get; init; }
 }

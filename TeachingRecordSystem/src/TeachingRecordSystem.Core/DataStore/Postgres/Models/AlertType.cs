@@ -13,4 +13,5 @@ public class AlertType
     public required string? DqtSanctionCode { get; init; }
     public required ProhibitionLevel ProhibitionLevel { get; init; }
     public required bool InternalOnly { get; init; }
+    public required bool IsActive { get; init; }
 }

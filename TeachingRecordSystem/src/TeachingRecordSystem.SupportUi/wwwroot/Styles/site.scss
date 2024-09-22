@@ -64,6 +64,17 @@
   width: 200px;
 }
 
+.trs-\!-width-300 {
+  width: 300px;
+}
+
 .trs-\!-max-width-none {
   max-width: none;
+}
+
+.trs-radios__divider--heading-s {
+  @include govuk-text-colour;
+  @include govuk-font($size: 19, $weight: bold);
+  width: 400px;
+  text-align: left;
 }

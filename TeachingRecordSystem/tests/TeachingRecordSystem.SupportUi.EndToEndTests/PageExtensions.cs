@@ -31,6 +31,11 @@ public static class PageExtensions
         await page.GotoAsync($"/persons/{personId}/qualifications");
     }
 
+    public static async Task GoToAddAlertPage(this IPage page, Guid personId)
+    {
+        await page.GotoAsync($"/alerts/add?personId={personId}");
+    }
+
     public static async Task GoToAddMqPage(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/mqs/add?personId={personId}");
@@ -112,14 +117,44 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/persons/{personId}/qualifications");
     }
 
-    public static async Task AssertOnAddAlertPage(this IPage page)
+    public static async Task AssertOnAddAlertTypePage(this IPage page)
     {
-        await page.WaitForUrlPathAsync($"/alerts/add");
+        await page.WaitForUrlPathAsync($"/alerts/add/type");
+    }
+
+    public static async Task AssertOnAddAlertDetailsPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/add/details");
     }
 
     public static async Task AssertOnAddAlertConfirmPage(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/confirm");
+    }
+
+    public static async Task AssertOnAddAlertLinkPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/add/link");
+    }
+
+    public static async Task AssertOnAddAlertStartDatePage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/add/start-date");
+    }
+
+    public static async Task AssertOnAddAlertEndDatePage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/add/end-date");
+    }
+
+    public static async Task AssertOnAddAlertReasonPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/add/reason");
+    }
+
+    public static async Task AssertOnAddAlertCheckAnswersPage(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/add/check-answers");
     }
 
     public static async Task AssertOnAlertDetailPage(this IPage page, Guid alertId)
@@ -324,7 +359,7 @@ public static class PageExtensions
 
     public static async Task SubmitAddAlertIndexPage(this IPage page, string alertType, string? details, string link, DateOnly startDate)
     {
-        await page.AssertOnAddAlertPage();
+        await page.AssertOnAddAlertTypePage();
         await page.FillAsync("label:text-is('Alert type')", alertType);
         if (details != null)
         {

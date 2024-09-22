@@ -23,5 +23,5 @@
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.UiCommon\TeachingRecordSystem.UiCommon.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.ServiceDefaults\TeachingRecordSystem.ServiceDefaults.csproj" />
-  </ItemGroup>
+  </ItemGroup>  
 </Project>
