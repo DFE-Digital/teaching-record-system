@@ -19,7 +19,7 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson(b => b.WithSyncOverride(personAlreadySynced));
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var entity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var entity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(entity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -35,13 +35,13 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson();
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var existingEntity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var existingEntity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         await Helper.SyncMandatoryQualification(existingEntity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
         var expectedFirstSync = Clock.UtcNow;
 
         Clock.Advance();
-        var updatedVersion = await CreateUpdatedVersionVersion(existingEntity, auditDetailCollection);
+        var updatedVersion = await CreateUpdatedMandatoryQualificationEntityVersion(existingEntity, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -57,7 +57,7 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson();
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var existingEntity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var existingEntity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         await Helper.SyncMandatoryQualification(existingEntity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
@@ -79,10 +79,10 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson();
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var initialVersion = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var initialVersion = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var updatedVersion = await CreateUpdatedVersionVersion(initialVersion, auditDetailCollection);
+        var updatedVersion = await CreateUpdatedMandatoryQualificationEntityVersion(initialVersion, auditDetailCollection);
 
         await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
         var expectedFirstSync = Clock.UtcNow;
@@ -102,10 +102,10 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson(b => b.WithSyncOverride(false));
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var entity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var entity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var (deletedVersion, deletedEvent) = await CreateDeletedEntityVersion(entity, auditDetailCollection);
+        var (deletedVersion, deletedEvent) = await CreateDeletedMandatoryQualificationEntityVersion(entity, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(deletedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -126,10 +126,10 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson(b => b.WithSyncOverride(false));
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var entity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var entity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, auditDetailCollection);
+        var deactivatedVersion = await CreateDeactivatedMandatoryQualificationEntityVersion(entity, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -150,7 +150,7 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson();
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var initialVersion = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection, addCreateAudit: true);
+        var initialVersion = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection, addCreateAudit: true);
 
         // Act
         await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -185,7 +185,7 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson();
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var initialVersion = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection, addCreateAudit: false);
+        var initialVersion = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection, addCreateAudit: false);
 
         // Act
         await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -227,14 +227,14 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson();
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var initialVersion = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection, addCreateAudit: false);
+        var initialVersion = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection, addCreateAudit: false);
         var created = Clock.UtcNow;
 
         Clock.Advance();
-        var updatedVersion = await CreateUpdatedVersionVersion(initialVersion, auditDetailCollection, changes: MandatoryQualificationUpdatedEventChanges.Specialism);
+        var updatedVersion = await CreateUpdatedMandatoryQualificationEntityVersion(initialVersion, auditDetailCollection, changes: MandatoryQualificationUpdatedEventChanges.Specialism);
 
         Clock.Advance();
-        updatedVersion = await CreateUpdatedVersionVersion(updatedVersion, auditDetailCollection, changes: MandatoryQualificationUpdatedEventChanges.Provider);
+        updatedVersion = await CreateUpdatedMandatoryQualificationEntityVersion(updatedVersion, auditDetailCollection, changes: MandatoryQualificationUpdatedEventChanges.Provider);
 
         // Act
         await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -282,7 +282,7 @@ public partial class TrsDataSyncHelperTests
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var trsEventId = Guid.NewGuid();
-        var initialVersion = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection, trsAuditEventId: trsEventId);
+        var initialVersion = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection, trsAuditEventId: trsEventId);
 
         // Act
         await Helper.SyncMandatoryQualification(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -318,10 +318,10 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson();
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var initialVersion = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var initialVersion = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var updatedVersion = await CreateUpdatedVersionVersion(initialVersion, auditDetailCollection);
+        var updatedVersion = await CreateUpdatedMandatoryQualificationEntityVersion(initialVersion, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -363,11 +363,11 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson();
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var initialVersion = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var initialVersion = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
         var trsEventId = Guid.NewGuid();
-        var updatedVersion = await CreateUpdatedVersionVersion(initialVersion, auditDetailCollection, trsEventId);
+        var updatedVersion = await CreateUpdatedMandatoryQualificationEntityVersion(initialVersion, auditDetailCollection, trsEventId);
 
         // Act
         await Helper.SyncMandatoryQualification(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -410,10 +410,10 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson(b => b.WithSyncOverride(false));
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var entity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var entity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, auditDetailCollection);
+        var deactivatedVersion = await CreateDeactivatedMandatoryQualificationEntityVersion(entity, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -436,13 +436,13 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson(b => b.WithSyncOverride(false));
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var entity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var entity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, auditDetailCollection);
+        var deactivatedVersion = await CreateDeactivatedMandatoryQualificationEntityVersion(entity, auditDetailCollection);
 
         Clock.Advance();
-        var reactivatedVersion = await CreateReactivatedEntityVersion(deactivatedVersion, auditDetailCollection);
+        var reactivatedVersion = await CreateReactivatedMandatoryQualificationEntityVersion(deactivatedVersion, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(reactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -487,10 +487,10 @@ public partial class TrsDataSyncHelperTests
         var person = await TestData.CreatePerson(b => b.WithSyncOverride(false));
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
-        var entity = await CreateNewEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
+        var entity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var (deletedVersion, deletedEvent) = await CreateDeletedEntityVersion(entity, auditDetailCollection);
+        var (deletedVersion, deletedEvent) = await CreateDeletedMandatoryQualificationEntityVersion(entity, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(deletedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -617,7 +617,7 @@ public partial class TrsDataSyncHelperTests
         }
     }
 
-    private async Task<dfeta_qualification> CreateNewEntityVersion(
+    private async Task<dfeta_qualification> CreateNewMandatoryQualificationEntityVersion(
         Guid qualificationId,
         Guid personContactId,
         AuditDetailCollection auditDetailCollection,
@@ -715,7 +715,7 @@ public partial class TrsDataSyncHelperTests
         return newQualification;
     }
 
-    private async Task<dfeta_qualification> CreateUpdatedVersionVersion(
+    private async Task<dfeta_qualification> CreateUpdatedMandatoryQualificationEntityVersion(
         dfeta_qualification existingQualification,
         AuditDetailCollection auditDetailCollection,
         Guid? trsAuditEventId = null,
@@ -867,7 +867,7 @@ public partial class TrsDataSyncHelperTests
                 a.Equals(b)));
     }
 
-    private async Task<(dfeta_qualification Entity, MandatoryQualificationDeletedEvent DeletedEvent)> CreateDeletedEntityVersion(
+    private async Task<(dfeta_qualification Entity, MandatoryQualificationDeletedEvent DeletedEvent)> CreateDeletedMandatoryQualificationEntityVersion(
         dfeta_qualification existingQualification,
         AuditDetailCollection auditDetailCollection)
     {
@@ -933,7 +933,7 @@ public partial class TrsDataSyncHelperTests
         return (updatedQualification, deletedEvent);
     }
 
-    private async Task<dfeta_qualification> CreateDeactivatedEntityVersion(
+    private async Task<dfeta_qualification> CreateDeactivatedMandatoryQualificationEntityVersion(
         dfeta_qualification existingQualification,
         AuditDetailCollection auditDetailCollection)
     {
@@ -975,7 +975,7 @@ public partial class TrsDataSyncHelperTests
         return updatedQualification;
     }
 
-    private async Task<dfeta_qualification> CreateReactivatedEntityVersion(
+    private async Task<dfeta_qualification> CreateReactivatedMandatoryQualificationEntityVersion(
         dfeta_qualification existingQualification,
         AuditDetailCollection auditDetailCollection)
     {

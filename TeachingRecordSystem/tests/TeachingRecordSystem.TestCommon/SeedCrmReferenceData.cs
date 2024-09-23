@@ -41,41 +41,81 @@ public class SeedCrmReferenceData : IStartupTask
 
     private void AddSanctionCodes()
     {
-        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
+        var sanctionCodesAndNames = new (string SanctionCode, string Name)[]
         {
-            dfeta_Value = "G1",
-            dfeta_name = "Barring by the Secretary of State"
-        });
+            ("A10", "No Sanction  -  unacceptable professional conduct"),
+            ("A11", "No Sanction  -  serious professional incompetence"),
+            ("A12", "Suspension order  -  unacceptable professional conduct  -  with conditions"),
+            ("A13", "Suspension order  -  serious professional incompetence  -  with conditions"),
+            ("A14", "For internal information only - historic GTC finding of unsuitable for registration"),
+            ("A15", "No Sanction  -  conviction for a relevant offence"),
+            ("A16", "Reprimand  -  conviction of a relevant offence"),
+            ("A17", "Conditional Registration Order  -  conviction of a relevant offence"),
+            ("A18", "Suspension order  -  conviction of a relevant offence  -  without conditions"),
+            ("A19", "Prohibition Order  -  unacceptable professional conduct  -  Ineligible to reapply"),
+            ("A1A", "Prohibition Order  -  unacceptable professional conduct  -  Eligible to reapply after specified time"),
+            ("A1B", "Suspension order  -  unacceptable professional conduct  -  without conditions"),
+            ("A2", "Suspension order  -  conviction of a relevant offence  -  with conditions"),
+            ("A20", "Prohibition Order  -  conviction of a relevant offence  -  ineligible to reapply"),
+            ("A21A", "Prohibition Order  -  conviction of a relevant offence  -  eligible to reapply after specified time"),
+            ("A21B", "No Sanction  -  breach of condition(s)"),
+            ("A22", "Suspension order  -  without conditions  -  (arising from breach of previous condition(s))"),
+            ("A23", "Suspension order  -  with conditions  -  (arising from breach of previous condition(s))"),
+            ("A24", "Prohibition order  -  breach of condition(s)  -  ineligible to reapply"),
+            ("A25A", "Prohibition Order  -  breach of condition(s)  -  eligible to reapply after specified time"),
+            ("A25B", "Refer to Professional Standards  -  discontinued hearing"),
+            ("A26", "Conditional Registration Order  -  unacceptable professional conduct"),
+            ("A3", "Reprimand  -  unacceptable professional conduct"),
+            ("A4", "Prohibition Order  -  serious professional incompetence  -  Ineligible to reapply"),
+            ("A5A", "Prohibition Order  -  serious professional incompetence  -  Eligible to reapply after specified time"),
+            ("A5B", "Suspension order  -  serious professional incompetence  -  without conditions"),
+            ("A6", "Conditional Registration Order  -  serious professional incompetence"),
+            ("A7", "Reprimand  -  serious professional incompetence"),
+            ("A8", "Refer to Professional Standards Team"),
+            ("A9", "Barring by the Secretary of State"),
+            ("B1", "Restricted by the Secretary of State  -  Permitted to work as teacher"),
+            ("B2A", "Restricted by the Secretary of State  -  Not Permitted to work as teacher"),
+            ("B2B", "Prohibited by an Independent Schools Tribunal or Secretary of State"),
+            ("B3", "Employers to contact the Secretary of State"),
+            ("B4", "Prohibited in Scotland or Northern Ireland"),
+            ("B5", "Formerly on List 99"),
+            ("B6", "Prohibited by the Secretary of State  -  failed probation"),
+            ("C1", "Failed induction"),
+            ("C2", "Restricted by the Secretary of State  -  failed probation  -  permitted to carry out specified work for a period equal in length to a statutory induction period only"),
+            ("C3", "Ineligible for registration  -  refer to General Teaching Council for Scotland"),
+            ("D1", "Eligible for registration subject to General Teaching Council for Scotland disciplinary order"),
+            ("D2", "Ineligible for registration subject to General Teaching Council for Wales disciplinary order"),
+            ("D3", "Eligible for registration subject to General Teaching Council for Wales disciplinary order"),
+            ("D4", "Ineligible for registration  -  refer to General Teaching Council for Northern Ireland"),
+            ("D5", "Eligible for registration subject to General Teaching Council for Northern Ireland disciplinary order"),
+            ("D6", "Ineligible for registration subject to Independent Schools Tribunal disciplinary drder"),
+            ("D7", "Restricted  -  Deferred for skills test"),
+            ("E1", "Restricted by statutory regulations"),
+            ("E2", "For internal information only - record potentially included in historic GTC data loss"),
+            ("E3", "For internal information only - historic GTC vexatious complainant"),
+            ("E4", "Non Payment of Fee"),
+            ("F1", "A possible matching record was found. Please contact the DBS before employing this person"),
+            ("G1", "Formerly barred by the Independent Safeguarding Authority"),
+            ("G2", "Prohibition by the Secretary of State - misconduct"),
+            ("T1", "FOR INTERNAL INFORMATION ONLY - known duplicate record"),
+            ("T10", "Interim prohibition by the Secretary of State"),
+            ("T2", "Prohibition by the Secretary of State  -  deregistered by GTC Scotland"),
+            ("T3", "Prohibition by the Secretary of State  -  refer to the Education Workforce Council, Wales"),
+            ("T4", "Prohibition by the Secretary of State  -  refer to GTC Northern Ireland"),
+            ("T5", "Secretary of State decision- no prohibition"),
+            ("T6", "Section 128 barring direction"),
+            ("T7", "Teacher sanctioned in other EEA member state"),
+            ("T8", "FOR INTERNAL INFORMATION ONLY - see alert details"),
+            ("T9", "Council Members never de-register"),
+            ("Z1", "Council Member  -  do not register"),
+            ("Z2", ""),
+        };
 
-        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
+        Array.ForEach(sanctionCodesAndNames, s => _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
         {
-            dfeta_Value = "A17",
-            dfeta_name = "Reprimand  -  conviction of a relevant offence"
-        });
-
-        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
-        {
-            dfeta_Value = "A18",
-            dfeta_name = "Conditional Registration Order  -  conviction of a relevant offence"
-        });
-
-        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
-        {
-            dfeta_Value = "B1",
-            dfeta_name = "Barring by the Secretary of State"
-        });
-
-        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
-        {
-            dfeta_Value = "A21B",
-            dfeta_name = "Prohibition Order  -  conviction of a relevant offence  -  eligible to reapply after specified time"
-        });
-
-        _xrmFakedContext.CreateEntity(new dfeta_sanctioncode()
-        {
-            dfeta_Value = "A13",
-            dfeta_name = "Suspension order  -  unacceptable professional conduct  -  with conditions"
-        });
+            dfeta_name = s.Name,
+            dfeta_Value = s.SanctionCode
+        }));
     }
 
     private void AddTeacherStatuses()

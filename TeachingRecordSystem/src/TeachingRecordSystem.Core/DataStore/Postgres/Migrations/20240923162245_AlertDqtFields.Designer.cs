@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240923162245_AlertDqtFields")]
+    partial class AlertDqtFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,7 +393,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             AlertCategoryId = new Guid("768c9eb4-355b-4491-bb20-67eb59a97579"),
-                            Name = "Flag"
+                            Name = "Flags"
                         },
                         new
                         {
@@ -415,7 +418,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             AlertCategoryId = new Guid("e8a9ee91-bf7f-4f70-bc66-a644d522384e"),
-                            Name = "Restricted/DBS"
+                            Name = "DBS"
                         },
                         new
                         {
@@ -434,8 +437,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         },
                         new
                         {
-                            AlertCategoryId = new Guid("e4057fc2-a010-42a9-8cb2-7dcc5c9b5fa7"),
-                            Name = "SoS Restriction"
+                            AlertCategoryId = new Guid("ff18c0a8-aaea-4c8b-93a2-2206beea1d7a"),
+                            Name = "Not true alert"
                         });
                 });
 
@@ -459,10 +462,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<bool>("InternalOnly")
                         .HasColumnType("boolean")
                         .HasColumnName("internal_only");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -490,7 +489,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("ee78d44d-abf8-44a9-b22b-87a821f8d3c9"),
                             DqtSanctionCode = "T8",
                             InternalOnly = true,
-                            IsActive = true,
                             Name = "Teacher sanctioned in other EEA member state",
                             ProhibitionLevel = 3
                         },
@@ -500,7 +498,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("0ae0707b-1503-477d-bc0f-1505ed95dbdf"),
                             DqtSanctionCode = "C2",
                             InternalOnly = false,
-                            IsActive = true,
                             Name = "Failed induction",
                             ProhibitionLevel = 1
                         },
@@ -510,7 +507,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("0ae0707b-1503-477d-bc0f-1505ed95dbdf"),
                             DqtSanctionCode = "C1",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Prohibited by the Secretary of State - failed probation",
                             ProhibitionLevel = 1
                         },
@@ -520,7 +516,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("0ae0707b-1503-477d-bc0f-1505ed95dbdf"),
                             DqtSanctionCode = "C3",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Restricted by the Secretary of State - failed probation - permitted to carry out specified work for a period equal in length to a statutory induction period only",
                             ProhibitionLevel = 1
                         },
@@ -530,7 +525,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("768c9eb4-355b-4491-bb20-67eb59a97579"),
                             DqtSanctionCode = "T9",
                             InternalOnly = true,
-                            IsActive = true,
                             Name = "FOR INTERNAL INFORMATION ONLY - see alert details",
                             ProhibitionLevel = 0
                         },
@@ -540,7 +534,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A18",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Conditional Registration Order - conviction of a relevant offence",
                             ProhibitionLevel = 2
                         },
@@ -550,7 +543,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A7",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Conditional Registration Order - serious professional incompetence",
                             ProhibitionLevel = 2
                         },
@@ -560,7 +552,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A3",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Conditional Registration Order - unacceptable professional conduct",
                             ProhibitionLevel = 2
                         },
@@ -570,7 +561,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A15",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "For internal information only - historic GTC finding of unsuitable for registration",
                             ProhibitionLevel = 0
                         },
@@ -580,7 +570,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A22",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "No Sanction - breach of condition(s)",
                             ProhibitionLevel = 0
                         },
@@ -590,7 +579,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A16",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "No Sanction - conviction for a relevant offence",
                             ProhibitionLevel = 0
                         },
@@ -600,7 +588,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A12",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "No Sanction - serious professional incompetence",
                             ProhibitionLevel = 0
                         },
@@ -610,7 +597,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A11",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "No Sanction - unacceptable professional conduct",
                             ProhibitionLevel = 0
                         },
@@ -620,7 +606,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A17",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "Reprimand - conviction of a relevant offence",
                             ProhibitionLevel = 0
                         },
@@ -630,7 +615,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A8",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "Reprimand - serious professional incompetence",
                             ProhibitionLevel = 0
                         },
@@ -640,7 +624,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("06d98708-b52d-496a-aaa7-c1d7d2ca8b24"),
                             DqtSanctionCode = "A4",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "Reprimand - unacceptable professional conduct",
                             ProhibitionLevel = 0
                         },
@@ -650,7 +633,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("70b7d473-2ec8-4643-bfd4-d4ab9a9a0988"),
                             DqtSanctionCode = "A21B",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Prohibition Order - conviction of a relevant offence - eligible to reapply after specified time",
                             ProhibitionLevel = 1
                         },
@@ -660,7 +642,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("70b7d473-2ec8-4643-bfd4-d4ab9a9a0988"),
                             DqtSanctionCode = "A21A",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Prohibition Order - conviction of a relevant offence - ineligible to reapply",
                             ProhibitionLevel = 1
                         },
@@ -670,7 +651,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("70b7d473-2ec8-4643-bfd4-d4ab9a9a0988"),
                             DqtSanctionCode = "A5B",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Prohibition Order - serious professional incompetence - Eligible to reapply after specified time",
                             ProhibitionLevel = 1
                         },
@@ -680,7 +660,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("70b7d473-2ec8-4643-bfd4-d4ab9a9a0988"),
                             DqtSanctionCode = "A5A",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Prohibition Order - serious professional incompetence - Ineligible to reapply",
                             ProhibitionLevel = 1
                         },
@@ -690,7 +669,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("70b7d473-2ec8-4643-bfd4-d4ab9a9a0988"),
                             DqtSanctionCode = "A1B",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Prohibition Order - unacceptable professional conduct - Eligible to reapply after specified time",
                             ProhibitionLevel = 1
                         },
@@ -700,7 +678,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("70b7d473-2ec8-4643-bfd4-d4ab9a9a0988"),
                             DqtSanctionCode = "A1A",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Prohibition Order - unacceptable professional conduct - Ineligible to reapply",
                             ProhibitionLevel = 1
                         },
@@ -710,7 +687,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("790410c1-b884-4cdd-8db9-64a042ab54ae"),
                             DqtSanctionCode = "A20",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Suspension order - conviction of a relevant offence - with conditions",
                             ProhibitionLevel = 2
                         },
@@ -720,7 +696,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("790410c1-b884-4cdd-8db9-64a042ab54ae"),
                             DqtSanctionCode = "A19",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Suspension order - conviction of a relevant offence - without conditions",
                             ProhibitionLevel = 2
                         },
@@ -730,7 +705,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("790410c1-b884-4cdd-8db9-64a042ab54ae"),
                             DqtSanctionCode = "A14",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Suspension order - serious professional incompetence - with conditions",
                             ProhibitionLevel = 2
                         },
@@ -740,7 +714,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("790410c1-b884-4cdd-8db9-64a042ab54ae"),
                             DqtSanctionCode = "A6",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Suspension order - serious professional incompetence - without conditions",
                             ProhibitionLevel = 2
                         },
@@ -750,7 +723,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("790410c1-b884-4cdd-8db9-64a042ab54ae"),
                             DqtSanctionCode = "A13",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Suspension order - unacceptable professional conduct - with conditions",
                             ProhibitionLevel = 2
                         },
@@ -760,7 +732,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("790410c1-b884-4cdd-8db9-64a042ab54ae"),
                             DqtSanctionCode = "A2",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Suspension order - unacceptable professional conduct - without conditions",
                             ProhibitionLevel = 2
                         },
@@ -770,7 +741,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("790410c1-b884-4cdd-8db9-64a042ab54ae"),
                             DqtSanctionCode = "A24",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Suspension order - with conditions - (arising from breach of previous condition(s))",
                             ProhibitionLevel = 2
                         },
@@ -780,9 +750,17 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("790410c1-b884-4cdd-8db9-64a042ab54ae"),
                             DqtSanctionCode = "A23",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Suspension order - without conditions - (arising from breach of previous condition(s))",
                             ProhibitionLevel = 2
+                        },
+                        new
+                        {
+                            AlertTypeId = new Guid("62715a16-69f8-44f7-90f4-df83cd0c9f16"),
+                            AlertCategoryId = new Guid("ff18c0a8-aaea-4c8b-93a2-2206beea1d7a"),
+                            DqtSanctionCode = "B4",
+                            InternalOnly = true,
+                            Name = "Employers to contact the Secretary of State",
+                            ProhibitionLevel = 0
                         },
                         new
                         {
@@ -790,7 +768,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("b2b19019-b165-47a3-8745-3297ff152581"),
                             DqtSanctionCode = "B1",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "Barring by the Secretary of State",
                             ProhibitionLevel = 1
                         },
@@ -800,7 +777,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("b2b19019-b165-47a3-8745-3297ff152581"),
                             DqtSanctionCode = "G2",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "Formerly barred by the Independent Safeguarding Authority",
                             ProhibitionLevel = 1
                         },
@@ -810,7 +786,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("b2b19019-b165-47a3-8745-3297ff152581"),
                             DqtSanctionCode = "B6",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "Formerly on List 99",
                             ProhibitionLevel = 1
                         },
@@ -820,7 +795,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("b2b19019-b165-47a3-8745-3297ff152581"),
                             DqtSanctionCode = "T2",
                             InternalOnly = false,
-                            IsActive = true,
                             Name = "Interim prohibition by the Secretary of State",
                             ProhibitionLevel = 1
                         },
@@ -830,7 +804,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("b2b19019-b165-47a3-8745-3297ff152581"),
                             DqtSanctionCode = "B3",
                             InternalOnly = false,
-                            IsActive = false,
                             Name = "Prohibited by an Independent Schools Tribunal or Secretary of State",
                             ProhibitionLevel = 1
                         },
@@ -840,7 +813,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("b2b19019-b165-47a3-8745-3297ff152581"),
                             DqtSanctionCode = "T3",
                             InternalOnly = false,
-                            IsActive = true,
                             Name = "Prohibition by the Secretary of State - deregistered by GTC Scotland",
                             ProhibitionLevel = 1
                         },
@@ -850,7 +822,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("b2b19019-b165-47a3-8745-3297ff152581"),
                             DqtSanctionCode = "T5",
                             InternalOnly = false,
-                            IsActive = true,
                             Name = "Prohibition by the Secretary of State - refer to GTC Northern Ireland",
                             ProhibitionLevel = 1
                         },
@@ -860,7 +831,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("b2b19019-b165-47a3-8745-3297ff152581"),
                             DqtSanctionCode = "T4",
                             InternalOnly = false,
-                            IsActive = true,
                             Name = "Prohibition by the Secretary of State - refer to the Education Workforce Council, Wales",
                             ProhibitionLevel = 1
                         },
@@ -870,7 +840,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("b2b19019-b165-47a3-8745-3297ff152581"),
                             DqtSanctionCode = "T1",
                             InternalOnly = false,
-                            IsActive = true,
                             Name = "Prohibition by the Secretary of State - misconduct",
                             ProhibitionLevel = 1
                         },
@@ -880,7 +849,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("e8a9ee91-bf7f-4f70-bc66-a644d522384e"),
                             DqtSanctionCode = "G1",
                             InternalOnly = true,
-                            IsActive = true,
                             Name = "A possible matching record was found. Please contact the DBS before employing this person",
                             ProhibitionLevel = 1
                         },
@@ -890,7 +858,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("cbf7633f-3904-407d-8371-42a473fa641f"),
                             DqtSanctionCode = "B2B",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "Restricted by the Secretary of State - Not Permitted to work as teacher",
                             ProhibitionLevel = 1
                         },
@@ -900,7 +867,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("cbf7633f-3904-407d-8371-42a473fa641f"),
                             DqtSanctionCode = "B2A",
                             InternalOnly = true,
-                            IsActive = false,
                             Name = "Restricted by the Secretary of State - Permitted to work as teacher",
                             ProhibitionLevel = 1
                         },
@@ -910,7 +876,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("38df5a00-94ab-486f-8905-d5b2eac04000"),
                             DqtSanctionCode = "T7",
                             InternalOnly = false,
-                            IsActive = true,
                             Name = "Section 128 barring direction",
                             ProhibitionLevel = 4
                         },
@@ -920,7 +885,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             AlertCategoryId = new Guid("227b75e5-bb98-496c-8860-1baea37aa5c6"),
                             DqtSanctionCode = "T6",
                             InternalOnly = false,
-                            IsActive = true,
                             Name = "Secretary of State decision- no prohibition",
                             ProhibitionLevel = 0
                         });
@@ -2710,7 +2674,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertType", b =>
                 {
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertCategory", null)
-                        .WithMany("AlertTypes")
+                        .WithMany()
                         .HasForeignKey("AlertCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -2884,11 +2848,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreAuthorization<System.Guid>", b =>
                 {
                     b.Navigation("Tokens");
-                });
-
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertCategory", b =>
-                {
-                    b.Navigation("AlertTypes");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.EytsAwardedEmailsJob", b =>

@@ -17,4 +17,9 @@ public class Alert
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
+
+    public Guid? DqtSanctionId { get; set; }
+    public int? DqtState { get; set; }
+    public DateTime? DqtCreatedOn { get; set; }
+    public DateTime? DqtModifiedOn { get; set; }
 }
