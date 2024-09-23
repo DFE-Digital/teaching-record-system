@@ -35,7 +35,7 @@ public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileServ
 
     public async Task OnGet()
     {
-        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
+        UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
             null;
     }

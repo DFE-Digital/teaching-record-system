@@ -25,6 +25,11 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public IReadOnlyCollection<MandatoryQualificationSpecialismInfo>? Specialisms { get; set; }
 
+    public void OnGet()
+    {
+        Specialism = JourneyInstance!.State.Specialism;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (Specialism is MandatoryQualificationSpecialism specialism && !Specialisms!.Any(s => s.Value == specialism))
@@ -63,6 +68,5 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
         Specialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: false);
 
         PersonName = personInfo.Name;
-        Specialism ??= JourneyInstance.State.Specialism;
     }
 }

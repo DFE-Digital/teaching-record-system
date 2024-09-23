@@ -23,6 +23,11 @@ public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDis
     [@EmailAddress(ErrorMessage = "Enter an email address in the correct format, like name@example.com")]
     public string? Email { get; set; }
 
+    public void OnGet()
+    {
+        Email = JourneyInstance!.State.Email;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -53,7 +58,5 @@ public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDis
             context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
             return;
         }
-
-        Email ??= JourneyInstance!.State.Email;
     }
 }

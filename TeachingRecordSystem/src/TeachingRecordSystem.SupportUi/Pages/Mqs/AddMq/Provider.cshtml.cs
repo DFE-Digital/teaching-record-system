@@ -26,6 +26,11 @@ public class ProviderModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public ProviderInfo[]? Providers { get; set; }
 
+    public void OnGet()
+    {
+        ProviderId = JourneyInstance!.State.ProviderId;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -51,7 +56,6 @@ public class ProviderModel(TrsLinkGenerator linkGenerator) : PageModel
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        ProviderId ??= JourneyInstance!.State.ProviderId;
         Providers = MandatoryQualificationProvider.All.Select(p => new ProviderInfo(p.MandatoryQualificationProviderId, p.Name)).ToArray();
     }
 

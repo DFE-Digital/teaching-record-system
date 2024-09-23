@@ -49,11 +49,11 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     public async Task OnGet()
     {
-        Detail ??= JourneyInstance!.State.Reason;
-        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
+        Detail = JourneyInstance!.State.Reason;
+        UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
             null;
-        UploadEvidence ??= JourneyInstance?.State.UploadEvidence;
+        UploadEvidence = JourneyInstance?.State.UploadEvidence;
     }
 
     public async Task<IActionResult> OnPost()

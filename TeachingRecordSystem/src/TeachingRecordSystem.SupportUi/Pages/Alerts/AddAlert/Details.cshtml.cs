@@ -23,6 +23,11 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
     [Display(Name = "Enter details")]
     public string? Details { get; set; }
 
+    public void OnGet()
+    {
+        Details = JourneyInstance!.State.Details;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -57,6 +62,5 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        Details ??= JourneyInstance!.State.Details;
     }
 }

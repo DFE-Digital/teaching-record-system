@@ -28,6 +28,12 @@ public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public DateOnly? StartDate { get; set; }
 
+    public void OnGet()
+    {
+        Status = JourneyInstance!.State.Status;
+        EndDate = JourneyInstance!.State.EndDate;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (Status == MandatoryQualificationStatus.Passed)
@@ -77,7 +83,5 @@ public class StatusModel(TrsLinkGenerator linkGenerator) : PageModel
 
         PersonName = personInfo.Name;
         StartDate = JourneyInstance!.State.StartDate;
-        Status ??= JourneyInstance.State.Status;
-        EndDate ??= JourneyInstance.State.EndDate;
     }
 }

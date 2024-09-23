@@ -24,6 +24,12 @@ public class NationalInsuranceNumberModel(AuthorizeAccessLinkGenerator linkGener
     [Required(ErrorMessage = "Enter your National Insurance number")]
     public string? NationalInsuranceNumber { get; set; }
 
+    public void OnGet()
+    {
+        HasNationalInsuranceNumber = JourneyInstance?.State.HasNationalInsuranceNumber;
+        NationalInsuranceNumber = JourneyInstance?.State.NationalInsuranceNumber;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (HasNationalInsuranceNumber == true)
@@ -68,12 +74,6 @@ public class NationalInsuranceNumberModel(AuthorizeAccessLinkGenerator linkGener
         else if (state.EvidenceFileId is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnIdentity(JourneyInstance.InstanceId));
-        }
-
-        if (context.Result is null)
-        {
-            HasNationalInsuranceNumber ??= JourneyInstance?.State.HasNationalInsuranceNumber;
-            NationalInsuranceNumber ??= JourneyInstance?.State.NationalInsuranceNumber;
         }
     }
 }

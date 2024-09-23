@@ -29,6 +29,11 @@ public class TypeModel(
 
     public AlertTypeInfo[]? AlertTypes { get; set; }
 
+    public void OnGet()
+    {
+        AlertTypeId = JourneyInstance!.State.AlertTypeId;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -61,7 +66,6 @@ public class TypeModel(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        AlertTypeId ??= JourneyInstance!.State.AlertTypeId;
 
         var alertTypes = await referenceDataCache.GetAlertTypes(activeOnly: true);
         AlertTypes = alertTypes.Select(t => new AlertTypeInfo(t.AlertTypeId, t.Name)).ToArray();
