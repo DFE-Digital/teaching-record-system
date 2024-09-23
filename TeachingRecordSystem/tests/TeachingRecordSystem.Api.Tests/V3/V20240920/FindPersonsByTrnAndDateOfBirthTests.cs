@@ -20,13 +20,14 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var sanctionCode = "A13";
         var startDate = new DateOnly(2022, 4, 1);
         var endDate = new DateOnly(2023, 1, 20);
+        var details = Faker.Lorem.Paragraph();
         var alertType = await ReferenceDataCache.GetAlertTypeByDqtSanctionCode(sanctionCode);
         var alertCategory = await ReferenceDataCache.GetAlertCategoryById(alertType.AlertCategoryId);
 
         var person = await TestData.CreatePerson(b => b
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithSanction(sanctionCode, startDate, endDate));
+            .WithSanction(sanctionCode, startDate, endDate, details: details));
 
         var sanction = person.Sanctions.Single();
 
@@ -57,6 +58,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
                             name = alertCategory.Name
                         }
                     },
+                    details = details,
                     startDate = startDate,
                     endDate = endDate,
                 }

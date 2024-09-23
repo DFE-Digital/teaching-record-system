@@ -61,7 +61,7 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
             new GetSanctionsByContactIdsQuery(
                 contactsById.Keys,
                 ActiveOnly: true,
-                new(dfeta_sanction.Fields.dfeta_StartDate, dfeta_sanction.Fields.dfeta_EndDate)));
+                new(dfeta_sanction.Fields.dfeta_StartDate, dfeta_sanction.Fields.dfeta_EndDate, dfeta_sanction.Fields.dfeta_SanctionDetails)));
 
         var getPreviousNamesTask = crmQueryDispatcher.ExecuteQuery(new GetPreviousNamesByContactIdsQuery(contactsById.Keys));
 
@@ -133,6 +133,7 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
                                     Name = alertType.Name,
                                     DqtSanctionCode = alertType.DqtSanctionCode!
                                 },
+                                Details = s.Sanction.dfeta_SanctionDetails,
                                 StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                                 EndDate = s.Sanction.dfeta_EndDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
                             };
