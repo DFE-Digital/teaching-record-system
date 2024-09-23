@@ -7,6 +7,7 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var sanctionCode = "A13";
+        var details = Faker.Lorem.Paragraph();
         var startDate = new DateOnly(2022, 4, 1);
         var endDate = new DateOnly(2023, 1, 20);
         var alertType = await ReferenceDataCache.GetAlertTypeByDqtSanctionCode(sanctionCode);
@@ -14,7 +15,7 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var person = await TestData.CreatePerson(x => x
             .WithTrn()
-            .WithSanction(sanctionCode, startDate, endDate));
+            .WithSanction(sanctionCode, startDate, endDate, details: details));
 
         var sanction = person.Sanctions.Single();
 
@@ -45,6 +46,7 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
                             name = alertCategory.Name
                         }
                     },
+                    details = details,
                     startDate = startDate,
                     endDate = endDate
                 }

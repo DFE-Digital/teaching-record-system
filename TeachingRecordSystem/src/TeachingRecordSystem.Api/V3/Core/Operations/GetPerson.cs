@@ -304,6 +304,7 @@ public class GetPersonHandler(
                 ColumnSet: new(
                     dfeta_sanction.Fields.dfeta_StartDate,
                     dfeta_sanction.Fields.dfeta_EndDate,
+                    dfeta_sanction.Fields.dfeta_SanctionDetails,
                     dfeta_sanction.Fields.dfeta_Spent)));
 
             return result[contact.Id];
@@ -439,6 +440,7 @@ public class GetPersonHandler(
                                 Name = alertType.Name,
                                 DqtSanctionCode = alertType.DqtSanctionCode!
                             },
+                            Details = s.Sanction.dfeta_SanctionDetails,
                             StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                             EndDate = s.Sanction.dfeta_EndDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
                         };
