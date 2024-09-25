@@ -13,7 +13,7 @@ public class GetAllSanctionCodesTests
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var query = new GetAllActiveSanctionCodesQuery();
+        var query = new GetAllSanctionCodesQuery(ActiveOnly: false);
 
         // Act
         var result = await _crmQueryDispatcher.ExecuteQuery(query);

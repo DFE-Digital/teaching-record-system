@@ -27,7 +27,7 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncEvents([trsEventEntity]);
+        await Helper.SyncEvents([trsEventEntity], dryRun: false);
 
         // Assert
         await DbFixture.WithDbContext(async dbContext =>

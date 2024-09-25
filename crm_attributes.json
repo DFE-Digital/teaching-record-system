@@ -267,7 +267,11 @@
     "dfeta_sanctiondetails",
     "dfeta_spent",
     "dfeta_startdate",
-    "statecode"
+    "statecode",
+    "statuscode",
+    "createdon",
+    "createdby",
+    "modifiedon"
   ],
   "dfeta_trsevent": [
     "dfeta_trseventid",
@@ -278,7 +282,7 @@
   "incident": [
     "customerid",
     "createdon",
-    "description",,
+    "description",
     "dfeta_emailaddress",
     "dfeta_fromidentity",
     "dfeta_newdateofbirth",

@@ -36,10 +36,10 @@ public class ReferenceDataCache(
         return sanctionCodes.Single(s => s.dfeta_sanctioncodeId == sanctionCodeId, $"Could not find sanction code with ID: '{sanctionCodeId}'.");
     }
 
-    public async Task<dfeta_sanctioncode[]> GetSanctionCodes()
+    public async Task<dfeta_sanctioncode[]> GetSanctionCodes(bool activeOnly = true)
     {
         var sanctionCodes = await EnsureSanctionCodes();
-        return sanctionCodes.ToArray();
+        return sanctionCodes.Where(s => s.StateCode == dfeta_sanctioncodeState.Active || !activeOnly).ToArray();
     }
 
     public async Task<Subject> GetSubjectByTitle(string title)
@@ -187,7 +187,7 @@ public class ReferenceDataCache(
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
-            () => crmQueryDispatcher.ExecuteQuery(new GetAllActiveSanctionCodesQuery()));
+            () => crmQueryDispatcher.ExecuteQuery(new GetAllSanctionCodesQuery(ActiveOnly: false)));
 
     private Task<Subject[]> EnsureSubjects() =>
         LazyInitializer.EnsureInitialized(

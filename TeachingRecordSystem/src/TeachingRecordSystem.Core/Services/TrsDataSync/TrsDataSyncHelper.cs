@@ -34,6 +34,7 @@ public class TrsDataSyncHelper(
         { ModelTypes.Person, GetModelTypeSyncInfoForPerson() },
         { ModelTypes.MandatoryQualification, GetModelTypeSyncInfoForMandatoryQualification() },
         { ModelTypes.Event, GetModelTypeSyncInfoForEvent() },
+        { ModelTypes.Alert, GetModelTypeSyncInfoForAlert() },
     };
 
     private readonly ISubject<object[]> _syncedEntitiesSubject = new Subject<object[]>();
@@ -46,6 +47,48 @@ public class TrsDataSyncHelper(
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
         return (modelTypeSyncInfo.EntityLogicalName, modelTypeSyncInfo.AttributeNames);
+    }
+
+    public static Alert? MapAlertFromDqtSanction(
+        dfeta_sanction sanction,
+        IEnumerable<dfeta_sanctioncode> sanctionCodes,
+        IEnumerable<AlertType> alertTypes,
+        bool ignoreInvalid)
+    {
+        if (sanction.dfeta_SanctionCodeId is null)
+        {
+            if (ignoreInvalid)
+            {
+                return null;
+            }
+
+            throw new InvalidOperationException($"Santion {sanction.Id} does not have a {nameof(dfeta_sanction.Fields.dfeta_SanctionCodeId)}.");
+        }
+
+        var sanctionCode = sanctionCodes.Single(c => c.Id == sanction.dfeta_SanctionCodeId.Id).dfeta_Value;
+        var alertType = alertTypes.SingleOrDefault(t => t.DqtSanctionCode == sanctionCode);
+
+        if (alertType is null)
+        {
+            return null;
+        }
+
+        return new Alert()
+        {
+            AlertId = sanction.Id,
+            AlertTypeId = alertType.AlertTypeId,
+            PersonId = sanction.dfeta_PersonId.Id,
+            Details = sanction.dfeta_SanctionDetails,
+            ExternalLink = sanction.dfeta_DetailsLink,
+            StartDate = sanction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            EndDate = sanction.dfeta_EndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            CreatedOn = sanction.CreatedOn!.Value,
+            UpdatedOn = sanction.ModifiedOn!.Value,
+            DqtSanctionId = sanction.Id,
+            DqtState = (int)sanction.StateCode!,
+            DqtCreatedOn = sanction.CreatedOn!.Value,
+            DqtModifiedOn = sanction.ModifiedOn!.Value,
+        };
     }
 
     public static MandatoryQualification MapMandatoryQualificationFromDqtQualification(
@@ -434,7 +477,146 @@ public class TrsDataSyncHelper(
         return toSync.Count;
     }
 
-    public async Task<int> SyncEvents(IReadOnlyCollection<dfeta_TRSEvent> events, bool dryRun = false, CancellationToken cancellationToken = default)
+    public async Task<bool> SyncAlert(
+        dfeta_sanction entity,
+        AuditDetailCollection auditDetails,
+        bool ignoreInvalid,
+        bool createMigratedEvent,
+        bool dryRun = false,
+        CancellationToken cancellationToken = default)
+    {
+        var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
+        {
+            { entity.Id, auditDetails }
+        };
+
+        return await SyncAlerts(new[] { entity }, auditDetailsDict, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken) == 1;
+    }
+
+    public async Task<int> SyncAlerts(
+        IReadOnlyCollection<dfeta_sanction> entities,
+        bool ignoreInvalid,
+        bool createMigratedEvent,
+        bool dryRun,
+        CancellationToken cancellationToken)
+    {
+        var auditDetails = await GetAuditRecords(dfeta_sanction.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
+
+        return await SyncAlerts(entities, auditDetails, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
+    }
+
+    public async Task<int> SyncAlerts(
+        IReadOnlyCollection<dfeta_sanction> entities,
+        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
+        bool ignoreInvalid,
+        bool createMigratedEvent,
+        bool dryRun,
+        CancellationToken cancellationToken = default)
+    {
+        var (alerts, events) = await MapAlertsAndAudits(entities, auditDetails, ignoreInvalid, createMigratedEvent);
+
+        return await SyncAlerts(alerts, events, ignoreInvalid, dryRun, cancellationToken);
+    }
+
+    private async Task<int> SyncAlerts(
+        IReadOnlyCollection<Alert> alerts,
+        IReadOnlyCollection<EventBase> events,
+        bool ignoreInvalid,
+        bool dryRun,
+        CancellationToken cancellationToken)
+    {
+        if (alerts.Count == 0)
+        {
+            Debug.Assert(events.Count == 0);
+            return 0;
+        }
+
+        var modelTypeSyncInfo = GetModelTypeSyncInfo<Alert>(ModelTypes.Alert);
+
+        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+
+        var toSync = alerts.ToList();
+
+        do
+        {
+            try
+            {
+                using var txn = await connection.BeginTransactionAsync(cancellationToken);
+
+                using (var createTempTableCommand = connection.CreateCommand())
+                {
+                    createTempTableCommand.CommandText = modelTypeSyncInfo.CreateTempTableStatement;
+                    createTempTableCommand.Transaction = txn;
+                    await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
+                }
+
+                using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement!, cancellationToken);
+
+                foreach (var a in toSync)
+                {
+                    writer.StartRow();
+                    modelTypeSyncInfo.WriteRecord!(writer, a);
+                }
+
+                await writer.CompleteAsync(cancellationToken);
+                await writer.CloseAsync(cancellationToken);
+
+                using (var mergeCommand = connection.CreateCommand())
+                {
+                    mergeCommand.CommandText = modelTypeSyncInfo.InsertStatement;
+                    mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
+                    mergeCommand.Transaction = txn;
+                    await mergeCommand.ExecuteNonQueryAsync();
+                }
+
+                await txn.SaveEvents(events, "events_import", clock, cancellationToken);
+
+                await txn.CommitAsync(cancellationToken);
+            }
+            catch (PostgresException ex) when (ex.SqlState == "23503" && ex.ConstraintName == Alert.PersonForeignKeyName)
+            {
+                // Person does not exist.
+                // This is unlikely to happen often so the handling of this doesn't need to be super optimal.
+                // In this case we just pull the contact record directly, sync it then go again.
+                // Since the person sync happens in its own transaction we need to ensure dryRun is false otherwise this will loop forever.
+
+                // ex.Detail will be something like "Key (person_id)=(6ac8dc26-c8ae-e311-b8ed-005056822391) is not present in table "persons"."
+                var personId = Guid.Parse(ex.Detail!.Substring("Key (person_id)=(".Length, Guid.Empty.ToString().Length));
+
+                var personSynced = await SyncPerson(personId, dryRun: false, cancellationToken);
+                if (!personSynced)
+                {
+                    // The person sync may fail if the record doesn't meet the criteria (e.g. it doesn't have a TRN).
+                    // If we're ignoring invalid records we can skip MQs that reference this person ID,
+                    // otherwise we blow up.
+
+                    if (ignoreInvalid)
+                    {
+                        toSync.RemoveAll(mq => mq.PersonId == personId);
+                        if (toSync.Count == 0)
+                        {
+                            return 0;
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            $"Attempted to sync Alert for person '{personId}' but the person record does not meet the sync criteria.");
+                    }
+                }
+
+                continue;
+            }
+
+            break;
+        }
+        while (true);
+
+        _syncedEntitiesSubject.OnNext([.. toSync, .. events]);
+        return toSync.Count;
+    }
+
+    public async Task<int> SyncEvents(IReadOnlyCollection<dfeta_TRSEvent> events, bool dryRun, CancellationToken cancellationToken = default)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo<EventInfo>(ModelTypes.Event);
 
@@ -896,6 +1078,97 @@ public class TrsDataSyncHelper(
         };
     }
 
+    private static ModelTypeSyncInfo GetModelTypeSyncInfoForAlert()
+    {
+        var tempTableName = "temp_alerts_import";
+        var tableName = "alerts";
+
+        var columnNames = new[]
+        {
+            "alert_id",
+            "alert_type_id",
+            "person_id",
+            "details",
+            "external_link",
+            "start_date",
+            "end_date",
+            "created_on",
+            "updated_on",
+            "dqt_sanction_id",
+            "dqt_state",
+            "dqt_created_on",
+            "dqt_modified_on",
+        };
+
+        var columnsToUpdate = columnNames.Except(new[] { "alert_id", "dqt_sanction_id" }).ToArray();
+
+        var columnList = string.Join(", ", columnNames);
+
+        var createTempTableStatement = $"CREATE TEMP TABLE {tempTableName} (LIKE {tableName} INCLUDING DEFAULTS)";
+
+        var copyStatement = $"COPY {tempTableName} ({columnList}) FROM STDIN (FORMAT BINARY)";
+
+        var insertStatement =
+            $"""
+            INSERT INTO {tableName} AS t ({columnList})
+            SELECT {columnList} FROM {tempTableName}
+            ON CONFLICT (alert_id) DO UPDATE
+            SET {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
+            WHERE t.dqt_modified_on < EXCLUDED.dqt_modified_on
+            """;
+
+        var deleteStatement = $"DELETE FROM {tableName} WHERE dqt_sanction_id = ANY({IdsParameterName})";
+
+        var getLastModifiedOnStatement = $"SELECT MAX(dqt_modified_on) FROM {tableName}";
+
+        var attributeNames = new[]
+        {
+            dfeta_sanction.Fields.dfeta_sanctionId,
+            dfeta_sanction.Fields.dfeta_SanctionCodeId,
+            dfeta_sanction.Fields.CreatedOn,
+            dfeta_sanction.Fields.CreatedBy,
+            dfeta_sanction.Fields.ModifiedOn,
+            dfeta_sanction.Fields.dfeta_StartDate,
+            dfeta_sanction.Fields.dfeta_EndDate,
+            dfeta_sanction.Fields.dfeta_PersonId,
+            dfeta_sanction.Fields.dfeta_SanctionDetails,
+            dfeta_sanction.Fields.dfeta_DetailsLink,
+            dfeta_sanction.Fields.StateCode,
+            dfeta_sanction.Fields.StatusCode
+        };
+
+        Action<NpgsqlBinaryImporter, Alert> writeRecord = (writer, alert) =>
+        {
+            writer.WriteValueOrNull(alert.AlertId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(alert.AlertTypeId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(alert.PersonId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(alert.Details, NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull(alert.ExternalLink, NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull(alert.StartDate, NpgsqlDbType.Date);
+            writer.WriteValueOrNull(alert.EndDate, NpgsqlDbType.Date);
+            writer.WriteValueOrNull(alert.CreatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(alert.UpdatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(alert.DqtSanctionId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(alert.DqtState, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(alert.DqtCreatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(alert.DqtModifiedOn, NpgsqlDbType.TimestampTz);
+        };
+
+        return new ModelTypeSyncInfo<Alert>()
+        {
+            CreateTempTableStatement = createTempTableStatement,
+            CopyStatement = copyStatement,
+            InsertStatement = insertStatement,
+            DeleteStatement = deleteStatement,
+            GetLastModifiedOnStatement = getLastModifiedOnStatement,
+            EntityLogicalName = dfeta_sanction.EntityLogicalName,
+            AttributeNames = attributeNames,
+            GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
+                helper.SyncAlerts(entities.Select(e => e.ToEntity<dfeta_sanction>()).ToArray(), ignoreInvalid, createMigratedEvent: false, dryRun, ct),
+            WriteRecord = writeRecord
+        };
+    }
+
     private static List<Person> MapPersons(IEnumerable<Contact> contacts) => contacts
         .Select(c => new Person()
         {
@@ -1170,6 +1443,33 @@ public class TrsDataSyncHelper(
         }
     }
 
+    private async Task<(List<Alert> Alerts, List<EventBase> Events)> MapAlertsAndAudits(
+        IEnumerable<dfeta_sanction> sanctions,
+        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
+        bool ignoreInvalid,
+        bool createMigratedEvent)
+    {
+        var sanctionCodes = await referenceDataCache.GetSanctionCodes(activeOnly: false);
+        var alertTypes = await referenceDataCache.GetAlertTypes();
+
+        var alerts = new List<Alert>();
+        var events = new List<EventBase>();
+
+        foreach (var s in sanctions)
+        {
+            var mapped = MapAlertFromDqtSanction(s, sanctionCodes, alertTypes, ignoreInvalid);
+
+            // Audits will come later
+
+            if (mapped is not null)
+            {
+                alerts.Add(mapped);
+            }
+        }
+
+        return (alerts, events);
+    }
+
     private record ModelTypeSyncInfo
     {
         public required string? CreateTempTableStatement { get; init; }
@@ -1201,6 +1501,7 @@ public class TrsDataSyncHelper(
         public const string Person = "Person";
         public const string MandatoryQualification = "MandatoryQualification";
         public const string Event = "Event";
+        public const string Alert = "Alert";
     }
 }
 
