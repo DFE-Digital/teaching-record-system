@@ -11,4 +11,5 @@ public static class JourneyNames
     public const string EditMqStatus = nameof(EditMqStatus);
     public const string DeleteMq = nameof(DeleteMq);
     public const string AddAlert = nameof(AddAlert);
+    public const string EditAlertStartDate = nameof(EditAlertStartDate);
 }

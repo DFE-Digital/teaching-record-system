@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.UiCommon.DataAnnotations;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
@@ -26,8 +25,9 @@ public class EndDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Display(Name = "End date")]
-    [RequiredIfOtherPropertyEquals(nameof(HasEndDate), ErrorMessage = "Enter an end date")]
     public DateOnly? EndDate { get; set; }
+
+    public DateOnly? StartDate { get; set; }
 
     public void OnGet()
     {
@@ -36,6 +36,17 @@ public class EndDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPost()
     {
+        if (HasEndDate == true && EndDate is null)
+        {
+            ModelState.AddModelError(nameof(EndDate), "Enter an end date");
+        }
+        else
+
+        if (StartDate >= EndDate)
+        {
+            ModelState.AddModelError(nameof(EndDate), "End date must be after start date");
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -69,5 +80,6 @@ public class EndDateModel(TrsLinkGenerator linkGenerator) : PageModel
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
+        StartDate = JourneyInstance!.State.StartDate;
     }
 }

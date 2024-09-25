@@ -172,6 +172,36 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_WhenStartDateIsAfterEndDate_RendersError()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        {
+            AlertTypeId = Guid.NewGuid(),
+            Details = "Details",
+            EndDate = new DateOnly(2021, 1, 1)
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["StartDate.Day"] = "2",
+                ["StartDate.Month"] = "1",
+                ["StartDate.Year"] = "2021"
+            })
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "StartDate", "Start date must be before end date");
+    }
+
+    [Fact]
     public async Task Post_WithValidInput_RedirectsToEndDatePage()
     {
         // Arrange
