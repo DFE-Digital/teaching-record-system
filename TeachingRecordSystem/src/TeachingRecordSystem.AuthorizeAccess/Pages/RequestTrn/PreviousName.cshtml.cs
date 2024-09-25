@@ -26,6 +26,12 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
     [MaxLength(200, ErrorMessage = "Previous name must be 200 characters or less")]
     public string? PreviousName { get; set; }
 
+    public void OnGet()
+    {
+        HasPreviousName = JourneyInstance!.State.HasPreviousName;
+        PreviousName = JourneyInstance!.State.PreviousName;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -55,12 +61,6 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
         {
             context.Result = Redirect(linkGenerator.RequestTrnName(JourneyInstance.InstanceId));
             return;
-        }
-
-        if (context.Result is null)
-        {
-            HasPreviousName ??= JourneyInstance!.State.HasPreviousName;
-            PreviousName ??= JourneyInstance!.State.PreviousName;
         }
     }
 }

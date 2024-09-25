@@ -45,11 +45,11 @@ public class AddressModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMode
 
     public void OnGet()
     {
-        AddressLine1 ??= JourneyInstance!.State.AddressLine1;
-        AddressLine2 ??= JourneyInstance!.State.AddressLine2;
-        TownOrCity ??= JourneyInstance!.State.TownOrCity;
-        PostalCode ??= JourneyInstance!.State.PostalCode;
-        Country ??= JourneyInstance!.State.Country;
+        AddressLine1 = JourneyInstance!.State.AddressLine1;
+        AddressLine2 = JourneyInstance!.State.AddressLine2;
+        TownOrCity = JourneyInstance!.State.TownOrCity;
+        PostalCode = JourneyInstance!.State.PostalCode;
+        Country = JourneyInstance!.State.Country;
     }
 
     public async Task<IActionResult> OnPost()

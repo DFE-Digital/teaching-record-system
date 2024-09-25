@@ -23,6 +23,11 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
     [Display(Name = "Enter start date")]
     public DateOnly? StartDate { get; set; }
 
+    public void OnGet()
+    {
+        StartDate = JourneyInstance!.State.StartDate;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -57,6 +62,5 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        StartDate ??= JourneyInstance!.State.StartDate;
     }
 }

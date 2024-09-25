@@ -16,6 +16,11 @@ public class NpqCheckModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMod
     [Required(ErrorMessage = "Tell us whether you plan on taking a national professional qualification (NPQ)")]
     public bool? IsPlanningToTakeAnNpq { get; set; }
 
+    public void OnGet()
+    {
+        IsPlanningToTakeAnNpq = JourneyInstance!.State.IsPlanningToTakeAnNpq;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -36,9 +41,6 @@ public class NpqCheckModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMod
         if (state.HasPendingTrnRequest)
         {
             context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
-            return;
         }
-
-        IsPlanningToTakeAnNpq ??= JourneyInstance!.State.IsPlanningToTakeAnNpq;
     }
 }

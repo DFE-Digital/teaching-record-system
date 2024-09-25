@@ -20,6 +20,11 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
     [MaxLength(200, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
+    public void OnGet()
+    {
+        Name = JourneyInstance!.State.Name;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -47,11 +52,6 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
         else if (state.Email is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnEmail(JourneyInstance.InstanceId));
-        }
-
-        if (context.Result is null)
-        {
-            Name ??= JourneyInstance!.State.Name;
         }
     }
 }

@@ -55,12 +55,12 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
     public async Task OnGet()
     {
-        DeletionReason ??= JourneyInstance!.State.DeletionReason;
-        DeletionReasonDetail ??= JourneyInstance?.State.DeletionReasonDetail;
-        UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
+        DeletionReason = JourneyInstance!.State.DeletionReason;
+        DeletionReasonDetail = JourneyInstance?.State.DeletionReasonDetail;
+        UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
             null;
-        UploadEvidence ??= JourneyInstance?.State.UploadEvidence;
+        UploadEvidence = JourneyInstance?.State.UploadEvidence;
     }
 
     public async Task<IActionResult> OnPost()

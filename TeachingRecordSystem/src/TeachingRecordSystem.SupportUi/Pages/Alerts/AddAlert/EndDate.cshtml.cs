@@ -29,6 +29,11 @@ public class EndDateModel(TrsLinkGenerator linkGenerator) : PageModel
     [RequiredIfOtherPropertyEquals(nameof(HasEndDate), ErrorMessage = "Enter an end date")]
     public DateOnly? EndDate { get; set; }
 
+    public void OnGet()
+    {
+        EndDate = JourneyInstance!.State.EndDate;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!ModelState.IsValid)
@@ -64,6 +69,5 @@ public class EndDateModel(TrsLinkGenerator linkGenerator) : PageModel
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        EndDate ??= JourneyInstance!.State.EndDate;
     }
 }

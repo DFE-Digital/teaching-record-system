@@ -19,6 +19,11 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator, IClock
     [Required(ErrorMessage = "Enter your date of birth")]
     public DateOnly? DateOfBirth { get; set; }
 
+    public void OnGet()
+    {
+        DateOfBirth = JourneyInstance!.State.DateOfBirth;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (DateOfBirth >= clock.Today)
@@ -48,9 +53,6 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator, IClock
         else if (state.HasPreviousName is null)
         {
             context.Result = Redirect(linkGenerator.RequestTrnPreviousName(JourneyInstance.InstanceId));
-            return;
         }
-
-        DateOfBirth ??= JourneyInstance!.State.DateOfBirth;
     }
 }

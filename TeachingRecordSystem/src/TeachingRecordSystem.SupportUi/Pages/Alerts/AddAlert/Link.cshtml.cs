@@ -22,6 +22,11 @@ public class LinkModel(TrsLinkGenerator linkGenerator) : PageModel
     [Display(Name = "Enter link")]
     public string? Link { get; set; }
 
+    public void OnGet()
+    {
+        Link = JourneyInstance!.State.Link;
+    }
+
     public async Task<IActionResult> OnPost()
     {
         if (!string.IsNullOrEmpty(Link) &&
@@ -63,6 +68,5 @@ public class LinkModel(TrsLinkGenerator linkGenerator) : PageModel
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        Link ??= JourneyInstance!.State.Link;
     }
 }
