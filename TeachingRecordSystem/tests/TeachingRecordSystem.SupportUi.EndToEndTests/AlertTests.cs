@@ -99,7 +99,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditAlertStartDatePage(alertId);
 
-        await page.FillDateInput(startDate);
+        await page.FillDateInput(newStartDate);
 
         await page.ClickContinueButton();
 
