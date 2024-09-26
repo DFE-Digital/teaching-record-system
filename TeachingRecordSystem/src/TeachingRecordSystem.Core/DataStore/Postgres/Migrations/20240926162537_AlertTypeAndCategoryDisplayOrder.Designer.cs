@@ -14,7 +14,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    [Migration("20240926142512_AlertTypeAndCategoryDisplayOrder")]
+    [Migration("20240926162537_AlertTypeAndCategoryDisplayOrder")]
     partial class AlertTypeAndCategoryDisplayOrder
     {
         /// <inheritdoc />
@@ -381,6 +381,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasKey("AlertCategoryId")
                         .HasName("pk_alert_categories");
 
+                    b.HasIndex("DisplayOrder")
+                        .IsUnique()
+                        .HasDatabaseName("ix_alert_categories_display_order");
+
                     b.ToTable("alert_categories", (string)null);
 
                     b.HasData(
@@ -503,6 +507,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     b.HasIndex("AlertCategoryId")
                         .HasDatabaseName("ix_alert_types_alert_category_id");
+
+                    b.HasIndex("DisplayOrder")
+                        .IsUnique()
+                        .HasDatabaseName("ix_alert_Types_display_order");
 
                     b.ToTable("alert_types", (string)null);
 

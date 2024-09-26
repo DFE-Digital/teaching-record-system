@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -416,11 +416,31 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                 keyValue: new Guid("fcff87d6-88f5-4fc5-ac81-5350b4fdd9e1"),
                 column: "display_order",
                 value: 14);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_alert_types_display_order",
+                table: "alert_types",
+                column: "display_order",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_alert_categories_display_order",
+                table: "alert_categories",
+                column: "display_order",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropIndex(
+                name: "ix_alert_Types_display_order",
+                table: "alert_types");
+
+            migrationBuilder.DropIndex(
+                name: "ix_alert_categories_display_order",
+                table: "alert_categories");
+
             migrationBuilder.DropColumn(
                 name: "display_order",
                 table: "alert_types");
