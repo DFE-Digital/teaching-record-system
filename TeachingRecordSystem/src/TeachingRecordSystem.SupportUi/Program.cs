@@ -99,11 +99,24 @@ builder.Services
             });
 
         options.Conventions.AddFolderApplicationModelConvention(
-            "/Alerts/AddAlert",
+            "/Alerts",
             model =>
             {
                 model.Filters.Add(new RequireFeatureEnabledFilterFactory("Alerts"));
+            });
+
+        options.Conventions.AddFolderApplicationModelConvention(
+            "/Alerts/AddAlert",
+            model =>
+            {
                 model.Filters.Add(new CheckPersonExistsFilterFactory());
+            });
+
+        options.Conventions.AddFolderApplicationModelConvention(
+            "/Alerts/EditAlert",
+            model =>
+            {
+                model.Filters.Add(new ServiceFilterAttribute<CheckAlertExistsFilter>());
             });
 
         options.Conventions.AddFolderApplicationModelConvention(
@@ -205,6 +218,7 @@ builder.Services
     .AddTrsBaseServices()
     .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
     .AddTransient<CheckMandatoryQualificationExistsFilter>()
+    .AddTransient<CheckAlertExistsFilter>()
     .AddFormFlow(options =>
     {
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
@@ -223,6 +237,12 @@ builder.Services
             JourneyNames.AddAlert,
             typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.AddAlertState),
             requestDataKeys: ["personId"],
+            appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.EditAlertStartDate,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate.EditAlertStartDateState),
+            requestDataKeys: ["alertId"],
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(

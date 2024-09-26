@@ -23,6 +23,8 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
     [Display(Name = "Enter start date")]
     public DateOnly? StartDate { get; set; }
 
+    public DateOnly? EndDate { get; set; }
+
     public void OnGet()
     {
         StartDate = JourneyInstance!.State.StartDate;
@@ -30,6 +32,11 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPost()
     {
+        if (StartDate >= EndDate)
+        {
+            ModelState.AddModelError(nameof(StartDate), "Start date must be before end date");
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -62,5 +69,6 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
+        EndDate = JourneyInstance!.State.EndDate;
     }
 }

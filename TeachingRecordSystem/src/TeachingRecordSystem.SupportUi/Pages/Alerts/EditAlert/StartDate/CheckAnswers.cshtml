@@ -1,0 +1,60 @@
+@page "/alerts/{alertId}/start-date/check-answers/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate.CheckAnswersModel
+@{
+    ViewBag.Title = "Check details and confirm change";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.AlertEditStartDateReason(Model.AlertId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full-from-desktop">
+        <form action="@LinkGenerator.AlertEditStartDateCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Change an alert - @Model.PersonName</span>
+            <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+
+            <govuk-summary-list data-testid="change-summary">
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>New start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="new-start-date">@Model.NewStartDate!.Value.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDate(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Current start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="current-start-date" use-empty-fallback>@Model.CurrentStartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>                
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value><multi-line-text text="@Model.ChangeReason" data-testid="change-reason" /></govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDateReason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="evidence">
+                        @if (Model.UploadedEvidenceFileUrl is not null)
+                        {
+                            <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
+                        }
+                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDateReason(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Confirm change</govuk-button>
+                <govuk-button formaction="@LinkGenerator.AlertEditStartDateCheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

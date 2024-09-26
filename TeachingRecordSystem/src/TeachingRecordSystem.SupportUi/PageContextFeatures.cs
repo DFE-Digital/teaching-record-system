@@ -32,6 +32,12 @@ public static class HttpContextExtensions
 
     public static void SetCurrentSupportTaskFeature(this HttpContext context, CurrentSupportTaskFeature currentSupportTaskFeature) =>
         context.Features.Set(currentSupportTaskFeature);
+
+    public static CurrentAlertFeature GetCurrentAlertFeature(this HttpContext context) =>
+        context.Features.GetRequiredFeature<CurrentAlertFeature>();
+
+    public static void SetCurrentAlertFeature(this HttpContext context, CurrentAlertFeature currentAlertFeature) =>
+        context.Features.Set(currentAlertFeature);
 }
 
 public record CurrentPersonFeature(Guid PersonId, string FirstName, string MiddleName, string LastName)
@@ -42,3 +48,5 @@ public record CurrentPersonFeature(Guid PersonId, string FirstName, string Middl
 public record CurrentMandatoryQualificationFeature(MandatoryQualification MandatoryQualification);
 
 public record CurrentSupportTaskFeature(SupportTask SupportTask);
+
+public record CurrentAlertFeature(Alert Alert);
