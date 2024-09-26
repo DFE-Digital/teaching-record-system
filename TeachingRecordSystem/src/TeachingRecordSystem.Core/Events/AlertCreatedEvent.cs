@@ -3,8 +3,9 @@ using File = TeachingRecordSystem.Core.Events.Models.File;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record class AlertCreatedEvent : EventBase, IEventWithPersonId, IEventWithAlert
+public record class AlertCreatedEvent : EventBase, IEventWithPersonId, IEventWithAlert, IEventWithKey
 {
+    public string? Key { get; init; }
     public required Guid PersonId { get; init; }
     public required Alert Alert { get; init; }
     public required string? Reason { get; init; }

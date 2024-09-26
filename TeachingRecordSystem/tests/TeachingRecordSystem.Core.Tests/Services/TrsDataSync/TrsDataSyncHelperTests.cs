@@ -1,10 +1,14 @@
+using FakeXrmEasy.Extensions;
+using Microsoft.Crm.Sdk.Messages;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Microsoft.Xrm.Sdk;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Services.TrsDataSync;
 
 [Collection(nameof(TrsDataSyncTestCollection))]
-public partial class TrsDataSyncHelperTests
+public partial class TrsDataSyncHelperTests : IAsyncLifetime
 {
     public TrsDataSyncHelperTests(
         DbFixture dbFixture,
@@ -37,4 +41,96 @@ public partial class TrsDataSyncHelperTests
     private TestableClock Clock { get; }
 
     public TrsDataSyncHelper Helper { get; }
+
+    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContext(dbContext => dbContext.Events.ExecuteDeleteAsync());
+
+    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+
+    private async Task<T> CreateDeactivatedEntityVersion<T>(
+        T existingEntity,
+        string entityLogicalName,
+        AuditDetailCollection auditDetailCollection)
+        where T : Entity
+    {
+        if (existingEntity.GetAttributeValue<OptionSetValue>("statecode").Value != 0)
+        {
+            throw new ArgumentException("Entity must be active.", nameof(existingEntity));
+        }
+
+        var currentDqtUser = await TestData.GetCurrentCrmUser();
+
+        var updatedEntity = existingEntity.Clone();
+        updatedEntity.Attributes["statecode"] = new OptionSetValue(1);
+        updatedEntity.Attributes["statuscode"] = new OptionSetValue(2);
+
+        var oldValue = new Entity(entityLogicalName, existingEntity.Id);
+        oldValue.Attributes["statecode"] = new OptionSetValue(0);
+        oldValue.Attributes["statuscode"] = new OptionSetValue(1);
+
+        var newValue = new Entity(entityLogicalName, existingEntity.Id);
+        newValue.Attributes["statecode"] = new OptionSetValue(1);
+        newValue.Attributes["statuscode"] = new OptionSetValue(2);
+
+        var auditId = Guid.NewGuid();
+        auditDetailCollection.Add(new AttributeAuditDetail()
+        {
+            AuditRecord = new Audit()
+            {
+                Action = Audit_Action.Update,
+                AuditId = auditId,
+                CreatedOn = Clock.UtcNow,
+                Id = auditId,
+                Operation = Audit_Operation.Update,
+                UserId = currentDqtUser
+            },
+            OldValue = oldValue,
+            NewValue = newValue
+        });
+
+        return updatedEntity.ToEntity<T>();
+    }
+
+    private async Task<T> CreateReactivatedEntityVersion<T>(
+        T existingEntity,
+        string entityLogicalName,
+        AuditDetailCollection auditDetailCollection)
+        where T : Entity
+    {
+        if (existingEntity.GetAttributeValue<OptionSetValue>("statecode").Value != 1)
+        {
+            throw new ArgumentException("Entity must be inactive.", nameof(existingEntity));
+        }
+
+        var currentDqtUser = await TestData.GetCurrentCrmUser();
+
+        var updatedEntity = existingEntity.Clone();
+        updatedEntity.Attributes["statecode"] = new OptionSetValue(0);
+        updatedEntity.Attributes["statuscode"] = new OptionSetValue(1);
+
+        var oldValue = new Entity(entityLogicalName, existingEntity.Id);
+        oldValue.Attributes["statecode"] = new OptionSetValue(1);
+        oldValue.Attributes["statuscode"] = new OptionSetValue(2);
+
+        var newValue = new Entity(entityLogicalName, existingEntity.Id);
+        newValue.Attributes["statecode"] = new OptionSetValue(0);
+        newValue.Attributes["statuscode"] = new OptionSetValue(1);
+
+        var auditId = Guid.NewGuid();
+        auditDetailCollection.Add(new AttributeAuditDetail()
+        {
+            AuditRecord = new Audit()
+            {
+                Action = Audit_Action.Update,
+                AuditId = auditId,
+                CreatedOn = Clock.UtcNow,
+                Id = auditId,
+                Operation = Audit_Operation.Update,
+                UserId = currentDqtUser
+            },
+            OldValue = oldValue,
+            NewValue = newValue
+        });
+
+        return updatedEntity.ToEntity<T>();
+    }
 }
