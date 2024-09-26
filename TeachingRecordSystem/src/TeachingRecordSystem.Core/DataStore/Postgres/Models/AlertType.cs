@@ -14,4 +14,5 @@ public class AlertType
     public required ProhibitionLevel ProhibitionLevel { get; init; }
     public required bool InternalOnly { get; init; }
     public required bool IsActive { get; init; }
+    public required int DisplayOrder { get; init; }
 }

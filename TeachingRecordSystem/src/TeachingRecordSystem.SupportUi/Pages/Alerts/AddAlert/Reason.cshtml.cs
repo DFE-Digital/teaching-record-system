@@ -115,9 +115,9 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.HasEndDate is null)
+        if (JourneyInstance!.State.StartDate is null)
         {
-            context.Result = Redirect(linkGenerator.AlertAddEndDate(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.AlertAddStartDate(PersonId, JourneyInstance.InstanceId));
             return;
         }
 

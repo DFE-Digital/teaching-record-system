@@ -36,8 +36,6 @@ public class CheckAnswersModel(
 
     public DateOnly? StartDate { get; set; }
 
-    public DateOnly? EndDate { get; set; }
-
     public string? Reason { get; set; }
 
     public string? EvidenceFileName { get; set; }
@@ -60,7 +58,7 @@ public class CheckAnswersModel(
             Details = Details,
             ExternalLink = Link,
             StartDate = StartDate,
-            EndDate = EndDate
+            EndDate = null
         };
         dbContext.Alerts.Add(alert);
 
@@ -112,7 +110,6 @@ public class CheckAnswersModel(
         Details = JourneyInstance!.State.Details;
         Link = JourneyInstance!.State.Link;
         StartDate = JourneyInstance!.State.StartDate;
-        EndDate = JourneyInstance!.State.EndDate;
         Reason = JourneyInstance!.State.Reason;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?

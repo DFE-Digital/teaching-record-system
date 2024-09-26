@@ -53,13 +53,6 @@
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@Model.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddEndDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for adding</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>
                         @if(!string.IsNullOrEmpty(Model.Reason))

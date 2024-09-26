@@ -15,8 +15,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
             StartDate = new DateOnly(2021, 1, 1),
-            HasEndDate = true,
-            EndDate = new DateOnly(2021, 1, 1),
             UploadEvidence = false
         });
 
@@ -58,7 +56,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var details = "Some details";
         var link = TestData.GenerateUrl();
         var startDate = new DateOnly(2021, 1, 1);
-        var endDate = new DateOnly(2023, 2, 10);
         var reason = "Some reason";
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "test.pdf";
@@ -70,8 +67,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Details = details,
             Link = populateOptional ? link : null,
             StartDate = new DateOnly(2021, 1, 1),
-            HasEndDate = populateOptional ? true : false,
-            EndDate = populateOptional ? endDate : null,
             Reason = populateOptional ? reason : null,
             UploadEvidence = populateOptional ? true : false,
             EvidenceFileId = populateOptional ? evidenceFileId : null,
@@ -90,7 +85,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(details, doc.GetElementByTestId("details")!.TextContent);
         Assert.Equal(populateOptional ? $"{link} (opens in new tab)" : "-", doc.GetElementByTestId("link")!.TextContent);
         Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("start-date")!.TextContent);
-        Assert.Equal(populateOptional ? endDate.ToString("d MMMM yyyy") : "-", doc.GetElementByTestId("end-date")!.TextContent);
         Assert.Equal(populateOptional ? reason : "-", doc.GetElementByTestId("reason")!.TextContent);
         Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : "-", doc.GetElementByTestId("uploaded-evidence-link")!.TextContent);
     }
@@ -106,7 +100,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
             StartDate = new DateOnly(2021, 1, 1),
-            EndDate = new DateOnly(2021, 1, 1),
             UploadEvidence = false
         });
 
@@ -127,7 +120,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var details = "Some details";
         var link = TestData.GenerateUrl();
         var startDate = new DateOnly(2021, 1, 1);
-        var endDate = new DateOnly(2023, 2, 10);
         var reason = "Some reason";
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "test.pdf";
@@ -142,8 +134,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Details = details,
             Link = link,
             StartDate = startDate,
-            HasEndDate = true,
-            EndDate = endDate,
             Reason = reason,
             UploadEvidence = true,
             EvidenceFileId = evidenceFileId,
@@ -178,7 +168,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Details = details,
                     ExternalLink = link,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = null
                 },
                 EvidenceFile = new()
                 {
@@ -206,8 +196,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
             StartDate = new DateOnly(2022, 1, 1),
-            HasEndDate = true,
-            EndDate = new DateOnly(2021, 1, 1),
             UploadEvidence = false
         });
 

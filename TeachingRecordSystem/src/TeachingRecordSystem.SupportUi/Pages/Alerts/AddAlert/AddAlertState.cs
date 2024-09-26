@@ -15,10 +15,6 @@ public class AddAlertState
 
     public DateOnly? StartDate { get; set; }
 
-    public DateOnly? EndDate { get; set; }
-
-    public bool? HasEndDate { get; set; }
-
     public string? Reason { get; set; }
 
     public bool? UploadEvidence { get; set; }
@@ -30,9 +26,11 @@ public class AddAlertState
     public string? EvidenceFileSizeDescription { get; set; }
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(AlertTypeId), nameof(Details), nameof(StartDate))]
+    [MemberNotNullWhen(true, nameof(AlertTypeId), nameof(Details), nameof(StartDate), nameof(UploadEvidence))]
     public bool IsComplete =>
         AlertTypeId.HasValue &&
-        !string.IsNullOrWhiteSpace(Details)
-        && StartDate.HasValue;
+        !string.IsNullOrWhiteSpace(Details) &&
+        StartDate.HasValue &&
+        UploadEvidence.HasValue &&
+        (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
 }
