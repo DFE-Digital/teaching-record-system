@@ -81,14 +81,10 @@ public static class HostApplicationBuilderExtensions
                 var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
 
                 recurringJobManager.RemoveIfExists("MopUpQtsAwardeesJob");
+                recurringJobManager.RemoveIfExists("SyncAllMqsFromCrmJob");
 
                 recurringJobManager.AddOrUpdate<SyncAllPersonsFromCrmJob>(
                     nameof(SyncAllPersonsFromCrmJob),
-                    job => job.Execute(CancellationToken.None),
-                    Cron.Never);
-
-                recurringJobManager.AddOrUpdate<SyncAllMqsFromCrmJob>(
-                    nameof(SyncAllMqsFromCrmJob),
                     job => job.Execute(CancellationToken.None),
                     Cron.Never);
 

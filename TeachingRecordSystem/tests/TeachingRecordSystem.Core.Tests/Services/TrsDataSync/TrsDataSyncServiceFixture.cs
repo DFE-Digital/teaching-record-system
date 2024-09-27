@@ -58,7 +58,7 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
         var options = Options.Create(new TrsDataSyncServiceOptions()
         {
             CrmConnectionString = "dummy",
-            ModelTypes = [TrsDataSyncHelper.ModelTypes.Person, TrsDataSyncHelper.ModelTypes.MandatoryQualification],
+            ModelTypes = [TrsDataSyncHelper.ModelTypes.Person],
             PollIntervalSeconds = 60,
             IgnoreInvalidData = false,
             RunService = true

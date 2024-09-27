@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Services.TrsDataSync;
-
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class MandatoryQualification : Qualification
@@ -13,12 +11,4 @@ public class MandatoryQualification : Qualification
 
     public Guid? DqtMqEstablishmentId { get; set; }
     public Guid? DqtSpecialismId { get; set; }
-
-    public static async Task<MandatoryQualification> MapFromDqtQualification(dfeta_qualification qualification, ReferenceDataCache referenceDataCache)
-    {
-        var mqEstablishments = await referenceDataCache.GetMqEstablishments();
-        var mqSpecialisms = await referenceDataCache.GetMqSpecialisms();
-
-        return TrsDataSyncHelper.MapMandatoryQualificationFromDqtQualification(qualification, mqEstablishments, mqSpecialisms, applyMigrationMappings: true);
-    }
 }
