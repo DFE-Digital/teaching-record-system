@@ -172,40 +172,11 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenStartDateIsAfterEndDate_RendersError()
+    public async Task Post_WhenStartDateIsInTheFuture_ReturnsError()
     {
         // Arrange
         var person = await TestData.CreatePerson();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
-        {
-            AlertTypeId = Guid.NewGuid(),
-            Details = "Details",
-            EndDate = new DateOnly(2021, 1, 1)
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["StartDate.Day"] = "2",
-                ["StartDate.Month"] = "1",
-                ["StartDate.Year"] = "2021"
-            })
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        await AssertEx.HtmlResponseHasError(response, "StartDate", "Start date must be before end date");
-    }
-
-    [Fact]
-    public async Task Post_WithValidInput_RedirectsToEndDatePage()
-    {
-        // Arrange
-        var person = await TestData.CreatePerson();
+        var futureDate = Clock.Today.AddDays(2);
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
         {
@@ -217,9 +188,39 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                ["StartDate.Day"] = "1",
-                ["StartDate.Month"] = "1",
-                ["StartDate.Year"] = "2021"
+                ["StartDate.Day"] = $"{futureDate.Day}",
+                ["StartDate.Month"] = $"{futureDate.Month}",
+                ["StartDate.Year"] = $"{futureDate.Year}"
+            })
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "StartDate", "Start date cannot be in the future");
+    }
+
+    [Fact]
+    public async Task Post_WithValidInput_RedirectsToReasonPage()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var startDate = Clock.Today;
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        {
+            AlertTypeId = Guid.NewGuid(),
+            Details = "Details"
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["StartDate.Day"] = $"{startDate.Day}",
+                ["StartDate.Month"] = $"{startDate.Month}",
+                ["StartDate.Year"] = $"{startDate.Year}"
             })
         };
 
@@ -228,7 +229,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/end-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/add/reason?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

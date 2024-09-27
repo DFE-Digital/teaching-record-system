@@ -43,12 +43,6 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string AlertAddStartDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/AddAlert/StartDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string AlertAddEndDate(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/Alerts/AddAlert/EndDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string AlertAddEndDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Alerts/AddAlert/EndDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
     public string AlertAddReason(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Alerts/AddAlert/Reason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 

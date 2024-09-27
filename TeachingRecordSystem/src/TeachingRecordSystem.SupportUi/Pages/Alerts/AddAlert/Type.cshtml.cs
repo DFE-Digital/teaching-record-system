@@ -68,21 +68,22 @@ public class TypeModel(
         PersonName = personInfo.Name;
 
         var alertTypes = await referenceDataCache.GetAlertTypes(activeOnly: true);
-        AlertTypes = alertTypes.Select(t => new AlertTypeInfo(t.AlertTypeId, t.Name)).ToArray();
+        AlertTypes = alertTypes.Select(t => new AlertTypeInfo(t.AlertTypeId, t.AlertCategoryId, t.Name, t.DisplayOrder)).ToArray();
 
         var categories = await referenceDataCache.GetAlertCategories();
         Categories = categories.Select(
             c => new AlertCategoryInfo(
                 c.Name,
-                alertTypes.Where(t => t.AlertCategoryId == c.AlertCategoryId).Select(t => new AlertTypeInfo(t.AlertTypeId, t.Name)).OrderBy(t => t.Name).ToArray()))
+                c.DisplayOrder,
+                AlertTypes.Where(t => t.AlertCategoryId == c.AlertCategoryId).OrderBy(t => t.DisplayOrder).ToArray()))
             .Where(c => c.AlertTypes.Length > 0)
-            .OrderBy(c => c.Name)
+            .OrderBy(c => c.DisplayOrder)
             .ToArray();
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 
-    public record AlertTypeInfo(Guid AlertTypeId, string Name);
+    public record AlertTypeInfo(Guid AlertTypeId, Guid AlertCategoryId, string Name, int DisplayOrder);
 
-    public record AlertCategoryInfo(string Name, AlertTypeInfo[] AlertTypes);
+    public record AlertCategoryInfo(string Name, int DisplayOrder, AlertTypeInfo[] AlertTypes);
 }

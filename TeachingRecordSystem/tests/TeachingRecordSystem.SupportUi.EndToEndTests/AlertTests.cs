@@ -12,7 +12,6 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var details = TestData.GenerateLoremIpsum();
         var link = TestData.GenerateUrl();
         var startDate = new DateOnly(2021, 1, 1);
-        var endDate = new DateOnly(2023, 2, 10);
         var reason = TestData.GenerateLoremIpsum();
         var evidenceFileName = "evidence.jpg";
         var evidenceFileMimeType = "image/jpeg";
@@ -44,13 +43,6 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnAddAlertStartDatePage();
 
         await page.FillDateInput(startDate);
-
-        await page.ClickContinueButton();
-
-        await page.AssertOnAddAlertEndDatePage();
-
-        await page.CheckAsync("text=Yes");
-        await page.FillDateInput(endDate);
 
         await page.ClickContinueButton();
 

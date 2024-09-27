@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
-public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
+public class StartDateModel(TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
@@ -23,8 +23,6 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
     [Display(Name = "Enter start date")]
     public DateOnly? StartDate { get; set; }
 
-    public DateOnly? EndDate { get; set; }
-
     public void OnGet()
     {
         StartDate = JourneyInstance!.State.StartDate;
@@ -32,9 +30,9 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        if (StartDate >= EndDate)
+        if (StartDate > clock.Today)
         {
-            ModelState.AddModelError(nameof(StartDate), "Start date must be before end date");
+            ModelState.AddModelError(nameof(StartDate), "Start date cannot be in the future");
         }
 
         if (!ModelState.IsValid)
@@ -49,7 +47,7 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
         return Redirect(FromCheckAnswers
             ? linkGenerator.AlertAddCheckAnswers(PersonId, JourneyInstance.InstanceId)
-            : linkGenerator.AlertAddEndDate(PersonId, JourneyInstance.InstanceId));
+            : linkGenerator.AlertAddReason(PersonId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
@@ -69,6 +67,5 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        EndDate = JourneyInstance!.State.EndDate;
     }
 }

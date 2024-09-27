@@ -41,7 +41,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
             StartDate = new DateOnly(2021, 1, 1),
-            HasEndDate = false,
             Reason = reason,
             UploadEvidence = true,
             EvidenceFileId = evidenceFileId,
@@ -73,8 +72,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
         {
             AlertTypeId = Guid.NewGuid(),
-            Details = "Details",
-            StartDate = new DateOnly(2022, 1, 1)
+            Details = "Details"
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -84,7 +82,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/end-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -97,8 +95,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
-            StartDate = new DateOnly(2022, 1, 1),
-            HasEndDate = false
+            StartDate = new DateOnly(2022, 1, 1)
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -120,8 +117,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
-            StartDate = new DateOnly(2022, 1, 1),
-            HasEndDate = false
+            StartDate = new DateOnly(2022, 1, 1)
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -150,8 +146,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
-            StartDate = new DateOnly(2022, 1, 1),
-            HasEndDate = false
+            StartDate = new DateOnly(2022, 1, 1)
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -179,8 +174,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
-            StartDate = new DateOnly(2022, 1, 1),
-            HasEndDate = false
+            StartDate = new DateOnly(2022, 1, 1)
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -209,8 +203,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
-            StartDate = new DateOnly(2022, 1, 1),
-            HasEndDate = false
+            StartDate = new DateOnly(2022, 1, 1)
         });
 
         var multipartContent = CreateFormFileUpload(".cs");
@@ -239,8 +232,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
-            StartDate = new DateOnly(2022, 1, 1),
-            HasEndDate = false
+            StartDate = new DateOnly(2022, 1, 1)
         });
 
         var multipartContent = CreateFormFileUpload(".pdf");
@@ -270,8 +262,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             AlertTypeId = Guid.NewGuid(),
             Details = "Details",
-            StartDate = new DateOnly(2022, 1, 1),
-            HasEndDate = false
+            StartDate = new DateOnly(2022, 1, 1)
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
