@@ -3,7 +3,6 @@ using Hangfire;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -14,22 +13,19 @@ public class SyncAllAlertsFromCrmJob
 {
     private readonly ICrmServiceClientProvider _crmServiceClientProvider;
     private readonly TrsDataSyncHelper _trsDataSyncHelper;
-    private readonly TrsDbContext _dbContext;
     private readonly IOptions<TrsDataSyncServiceOptions> _syncOptionsAccessor;
 
     public SyncAllAlertsFromCrmJob(
         ICrmServiceClientProvider crmServiceClientProvider,
         TrsDataSyncHelper trsDataSyncHelper,
-        TrsDbContext dbContext,
         IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor)
     {
         _crmServiceClientProvider = crmServiceClientProvider;
         _trsDataSyncHelper = trsDataSyncHelper;
-        _dbContext = dbContext;
         _syncOptionsAccessor = syncOptionsAccessor;
     }
 
-    public async Task Execute(CancellationToken cancellationToken)
+    public async Task Execute(bool createMigratedEvent, bool dryRun, CancellationToken cancellationToken)
     {
         const int pageSize = 1000;
 
@@ -68,8 +64,8 @@ public class SyncAllAlertsFromCrmJob
             await _trsDataSyncHelper.SyncAlerts(
                 result.Entities.Select(e => e.ToEntity<dfeta_sanction>()).ToArray(),
                 ignoreInvalid: _syncOptionsAccessor.Value.IgnoreInvalidData,
-                createMigratedEvent: true,
-                dryRun: true,
+                createMigratedEvent,
+                dryRun,
                 cancellationToken);
 
             if (result.MoreRecords)
