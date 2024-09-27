@@ -171,7 +171,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Post_WhenStartDateIsUnchanged_ReturnsError()
     {
-        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var databaseStartDate = Clock.Today;
         var newStartDate = databaseStartDate;
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate)));
         var alertId = person.Alerts.Single().AlertId;
@@ -197,8 +197,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Post_WhenStartDateIsEntered_RedirectsToChangeReasonPage()
     {
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var newStartDate = new DateOnly(2021, 10, 6);
+        var databaseStartDate = Clock.Today.AddDays(-20);
+        var newStartDate = Clock.Today.AddDays(-18);
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(alertId);
