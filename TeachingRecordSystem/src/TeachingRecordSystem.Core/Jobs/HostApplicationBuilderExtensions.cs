@@ -151,7 +151,22 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.AddOrUpdate<SyncAllAlertsFromCrmJob>(
                     nameof(SyncAllAlertsFromCrmJob),
-                    job => job.Execute(CancellationToken.None),
+                    job => job.Execute(/*createMigratedEvent: */false, /*dryRun: */false, CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<SyncAllAlertsFromCrmJob>(
+                    $"{nameof(SyncAllAlertsFromCrmJob)} (dry-run)",
+                    job => job.Execute(/*createMigratedEvent: */true, /*dryRun: */true, CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<SyncAllAlertsFromCrmJob>(
+                    $"{nameof(SyncAllAlertsFromCrmJob)} & migrate",
+                    job => job.Execute(/*createMigratedEvent: */true, /*dryRun: */false, CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<ClearAlertsJob>(
+                    nameof(ClearAlertsJob),
+                    job => job.Execute(),
                     Cron.Never);
 
                 return Task.CompletedTask;
