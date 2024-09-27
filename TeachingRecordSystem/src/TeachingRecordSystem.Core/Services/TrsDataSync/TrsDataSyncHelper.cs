@@ -571,7 +571,10 @@ public class TrsDataSyncHelper(
 
                 await txn.SaveEvents(events, "events_import", clock, cancellationToken);
 
-                await txn.CommitAsync(cancellationToken);
+                if (!dryRun)
+                {
+                    await txn.CommitAsync(cancellationToken);
+                }
             }
             catch (PostgresException ex) when (ex.SqlState == "23503" && ex.ConstraintName == Alert.PersonForeignKeyName)
             {
@@ -592,7 +595,7 @@ public class TrsDataSyncHelper(
 
                     if (ignoreInvalid)
                     {
-                        toSync.RemoveAll(mq => mq.PersonId == personId);
+                        toSync.RemoveAll(a => a.PersonId == personId);
                         if (toSync.Count == 0)
                         {
                             return 0;
@@ -1094,6 +1097,7 @@ public class TrsDataSyncHelper(
             "end_date",
             "created_on",
             "updated_on",
+            "deleted_on",
             "dqt_sanction_id",
             "dqt_state",
             "dqt_created_on",
@@ -1133,6 +1137,7 @@ public class TrsDataSyncHelper(
             dfeta_sanction.Fields.dfeta_PersonId,
             dfeta_sanction.Fields.dfeta_SanctionDetails,
             dfeta_sanction.Fields.dfeta_DetailsLink,
+            dfeta_sanction.Fields.dfeta_Spent,
             dfeta_sanction.Fields.StateCode,
             dfeta_sanction.Fields.StatusCode
         };
@@ -1148,6 +1153,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(alert.EndDate, NpgsqlDbType.Date);
             writer.WriteValueOrNull(alert.CreatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(alert.UpdatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(alert.DeletedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(alert.DqtSanctionId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(alert.DqtState, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(alert.DqtCreatedOn, NpgsqlDbType.TimestampTz);
@@ -1459,15 +1465,194 @@ public class TrsDataSyncHelper(
         {
             var mapped = MapAlertFromDqtSanction(s, sanctionCodes, alertTypes, ignoreInvalid);
 
-            // Audits will come later
-
-            if (mapped is not null)
+            if (mapped is null)
             {
-                alerts.Add(mapped);
+                continue;
             }
+
+            var audits = auditDetails[s.Id].AuditDetails;
+            var versions = GetEntityVersions(s, audits, GetModelTypeSyncInfo(ModelTypes.Alert).AttributeNames);
+
+            events.Add(audits.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create) ?
+                MapCreatedEvent(versions.First()) :
+                MapImportedEvent(versions.First()));
+
+            foreach (var (thisVersion, previousVersion) in versions.Skip(1).Zip(versions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
+            {
+                var mappedEvent = MapUpdatedEvent(thisVersion, previousVersion);
+
+                if (mappedEvent is not null)
+                {
+                    events.Add(mappedEvent);
+                }
+            }
+
+            // If the record is deactivated we should have an AlertDqtDeactivatedEvent or AlertDqtImportedEvent (with inactive status)
+            if (s.StateCode == dfeta_sanctionState.Inactive)
+            {
+                var lastEvent = events.Last();
+
+                if (lastEvent is AlertDqtDeactivatedEvent or AlertDqtImportedEvent { DqtState: (int)dfeta_qualificationState.Inactive })
+                {
+                    mapped.DeletedOn = lastEvent.CreatedUtc;
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"Expected last event to be a {nameof(AlertDqtDeactivatedEvent)} or {nameof(AlertDqtImportedEvent)}" +
+                        $" but was {lastEvent.GetEventName()}" +
+                        $" (sanction ID: '{s.Id}').");
+                }
+            }
+            else if (createMigratedEvent)
+            {
+                events.Add(MapMigratedEvent(versions.Last()));
+            }
+
+            alerts.Add(mapped);
         }
 
         return (alerts, events);
+
+        EventBase MapCreatedEvent(EntityVersionInfo<dfeta_sanction> snapshot)
+        {
+            return new AlertCreatedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Entity.Id}-Created",
+                CreatedUtc = snapshot.Timestamp,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false),
+                Reason = null,
+                EvidenceFile = null,
+            };
+        }
+
+        EventBase? MapUpdatedEvent(EntityVersionInfo<dfeta_sanction> snapshot, EntityVersionInfo<dfeta_sanction> previous)
+        {
+            if (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.StateCode))
+            {
+                var nonStateAttributes = snapshot.ChangedAttributes
+                    .Where(a => !(a is dfeta_sanction.Fields.StateCode or dfeta_sanction.Fields.StatusCode))
+                    .ToArray();
+
+                if (nonStateAttributes.Length > 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
+                }
+
+                if (snapshot.Entity.StateCode == dfeta_sanctionState.Inactive)
+                {
+                    return new AlertDqtDeactivatedEvent()
+                    {
+                        EventId = Guid.NewGuid(),
+                        Key = $"{snapshot.Id}",  // The CRM Audit ID
+                        CreatedUtc = snapshot.Timestamp,
+                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                        PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                        Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false)
+                    };
+                }
+                else
+                {
+                    return new AlertDqtReactivatedEvent()
+                    {
+                        EventId = Guid.NewGuid(),
+                        Key = $"{snapshot.Id}",  // The CRM Audit ID
+                        CreatedUtc = snapshot.Timestamp,
+                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                        PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                        Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false)
+                    };
+                }
+            }
+
+            var changes = AlertUpdatedEventChanges.None |
+                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_SanctionDetails) ? AlertUpdatedEventChanges.Details : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_DetailsLink) ? AlertUpdatedEventChanges.ExternalLink : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_StartDate) ? AlertUpdatedEventChanges.StartDate : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_EndDate) ? AlertUpdatedEventChanges.EndDate : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_Spent) ? AlertUpdatedEventChanges.DqtSpent : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_SanctionCodeId) ? AlertUpdatedEventChanges.DqtSanctionCode : 0);
+
+            if (changes == AlertUpdatedEventChanges.None)
+            {
+                return null;
+            }
+
+            return new AlertUpdatedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Id}",  // The CRM Audit ID
+                CreatedUtc = snapshot.Timestamp,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false),
+                OldAlert = GetEventAlert(previous.Entity, applyMigrationMappings: false),
+                ChangeReason = null,
+                EvidenceFile = null,
+                Changes = changes
+            };
+        }
+
+        EventBase MapImportedEvent(EntityVersionInfo<dfeta_sanction> snapshot)
+        {
+            return new AlertDqtImportedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Entity.Id}-Imported",
+                CreatedUtc = snapshot.Timestamp,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false),
+                DqtState = (int)snapshot.Entity.StateCode!
+            };
+        }
+
+        EventBase MapMigratedEvent(EntityVersionInfo<dfeta_sanction> snapshot)
+        {
+            return new AlertMigratedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Entity.Id}-Migrated",
+                CreatedUtc = clock.UtcNow,
+                RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: true)
+            };
+        }
+
+        EventModels.Alert GetEventAlert(dfeta_sanction snapshot, bool applyMigrationMappings)
+        {
+            var dqtSanctionCode = snapshot.dfeta_SanctionCodeId is null ?
+                null :
+                sanctionCodes.Single(s => s.Id == snapshot.dfeta_SanctionCodeId.Id);
+
+            var alertType = applyMigrationMappings && dqtSanctionCode is not null ?
+                alertTypes.Single(t => t.DqtSanctionCode == dqtSanctionCode.dfeta_Value) :
+                null;
+
+            return new()
+            {
+                AlertId = snapshot.Id,
+                AlertTypeId = alertType?.AlertTypeId,
+                Details = snapshot.dfeta_SanctionDetails,
+                ExternalLink = snapshot.dfeta_DetailsLink,
+                StartDate = snapshot.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                EndDate = snapshot.dfeta_EndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                DqtSpent = applyMigrationMappings ? null : snapshot.dfeta_Spent,
+                DqtSanctionCode = !applyMigrationMappings && dqtSanctionCode is not null ?
+                    new EventModels.AlertDqtSanctionCode()
+                    {
+                        SanctionCodeId = dqtSanctionCode.Id,
+                        Name = dqtSanctionCode.dfeta_name,
+                        Value = dqtSanctionCode.dfeta_Value
+                    } :
+                    null
+            };
+        }
     }
 
     private record ModelTypeSyncInfo

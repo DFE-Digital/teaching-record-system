@@ -3,8 +3,9 @@ using File = TeachingRecordSystem.Core.Events.Models.File;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record class AlertUpdatedEvent : EventBase, IEventWithPersonId, IEventWithAlert
+public record class AlertUpdatedEvent : EventBase, IEventWithPersonId, IEventWithAlert, IEventWithKey
 {
+    public string? Key { get; init; }
     public required Guid PersonId { get; init; }
     public required Alert Alert { get; init; }
     public required Alert OldAlert { get; init; }
@@ -21,4 +22,6 @@ public enum AlertUpdatedEventChanges
     ExternalLink = 1 << 2,
     StartDate = 1 << 3,
     EndDate = 1 << 4,
+    DqtSpent = 1 << 5,
+    DqtSanctionCode = 1 << 6,
 }

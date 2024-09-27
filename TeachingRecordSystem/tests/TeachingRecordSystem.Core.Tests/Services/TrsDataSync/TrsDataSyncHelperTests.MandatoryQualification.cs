@@ -129,7 +129,7 @@ public partial class TrsDataSyncHelperTests
         var entity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var deactivatedVersion = await CreateDeactivatedMandatoryQualificationEntityVersion(entity, auditDetailCollection);
+        var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, dfeta_qualification.EntityLogicalName, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -166,7 +166,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, createdEvent.CreatedUtc);
                 Assert.Equal(await TestData.GetCurrentCrmUserId(), createdEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, createdEvent.PersonId);
-                await AssertEventMatchesEntity(initialVersion, createdEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
+                await AssertMandatoryQualificationEventMatchesEntity(initialVersion, createdEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
             },
             async e =>
             {
@@ -174,7 +174,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                await AssertEventMatchesEntity(initialVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
+                await AssertMandatoryQualificationEventMatchesEntity(initialVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
             });
     }
 
@@ -201,7 +201,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, migatedEvent.CreatedUtc);
                 Assert.Equal(await TestData.GetCurrentCrmUserId(), migatedEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, migatedEvent.PersonId);
-                await AssertEventMatchesEntity(initialVersion, migatedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
+                await AssertMandatoryQualificationEventMatchesEntity(initialVersion, migatedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
             },
             async e =>
             {
@@ -209,7 +209,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                await AssertEventMatchesEntity(initialVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
+                await AssertMandatoryQualificationEventMatchesEntity(initialVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
             });
     }
 
@@ -250,7 +250,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(created, importedEvent.CreatedUtc);
                 Assert.Equal(await TestData.GetCurrentCrmUserId(), importedEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, importedEvent.PersonId);
-                await AssertEventMatchesEntity(initialVersion, importedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
+                await AssertMandatoryQualificationEventMatchesEntity(initialVersion, importedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
             },
             e =>
             {
@@ -270,7 +270,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                await AssertEventMatchesEntity(updatedVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
+                await AssertMandatoryQualificationEventMatchesEntity(updatedVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
             });
     }
 
@@ -299,7 +299,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, createdEvent.CreatedUtc);
                 Assert.Equal(await TestData.GetCurrentCrmUserId(), createdEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, createdEvent.PersonId);
-                await AssertEventMatchesEntity(initialVersion, createdEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
+                await AssertMandatoryQualificationEventMatchesEntity(initialVersion, createdEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
             },
             async e =>
             {
@@ -307,7 +307,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                await AssertEventMatchesEntity(initialVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
+                await AssertMandatoryQualificationEventMatchesEntity(initialVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
             });
     }
 
@@ -343,7 +343,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);
                 Assert.Equal(await TestData.GetCurrentCrmUserId(), updatedEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, updatedEvent.PersonId);
-                await AssertEventMatchesEntity(updatedVersion, updatedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
+                await AssertMandatoryQualificationEventMatchesEntity(updatedVersion, updatedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
                 Assert.Equal(GetChanges(initialVersion, updatedVersion), updatedEvent.Changes);
             },
             async e =>
@@ -352,7 +352,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                await AssertEventMatchesEntity(updatedVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
+                await AssertMandatoryQualificationEventMatchesEntity(updatedVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
             });
     }
 
@@ -390,7 +390,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);
                 Assert.Equal(await TestData.GetCurrentCrmUserId(), updatedEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, updatedEvent.PersonId);
-                await AssertEventMatchesEntity(updatedVersion, updatedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
+                await AssertMandatoryQualificationEventMatchesEntity(updatedVersion, updatedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
                 Assert.Equal(GetChanges(initialVersion, updatedVersion), updatedEvent.Changes);
             },
             async e =>
@@ -399,7 +399,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                await AssertEventMatchesEntity(updatedVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
+                await AssertMandatoryQualificationEventMatchesEntity(updatedVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
             });
     }
 
@@ -413,7 +413,7 @@ public partial class TrsDataSyncHelperTests
         var entity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var deactivatedVersion = await CreateDeactivatedMandatoryQualificationEntityVersion(entity, auditDetailCollection);
+        var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, dfeta_qualification.EntityLogicalName, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -426,7 +426,7 @@ public partial class TrsDataSyncHelperTests
         Assert.Equal(Clock.UtcNow, deactivatedEvent.CreatedUtc);
         Assert.Equal(await TestData.GetCurrentCrmUserId(), deactivatedEvent.RaisedBy.DqtUserId);
         Assert.Equal(person.PersonId, deactivatedEvent.PersonId);
-        await AssertEventMatchesEntity(deactivatedVersion, deactivatedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
+        await AssertMandatoryQualificationEventMatchesEntity(deactivatedVersion, deactivatedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
     }
 
     [Fact]
@@ -439,10 +439,10 @@ public partial class TrsDataSyncHelperTests
         var entity = await CreateNewMandatoryQualificationEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var deactivatedVersion = await CreateDeactivatedMandatoryQualificationEntityVersion(entity, auditDetailCollection);
+        var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, dfeta_qualification.EntityLogicalName, auditDetailCollection);
 
         Clock.Advance();
-        var reactivatedVersion = await CreateReactivatedMandatoryQualificationEntityVersion(deactivatedVersion, auditDetailCollection);
+        var reactivatedVersion = await CreateReactivatedEntityVersion(deactivatedVersion, dfeta_qualification.EntityLogicalName, auditDetailCollection);
 
         // Act
         await Helper.SyncMandatoryQualification(reactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -468,7 +468,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, reactivatedEvent.CreatedUtc);
                 Assert.Equal(await TestData.GetCurrentCrmUserId(), reactivatedEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, reactivatedEvent.PersonId);
-                await AssertEventMatchesEntity(reactivatedVersion, reactivatedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
+                await AssertMandatoryQualificationEventMatchesEntity(reactivatedVersion, reactivatedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
             },
             async e =>
             {
@@ -476,7 +476,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                await AssertEventMatchesEntity(reactivatedVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
+                await AssertMandatoryQualificationEventMatchesEntity(reactivatedVersion, migratedEvent.MandatoryQualification, expectMigrationMappingsApplied: true);
             });
     }
 
@@ -504,7 +504,7 @@ public partial class TrsDataSyncHelperTests
         Assert.Equal(Clock.UtcNow, actualDeletedEvent.CreatedUtc);
         Assert.Equal(await TestData.GetCurrentCrmUserId(), actualDeletedEvent.RaisedBy.DqtUserId);
         Assert.Equal(person.PersonId, actualDeletedEvent.PersonId);
-        await AssertEventMatchesEntity(deletedVersion, actualDeletedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
+        await AssertMandatoryQualificationEventMatchesEntity(deletedVersion, actualDeletedEvent.MandatoryQualification, expectMigrationMappingsApplied: false);
     }
 
     private static MandatoryQualificationUpdatedEventChanges GetChanges(dfeta_qualification first, dfeta_qualification second) =>
@@ -567,7 +567,7 @@ public partial class TrsDataSyncHelperTests
         });
     }
 
-    private async Task AssertEventMatchesEntity(
+    private async Task AssertMandatoryQualificationEventMatchesEntity(
         dfeta_qualification entity,
         EventModels.MandatoryQualification eventModel,
         bool expectMigrationMappingsApplied)
@@ -933,94 +933,10 @@ public partial class TrsDataSyncHelperTests
         return (updatedQualification, deletedEvent);
     }
 
-    private async Task<dfeta_qualification> CreateDeactivatedMandatoryQualificationEntityVersion(
-        dfeta_qualification existingQualification,
-        AuditDetailCollection auditDetailCollection)
-    {
-        if (existingQualification.StateCode != dfeta_qualificationState.Active)
-        {
-            throw new ArgumentException("Entity must be active.", nameof(existingQualification));
-        }
-
-        var currentDqtUser = await TestData.GetCurrentCrmUser();
-
-        var updatedQualification = existingQualification.Clone<dfeta_qualification>();
-        updatedQualification.StateCode = dfeta_qualificationState.Inactive;
-        updatedQualification.Attributes["statuscode"] = new OptionSetValue(2);
-
-        var oldValue = new Entity(dfeta_qualification.EntityLogicalName, existingQualification.Id);
-        oldValue.Attributes[dfeta_qualification.Fields.StateCode] = new OptionSetValue((int)dfeta_qualificationState.Active);
-        oldValue.Attributes["statuscode"] = new OptionSetValue(1);
-
-        var newValue = new Entity(dfeta_qualification.EntityLogicalName, existingQualification.Id);
-        newValue.Attributes[dfeta_qualification.Fields.StateCode] = new OptionSetValue((int)dfeta_qualificationState.Inactive);
-        newValue.Attributes["statuscode"] = new OptionSetValue(2);
-
-        var auditId = Guid.NewGuid();
-        auditDetailCollection.Add(new AttributeAuditDetail()
-        {
-            AuditRecord = new Audit()
-            {
-                Action = Audit_Action.Update,
-                AuditId = auditId,
-                CreatedOn = Clock.UtcNow,
-                Id = auditId,
-                Operation = Audit_Operation.Update,
-                UserId = currentDqtUser
-            },
-            OldValue = oldValue,
-            NewValue = newValue
-        });
-
-        return updatedQualification;
-    }
-
-    private async Task<dfeta_qualification> CreateReactivatedMandatoryQualificationEntityVersion(
-        dfeta_qualification existingQualification,
-        AuditDetailCollection auditDetailCollection)
-    {
-        if (existingQualification.StateCode != dfeta_qualificationState.Inactive)
-        {
-            throw new ArgumentException("Entity must be inactive.", nameof(existingQualification));
-        }
-
-        var currentDqtUser = await TestData.GetCurrentCrmUser();
-
-        var updatedQualification = existingQualification.Clone<dfeta_qualification>();
-        updatedQualification.StateCode = dfeta_qualificationState.Active;
-        updatedQualification.Attributes["statuscode"] = new OptionSetValue(1);
-
-        var oldValue = new Entity(dfeta_qualification.EntityLogicalName, existingQualification.Id);
-        oldValue.Attributes[dfeta_qualification.Fields.StateCode] = new OptionSetValue((int)dfeta_qualificationState.Inactive);
-        oldValue.Attributes["statuscode"] = new OptionSetValue(2);
-
-        var newValue = new Entity(dfeta_qualification.EntityLogicalName, existingQualification.Id);
-        newValue.Attributes[dfeta_qualification.Fields.StateCode] = new OptionSetValue((int)dfeta_qualificationState.Active);
-        newValue.Attributes["statuscode"] = new OptionSetValue(1);
-
-        var auditId = Guid.NewGuid();
-        auditDetailCollection.Add(new AttributeAuditDetail()
-        {
-            AuditRecord = new Audit()
-            {
-                Action = Audit_Action.Update,
-                AuditId = auditId,
-                CreatedOn = Clock.UtcNow,
-                Id = auditId,
-                Operation = Audit_Operation.Update,
-                UserId = currentDqtUser
-            },
-            OldValue = oldValue,
-            NewValue = newValue
-        });
-
-        return updatedQualification;
-    }
-
     private Task<EventBase[]> GetEventsForQualification(Guid qualificationId) =>
         DbFixture.WithDbContext(async dbContext =>
         {
-            var results = await dbContext.Database.SqlQuery<EventQueryResult>(
+            var results = await dbContext.Database.SqlQuery<MandatoryQualificationEventQueryResult>(
                 $"""
                 SELECT e.event_name, e.payload
                 FROM events as e
@@ -1031,7 +947,7 @@ public partial class TrsDataSyncHelperTests
             return results.Select(r => EventBase.Deserialize(r.Payload, r.EventName)).ToArray();
         });
 
-    private class EventQueryResult
+    private class MandatoryQualificationEventQueryResult
     {
         public required string EventName { get; set; }
         public required string Payload { get; set; }
