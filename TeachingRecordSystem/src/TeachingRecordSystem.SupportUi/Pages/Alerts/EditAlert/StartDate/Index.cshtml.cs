@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
 [Journey(JourneyNames.EditAlertStartDate), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
+public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageModel
 {
     public JourneyInstance<EditAlertStartDateState>? JourneyInstance { get; set; }
 
@@ -26,8 +26,6 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public DateOnly? CurrentStartDate { get; set; }
 
-    public DateOnly? EndDate { get; set; }
-
     public void OnGet()
     {
         StartDate = JourneyInstance!.State.StartDate;
@@ -39,9 +37,9 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         {
             ModelState.AddModelError(nameof(StartDate), "Enter a start date");
         }
-        else if (StartDate >= EndDate)
+        else if (StartDate > clock.Today)
         {
-            ModelState.AddModelError(nameof(StartDate), "Start date must be before end date");
+            ModelState.AddModelError(nameof(StartDate), "Start date cannot be in the future");
         }
         else if (StartDate == CurrentStartDate)
         {
@@ -69,6 +67,12 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         var alertInfo = context.HttpContext.GetCurrentAlertFeature();
+        if (alertInfo.Alert.EndDate is not null)
+        {
+            context.Result = BadRequest();
+            return;
+        }
+
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         JourneyInstance!.State.EnsureInitialized(alertInfo);
@@ -76,6 +80,5 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         CurrentStartDate = alertInfo.Alert.StartDate;
-        EndDate = alertInfo.Alert.EndDate;
     }
 }
