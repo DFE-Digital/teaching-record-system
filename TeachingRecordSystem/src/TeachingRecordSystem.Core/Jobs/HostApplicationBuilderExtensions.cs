@@ -169,6 +169,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.Execute(),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<BackfillDqtReportingAlertTypes>(
+                    nameof(BackfillDqtReportingAlertTypes),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }
