@@ -46,6 +46,11 @@ public static class PageExtensions
         await page.GotoAsync($"/alerts/{alertId}/end-date");
     }
 
+    public static async Task GoToCloseAlertPage(this IPage page, Guid alertId)
+    {
+        await page.GotoAsync($"/alerts/{alertId}/close");
+    }
+
     public static async Task GoToAddMqPage(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/mqs/add?personId={personId}");
@@ -197,7 +202,6 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/check-answers");
     }
 
-
     public static async Task AssertOnAlertDetailPage(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}");
@@ -208,9 +212,14 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/close");
     }
 
-    public static async Task AssertOnCloseAlertConfirmPage(this IPage page, Guid alertId)
+    public static async Task AssertOnCloseAlertChangeReasonPage(this IPage page, Guid alertId)
     {
-        await page.WaitForUrlPathAsync($"/alerts/{alertId}/close/confirm");
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/close/change-reason");
+    }
+
+    public static async Task AssertOnCloseAlertCheckAnswersPage(this IPage page, Guid alertId)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/close/check-answers");
     }
 
     public static async Task AssertOnPersonEditNamePage(this IPage page, Guid personId)

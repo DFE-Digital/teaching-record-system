@@ -91,11 +91,23 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string AlertEditEndDateCheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/EditAlert/EndDate/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
-    public string AlertClose(Guid alertId, JourneyInstanceId? journeyInstanceId) =>
-        GetRequiredPathByPage("/Alerts/CloseAlert/Index", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+    public string AlertClose(Guid alertId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Alerts/CloseAlert/Index", routeValues: new { alertId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string AlertCloseConfirm(Guid alertId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Alerts/CloseAlert/Confirm", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+    public string AlertCloseCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/CloseAlert/Index", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertCloseReason(Guid alertId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Alerts/CloseAlert/Reason", routeValues: new { alertId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertCloseReasonCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/CloseAlert/Reason", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertCloseCheckAnswers(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/CloseAlert/CheckAnswers", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertCloseCheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/CloseAlert/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
     public string EditChangeRequest(string ticketNumber) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", routeValues: new { ticketNumber });
 
