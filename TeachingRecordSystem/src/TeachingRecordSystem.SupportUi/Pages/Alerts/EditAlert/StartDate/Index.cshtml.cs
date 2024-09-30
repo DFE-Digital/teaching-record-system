@@ -21,7 +21,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageMode
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Start date")]
+    [Display(Name = "Enter a new start date")]
     public DateOnly? StartDate { get; set; }
 
     public DateOnly? CurrentStartDate { get; set; }

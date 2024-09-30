@@ -24,7 +24,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddAlertTypePage();
 
-        await page.CheckAsync($"text={alertType.Name}");
+        await page.CheckAsync($"label:text-is('{alertType.Name}')");
 
         await page.ClickContinueButton();
 
@@ -50,7 +50,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.FillAsync("label:text-is('Why are you adding this alert?')", reason);
 
-        await page.CheckAsync("text=Yes");
+        await page.CheckAsync("label:text-is('Yes')");
         await page
             .GetByLabel("Upload a file")
             .SetInputFilesAsync(
@@ -100,7 +100,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.CheckAsync("text=Another reason");
         await page.FillAsync("label:text-is('Enter details')", changeReason);
 
-        await page.CheckAsync("text=Yes");
+        await page.CheckAsync("label:text-is('Yes')");
         await page
             .GetByLabel("Upload a file")
             .SetInputFilesAsync(
@@ -114,6 +114,57 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButton();
 
         await page.AssertOnEditAlertStartDateCheckAnswersPage(alertId);
+
+        await page.ClickConfirmChangeButton();
+
+        await page.AssertOnPersonAlertsPage(personId);
+
+        await page.AssertFlashMessage("Alert changed");
+    }
+
+    [Fact]
+    public async Task EditAlertEndDate()
+    {
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var endDate = TestData.Clock.Today.AddDays(-10);
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts.First().AlertId;
+        var newEndDate = TestData.Clock.Today.AddDays(-5);
+        var changeReason = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToEditAlertEndDatePage(alertId);
+
+        await page.AssertOnEditAlertEndDatePage(alertId);
+
+        await page.FillDateInput(newEndDate);
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnEditAlertEndDateChangeReasonPage(alertId);
+
+        await page.CheckAsync("label:text-is('Another reason')");
+        await page.FillAsync("label:text-is('Enter details')", changeReason);
+
+        await page.CheckAsync("label:text-is('Yes')");
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnEditAlertEndDateCheckAnswersPage(alertId);
 
         await page.ClickConfirmChangeButton();
 

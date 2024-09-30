@@ -246,6 +246,12 @@ builder.Services
             appendUniqueKey: true));
 
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.EditAlertEndDate,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate.EditAlertEndDateState),
+            requestDataKeys: ["alertId"],
+            appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.AddMq,
             typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.AddMqState),
             requestDataKeys: ["personId"],
