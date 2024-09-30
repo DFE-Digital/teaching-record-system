@@ -73,6 +73,24 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string AlertEditStartDateCheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/EditAlert/StartDate/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
+    public string AlertEditEndDate(Guid alertId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Alerts/EditAlert/EndDate/Index", routeValues: new { alertId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertEditEndDateCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/EditAlert/EndDate/Index", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertEditEndDateReason(Guid alertId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Alerts/EditAlert/EndDate/Reason", routeValues: new { alertId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertEditEndDateReasonCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/EditAlert/EndDate/Reason", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertEditEndDateCheckAnswers(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/EditAlert/EndDate/CheckAnswers", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertEditEndDateCheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/EditAlert/EndDate/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
     public string AlertClose(Guid alertId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/CloseAlert/Index", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 

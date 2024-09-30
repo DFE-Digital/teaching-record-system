@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
@@ -48,7 +47,7 @@ public class CheckAnswersModel(
     {
         var now = clock.UtcNow;
 
-        var alert = new Alert()
+        var alert = new Core.DataStore.Postgres.Models.Alert()
         {
             AlertId = Guid.NewGuid(),
             CreatedOn = now,
