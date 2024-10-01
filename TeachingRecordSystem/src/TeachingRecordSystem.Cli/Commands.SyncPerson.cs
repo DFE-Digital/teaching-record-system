@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -33,7 +32,7 @@ public partial class Commands
                     .AddCrmQueries()
                     .AddDefaultServiceClient(ServiceLifetime.Singleton, _ => serviceClient)
                     .AddNamedServiceClient(TrsDataSyncService.CrmClientName, ServiceLifetime.Singleton, _ => serviceClient)
-                    .AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options, connectionString))
+                    .AddDatabase(connectionString)
                     .AddTransient<TrsDataSyncHelper>()
                     .AddSingleton<IClock, Clock>()
                     .AddSingleton<ReferenceDataCache>()
