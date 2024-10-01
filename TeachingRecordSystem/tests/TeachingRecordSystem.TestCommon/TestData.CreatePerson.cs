@@ -705,7 +705,7 @@ public partial class TestData
 
             var alertTypeId = _alertTypeId.ValueOr((await testData.ReferenceDataCache.GetAlertTypes()).RandomOne().AlertTypeId);
             var details = _details.ValueOr(testData.GenerateLoremIpsum());
-            var externalLink = _externalLink.ValueOr(testData.GenerateUrl());
+            var externalLink = _externalLink.ValueOr((string?)null);
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
             var endDate = _endDate.ValueOr((DateOnly?)null);
             var reason = _reason.ValueOr(testData.GenerateLoremIpsum());

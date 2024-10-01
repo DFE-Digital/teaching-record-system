@@ -1,0 +1,27 @@
+@page "/alerts/{alertId}/close/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert.IndexModel
+@{
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.AlertCloseCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.PersonAlerts(Model.PersonId))">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.AlertClose(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+            <span class="govuk-caption-l">Change an alert - @Model.PersonName</span>
+
+            <govuk-date-input asp-for="EndDate">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.AlertCloseCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </<div>
+</div>

@@ -120,6 +120,13 @@ builder.Services
             });
 
         options.Conventions.AddFolderApplicationModelConvention(
+            "/Alerts/CloseAlert",
+            model =>
+            {
+                model.Filters.Add(new ServiceFilterAttribute<CheckAlertExistsFilter>());
+            });
+
+        options.Conventions.AddFolderApplicationModelConvention(
             "/Mqs/AddMq",
             model =>
             {
@@ -248,6 +255,12 @@ builder.Services
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.EditAlertEndDate,
             typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate.EditAlertEndDateState),
+            requestDataKeys: ["alertId"],
+            appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.CloseAlert,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert.CloseAlertState),
             requestDataKeys: ["alertId"],
             appendUniqueKey: true));
 
