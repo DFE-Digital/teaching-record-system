@@ -65,7 +65,7 @@ public class CheckPersonExistsFilter(
         // Ensure we've synced this person into the TRS DB at least once
         if (!await dbContext.Persons.AnyAsync(p => p.PersonId == personId))
         {
-            await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncPerson(personId, /*dryRun:*/ false, CancellationToken.None));
+            await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncPerson(personId, /*ignoreInvalid: */ false, /*dryRun:*/ false, CancellationToken.None));
         }
 
         await next();

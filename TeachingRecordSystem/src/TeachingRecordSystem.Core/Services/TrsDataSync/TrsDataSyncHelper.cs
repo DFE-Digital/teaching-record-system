@@ -140,7 +140,7 @@ public class TrsDataSyncHelper(
         return modelTypeSyncInfo.GetSyncHandler(this)(entities, ignoreInvalid, dryRun, cancellationToken);
     }
 
-    public async Task<bool> SyncPerson(Guid contactId, bool dryRun = false, CancellationToken cancellationToken = default)
+    public async Task<bool> SyncPerson(Guid contactId, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.Person);
 
@@ -151,7 +151,7 @@ public class TrsDataSyncHelper(
             modelTypeSyncInfo.AttributeNames,
             cancellationToken);
 
-        return await SyncPersons(contacts, ignoreInvalid: false, dryRun, cancellationToken) == 1;
+        return await SyncPersons(contacts, ignoreInvalid, dryRun, cancellationToken) == 1;
     }
 
     public async Task<bool> SyncPerson(Contact entity, bool ignoreInvalid, bool dryRun = false, CancellationToken cancellationToken = default) =>
@@ -356,7 +356,7 @@ public class TrsDataSyncHelper(
                 // ex.Detail will be something like "Key (person_id)=(6ac8dc26-c8ae-e311-b8ed-005056822391) is not present in table "persons"."
                 var personId = Guid.Parse(ex.Detail!.Substring("Key (person_id)=(".Length, Guid.Empty.ToString().Length));
 
-                var personSynced = await SyncPerson(personId, dryRun: false, cancellationToken);
+                var personSynced = await SyncPerson(personId, ignoreInvalid, dryRun: false, cancellationToken);
                 if (!personSynced)
                 {
                     // The person sync may fail if the record doesn't meet the criteria (e.g. it doesn't have a TRN).
