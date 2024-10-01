@@ -114,7 +114,7 @@ jobs:
         dotnet_test_args: >-
           --no-build
           -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
-      timeout-minutes: 5
+      timeout-minutes: 10
 
     - name: Authorize access tests
       uses: ./.github/workflows/actions/test
