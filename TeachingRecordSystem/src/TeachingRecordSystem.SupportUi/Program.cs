@@ -127,6 +127,13 @@ builder.Services
             });
 
         options.Conventions.AddFolderApplicationModelConvention(
+            "/Alerts/ReopenAlert",
+            model =>
+            {
+                model.Filters.Add(new ServiceFilterAttribute<CheckAlertExistsFilter>());
+            });
+
+        options.Conventions.AddFolderApplicationModelConvention(
             "/Mqs/AddMq",
             model =>
             {
@@ -261,6 +268,12 @@ builder.Services
         options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
             JourneyNames.CloseAlert,
             typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert.CloseAlertState),
+            requestDataKeys: ["alertId"],
+            appendUniqueKey: true));
+
+        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
+            JourneyNames.ReopenAlert,
+            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert.ReopenAlertState),
             requestDataKeys: ["alertId"],
             appendUniqueKey: true));
 

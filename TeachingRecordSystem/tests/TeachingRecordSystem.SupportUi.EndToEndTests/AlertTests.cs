@@ -222,4 +222,49 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertFlashMessage("Alert closed");
     }
+
+    [Fact]
+    public async Task ReopenAlert()
+    {
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var endDate = TestData.Clock.Today.AddDays(-10);
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts.First().AlertId;
+        var newEndDate = TestData.Clock.Today.AddDays(-5);
+        var changeReason = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToReopenAlertPage(alertId);
+
+        await page.AssertOnReopenAlertPage(alertId);
+
+        await page.CheckAsync("label:text-is('Another reason')");
+        await page.FillAsync("label:text-is('Enter details')", changeReason);
+
+        await page.CheckAsync("label:text-is('Yes')");
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnReopenAlertCheckAnswersPage(alertId);
+
+        await page.ClickButton("Confirm and re-open alert");
+
+        await page.AssertOnPersonAlertsPage(personId);
+
+        await page.AssertFlashMessage("Alert re-opened");
+    }
 }
