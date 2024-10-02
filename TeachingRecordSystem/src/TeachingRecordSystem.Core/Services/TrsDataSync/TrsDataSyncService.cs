@@ -27,7 +27,7 @@ public class TrsDataSyncService(
         })
         .Build();
 
-    private const int PageSize = 1000;
+    private const int PageSize = 500;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
