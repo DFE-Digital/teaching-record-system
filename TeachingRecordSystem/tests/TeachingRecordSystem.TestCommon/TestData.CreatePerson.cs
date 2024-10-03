@@ -1,6 +1,7 @@
 using Microsoft.Xrm.Sdk.Messages;
 using Optional;
 using Optional.Unsafe;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -593,8 +594,47 @@ public partial class TestData
                 helper => helper.SyncPerson(contact, ignoreInvalid: false),
                 _syncEnabledOverride);
 
-            var mqs = await Task.WhenAll(_mqBuilders.Select(mqb => mqb.Execute(this, testData)));
-            var alerts = await Task.WhenAll(_alertBuilders.Select(ab => ab.Execute(this, testData)));
+            var (mqs, alerts) = await testData.WithDbContext(async dbContext =>
+            {
+                return (
+                    await AddMqs(),
+                    await AddAlerts());
+
+                async Task<MandatoryQualification[]> AddMqs()
+                {
+                    var mqIds = new List<Guid>();
+                    foreach (var builder in _mqBuilders)
+                    {
+                        mqIds.Add(await builder.Execute(this, testData, dbContext));
+                    }
+                    await dbContext.SaveChangesAsync();
+
+                    var mqs = await dbContext.MandatoryQualifications
+                        .Where(mq => mq.PersonId == PersonId)
+                        .Include(mq => mq.Provider)
+                        .ToDictionaryAsync(mq => mq.QualificationId, mq => mq);
+
+                    return mqIds.Select(id => mqs[id]).ToArray();
+                }
+
+                async Task<Alert[]> AddAlerts()
+                {
+                    var alertIds = new List<Guid>();
+                    foreach (var builder in _alertBuilders)
+                    {
+                        alertIds.Add(await builder.Execute(this, testData, dbContext));
+                    }
+                    await dbContext.SaveChangesAsync();
+
+                    var alerts = await dbContext.Alerts
+                        .Where(a => a.PersonId == PersonId)
+                        .Include(a => a.AlertType)
+                        .ThenInclude(at => at.AlertCategory)
+                        .ToDictionaryAsync(a => a.AlertId, a => a);
+
+                    return alertIds.Select(id => alerts[id]).ToArray();
+                }
+            });
 
             return new CreatePersonResult()
             {
@@ -694,7 +734,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<Alert> Execute(CreatePersonBuilder createPersonBuilder, TestData testData)
+        internal async Task<Guid> Execute(CreatePersonBuilder createPersonBuilder, TestData testData, TrsDbContext dbContext)
         {
             var personId = createPersonBuilder.PersonId;
 
@@ -712,40 +752,35 @@ public partial class TestData
             var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
-            return await testData.WithDbContext(async dbContext =>
+            var alert = new Alert()
             {
-                var alert = new Alert()
-                {
-                    AlertId = AlertId,
-                    PersonId = personId,
-                    AlertTypeId = alertTypeId!.Value,
-                    Details = details,
-                    ExternalLink = externalLink,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    CreatedOn = createdUtc!.Value,
-                    UpdatedOn = createdUtc!.Value
-                };
+                AlertId = AlertId,
+                PersonId = personId,
+                AlertTypeId = alertTypeId!.Value,
+                Details = details,
+                ExternalLink = externalLink,
+                StartDate = startDate,
+                EndDate = endDate,
+                CreatedOn = createdUtc!.Value,
+                UpdatedOn = createdUtc!.Value
+            };
 
-                dbContext.Alerts.Add(alert);
+            dbContext.Alerts.Add(alert);
 
-                var createdEvent = new AlertCreatedEvent()
-                {
-                    EventId = Guid.NewGuid(),
-                    CreatedUtc = createdUtc!.Value,
-                    RaisedBy = createdByUser,
-                    Alert = TeachingRecordSystem.Core.Events.Models.Alert.FromModel(alert),
-                    PersonId = personId,
-                    Reason = reason,
-                    EvidenceFile = null
-                };
+            var createdEvent = new AlertCreatedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                CreatedUtc = createdUtc!.Value,
+                RaisedBy = createdByUser,
+                Alert = TeachingRecordSystem.Core.Events.Models.Alert.FromModel(alert),
+                PersonId = personId,
+                Reason = reason,
+                EvidenceFile = null
+            };
 
-                dbContext.AddEvent(createdEvent);
+            dbContext.AddEvent(createdEvent);
 
-                await dbContext.SaveChangesAsync();
-
-                return alert;
-            });
+            return AlertId;
         }
     }
 
@@ -853,7 +888,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<MandatoryQualification> Execute(CreatePersonBuilder createPersonBuilder, TestData testData)
+        internal async Task<Guid> Execute(CreatePersonBuilder createPersonBuilder, TestData testData, TrsDbContext dbContext)
         {
             var personId = createPersonBuilder.PersonId;
 
@@ -864,89 +899,84 @@ public partial class TestData
             var endDate = _endDate.ValueOr(status == MandatoryQualificationStatus.Passed ? testData.GenerateDate(min: (startDate ?? new DateOnly(2000, 1, 1)).AddYears(1)) : null);
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
-            return await testData.WithDbContext(async dbContext =>
-            {
-                var provider = providerId.HasValue ?
+            var provider = providerId.HasValue ?
                     await dbContext.MandatoryQualificationProviders.SingleAsync(p => p.MandatoryQualificationProviderId == providerId) :
                     null;
 
-                var mq = new MandatoryQualification()
+            var mq = new MandatoryQualification()
+            {
+                QualificationId = QualificationId,
+                CreatedOn = testData.Clock.UtcNow,
+                UpdatedOn = testData.Clock.UtcNow,
+                PersonId = personId,
+                ProviderId = providerId,
+                Status = status,
+                Specialism = specialism,
+                StartDate = startDate,
+                EndDate = endDate,
+                DqtSpecialismId = _dqtSpecialismId.ValueOr((Guid?)null),
+                DqtMqEstablishmentId = _mqEstablishmentId.ValueOr((Guid?)null)
+            };
+
+            dbContext.MandatoryQualifications.Add(mq);
+
+            if (_importedByUser.HasValue)
+            {
+                var createdEvent = new MandatoryQualificationDqtImportedEvent()
                 {
-                    QualificationId = QualificationId,
-                    CreatedOn = testData.Clock.UtcNow,
-                    UpdatedOn = testData.Clock.UtcNow,
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = createdUtc!.Value,
+                    RaisedBy = _importedByUser.ValueOrFailure(),
                     PersonId = personId,
-                    ProviderId = providerId,
-                    Status = status,
-                    Specialism = specialism,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    DqtSpecialismId = _dqtSpecialismId.ValueOr((Guid?)null),
-                    DqtMqEstablishmentId = _mqEstablishmentId.ValueOr((Guid?)null)
+                    MandatoryQualification = new()
+                    {
+                        QualificationId = QualificationId,
+                        Provider = provider is not null ?
+                            new()
+                            {
+                                MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                                Name = provider.Name,
+                            } :
+                            null,
+                        Specialism = specialism,
+                        Status = status,
+                        StartDate = startDate,
+                        EndDate = endDate
+                    },
+                    DqtState = 0
                 };
+                dbContext.AddEvent(createdEvent);
+            }
+            else
+            {
+                var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
 
-                dbContext.MandatoryQualifications.Add(mq);
-
-                if (_importedByUser.HasValue)
+                var createdEvent = new MandatoryQualificationCreatedEvent()
                 {
-                    var createdEvent = new MandatoryQualificationDqtImportedEvent()
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = createdUtc!.Value,
+                    RaisedBy = createdByUser,
+                    PersonId = personId,
+                    MandatoryQualification = new()
                     {
-                        EventId = Guid.NewGuid(),
-                        CreatedUtc = createdUtc!.Value,
-                        RaisedBy = _importedByUser.ValueOrFailure(),
-                        PersonId = personId,
-                        MandatoryQualification = new()
-                        {
-                            QualificationId = QualificationId,
-                            Provider = provider is not null ?
-                                new()
-                                {
-                                    MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                                    Name = provider.Name,
-                                } :
-                                null,
-                            Specialism = specialism,
-                            Status = status,
-                            StartDate = startDate,
-                            EndDate = endDate
-                        },
-                        DqtState = 0
-                    };
-                    dbContext.AddEvent(createdEvent);
-                }
-                else
-                {
-                    var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
+                        QualificationId = QualificationId,
+                        Provider = provider is not null ?
+                            new()
+                            {
+                                MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
+                                Name = provider.Name,
+                            } :
+                            null,
+                        Specialism = specialism,
+                        Status = status,
+                        StartDate = startDate,
+                        EndDate = endDate
+                    }
+                };
+                dbContext.AddEvent(createdEvent);
+            }
 
-                    var createdEvent = new MandatoryQualificationCreatedEvent()
-                    {
-                        EventId = Guid.NewGuid(),
-                        CreatedUtc = createdUtc!.Value,
-                        RaisedBy = createdByUser,
-                        PersonId = personId,
-                        MandatoryQualification = new()
-                        {
-                            QualificationId = QualificationId,
-                            Provider = provider is not null ?
-                                new()
-                                {
-                                    MandatoryQualificationProviderId = provider.MandatoryQualificationProviderId,
-                                    Name = provider.Name,
-                                } :
-                                null,
-                            Specialism = specialism,
-                            Status = status,
-                            StartDate = startDate,
-                            EndDate = endDate
-                        }
-                    };
-                    dbContext.AddEvent(createdEvent);
-                }
-
-                await dbContext.SaveChangesAsync();
-
-                return mq;
-            });
+            return QualificationId;
         }
     }
 
