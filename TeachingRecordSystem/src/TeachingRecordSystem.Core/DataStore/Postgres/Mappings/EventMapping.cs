@@ -17,6 +17,6 @@ public class EventMapping : IEntityTypeConfiguration<Event>
         builder.HasKey(e => e.EventId);
         builder.HasIndex(e => e.Payload).HasMethod("gin");
         builder.HasIndex(e => e.Key).IsUnique().HasFilter("key is not null").HasDatabaseName(Event.KeyUniqueIndexName);
-        builder.HasIndex(e => new { e.PersonId, e.EventName }).IncludeProperties(e => e.Payload).HasFilter("person_id is not null");
+        builder.HasIndex(e => new { e.PersonId, e.EventName }).HasFilter("person_id is not null");
     }
 }
