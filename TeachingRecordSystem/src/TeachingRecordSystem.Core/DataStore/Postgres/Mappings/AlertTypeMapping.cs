@@ -15,7 +15,7 @@ public class AlertTypeMapping : IEntityTypeConfiguration<AlertType>
         builder.Property(x => x.IsActive).IsRequired();
         builder.HasIndex(x => x.AlertCategoryId).HasDatabaseName(AlertType.AlertCategoryIdIndexName);
         builder.HasIndex(x => x.DisplayOrder).HasDatabaseName(AlertType.DisplayOrderIndexName).IsUnique();
-        builder.HasOne<AlertCategory>().WithMany(c => c.AlertTypes).HasForeignKey(x => x.AlertCategoryId).HasConstraintName(AlertType.AlertCategoryForeignKeyName);
+        builder.HasOne<AlertCategory>(x => x.AlertCategory).WithMany(c => c.AlertTypes).HasForeignKey(x => x.AlertCategoryId).HasConstraintName(AlertType.AlertCategoryForeignKeyName);
         builder.HasData(
             new AlertType { AlertTypeId = Guid.Parse("2ca98658-1d5b-49d5-b05f-cc08c8b8502c"), AlertCategoryId = Guid.Parse("ee78d44d-abf8-44a9-b22b-87a821f8d3c9"), Name = "Teacher sanctioned in other EEA member state", DqtSanctionCode = "T8", ProhibitionLevel = ProhibitionLevel.Notify, InternalOnly = true, IsActive = true, DisplayOrder = 1 },
             new AlertType { AlertTypeId = Guid.Parse("9fafaa80-f9f8-44a0-b7b3-cffedcbe0298"), AlertCategoryId = Guid.Parse("0ae0707b-1503-477d-bc0f-1505ed95dbdf"), Name = "Failed induction", DqtSanctionCode = "C2", ProhibitionLevel = ProhibitionLevel.Teaching, InternalOnly = false, IsActive = true, DisplayOrder = 2 },

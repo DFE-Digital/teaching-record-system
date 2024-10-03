@@ -17,6 +17,7 @@
     <PackageVersion Include="DistributedLock.Azure" Version="1.0.0" />
     <PackageVersion Include="DistributedLock.FileSystem" Version="1.0.2" />
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
+    <PackageVersion Include="EntityFrameworkCore.Projectables" Version="3.0.4" />
     <PackageVersion Include="Faker.Net" Version="2.0.154" />
     <PackageVersion Include="FakeXrmEasy.v9" Version="3.5.0" />
     <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />

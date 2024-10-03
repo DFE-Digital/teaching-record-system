@@ -13,6 +13,8 @@ public class Person
     public required DateOnly? DateOfBirth { get; set; }  // A few DQT records in prod have a null DOB
     public string? EmailAddress { get; set; }
     public string? NationalInsuranceNumber { get; set; }
+    public ICollection<Qualification> Qualifications { get; } = new List<Qualification>();
+    public ICollection<Alert> Alerts { get; } = new List<Alert>();
 
     public Guid? DqtContactId { get; init; }
     public DateTime? DqtFirstSync { get; set; }
