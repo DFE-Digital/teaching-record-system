@@ -25,6 +25,7 @@ public class CheckAlertExistsFilter(TrsDbContext dbContext, ICrmQueryDispatcher 
         }
 
         var currentAlert = await dbContext.Alerts
+            .Include(a => a.AlertType)
             .SingleOrDefaultAsync(a => a.AlertId == alertId);
 
         if (currentAlert is null)
