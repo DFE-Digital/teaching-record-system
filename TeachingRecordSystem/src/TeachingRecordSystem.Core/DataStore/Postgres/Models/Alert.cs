@@ -1,3 +1,5 @@
+using EntityFrameworkCore.Projectables;
+
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Alert
@@ -8,6 +10,7 @@ public class Alert
     public const string PersonForeignKeyName = "fk_alerts_person";
 
     public required Guid AlertId { get; init; }
+    public AlertType AlertType { get; } = null!;
     public required Guid AlertTypeId { get; init; }
     public required Guid PersonId { get; init; }
     public required string? Details { get; init; }
@@ -17,6 +20,7 @@ public class Alert
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
+    [Projectable] public bool IsActive => EndDate == null;
 
     public Guid? DqtSanctionId { get; set; }
     public int? DqtState { get; set; }

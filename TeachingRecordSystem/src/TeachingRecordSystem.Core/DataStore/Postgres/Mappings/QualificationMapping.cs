@@ -12,7 +12,7 @@ public class QualificationMapping : IEntityTypeConfiguration<Qualification>
         builder.HasQueryFilter(q => EF.Property<DateTime?>(q, nameof(Qualification.DeletedOn)) == null);
         builder.HasDiscriminator(q => q.QualificationType)
             .HasValue<MandatoryQualification>(QualificationType.MandatoryQualification);
-        builder.HasOne<Person>().WithMany().HasForeignKey(q => q.PersonId).HasConstraintName(Qualification.PersonForeignKeyName);
+        builder.HasOne<Person>().WithMany(p => p.Qualifications).HasForeignKey(q => q.PersonId).HasConstraintName(Qualification.PersonForeignKeyName);
         builder.HasIndex(q => q.PersonId);
         builder.HasIndex(q => q.DqtQualificationId).HasFilter("dqt_qualification_id is not null").IsUnique();
     }

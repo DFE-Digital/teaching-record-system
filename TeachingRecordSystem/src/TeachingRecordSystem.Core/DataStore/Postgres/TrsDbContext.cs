@@ -102,7 +102,8 @@ public class TrsDbContext : DbContext
         optionsBuilder
             .UseSnakeCaseNamingConvention()
             .UseOpenIddict<Guid>()
-            .AddInterceptors(new PopulateOidcApplicationInterceptor());
+            .AddInterceptors(new PopulateOidcApplicationInterceptor())
+            .UseProjectables();
     }
 
     public void AddEvent(EventBase @event, DateTime? inserted = null)

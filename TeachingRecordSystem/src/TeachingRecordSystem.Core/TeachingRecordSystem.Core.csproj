@@ -134,6 +134,7 @@
     <PackageReference Include="DistributedLock.Azure" />
     <PackageReference Include="DistributedLock.FileSystem" />
     <PackageReference Include="EFCore.NamingConventions" />
+    <PackageReference Include="EntityFrameworkCore.Projectables" />
     <PackageReference Include="Google.Cloud.Storage.V1" />
     <PackageReference Include="GovukNotify" />
     <PackageReference Include="Hangfire.Core" />
