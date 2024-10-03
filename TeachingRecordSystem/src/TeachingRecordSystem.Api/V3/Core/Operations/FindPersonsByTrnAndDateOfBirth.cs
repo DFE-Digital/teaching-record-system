@@ -95,6 +95,7 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
                     LastName = r.ResolveLastName(),
                     Sanctions = sanctions[r.Id]
                         .Where(s => Constants.LegacyExposableSanctionCodes.Contains(s.SanctionCode))
+                        .Where(s => s.Sanction.dfeta_EndDate is null && s.Sanction.dfeta_Spent != true)
                         .Select(s => new SanctionInfo()
                         {
                             Code = s.SanctionCode,
