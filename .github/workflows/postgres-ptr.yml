@@ -76,5 +76,5 @@ jobs:
         echo '  ENV: ${{ inputs.environment }}' >> $GITHUB_STEP_SUMMARY
         echo "  AT : ${NOW}" >> $GITHUB_STEP_SUMMARY
         echo '  SOURCE SERVER: ${{ env.DB_SERVER }}' >> $GITHUB_STEP_SUMMARY
-        echo '  RESTORED SERVER: ${{ env.DB_SERVER }}-ptr' >> $GITHUB_STEP_SUMMARY
+        echo '  RESTORED SERVER: ${{ env.NEW_DB_SERVER }}' >> $GITHUB_STEP_SUMMARY
         echo '  RESTORE POINT: ${{ inputs.restore-time }} UTC' >> $GITHUB_STEP_SUMMARY

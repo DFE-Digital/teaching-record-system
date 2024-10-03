@@ -11,16 +11,16 @@ on:
         options:
         - test
         - production
-      backupFileName:
-        description: Backup file name. Default is [SERVICE_SHORT]_[CONFIG_SHORT]_adhoc_YYYY-MM-DD
+      backup-file:
+        description: |
+          Backup file name (without extension). Default is trs_[env]_adhoc_YYYY-MM-DD. Set it explicitly when backing up a point-in-time (PTR) server. (Optional)
         required: false
         type: string
         default: default
-      backupPTRServer:
-        description: Set to true if backing up a point in time restored database server
-        required: false
-        type: boolean
-        default: false
+      db-server:
+        description: |
+          Name of the database server. Default is the live server. When backing up a point-in-time (PTR) server, use the full name of the PTR server. (Optional)
+
   schedule:
     - cron: "0 4 * * *" # 04:00 UTC
 
@@ -36,7 +36,7 @@ jobs:
       name: ${{ inputs.environment || 'production' }}
     env:
       DEPLOY_ENV: ${{ inputs.environment || 'production'  }}
-      BACKUP_FILE: ${{ inputs.backupFileName || 'schedule'  }}
+      BACKUP_FILE: ${{ inputs.backup-file || 'schedule'  }}
 
     steps:
     - uses: actions/checkout@v4
@@ -60,12 +60,6 @@ jobs:
         echo "BACKUP_FILE=${BACKUP_FILE}" >> $GITHUB_ENV
         echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
 
-    - name: Set PTR variables
-      if: ${{ github.event.inputs.backupPTRServer == 'true' }}
-      run: |
-        echo "PTR_DB_SERVER=${{ env.DB_SERVER }}-ptr" >> $GITHUB_ENV
-        echo "BACKUP_FILE=${{ env.BACKUP_FILE }}-ptr" >> $GITHUB_ENV
-
     - name: Backup ${{ env.DEPLOY_ENV }} postgres
       uses: DFE-Digital/github-actions/backup-postgres@master
       with:
@@ -75,7 +69,7 @@ jobs:
         cluster: ${{ env.CLUSTER }}
         azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
         backup-file: ${{ env.BACKUP_FILE }}.sql
-        ptr-db-server-name: ${{ env.PTR_DB_SERVER }}
+        db-server-name: ${{ inputs.db-server }}
 
     - name: Backup Summary
       if: success()
@@ -84,7 +78,7 @@ jobs:
         echo 'BACKUP SUCCESSFUL!' >> $GITHUB_STEP_SUMMARY
         echo '  ENV: ${{ env.DEPLOY_ENV }}' >> $GITHUB_STEP_SUMMARY
         echo "  AT : ${NOW}" >> $GITHUB_STEP_SUMMARY
-        echo '  DB SERVER: ${{ env.PTR_DB_SERVER || env.DB_SERVER  }}' >> $GITHUB_STEP_SUMMARY
+        echo '  DB SERVER: ${{ inputs.db-server || env.DB_SERVER  }}' >> $GITHUB_STEP_SUMMARY
         echo '  STORAGE ACCOUNT: ${{ env.STORAGE_ACCOUNT_NAME }}' >> $GITHUB_STEP_SUMMARY
         echo '  FILENAME: ${{ env.BACKUP_FILE }}.sql.gz' >> $GITHUB_STEP_SUMMARY
 

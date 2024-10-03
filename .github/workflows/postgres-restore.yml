@@ -20,7 +20,7 @@ on:
         - 'false'
         - 'true'
       backup-file:
-        description: Name of the backup file in Azure storage. e.g. trs_prod_2024-08-09.tar.gz. The default value is today's scheduled backup.
+        description: Name of the backup file in Azure storage. e.g. trs_prod_2024-08-09.sql.gz. The default value is today's scheduled backup.
         type: string
         required: false
 
