@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using OpenIddict.EntityFrameworkCore.Models;
@@ -103,7 +104,13 @@ public class TrsDbContext : DbContext
             .UseSnakeCaseNamingConvention()
             .UseOpenIddict<Guid>()
             .AddInterceptors(new PopulateOidcApplicationInterceptor())
-            .UseProjectables();
+            .UseProjectables()
+            .ConfigureWarnings(b =>
+            {
+                b.Throw(CoreEventId.NavigationLazyLoading);
+                b.Throw(CoreEventId.DetachedLazyLoadingWarning);
+                b.Throw(CoreEventId.LazyLoadOnDisposedContextWarning);
+            });
     }
 
     public void AddEvent(EventBase @event, DateTime? inserted = null)
