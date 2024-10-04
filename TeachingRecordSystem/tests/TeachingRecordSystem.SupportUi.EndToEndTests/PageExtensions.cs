@@ -56,6 +56,11 @@ public static class PageExtensions
         await page.GotoAsync($"/alerts/{alertId}/reopen");
     }
 
+    public static async Task GoToDeleteAlertPage(this IPage page, Guid alertId)
+    {
+        await page.GotoAsync($"/alerts/{alertId}/delete");
+    }
+
     public static async Task GoToAddMqPage(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/mqs/add?personId={personId}");
@@ -235,6 +240,16 @@ public static class PageExtensions
     public static async Task AssertOnReopenAlertCheckAnswersPage(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/reopen/check-answers");
+    }
+
+    public static async Task AssertOnDeleteAlertPage(this IPage page, Guid alertId)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/delete");
+    }
+
+    public static async Task AssertOnDeleteAlertConfirmPage(this IPage page, Guid alertId)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/delete/confirm");
     }
 
     public static async Task AssertOnPersonEditNamePage(this IPage page, Guid personId)

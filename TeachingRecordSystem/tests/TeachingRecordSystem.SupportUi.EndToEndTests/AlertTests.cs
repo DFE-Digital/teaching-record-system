@@ -231,7 +231,6 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
-        var newEndDate = TestData.Clock.Today.AddDays(-5);
         var changeReason = TestData.GenerateLoremIpsum();
         var evidenceFileName = "evidence.jpg";
         var evidenceFileMimeType = "image/jpeg";
@@ -266,5 +265,52 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonAlertsPage(personId);
 
         await page.AssertFlashMessage("Alert re-opened");
+    }
+
+    [Fact]
+    public async Task DeleteAlert()
+    {
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var endDate = TestData.Clock.Today.AddDays(-10);
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts.First().AlertId;
+        var deleteReason = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToDeleteAlertPage(alertId);
+
+        await page.AssertOnDeleteAlertPage(alertId);
+        await page.CheckAsync("label:text-is('Yes, I want to delete this alert')");
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnDeleteAlertConfirmPage(alertId);
+
+        await page.CheckAsync(":nth-match(label:text-is('Yes'), 1)");
+
+        await page.FillAsync("label:text-is('Add additional detail')", deleteReason);
+
+        await page.CheckAsync(":nth-match(label:text-is('Yes'), 2)");
+
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickButton("Delete this alert");
+
+        await page.AssertOnPersonAlertsPage(personId);
+
+        await page.AssertFlashMessage("Alert deleted");
     }
 }

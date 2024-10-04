@@ -121,6 +121,18 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string AlertReopenCheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/ReopenAlert/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
+    public string AlertDelete(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/DeleteAlert/Index", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertDeleteCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/DeleteAlert/Index", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertDeleteConfirm(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/DeleteAlert/Confirm", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
+    public string AlertDeleteConfirmCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/DeleteAlert/Confirm", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+
     public string EditChangeRequest(string ticketNumber) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", routeValues: new { ticketNumber });
 
     public string ChangeRequestDocument(string ticketNumber, Guid documentId) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", "documents", routeValues: new { ticketNumber, id = documentId });

@@ -1,0 +1,65 @@
+@page "/alerts/{alertId}/delete/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert.IndexModel
+@{
+    ViewBag.Title = "Delete this alert";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.EndDate is null ? LinkGenerator.PersonAlerts(Model.PersonId) : LinkGenerator.Alert(Model.AlertId))">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full-from-desktop">
+        <form action="@LinkGenerator.AlertDelete(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Delete an alert - @Model.PersonName</span>
+            <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="alert-type">@Model.AlertTypeName</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value><multi-line-text text="@Model.Details" data-testid="details" /></govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @if (Model.Link is not null)
+                        {
+                            <a href="@Model.Link" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="link">@($"{Model.Link} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span data-testid="link" use-empty-fallback></span>
+                        }
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@Model.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <govuk-radios asp-for="ConfirmDelete">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-hint>If you delete this alert it will be permanently removed from the database</govuk-radios-hint>
+                    <govuk-radios-item value="@true">Yes, I want to delete this alert</govuk-radios-item>
+                    <govuk-radios-item value="@false">No, I want to keep this alert</govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.AlertDeleteCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
+
