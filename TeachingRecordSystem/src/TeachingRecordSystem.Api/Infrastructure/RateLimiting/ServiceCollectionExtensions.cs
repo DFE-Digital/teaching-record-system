@@ -19,37 +19,46 @@ public static class ServiceCollectionExtensions
     {
         if (environment.IsProduction())
         {
-            services.Configure<ClientIdRateLimiterOptions>(configuration.GetSection("RateLimiting"));
+            services.AddOptions<ClientIdRateLimiterOptions>()
+                .Bind(configuration.GetSection("RateLimiting"))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
             services.AddRateLimiter(options =>
             {
+                const string _windowSecondsHttpContextKey = "RateLimitWindowSeconds";
+
                 options.OnRejected = async (context, token) =>
                 {
-                    // The default OnRejected handler sets the status code and adds some useful headers so we would also like that in our policy OnRejected handler which overrides it
-                    await RateLimitMetadata.OnRejected.Invoke(context.HttpContext, context.Lease, token);
+                    await RateLimitMetadata.OnRejected(context.HttpContext, context.Lease, token);
 
-                    var rateLimitOptions = context.HttpContext.RequestServices.GetRequiredService<IOptions<ClientIdRateLimiterOptions>>();
-                    var clientId = ClaimsPrincipalCurrentClientProvider.GetCurrentClientIdFromHttpContext(context.HttpContext) ?? UnknownClientId;
-                    var clientRateLimit = GetFixedWindowRateLimiterOptionsForClient(clientId, rateLimitOptions.Value);
-                    var message = string.Format("A maximum of {0} calls per {1} seconds are permitted.", clientRateLimit.PermitLimit, clientRateLimit.Window.TotalSeconds);
-
-                    var problemDetails = new ProblemDetails()
+                    if (context.Lease.TryGetMetadata(RateLimitMetadataName.Limit, out var limit) &&
+                        context.HttpContext.Items.TryGetValue(_windowSecondsHttpContextKey, out var windowSeconds))
                     {
-                        Title = "API calls quota exceeded",
-                        Detail = message,
-                        Status = context.HttpContext.Response.StatusCode
-                    };
+                        var message = $"A maximum of {limit} calls per {windowSeconds} seconds are permitted.";
 
-                    await context.HttpContext.Response.WriteAsJsonAsync(problemDetails, type: typeof(ProblemDetails), options: null, contentType: "application/problem+json");
+                        var problemDetails = new ProblemDetails()
+                        {
+                            Title = "API calls quota exceeded",
+                            Detail = message,
+                            Status = context.HttpContext.Response.StatusCode
+                        };
+
+                        await context.HttpContext.Response.WriteAsJsonAsync(problemDetails, type: typeof(ProblemDetails), options: null, contentType: "application/problem+json");
+                    }
                 };
 
                 options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
                 {
-                    var rateLimitOptions = httpContext.RequestServices.GetRequiredService<IOptions<ClientIdRateLimiterOptions>>();
+                    var rateLimiterOptions = httpContext.RequestServices.GetRequiredService<IOptions<ClientIdRateLimiterOptions>>().Value;
                     var connectionMultiplexerFactory = () => httpContext.RequestServices.GetRequiredService<IConnectionMultiplexer>();
                     var clientId = ClaimsPrincipalCurrentClientProvider.GetCurrentClientIdFromHttpContext(httpContext) ?? UnknownClientId;
-                    var clientRateLimit = GetFixedWindowRateLimiterOptionsForClient(clientId, rateLimitOptions.Value);
+                    var clientRateLimit = rateLimiterOptions.ClientRateLimits.TryGetValue(clientId, out var windowOptions) ? windowOptions : rateLimiterOptions.DefaultRateLimit;
 
-                    return RedisRateLimitPartition.GetFixedWindowRateLimiter(clientId, key => new RedisFixedWindowRateLimiterOptions
+                    // Window isn't available via RateLimitMetadata so stash it on the HttpContext instead
+                    httpContext.Items.TryAdd(_windowSecondsHttpContextKey, clientRateLimit.Window.TotalSeconds);
+
+                    return RedisRateLimitPartition.GetFixedWindowRateLimiter(clientId, key => new RedisFixedWindowRateLimiterOptions()
                     {
                         Window = clientRateLimit.Window,
                         PermitLimit = clientRateLimit.PermitLimit,
@@ -60,16 +69,5 @@ public static class ServiceCollectionExtensions
         }
 
         return services;
-    }
-
-    private static FixedWindowOptions GetFixedWindowRateLimiterOptionsForClient(string clientId, ClientIdRateLimiterOptions rateLimiterOptions)
-    {
-        FixedWindowOptions? clientRateLimit;
-        if (rateLimiterOptions.ClientRateLimits is null || !rateLimiterOptions.ClientRateLimits.TryGetValue(clientId, out clientRateLimit))
-        {
-            clientRateLimit = rateLimiterOptions.DefaultRateLimit;
-        }
-
-        return clientRateLimit;
     }
 }

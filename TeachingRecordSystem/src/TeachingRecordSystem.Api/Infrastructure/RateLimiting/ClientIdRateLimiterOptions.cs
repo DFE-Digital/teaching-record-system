@@ -1,7 +1,11 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TeachingRecordSystem.Api.Infrastructure.RateLimiting;
 
 public class ClientIdRateLimiterOptions
 {
-    public required FixedWindowOptions DefaultRateLimit { get; set; } = new FixedWindowOptions { Window = TimeSpan.FromMinutes(1), PermitLimit = 300 };
-    public IDictionary<string, FixedWindowOptions>? ClientRateLimits { get; set; }
+    [Required]
+    public required FixedWindowOptions DefaultRateLimit { get; set; }
+
+    public required Dictionary<string, FixedWindowOptions> ClientRateLimits { get; set; } = [];
 }
