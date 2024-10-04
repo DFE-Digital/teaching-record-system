@@ -78,11 +78,14 @@ public class ApiKeyAuthenticationHandler(
 
     public static ClaimsPrincipal CreatePrincipal(string clientId, string name, IEnumerable<string> roles)
     {
-        var identity = new ClaimsIdentity(new[]
-        {
-            new Claim("sub", clientId),
-            new Claim(ClaimTypes.Name, name)
-        });
+        var identity = new ClaimsIdentity(
+            [
+                new Claim("sub", clientId),
+                new Claim(ClaimTypes.Name, name)
+            ],
+            authenticationType: "Bearer",
+            nameType: "sub",
+            roleType: ClaimTypes.Role);
 
         foreach (var role in roles)
         {
