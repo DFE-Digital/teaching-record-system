@@ -10,3 +10,4 @@ bin/terrafile
 terraform/domains/environment_domains/vendor/
 terraform/domains/infrastructure/vendor/
 terraform/aks/vendor/
+bin/konduit.sh
