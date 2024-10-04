@@ -1,4 +1,4 @@
-name: Backup production database
+name: Backup database to Azure storage
 
 on:
   workflow_dispatch:
