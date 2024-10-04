@@ -10,7 +10,7 @@ on:
         type: choice
         options:
         - test
-#        - production
+        - production
       confirm-production:
         description: Must be set to true if restoring production
         required: true
