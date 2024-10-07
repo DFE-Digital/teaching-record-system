@@ -905,22 +905,10 @@ public class TrsDataSyncHelper(
                 }
             }
 
-            // If the record is deactivated we should have an AlertDqtDeactivatedEvent or AlertDqtImportedEvent (with inactive status)
+            // If the record is deactivated then it's migrated as deleted
             if (s.StateCode == dfeta_sanctionState.Inactive)
             {
-                var lastEvent = events.Last();
-
-                if (lastEvent is AlertDqtDeactivatedEvent or AlertDqtImportedEvent { DqtState: (int)dfeta_qualificationState.Inactive })
-                {
-                    mapped.DeletedOn = lastEvent.CreatedUtc;
-                }
-                else
-                {
-                    throw new InvalidOperationException(
-                        $"Expected last event to be a {nameof(AlertDqtDeactivatedEvent)} or {nameof(AlertDqtImportedEvent)}" +
-                        $" but was {lastEvent.GetEventName()}" +
-                        $" (sanction ID: '{s.Id}').");
-                }
+                mapped.DeletedOn = clock.UtcNow;
             }
             else if (createMigratedEvent)
             {
