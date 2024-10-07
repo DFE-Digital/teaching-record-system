@@ -783,10 +783,10 @@ public class TrsDataSyncHelper(
 
         var insertStatement =
             $"""
-            INSERT INTO {tableName} AS t ({columnList})
-            SELECT {columnList} FROM {tempTableName}
+            INSERT INTO {tableName} AS t ({columnList}, dqt_first_sync, dqt_last_sync)
+            SELECT {columnList}, {NowParameterName}, {NowParameterName} FROM {tempTableName}
             ON CONFLICT (alert_id) DO UPDATE
-            SET {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
+            SET dqt_last_sync = {NowParameterName}, {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
             WHERE t.dqt_modified_on < EXCLUDED.dqt_modified_on
             """;
 
