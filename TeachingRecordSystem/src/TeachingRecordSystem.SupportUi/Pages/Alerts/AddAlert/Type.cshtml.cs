@@ -68,7 +68,7 @@ public class TypeModel(
         PersonName = personInfo.Name;
 
         var alertTypes = await referenceDataCache.GetAlertTypes(activeOnly: true);
-        AlertTypes = alertTypes.Select(t => new AlertTypeInfo(t.AlertTypeId, t.AlertCategoryId, t.Name, t.DisplayOrder)).ToArray();
+        AlertTypes = alertTypes.Select(t => new AlertTypeInfo(t.AlertTypeId, t.AlertCategoryId, t.Name, t.DisplayOrder ?? int.MaxValue)).ToArray();
 
         var categories = await referenceDataCache.GetAlertCategories();
         Categories = categories.Select(
