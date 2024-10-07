@@ -20,7 +20,7 @@ public class Alert
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
-    [Projectable] public bool IsActive => EndDate == null;
+    [Projectable] public bool IsOpen => EndDate == null;
 
     public Guid? DqtSanctionId { get; set; }
     public int? DqtState { get; set; }

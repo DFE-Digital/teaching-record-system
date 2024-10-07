@@ -2762,7 +2762,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Alert", b =>
                 {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertType", null)
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertType", "AlertType")
                         .WithMany()
                         .HasForeignKey("AlertTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2770,21 +2770,25 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasConstraintName("fk_alerts_alert_type");
 
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
-                        .WithMany()
+                        .WithMany("Alerts")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_alerts_person");
+
+                    b.Navigation("AlertType");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertType", b =>
                 {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertCategory", null)
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertCategory", "AlertCategory")
                         .WithMany("AlertTypes")
                         .HasForeignKey("AlertCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_alert_types_alert_category");
+
+                    b.Navigation("AlertCategory");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.ApiKey", b =>
@@ -2870,7 +2874,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Qualification", b =>
                 {
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
-                        .WithMany()
+                        .WithMany("Qualifications")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -2974,6 +2978,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.InternationalQtsAwardedEmailsJob", b =>
                 {
                     b.Navigation("JobItems");
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", b =>
+                {
+                    b.Navigation("Alerts");
+
+                    b.Navigation("Qualifications");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.QtsAwardedEmailsJob", b =>
