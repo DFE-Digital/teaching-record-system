@@ -1,12 +1,14 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 public class IndexModel(
+    TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     PreviousNameHelper previousNameHelper) : PageModel
 {
@@ -42,8 +44,9 @@ public class IndexModel(
                     Contact.Fields.EMailAddress1,
                     Contact.Fields.MobilePhone,
                     Contact.Fields.dfeta_NINumber,
-                    Contact.Fields.GenderCode,
-                    Contact.Fields.dfeta_ActiveSanctions)));
+                    Contact.Fields.GenderCode)));
+
+        var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == PersonId && a.IsOpen).AnyAsync();
 
         var contact = contactDetail!.Contact;
         var previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact);
@@ -57,7 +60,7 @@ public class IndexModel(
             Email = contact.EMailAddress1,
             MobileNumber = contact.MobilePhone,
             Gender = contact.GenderCode.ToString(),
-            HasAlerts = contact.dfeta_ActiveSanctions == true,
+            HasActiveAlert = hasActiveAlert,
             PreviousNames = previousNames
                 .Select(name => GetFullName(name.FirstName, name.MiddleName, name.LastName))
                 .ToArray()
@@ -99,7 +102,7 @@ public class IndexModel(
         public required string? Email { get; init; }
         public required string? MobileNumber { get; init; }
         public required string? Gender { get; init; }
-        public required bool HasAlerts { get; init; }
+        public required bool HasActiveAlert { get; init; }
         public required string[] PreviousNames { get; init; }
     }
 }

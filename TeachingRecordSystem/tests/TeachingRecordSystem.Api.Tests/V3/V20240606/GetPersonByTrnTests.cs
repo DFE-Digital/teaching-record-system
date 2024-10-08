@@ -186,19 +186,73 @@ public class GetPersonByTrnTests : GetPersonTestBase
     [Fact]
     public async Task Get_ValidRequestWithSanctions_ReturnsExpectedSanctionsContent()
     {
-        var contact = await CreateContact();
-        var baseUrl = $"/v3/persons/{contact.dfeta_TRN}";
+        // Arrange
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
 
-        await ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(GetHttpClientWithApiKey(), baseUrl, contact);
+        var person = await TestData.CreatePerson(b => b
+            .WithTrn()
+            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
+
+        var alert = person.Alerts.Last();
+
+        // Arrange
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Sanctions");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responseSanctions = jsonResponse.RootElement.GetProperty("sanctions");
+
+        AssertEx.JsonObjectEquals(
+            new[]
+            {
+                new
+                {
+                    code = alert.AlertType.DqtSanctionCode,
+                    startDate = alert.StartDate
+                }
+            },
+            responseSanctions);
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithAlerts_ReturnsExpectedSanctionsContent()
+    public async Task Get_ValidRequestWithAlerts_ReturnsExpectedAlertsContent()
     {
-        var contact = await CreateContact();
-        var baseUrl = $"/v3/persons/{contact.dfeta_TRN}";
+        // Arrange
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyProhibitionSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
 
-        await ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(GetHttpClientWithApiKey(), baseUrl, contact);
+        var person = await TestData.CreatePerson(b => b
+            .WithTrn()
+            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
+
+        var alert = person.Alerts.Last();
+
+        // Arrange
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Alerts");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponse(response);
+        var responseAlerts = jsonResponse.RootElement.GetProperty("alerts");
+
+        AssertEx.JsonObjectEquals(
+            new[]
+            {
+                new
+                {
+                    alertType = "Prohibition",
+                    dqtSanctionCode = alert.AlertType.DqtSanctionCode,
+                    startDate = alert.StartDate,
+                    endDate = alert.EndDate
+                }
+            },
+            responseAlerts);
     }
 
     [Fact]

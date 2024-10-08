@@ -13,14 +13,7 @@ public partial class DataverseAdapter
 
     internal async Task<(SetNpqQualificationResult, ExecuteTransactionRequest TransactionRequest)> SetNpqQualificationImpl(SetNpqQualificationCommand command)
     {
-        //all qualifications
-        var teacher = await GetTeacher(
-            command.TeacherId,
-            columnNames: new[]
-            {
-                Contact.Fields.dfeta_ActiveSanctions,
-                Contact.Fields.dfeta_TRN
-            });
+        var hasActiveAlert = await _dbContext.Alerts.Where(a => a.PersonId == command.TeacherId && a.IsOpen).AnyAsync();
 
         var qualifications = await GetQualificationsForTeacher(
             command.TeacherId,
@@ -83,9 +76,9 @@ public partial class DataverseAdapter
         }
 
         // teacher has a sanction, create review task.
-        if (teacher.dfeta_ActiveSanctions == true)
+        if (hasActiveAlert)
         {
-            var reviewTask = CreateReviewTaskForActiveSanctions(command.TeacherId, teacher.dfeta_TRN);
+            var reviewTask = CreateReviewTaskForActiveSanctions(command.TeacherId, command.Trn);
             txnRequest.Requests.Add(new CreateRequest()
             {
                 Target = reviewTask

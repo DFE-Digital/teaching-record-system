@@ -30,7 +30,6 @@ public class SetNpqQualificationHandler : IRequestHandler<SetNpqQualificationReq
                 Contact.Fields.BirthDate,
                 Contact.Fields.dfeta_EYTSDate,
                 Contact.Fields.dfeta_QTSDate,
-                Contact.Fields.dfeta_ActiveSanctions,
                 Contact.Fields.dfeta_NINumber,
                 Contact.Fields.dfeta_TRN
             },
