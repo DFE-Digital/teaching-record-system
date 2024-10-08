@@ -2,6 +2,7 @@ using System.Diagnostics;
 using MediatR;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 
@@ -9,11 +10,13 @@ namespace TeachingRecordSystem.Api.V2.Handlers;
 
 public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeachersResponse>
 {
+    private readonly TrsDbContext _dbContext;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ILogger<FindTeachersHandler> _logger;
 
-    public FindTeachersHandler(IDataverseAdapter dataverseAdapter, ILogger<FindTeachersHandler> logger)
+    public FindTeachersHandler(TrsDbContext dbContext, IDataverseAdapter dataverseAdapter, ILogger<FindTeachersHandler> logger)
     {
+        _dbContext = dbContext;
         _dataverseAdapter = dataverseAdapter;
         _logger = logger;
     }
@@ -23,6 +26,13 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
         var result = request.MatchPolicy.GetValueOrDefault() == FindTeachersMatchPolicy.Default ?
             await HandleDefaultRequest(request) :
             await HandleStrictRequest(request);
+
+        var matchedPersonIds = result.Select(c => c.Id).ToHashSet();
+        var resultsWithActiveAlerts = await _dbContext.Alerts
+            .Where(a => matchedPersonIds.Contains(a.PersonId) && a.IsOpen)
+            .Select(a => a.PersonId)
+            .Distinct()
+            .ToArrayAsync();
 
         return new FindTeachersResponse()
         {
@@ -36,7 +46,7 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
                 DateOfBirth = a.BirthDate.HasValue ? DateOnly.FromDateTime(a.BirthDate.Value) : null,
                 NationalInsuranceNumber = a.dfeta_NINumber,
                 Uid = a.Id.ToString(),
-                HasActiveSanctions = a.dfeta_ActiveSanctions == true
+                HasActiveSanctions = resultsWithActiveAlerts.Contains(a.Id)
             })
         };
     }

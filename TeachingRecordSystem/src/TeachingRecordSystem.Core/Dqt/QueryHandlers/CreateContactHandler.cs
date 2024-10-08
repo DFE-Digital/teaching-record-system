@@ -44,9 +44,9 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         }
         else
         {
-            foreach (var duplicate in query.PotentialDuplicates)
+            foreach (var (duplicate, hasActiveAlert) in query.PotentialDuplicates)
             {
-                var task = CreateDuplicateReviewTaskEntity(duplicate, query, contactId);
+                var task = CreateDuplicateReviewTaskEntity(duplicate, query, contactId, hasActiveAlert);
                 requestBuilder.AddRequest(new CreateRequest() { Target = task });
             }
         }
@@ -71,7 +71,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         }
     }
 
-    private CrmTask CreateDuplicateReviewTaskEntity(FindPotentialDuplicateContactsResult duplicate, CreateContactQuery createTeacherRequest, Guid contactId)
+    private CrmTask CreateDuplicateReviewTaskEntity(FindPotentialDuplicateContactsResult duplicate, CreateContactQuery createTeacherRequest, Guid contactId, bool hasActiveAlert)
     {
         var description = GetDescription();
 
@@ -108,7 +108,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             Debug.Assert(!duplicate.HasEytsDate || !duplicate.HasQtsDate);
             var additionalFlags = new List<string>();
 
-            if (duplicate.HasActiveSanctions)
+            if (hasActiveAlert)
             {
                 additionalFlags.Add("active sanctions");
             }

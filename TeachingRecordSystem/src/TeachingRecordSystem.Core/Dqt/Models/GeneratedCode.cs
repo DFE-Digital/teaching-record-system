@@ -2287,7 +2287,6 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string ContactId = "contactid";
 			public const string Id = "contactid";
 			public const string CreatedOn = "createdon";
-			public const string dfeta_ActiveSanctions = "dfeta_activesanctions";
 			public const string dfeta_AllowIDSignInWithProhibitions = "dfeta_allowidsigninwithprohibitions";
 			public const string dfeta_AllowPiiUpdatesFromRegister = "dfeta_allowpiiupdatesfromregister";
 			public const string dfeta_DateofDeath = "dfeta_dateofdeath";
@@ -2607,26 +2606,6 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("CreatedOn");
 				this.SetAttributeValue("createdon", value);
 				this.OnPropertyChanged("CreatedOn");
-			}
-		}
-		
-		/// <summary>
-		/// 
-		/// </summary>
-		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_activesanctions")]
-		public System.Nullable<bool> dfeta_ActiveSanctions
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.GetAttributeValue<System.Nullable<bool>>("dfeta_activesanctions");
-			}
-			[System.Diagnostics.DebuggerNonUserCode()]
-			set
-			{
-				this.OnPropertyChanging("dfeta_ActiveSanctions");
-				this.SetAttributeValue("dfeta_activesanctions", value);
-				this.OnPropertyChanged("dfeta_ActiveSanctions");
 			}
 		}
 		
