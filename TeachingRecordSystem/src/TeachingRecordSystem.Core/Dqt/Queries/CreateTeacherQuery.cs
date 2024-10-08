@@ -11,7 +11,7 @@ public class CreateContactQuery : ICrmQuery<Guid>
     public required DateOnly DateOfBirth { get; init; }
     public required string? EmailAddress { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
-    public required IReadOnlyCollection<FindPotentialDuplicateContactsResult> PotentialDuplicates { get; init; }
+    public required IReadOnlyCollection<(FindPotentialDuplicateContactsResult Duplicate, bool HasActiveAlert)> PotentialDuplicates { get; init; }
     public required string? Trn { get; init; }
     public required string? TrnRequestId { get; init; }
 }

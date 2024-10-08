@@ -101,6 +101,13 @@ public class CreateTrnRequestHandler(
             trn = await trnGenerationApiClient.GenerateTrn();
         }
 
+        var potentialDuplicatePersonIds = potentialDuplicates.Select(d => d.ContactId).ToList();
+        var resultsWithActiveAlerts = await dbContext.Alerts
+            .Where(a => potentialDuplicatePersonIds.Contains(a.PersonId) && a.IsOpen)
+            .Select(a => a.PersonId)
+            .Distinct()
+            .ToArrayAsync();
+
         var emailAddress = command.EmailAddresses?.FirstOrDefault();
 
         await crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
@@ -114,7 +121,7 @@ public class CreateTrnRequestHandler(
             DateOfBirth = command.DateOfBirth,
             EmailAddress = emailAddress,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
-            PotentialDuplicates = potentialDuplicates,
+            PotentialDuplicates = potentialDuplicates.Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId))).ToArray(),
             Trn = trn,
             TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
         });

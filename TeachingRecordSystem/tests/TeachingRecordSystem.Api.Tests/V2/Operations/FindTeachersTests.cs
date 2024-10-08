@@ -219,7 +219,7 @@ public class FindTeachersTests : TestBase
     public async Task Given_search_returns_a_result_with_no_active_sanctions_returns_expected_response()
     {
         // Arrange
-        var contact1 = new Contact() { FirstName = "test", MiddleName = "tester", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference", dfeta_ActiveSanctions = null };
+        var contact1 = new Contact() { FirstName = "test", MiddleName = "tester", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference" };
         DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
@@ -259,17 +259,16 @@ public class FindTeachersTests : TestBase
     public async Task Given_search_returns_a_result_with_activesanctions_set_returns_expected_response(bool? activeSanctions)
     {
         // Arrange
-        var contact1 = new Contact()
+        var createPersonResult = await TestData.CreatePerson(b =>
         {
-            FirstName = "test",
-            MiddleName = "tester",
-            LastName = "testing",
-            Id = Guid.NewGuid(),
-            dfeta_NINumber = "1111",
-            BirthDate = new DateTime(1988, 2, 1),
-            dfeta_TRN = "someReference",
-            dfeta_ActiveSanctions = activeSanctions
-        };
+            if (activeSanctions == true)
+            {
+                b.WithAlert(a => a.WithEndDate(null));  // Active
+            }
+        });
+
+        var contact1 = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, createPersonResult.ContactId, new Microsoft.Xrm.Sdk.Query.ColumnSet(allColumns: true)))
+            .ToEntity<Contact>();
 
         DataverseAdapterMock
             .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))

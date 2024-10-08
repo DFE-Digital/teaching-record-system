@@ -35,9 +35,9 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 
         requestBuilder.AddRequest(new CreateRequest() { Target = contact });
 
-        foreach (var duplicate in query.PotentialDuplicates)
+        foreach (var (duplicate, hasActiveAlert) in query.PotentialDuplicates)
         {
-            var task = CreateDuplicateReviewTaskEntity(duplicate, contactId);
+            var task = CreateDuplicateReviewTaskEntity(duplicate, contactId, hasActiveAlert);
             requestBuilder.AddRequest(new CreateRequest() { Target = task });
         }
 
@@ -46,7 +46,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         return contactId;
     }
 
-    private CrmTask CreateDuplicateReviewTaskEntity(FindPotentialDuplicateContactsResult duplicate, Guid contactId)
+    private CrmTask CreateDuplicateReviewTaskEntity(FindPotentialDuplicateContactsResult duplicate, Guid contactId, bool hasActiveAlert)
     {
         var description = GetDescription();
 
@@ -83,7 +83,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 
             var additionalFlags = new List<string>();
 
-            if (duplicate.HasActiveSanctions)
+            if (hasActiveAlert)
             {
                 additionalFlags.Add("active sanctions");
             }

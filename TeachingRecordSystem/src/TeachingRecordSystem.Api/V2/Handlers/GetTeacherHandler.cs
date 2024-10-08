@@ -3,6 +3,7 @@ using MediatR;
 using TeachingRecordSystem.Api.V2.ApiModels;
 using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 
@@ -11,10 +12,12 @@ namespace TeachingRecordSystem.Api.V2.Handlers;
 public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherResponse>
 {
     private readonly IDataverseAdapter _dataverseAdapter;
+    private readonly TrsDbContext _dbContext;
 
-    public GetTeacherHandler(IDataverseAdapter dataverseAdapter)
+    public GetTeacherHandler(IDataverseAdapter dataverseAdapter, TrsDbContext dbContext)
     {
         _dataverseAdapter = dataverseAdapter;
+        _dbContext = dbContext;
     }
 
     public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
@@ -29,7 +32,6 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
                 Contact.Fields.BirthDate,
                 Contact.Fields.dfeta_EYTSDate,
                 Contact.Fields.dfeta_QTSDate,
-                Contact.Fields.dfeta_ActiveSanctions,
                 Contact.Fields.dfeta_NINumber,
                 Contact.Fields.dfeta_TRN,
                 Contact.Fields.dfeta_HUSID,
@@ -79,11 +81,13 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             null,
             request.IncludeInactive != true);
 
+        var hasActiveAlert = await _dbContext.Alerts.Where(a => a.PersonId == teacher.Id && a.IsOpen).AnyAsync();
+
         return new GetTeacherResponse()
         {
             DateOfBirth = teacher.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
             FirstName = teacher.FirstName,
-            HasActiveSanctions = teacher.dfeta_ActiveSanctions == true,
+            HasActiveSanctions = hasActiveAlert,
             LastName = teacher.LastName,
             MiddleName = teacher.MiddleName,
             NationalInsuranceNumber = teacher.dfeta_NINumber,

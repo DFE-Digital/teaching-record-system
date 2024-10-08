@@ -1,6 +1,7 @@
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Api.Validation;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
@@ -29,7 +30,7 @@ public sealed class SetQtlsResult
     };
 }
 
-public class SetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher, IClock clock)
+public class SetQtlsHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher, IClock clock)
 {
     public async Task<SetQtlsResult> Handle(SetQtlsCommand command)
     {
@@ -40,8 +41,7 @@ public class SetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher, IClock clock
                     Contact.Fields.dfeta_TRN,
                     Contact.Fields.dfeta_InductionStatus,
                     Contact.Fields.dfeta_qtlsdate,
-                    Contact.Fields.dfeta_QTSDate,
-                    Contact.Fields.dfeta_ActiveSanctions))
+                    Contact.Fields.dfeta_QTSDate))
             ))!;
 
         if (contact == null)
@@ -66,8 +66,11 @@ public class SetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher, IClock clock
 
             return SetQtlsResult.Failed();
         }
+
+        var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == contact.Id && a.IsOpen).AnyAsync();
+
         await crmQueryDispatcher.ExecuteQuery(
-             new SetQtlsDateQuery(contact.Id, command.QtsDate, contact.dfeta_ActiveSanctions == true, clock.UtcNow))!;
+             new SetQtlsDateQuery(contact.Id, command.QtsDate, hasActiveAlert, clock.UtcNow))!;
 
         return SetQtlsResult.Success(new QtlsResult()
         {

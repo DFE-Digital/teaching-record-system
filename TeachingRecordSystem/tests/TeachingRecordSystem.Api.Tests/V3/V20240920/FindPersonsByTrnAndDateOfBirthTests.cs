@@ -17,20 +17,16 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var sanctionCode = "A13";
-        var startDate = new DateOnly(2022, 4, 1);
-        var endDate = new DateOnly(2023, 1, 20);
-        var details = Faker.Lorem.Paragraph();
-        var alertType = await ReferenceDataCache.GetAlertTypeByDqtSanctionCode(sanctionCode);
-        var alertCategory = await ReferenceDataCache.GetAlertCategoryById(alertType.AlertCategoryId);
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertType = alertTypes.Where(at => !at.InternalOnly).RandomOne();
 
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithSanction(sanctionCode, startDate, endDate, details: details));
+            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
-        var sanction = person.Sanctions.Single();
+        var alert = person.Alerts.Single();
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -48,20 +44,20 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
             {
                 new
                 {
-                    alertId = sanction.SanctionId,
+                    alertId = alert.AlertId,
                     alertType = new
                     {
-                        alertTypeId = alertType.AlertTypeId,
-                        name = alertType.Name,
+                        alertTypeId = alert.AlertType.AlertTypeId,
+                        name = alert.AlertType.Name,
                         alertCategory = new
                         {
-                            alertCategoryId = alertCategory.AlertCategoryId,
-                            name = alertCategory.Name
+                            alertCategoryId = alert.AlertType.AlertCategory.AlertCategoryId,
+                            name = alert.AlertType.AlertCategory.Name
                         }
                     },
-                    details = details,
-                    startDate = startDate,
-                    endDate = endDate,
+                    details = alert.Details,
+                    startDate = alert.StartDate,
+                    endDate = alert.EndDate,
                 }
             },
             responseAlerts);

@@ -217,7 +217,7 @@ public partial class DataverseAdapter
             }
         }
 
-        if (referenceData.TeacherHasActiveSanctions)
+        if (referenceData.TeacherHasActiveAlert)
         {
             var reviewTask = helper.CreateReviewTaskEntityForActiveSanctions();
 
@@ -734,12 +734,15 @@ public partial class DataverseAdapter
                 {
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_EYTSDate,
-                    Contact.Fields.dfeta_ActiveSanctions,
                     Contact.Fields.dfeta_HUSID,
                     Contact.Fields.StateCode,
                     Contact.Fields.dfeta_AllowPiiUpdatesFromRegister,
                     Contact.Fields.dfeta_TSPersonID
                 });
+
+            var getActiveAlertsTask = _dataverseAdapter._dbContext.Alerts
+                .Where(a => a.PersonId == TeacherId && a.IsOpen)
+                .AnyAsync();
 
             var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
                 TeacherId,
@@ -906,6 +909,7 @@ public partial class DataverseAdapter
 
             var lookupTasks = new Task[]
                 {
+                    getActiveAlertsTask,
                     getIttProviderTask,
                     getIttCountryTask,
                     getSubject1Task,
@@ -954,7 +958,7 @@ public partial class DataverseAdapter
                 Teacher = getTeacherTask.Result,
                 Itt = getIttRecordsBySlugIdTask?.Result.Length > 0 ? getIttRecordsBySlugIdTask.Result : getIttRecordsTask.Result,
                 Qualifications = getQualifications.Result,
-                TeacherHasActiveSanctions = getTeacherTask.Result?.dfeta_ActiveSanctions == true,
+                TeacherHasActiveAlert = getActiveAlertsTask.Result,
                 TeacherHusId = getTeacherTask.Result?.dfeta_HUSID,
                 HaveExistingTeacherWithHusId = existingTeachersWithHusIdTask?.Result != null && existingTeachersWithHusIdTask.Result.Count(x => x.Id != _command.TeacherId) > 0,
                 QtsRegistrations = getQtsRegistrationsTask?.Result,
@@ -981,7 +985,7 @@ public partial class DataverseAdapter
         public Contact Teacher { get; set; }
         public IEnumerable<dfeta_initialteachertraining> Itt { get; set; }
         public IEnumerable<dfeta_qualification> Qualifications { get; set; }
-        public bool TeacherHasActiveSanctions { get; set; }
+        public bool TeacherHasActiveAlert { get; set; }
         public string TeacherHusId { get; set; }
         public Guid? QualificationSubject2Id { get; set; }
         public Guid? QualificationSubject3Id { get; set; }
