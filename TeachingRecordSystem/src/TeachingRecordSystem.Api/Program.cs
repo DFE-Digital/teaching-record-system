@@ -165,8 +165,10 @@ public class Program
             .AddAutoMapper(cfg =>
             {
                 cfg.AddMaps(typeof(Program).Assembly);
-                cfg.CreateMap(typeof(Option<>), typeof(Option<>)).ConvertUsing(typeof(OptionMapper<,>));
-            });
+                cfg.CreateMap(typeof(Option<>), typeof(Option<>)).ConvertUsing(typeof(OptionToOptionTypeConverter<,>));
+            })
+            .AddTransient(typeof(WrapWithOptionValueConverter<>))
+            .AddTransient(typeof(WrapWithOptionValueConverter<,>));
 
         services.Scan(scan =>
         {
