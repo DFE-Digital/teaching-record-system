@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.TestCommon.Infrastructure.FakeXrmEasy.FakeMessageExecutors;
 using TeachingRecordSystem.TestCommon.Infrastructure.FakeXrmEasy.Plugins;
 
@@ -59,6 +60,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IXrmFakedContext>(fakedXrmContext);
         var organizationService = fakedXrmContext.GetAsyncOrganizationService2();
         services.AddDefaultServiceClient(ServiceLifetime.Singleton, _ => organizationService);
+        services.AddNamedServiceClient(TrsDataSyncService.CrmClientName, ServiceLifetime.Singleton, _ => organizationService);
 
         fakedXrmContext.CallerProperties.CallerId = CreateTestUser();
 
