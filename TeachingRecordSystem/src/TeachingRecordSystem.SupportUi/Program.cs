@@ -282,6 +282,10 @@ app.UseCsp(csp =>
         .From(pageTemplateHelper.GetCspScriptHashes())
         .AddNonce();
 
+    csp.AllowStyles
+        .FromSelf()
+        .AllowUnsafeInline();
+
     // Ensure ASP.NET Core's auto refresh works
     // See https://github.com/dotnet/aspnetcore/issues/33068
     if (builder.Environment.IsDevelopment())

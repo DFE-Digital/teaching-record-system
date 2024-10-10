@@ -6,6 +6,11 @@
 @{
     Layout = "Layout";
     ViewBag.SelectedTab = PersonSubNavigationTab.ChangeHistory;
+    var person = HttpContext.Features.GetRequiredFeature<CurrentPersonFeature>();
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)">Back to record</govuk-back-link>
 }
 
 @if (Model.TimelineItems!.Length == 0)

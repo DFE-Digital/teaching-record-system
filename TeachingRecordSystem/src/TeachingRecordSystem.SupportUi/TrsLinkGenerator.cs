@@ -121,7 +121,7 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string AlertReopenCheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/ReopenAlert/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
-    public string AlertDelete(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+    public string AlertDelete(Guid alertId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/DeleteAlert/Index", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
     public string AlertDeleteCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>

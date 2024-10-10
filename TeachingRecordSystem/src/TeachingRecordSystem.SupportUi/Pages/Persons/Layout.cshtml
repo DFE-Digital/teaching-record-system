@@ -1,4 +1,3 @@
-@using Microsoft.AspNetCore.Http.Features
 @using TeachingRecordSystem.Core.Dqt.Models;
 @using TeachingRecordSystem.SupportUi.Pages.Common;
 @{
@@ -7,6 +6,10 @@
     var person = Context.Features.GetRequiredFeature<CurrentPersonFeature>();
     var personId = person.PersonId;
     ViewBag.Title = person.Name;
+}
+
+@section BeforeContent {
+    @RenderSection("BeforeContent", required: false)
 }
 
 <h1 class="govuk-heading-l" data-testid="page-title">@person.Name</h1>
@@ -22,6 +25,13 @@
                 <li class="moj-sub-navigation__item">
                     <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator.PersonQualifications(personId)">Qualifications</a>
                 </li>
+
+                @if (FeatureProvider.IsEnabled(FeatureNames.Alerts))
+                {
+                    <li class="moj-sub-navigation__item">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonAlerts(personId)">Alerts</a>
+                    </li>
+                }
 
                 <li class="moj-sub-navigation__item">
                     <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.ChangeHistory ? "page" : null)" href="@LinkGenerator.PersonChangeHistory(personId)">Change history</a>
