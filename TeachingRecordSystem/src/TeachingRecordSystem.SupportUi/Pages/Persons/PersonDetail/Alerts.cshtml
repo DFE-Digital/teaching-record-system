@@ -1,4 +1,102 @@
 @page "/persons/{personId}/alerts"
+@using TeachingRecordSystem.SupportUi.Pages.Common;
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.AlertsModel
 @{
+    Layout = "Layout";
+    ViewBag.SelectedTab = PersonSubNavigationTab.Alerts;
+    var person = HttpContext.Features.GetRequiredFeature<CurrentPersonFeature>();
 }
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)">Back to record</govuk-back-link>
+}
+
+<div>
+    <h2 class="govuk-heading-m">Open alerts</h2>
+
+    @if (Model.OpenAlerts!.Length == 0)
+    {
+        <p class="govuk-body" data-testid="no-open-alerts">No open alerts</p>
+    }
+    else
+    {
+        @foreach (var alert in Model.OpenAlerts)
+        {
+            <govuk-summary-card data-testid="open-alert">
+                <govuk-summary-card-title heading-level="3">@alert.AlertType.Name</govuk-summary-card-title>
+                <govuk-summary-card-actions>
+                    <govuk-summary-card-action href="@LinkGenerator.AlertDelete(alert.AlertId, journeyInstanceId: null)">Delete alert</govuk-summary-card-action>
+                </govuk-summary-card-actions>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@alert.Details</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="#" visually-hidden-text="details">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>
+                            @if (!string.IsNullOrEmpty(alert.ExternalLink))
+                            {
+                                <a href="@alert.ExternalLink" rel="noopener noreferrer" class="govuk-link">@alert.ExternalLink</a>
+                            }
+                        </govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="#" visually-hidden-text="link">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDate(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@alert.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-summary-card>
+        }
+    }
+
+    <govuk-button-link href="@LinkGenerator.AlertAdd(person.PersonId, journeyInstanceId: null)" class="govuk-!-margin-bottom-0">Add an alert</govuk-button-link>
+</div>
+
+<hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+<div>
+    <h2 class="govuk-heading-m">Closed alerts</h2>
+
+    @if (Model.ClosedAlerts!.Length == 0)
+    {
+        <p class="govuk-body" data-testid="no-closed-alerts">No closed alerts</p>
+    }
+    else
+    {
+        <table class="govuk-table" data-testid="closed-alerts">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Alert</th>
+                    <th scope="col" class="govuk-table__header" style="width:165px">Start date</th>
+                    <th scope="col" class="govuk-table__header" style="width:165px">End date</th>
+                    <th scope="col" class="govuk-table__header" style="width:70px"></th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @foreach (var alert in Model.ClosedAlerts!)
+                {
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell"><a href="@LinkGenerator.Alert(alert.AlertId)" class="govuk-link">@alert.AlertType.Name</a></td>
+                        <td class="govuk-table__cell">@alert.StartDate?.ToString("d MMMM yyyy")</td>
+                        <td class="govuk-table__cell">@alert.EndDate?.ToString("d MMMM yyyy")</td>
+                        <td class="govuk-table__cell"><a href="@LinkGenerator.AlertDelete(alert.AlertId, journeyInstanceId: null)" class="govuk-link">Delete <span class="govuk-visually-hidden">alert</span></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

@@ -4,6 +4,11 @@
 @{
     Layout = "Layout";
     ViewBag.SelectedTab = PersonSubNavigationTab.Qualifications;
+    var person = HttpContext.Features.GetRequiredFeature<CurrentPersonFeature>();
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)">Back to record</govuk-back-link>
 }
 
 @if (Model.MandatoryQualifications!.Length == 0)
