@@ -4,7 +4,8 @@
     "dfeta_trainingprovider",
     "dfeta_ukprn",
     "name",
-    "statecode"
+    "statecode",
+    "accountnumber"
   ],
   "annotation": [
     "annotationid",
@@ -135,11 +136,13 @@
     "modifiedon"
   ],
   "dfeta_inductionperiod": [
+    "dfeta_inductionperiodid",
     "dfeta_startdate",
     "dfeta_enddate",
     "dfeta_inductionid",
     "dfeta_numberofterms",
     "dfeta_appropriatebodyid",
+    "dfeta_inductionStatus",
     "statecode"
   ],
   "dfeta_initialteachertraining": [
@@ -241,7 +244,8 @@
     "dfeta_trsevent",
     "CreatedOn",
     "CreatedBy",
-    "ModifiedOn"
+    "ModifiedOn",
+    "dfeta_HECourseLength"
   ],
   "dfeta_specialism": [
     "dfeta_specialismid",
@@ -351,6 +355,42 @@
     "statecode",
     "subject",
     "dfeta_EmailAddress"
+  ],
+  "dfeta_integrationtransaction": [
+    "createdby",
+    "createdon",
+    "dfeta_enddate",
+    "dfeta_failurecount",
+    "dfeta_failuremessage",
+    "dfeta_filename",
+    "dfeta_id",
+    "dfeta_interface",
+    "dfeta_startdate",
+    "dfeta_successcount",
+    "dfeta_duplicatecount",
+    "dfeta_importorganisation",
+    "dfeta_integrationtransactionid",
+    "dfeta_totalcount",
+    "statecode"
+  ],
+  "dfeta_integrationtransactionrecord" : [
+    "dfeta_id",
+    "dfeta_filename",
+    "dfeta_personid",
+    "dfeta_organisationid",
+    "dfeta_inductionperiodid",
+    "dfeta_inductionid",
+    "dfeta_initialteachertrainingid",
+    "dfeta_duplicatestatus",
+    "dfeta_trefno",
+    "dfeta_failuremessage",
+    "dfeta_integrationtransactionrecordid",
+    "dfeta_integrationtransactionid",
+    "dfeta_qualificationid",
+    "dfeta_rowdata",
+    "dfeta_ukprn",
+    "statecode",
+    "statuscode"
   ],
   "dfeta_trsoutboxmessage": [
     "dfeta_trsoutboxmessageid",

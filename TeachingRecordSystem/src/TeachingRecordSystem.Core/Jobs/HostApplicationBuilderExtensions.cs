@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
+using TeachingRecordSystem.Core.Jobs.EWCWalesImport;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
 
@@ -46,6 +48,9 @@ public static class HostApplicationBuilderExtensions
                 builder.Services.AddTransient<SendInductionCompletedEmailJob>();
                 builder.Services.AddTransient<InductionCompletedEmailJobDispatcher>();
                 builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
+                builder.Services.AddTransient<EwcWalesImportJob>();
+                builder.Services.AddTransient<QtsImporter>();
+                builder.Services.AddTransient<InductionImporter>();
 
                 builder.Services.AddStartupTask(sp =>
                 {
@@ -71,6 +76,11 @@ public static class HostApplicationBuilderExtensions
                         nameof(BatchSendInductionCompletedEmailsJob),
                         job => job.ExecuteAsync(CancellationToken.None),
                         options.BatchSendInductionCompletedEmails.JobSchedule);
+
+                    recurringJobManager.AddOrUpdate<EwcWalesImportJob>(
+                        nameof(EwcWalesImportJob),
+                        job => job.ExecuteAsync(CancellationToken.None),
+                        EwcWalesImportJob.JobSchedule);
 
                     return Task.CompletedTask;
                 });
