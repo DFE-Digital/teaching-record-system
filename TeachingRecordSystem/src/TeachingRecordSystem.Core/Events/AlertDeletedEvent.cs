@@ -7,6 +7,6 @@ public record class AlertDeletedEvent : EventBase, IEventWithPersonId, IEventWit
 {
     public required Guid PersonId { get; init; }
     public required Alert Alert { get; init; }
-    public required string? Reason { get; init; }
+    public required string? DeletionReasonDetail { get; init; }
     public required File? EvidenceFile { get; init; }
 }

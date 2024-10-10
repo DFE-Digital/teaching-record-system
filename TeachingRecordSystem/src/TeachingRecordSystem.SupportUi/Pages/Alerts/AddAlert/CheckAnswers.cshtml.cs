@@ -68,7 +68,7 @@ public class CheckAnswersModel(
             RaisedBy = User.GetUserId(),
             PersonId = PersonId,
             Alert = EventModels.Alert.FromModel(alert),
-            Reason = Reason,
+            AddReasonDetail = Reason,
             EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
                 new EventModels.File()
                 {
