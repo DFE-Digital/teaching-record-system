@@ -31,7 +31,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
 
         if (User.IsInRole(ApiRoles.AppropriateBody))
         {
-            if ((include & ~(GetPersonRequestIncludes.Induction | GetPersonRequestIncludes.Alerts)) != 0)
+            if ((include & ~(GetPersonRequestIncludes.Induction | GetPersonRequestIncludes.Alerts | GetPersonRequestIncludes.InitialTeacherTraining)) != 0)
             {
                 return Forbid();
             }
@@ -56,6 +56,30 @@ public class PersonsController(IMapper mapper) : ControllerBase
         }
 
         var response = mapper.Map<GetPersonResponse>(result);
+
+        if (User.IsInRole(ApiRoles.AppropriateBody))
+        {
+            response = response with
+            {
+                InitialTeacherTraining = response.InitialTeacherTraining
+                    .Map(itts => itts
+                        .Select(itt => new GetPersonResponseInitialTeacherTraining()
+                        {
+                            Provider = itt.Provider,
+                            Qualification = default,
+                            StartDate = default,
+                            EndDate = default,
+                            ProgrammeType = default,
+                            ProgrammeTypeDescription = default,
+                            Result = default,
+                            AgeRange = default,
+                            Subjects = default
+                        })
+                        .Where(itt => itt.Provider is not null)
+                        .AsReadOnly())
+            };
+        }
+
         return Ok(response);
     }
 
