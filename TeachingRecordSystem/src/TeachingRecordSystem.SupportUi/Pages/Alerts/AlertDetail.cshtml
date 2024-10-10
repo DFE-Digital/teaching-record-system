@@ -1,0 +1,30 @@
+@page "/alerts/{alertId}"
+@model AlertDetailModel
+@{
+    ViewBag.Title = Model.Alert!.AlertType.Name;
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonAlerts(Model.Alert.PersonId)">Back to record</govuk-back-link>
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<govuk-summary-list>
+    <govuk-summary-list-row>
+        <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.Details</govuk-summary-list-row-value>
+    </govuk-summary-list-row>
+    <govuk-summary-list-row>
+        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+    </govuk-summary-list-row>
+    <govuk-summary-list-row>
+        <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+        <govuk-summary-list-row-actions>
+            <govuk-summary-list-row-action href="@LinkGenerator.AlertReopen(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Remove</govuk-summary-list-row-action>
+            <govuk-summary-list-row-action href="@LinkGenerator.AlertEditEndDate(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
+        </govuk-summary-list-row-actions>
+    </govuk-summary-list-row>
+</govuk-summary-list>

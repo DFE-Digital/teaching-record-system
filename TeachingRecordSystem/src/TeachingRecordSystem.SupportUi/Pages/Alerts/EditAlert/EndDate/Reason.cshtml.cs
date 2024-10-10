@@ -127,7 +127,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.Alert(AlertId));
+        return Redirect(linkGenerator.AlertDetail(AlertId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

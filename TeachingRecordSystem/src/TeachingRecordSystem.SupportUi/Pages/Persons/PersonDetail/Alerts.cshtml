@@ -90,7 +90,7 @@
                 @foreach (var alert in Model.ClosedAlerts!)
                 {
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell"><a href="@LinkGenerator.Alert(alert.AlertId)" class="govuk-link">@alert.AlertType.Name</a></td>
+                        <td class="govuk-table__cell"><a href="@LinkGenerator.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType.Name</a></td>
                         <td class="govuk-table__cell">@alert.StartDate?.ToString("d MMMM yyyy")</td>
                         <td class="govuk-table__cell">@alert.EndDate?.ToString("d MMMM yyyy")</td>
                         <td class="govuk-table__cell"><a href="@LinkGenerator.AlertDelete(alert.AlertId, journeyInstanceId: null)" class="govuk-link">Delete <span class="govuk-visually-hidden">alert</span></a></td>

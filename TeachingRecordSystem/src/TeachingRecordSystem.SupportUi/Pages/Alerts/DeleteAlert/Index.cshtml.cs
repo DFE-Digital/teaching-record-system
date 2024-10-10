@@ -49,7 +49,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         if (ConfirmDelete == false)
         {
             await JourneyInstance!.DeleteAsync();
-            return Redirect(EndDate is null ? linkGenerator.PersonAlerts(PersonId) : linkGenerator.Alert(AlertId));
+            return Redirect(EndDate is null ? linkGenerator.PersonAlerts(PersonId) : linkGenerator.AlertDetail(AlertId));
         }
 
         await JourneyInstance!.UpdateStateAsync(state =>
@@ -63,7 +63,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(EndDate is null ? linkGenerator.PersonAlerts(PersonId) : linkGenerator.Alert(AlertId));
+        return Redirect(EndDate is null ? linkGenerator.PersonAlerts(PersonId) : linkGenerator.AlertDetail(AlertId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
