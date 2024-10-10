@@ -18,6 +18,9 @@ public class ReferenceDataCache(
     private Task<dfeta_specialism[]>? _getSpecialismsTask;
     private Task<dfeta_hequalification[]>? _getHeQualificationsTask;
     private Task<dfeta_hesubject[]>? _getHeSubjectsTask;
+    private Task<dfeta_country[]>? _getCountriesTask;
+    private Task<dfeta_ittsubject[]>? _getIttSubjectsTask;
+    private Task<dfeta_ittqualification[]>? _getIttQualificationsTask;
 
     // TRS
     private Task<AlertCategory[]>? _alertCategoriesTask;
@@ -184,6 +187,24 @@ public class ReferenceDataCache(
         return alertTypes.SingleOrDefault(at => at.DqtSanctionCode == dqtSanctionCode);
     }
 
+    public async Task<dfeta_country?> GetCountryByCountryCodeAsync(string countryCode)
+    {
+        var countries = await EnsureCountriesAsync();
+        return countries.SingleOrDefault(at => at.dfeta_Value == countryCode);
+    }
+
+    public async Task<dfeta_ittsubject?> GetIttSubjectBySubjectCodeAsync(string subjectCode)
+    {
+        var ittSubjects = await EnsureIttSubjectsAsync();
+        return ittSubjects.SingleOrDefault(at => at.dfeta_Value == subjectCode);
+    }
+
+    public async Task<dfeta_ittqualification[]> GetIttQualificationsAsync()
+    {
+        var ittQualifications = await EnsureIttQualificationsAsync();
+        return ittQualifications.ToArray();
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
@@ -242,6 +263,21 @@ public class ReferenceDataCache(
                 return await dbContext.AlertTypes.AsNoTracking().Include(at => at.AlertCategory).ToArrayAsync();
             });
 
+    private Task<dfeta_country[]> EnsureCountriesAsync() =>
+        LazyInitializer.EnsureInitialized(
+            ref _getCountriesTask,
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllCountriesQuery()));
+
+    private Task<dfeta_ittsubject[]> EnsureIttSubjectsAsync() =>
+        LazyInitializer.EnsureInitialized(
+            ref _getIttSubjectsTask,
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveIttSubjectsQuery()));
+
+    private Task<dfeta_ittqualification[]> EnsureIttQualificationsAsync() =>
+        LazyInitializer.EnsureInitialized(
+            ref _getIttQualificationsTask,
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveIttQualificationsQuery()));
+
     async Task IStartupTask.ExecuteAsync()
     {
         // CRM
@@ -253,6 +289,9 @@ public class ReferenceDataCache(
         await EnsureMqEstablishmentsAsync();
         await EnsureHeQualificationsAsync();
         await EnsureHeSubjectsAsync();
+        await EnsureCountriesAsync();
+        await EnsureIttSubjectsAsync();
+        await EnsureIttQualificationsAsync();
 
         // TRS
         await EnsureAlertCategoriesAsync();
