@@ -4,14 +4,9 @@
 @{
     Layout = "Layout";
     ViewBag.SelectedTab = PersonSubNavigationTab.Qualifications;
-    ViewBag.PersonId = Model.PersonId;
-    ViewBag.Search = Model.Search;
-    ViewBag.SortBy = Model.SortBy;
-    ViewBag.PageNumber = Model.PageNumber;
-    ViewBag.Title = Model.Name;
 }
 
-@if (Model.MandatoryQualifications is null || Model.MandatoryQualifications.Length == 0)
+@if (Model.MandatoryQualifications!.Length == 0)
 {
     <p class="govuk-body" data-testid="no-mandatory-qualifications">No mandatory qualifications</p>
 }
