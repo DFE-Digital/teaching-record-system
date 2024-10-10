@@ -119,7 +119,7 @@ public class ConfirmModel(
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(EndDate is null ? linkGenerator.PersonAlerts(PersonId) : linkGenerator.Alert(AlertId));
+        return Redirect(EndDate is null ? linkGenerator.PersonAlerts(PersonId) : linkGenerator.AlertDetail(AlertId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

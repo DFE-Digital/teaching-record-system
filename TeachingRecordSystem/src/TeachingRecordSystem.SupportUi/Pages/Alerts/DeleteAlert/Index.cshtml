@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.EndDate is null ? LinkGenerator.PersonAlerts(Model.PersonId) : LinkGenerator.Alert(Model.AlertId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.EndDate is null ? LinkGenerator.PersonAlerts(Model.PersonId) : LinkGenerator.AlertDetail(Model.AlertId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">

@@ -5,13 +5,13 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.AlertEditEndDateCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.Alert(Model.AlertId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.AlertEditEndDateCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.AlertDetail(Model.AlertId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.AlertEditEndDate(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
-            <span class="govuk-caption-l">Change previous alert - @Model.PersonName</span>
+            <span class="govuk-caption-l">Change closed alert - @Model.PersonName</span>
 
             <govuk-date-input asp-for="EndDate">
                 <govuk-date-input-fieldset>

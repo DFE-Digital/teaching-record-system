@@ -14,7 +14,7 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string SignedOut() => GetRequiredPathByPage("/SignedOut");
 
-    public string Alert(Guid alertId) => GetRequiredPathByPage("/Alerts/Alert/Index", routeValues: new { alertId });
+    public string AlertDetail(Guid alertId) => GetRequiredPathByPage("/Alerts/AlertDetail", routeValues: new { alertId });
 
     public string AlertAdd(Guid personId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/AddAlert/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
