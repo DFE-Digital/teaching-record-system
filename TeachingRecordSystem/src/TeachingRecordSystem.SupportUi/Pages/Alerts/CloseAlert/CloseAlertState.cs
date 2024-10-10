@@ -3,8 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
-public class CloseAlertState
+public class CloseAlertState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.CloseAlert,
+        typeof(CloseAlertState),
+        requestDataKeys: ["alertId"],
+        appendUniqueKey: true);
+
     public DateOnly? EndDate { get; set; }
 
     public CloseAlertReasonOption? ChangeReason { get; set; }

@@ -25,7 +25,6 @@ using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Redis;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
-using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 using TeachingRecordSystem.UiCommon.Filters;
@@ -240,92 +239,8 @@ builder.Services
     .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
     .AddTransient<CheckMandatoryQualificationExistsFilter>()
     .AddTransient<CheckAlertExistsFilter>()
-    .AddFormFlow(options =>
-    {
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.EditName,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditName.EditNameState),
-            requestDataKeys: ["personId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.EditDateOfBirth,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDateOfBirth.EditDateOfBirthState),
-            requestDataKeys: ["personId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.AddAlert,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.AddAlertState),
-            requestDataKeys: ["personId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.EditAlertStartDate,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate.EditAlertStartDateState),
-            requestDataKeys: ["alertId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.EditAlertEndDate,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate.EditAlertEndDateState),
-            requestDataKeys: ["alertId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.CloseAlert,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert.CloseAlertState),
-            requestDataKeys: ["alertId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.ReopenAlert,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert.ReopenAlertState),
-            requestDataKeys: ["alertId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.DeleteAlert,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert.DeleteAlertState),
-            requestDataKeys: ["alertId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.AddMq,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq.AddMqState),
-            requestDataKeys: ["personId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.EditMqProvider,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider.EditMqProviderState),
-            requestDataKeys: ["qualificationId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.EditMqSpecialism,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism.EditMqSpecialismState),
-            requestDataKeys: ["qualificationId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.EditMqStartDate,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate.EditMqStartDateState),
-            requestDataKeys: ["qualificationId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.EditMqStatus,
-            typeof(EditMqStatusState),
-            requestDataKeys: ["qualificationId"],
-            appendUniqueKey: true));
-
-        options.JourneyRegistry.RegisterJourney(new JourneyDescriptor(
-            JourneyNames.DeleteMq,
-            typeof(TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq.DeleteMqState),
-            requestDataKeys: ["qualificationId"],
-            appendUniqueKey: true));
-    });
+    .AddFormFlow()
+    .AddFormFlowJourneyDescriptors(typeof(Program).Assembly);
 
 builder.AddBlobStorage();
 

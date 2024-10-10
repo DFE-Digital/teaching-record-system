@@ -3,8 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 
-public class EditAlertEndDateState
+public class EditAlertEndDateState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.EditAlertEndDate,
+        typeof(EditAlertEndDateState),
+        requestDataKeys: ["alertId"],
+        appendUniqueKey: true);
+
     public bool Initialized { get; set; }
 
     public DateOnly? CurrentEndDate { get; set; }

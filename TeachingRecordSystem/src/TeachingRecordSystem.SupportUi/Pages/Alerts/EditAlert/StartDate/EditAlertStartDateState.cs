@@ -3,8 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
-public class EditAlertStartDateState
+public class EditAlertStartDateState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.EditAlertStartDate,
+        typeof(EditAlertStartDateState),
+        requestDataKeys: ["alertId"],
+        appendUniqueKey: true);
+
     public bool Initialized { get; set; }
 
     public DateOnly? CurrentStartDate { get; set; }

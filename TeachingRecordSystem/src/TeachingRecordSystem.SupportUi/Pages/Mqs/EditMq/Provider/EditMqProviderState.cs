@@ -3,8 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 
-public class EditMqProviderState
+public class EditMqProviderState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.EditMqProvider,
+        typeof(EditMqProviderState),
+        requestDataKeys: ["qualificationId"],
+        appendUniqueKey: true);
+
     public bool Initialized { get; set; }
 
     public Guid? CurrentProviderId { get; set; }

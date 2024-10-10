@@ -3,8 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 
-public class DeleteMqState
+public class DeleteMqState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.DeleteMq,
+        typeof(DeleteMqState),
+        requestDataKeys: ["qualificationId"],
+        appendUniqueKey: true);
+
     public bool Initialized { get; set; }
 
     public MqDeletionReasonOption? DeletionReason { get; set; }
