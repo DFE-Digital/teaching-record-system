@@ -255,6 +255,12 @@ app.UseMiddleware<AddAnalyticsDataMiddleware>();
 
 app.UseRouting();
 
+app.MapGet("/ip", (ctx) =>
+{
+    Console.WriteLine(ctx.Connection.RemoteIpAddress);
+    return Task.CompletedTask;
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 
