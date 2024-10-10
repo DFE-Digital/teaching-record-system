@@ -3,8 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.AddMq;
 
-public class AddMqState
+public class AddMqState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.AddMq,
+        typeof(AddMqState),
+        requestDataKeys: ["personId"],
+        appendUniqueKey: true);
+
     public Guid? ProviderId { get; set; }
 
     public MandatoryQualificationSpecialism? Specialism { get; set; }

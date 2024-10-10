@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.UiCommon.FormFlow.Conventions;
 using TeachingRecordSystem.UiCommon.FormFlow.Filters;
 using TeachingRecordSystem.UiCommon.FormFlow.ModelBinding;
@@ -53,6 +55,13 @@ public static class ServiceCollectionExtensions
     {
         services.Configure(configure);
         services.AddFormFlow();
+
+        return services;
+    }
+
+    public static IServiceCollection AddFormFlowJourneyDescriptors(this IServiceCollection services, Assembly assembly)
+    {
+        services.AddSingleton<IConfigureOptions<FormFlowOptions>>(new DiscoverJourneyDescriptors(assembly));
 
         return services;
     }

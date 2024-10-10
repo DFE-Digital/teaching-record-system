@@ -3,8 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
-public class AddAlertState
+public class AddAlertState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.AddAlert,
+        typeof(AddAlertState),
+        requestDataKeys: ["personId"],
+        appendUniqueKey: true);
+
     public Guid? AlertTypeId { get; set; }
 
     public string? AlertTypeName { get; set; }

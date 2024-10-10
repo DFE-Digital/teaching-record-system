@@ -5,8 +5,14 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditName;
 
-public class EditNameState
+public class EditNameState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.EditName,
+        typeof(EditNameState),
+        requestDataKeys: ["personId"],
+        appendUniqueKey: true);
+
     public bool Initialized { get; set; }
 
     public string? FirstName { get; set; }

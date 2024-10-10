@@ -3,8 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 
-public class EditMqSpecialismState
+public class EditMqSpecialismState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.EditMqSpecialism,
+        typeof(EditMqSpecialismState),
+        requestDataKeys: ["qualificationId"],
+        appendUniqueKey: true);
+
     public bool Initialized { get; set; }
 
     public MandatoryQualificationSpecialism? CurrentSpecialism { get; set; }

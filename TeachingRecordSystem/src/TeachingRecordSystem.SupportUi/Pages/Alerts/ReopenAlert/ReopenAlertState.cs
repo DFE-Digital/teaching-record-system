@@ -3,8 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 
-public class ReopenAlertState
+public class ReopenAlertState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.ReopenAlert,
+        typeof(ReopenAlertState),
+        requestDataKeys: ["alertId"],
+        appendUniqueKey: true);
+
     public ReopenAlertReasonOption? ChangeReason { get; set; }
 
     public string? ChangeReasonDetail { get; set; }

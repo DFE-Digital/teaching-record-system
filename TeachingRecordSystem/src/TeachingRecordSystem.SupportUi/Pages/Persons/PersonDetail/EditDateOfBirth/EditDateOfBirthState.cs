@@ -5,8 +5,14 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDateOfBirth;
 
-public class EditDateOfBirthState
+public class EditDateOfBirthState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.EditDateOfBirth,
+        typeof(EditDateOfBirthState),
+        requestDataKeys: ["personId"],
+        appendUniqueKey: true);
+
     public bool Initialized { get; set; }
 
     public DateOnly? DateOfBirth { get; set; }

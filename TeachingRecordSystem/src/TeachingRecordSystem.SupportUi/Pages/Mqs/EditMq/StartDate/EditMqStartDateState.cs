@@ -3,8 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 
-public class EditMqStartDateState
+public class EditMqStartDateState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.EditMqStartDate,
+        typeof(EditMqStartDateState),
+        requestDataKeys: ["qualificationId"],
+        appendUniqueKey: true);
+
     public bool Initialized { get; set; }
 
     public DateOnly? CurrentStartDate { get; set; }

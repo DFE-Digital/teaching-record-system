@@ -2,8 +2,14 @@ using System.Text.Json.Serialization;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-public class EditMqStatusState
+public class EditMqStatusState : IRegisterJourney
 {
+    public static JourneyDescriptor Journey => new(
+        JourneyNames.EditMqStatus,
+        typeof(EditMqStatusState),
+        requestDataKeys: ["qualificationId"],
+        appendUniqueKey: true);
+
     public bool Initialized { get; set; }
 
     public MandatoryQualificationStatus? CurrentStatus { get; set; }
