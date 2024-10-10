@@ -16,7 +16,6 @@ public class GetTeacherHandlerTests
 
         var contact = new Contact
         {
-            dfeta_ActiveSanctions = true,
             BirthDate = birthDate,
             FullName = fullName,
             dfeta_NINumber = nationalInsuranceNumber,
@@ -28,7 +27,9 @@ public class GetTeacherHandlerTests
             }
         };
 
-        var response = GetTeacherHandler.MapContactToResponse(contact);
+        var hasActiveAlert = true;
+
+        var response = GetTeacherHandler.MapContactToResponse(contact, hasActiveAlert);
 
         Assert.True(response.ActiveAlert);
         Assert.Equal(birthDate, response.DateOfBirth);
@@ -49,7 +50,6 @@ public class GetTeacherHandlerTests
 
         var contact = new Contact
         {
-            dfeta_ActiveSanctions = false,
             StateCode = ContactState.Active,
             Attributes =
             {
@@ -69,7 +69,9 @@ public class GetTeacherHandlerTests
             }
         };
 
-        var response = GetTeacherHandler.MapContactToResponse(contact);
+        var hasActiveAlert = false;
+
+        var response = GetTeacherHandler.MapContactToResponse(contact, hasActiveAlert);
 
         var qualifiedTeacherStatus = response.QualifiedTeacherStatus;
 
@@ -91,7 +93,6 @@ public class GetTeacherHandlerTests
 
         var contact = new Contact
         {
-            dfeta_ActiveSanctions = false,
             StateCode = ContactState.Active,
             Attributes =
             {
@@ -113,7 +114,9 @@ public class GetTeacherHandlerTests
             }
         };
 
-        var response = GetTeacherHandler.MapContactToResponse(contact);
+        var hasActiveAlert = false;
+
+        var response = GetTeacherHandler.MapContactToResponse(contact, hasActiveAlert);
 
         var induction = response.Induction;
 
@@ -146,7 +149,6 @@ public class GetTeacherHandlerTests
 
         var contact = new Contact
         {
-            dfeta_ActiveSanctions = false,
             StateCode = ContactState.Active,
             Attributes =
             {
@@ -184,7 +186,9 @@ public class GetTeacherHandlerTests
             }
         };
 
-        var response = GetTeacherHandler.MapContactToResponse(contact);
+        var hasActiveAlert = false;
+
+        var response = GetTeacherHandler.MapContactToResponse(contact, hasActiveAlert);
 
         var initialTeacherTraining = response.InitialTeacherTraining;
 
@@ -251,7 +255,6 @@ public class GetTeacherHandlerTests
 
         var contact = new Contact()
         {
-            dfeta_ActiveSanctions = false,
             StateCode = ContactState.Active,
             dfeta_contact_dfeta_qualification = new[] { qualification1, qualification2 },
             FormattedValues =
@@ -260,7 +263,9 @@ public class GetTeacherHandlerTests
             }
         };
 
-        var response = GetTeacherHandler.MapContactToResponse(contact);
+        var hasActiveAlert = false;
+
+        var response = GetTeacherHandler.MapContactToResponse(contact, hasActiveAlert);
 
         var qualifications = response.Qualifications;
 
@@ -299,7 +304,6 @@ public class GetTeacherHandlerTests
 
         var contact = new Contact
         {
-            dfeta_ActiveSanctions = false,
             StateCode = ContactState.Active,
             Attributes =
             {
@@ -321,7 +325,9 @@ public class GetTeacherHandlerTests
             }
         };
 
-        var response = GetTeacherHandler.MapContactToResponse(contact);
+        var hasActiveAlert = false;
+
+        var response = GetTeacherHandler.MapContactToResponse(contact, hasActiveAlert);
 
         var induction = response.Induction;
 
