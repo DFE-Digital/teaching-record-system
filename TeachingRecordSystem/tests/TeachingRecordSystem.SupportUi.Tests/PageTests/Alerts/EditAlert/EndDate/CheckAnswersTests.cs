@@ -198,7 +198,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     StartDate = originalAlert.StartDate,
                     EndDate = databaseEndDate
                 },
-                ChangeReason = changeReason == AlertChangeEndDateReasonOption.AnotherReason ? changeReasonDetail : changeReason.GetDisplayName(),
+                ChangeReasonDetail = changeReason == AlertChangeEndDateReasonOption.AnotherReason ? changeReasonDetail : changeReason.GetDisplayName(),
                 EvidenceFile = new()
                 {
                     FileId = evidenceFileId,

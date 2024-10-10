@@ -930,7 +930,7 @@ public class TrsDataSyncHelper(
                 RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
                 Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false),
-                Reason = null,
+                AddReasonDetail = null,
                 EvidenceFile = null,
             };
         }
@@ -997,7 +997,7 @@ public class TrsDataSyncHelper(
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
                 Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false),
                 OldAlert = GetEventAlert(previous.Entity, applyMigrationMappings: false),
-                ChangeReason = null,
+                ChangeReasonDetail = null,
                 EvidenceFile = null,
                 Changes = changes
             };

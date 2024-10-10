@@ -203,7 +203,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     StartDate = originalAlert.StartDate,
                     EndDate = originalAlert.EndDate
                 },
-                ChangeReason = changeReason == ReopenAlertReasonOption.AnotherReason ? changeReasonDetail : changeReason.GetDisplayName(),
+                ChangeReasonDetail = changeReason == ReopenAlertReasonOption.AnotherReason ? changeReasonDetail : changeReason.GetDisplayName(),
                 EvidenceFile = new()
                 {
                     FileId = evidenceFileId,

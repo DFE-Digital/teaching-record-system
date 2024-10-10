@@ -312,7 +312,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
                 CreatedUtc = Clock.UtcNow,
                 RaisedBy = GetCurrentUserId(),
                 PersonId = person.PersonId,
-                Reason = additionalDetail,
+                DeletionReasonDetail = additionalDetail,
                 Alert = new()
                 {
                     AlertId = Guid.Empty,

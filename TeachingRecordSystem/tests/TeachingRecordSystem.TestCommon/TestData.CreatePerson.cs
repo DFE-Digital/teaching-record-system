@@ -774,7 +774,7 @@ public partial class TestData
                 RaisedBy = createdByUser,
                 Alert = TeachingRecordSystem.Core.Events.Models.Alert.FromModel(alert),
                 PersonId = personId,
-                Reason = reason,
+                AddReasonDetail = reason,
                 EvidenceFile = null
             };
 

@@ -160,7 +160,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 CreatedUtc = Clock.UtcNow,
                 RaisedBy = GetCurrentUserId(),
                 PersonId = person.PersonId,
-                Reason = reason,
+                AddReasonDetail = reason,
                 Alert = new()
                 {
                     AlertId = Guid.Empty,

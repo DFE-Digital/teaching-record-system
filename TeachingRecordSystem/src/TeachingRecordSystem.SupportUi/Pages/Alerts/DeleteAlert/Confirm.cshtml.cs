@@ -96,7 +96,7 @@ public class ConfirmModel(
             RaisedBy = User.GetUserId(),
             PersonId = PersonId,
             Alert = EventModels.Alert.FromModel(alert),
-            Reason = HasAdditionalDetail == true ? AdditionalDetail : null,
+            DeletionReasonDetail = HasAdditionalDetail == true ? AdditionalDetail : null,
             EvidenceFile = evidenceFileId is Guid fileId ?
                 new EventModels.File()
                 {
