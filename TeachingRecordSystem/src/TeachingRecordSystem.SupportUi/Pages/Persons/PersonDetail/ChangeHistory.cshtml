@@ -6,11 +6,6 @@
 @{
     Layout = "Layout";
     ViewBag.SelectedTab = PersonSubNavigationTab.ChangeHistory;
-    ViewBag.PersonId = Model.PersonId;
-    ViewBag.Search = Model.Search;
-    ViewBag.SortBy = Model.SortBy;
-    ViewBag.PageNumber = Model.PageNumber;
-    ViewBag.Title = Model.Name;
 }
 
 @if (Model.TimelineItems!.Length == 0)

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -21,8 +20,6 @@ public class QualificationsModel(TrsDbContext dbContext) : PageModel
     [FromQuery]
     public ContactSearchSortByOption? SortBy { get; set; }
 
-    public string? Name { get; set; }
-
     public MandatoryQualification[]? MandatoryQualifications { get; set; }
 
     public async Task OnGet()
@@ -31,12 +28,5 @@ public class QualificationsModel(TrsDbContext dbContext) : PageModel
             .Include(q => q.Provider)
             .Where(q => q.PersonId == PersonId)
             .ToArrayAsync();
-    }
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-
-        Name = personInfo.Name;
     }
 }

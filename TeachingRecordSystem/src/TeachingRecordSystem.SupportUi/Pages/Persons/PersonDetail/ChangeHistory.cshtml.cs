@@ -21,15 +21,11 @@ public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, IDbConte
     [FromQuery]
     public ContactSearchSortByOption? SortBy { get; set; }
 
-    public string? Name { get; set; }
-
     public TimelineItem[]? TimelineItems { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
         var personInfo = HttpContext.GetCurrentPersonFeature();
-
-        Name = personInfo.Name;
 
         var notesResult = await crmQueryDispatcher.ExecuteQuery(new GetNotesByContactIdQuery(PersonId));
 

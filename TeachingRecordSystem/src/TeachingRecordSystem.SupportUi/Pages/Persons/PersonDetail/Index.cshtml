@@ -5,11 +5,6 @@
 @{
     Layout = "Layout";
     ViewBag.SelectedTab = PersonSubNavigationTab.General;
-    ViewBag.PersonId = Model.PersonId;
-    ViewBag.Search = Model.Search;
-    ViewBag.SortBy = Model.SortBy;
-    ViewBag.PageNumber = Model.PageNumber;
-    ViewBag.Title = Model.Person!.Name;
 }
 
 @{
@@ -17,7 +12,7 @@
     {
         PersonId = Model.PersonId,
         Options = PersonDetailViewModelOptions.ShowAll,
-        Trn = Model.Person.Trn,
+        Trn = Model.Person!.Trn,
         Name = Model.Person.Name,
         PreviousNames = Model.Person.PreviousNames,
         DateOfBirth = Model.Person.DateOfBirth,
