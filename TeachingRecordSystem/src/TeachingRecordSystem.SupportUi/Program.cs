@@ -101,7 +101,7 @@ builder.Services
             "/Alerts",
             model =>
             {
-                model.Filters.Add(new RequireFeatureEnabledFilterFactory("Alerts"));
+                model.Filters.Add(new RequireFeatureEnabledFilterFactory(FeatureNames.Alerts));
             });
 
         options.Conventions.AddFolderApplicationModelConvention(
@@ -251,6 +251,7 @@ builder.Services
     .AddSingleton<ReferenceDataCache>()
     .AddSingleton<SanctionTextLookup>()
     .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
+    .AddSingleton<FeatureProvider>()
     .AddFileService()
     .AddPersonMatching();
 

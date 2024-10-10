@@ -3,12 +3,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-public class RequireFeatureEnabledFilter(IConfiguration configuration, string featureName) : IResourceFilter
+public class RequireFeatureEnabledFilter(FeatureProvider featureProvider, string featureName) : IResourceFilter
 {
     public void OnResourceExecuting(ResourceExecutingContext context)
     {
-        var features = configuration.GetSection("EnabledFeatures").Get<List<string>>();
-        if (features is null || !features.Contains(featureName))
+        if (!featureProvider.IsEnabled(featureName))
         {
             context.Result = new NotFoundResult();
         }
