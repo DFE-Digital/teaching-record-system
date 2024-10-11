@@ -31,7 +31,7 @@ public class ConfirmModel : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        await _crmQueryDispatcher.ExecuteQuery(
+        await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(
             new UpdateContactNameQuery(
                 PersonId,
                 JourneyInstance!.State.FirstName,
@@ -54,7 +54,7 @@ public class ConfirmModel : PageModel
             return;
         }
 
-        var person = await _crmQueryDispatcher.ExecuteQuery(
+        var person = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(
             new GetActiveContactDetailByIdQuery(
                 PersonId,
                 new ColumnSet(

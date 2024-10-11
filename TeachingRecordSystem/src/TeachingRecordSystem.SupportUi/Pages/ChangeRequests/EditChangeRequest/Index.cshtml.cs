@@ -32,7 +32,7 @@ public partial class IndexModel : PageModel
 
     public async Task<IActionResult> OnGet()
     {
-        var incidentDetail = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
+        var incidentDetail = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
         if (incidentDetail is null)
         {
             return NotFound();
@@ -49,7 +49,7 @@ public partial class IndexModel : PageModel
     }
     public async Task<IActionResult> OnGetDocuments(Guid id)
     {
-        var document = await _crmQueryDispatcher.ExecuteQuery(new GetDocumentByIdQuery(id));
+        var document = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(new GetDocumentByIdQuery(id));
         var annotation = document?.Extract<Annotation>("annotation", Annotation.PrimaryIdAttribute);
 
         if (document is null || annotation is null)

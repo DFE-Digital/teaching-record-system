@@ -205,25 +205,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
         RetryPauseTime = TimeSpan.FromSeconds(1)
     };
 
-    builder.Services.AddDefaultServiceClient(
-        ServiceLifetime.Transient,
-        sp =>
-        {
-            var sc = serviceClient.Clone();
-
-            var httpContext = sp.GetRequiredService<IHttpContextAccessor>().HttpContext;
-            if (httpContext?.User?.Identity?.IsAuthenticated == true)
-            {
-                sc.CallerId = httpContext.User.GetDqtUserId();
-            }
-
-            return sc;
-        });
-
-    builder.Services.AddNamedServiceClient(
-        "WithoutImpersonation",
-        ServiceLifetime.Transient,
-        _ => serviceClient.Clone());
+    builder.Services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => serviceClient.Clone());
 
     builder.Services.AddHealthChecks()
         .AddCheck("CRM", () => serviceClient.IsReady ? HealthCheckResult.Healthy() : HealthCheckResult.Degraded());
