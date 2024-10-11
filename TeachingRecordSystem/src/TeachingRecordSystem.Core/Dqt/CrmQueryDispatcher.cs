@@ -6,11 +6,16 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public class CrmQueryDispatcher(IServiceProvider serviceProvider, string? serviceClientName) : ICrmQueryDispatcher
 {
-    public async Task<TResult> ExecuteQuery<TResult>(ICrmQuery<TResult> query)
+    public Task<TResult> ExecuteQuery<TResult>(ICrmQuery<TResult> query) =>
+        ExecuteQuery(GetOrganizationService, query);
+
+    public async Task<TResult> ExecuteQuery<TResult>(
+        Func<IServiceProvider, IOrganizationServiceAsync> getOrganizationService,
+        ICrmQuery<TResult> query)
     {
         using var scope = serviceProvider.CreateScope();
 
-        var organizationService = scope.ServiceProvider.GetRequiredKeyedService<IOrganizationServiceAsync>(serviceClientName);
+        var organizationService = getOrganizationService(scope.ServiceProvider);
 
         var handlerType = typeof(ICrmQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
         var handler = scope.ServiceProvider.GetRequiredService(handlerType);
@@ -21,11 +26,17 @@ public class CrmQueryDispatcher(IServiceProvider serviceProvider, string? servic
         return await wrappedHandler.Execute(query, organizationService);
     }
 
-    public async IAsyncEnumerable<TResult> ExecuteQuery<TResult>(IEnumerableCrmQuery<TResult> query, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public IAsyncEnumerable<TResult> ExecuteQuery<TResult>(IEnumerableCrmQuery<TResult> query, CancellationToken cancellationToken = default) =>
+        ExecuteQuery(GetOrganizationService, query, cancellationToken);
+
+    public async IAsyncEnumerable<TResult> ExecuteQuery<TResult>(
+        Func<IServiceProvider, IOrganizationServiceAsync> getOrganizationService,
+        IEnumerableCrmQuery<TResult> query,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         using var scope = serviceProvider.CreateScope();
 
-        var organizationService = scope.ServiceProvider.GetRequiredKeyedService<IOrganizationServiceAsync>(serviceClientName);
+        var organizationService = getOrganizationService(scope.ServiceProvider);
 
         var handlerType = typeof(IEnumerableCrmQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
         var handler = scope.ServiceProvider.GetRequiredService(handlerType);
@@ -38,6 +49,9 @@ public class CrmQueryDispatcher(IServiceProvider serviceProvider, string? servic
             yield return result;
         }
     }
+
+    public IOrganizationServiceAsync GetOrganizationService(IServiceProvider serviceProvider) =>
+        serviceProvider.GetRequiredKeyedService<IOrganizationServiceAsync>(serviceClientName);
 
     private abstract class QueryHandler<T>
     {

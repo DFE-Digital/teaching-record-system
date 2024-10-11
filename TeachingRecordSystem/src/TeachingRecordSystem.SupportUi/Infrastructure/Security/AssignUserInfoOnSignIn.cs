@@ -72,7 +72,7 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
 
             async Task<Guid?> GetDqtUserId()
             {
-                var organizationService = ctx.HttpContext.RequestServices.GetRequiredKeyedService<IOrganizationServiceAsync>("WithoutImpersonation");
+                var organizationService = ctx.HttpContext.RequestServices.GetRequiredService<IOrganizationServiceAsync>();
 
                 var request = new QueryByAttribute(SystemUser.EntityLogicalName);
                 request.AddAttributeValue(SystemUser.Fields.AzureActiveDirectoryObjectId, new Guid(aadUserId));

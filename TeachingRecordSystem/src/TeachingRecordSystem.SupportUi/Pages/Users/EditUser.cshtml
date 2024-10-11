@@ -16,15 +16,15 @@
 
             @if (!Model.HasCrmAccount)
             {
-                <govuk-warning-text icon-fallback-text="Warning" data-testid="no-crm-account-warning">User does not have an account in CRM.<br />The user will not be able to access the TRS Console.</govuk-warning-text>
+                <govuk-warning-text icon-fallback-text="Warning" data-testid="no-crm-account-warning">User does not have an account in CRM.<br />Some functionality will not be available.</govuk-warning-text>
             }
             else if (Model.CrmAccountIsDisabled)
             {
-                <govuk-warning-text icon-fallback-text="Warning" data-testid="disabled-crm-account-warning">User CRM account is disabled.<br />The user will not be able to access the TRS Console.</govuk-warning-text>
+                <govuk-warning-text icon-fallback-text="Warning" data-testid="disabled-crm-account-warning">User CRM account is disabled.<br />Some functionality will not be available.</govuk-warning-text>
             }
             else if (Model.DqtRoles is null || Model.DqtRoles.Length == 0)
             {
-                <govuk-warning-text icon-fallback-text="Warning" data-testid="no-dqt-roles-warning">User does not have any roles in CRM.<br />The user will not be able to access the TRS Console.</govuk-warning-text>
+                <govuk-warning-text icon-fallback-text="Warning" data-testid="no-dqt-roles-warning">User does not have any roles in CRM.<br />Some functionality will not be available.</govuk-warning-text>
             }
 
             <govuk-input asp-for="Email" label-class="govuk-label--m" type="email" disabled />
