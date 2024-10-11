@@ -17,11 +17,17 @@ public class AddAlertState : IRegisterJourney
 
     public string? Details { get; set; }
 
+    public bool? AddLink { get; set; }
+
     public string? Link { get; set; }
 
     public DateOnly? StartDate { get; set; }
 
-    public string? Reason { get; set; }
+    public AddAlertReasonOption? AddReason { get; set; }
+
+    public bool? HaveAdditionalReasonDetail { get; set; }
+
+    public string? AddReasonDetail { get; set; }
 
     public bool? UploadEvidence { get; set; }
 
@@ -36,7 +42,10 @@ public class AddAlertState : IRegisterJourney
     public bool IsComplete =>
         AlertTypeId.HasValue &&
         !string.IsNullOrWhiteSpace(Details) &&
+        AddLink.HasValue &&
         StartDate.HasValue &&
+        AddReason.HasValue &&
+        HaveAdditionalReasonDetail.HasValue &&
         UploadEvidence.HasValue &&
         (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
 }

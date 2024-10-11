@@ -9,10 +9,12 @@ public class DetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange        
         var personId = Guid.NewGuid();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid()
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/details?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -47,10 +49,12 @@ public class DetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details"
         });
 
@@ -68,11 +72,13 @@ public class DetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
         var details = "My details";
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = details
         });
 
@@ -91,8 +97,13 @@ public class DetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var personId = Guid.NewGuid();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(personId);
+        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -126,10 +137,12 @@ public class DetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid()
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -142,21 +155,25 @@ public class DetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_ValidInput_RedirectsToLinkPage()
+    public async Task Post_ValidInput_UpdatesStateAndRedirectsToLinkPage()
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid()
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name
         });
+
+        var details = "My details";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                {  "Details", "My details" }
+                { "Details", details }
             }
         };
 
@@ -166,6 +183,9 @@ public class DetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(details, journeyInstance.State.Details);
     }
 
     [Fact]
@@ -173,10 +193,12 @@ public class DetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid()
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");

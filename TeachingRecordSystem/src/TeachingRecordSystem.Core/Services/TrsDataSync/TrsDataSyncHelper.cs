@@ -930,6 +930,7 @@ public class TrsDataSyncHelper(
                 RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
                 Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false),
+                AddReason = null,
                 AddReasonDetail = null,
                 EvidenceFile = null,
             };

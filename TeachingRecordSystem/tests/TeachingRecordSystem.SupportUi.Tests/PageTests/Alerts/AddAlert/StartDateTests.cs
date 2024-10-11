@@ -9,11 +9,14 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var personId = Guid.NewGuid();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
-            Details = "Details"
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -26,13 +29,17 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_MissingDataInJourneyState_RedirectsToDetailsPage()
+    public async Task Get_MissingDataInJourneyState_RedirectsToLinkPage()
     {
+        // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -42,7 +49,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/details?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -50,11 +57,14 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
-            Details = "Details"
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -71,12 +81,15 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
         var startDate = new DateOnly(2021, 1, 1);
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
+            AddLink = false,
             StartDate = startDate
         });
 
@@ -97,21 +110,25 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var personId = Guid.NewGuid();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+        var startDate = Clock.Today;
 
-        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
-            Details = "Details"
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new FormUrlEncodedContentBuilder()
             {
-                ["StartDate.Day"] = "1",
-                ["StartDate.Month"] = "1",
-                ["StartDate.Year"] = "2021"
-            })
+                { "StartDate.Day", startDate.Day },
+                { "StartDate.Month", startDate.Month },
+                { "StartDate.Year", startDate.Year }
+            }
         };
 
         // Act
@@ -122,24 +139,28 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WithMissingDataInJourneyState_RedirectsToDetailsPage()
+    public async Task Post_WithMissingDataInJourneyState_RedirectsToLinkPage()
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+        var startDate = Clock.Today;
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid()
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details"
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new FormUrlEncodedContentBuilder()
             {
-                ["StartDate.Day"] = "1",
-                ["StartDate.Month"] = "1",
-                ["StartDate.Year"] = "2021"
-            })
+                { "StartDate.Day", startDate.Day },
+                { "StartDate.Month", startDate.Month },
+                { "StartDate.Year", startDate.Year }
+            }
         };
 
         // Act
@@ -147,7 +168,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/details?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -155,11 +176,14 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
-            Details = "Details"
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -176,22 +200,25 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var futureDate = Clock.Today.AddDays(2);
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+        var startDate = Clock.Today.AddDays(2);
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
-            Details = "Details"
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new FormUrlEncodedContentBuilder()
             {
-                ["StartDate.Day"] = $"{futureDate.Day}",
-                ["StartDate.Month"] = $"{futureDate.Month}",
-                ["StartDate.Year"] = $"{futureDate.Year}"
-            })
+                { "StartDate.Day", startDate.Day },
+                { "StartDate.Month", startDate.Month },
+                { "StartDate.Year", startDate.Year }
+            }
         };
 
         // Act
@@ -202,26 +229,29 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WithValidInput_RedirectsToReasonPage()
+    public async Task Post_WithValidInput_UpdatesStateAndRedirectsToReasonPage()
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
         var startDate = Clock.Today;
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
-            Details = "Details"
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new FormUrlEncodedContentBuilder()
             {
-                ["StartDate.Day"] = $"{startDate.Day}",
-                ["StartDate.Month"] = $"{startDate.Month}",
-                ["StartDate.Year"] = $"{startDate.Year}"
-            })
+                { "StartDate.Day", startDate.Day },
+                { "StartDate.Month", startDate.Month },
+                { "StartDate.Year", startDate.Year }
+            }
         };
 
         // Act
@@ -230,6 +260,9 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/add/reason?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(startDate, journeyInstance.State.StartDate);
     }
 
     [Fact]
@@ -237,11 +270,14 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
-            Details = "Details"
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");

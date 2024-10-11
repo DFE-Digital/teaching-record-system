@@ -12,19 +12,19 @@
     <div class="govuk-grid-column-full-from-desktop">
         <form action="@LinkGenerator.AlertAddCheckAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Add an alert - @Model.PersonName</span>
-            <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-list>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="alert-type">@Model.AlertTypeName</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>@Model.AlertTypeName</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.AlertAddType(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value><multi-line-text text="@Model.Details" data-testid="details" /></govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value><multi-line-text text="@Model.Details" /></govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.AlertAddDetails(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
@@ -34,11 +34,11 @@
                     <govuk-summary-list-row-value>
                     @if (Model.Link is not null)
                     {
-                        <a href="@Model.Link" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="link">@($"{Model.Link} (opens in new tab)")</a>                        
+                        <a href="@Model.Link" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.Link} (opens in new tab)")</a>                        
                     }
                     else
                     {
-                        <span data-testid="link" use-empty-fallback></span>
+                        <span use-empty-fallback></span>
                     }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
@@ -47,21 +47,28 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>@Model.StartDate.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.AlertAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for adding</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.AddReason.GetDisplayName()</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>
-                        @if(!string.IsNullOrEmpty(Model.Reason))
+                        @if (Model.AddReasonDetail is not null)
                         {
-                            <multi-line-text text="@Model.Reason" data-testid="reason" />
+                            <multi-line-text text="@Model.AddReasonDetail" />
                         }
                         else
                         {
-                            <span data-testid="reason" use-empty-fallback></span>
+                            <span use-empty-fallback></span>
                         }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
@@ -73,11 +80,11 @@
                     <govuk-summary-list-row-value>
                         @if (Model.UploadedEvidenceFileUrl is not null)
                         {
-                            <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                            <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
                         }
                         else
                         {
-                            <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
+                            <span use-empty-fallback></span>
                         }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>

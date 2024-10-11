@@ -25,7 +25,7 @@ public class CheckAnswersModel(
 
     public string? PersonName { get; set; }
 
-    public Guid? AlertTypeId { get; set; }
+    public Guid AlertTypeId { get; set; }
 
     public string? AlertTypeName { get; set; }
 
@@ -33,9 +33,11 @@ public class CheckAnswersModel(
 
     public string? Link { get; set; }
 
-    public DateOnly? StartDate { get; set; }
+    public DateOnly StartDate { get; set; }
 
-    public string? Reason { get; set; }
+    public AddAlertReasonOption AddReason { get; set; }
+
+    public string? AddReasonDetail { get; set; }
 
     public string? EvidenceFileName { get; set; }
 
@@ -53,7 +55,7 @@ public class CheckAnswersModel(
             CreatedOn = now,
             UpdatedOn = now,
             PersonId = PersonId,
-            AlertTypeId = AlertTypeId!.Value,
+            AlertTypeId = AlertTypeId,
             Details = Details,
             ExternalLink = Link,
             StartDate = StartDate,
@@ -68,7 +70,8 @@ public class CheckAnswersModel(
             RaisedBy = User.GetUserId(),
             PersonId = PersonId,
             Alert = EventModels.Alert.FromModel(alert),
-            AddReasonDetail = Reason,
+            AddReason = AddReason.GetDisplayName(),
+            AddReasonDetail = AddReasonDetail,
             EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
                 new EventModels.File()
                 {
@@ -97,19 +100,20 @@ public class CheckAnswersModel(
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(linkGenerator.AlertAddType(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.AlertAddReason(PersonId, JourneyInstance.InstanceId));
             return;
         }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
-        AlertTypeId = JourneyInstance!.State.AlertTypeId;
+        AlertTypeId = JourneyInstance!.State.AlertTypeId!.Value;
         AlertTypeName = JourneyInstance!.State.AlertTypeName;
         Details = JourneyInstance!.State.Details;
         Link = JourneyInstance!.State.Link;
-        StartDate = JourneyInstance!.State.StartDate;
-        Reason = JourneyInstance!.State.Reason;
+        StartDate = JourneyInstance!.State.StartDate!.Value;
+        AddReason = JourneyInstance!.State.AddReason!.Value;
+        AddReasonDetail = JourneyInstance!.State.AddReasonDetail;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter) :

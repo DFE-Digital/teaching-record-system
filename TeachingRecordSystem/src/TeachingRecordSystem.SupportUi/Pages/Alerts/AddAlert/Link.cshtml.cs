@@ -19,17 +19,23 @@ public class LinkModel(TrsLinkGenerator linkGenerator) : PageModel
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter link")]
+    [Display(Name = "Do you want to add a link to a panel outcome?")]
+    [Required(ErrorMessage = "Select yes if you want to add a link to a panel outcome")]
+    public bool? AddLink { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Enter link to panel outcome")]
     public string? Link { get; set; }
 
     public void OnGet()
     {
+        AddLink = JourneyInstance!.State.AddLink;
         Link = JourneyInstance!.State.Link;
     }
 
     public async Task<IActionResult> OnPost()
     {
-        if (!string.IsNullOrEmpty(Link) &&
+        if (AddLink == true &&
             (!Uri.TryCreate(Link, UriKind.Absolute, out var uri) ||
                 (uri.Scheme != "http" && uri.Scheme != "https")))
         {
@@ -43,7 +49,8 @@ public class LinkModel(TrsLinkGenerator linkGenerator) : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            state.Link = Link;
+            state.AddLink = AddLink;
+            state.Link = AddLink == true ? Link : null;
         });
 
         return Redirect(FromCheckAnswers
